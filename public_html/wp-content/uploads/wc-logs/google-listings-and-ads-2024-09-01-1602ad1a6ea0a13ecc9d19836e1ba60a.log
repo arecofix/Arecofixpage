@@ -1,0 +1,56 @@
+2024-09-01T00:24:14+00:00 ERROR Automattic\WooCommerce\GoogleListingsAndAds\API\Google\Ads::get_account_details {
+    "message": "The caller does not have permission",
+    "code": 7,
+    "status": "PERMISSION_DENIED",
+    "details": [
+        {
+            "@type": "type.googleapis.com\/google.ads.googleads.v16.errors.GoogleAdsFailure",
+            "errors": [
+                {
+                    "errorCode": {
+                        "authorizationError": "CUSTOMER_NOT_ENABLED"
+                    },
+                    "message": "The customer account can't be accessed because it is not yet enabled or has been deactivated."
+                }
+            ],
+            "requestId": "uhGL8J2TDql8WHI2YBY03A"
+        }
+    ]
+}
+2024-09-01T00:24:54+00:00 ERROR Automattic\WooCommerce\GoogleListingsAndAds\API\Google\Merchant::claimwebsite {
+  "error": {
+    "code": 403,
+    "message": "There exist other accounts with homepage that conflicts with the homepage of account 5339202435. Set the parameter 'overwrite' to true if you want to take the claim and remove it from these accounts: ezequielEnrico15@gmail.com",
+    "errors": [
+      {
+        "message": "There exist other accounts with homepage that conflicts with the homepage of account 5339202435. Set the parameter 'overwrite' to true if you want to take the claim and remove it from these accounts: ezequielEnrico15@gmail.com",
+        "domain": "global",
+        "reason": "forbidden"
+      }
+    ]
+  }
+}
+2024-09-01T00:25:17+00:00 ERROR Automattic\WooCommerce\GoogleListingsAndAds\API\Google\Merchant::claimwebsite {
+  "error": {
+    "code": 403,
+    "message": "There exist other accounts with homepage that conflicts with the homepage of account 5430780858. Set the parameter 'overwrite' to true if you want to take the claim and remove it from these accounts: ezequielEnrico15@gmail.com",
+    "errors": [
+      {
+        "message": "There exist other accounts with homepage that conflicts with the homepage of account 5430780858. Set the parameter 'overwrite' to true if you want to take the claim and remove it from these accounts: ezequielEnrico15@gmail.com",
+        "domain": "global",
+        "reason": "forbidden"
+      }
+    ]
+  }
+}
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 239): ["Gadgets"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 243): ["Smartphones"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 253): ["Gaming"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 255): ["Gaming"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 257): ["Gadgets","Gaming"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 259): ["Gadgets","Gaming"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 669): ["Gadgets"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 671): ["Gaming"].
+2024-09-01T00:55:56+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\WCProductAdapter::map_product_categories Product category (ID: 673): ["Gadgets"].
+2024-09-01T00:55:59+00:00 DEBUG Automattic\WooCommerce\GoogleListingsAndAds\Product\ProductSyncer::update_by_batch_requests Submitted 9 products:
+[{"woocommerce_id":239,"google_id":"online:es:AR:gla_239"},{"woocommerce_id":243,"google_id":"online:es:AR:gla_243"},{"woocommerce_id":253,"google_id":"online:es:AR:gla_253"},{"woocommerce_id":255,"google_id":"online:es:AR:gla_255"},{"woocommerce_id":257,"google_id":"online:es:AR:gla_257"},{"woocommerce_id":259,"google_id":"online:es:AR:gla_259"},{"woocommerce_id":669,"google_id":"online:es:AR:gla_669"},{"woocommerce_id":671,"google_id":"online:es:AR:gla_671"},{"woocommerce_id":673,"google_id":"online:es:AR:gla_673"}]

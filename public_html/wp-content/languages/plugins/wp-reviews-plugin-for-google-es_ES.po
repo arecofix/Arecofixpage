@@ -1,0 +1,1176 @@
+# Translation of Plugins - Widgets for Google Reviews - Stable (latest release) in Spanish (Spain)
+# This file is distributed under the same license as the Plugins - Widgets for Google Reviews - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2024-08-21 08:50:22+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: es\n"
+"Project-Id-Version: Plugins - Widgets for Google Reviews - Stable (latest release)\n"
+
+#: tabs/instagram-feed-widget.php:25
+msgid "Shortcode integration"
+msgstr "Integración mediante shortcode"
+
+#: tabs/instagram-feed-widget.php:24
+msgid "Easy setup process"
+msgstr "Fácil proceso de configuración"
+
+#: tabs/instagram-feed-widget.php:23
+msgid "<strong>Load more %s photos</strong> with the \"Load More\" button"
+msgstr "<strong>Cargar más fotos %s</strong> con el botón «Cargar más»"
+
+#: tabs/instagram-feed-widget.php:22
+msgid "Showcase a header at the top of your feed widget"
+msgstr "Muestra una cabecera en la parte superior del widget de tu feed"
+
+#: tabs/instagram-feed-widget.php:21
+msgid "Includes a Follow on %s button"
+msgstr "Incluye un botón Seguir en %s"
+
+#: tabs/instagram-feed-widget.php:20
+msgid "Fully responsive and <strong>mobile-friendly</strong>: a great layout on any screen size and container width"
+msgstr "Totalmente adaptable y <strong>preparado para móviles</strong>: un gran diseño en cualquier tamaño de pantalla y ancho de contenedor"
+
+#: tabs/instagram-feed-widget.php:19
+msgid "<strong>Likes and Comments Count</strong>: Display the number of likes and comments for each post"
+msgstr "<strong>Cantidad de me gusta y comentarios</strong>: Muestra el número de me gusta y comentarios de cada publicación"
+
+#: tabs/instagram-feed-widget.php:18
+msgid "Customizable"
+msgstr "Personalizable"
+
+#: tabs/instagram-feed-widget.php:17
+msgid "Automatic, daily updates"
+msgstr "Actualizaciones diarias automáticas"
+
+#: tabs/instagram-feed-widget.php:16
+msgid "Multiple card layouts"
+msgstr "Múltiples diseños de tarjeta"
+
+#: tabs/instagram-feed-widget.php:15
+msgid "Multiple layout options: %s"
+msgstr "Múltiples opciones de diseño: %s"
+
+#: tabs/instagram-feed-widget.php:13
+msgid "Free features"
+msgstr "Características gratuitas"
+
+#: tabs/instagram-feed-widget.php:12 tabs/instagram-feed-widget.php:27
+msgid "Create %s Widgets for Free"
+msgstr "Crea widgets %s gratis"
+
+#: tabs/instagram-feed-widget.php:10
+msgid "Display your %s with our free Widgets!"
+msgstr "¡Muestra tus %s con nuestros widgets gratuitos!"
+
+#: tabs/free-widget-configurator.php:804
+msgid "Show photos in reviews"
+msgstr "Muestra fotos en las reseñas"
+
+#: tabs/free-widget-configurator.php:792
+msgid "Show reviewer's profile picture"
+msgstr "Mostrar la foto de perfil del evaluador"
+
+#: include/get-more-customers-box.php:19
+msgid "Boost engagement by displaying customer photos in an interactive popup slider, bringing real experiences to life."
+msgstr "Mejora el compromiso mostrando fotos de clientes en un carrusel emergente interactivo, dando vida a experiencias reales."
+
+#: include/get-more-customers-box.php:18 tabs/get-more-features.php:15
+msgid "Display reviews with photos"
+msgstr "Muestra reseñas con fotos"
+
+#: include/rate-us-feedback-box.php:6
+msgid "Support our work by leaving a review!"
+msgstr "¡Apoya nuestro trabajo dejando una reseña!"
+
+#: include/rate-us-feedback-box.php:5 tabs/rate-us.php:7
+msgid "Do you like our free plugin?"
+msgstr "¿Te gusta nuestro plugin gratuito?"
+
+#: tabs/free-widget-configurator.php:737
+msgid "Current year"
+msgstr "Año actual"
+
+#: tabs/free-widget-configurator.php:736
+msgid "Last year"
+msgstr "Año pasado"
+
+#: tabs/free-widget-configurator.php:717
+msgid "Select type"
+msgstr "Selecciona el tipo"
+
+#: tabs/free-widget-configurator.php:590 trustindex-plugin.class.php:6204
+msgid "Please select another widget"
+msgstr "Selecciona otro widget"
+
+#: tabs/free-widget-configurator.php:525 tabs/free-widget-configurator.php:589
+#: trustindex-plugin.class.php:6202
+msgid "Our exclusive \"Top Rated\" badge is awarded to service providers with a rating of %s and above."
+msgstr "Nuestro exclusivo distintivo «Mejor valorado» se concede a los proveedores de servicios con una puntuación de %s y superior."
+
+#: trustindex-plugin.class.php:103
+msgid "Sign Up Free – Try PRO Features"
+msgstr "Regístrate gratis - Prueba las características PRO"
+
+#: trustindex-plugin.class.php:98
+msgid "Create a Free Account"
+msgstr "Crear una cuenta gratuita"
+
+#: trustindex-plugin.class.php:93
+msgid "Sign Up Free"
+msgstr "Regístrate gratis"
+
+#: tabs/my-reviews.php:233
+msgid "Show review"
+msgstr "Mostrar reseña"
+
+#: tabs/my-reviews.php:231
+msgid "Hide review"
+msgstr "Ocultar reseña"
+
+#: wp-reviews-plugin-for-google.php:96
+msgid "Write a review"
+msgstr "Escribe una reseña"
+
+#. translators: %s: Trustindex CEO
+#: trustindex-plugin.class.php:563
+msgid "Thank you. Gabor, %s"
+msgstr "Gracias. Gabor, %s"
+
+#: trustindex-plugin.class.php:561
+msgid "If you love our features, please write a review to help us make the plugin even better."
+msgstr "Si te gustan nuestras funciones, escribe una opinión para ayudarnos a mejorar aún más el plugin."
+
+#. translators: %s: Name of the plugin
+#: trustindex-plugin.class.php:560
+msgid "We have worked a lot on the free \"%s\" plugin."
+msgstr "Hemos trabajado mucho en el plugin gratuito «%s»."
+
+#: wp-reviews-plugin-for-google.php:114
+msgid "Remind me later"
+msgstr "Recuérdamelo más tarde"
+
+#: wp-reviews-plugin-for-google.php:99
+msgid "Maybe later"
+msgstr "Quizá más tarde"
+
+#: wp-reviews-plugin-for-google.php:75 wp-reviews-plugin-for-google.php:102
+msgid "Do not remind me again"
+msgstr "No me lo recuerdes de nuevo"
+
+#: trustindex-plugin.class.php:6319
+msgid "Could not download the template for the widget.<br />Please reload the page.<br />If the problem persists, please write an email to support@trustindex.io."
+msgstr "No se ha podido descargar la plantilla para el widget.<br />Por favor, vuelve a cargar la página.<br />Si el problema persiste, escribe un correo electrónico a support@trustindex.io."
+
+#: trustindex-plugin.class.php:950
+msgid "enable 'CSS internal loading' in the %s page!"
+msgstr "¡activa la «carga interna de CSS» en la página %s!"
+
+#: trustindex-plugin.class.php:949
+msgid "or"
+msgstr "o"
+
+#: trustindex-plugin.class.php:946
+msgid "Grant write permissions to upload folder"
+msgstr "Conceder permisos de escritura a la carpeta de subida"
+
+#: trustindex-plugin.class.php:943
+msgid "CSS file exists and it is not writeable. Delete the file"
+msgstr "El archivo CSS existe y no se puede escribir en él. Borra el archivo"
+
+#: trustindex-plugin.class.php:933
+msgid "Your widgets do not display properly!"
+msgstr "¡Tus widgets no se muestran correctamente!"
+
+#: trustindex-plugin.class.php:933 trustindex-plugin.class.php:6390
+msgid "CSS file could not saved."
+msgstr "No se ha podido guardar el archivo CSS."
+
+#: trustindex-plugin.class.php:932
+msgid "ERROR with the following plugin:"
+msgstr "ERROR con el siguiente plugin:"
+
+#: trustindex-plugin.class.php:837
+msgid "This message is not be visible to visitors in public mode."
+msgstr "Este mensaje no es visible para los visitantes en modo público."
+
+#: trustindex-plugin.class.php:829
+msgid "Your shortcode is deficient: Trustindex Widget ID is empty! Example: "
+msgstr "Tu shortcode está mal: ¡El ID de widget de Trustindex está vacío! Ejemplo: "
+
+#: trustindex-plugin.class.php:821
+msgid "You have to connect your business (%s)!"
+msgstr "¡Tienes que conectar tu empresa (%s)!"
+
+#. translators: %s: Service name (ChatGPT)
+#: trustindex-plugin.class.php:607
+msgid "Reply with %s! »"
+msgstr "¡Responde con %s! »"
+
+#: trustindex-plugin.class.php:594
+msgid "Download your latest reviews! »"
+msgstr "¡Descarga tus últimas valoraciones! »"
+
+#. translators: %s: Platform name
+#: trustindex-plugin.class.php:582
+msgid "Embed the %s reviews widget! »"
+msgstr "¡Incrusta el widget %s de valoraciones! »"
+
+#. translators: %s: Platform name
+#: trustindex-plugin.class.php:569
+msgid "Create a free %s widget! »"
+msgstr "¡Crea un widget %s gratis! »"
+
+#. translators: %s: Platform name
+#: trustindex-plugin.class.php:614
+msgid "Your new %s reviews have been downloaded."
+msgstr "Se han descargado tus %s valoraciones nuevas."
+
+#. translators: %s: Platform name
+#: trustindex-plugin.class.php:601
+msgid "You can update your %s reviews."
+msgstr "Puedes actualizar tus %s valoraciones."
+
+#. translators: %s: Platform name
+#: trustindex-plugin.class.php:589
+msgid "Build trust and display your %s reviews on your website."
+msgstr "Genera confianza y muestra tus %s valoraciones en tu web."
+
+#. translators: %s: Platform name
+#: trustindex-plugin.class.php:576
+msgid "Display %s reviews on your website."
+msgstr "Mostrar %s valoraciones en tu web."
+
+#: trustindex-plugin.class.php:382
+msgid "Rate our plugin"
+msgstr "Valora nuestro plugin"
+
+#: trustindex-plugin.class.php:373
+msgid "Settings"
+msgstr "Ajustes"
+
+#: trustindex-plugin.class.php:369
+msgid "Create Widget"
+msgstr "Crear widget"
+
+#: trustindex-plugin.class.php:361
+msgid "Review Management"
+msgstr "Valorar la gestión"
+
+#: trustindex-plugin.class.php:315 trustindex-plugin.class.php:318
+msgid "Reviews"
+msgstr "Valoraciones"
+
+#: trustindex-plugin.class.php:29
+msgid "My reviews"
+msgstr "Mis valoraciones"
+
+#: trustindex-google-widget.class.php:117 trustindex-plugin.class.php:6853
+msgid "Go to <a href='%s'>plugin setup page</a> to complete the one-step setup guide and enjoy the full functionalization!"
+msgstr "Ve a la <a href='%s'>página de configuración del plugin</a> para completar la guía de configuración en un solo paso y ¡disfruta de la funcionalidad completa!"
+
+#: trustindex-google-widget.class.php:116
+msgid "You can only list 10 reviews without it."
+msgstr "Solo puedes incluir 10 valoraciones sin él."
+
+#: trustindex-google-widget.class.php:115 trustindex-plugin.class.php:6852
+msgid "You have not set up your Trustindex account yet!"
+msgstr "¡Aún no has configurado tu cuenta Trustindex!"
+
+#: trustindex-google-widget.class.php:79 trustindex-plugin.class.php:6847
+msgid "Let's go, create amazing widgets for free!"
+msgstr "Vamos, ¡crea widgets increíbles gratis!"
+
+#: trustindex-google-widget.class.php:78 trustindex-plugin.class.php:6846
+msgid "You have no widget saved!"
+msgstr "¡No tienes ningún widget guardado!"
+
+#: trustindex-google-widget.class.php:64 trustindex-plugin.class.php:6832
+msgid "Your saved widgets"
+msgstr "Tus widgets guardados"
+
+#: trustindex-google-widget.class.php:47
+msgid "Please fill out <strong>all the required fields</strong> in the <a href='%s'>widget settings</a> page"
+msgstr "Rellena <strong>todos los campos obligatorios</strong> en la página <a href='%s'>ajustes del widget</a>"
+
+#: tabs/advanced.php:347
+msgid "Create more!"
+msgstr "¡Crea más!"
+
+#: tabs/advanced.php:345
+msgid "You have no widgets saved!"
+msgstr "¡No tienes widgets guardados!"
+
+#: tabs/advanced.php:322
+msgid "You have got %d widgets saved in Trustindex admin."
+msgstr "Tienes %d widgets guardados en el administrador de Trustindex."
+
+#: tabs/advanced.php:319
+msgid "Insert your widget into your wordpress site using shortcode"
+msgstr "Inserta tu widget en tu sitio WordPress utilizando el shortcode"
+
+#: tabs/advanced.php:318
+msgid "Go to Trustindex's admin!"
+msgstr "¡Ve al administrador de Trustindex!"
+
+#: tabs/advanced.php:317
+msgid "Manage your Trustindex account"
+msgstr "Gestiona tu cuenta de Trustindex"
+
+#: tabs/advanced.php:312
+msgid "Create a new Trustindex account"
+msgstr "Crea una cuenta nueva de Trustindex"
+
+#: tabs/advanced.php:311
+msgid "Have you forgotten your password?"
+msgstr "¿Has olvidado tu contraseña?"
+
+#: tabs/advanced.php:309
+msgid "CONNECT ACCOUNT"
+msgstr "CONECTAR CUENTA"
+
+#: tabs/advanced.php:304 tabs/advanced.php:305
+msgid "Password"
+msgstr "Contraseña"
+
+#: tabs/advanced.php:295
+msgid "You can connect your %s with your Trustindex account, and can display your widgets easier."
+msgstr "Puedes conectar tus %s con tu cuenta de Trustindex y mostrar tus widgets más fácilmente."
+
+#: tabs/advanced.php:284 tabs/advanced.php:286 trustindex-plugin.class.php:23
+msgid "Free Widget Configurator"
+msgstr "Configurador gratuito de widgets"
+
+#: tabs/advanced.php:284 tabs/advanced.php:286
+msgid "Once the trial period has expired, the widgets will not appear. You can subscribe or switch back to the \"%s\" tab"
+msgstr "Una vez ha caducado el periodo de prueba, los widgets no aparecerán. Puedes suscribirte o volver a la pestaña «%s»"
+
+#: tabs/advanced.php:280
+msgid "Your package:"
+msgstr "Tu paquete:"
+
+#: tabs/advanced.php:278
+msgid "Your subscription ID:"
+msgstr "Tu ID de suscripción:"
+
+#: tabs/advanced.php:277
+msgid "Trustindex account"
+msgstr "Cuenta de Trustindex"
+
+#: tabs/advanced.php:277
+msgid "Your %s is connected."
+msgstr "Tu %s está conectada."
+
+#: tabs/advanced.php:266
+msgid "Trustindex account successfully disconnected!"
+msgstr "¡Cuenta de Trustindex desconectada correctamente!"
+
+#: tabs/advanced.php:264
+msgid "Trustindex account successfully connected!"
+msgstr "¡Cuenta de Trustindex conectada correctamente!"
+
+#: tabs/advanced.php:262
+msgid "Connect your Trustindex account"
+msgstr "Conecta tu cuenta de Trustindex"
+
+#: tabs/advanced.php:78
+msgid "You must provide a password and a valid e-mail!"
+msgstr "¡Debes proporcionar una contraseña y un correo electrónico válido!"
+
+#: tabs/advanced.php:74
+msgid "Wrong e-mail or password!"
+msgstr "¡Correo electrónico o contraseña incorrectos!"
+
+#: tabs/rate-us.php:12
+msgid "Click here to rate us!"
+msgstr "¡Haz clic aquí para valorarnos!"
+
+#: tabs/rate-us.php:10
+msgid "Thank you in advance!"
+msgstr "¡Gracias de antemano!"
+
+#: tabs/rate-us.php:9
+msgid "We've spent a lot of time developing this software. If you use the free version, you can still support us by leaving a review!"
+msgstr "Hemos dedicado mucho tiempo a desarrollar este software. Si utilizas la versión gratuita, ¡aún puedes apoyarnos dejando una valoración!"
+
+#: tabs/rate-us.php:5 trustindex-plugin.class.php:40
+msgid "Rate Us"
+msgstr "Valóranos"
+
+#: tabs/my-reviews.php:329
+msgid "Remove highlight"
+msgstr "Eliminar resalte"
+
+#: tabs/my-reviews.php:320
+msgid "just select the text you want to highlight"
+msgstr "solo tienes que seleccionar el texto que quieres resaltar"
+
+#: tabs/my-reviews.php:280
+msgid "Try again"
+msgstr "Inténtalo de nuevo"
+
+#: tabs/my-reviews.php:279
+msgid "We could not connect your account with the review."
+msgstr "No hemos podido conectar tu cuenta con la valoración."
+
+#: tabs/my-reviews.php:276
+msgid "Copy the reply"
+msgstr "Copia la respuesta"
+
+#: tabs/my-reviews.php:267
+msgid "change your previous reply"
+msgstr "cambia tu respuesta anterior"
+
+#: tabs/my-reviews.php:260 tabs/my-reviews.php:266
+msgid "Edit reply"
+msgstr "Editar la respuesta"
+
+#: tabs/my-reviews.php:257
+msgid "Reply successfully uploaded."
+msgstr "¡Respuesta subida correctamente!"
+
+#: tabs/my-reviews.php:255
+msgid "Reply by %s"
+msgstr "Respuesta de %s"
+
+#: tabs/my-reviews.php:249 tabs/my-reviews.php:270
+msgid "Upload reply to %s"
+msgstr "Subir respuesta a %s"
+
+#: tabs/my-reviews.php:247
+msgid "The reply was generated in your widget language because the review's text is empty."
+msgstr "La respuesta se ha generado en el idioma de tu widget porque el texto de la valoración está vacío."
+
+#: tabs/my-reviews.php:243
+msgid "you can modify before upload"
+msgstr "puedes modificarla antes de subirla"
+
+#: tabs/my-reviews.php:242
+msgid "ChatGPT generated reply"
+msgstr "Respuesta generada por ChatGPT"
+
+#: tabs/my-reviews.php:226 tabs/my-reviews.php:319
+msgid "Highlight text"
+msgstr "Resaltar texto"
+
+#: tabs/my-reviews.php:222
+msgid "Reply with ChatGPT"
+msgstr "Responder con ChatGPT"
+
+#: tabs/my-reviews.php:220 tabs/my-reviews.php:222
+msgid "Reply"
+msgstr "Responder"
+
+#: tabs/my-reviews.php:193
+msgid "Text"
+msgstr "Texto"
+
+#: tabs/my-reviews.php:192
+msgid "Date"
+msgstr "Fecha"
+
+#: tabs/my-reviews.php:191
+msgid "Rating"
+msgstr "Puntuación"
+
+#: tabs/my-reviews.php:190
+msgid "Reviewer"
+msgstr "Revisor"
+
+#: tabs/my-reviews.php:182
+msgid "You had no reviews at the time of last review downloading."
+msgstr "No tenías reseñas en el momento de la última descarga de reseñas."
+
+#: tabs/my-reviews.php:175
+msgid "Automatic review update, creating unlimited review widgets, downloading and displaying all reviews, %d review platforms available!"
+msgstr "¡Actualización automática de reseñas, creación ilimitada de widgets de reseñas, descarga y visualización de todas las reseñas, %d plataformas de reseñas disponibles!"
+
+#: tabs/my-reviews.php:174
+msgid "UPGRADE to PRO Features"
+msgstr "ACTUALIZAR a funciones PRO"
+
+#: tabs/my-reviews.php:155
+msgid "The manual review download will be available again in %d day(s)."
+msgstr "La descarga de la revisión manual volverá a estar disponible en %d día/s."
+
+#: tabs/my-reviews.php:149
+msgid "Now, you can download your new reviews."
+msgstr "Ahora puedes descargar tus nuevas revisiones."
+
+#: tabs/my-reviews.php:148 tabs/my-reviews.php:154
+msgid "Download new reviews"
+msgstr "Descargar nuevas reseñas"
+
+#: tabs/my-reviews.php:140
+msgid "My Reviews"
+msgstr "Mis reseñas"
+
+#: tabs/my-reviews.php:133
+msgid "Show more"
+msgstr "Mostrar más"
+
+#: tabs/my-reviews.php:132
+msgid "Show less"
+msgstr "Mostrar menos"
+
+#: tabs/get-reviews.php:28 wp-reviews-plugin-for-google.php:72
+msgid "Download plugin"
+msgstr "Descargar plugin"
+
+#: tabs/get-reviews.php:24
+msgid "Collect reviews automatically"
+msgstr "Recopila opiniones automáticamente"
+
+#: tabs/get-reviews.php:20 wp-reviews-plugin-for-google.php:68
+msgid "Collect reviews on 100+ review platforms (Google, Facebook, Yelp, etc.)"
+msgstr "Recopila opiniones en más de 100 plataformas de reseñas (Google, Facebook, Yelp, etc.)"
+
+#: tabs/get-reviews.php:19 wp-reviews-plugin-for-google.php:67
+msgid "E-mail templates are fully customizable"
+msgstr "Las plantillas de correo electrónico son totalmente personalizables"
+
+#: tabs/get-reviews.php:18 wp-reviews-plugin-for-google.php:66
+msgid "Send unlimited review invitations for free"
+msgstr "Envía invitaciones de reseña ilimitadas y gratuitas"
+
+#: tabs/get-reviews.php:15 wp-reviews-plugin-for-google.php:64
+msgid "Download our new <a href='%s' target='_blank'>%s</a> plugin and get features for free!"
+msgstr "Descarga nuestro nuevo plugin <a href='%s' target='_blank'>%s</a> ¡y obtén funciones gratis!"
+
+#: tabs/get-reviews.php:13
+msgid "Collect reviews automatically for your WooCommerce shop"
+msgstr "Recopila reseñas automáticamente para tu tienda WooCommerce"
+
+#: tabs/get-reviews.php:9
+msgid "DOWNLOAD OUR FREE GUIDE"
+msgstr "DESCARGA NUESTRA GUÍA GRATUITA"
+
+#: tabs/get-reviews.php:8
+msgid "Get 100+ REAL Google reviews, with only 3 minutes of work, without developer knowledge..."
+msgstr "Consigue más de 100 reseñas REALES de Google, con sólo 3 minutos de trabajo, sin conocimientos de desarrollo..."
+
+#: tabs/get-reviews.php:6
+msgid "Want more %s reviews?"
+msgstr "¿Quieres más reseñas de %s?"
+
+#: tabs/get-reviews.php:4 trustindex-plugin.class.php:35
+msgid "Get Reviews"
+msgstr "Consigue reseñas"
+
+#: tabs/get-more-features.php:17
+msgid "Mix reviews from different platforms"
+msgstr "Mezclar reseñas de diferentes plataformas"
+
+#: tabs/get-more-features.php:11
+msgid "Top Features"
+msgstr "Características principales"
+
+#: tabs/get-more-features.php:8
+msgid "%s+ WordPress websites use Trustindex to embed reviews fast and easily."
+msgstr "Más de %s sitios WordPress utilizan Trustindex para incrustar reseñas de forma rápida y sencilla."
+
+#: tabs/get-more-features.php:6
+msgid "Skyrocket Your Sales with Customer Reviews"
+msgstr "Aumenta tus ventas con las reseñas de los clientes"
+
+#: tabs/get-more-features.php:4 trustindex-plugin.class.php:46
+#: trustindex-plugin.class.php:381
+msgid "Get more Features"
+msgstr "Consigue más características"
+
+#: include/shortcode-paste-box.php:19
+msgid "Copy and paste this shortcode into post, page or widget."
+msgstr "Copia y pega este shortcode en una entrada, página o widget."
+
+#: tabs/free-widget-configurator.php:854
+msgid "Insert this shortcode into your website"
+msgstr "Inserta este shortcode en tu web"
+
+#: tabs/free-widget-configurator.php:836
+msgid "Save and get code"
+msgstr "Guardar y obtener el código"
+
+#: tabs/free-widget-configurator.php:827
+msgid "Show platform stars"
+msgstr "Mostrar estrellas de la plataforma"
+
+#: tabs/free-widget-configurator.php:822
+msgid "Show platform logos"
+msgstr "Mostrar logotipos de plataformas"
+
+#: tabs/free-widget-configurator.php:817
+msgid "Use site's font"
+msgstr "Utiliza el tipo de letra del sitio"
+
+#: tabs/free-widget-configurator.php:812
+msgid "Enable mouseover animation"
+msgstr "Activar la animación al pasar el ratón"
+
+#: tabs/free-widget-configurator.php:798 tabs/free-widget-configurator.php:805
+msgid "Paid package feature"
+msgstr "Característica del paquete de pago"
+
+#: tabs/free-widget-configurator.php:797
+msgid "Show reviewer's profile picture locally, from a single image (less requests)"
+msgstr "Mostrar las fotos de los revisores localmente, a partir de una sola imagen (menos solicitudes)"
+
+#: tabs/free-widget-configurator.php:786
+msgid "Show navigation arrows"
+msgstr "Mostrar flechas de navegación"
+
+#: tabs/free-widget-configurator.php:780
+msgid "Show verified review icon"
+msgstr "Mostrar icono de reseña verificada"
+
+#: tabs/free-widget-configurator.php:774
+msgid "Show \"Load more\" button"
+msgstr "Mostrar botón de «Cargar más»"
+
+#: tabs/free-widget-configurator.php:768
+msgid "Show write review button"
+msgstr "Mostrar el botón de escribir reseña"
+
+#: tabs/free-widget-configurator.php:762
+msgid "Show minimum review filter condition"
+msgstr "Mostrar la condición mínima del filtro de reseña"
+
+#: tabs/free-widget-configurator.php:756
+msgid "Hide rating text"
+msgstr "Ocultar texto de valoración"
+
+#: tabs/free-widget-configurator.php:750
+msgid "Hide reviews without comments"
+msgstr "Ocultar reseñas sin comentarios"
+
+#: tabs/free-widget-configurator.php:698
+msgid "Review text"
+msgstr "Texto de la reseña"
+
+#: tabs/free-widget-configurator.php:686
+msgid "Align"
+msgstr "Alineación"
+
+#: tabs/free-widget-configurator.php:673 tabs/free-widget-configurator.php:735
+msgid "Hide"
+msgstr "Ocultar"
+
+#: tabs/free-widget-configurator.php:656 tabs/free-widget-configurator.php:729
+msgid "Select date format"
+msgstr "Selecciona el formato de fecha"
+
+#: tabs/free-widget-configurator.php:643
+msgid "Select language"
+msgstr "Selecciona el idioma"
+
+#: tabs/free-widget-configurator.php:637
+msgid "only"
+msgstr "solo"
+
+#: tabs/free-widget-configurator.php:635
+msgid "Show all"
+msgstr "Mostrar todo"
+
+#: tabs/free-widget-configurator.php:630
+msgid "Filter your ratings"
+msgstr "Filtra tus valoraciones"
+
+#: tabs/free-widget-configurator.php:626
+msgid "Widget Settings"
+msgstr "Ajustes del widget"
+
+#: tabs/free-widget-configurator.php:614
+msgid "You do not have reviews with the current filters. <br />Change your filters if you would like to display reviews on your page!"
+msgstr "No tienes opiniones con los filtros actuales. <br />¡Cambia tus filtros si quieres mostrar opiniones en tu página!"
+
+#: tabs/free-widget-configurator.php:599
+msgid "Widget Preview"
+msgstr "Vista previa del Widget"
+
+#: tabs/free-widget-configurator.php:559 tabs/free-widget-configurator.php:602
+msgid "Style"
+msgstr "Estilo"
+
+#: tabs/free-widget-configurator.php:517 tabs/free-widget-configurator.php:561
+msgid "Select"
+msgstr "Seleccionar"
+
+#: tabs/free-widget-configurator.php:478
+msgid "All"
+msgstr "Todos"
+
+#: tabs/free-widget-configurator.php:475 tabs/free-widget-configurator.php:514
+#: tabs/free-widget-configurator.php:607
+msgid "Layout"
+msgstr "Disposición"
+
+#: tabs/free-widget-configurator.php:470 tabs/free-widget-configurator.php:542
+#: tabs/free-widget-configurator.php:582 tabs/free-widget-configurator.php:849
+#: trustindex-plugin.class.php:6268
+msgid "There are no reviews on your %s platform."
+msgstr "No hay reseñas en tu plataforma %s."
+
+#: tabs/free-widget-configurator.php:463
+msgid "Check some %s widget layouts and styles"
+msgstr "Mira algunos diseños y estilos de widgets de %s"
+
+#: tabs/free-widget-configurator.php:457
+msgid "Connect"
+msgstr "Conectar"
+
+#: tabs/free-widget-configurator.php:454 tabs/my-reviews.php:145
+msgid "A popup window should be appear! Please, go to there and continue the steps! (If there is no popup window, you can check the the browser's popup blocker)"
+msgstr "Debería aparecer una ventana emergente. Por favor, ve allí y continúa los pasos. (Si no aparece ninguna ventana emergente, puedes comprobar el bloqueador de ventanas emergentes del navegador)"
+
+#: tabs/advanced.php:291 tabs/free-widget-configurator.php:430
+msgid "Disconnect"
+msgstr "Desconectar"
+
+#: tabs/free-widget-configurator.php:408
+msgid "Try premium features (like AMP) for free"
+msgstr "Prueba funciones premium (como AMP) gratis"
+
+#: tabs/free-widget-configurator.php:404 trustindex-plugin.class.php:6273
+msgid "Free plugin features are unavailable with AMP plugin."
+msgstr "Las funciones gratuitas del plugin no están disponibles con el plugin AMP."
+
+#: tabs/free-widget-configurator.php:395
+msgid "You have connected your Trustindex account, so you can find premium functionality under the %s tab. You no longer need this tab unless you choose the limited but forever free mode."
+msgstr "Has conectado tu cuenta de Trustindex, por lo que puedes encontrar funciones premium en la pestaña %s. Ya no necesitas esta pestaña a menos que elijas el modo gratuito pero limitado para siempre."
+
+#: tabs/free-widget-configurator.php:360 tabs/free-widget-configurator.php:845
+msgid "Insert code"
+msgstr "Insertar código"
+
+#: tabs/free-widget-configurator.php:359 tabs/free-widget-configurator.php:578
+msgid "Set up widget"
+msgstr "Configurar widget"
+
+#: tabs/free-widget-configurator.php:358 tabs/free-widget-configurator.php:538
+msgid "Select Style"
+msgstr "Selecciona estilo"
+
+#: tabs/free-widget-configurator.php:357 tabs/free-widget-configurator.php:466
+msgid "Select Layout"
+msgstr "Selecciona disposición"
+
+#: tabs/free-widget-configurator.php:356 tabs/free-widget-configurator.php:415
+#: trustindex-plugin.class.php:366
+msgid "Connect %s"
+msgstr "Conectar %s"
+
+#: include/feature-request.php:64
+msgid "Feature request sent"
+msgstr "Solicitud de función enviada"
+
+#: include/feature-request.php:61
+msgid "Send feature request"
+msgstr "Enviar solicitud de función"
+
+#: include/feature-request.php:58
+msgid "Thanks for taking the time - we will get back to you as soon as possible to ask a few clarifying question or to give you an update."
+msgstr "Gracias por dedicarnos tu tiempo. Nos pondremos en contacto contigo lo antes posible para hacerte algunas preguntas aclaratorias o ponerte al día."
+
+#: include/feature-request.php:55
+msgid "Your email address"
+msgstr "Tu correo electrónico"
+
+#: include/feature-request.php:51
+msgid "Your name"
+msgstr "Tu nombre"
+
+#: include/feature-request.php:48
+msgid "If you have one - otherwise leave it blank."
+msgstr "Si tienes una, de lo contrario déjalo en blanco."
+
+#: include/feature-request.php:47
+msgid "Please describe your current workaround"
+msgstr "Describe tu solución actual"
+
+#: include/feature-request.php:44
+msgid "URL of images (each on a separate line)"
+msgstr "URL de las imágenes (cada una en una línea distinta)"
+
+#: include/feature-request.php:42
+msgid "use %s for image share"
+msgstr "utiliza %s para compartir imágenes"
+
+#: include/feature-request.php:41
+msgid "Attach images"
+msgstr "Adjuntar imágenes"
+
+#: include/feature-request.php:37 include/feature-request.php:52
+msgid "The more detail you can share, the better."
+msgstr "Cuantos más detalles puedas compartir, mejor."
+
+#: include/feature-request.php:36
+msgid "Please describe the feature you need"
+msgstr "Describe la función que necesitas"
+
+#: include/feature-request.php:30
+msgid "Drop a message here to let us know!"
+msgstr "¡Envíanos un mensaje aquí para contárnoslo!"
+
+#: include/feature-request.php:29
+msgid "Anything you are missing in our product?"
+msgstr "¿Hay algo que eches en falta en nuestro producto?"
+
+#: include/feature-request.php:27
+msgid "Missing a feature?"
+msgstr "¿Echas en falta una característica?"
+
+#: tabs/advanced.php:256
+msgid "If you notice an incorrect translation in the plugin text, please report it here:"
+msgstr "Si observas una traducción incorrecta en el texto del plugin, infórmalo aquí:"
+
+#: tabs/advanced.php:254
+msgid "Translation"
+msgstr "Traducción"
+
+#: tabs/advanced.php:249
+msgid "Re-create the database tables of the plugin.<br />Please note: this removes all settings and reviews."
+msgstr "Vuelve a crear las tablas de la base de datos del plugin.<br />Ten en cuenta que esto elimina todos los ajustes y revisiones."
+
+#: tabs/advanced.php:248 tabs/advanced.php:250
+msgid "Re-create plugin"
+msgstr "Volver a crear el plugin"
+
+#: include/shortcode-paste-box.php:15 tabs/advanced.php:242
+#: tabs/my-reviews.php:287
+msgid "Copied"
+msgstr "Copiado"
+
+#: include/shortcode-paste-box.php:12 tabs/advanced.php:239
+#: tabs/my-reviews.php:284
+msgid "Copy to clipboard"
+msgstr "Copiar al portapapeles"
+
+#: tabs/advanced.php:233
+msgid "And include the information below:"
+msgstr "E incluye la información que figura a continuación:"
+
+#: tabs/advanced.php:232
+msgid "If you have an (webserver) error log, you can copy it to the issue, or link it with %s"
+msgstr "Si tienes un registro de errores (del servidor web), puedes copiarlo en la incidencia, o enlazarlo con %s"
+
+#: tabs/advanced.php:231
+msgid "You can share a screencast video with %s"
+msgstr "Puedes compartir una grabación de pantalla con %s"
+
+#: tabs/advanced.php:230
+msgid "You can share a screenshot with %s"
+msgstr "Puedes compartir una captura de pantalla con %s"
+
+#: tabs/advanced.php:229
+msgid "Describe your problem"
+msgstr "Describe tu problema"
+
+#: tabs/advanced.php:227
+msgid "Please help us with some information:"
+msgstr "Por favor, ayúdanos con algo de información:"
+
+#: tabs/advanced.php:224
+msgid "If the problem/question still exists, please create an issue here: %s"
+msgstr "Si el problema/la pregunta sigue existiendo, crea una incidencia aquí: %s"
+
+#: tabs/advanced.php:210
+msgid "In a new line, add"
+msgstr "En una nueva línea, añade"
+
+#: tabs/advanced.php:209
+msgid "Scroll to"
+msgstr "Desplázate hasta"
+
+#: tabs/advanced.php:208
+msgid "Navigate to"
+msgstr "Navegar a"
+
+#: tabs/advanced.php:204
+msgid "exclude Trustindex's JS file:"
+msgstr "excluir el archivo JS de Trustindex:"
+
+#: tabs/advanced.php:203
+msgid "clear the cache"
+msgstr "vaciar la caché"
+
+#: tabs/advanced.php:201
+msgid "If you are using cacher plugin, you should:"
+msgstr "Si utilizas un plugin de caché, deberías:"
+
+#: tabs/advanced.php:194
+msgid "Enable CSS internal loading"
+msgstr "Activar la carga interna de CSS"
+
+#: tabs/advanced.php:184
+msgid "Delete the CSS file at <strong>%s</strong>."
+msgstr "Elimina el archivo CSS en <strong>%s</strong>."
+
+#: tabs/advanced.php:182
+msgid "corrupted"
+msgstr "corrompido"
+
+#: tabs/advanced.php:174
+msgid "CSS content:"
+msgstr "Contenido CSS:"
+
+#: tabs/advanced.php:171
+msgid "writing permission"
+msgstr "permiso de escritura"
+
+#: tabs/advanced.php:159
+msgid "You should enable it, to get new features and fixes automatically, right after they published!"
+msgstr "Deberías activarlo, para obtener nuevas funciones y correcciones automáticamente, ¡justo después de que se publiquen!"
+
+#: tabs/advanced.php:155
+msgid "Use automatic plugin update:"
+msgstr "Utiliza la actualización automática de plugins:"
+
+#: tabs/advanced.php:151
+msgid "Update"
+msgstr "Actualizar"
+
+#: tabs/advanced.php:149
+msgid "Use the latest version:"
+msgstr "Utiliza la última versión:"
+
+#: tabs/advanced.php:146 trustindex-plugin.class.php:837
+msgid "Trustindex plugin"
+msgstr "Plugin Trustindex"
+
+#: tabs/advanced.php:143
+msgid "If you have any problem, you should try these steps:"
+msgstr "Si tienes algún problema, prueba estos pasos:"
+
+#: tabs/advanced.php:142
+msgid "Troubleshooting"
+msgstr "Solución de problemas"
+
+#: tabs/advanced.php:134
+msgid "Leave the field blank if you do not want email notification."
+msgstr "Deja el campo en blanco si no quieres recibir avisos por correo electrónico."
+
+#: tabs/advanced.php:132 tabs/advanced.php:211 tabs/my-reviews.php:326
+msgid "Save"
+msgstr "Guardar"
+
+#: tabs/advanced.php:130
+msgid "Send email notification to:"
+msgstr "Enviar aviso de correo electrónico a:"
+
+#: tabs/advanced.php:127
+msgid "Invalid email"
+msgstr "Correo electrónico no válido"
+
+#: tabs/advanced.php:112
+msgid "Review download finished"
+msgstr "Descarga de revisiones terminada"
+
+#: tabs/advanced.php:105 tabs/advanced.php:121 tabs/advanced.php:157
+msgid "Enable"
+msgstr "Activar"
+
+#: tabs/advanced.php:103 tabs/advanced.php:119
+msgid "Disable"
+msgstr "Desactivar"
+
+#: tabs/advanced.php:101 tabs/advanced.php:117
+msgid "Notification"
+msgstr "Aviso"
+
+#: tabs/advanced.php:96
+msgid "Review download available"
+msgstr "Descarga de revisiones disponible"
+
+#: tabs/advanced.php:93
+msgid "Notifications"
+msgstr "Avisos"
+
+#: tabs/advanced.php:91 tabs/free-widget-configurator.php:394
+#: trustindex-plugin.class.php:57 trustindex-plugin.class.php:950
+msgid "Advanced"
+msgstr "Avanzado"
+
+#: include/step-list.php:30
+msgid "Back"
+msgstr "Volver"
+
+#: include/rate-us-feedback-box.php:28
+msgid "Contact our support"
+msgstr "Contacta con nuestro soporte"
+
+#: include/rate-us-feedback-box.php:27 tabs/my-reviews.php:250
+#: tabs/my-reviews.php:271 tabs/my-reviews.php:290 tabs/my-reviews.php:327
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: include/rate-us-feedback-box.php:24
+msgid "Describe your experience"
+msgstr "Describe tu experiencia"
+
+#: include/rate-us-feedback-box.php:23
+msgid "Contact e-mail"
+msgstr "Correo electrónico de contacto"
+
+#: include/rate-us-feedback-box.php:22
+msgid "Thanks for your feedback!<br />Let us know how we can improve."
+msgstr "Gracias por tus comentarios<br />Haznos saber cómo podemos mejorar."
+
+#: include/get-more-customers-box.php:46 tabs/get-more-features.php:25
+msgid "Now we offer you a 30%% discount off for your first subscription! Create your free account and benefit from the onboarding discount now!"
+msgstr "¡Ahora te ofrecemos un 30%% de descuento en tu suscripción! ¡Crea tu cuenta gratuita y benefíciate ahora del descuento por incorporación!"
+
+#: include/get-more-customers-box.php:40
+msgid "Wordpress cannot update reviews, but Trustindex can! As soon as you get a new review, Trustindex Business can automatically add it to your website. Customers love fresh reviews!"
+msgstr "WordPress no puede actualizar las reseñas, ¡pero Trustindex sí! En cuanto recibes una nueva opinión, Trustindex Business puede añadirla automáticamente a tu sitio web. ¡A los clientes les encantan las opiniones nuevas!"
+
+#: include/get-more-customers-box.php:39 tabs/get-more-features.php:20
+msgid "Automatically update with NEW reviews"
+msgstr "Actualizar automáticamente con NUEVAS reseñas"
+
+#: include/get-more-customers-box.php:36
+msgid "Turn on email alert to ALL new reviews, so that you can manage them quickly."
+msgstr "Activa la alerta por correo electrónico de TODAS las reseñas nuevas, para que puedas gestionarlas rápidamente."
+
+#: include/get-more-customers-box.php:35 tabs/get-more-features.php:19
+msgid "Manage all reviews in one place"
+msgstr "Gestiona todas las reseñas en un solo lugar"
+
+#: include/get-more-customers-box.php:32
+msgid "Use our Review Invitation System to collect hundreds of new reviews. Become impossible to resist!"
+msgstr "Utiliza nuestro sistema de invitación a reseñas para recopilar cientos de nuevas reseñas. ¡Hazte imposible de resistir!"
+
+#: include/get-more-customers-box.php:31 tabs/get-more-features.php:18
+msgid "Get more reviews"
+msgstr "Consigue más reseñas"
+
+#: include/get-more-customers-box.php:28
+msgid "You can mix your reviews from different platforms and display them in 1 review widget."
+msgstr "Puedes mezclar tus reseñas de diferentes plataformas y mostrarlas en 1 widget de reseñas."
+
+#: include/get-more-customers-box.php:27
+msgid "Mix Reviews"
+msgstr "Mezclar reseñas"
+
+#: include/get-more-customers-box.php:23
+msgid "Add more reviews to your widget from %s, etc. to enjoy more trust, and to keep customers on your site."
+msgstr "Añade más reseñas a tu widget de %s, etc. para disfrutar de más confianza y mantener a los clientes en tu sitio."
+
+#: include/get-more-customers-box.php:22 tabs/get-more-features.php:16
+msgid "%d review platforms"
+msgstr "%d plataformas de reseñas"
+
+#: include/get-more-customers-box.php:15
+msgid "Use the widgets matching your page the best to build trust."
+msgstr "Utiliza los widgets que mejor se adapten a tu página para generar confianza."
+
+#: include/get-more-customers-box.php:14 tabs/get-more-features.php:14
+msgid "Create unlimited number of widgets"
+msgstr "Crea un número ilimitado de widgets"
+
+#: include/get-more-customers-box.php:11
+msgid "You can test Trustindex with 10 reviews in the free version. Upgrade to Business to display ALL the reviews received. Be the undisputed customer choice in your industry!"
+msgstr "Puedes probar Trustindex con 10 reseñas en la versión gratuita. Actualiza a Business para mostrar TODAS las reseñas recibidas. ¡Conviértete en la elección indiscutible de los clientes de tu sector!"
+
+#: include/get-more-customers-box.php:10 tabs/get-more-features.php:13
+msgid "Display unlimited number of reviews"
+msgstr "Mostrar un número ilimitado de reseñas"
+
+#: trustindex-plugin.class.php:88
+msgid "Create a Free Account for More Features"
+msgstr "Crea una cuenta gratuita para obtener más funciones"
+
+#: include/get-more-customers-box.php:6 tabs/get-more-features.php:9
+msgid "Increase SEO, trust and sales using customer reviews."
+msgstr "Aumenta el SEO, la confianza y las ventas utilizando las reseñas de los clientes."
+
+#: include/get-more-customers-box.php:4
+msgid "Want to get more customers?"
+msgstr "¿Quieres conseguir más clientes?"
+
+#: include/demo-widgets.php:9 include/demo-widgets.php:65
+msgid "Example Widget"
+msgstr "Widget de ejemplo"
+
+#: include/admin.php:223
+msgid "Test again"
+msgstr "Probar otra vez"
+
+#: include/admin.php:221
+msgid "Therefore, our plugin might not work properly. Please, contact your hosting support, they can resolve this easily."
+msgstr "Por lo tanto, es posible que nuestro plugin no funcione correctamente. Por favor, ponte en contacto con el soporte de tu alojamiento, ellos pueden resolver esto fácilmente."
+
+#: include/admin.php:219
+msgid "It seems you are using a proxy for HTTP requests but after a test request it returned a following error:"
+msgstr "Parece que estás utilizando un proxy para las peticiones HTTP, pero tras una petición de prueba ha devuelto el siguiente error:"
+
+#: include/admin.php:212
+msgid "b) or you should add Trustindex as an <strong>WP_ACCESSIBLE_HOSTS</strong>: \"*.trustindex.io\""
+msgstr "b) o deberías añadir Trustindex como un <strong>WP_ACCESSIBLE_HOSTS</strong>: \"*.trustindex.io\""
+
+#: include/admin.php:211
+msgid "a) You should define <strong>WP_HTTP_BLOCK_EXTERNAL</strong> as false"
+msgstr "a) Debes definir <strong>WP_HTTP_BLOCK_EXTERNAL</strong> como false"
+
+#: include/admin.php:210
+msgid "Solution"
+msgstr "Solución"
+
+#: include/admin.php:209
+msgid "Your site cannot download our widget templates, because of your server settings not allowing that:"
+msgstr "Tu sitio no puede descargar nuestras plantillas de widgets, porque los ajustes de tu servidor no lo permites:"
+
+#: include/admin.php:198
+msgid "new"
+msgstr "nuevo"
+
+#: include/admin.php:101
+msgid "For some reason, the <strong>CSS</strong> file required to run the plugin was not loaded.<br />One of your plugins is probably causing the problem."
+msgstr "Por alguna razón, el archivo <strong>CSS</strong> necesario para ejecutar el plugin no se ha cargado.<br />Probablemente uno de tus plugins esté causando el problema."
+
+#: include/activate.php:33
+msgid "Then try activate the plugin again."
+msgstr "Luego intenta activar de nuevo el plugin."
+
+#: include/activate.php:31
+msgid "Run the following SQL codes in your database administration interface (e.g. PhpMyAdmin) to create the tables or contact your system administrator:"
+msgstr "Ejecuta los siguientes códigos SQL en la interfaz de administración de tu base de datos (por ejemplo, PhpMyAdmin) para crear las tablas o ponte en contacto con el administrador de tu sistema:"
+
+#: include/activate.php:29
+msgid "database"
+msgstr "base de datos"
+
+#: include/activate.php:29
+msgid "We got the following error from %s:"
+msgstr "Recibimos el siguiente error de %s:"
+
+#: include/activate.php:28
+msgid "Plugin activation is failed because the required database tables could not created!"
+msgstr "La activación del plugin ha fallado porque no se han podido crear las tablas necesarias de la base de datos."
+
+#. Author URI of the plugin
+#: wp-reviews-plugin-for-google.php
+msgid "https://www.trustindex.io/"
+msgstr "https://www.trustindex.io/"
+
+#. Author of the plugin
+#: wp-reviews-plugin-for-google.php
+msgid "Trustindex.io <support@trustindex.io>"
+msgstr "Trustindex.io <support@trustindex.io>"
+
+#. Description of the plugin
+#: wp-reviews-plugin-for-google.php
+msgid "Embed Google reviews fast and easily into your WordPress site. Increase SEO, trust and sales using Google reviews."
+msgstr "Incrusta reseñas de Google rápida y fácilmente en su sitio WordPress. Aumenta el SEO, la confianza y las ventas usando las reseñas de Google."
+
+#. Plugin URI of the plugin
+#: wp-reviews-plugin-for-google.php
+msgid "https://wordpress.org/plugins/wp-reviews-plugin-for-google/"
+msgstr "https://es.wordpress.org/plugins/wp-reviews-plugin-for-google/"
+
+#. Plugin Name of the plugin
+#: wp-reviews-plugin-for-google.php
+msgid "Widgets for Google Reviews"
+msgstr "Widgets para reseñas de Google"
