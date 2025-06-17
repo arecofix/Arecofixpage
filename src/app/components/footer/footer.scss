@@ -1,0 +1,219 @@
+// footer.component.scss
+$primary-color: #252348;
+$secondary-color: #ff6b6b;
+$text-color: #ffffff;
+$hover-color: #4ecdc4;
+
+.app-footer {
+  background-color: $primary-color;
+  color: $text-color;
+  padding: 3rem 0 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, $secondary-color, $hover-color);
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+
+    .footer-section {
+      margin-bottom: 1.5rem;
+
+      h3 {
+        color: $secondary-color;
+        margin-bottom: 1.5rem;
+        position: relative;
+        font-size: 1.3rem;
+        padding-bottom: 0.5rem;
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 50px;
+          height: 2px;
+          background: $hover-color;
+        }
+      }
+
+      p {
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+      }
+
+      .footer-links {
+        list-style: none;
+        padding: 0;
+
+        li {
+          margin-bottom: 0.8rem;
+
+          a {
+            color: $text-color;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            opacity: 0.8;
+
+            &:hover {
+              color: $hover-color;
+              opacity: 1;
+              transform: translateX(5px);
+            }
+
+            mat-icon {
+              margin-right: 8px;
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+
+      .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+
+        a {
+          color: $text-color;
+          background: rgba(255, 255, 255, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: $secondary-color;
+            transform: translateY(-3px);
+          }
+        }
+      }
+
+      .newsletter-form {
+        margin-top: 1rem;
+
+        .form-group {
+          position: relative;
+          margin-bottom: 1rem;
+
+          input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: $text-color;
+            outline: none;
+            transition: all 0.3s ease;
+
+            &:focus {
+              background: rgba(255, 255, 255, 0.2);
+              box-shadow: 0 0 0 2px $hover-color;
+            }
+
+            &::placeholder {
+              color: rgba(255, 255, 255, 0.6);
+            }
+          }
+
+          button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: $secondary-color;
+            color: $text-color;
+            border: none;
+            border-radius: 30px;
+            padding: 7px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+
+            &:hover {
+              background: darken($secondary-color, 10%);
+              transform: scale(1.05);
+            }
+          }
+        }
+
+        .form-message {
+          font-size: 0.8rem;
+          margin-top: 0.5rem;
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    opacity: 0.7;
+
+    .back-to-top {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: $secondary-color;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: $hover-color;
+        transform: translateY(-3px);
+      }
+    }
+  }
+}
+
+// Media Queries para responsividad
+@media (max-width: 768px) {
+  .app-footer {
+    .footer-container {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    .footer-container {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-section {
+      text-align: center;
+
+      h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .social-links {
+        justify-content: center;
+      }
+    }
+  }
+}

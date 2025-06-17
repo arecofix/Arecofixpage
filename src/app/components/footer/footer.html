@@ -1,0 +1,68 @@
+<footer class="bg-white border-t border-neutral-200 py-12 lg:py-16">
+  <div class="max-w-7xl w-[96%] mx-auto">
+    <div class="flex flex-col lg:flex-row justify-between gap-12 border-b border-neutral-200 pb-12">
+      
+      <!-- Logo + Links + Redes -->
+      <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-auto">
+        <img src="./assets/img/logo.svg" alt="Logo Arecofix" class="h-10" />
+
+        <nav aria-label="Footer navigation">
+          <ul class="flex flex-col lg:flex-row items-center lg:items-start gap-4 text-sm text-gray-500">
+            <li><a routerLink="/productos" class="hover:text-cyan-600">Productos</a></li>
+            <li><a routerLink="/recursos" class="hover:text-cyan-600">Recursos</a></li>
+            <li><a routerLink="/contacto" class="hover:text-cyan-600">Contacto</a></li>
+            <li><a routerLink="/nosotros" class="hover:text-cyan-600">Nosotros</a></li>
+          </ul>
+        </nav>
+
+        <div class="flex gap-4 text-gray-600">
+          <a href="#" aria-label="Facebook" class="hover:text-cyan-600">
+            <i class="fab fa-facebook-f text-xl"></i>
+          </a>
+          <a href="#" aria-label="Instagram" class="hover:text-cyan-600">
+            <i class="fab fa-instagram text-xl"></i>
+          </a>
+          <a href="#" aria-label="X (Twitter)" class="hover:text-cyan-600">
+            <i class="fab fa-x-twitter text-xl"></i>
+          </a>
+          <a href="#" aria-label="LinkedIn" class="hover:text-cyan-600">
+            <i class="fab fa-linkedin-in text-xl"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="w-full lg:max-w-xl text-center lg:text-left">
+        <h4 class="text-lg font-semibold text-gray-900 mb-2">Unite a nuestro Newsletter</h4>
+        <p class="text-gray-500 text-sm mb-6">Sé el primero en enterarte de nuestras novedades, promociones exclusivas y más.</p>
+
+        <form (ngSubmit)="subscribe()" #form="" class="flex flex-col sm:flex-row gap-3">
+          <input 
+            type="email" 
+            name="email" 
+            required 
+            placeholder="Tu email" 
+            class="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-600" 
+          />
+          <button 
+            type="submit" 
+            [disabled]=""
+            class="bg-cyan-600 text-white rounded-md px-5 py-2 text-sm hover:brightness-110 transition-all disabled:opacity-50"
+          >
+            Suscribirse
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer inferior -->
+    <div class="pt-8 flex flex-col lg:flex-row items-center justify-between text-sm text-gray-400 gap-4">
+      <ul class="flex gap-6 text-xs">
+        <li><a href="#" class="hover:text-cyan-600">Español</a></li>
+        <li><a href="#" class="hover:text-cyan-600">Privacidad</a></li>
+        <li><a href="#" class="hover:text-cyan-600">Términos Legales</a></li>
+      </ul>
+      <p>© 2025 Arecofix. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
