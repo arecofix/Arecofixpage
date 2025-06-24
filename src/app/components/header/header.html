@@ -1,9 +1,11 @@
 <header>
-  <nav class="bg-[#E4E8E4] shadow-md transition-all duration-300 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex h-16 items-center justify-between relative">
+<nav class="bg-[#E4E8E4] shadow-md transition-all duration-300 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <!-- Sección izquierda (hamburguesa + logo) -->
+      <div class="flex items-center">
         <!-- Botón hamburguesa -->
-        <div class="sm:hidden flex items-center">
+        <div class="sm:hidden mr-2">
           <button (click)="toggleMobileMenu()" type="button"
             class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
             <svg *ngIf="!mobileMenuOpen" class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5">
@@ -14,60 +16,67 @@
             </svg>
           </button>
         </div>
-        <div class="flex items-center justify-between w-full">
-        <!-- Logo alineado a la izquierda -->
+        
+        <!-- Logo -->
         <div class="flex-shrink-0">
-            <a routerLink="/" class="flex items-center hover:scale-105 transition-transform">
+          <a routerLink="/" class="flex items-center hover:scale-105 transition-transform">
             <img class="h-8 w-auto" src="https://arecofix.com.ar/assets/img/log.png" alt="Logo" />
-            </a>
+          </a>
         </div>
+      </div>
 
-        <!-- Buscador centrado -->
-        <div class="hidden sm:flex justify-center flex-1">
-            <input
-            type="text"
-            [(ngModel)]="searchText"
-            placeholder="Buscar..."
-            class="w-full max-w-sm px-3 py-2 rounded-md border border-gray-400 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm"
-            />
-        </div>
-        </div>
-
-        <!-- Enlaces navegación (visible en escritorio) -->
-        <div class="hidden sm:flex space-x-6 mr-18 ml-6">
+      <!-- Navegación desktop -->
+      <div class="hidden sm:flex space-x-8 ml-8">
         <a routerLink="/" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Inicio</a>
         <a routerLink="/nosotros" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Nosotros</a>
         <a routerLink="/productos" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Productos</a>
         <a routerLink="/contacto" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Contacto</a>
-        </div>
-        <!-- Sección derecha: carrito + perfil -->
-        <div class="flex items-center space-x-4">
-          <!-- Botón carrito -->
-          <button routerLink="/carrito" class="relative text-gray-700 hover:text-indigo-600 transition-transform hover:scale-110">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1 5h12l-1-5M9 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" />
-            </svg>
-            <span *ngIf="cartItemCount > 0"
-              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-              {{ cartItemCount }}
-            </span>
-          </button>
+      </div>
 
-          <!-- Perfil -->
-          <div class="relative">
-            <button (click)="toggleProfileMenu()" type="button"
-              class="flex items-center rounded-full focus:ring-2 focus:ring-indigo-500">
-              <img class="w-8 h-8 rounded-full"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="Foto de perfil" />
+      <!-- Sección derecha (buscador + acciones) -->
+      <div class="flex items-center space-x-6">
+        <!-- Buscador desktop -->
+        <div class="hidden sm:flex ml-4">
+          <input
+            type="text"
+            [(ngModel)]="searchText"
+            placeholder="Buscar..."
+            class="w-full max-w-xs px-3 py-2 rounded-md border border-gray-400 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm"
+          />
+        </div>
+
+        <!-- Acciones (carrito + perfil) CON ESPACIADO AUMENTADO -->
+        <div class="flex items-center">
+          <!-- Botón carrito con margen derecho aumentado -->
+          <div class="mr-6"> <!-- Cambiado de mr-2 a mr-6 (24px) -->
+            <button routerLink="/carrito" class="relative text-gray-700 hover:text-indigo-600 transition-transform hover:scale-110">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1 5h12l-1-5M9 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" />
+              </svg>
+              <span *ngIf="cartItemCount > 0"
+                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                {{ cartItemCount }}
+              </span>
             </button>
-            <!-- Menú perfil -->
-            <div *ngIf="profileMenuOpen"
-              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Tu perfil</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+          </div>
+
+          <!-- Perfil con margen izquierdo -->
+          <div class="ml-2"> <!-- Añadido margen izquierdo -->
+            <div class="relative">
+              <button (click)="toggleProfileMenu()" type="button"
+                class="flex items-center rounded-full focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <img class="w-8 h-8 rounded-full"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit:facearea&facepad=2&w=256&h=256&q=80"
+                  alt="Foto de perfil" />
+              </button>
+              
+              <div *ngIf="profileMenuOpen"
+                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Tu perfil</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+              </div>
             </div>
           </div>
         </div>
@@ -77,18 +86,15 @@
     <!-- Menú móvil -->
     <div class="sm:hidden" *ngIf="mobileMenuOpen" id="mobile-menu">
       <div class="px-4 pt-4 pb-2 space-y-2">
-        <!-- Buscador en móvil -->
         <input type="text" [(ngModel)]="searchText" placeholder="Buscar..."
           class="w-full px-3 py-2 rounded-md border border-gray-400 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm" />
-
-        <!-- Enlaces -->
         <a routerLink="/" class="block text-gray-700 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-200">Inicio</a>
         <a routerLink="/nosotros" class="block text-gray-700 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-200">Nosotros</a>
         <a routerLink="/productos" class="block text-gray-700 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-200">Productos</a>
         <a routerLink="/contacto" class="block text-gray-700 px-3 py-2 rounded-md text-base font-medium hover:bg-gray-200">Contacto</a>
       </div>
     </div>
-  </nav>
-
+  </div>
+</nav>
 </header>
 
