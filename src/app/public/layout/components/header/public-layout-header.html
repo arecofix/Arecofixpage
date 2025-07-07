@@ -1,0 +1,127 @@
+<div class="navbar bg-base-100 shadow-sm">
+  <!-- NAVBAR START -->
+  <div class="navbar-start">
+    <!-- Menú hamburguesa -->
+    <div class="dropdown">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+        </svg>
+      </div>
+
+      <ul tabindex="0"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-60 p-2 shadow">
+        @for (item of menuItems(); track $index) {
+        <li>
+          <a class="btn btn-primary" [routerLink]="item.path"
+            routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i [class]="item.icon"></i> {{item.title}}
+          </a>
+        </li>
+        }
+
+        <li>
+          <a class="btn btn-primary" routerLink="products/featured"
+            routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-star"></i> Destacados
+          </a>
+        </li>
+        <li>
+          <a class="btn btn-primary" routerLink="categories"
+            routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-tag"></i> Categorías
+          </a>
+        </li>
+
+        <!-- Buscador móvil -->
+        <li class="mt-2">
+          <form class="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Buscar..."
+              class="input input-sm input-bordered w-full"
+            />
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Logo + appName -->
+    <a class="flex items-center gap-2 btn btn-ghost" [routerLink]="['/']">
+      <img src="https://arecofix.com.ar/assets/img/logo.png" alt="Arecofix Logo" class="h-8 w-auto" />
+      <span class="font-bold text-lg">{{ appName }}</span>
+    </a>
+  </div>
+
+  <!-- NAVBAR CENTER (desktop) -->
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1">
+      @for (item of menuItems(); track $index) {
+      <li>
+        <a class="link link-primary" [routerLink]="item.path"
+          routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i [class]="item.icon"></i> {{item.title}}
+        </a>
+      </li>
+      }
+
+      <li>
+        <a class="link link-primary" routerLink="products/featured"
+          routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-star"></i> Destacados
+        </a>
+      </li>
+      <li>
+        <a class="link link-primary" routerLink="categories"
+          routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-tag"></i> Categorías
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- NAVBAR END -->
+  <div class="navbar-end flex items-center gap-3">
+    <!-- Buscador desktop -->
+    <form class="hidden lg:flex items-center gap-2">
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        class="input input-sm input-bordered"
+      />
+      <button type="submit" class="btn btn-sm btn-primary">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+
+    <!-- Botón Carrito con contador -->
+    <div class="indicator">
+      <button class="btn btn-circle btn-sm btn-ghost" aria-label="Carrito">
+        <i class="fas fa-shopping-cart text-lg"></i>
+      </button>
+      <span class="indicator-item badge badge-sm badge-primary">3</span>
+    </div>
+
+    <!-- Botón Perfil con menú -->
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost">
+        <i class="fas fa-user text-lg"></i>
+      </div>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-48">
+        <li><a routerLink="/perfil"><i class="fas fa-user-circle"></i> Mi Perfil</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- NAVBAR END -->
