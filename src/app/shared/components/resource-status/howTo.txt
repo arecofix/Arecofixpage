@@ -1,0 +1,9 @@
+@if (usersResource.isLoading()) {
+<is-loading />
+} @else if (!usersResource.hasValue()) {
+<is-empty />
+} @else if (usersResource.error()) {
+<is-error />
+} @else if (usersResource.hasValue()) {
+<!-- Data -->
+}
