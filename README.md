@@ -21,8 +21,8 @@ Una aplicación de catálogo de productos desarrollada con Angular 20 que permit
 - **RxJS**: Programación reactiva para manejo de datos asincrónicos
 
 Pasos para Iniciar proyecto:
-rm -rf node_modules package-lock.json .angular/cache
-ng update @angular/cli @angular/core
-npm update vite @vitejs/plugin-angular
 npm install
+npm run jserver
+ng build
+ng serve
 
