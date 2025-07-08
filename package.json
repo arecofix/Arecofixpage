@@ -5,7 +5,7 @@
     "ng": "ng",
     "dev": "rm -rf .angular && ng serve",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --base-href /Arecofixpage/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "jserver": "json-server --watch ./src/app/data/data.json --port 3000"
