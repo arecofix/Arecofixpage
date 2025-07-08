@@ -1,0 +1,39 @@
+name: Deploy Arecofix Page
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Build the project
+        run: npm run build
+      - name: jserver
+        run: npm run jserver
+      - name: Artifact upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: arecofix-artifact 
+          path: dist/arecofix-product-catalog/browser
+            
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
