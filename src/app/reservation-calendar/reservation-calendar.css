@@ -1,0 +1,34 @@
+/* Animaciones */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Efecto hover para días seleccionables */
+button:not(:disabled):hover {
+  transform: scale(1.05);
+}
+
+/* Efecto para el día actual */
+.bg-blue-100 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Responsividad mejorada */
+@media (max-width: 640px) {
+  .grid-cols-7 {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  
+  .h-10 {
+    height: 2.5rem;
+  }
+}

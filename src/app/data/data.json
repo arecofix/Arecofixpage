@@ -38,7 +38,7 @@
       "description": "Decoración y herramientas para el hogar",
       "icon": "fas fa-home",
       "slug": "domotica",
-      "featured": false
+      "featured": true
     },
     {
       "id": 6,
@@ -54,7 +54,7 @@
       "description": "Vehículos y accesorios automotrices",
       "icon": "fas fa-car",
       "slug": "automotive",
-      "featured": true
+      "featured": false
     },
     {
       "id": 8,
@@ -78,7 +78,7 @@
       "description": "Instrumentos y equipos de audio",
       "icon": "fas fa-music",
       "slug": "music",
-      "featured": true
+      "featured": false
     }
   ],
   "products": [

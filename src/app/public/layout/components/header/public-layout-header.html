@@ -1,59 +1,70 @@
 <div class="navbar bg-base-100 shadow-sm">
   <!-- NAVBAR START -->
   <div class="navbar-start">
-    <!-- Menú hamburguesa -->
-    <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-          viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
-        </svg>
-      </div>
+<!-- Menú hamburguesa -->
+<div class="dropdown">
+  <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+    </svg>
+  </div>
 
-      <ul tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-60 p-2 shadow">
-        @for (item of menuItems(); track $index) {
-        <li>
-          <a class="btn btn-primary" [routerLink]="item.path"
-            routerLinkActive="btn btn-secondary"
-            [routerLinkActiveOptions]="{exact: true}">
-            <i [class]="item.icon"></i> {{item.title}}
-          </a>
-        </li>
-        }
+  <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-60 p-2 shadow">
+    <!-- Buscador móvil - Ahora en la parte superior -->
+    <li class="mb-4">
+      <form class="flex items-center gap-2">
+        <input
+          type="text"
+          placeholder="Buscar..."
+          class="input input-sm input-bordered w-full"
+        />
+        <button type="submit" class="btn btn-sm btn-primary">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+    </li>
 
-        <li>
-          <a class="btn btn-primary" routerLink="products/featured"
-            routerLinkActive="btn btn-secondary"
-            [routerLinkActiveOptions]="{exact: true}">
-            <i class="fas fa-star"></i> Destacados
-          </a>
-        </li>
-        <li>
-          <a class="btn btn-primary" routerLink="categories"
-            routerLinkActive="btn btn-secondary"
-            [routerLinkActiveOptions]="{exact: true}">
-            <i class="fas fa-tag"></i> Categorías
-          </a>
-        </li>
+    <!-- Elementos del menú -->
+    @for (item of menuItems(); track $index) {
+    <li>
+      <a class="btn btn-primary" [routerLink]="item.path"
+        routerLinkActive="btn btn-secondary"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i [class]="item.icon"></i> {{item.title}}
+      </a>
+    </li>
+    }
 
-        <!-- Buscador móvil -->
-        <li class="mt-2">
-          <form class="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Buscar..."
-              class="input input-sm input-bordered w-full"
-            />
-            <button type="submit" class="btn btn-sm btn-primary">
-              <i class="fas fa-search"></i>
-            </button>
-          </form>
-        </li>
-      </ul>
-    </div>
-
+    <li>
+      <a class="btn btn-primary" routerLink="products/featured"
+        routerLinkActive="btn btn-secondary"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fas fa-star"></i> Destacados
+      </a>
+    </li>
+    <li>
+      <a class="btn btn-primary" routerLink="categories"
+        routerLinkActive="btn btn-secondary"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fas fa-tag"></i> Categorías
+      </a>
+    </li>
+    <li>
+      <a class="btn btn-primary" routerLink="/contacto"
+        routerLinkActive="btn btn-secondary"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fas fa-envelope"></i> Contacto
+      </a>
+    </li>
+    <li>
+      <a class="btn btn-primary" routerLink="/nosotros"
+        routerLinkActive="btn btn-secondary"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fas fa-info-circle"></i> Nosotros
+      </a>
+    </li>
+  </ul>
+</div>
     <!-- Logo + appName -->
     <a class="flex items-center gap-2 btn btn-ghost" [routerLink]="['/']">
       <img src="https://arecofix.com.ar/assets/img/logo.png" alt="Arecofix Logo" class="h-8 w-auto" />

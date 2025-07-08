@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ReservationCalendar } from '../../reservation-calendar/reservation-calendar';
 
 @Component({
   selector: 'app-public-home-page',
-  imports: [],
+  imports: [ReservationCalendar],
   templateUrl: './public-home-page.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,

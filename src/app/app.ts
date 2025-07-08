@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Footer } from './shared/footer/footer';
+import { Footer } from './shared/footer/footer'; // <-- Sin .component
+import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button'; // <-- Sin .component
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer],
-  templateUrl: './app.html',
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    Footer,
+    WhatsappButton
+  ],
+  templateUrl: './app.html'
 })
-export class App {
- 
-}
+export class App {}
