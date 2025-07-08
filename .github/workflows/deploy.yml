@@ -22,9 +22,9 @@ jobs:
       - name: Artifact upload
         uses: actions/upload-artifact@v4
         with:
-          name: arecofix-artifact 
-          path: dist/arecofix-product-catalog/browser
-            
+            name: github-pages  # ¡Cambiado a este nombre!
+            path: dist/arecofix-product-catalog/browser
+                    
   deploy:
     needs: build
     permissions:
