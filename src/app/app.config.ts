@@ -1,18 +1,21 @@
 import {
   ApplicationConfig,
-  provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection,
+  provideExperimentalZonelessChangeDetection,
+  provideZoneChangeDetection
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
+import { provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideZonelessChangeDetection(),
-    provideRouter(routes),
-    provideHttpClient(withFetch()),
-  ],
+    // O
+    provideExperimentalZonelessChangeDetection(),  // Opción moderna sin Zone.js
+
+    provideRouter(routes, withHashLocation()),  // Hash routing para GitHub Pages
+    provideHttpClient(withFetch()),  // HttpClient con Fetch API
+    
+    // Configuración adicional recomendada para producción:
+    { provide: 'BASE_URL', useValue: '/' },  // URL base para APIs
+  ]
 };
