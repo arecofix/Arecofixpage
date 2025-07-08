@@ -35,7 +35,7 @@
     {
       "id": 5,
       "name": "Domotica",
-      "description": "Decoración y herramientas para el hogar",
+      "description": "Tu casa más inteligente: herramientas para el hogar",
       "icon": "fas fa-home",
       "slug": "domotica",
       "featured": true
