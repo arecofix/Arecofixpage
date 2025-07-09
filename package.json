@@ -1,55 +1,50 @@
-{
-  "name": "arecofix",
-  "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "dev": "rm -rf .angular && ng serve",
-    "start": "ng serve",
-    "build": "ng build --base-href /Arecofixpage/",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "jserver": "json-server --watch ./src/app/data/data.json --port 3000"
-  },
-  "prettier": {
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
-  },
-  "private": true,
-  "dependencies": {
-    "@angular/common": "^20.0.0",
-    "@angular/compiler": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@angular/fire": "^20.0.1",
-    "@angular/forms": "^20.0.0",
-    "@angular/platform-browser": "^20.0.0",
-    "@angular/router": "^20.0.0",
-    "@tailwindcss/postcss": "^4.1.10",
-    "cally": "^0.8.0",
-    "firebase": "^11.10.0",
-    "json-server": "^1.0.0-beta.3",
-    "postcss": "^8.5.6",
-    "rxjs": "~7.8.0",
-    "tailwindcss": "^4.1.10",
-    "tslib": "^2.3.0"
-  },
-  "devDependencies": {
-    "@angular/build": "^20.0.4",
-    "@angular/cli": "^20.0.4",
-    "@angular/compiler-cli": "^20.0.0",
-    "@types/jasmine": "~5.1.0",
-    "daisyui": "^5.0.43",
-    "jasmine-core": "~5.7.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2"
-  }
-}
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build production
+        run: npm run build -- --configuration=production
+
+      - name: Verify build output
+        run: |
+          ls -la dist/arecofix-product-catalog/browser
+          [ -f dist/arecofix-product-catalog/browser/index.html ] || exit 1
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/arecofix-product-catalog/browser
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
