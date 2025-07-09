@@ -8,11 +8,7 @@ on:
 permissions:
   contents: read
   pages: write
-  id-token: write  # Permiso necesario para OIDC
-
-env:
-  NODE_VERSION: '20'
-  SERVER_START_DELAY: 10  # Tiempo de espera para el servidor
+  id-token: write
 
 jobs:
   build:
@@ -20,58 +16,44 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Para obtener todo el historial de commits
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci  # Usamos ci para instalación limpia
-
-      - name: Start jserver in background
+      - name: Install dependencies including json-server
         run: |
-          nohup npm run jserver > jserver.log 2>&1 &
+          npm install
+          npm install -g json-server  # Instala json-server globalmente
+          
+      - name: Verify json-server installation
+        run: json-server --version
+
+      - name: Run jserver
+        run: |
+          npx json-server --watch ./src/app/data/data.json --port 3000 &
           echo $! > server.pid
-          echo "Waiting ${{ env.SERVER_START_DELAY }} seconds for server to start..."
-          sleep ${{ env.SERVER_START_DELAY }}
-          echo "Server started with PID $(cat server.pid)"
+          sleep 5  # Espera breve para que el servidor inicie
 
       - name: Build production
         run: npm run build -- --configuration=production
 
-      - name: Verify build output
+      - name: Stop jserver after build
         run: |
-          echo "Build contents:"
-          ls -la dist/arecofix-product-catalog/browser
-          [ -f dist/arecofix-product-catalog/browser/index.html ] || (echo "Error: index.html not found!" && exit 1)
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/arecofix-product-catalog/browser
-          retention-days: 1  # Reduce el almacenamiento de artifacts
-
-      - name: Stop jserver
-        if: always()  # Siempre ejecuta este paso aunque falle el build
-        run: |
-          if [ -f server.pid ]; then
-            echo "Stopping jserver with PID $(cat server.pid)"
-            kill $(cat server.pid) || true
-            rm server.pid
-            echo "Server logs:"
-            cat jserver.log || true
-            rm jserver.log || true
-          fi
 
   deploy:
     needs: build
-    permissions:
-      pages: write
-      id-token: write  # Permisos específicos para el deploy
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -80,5 +62,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          artifact_name: 'github-pages' 
