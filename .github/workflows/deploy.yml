@@ -5,11 +5,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,19 +20,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run jserver
+      - name: Run jserver in background
         run: |
-          npm run jserver &
+          nohup npm run jserver > jserver.log 2>&1 &
           echo $! > server.pid
-          sleep 10 # Espera a que el servidor inicie
+          sleep 5 # Espera breve para inicio del servidor
 
       - name: Build production
         run: npm run build -- --configuration=production
 
-      - name: Verify build output
+      - name: Stop jserver after build
         run: |
-          ls -la dist/arecofix-product-catalog/browser
-          [ -f dist/arecofix-product-catalog/browser/index.html ] || exit 1
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "/dist/arecofix-product-catalog",
+    "public": "dist/arecofix-product-catalog",
     "ignore": [
       "firebase.json",
       "**/.*",
