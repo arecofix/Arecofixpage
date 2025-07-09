@@ -4,18 +4,11 @@
   "scripts": {
     "ng": "ng",
     "dev": "rm -rf .angular && ng serve",
-    "start": "ng serve --port 4200 --host 0.0.0.0 --disable-host-check",
+    "start": "ng serve",
     "build": "ng build --base-href /Arecofixpage/",
-    "build:firebase": "ng build --configuration production --output-path dist/arecofix-firebase",
-    "build:pages": "ng build --base-href /Arecofixpage/ --output-path dist/arecofix-pages",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "jserver": "json-server --watch ./src/app/data/data.json --port 3000",
-    "predeploy": "npm run build:firebase && npm run build:pages",
-    "deploy:firebase": "firebase deploy --only hosting",
-    "deploy:pages": "gh-pages -d dist/arecofix-pages",
-    "serve:firebase": "firebase emulators:start --only hosting",
-    "postinstall": "ngcc --properties es2015 browser module main"
+    "jserver": "json-server --watch ./src/app/data/data.json --port 3000"
   },
   "prettier": {
     "overrides": [
@@ -43,9 +36,7 @@
     "postcss": "^8.5.6",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.10",
-    "tslib": "^2.3.0",
-    "firebase-tools": "^13.0.0",
-    "gh-pages": "^6.0.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^20.0.4",
@@ -59,20 +50,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2",
-    "@types/json-server": "^0.14.3"
-  },
-  "browserslist": {
-    "production": [
-      "last 2 Chrome versions",
-      "last 2 Firefox versions",
-      "last 2 Safari versions",
-      "last 2 Edge versions"
-    ],
-    "development": [
-      "last 1 Chrome version",
-      "last 1 Firefox version",
-      "last 1 Safari version"
-    ]
+    "typescript": "~5.8.2"
   }
 }
