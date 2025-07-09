@@ -1,64 +1,86 @@
-name: Deploy to GitHub Pages
+name: Deploy to Firebase and GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+env:
+  NODE_VERSION: '20'
+  FIREBASE_PROJECT_ID: 'arecofix-ca60b'
+  JSON_SERVER_PORT: 3000
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies including json-server
+      - name: Install dependencies
         run: |
-          npm install
-          npm install -g json-server  # Instala json-server globalmente
-          
-      - name: Verify json-server installation
-        run: json-server --version
+          npm ci
+          npm install -g firebase-tools@13.0.0
 
-      - name: Run jserver
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start JSON Server
         run: |
-          npx json-server --watch ./src/app/data/data.json --port 3000 &
+          npx json-server --watch ./src/app/data/data.json --port ${{ env.JSON_SERVER_PORT }} > server.log 2>&1 &
           echo $! > server.pid
-          sleep 5  # Espera breve para que el servidor inicie
+          sleep 5
+          curl -s http://localhost:${{ env.JSON_SERVER_PORT }}/db || (cat server.log && exit 1)
 
-      - name: Build production
-        run: npm run build -- --configuration=production
+      - name: Build for Firebase
+        run: npm run build:firebase
 
-      - name: Stop jserver after build
+      - name: Build for GitHub Pages
+        run: npm run build:pages
+
+      - name: Verify builds
+        run: |
+          ls -la dist/arecofix-firebase
+          ls -la dist/arecofix-pages
+          [ -f dist/arecofix-firebase/index.html ] || exit 1
+          [ -f dist/arecofix-pages/index.html ] || exit 1
+
+      - name: Stop JSON Server
+        if: always()
         run: |
           if [ -f server.pid ]; then
             kill $(cat server.pid) || true
-            rm server.pid
+            rm server.pid server.log
           fi
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/arecofix-product-catalog/browser
-
-  deploy:
+  deploy-firebase:
     needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Firebase
+        run: |
+          firebase deploy --project ${{ env.FIREBASE_PROJECT_ID }} --only hosting --non-interactive
+        env:
+          FIREBASE_TOKEN: 1//0hGYX8zNy2rMfCgYIARAAGBESNwF-L9IrwJZwZN56E_QWBaJnwT7cv5oI7ODUlUuKQaWV7IOLFPS5AD6CGrgPiVidf28UwRQXejc
+
+
+  deploy-pages:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ github.token }}
+          publish_dir: ./dist/arecofix-pages
+          keep_files: true
+          commit_message: 'Deploy: $(date +%Y-%m-%d) [skip ci]'
