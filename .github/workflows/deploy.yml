@@ -25,12 +25,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run jserver
-        run: |
-          npm run jserver &
-          echo $! > server.pid
-          sleep 10 # Espera a que el servidor inicie
-
       - name: Build production
         run: npm run build -- --configuration=production
 
