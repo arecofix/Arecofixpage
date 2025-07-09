@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Footer } from './shared/footer/footer'; // <-- Sin .component
+import { Footer } from './shared/footer/footer'; //
 import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button'; // <-- Sin .component
 
 @Component({
@@ -9,7 +9,7 @@ import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button'; // <-
   imports: [
     RouterOutlet,
     Footer,
-    WhatsappButton
+    WhatsappButton,
   ],
   templateUrl: './app.html'
 })
