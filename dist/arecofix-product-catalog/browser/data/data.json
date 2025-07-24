@@ -1,0 +1,1886 @@
+{
+  "categories": [
+    {
+      "id": 1,  
+      "name": "Electrónicos",
+      "description": "Dispositivos y gadgets",
+      "icon": "fas fa-laptop",
+      "slug": "electronics",
+      "featured": true
+    },
+    {
+      "id": 2,
+      "name": "Cursos",
+      "description": "Capacitaciones y materiales educativos",
+      "icon": "fas fa-book",
+      "slug": "Cursos",
+      "featured": true
+    },
+    {
+      "id": 3,
+      "name": "Ropa",
+      "description": "Vestimenta y accesorios",
+      "icon": "fas fa-tshirt",
+      "slug": "clothing",
+      "featured": false
+    },
+    {
+      "id": 4,
+      "name": "Deportes",
+      "description": "Equipos y artículos deportivos",
+      "icon": "fas fa-football-ball",
+      "slug": "sports",
+      "featured": false
+    },
+    {
+      "id": 5,
+      "name": "Domotica",
+      "description": "Tu casa más inteligente: herramientas para el hogar",
+      "icon": "fas fa-home",
+      "slug": "domotica",
+      "featured": true
+    },
+    {
+      "id": 6,
+      "name": "Salud y Belleza",
+      "description": "Productos de cuidado personal",
+      "icon": "fas fa-heart",
+      "slug": "health-beauty",
+      "featured": false
+    },
+    {
+      "id": 7,
+      "name": "Automóviles",
+      "description": "Vehículos y accesorios automotrices",
+      "icon": "fas fa-car",
+      "slug": "automotive",
+      "featured": false
+    },
+    {
+      "id": 8,
+      "name": "Juguetes",
+      "description": "Juguetes y entretenimiento infantil",
+      "icon": "fas fa-gamepad",
+      "slug": "toys",
+      "featured": false
+    },
+    {
+      "id": 9,
+      "name": "Comida y Bebidas",
+      "description": "Alimentos y bebidas gourmet",
+      "icon": "fas fa-utensils",
+      "slug": "food-drinks",
+      "featured": false
+    },
+    {
+      "id": 10,
+      "name": "Música",
+      "description": "Instrumentos y equipos de audio",
+      "icon": "fas fa-music",
+      "slug": "music",
+      "featured": false
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "category_id": 1,
+      "slug": "smartphone",
+      "name": "Teléfono Inteligente",
+      "description": "Último modelo de smartphone con pantalla de alta resolución",
+      "price": 699.99,
+      "featured": false
+    },
+    {
+      "id": 2,
+      "category_id": 1,
+      "slug": "laptop-gaming",
+      "name": "Laptop Gaming",
+      "description": "Laptop de alto rendimiento para gaming y trabajo profesional",
+      "price": 1299.99,
+      "featured": false
+    },
+    {
+      "id": 3,
+      "category_id": 1,
+      "slug": "tablet-pro",
+      "name": "Tablet Pro",
+      "description": "Tablet profesional con stylus incluido",
+      "price": 899.99,
+      "featured": false
+    },
+    {
+      "id": 4,
+      "category_id": 1,
+      "slug": "smartwatch",
+      "name": "Reloj Inteligente",
+      "description": "Reloj inteligente con monitoreo de salud",
+      "price": 299.99,
+      "featured": false
+    },
+    {
+      "id": 5,
+      "category_id": 1,
+      "slug": "wireless-earbuds",
+      "name": "Auriculares Inalámbricos",
+      "description": "Auriculares bluetooth con cancelación de ruido",
+      "price": 179.99,
+      "featured": false
+    },
+    {
+      "id": 6,
+      "category_id": 1,
+      "slug": "4k-monitor",
+      "name": "Monitor 4K",
+      "description": "Monitor 4K de 27 pulgadas para profesionales",
+      "price": 449.99,
+      "featured": false
+    },
+    {
+      "id": 7,
+      "category_id": 1,
+      "slug": "gaming-keyboard",
+      "name": "Teclado Gaming",
+      "description": "Teclado mecánico RGB para gaming",
+      "price": 129.99,
+      "featured": false
+    },
+    {
+      "id": 8,
+      "category_id": 1,
+      "slug": "wireless-mouse",
+      "name": "Mouse Inalámbrico",
+      "description": "Mouse ergonómico de alta precisión",
+      "price": 89.99,
+      "featured": true
+    },
+    {
+      "id": 9,
+      "category_id": 1,
+      "slug": "external-hdd",
+      "name": "Disco Duro Externo",
+      "description": "Disco duro externo de 2TB",
+      "price": 99.99,
+      "featured": false
+    },
+    {
+      "id": 10,
+      "category_id": 1,
+      "slug": "power-bank",
+      "name": "Batería Portátil",
+      "description": "Power bank de 20000mAh con carga rápida",
+      "price": 49.99,
+      "featured": false
+    },
+    {
+      "id": 11,
+      "category_id": 1,
+      "slug": "webcam-hd",
+      "name": "Cámara Web HD",
+      "description": "Webcam 1080p para videoconferencias",
+      "price": 79.99,
+      "featured": true
+    },
+    {
+      "id": 12,
+      "category_id": 1,
+      "slug": "bluetooth-speaker",
+      "name": "Altavoz Bluetooth",
+      "description": "Altavoz portátil resistente al agua",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 13,
+      "category_id": 1,
+      "slug": "router-wifi6",
+      "name": "Router WiFi 6",
+      "description": "Router de alta velocidad WiFi 6",
+      "price": 149.99,
+      "featured": false
+    },
+    {
+      "id": 14,
+      "category_id": 1,
+      "slug": "usb-hub",
+      "name": "Hub USB",
+      "description": "Hub USB 3.0 de 7 puertos",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 15,
+      "category_id": 1,
+      "slug": "graphics-card",
+      "name": "Tarjeta Gráfica",
+      "description": "GPU de última generación para gaming",
+      "price": 899.99,
+      "featured": false
+    },
+    {
+      "id": 16,
+      "category_id": 1,
+      "slug": "ssd-nvme",
+      "name": "SSD NVMe",
+      "description": "Disco sólido de 1TB ultra rápido",
+      "price": 119.99,
+      "featured": true
+    },
+    {
+      "id": 17,
+      "category_id": 1,
+      "slug": "drone-camera",
+      "name": "Drone con Cámara",
+      "description": "Drone profesional con cámara 4K",
+      "price": 799.99,
+      "featured": false
+    },
+    {
+      "id": 18,
+      "category_id": 1,
+      "slug": "vr-headset",
+      "name": "Casco VR",
+      "description": "Casco de realidad virtual inmersivo",
+      "price": 399.99,
+      "featured": false
+    },
+    {
+      "id": 19,
+      "category_id": 1,
+      "slug": "smart-home-hub",
+      "name": "Hub Casa Inteligente",
+      "description": "Centro de control para dispositivos inteligentes",
+      "price": 129.99,
+      "featured": true
+    },
+    {
+      "id": 20,
+      "category_id": 1,
+      "slug": "portable-projector",
+      "name": "Proyector Portátil",
+      "description": "Mini proyector Full HD portátil",
+      "price": 249.99,
+      "featured": true
+    },
+    {
+      "id": 21,
+      "category_id": 2,
+      "slug": "programming-guide",
+      "name": "Guía de Programación",
+      "description": "Manual completo de desarrollo de software",
+      "price": 49.99,
+      "featured": false
+    },
+    {
+      "id": 22,
+      "category_id": 2,
+      "slug": "cooking-masterclass",
+      "name": "Masterclass de Cocina",
+      "description": "Libro de recetas gourmet con técnicas profesionales",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 23,
+      "category_id": 2,
+      "slug": "mystery-novel",
+      "name": "Novela de Misterio",
+      "description": "Thriller psicológico bestseller",
+      "price": 19.99,
+      "featured": true
+    },
+    {
+      "id": 24,
+      "category_id": 2,
+      "slug": "science-encyclopedia",
+      "name": "Enciclopedia de Ciencias",
+      "description": "Compendio completo de conocimientos científicos",
+      "price": 89.99,
+      "featured": true
+    },
+    {
+      "id": 25,
+      "category_id": 2,
+      "slug": "photography-manual",
+      "name": "Manual de Fotografía",
+      "description": "Guía práctica para fotógrafos principiantes y avanzados",
+      "price": 39.99,
+      "featured": true
+    },
+    {
+      "id": 26,
+      "category_id": 2,
+      "slug": "business-strategy",
+      "name": "Estrategia Empresarial",
+      "description": "Libro sobre liderazgo y gestión empresarial",
+      "price": 44.99,
+      "featured": true
+    },
+    {
+      "id": 27,
+      "category_id": 2,
+      "slug": "children-stories",
+      "name": "Cuentos Infantiles",
+      "description": "Colección de cuentos ilustrados para niños",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 28,
+      "category_id": 2,
+      "slug": "history-atlas",
+      "name": "Atlas Histórico",
+      "description": "Atlas mundial con mapas históricos detallados",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 29,
+      "category_id": 2,
+      "slug": "poetry-collection",
+      "name": "Colección de Poesía",
+      "description": "Antología de poemas contemporáneos",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 30,
+      "category_id": 2,
+      "slug": "self-help-guide",
+      "name": "Guía de Autoayuda",
+      "description": "Manual para el desarrollo personal y profesional",
+      "price": 27.99,
+      "featured": false
+    },
+    {
+      "id": 31,
+      "category_id": 2,
+      "slug": "art-history",
+      "name": "Historia del Arte",
+      "description": "Recorrido por los movimientos artísticos más importantes",
+      "price": 54.99,
+      "featured": true
+    },
+    {
+      "id": 32,
+      "category_id": 2,
+      "slug": "language-course",
+      "name": "Curso de Idiomas",
+      "description": "Método completo para aprender inglés",
+      "price": 42.99,
+      "featured": false
+    },
+    {
+      "id": 33,
+      "category_id": 2,
+      "slug": "health-nutrition",
+      "name": "Nutrición y Salud",
+      "description": "Guía completa sobre alimentación saludable",
+      "price": 36.99,
+      "featured": true
+    },
+    {
+      "id": 34,
+      "category_id": 2,
+      "slug": "travel-guide",
+      "name": "Guía de Viajes",
+      "description": "Guía completa de destinos turísticos mundiales",
+      "price": 32.99,
+      "featured": false
+    },
+    {
+      "id": 35,
+      "category_id": 2,
+      "slug": "biography-collection",
+      "name": "Biografías Ilustres",
+      "description": "Colección de biografías de personajes históricos",
+      "price": 47.99,
+      "featured": false
+    },
+    {
+      "id": 36,
+      "category_id": 2,
+      "slug": "philosophy-classics",
+      "name": "Clásicos de Filosofía",
+      "description": "Obras fundamentales del pensamiento filosófico",
+      "price": 41.99,
+      "featured": true
+    },
+    {
+      "id": 37,
+      "category_id": 2,
+      "slug": "comic-series",
+      "name": "Serie de Cómics",
+      "description": "Colección completa de superhéroes",
+      "price": 79.99,
+      "featured": false
+    },
+    {
+      "id": 38,
+      "category_id": 2,
+      "slug": "recipe-cookbook",
+      "name": "Libro de Recetas",
+      "description": "Recetas tradicionales de cocina internacional",
+      "price": 33.99,
+      "featured": false
+    },
+    {
+      "id": 39,
+      "category_id": 2,
+      "slug": "meditation-guide",
+      "name": "Guía de Meditación",
+      "description": "Manual práctico de mindfulness y meditación",
+      "price": 25.99,
+      "featured": false
+    },
+    {
+      "id": 40,
+      "category_id": 2,
+      "slug": "technical-manual",
+      "name": "Manual Técnico",
+      "description": "Documentación técnica especializada",
+      "price": 67.99,
+      "featured": false
+    },
+    {
+      "id": 41,
+      "category_id": 3,
+      "slug": "casual-shirt",
+      "name": "Camisa Casual",
+      "description": "Camisa de algodón para uso diario",
+      "price": 39.99,
+      "featured": false
+    },
+    {
+      "id": 42,
+      "category_id": 3,
+      "slug": "jeans-classic",
+      "name": "Jeans Clásicos",
+      "description": "Pantalones de mezclilla de corte clásico",
+      "price": 59.99,
+      "featured": true
+    },
+    {
+      "id": 43,
+      "category_id": 3,
+      "slug": "summer-dress",
+      "name": "Vestido de Verano",
+      "description": "Vestido ligero y fresco para el verano",
+      "price": 49.99,
+      "featured": false
+    },
+    {
+      "id": 44,
+      "category_id": 3,
+      "slug": "formal-suit",
+      "name": "Traje Formal",
+      "description": "Traje elegante para ocasiones especiales",
+      "price": 299.99,
+      "featured": false
+    },
+    {
+      "id": 45,
+      "category_id": 3,
+      "slug": "winter-jacket",
+      "name": "Chaqueta de Invierno",
+      "description": "Chaqueta térmica resistente al frío",
+      "price": 129.99,
+      "featured": true
+    },
+    {
+      "id": 46,
+      "category_id": 3,
+      "slug": "running-shoes",
+      "name": "Zapatos Deportivos",
+      "description": "Zapatillas cómodas para correr",
+      "price": 89.99,
+      "featured": true
+    },
+    {
+      "id": 47,
+      "category_id": 3,
+      "slug": "leather-belt",
+      "name": "Cinturón de Cuero",
+      "description": "Cinturón genuino de cuero premium",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 48,
+      "category_id": 3,
+      "slug": "wool-sweater",
+      "name": "Suéter de Lana",
+      "description": "Suéter cálido de lana merino",
+      "price": 79.99,
+      "featured": false
+    },
+    {
+      "id": 49,
+      "category_id": 3,
+      "slug": "cotton-tshirt",
+      "name": "Camiseta de Algodón",
+      "description": "Camiseta básica 100% algodón",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 50,
+      "category_id": 3,
+      "slug": "silk-scarf",
+      "name": "Bufanda de Seda",
+      "description": "Elegante bufanda de seda natural",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 51,
+      "category_id": 3,
+      "slug": "denim-jacket",
+      "name": "Chaqueta de Mezclilla",
+      "description": "Chaqueta clásica de denim vintage",
+      "price": 69.99,
+      "featured": false
+    },
+    {
+      "id": 52,
+      "category_id": 3,
+      "slug": "formal-shoes",
+      "name": "Zapatos Formales",
+      "description": "Zapatos de cuero para ocasiones elegantes",
+      "price": 119.99,
+      "featured": false
+    },
+    {
+      "id": 53,
+      "category_id": 3,
+      "slug": "yoga-pants",
+      "name": "Pantalones de Yoga",
+      "description": "Leggings cómodos para ejercicio",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 54,
+      "category_id": 3,
+      "slug": "evening-gown",
+      "name": "Vestido de Noche",
+      "description": "Elegante vestido para eventos formales",
+      "price": 199.99,
+      "featured": false
+    },
+    {
+      "id": 55,
+      "category_id": 3,
+      "slug": "polo-shirt",
+      "name": "Polo Shirt",
+      "description": "Camisa polo clásica de algodón",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 56,
+      "category_id": 3,
+      "slug": "casual-sneakers",
+      "name": "Sneakers Casuales",
+      "description": "Zapatillas cómodas para el día a día",
+      "price": 74.99,
+      "featured": false
+    },
+    {
+      "id": 57,
+      "category_id": 3,
+      "slug": "blazer-jacket",
+      "name": "Blazer",
+      "description": "Blazer versátil para look profesional",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 58,
+      "category_id": 3,
+      "slug": "shorts-summer",
+      "name": "Shorts de Verano",
+      "description": "Shorts ligeros para clima cálido",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 59,
+      "category_id": 3,
+      "slug": "cardigan-sweater",
+      "name": "Cárdigan",
+      "description": "Cárdigan suave de punto",
+      "price": 54.99,
+      "featured": false
+    },
+    {
+      "id": 60,
+      "category_id": 3,
+      "slug": "designer-handbag",
+      "name": "Bolso de Diseñador",
+      "description": "Bolso elegante de cuero genuino",
+      "price": 149.99,
+      "featured": false
+    },
+    {
+      "id": 61,
+      "category_id": 4,
+      "slug": "soccer-ball",
+      "name": "Balón de Fútbol",
+      "description": "Balón oficial de fútbol profesional",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 62,
+      "category_id": 4,
+      "slug": "tennis-racket",
+      "name": "Raqueta de Tenis",
+      "description": "Raqueta profesional de fibra de carbono",
+      "price": 149.99,
+      "featured": false
+    },
+    {
+      "id": 63,
+      "category_id": 4,
+      "slug": "basketball-shoes",
+      "name": "Zapatillas de Básquet",
+      "description": "Zapatillas de alto rendimiento para básquet",
+      "price": 119.99,
+      "featured": false
+    },
+    {
+      "id": 64,
+      "category_id": 4,
+      "slug": "yoga-mat",
+      "name": "Esterilla de Yoga",
+      "description": "Esterilla antideslizante para yoga y pilates",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 65,
+      "category_id": 4,
+      "slug": "dumbbells-set",
+      "name": "Set de Mancuernas",
+      "description": "Juego de mancuernas ajustables",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 66,
+      "category_id": 4,
+      "slug": "cycling-helmet",
+      "name": "Casco de Ciclismo",
+      "description": "Casco ligero y ventilado para ciclistas",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 67,
+      "category_id": 4,
+      "slug": "swimming-goggles",
+      "name": "Gafas de Natación",
+      "description": "Gafas profesionales para natación",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 68,
+      "category_id": 4,
+      "slug": "golf-clubs-set",
+      "name": "Set de Palos de Golf",
+      "description": "Juego completo de palos de golf",
+      "price": 399.99,
+      "featured": true
+    },
+    {
+      "id": 69,
+      "category_id": 4,
+      "slug": "boxing-gloves",
+      "name": "Guantes de Boxeo",
+      "description": "Guantes profesionales de boxeo",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 70,
+      "category_id": 4,
+      "slug": "treadmill-home",
+      "name": "Cinta de Correr",
+      "description": "Cinta de correr plegable para hogar",
+      "price": 799.99,
+      "featured": true
+    },
+    {
+      "id": 71,
+      "category_id": 4,
+      "slug": "protein-powder",
+      "name": "Proteína en Polvo",
+      "description": "Suplemento de proteína whey",
+      "price": 39.99,
+      "featured": false
+    },
+    {
+      "id": 72,
+      "category_id": 4,
+      "slug": "resistance-bands",
+      "name": "Bandas de Resistencia",
+      "description": "Set de bandas elásticas para ejercicio",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 73,
+      "category_id": 4,
+      "slug": "fitness-tracker",
+      "name": "Monitor de Fitness",
+      "description": "Pulsera inteligente para seguimiento deportivo",
+      "price": 79.99,
+      "featured": false
+    },
+    {
+      "id": 74,
+      "category_id": 4,
+      "slug": "camping-tent",
+      "name": "Tienda de Campaña",
+      "description": "Tienda resistente para 4 personas",
+      "price": 129.99,
+      "featured": false
+    },
+    {
+      "id": 75,
+      "category_id": 4,
+      "slug": "skateboard-complete",
+      "name": "Skateboard Completo",
+      "description": "Patineta profesional montada",
+      "price": 84.99,
+      "featured": false
+    },
+    {
+      "id": 76,
+      "category_id": 4,
+      "slug": "baseball-glove",
+      "name": "Guante de Béisbol",
+      "description": "Guante de cuero genuino para béisbol",
+      "price": 54.99,
+      "featured": false
+    },
+    {
+      "id": 77,
+      "category_id": 4,
+      "slug": "surfboard-beginner",
+      "name": "Tabla de Surf",
+      "description": "Tabla de surf para principiantes",
+      "price": 249.99,
+      "featured": false
+    },
+    {
+      "id": 78,
+      "category_id": 4,
+      "slug": "volleyball-net",
+      "name": "Red de Voleibol",
+      "description": "Red oficial de voleibol con postes",
+      "price": 69.99,
+      "featured": true
+    },
+    {
+      "id": 79,
+      "category_id": 4,
+      "slug": "sports-water-bottle",
+      "name": "Botella Deportiva",
+      "description": "Botella de agua con aislamiento térmico",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 80,
+      "category_id": 4,
+      "slug": "exercise-bike",
+      "name": "Bicicleta Estática",
+      "description": "Bicicleta estática con monitor digital",
+      "price": 299.99,
+      "featured": false
+    },
+    {
+      "id": 81,
+      "category_id": 5,
+      "slug": "ceramic-vase",
+      "name": "Jarrón de Cerámica",
+      "description": "Elegante jarrón decorativo hecho a mano",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 82,
+      "category_id": 5,
+      "slug": "garden-tools-set",
+      "name": "Set de Herramientas de Jardín",
+      "description": "Kit completo de herramientas para jardinería",
+      "price": 79.99,
+      "featured": false
+    },
+    {
+      "id": 83,
+      "category_id": 5,
+      "slug": "throw-pillows",
+      "name": "Cojines Decorativos",
+      "description": "Set de cojines de algodón con diseños modernos",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 84,
+      "category_id": 5,
+      "slug": "wall-mirror",
+      "name": "Espejo de Pared",
+      "description": "Espejo decorativo con marco dorado",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 85,
+      "category_id": 5,
+      "slug": "table-lamp",
+      "name": "Lámpara de Mesa",
+      "description": "Lámpara LED con base de madera",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 86,
+      "category_id": 5,
+      "slug": "area-rug",
+      "name": "Alfombra Decorativa",
+      "description": "Alfombra suave de patrones geométricos",
+      "price": 129.99,
+      "featured": false
+    },
+    {
+      "id": 87,
+      "category_id": 5,
+      "slug": "curtains-blackout",
+      "name": "Cortinas Opacas",
+      "description": "Cortinas térmicas que bloquean la luz",
+      "price": 49.99,
+      "featured": true
+    },
+    {
+      "id": 88,
+      "category_id": 5,
+      "slug": "plant-pot-ceramic",
+      "name": "Maceta de Cerámica",
+      "description": "Maceta grande para plantas de interior",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 89,
+      "category_id": 5,
+      "slug": "wall-art-canvas",
+      "name": "Arte de Pared",
+      "description": "Lienzo impreso con diseño abstracto",
+      "price": 74.99,
+      "featured": false
+    },
+    {
+      "id": 90,
+      "category_id": 5,
+      "slug": "dining-table-set",
+      "name": "Juego de Comedor",
+      "description": "Mesa de comedor con 4 sillas",
+      "price": 399.99,
+      "featured": false
+    },
+    {
+      "id": 91,
+      "category_id": 5,
+      "slug": "bookshelf-wood",
+      "name": "Estantería de Madera",
+      "description": "Librero de 5 niveles en madera natural",
+      "price": 149.99,
+      "featured": false
+    },
+    {
+      "id": 92,
+      "category_id": 5,
+      "slug": "ceiling-fan",
+      "name": "Ventilador de Techo",
+      "description": "Ventilador con luz LED integrada",
+      "price": 119.99,
+      "featured": true
+    },
+    {
+      "id": 93,
+      "category_id": 5,
+      "slug": "kitchen-cabinet",
+      "name": "Gabinete de Cocina",
+      "description": "Mueble de cocina con múltiples compartimentos",
+      "price": 199.99,
+      "featured": false
+    },
+    {
+      "id": 94,
+      "category_id": 5,
+      "slug": "outdoor-furniture",
+      "name": "Muebles de Exterior",
+      "description": "Set de mesa y sillas para jardín",
+      "price": 299.99,
+      "featured": false
+    },
+    {
+      "id": 95,
+      "category_id": 5,
+      "slug": "bed-frame-queen",
+      "name": "Base de Cama Queen",
+      "description": "Estructura de cama moderna en madera",
+      "price": 249.99,
+      "featured": false
+    },
+    {
+      "id": 96,
+      "category_id": 5,
+      "slug": "storage-ottoman",
+      "name": "Otomán con Almacenaje",
+      "description": "Banco acolchado con espacio interno",
+      "price": 69.99,
+      "featured": true
+    },
+    {
+      "id": 97,
+      "category_id": 5,
+      "slug": "wall-clock",
+      "name": "Reloj de Pared",
+      "description": "Reloj silencioso con diseño minimalista",
+      "price": 39.99,
+      "featured": false
+    },
+    {
+      "id": 98,
+      "category_id": 5,
+      "slug": "shower-curtain",
+      "name": "Cortina de Ducha",
+      "description": "Cortina impermeable con ganchos incluidos",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 99,
+      "category_id": 5,
+      "slug": "floating-shelves",
+      "name": "Repisas Flotantes",
+      "description": "Set de 3 repisas de pared",
+      "price": 44.99,
+      "featured": true
+    },
+    {
+      "id": 100,
+      "category_id": 5,
+      "slug": "doormat-welcome",
+      "name": "Tapete de Entrada",
+      "description": "Tapete resistente con mensaje de bienvenida",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 101,
+      "category_id": 6,
+      "slug": "face-moisturizer",
+      "name": "Crema Hidratante Facial",
+      "description": "Crema hidratante con ácido hialurónico",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 102,
+      "category_id": 6,
+      "slug": "vitamin-c-serum",
+      "name": "Sérum de Vitamina C",
+      "description": "Sérum antioxidante para el rostro",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 103,
+      "category_id": 6,
+      "slug": "organic-shampoo",
+      "name": "Champú Orgánico",
+      "description": "Champú sin sulfatos para todo tipo de cabello",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 104,
+      "category_id": 6,
+      "slug": "makeup-palette",
+      "name": "Paleta de Maquillaje",
+      "description": "Paleta de sombras y coloretes profesional",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 105,
+      "category_id": 6,
+      "slug": "essential-oils-set",
+      "name": "Set de Aceites Esenciales",
+      "description": "Colección de 6 aceites esenciales puros",
+      "price": 39.99,
+      "featured": true
+    },
+    {
+      "id": 106,
+      "category_id": 6,
+      "slug": "electric-toothbrush",
+      "name": "Cepillo Eléctrico",
+      "description": "Cepillo dental eléctrico con temporizador",
+      "price": 79.99,
+      "featured": true
+    },
+    {
+      "id": 107,
+      "category_id": 6,
+      "slug": "nail-care-kit",
+      "name": "Kit de Cuidado de Uñas",
+      "description": "Set completo para manicure profesional",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 108,
+      "category_id": 6,
+      "slug": "hair-straightener",
+      "name": "Plancha para Cabello",
+      "description": "Plancha de cerámica con control de temperatura",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 109,
+      "category_id": 6,
+      "slug": "sunscreen-spf50",
+      "name": "Protector Solar SPF 50",
+      "description": "Protección solar resistente al agua",
+      "price": 16.99,
+      "featured": false
+    },
+    {
+      "id": 110,
+      "category_id": 6,
+      "slug": "perfume-luxury",
+      "name": "Perfume de Lujo",
+      "description": "Fragancia exclusiva de larga duración",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 111,
+      "category_id": 6,
+      "slug": "body-lotion",
+      "name": "Loción Corporal",
+      "description": "Loción hidratante con manteca de karité",
+      "price": 22.99,
+      "featured": true
+    },
+    {
+      "id": 112,
+      "category_id": 6,
+      "slug": "face-mask-set",
+      "name": "Set de Mascarillas",
+      "description": "Mascarillas faciales para diferentes tipos de piel",
+      "price": 27.99,
+      "featured": true
+    },
+    {
+      "id": 113,
+      "category_id": 6,
+      "slug": "makeup-remover",
+      "name": "Desmaquillante",
+      "description": "Agua micelar para limpieza facial profunda",
+      "price": 18.99,
+      "featured": false
+    },
+    {
+      "id": 114,
+      "category_id": 6,
+      "slug": "lip-balm-set",
+      "name": "Set de Bálsamos Labiales",
+      "description": "Bálsamos hidratantes con diferentes sabores",
+      "price": 14.99,
+      "featured": false
+    },
+    {
+      "id": 115,
+      "category_id": 6,
+      "slug": "hand-cream",
+      "name": "Crema para Manos",
+      "description": "Crema nutritiva para manos secas",
+      "price": 12.99,
+      "featured": true
+    },
+    {
+      "id": 116,
+      "category_id": 6,
+      "slug": "facial-cleanser",
+      "name": "Limpiador Facial",
+      "description": "Gel limpiador suave para uso diario",
+      "price": 21.99,
+      "featured": false
+    },
+    {
+      "id": 117,
+      "category_id": 6,
+      "slug": "hair-mask",
+      "name": "Mascarilla Capilar",
+      "description": "Tratamiento intensivo para cabello dañado",
+      "price": 25.99,
+      "featured": true
+    },
+    {
+      "id": 118,
+      "category_id": 6,
+      "slug": "eye-cream",
+      "name": "Crema para Ojos",
+      "description": "Tratamiento anti-edad para el contorno de ojos",
+      "price": 37.99,
+      "featured": true
+    },
+    {
+      "id": 119,
+      "category_id": 6,
+      "slug": "deodorant-natural",
+      "name": "Desodorante Natural",
+      "description": "Desodorante sin aluminio de 24 horas",
+      "price": 9.99,
+      "featured": false
+    },
+    {
+      "id": 120,
+      "category_id": 6,
+      "slug": "bath-bomb-set",
+      "name": "Set de Bombas de Baño",
+      "description": "Bombas efervescentes aromáticas para el baño",
+      "price": 32.99,
+      "featured": true
+    },
+    {
+      "id": 121,
+      "category_id": 7,
+      "slug": "car-phone-mount",
+      "name": "Soporte para Teléfono",
+      "description": "Soporte magnético para teléfono en el auto",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 122,
+      "category_id": 7,
+      "slug": "car-vacuum-cleaner",
+      "name": "Aspiradora para Auto",
+      "description": "Aspiradora portátil de 12V para vehículos",
+      "price": 49.99,
+      "featured": true
+    },
+    {
+      "id": 123,
+      "category_id": 7,
+      "slug": "dash-camera",
+      "name": "Cámara de Tablero",
+      "description": "Cámara Full HD con grabación continua",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 124,
+      "category_id": 7,
+      "slug": "car-seat-covers",
+      "name": "Fundas para Asientos",
+      "description": "Fundas universales de cuero sintético",
+      "price": 79.99,
+      "featured": true
+    },
+    {
+      "id": 125,
+      "category_id": 7,
+      "slug": "tire-pressure-gauge",
+      "name": "Medidor de Presión",
+      "description": "Medidor digital de presión de llantas",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 126,
+      "category_id": 7,
+      "slug": "car-air-freshener",
+      "name": "Ambientador para Auto",
+      "description": "Ambientador de larga duración con clip",
+      "price": 7.99,
+      "featured": true
+    },
+    {
+      "id": 127,
+      "category_id": 7,
+      "slug": "jump-starter",
+      "name": "Arrancador de Batería",
+      "description": "Power bank para arrancar vehículos",
+      "price": 129.99,
+      "featured": false
+    },
+    {
+      "id": 128,
+      "category_id": 7,
+      "slug": "car-wax-polish",
+      "name": "Cera para Auto",
+      "description": "Cera protectora de larga duración",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 129,
+      "category_id": 7,
+      "slug": "bluetooth-adapter",
+      "name": "Adaptador Bluetooth",
+      "description": "Transmisor FM Bluetooth para auto",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 130,
+      "category_id": 7,
+      "slug": "emergency-kit",
+      "name": "Kit de Emergencia",
+      "description": "Kit completo de herramientas de emergencia",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 131,
+      "category_id": 7,
+      "slug": "car-organizer",
+      "name": "Organizador de Auto",
+      "description": "Organizador para asiento trasero",
+      "price": 22.99,
+      "featured": false
+    },
+    {
+      "id": 132,
+      "category_id": 7,
+      "slug": "windshield-washer",
+      "name": "Líquido Limpiaparabrisas",
+      "description": "Líquido concentrado para limpiaparabrisas",
+      "price": 12.99,
+      "featured": false
+    },
+    {
+      "id": 133,
+      "category_id": 7,
+      "slug": "car-charger-usb",
+      "name": "Cargador USB para Auto",
+      "description": "Cargador dual USB con carga rápida",
+      "price": 16.99,
+      "featured": false
+    },
+    {
+      "id": 134,
+      "category_id": 7,
+      "slug": "floor-mats",
+      "name": "Tapetes para Auto",
+      "description": "Tapetes universales de goma resistente",
+      "price": 39.99,
+      "featured": false
+    },
+    {
+      "id": 135,
+      "category_id": 7,
+      "slug": "steering-wheel-cover",
+      "name": "Funda para Volante",
+      "description": "Funda ergonómica antideslizante",
+      "price": 18.99,
+      "featured": false
+    },
+    {
+      "id": 136,
+      "category_id": 7,
+      "slug": "car-alarm-system",
+      "name": "Sistema de Alarma",
+      "description": "Alarma con control remoto bidireccional",
+      "price": 149.99,
+      "featured": false
+    },
+    {
+      "id": 137,
+      "category_id": 7,
+      "slug": "oil-change-kit",
+      "name": "Kit de Cambio de Aceite",
+      "description": "Kit completo para cambio de aceite",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 138,
+      "category_id": 7,
+      "slug": "backup-camera",
+      "name": "Cámara de Reversa",
+      "description": "Cámara inalámbrica de visión trasera",
+      "price": 99.99,
+      "featured": false
+    },
+    {
+      "id": 139,
+      "category_id": 7,
+      "slug": "car-polish-kit",
+      "name": "Kit de Pulido",
+      "description": "Kit profesional para pulir vehículos",
+      "price": 67.99,
+      "featured": false
+    },
+    {
+      "id": 140,
+      "category_id": 7,
+      "slug": "trailer-hitch",
+      "name": "Enganche para Remolque",
+      "description": "Enganche universal para remolques",
+      "price": 189.99,
+      "featured": false
+    },
+    {
+      "id": 141,
+      "category_id": 8,
+      "slug": "building-blocks",
+      "name": "Bloques de Construcción",
+      "description": "Set de 500 piezas de construcción",
+      "price": 34.99,
+      "featured": true
+    },
+    {
+      "id": 142,
+      "category_id": 8,
+      "slug": "remote-control-car",
+      "name": "Auto a Control Remoto",
+      "description": "Carro RC de alta velocidad",
+      "price": 79.99,
+      "featured": false
+    },
+    {
+      "id": 143,
+      "category_id": 8,
+      "slug": "plush-teddy-bear",
+      "name": "Oso de Peluche",
+      "description": "Oso suave y abrazable de 40cm",
+      "price": 24.99,
+      "featured": true
+    },
+    {
+      "id": 144,
+      "category_id": 8,
+      "slug": "puzzle-1000-pieces",
+      "name": "Rompecabezas 1000 Piezas",
+      "description": "Puzzle de paisaje con 1000 piezas",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 145,
+      "category_id": 8,
+      "slug": "action-figure-set",
+      "name": "Set de Figuras de Acción",
+      "description": "Colección de superhéroes articulados",
+      "price": 49.99,
+      "featured": true
+    },
+    {
+      "id": 146,
+      "category_id": 8,
+      "slug": "board-game-family",
+      "name": "Juego de Mesa Familiar",
+      "description": "Juego estratégico para toda la familia",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 147,
+      "category_id": 8,
+      "slug": "art-supplies-kit",
+      "name": "Kit de Arte",
+      "description": "Set completo de materiales artísticos",
+      "price": 39.99,
+      "featured": false
+    },
+    {
+      "id": 148,
+      "category_id": 8,
+      "slug": "electronic-learning-toy",
+      "name": "Juguete Educativo",
+      "description": "Tablet educativa interactiva para niños",
+      "price": 59.99,
+      "featured": false
+    },
+    {
+      "id": 149,
+      "category_id": 8,
+      "slug": "doll-house",
+      "name": "Casa de Muñecas",
+      "description": "Casa de muñecas de 3 pisos con muebles",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 150,
+      "category_id": 8,
+      "slug": "science-experiment-kit",
+      "name": "Kit de Experimentos",
+      "description": "Set de experimentos científicos seguros",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 151,
+      "category_id": 8,
+      "slug": "toy-kitchen-set",
+      "name": "Cocina de Juguete",
+      "description": "Cocina interactiva con sonidos y luces",
+      "price": 129.99,
+      "featured": true
+    },
+    {
+      "id": 152,
+      "category_id": 8,
+      "slug": "musical-keyboard",
+      "name": "Teclado Musical",
+      "description": "Piano electrónico de 37 teclas",
+      "price": 54.99,
+      "featured": false
+    },
+    {
+      "id": 153,
+      "category_id": 8,
+      "slug": "robot-toy",
+      "name": "Robot Interactivo",
+      "description": "Robot programable con control por app",
+      "price": 99.99,
+      "featured": true
+    },
+    {
+      "id": 154,
+      "category_id": 8,
+      "slug": "outdoor-play-tent",
+      "name": "Tienda de Juegos",
+      "description": "Carpa plegable para juegos al aire libre",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 155,
+      "category_id": 8,
+      "slug": "magnetic-tiles",
+      "name": "Azulejos Magnéticos",
+      "description": "Set de construcción con imanes",
+      "price": 42.99,
+      "featured": false
+    },
+    {
+      "id": 156,
+      "category_id": 8,
+      "slug": "water-gun-super",
+      "name": "Pistola de Agua",
+      "description": "Súper pistola de agua de largo alcance",
+      "price": 16.99,
+      "featured": false
+    },
+    {
+      "id": 157,
+      "category_id": 8,
+      "slug": "train-set-electric",
+      "name": "Tren Eléctrico",
+      "description": "Set de tren con vías y estación",
+      "price": 79.99,
+      "featured": true
+    },
+    {
+      "id": 158,
+      "category_id": 8,
+      "slug": "basketball-hoop",
+      "name": "Canasta de Básquet",
+      "description": "Aro de básquet ajustable para niños",
+      "price": 69.99,
+      "featured": false
+    },
+    {
+      "id": 159,
+      "category_id": 8,
+      "slug": "coloring-book-set",
+      "name": "Set de Libros para Colorear",
+      "description": "Libros de colorear con crayones incluidos",
+      "price": 12.99,
+      "featured": false
+    },
+    {
+      "id": 160,
+      "category_id": 8,
+      "slug": "walkie-talkies",
+      "name": "Radios de Juguete",
+      "description": "Par de walkie-talkies de largo alcance",
+      "price": 27.99,
+      "featured": false
+    },
+    {
+      "id": 161,
+      "category_id": 9,
+      "slug": "organic-coffee-beans",
+      "name": "Café Orgánico en Grano",
+      "description": "Granos de café premium de comercio justo",
+      "price": 24.99,
+      "featured": false
+    },
+    {
+      "id": 162,
+      "category_id": 9,
+      "slug": "artisan-chocolate",
+      "name": "Chocolate Artesanal",
+      "description": "Tableta de chocolate belga 70% cacao",
+      "price": 12.99,
+      "featured": false
+    },
+    {
+      "id": 163,
+      "category_id": 9,
+      "slug": "green-tea-premium",
+      "name": "Té Verde Premium",
+      "description": "Hojas de té verde japonés de alta calidad",
+      "price": 18.99,
+      "featured": true
+    },
+    {
+      "id": 164,
+      "category_id": 9,
+      "slug": "honey-raw-organic",
+      "name": "Miel Cruda Orgánica",
+      "description": "Miel pura sin procesar de flores silvestres",
+      "price": 16.99,
+      "featured": false
+    },
+    {
+      "id": 165,
+      "category_id": 9,
+      "slug": "olive-oil-extra-virgin",
+      "name": "Aceite de Oliva Extra Virgen",
+      "description": "Aceite prensado en frío de aceitunas españolas",
+      "price": 22.99,
+      "featured": false
+    },
+    {
+      "id": 166,
+      "category_id": 9,
+      "slug": "wine-red-reserve",
+      "name": "Vino Tinto Reserva",
+      "description": "Vino tinto añejado de la región de Rioja",
+      "price": 34.99,
+      "featured": false
+    },
+    {
+      "id": 167,
+      "category_id": 9,
+      "slug": "pasta-artisan",
+      "name": "Pasta Artesanal",
+      "description": "Pasta fresca hecha a mano con huevos",
+      "price": 8.99,
+      "featured": false
+    },
+    {
+      "id": 168,
+      "category_id": 9,
+      "slug": "spice-blend-collection",
+      "name": "Colección de Especias",
+      "description": "Set de 12 mezclas de especias gourmet",
+      "price": 39.99,
+      "featured": true
+    },
+    {
+      "id": 169,
+      "category_id": 9,
+      "slug": "truffle-oil",
+      "name": "Aceite de Trufa",
+      "description": "Aceite infusionado con trufa negra",
+      "price": 28.99,
+      "featured": false
+    },
+    {
+      "id": 170,
+      "category_id": 9,
+      "slug": "aged-cheese-selection",
+      "name": "Selección de Quesos",
+      "description": "Tabla de quesos curados artesanales",
+      "price": 44.99,
+      "featured": false
+    },
+    {
+      "id": 171,
+      "category_id": 9,
+      "slug": "craft-beer-pack",
+      "name": "Pack de Cerveza Artesanal",
+      "description": "6 cervezas artesanales de diferentes estilos",
+      "price": 32.99,
+      "featured": false
+    },
+    {
+      "id": 172,
+      "category_id": 9,
+      "slug": "balsamic-vinegar",
+      "name": "Vinagre Balsámico",
+      "description": "Vinagre balsámico envejecido de Módena",
+      "price": 19.99,
+      "featured": false
+    },
+    {
+      "id": 173,
+      "category_id": 9,
+      "slug": "gourmet-nuts-mix",
+      "name": "Mezcla de Frutos Secos",
+      "description": "Mix premium de nueces y frutos secos",
+      "price": 26.99,
+      "featured": false
+    },
+    {
+      "id": 174,
+      "category_id": 9,
+      "slug": "himalayan-pink-salt",
+      "name": "Sal Rosa del Himalaya",
+      "description": "Sal mineral pura en cristales gruesos",
+      "price": 9.99,
+      "featured": true
+    },
+    {
+      "id": 175,
+      "category_id": 9,
+      "slug": "vanilla-extract-pure",
+      "name": "Extracto de Vainilla Puro",
+      "description": "Extracto de vainilla de Madagascar",
+      "price": 14.99,
+      "featured": false
+    },
+    {
+      "id": 176,
+      "category_id": 9,
+      "slug": "smoked-salmon",
+      "name": "Salmón Ahumado",
+      "description": "Salmón ahumado en frío de Noruega",
+      "price": 38.99,
+      "featured": false
+    },
+    {
+      "id": 177,
+      "category_id": 9,
+      "slug": "matcha-powder",
+      "name": "Polvo de Matcha",
+      "description": "Matcha ceremonial de grado premium",
+      "price": 31.99,
+      "featured": false
+    },
+    {
+      "id": 178,
+      "category_id": 9,
+      "slug": "dark-chocolate-truffles",
+      "name": "Trufas de Chocolate Negro",
+      "description": "Trufas handmade con cacao del 85%",
+      "price": 21.99,
+      "featured": false
+    },
+    {
+      "id": 179,
+      "category_id": 9,
+      "slug": "herbal-tea-collection",
+      "name": "Colección de Tés Herbales",
+      "description": "Set de 8 tés herbales medicinales",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 180,
+      "category_id": 9,
+      "slug": "premium-whiskey",
+      "name": "Whiskey Premium",
+      "description": "Whiskey single malt de 12 años",
+      "price": 89.99,
+      "featured": false
+    },
+    {
+      "id": 181,
+      "category_id": 10,
+      "slug": "acoustic-guitar",
+      "name": "Guitarra Acústica",
+      "description": "Guitarra de madera con cuerdas de acero",
+      "price": 199.99,
+      "featured": true
+    },
+    {
+      "id": 182,
+      "category_id": 10,
+      "slug": "electronic-keyboard",
+      "name": "Teclado Electrónico",
+      "description": "Teclado de 88 teclas con múltiples sonidos",
+      "price": 349.99,
+      "featured": false
+    },
+    {
+      "id": 183,
+      "category_id": 10,
+      "slug": "violin-student",
+      "name": "Violín para Estudiante",
+      "description": "Violín 4/4 con estuche y arco incluidos",
+      "price": 149.99,
+      "featured": false
+    },
+    {
+      "id": 184,
+      "category_id": 10,
+      "slug": "drum-kit-electronic",
+      "name": "Batería Electrónica",
+      "description": "Kit de batería digital con pads sensibles",
+      "price": 599.99,
+      "featured": false
+    },
+    {
+      "id": 185,
+      "category_id": 10,
+      "slug": "microphone-professional",
+      "name": "Micrófono Profesional",
+      "description": "Micrófono de condensador para estudio",
+      "price": 129.99,
+      "featured": false
+    },
+    {
+      "id": 186,
+      "category_id": 10,
+      "slug": "headphones-studio",
+      "name": "Audífonos de Estudio",
+      "description": "Audífonos profesionales de monitoreo",
+      "price": 179.99,
+      "featured": false
+    },
+    {
+      "id": 187,
+      "category_id": 10,
+      "slug": "bass-guitar",
+      "name": "Bajo Eléctrico",
+      "description": "Bajo de 4 cuerdas con amplificador",
+      "price": 299.99,
+      "featured": true
+    },
+    {
+      "id": 188,
+      "category_id": 10,
+      "slug": "audio-interface",
+      "name": "Interfaz de Audio",
+      "description": "Interfaz USB para grabación profesional",
+      "price": 189.99,
+      "featured": false
+    },
+    {
+      "id": 189,
+      "category_id": 10,
+      "slug": "trumpet-brass",
+      "name": "Trompeta",
+      "description": "Trompeta de latón con estuche rígido",
+      "price": 249.99,
+      "featured": false
+    },
+    {
+      "id": 190,
+      "category_id": 10,
+      "slug": "saxophone-alto",
+      "name": "Saxofón Alto",
+      "description": "Saxofón alto dorado con llaves niqueladas",
+      "price": 449.99,
+      "featured": false
+    },
+    {
+      "id": 191,
+      "category_id": 10,
+      "slug": "music-stand",
+      "name": "Atril para Partituras",
+      "description": "Atril ajustable y plegable",
+      "price": 29.99,
+      "featured": false
+    },
+    {
+      "id": 192,
+      "category_id": 10,
+      "slug": "guitar-amplifier",
+      "name": "Amplificador de Guitarra",
+      "description": "Amplificador de 40W con efectos",
+      "price": 159.99,
+      "featured": false
+    },
+    {
+      "id": 193,
+      "category_id": 10,
+      "slug": "harmonica-set",
+      "name": "Set de Armónicas",
+      "description": "Juego de 7 armónicas en diferentes tonos",
+      "price": 79.99,
+      "featured": false
+    },
+    {
+      "id": 194,
+      "category_id": 10,
+      "slug": "digital-piano",
+      "name": "Piano Digital",
+      "description": "Piano digital de 88 teclas con pedales",
+      "price": 799.99,
+      "featured": false
+    },
+    {
+      "id": 195,
+      "category_id": 10,
+      "slug": "ukulele-soprano",
+      "name": "Ukulele Soprano",
+      "description": "Ukulele tradicional hawaiano de koa",
+      "price": 89.99,
+      "featured": true
+    },
+    {
+      "id": 196,
+      "category_id": 10,
+      "slug": "metronome-digital",
+      "name": "Metrónomo Digital",
+      "description": "Metrónomo con múltiples patrones rítmicos",
+      "price": 34.99,
+      "featured": true
+    },
+    {
+      "id": 197,
+      "category_id": 10,
+      "slug": "guitar-strings-set",
+      "name": "Cuerdas para Guitarra",
+      "description": "Set de cuerdas de alta calidad",
+      "price": 12.99,
+      "featured": true
+    },
+    {
+      "id": 198,
+      "category_id": 10,
+      "slug": "piano-bench",
+      "name": "Banco de Piano",
+      "description": "Banco ajustable con almacenamiento",
+      "price": 69.99,
+      "featured": false
+    },
+    {
+      "id": 199,
+      "category_id": 10,
+      "slug": "music-theory-book",
+      "name": "Libro de Teoría Musical",
+      "description": "Guía completa de teoría musical",
+      "price": 24.99,
+      "featured": true
+    },
+    {
+      "id": 200,
+      "category_id": 10,
+      "slug": "speaker-monitor",
+      "name": "Monitor de Estudio",
+      "description": "Altavoz de monitoreo profesional",
+      "price": 229.99,
+      "featured": false
+    }
+  ]
+}
