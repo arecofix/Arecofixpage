@@ -1,0 +1,210 @@
+<!-- Mini Header -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4 py-3">
+    <button (click)="goToHome()" class="flex items-center gap-2 text-blue-600 hover:text-blue-800">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Volver al inicio
+    </button>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="bg-blue-700 text-white py-12">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">Repuestos para Celulares</h1>
+    <p class="text-lg mb-6">Los mejores repuestos originales y compatibles</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="#catalogo" class="btn btn-primary">Ver Catálogo</a>
+      <a href="#productos" class="btn btn-outline btn-light">Productos Destacados</a>
+    </div>
+  </div>
+</section>
+
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4"></h3>
+        <div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+          <div class="flex items-stretch p-4 gap-3">
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://www.arecofix.com.ar/assets/img/products/sam.webp");'
+              ></div>
+              <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+                <div>
+                  <p class="text-white text-base font-medium leading-normal">Samsung Galaxy A31</p>
+                  <p class="text-[#97a2c3] text-sm font-normal leading-normal">En venta Samsung Galaxy A31 Color Gris | $79000 | Celulares</p>
+                </div>
+                <button
+                class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                data-id="Samsung Galaxy A31"
+                data-price="79000"
+                data-name="Samsung Galaxy A31"
+                data-image="https://www.arecofix.com.ar/assets/img/products/sam.webp"
+              >
+                <span class="btn-text">Agregar al Carrito</span>
+              </button>
+              </div>
+            </div>
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://www.arecofix.com.ar/assets/img/products/iphx.webp");'
+              ></div>
+              <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+                <div>
+                  <p class="text-white text-base font-medium leading-normal">iPhone X</p>
+                  <p class="text-[#97a2c3] text-sm font-normal leading-normal">Apple iPhone tapa trasera astillada | $369 USD | Celulares</p>
+                </div>
+                <button
+                class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                data-id="iphone-x"
+                data-name="iPhone X"
+                data-price="369"
+                data-image="https://www.arecofix.com.ar/assets/img/products/iphx.webp"
+              >
+                <span class="btn-text">Agregar al Carrito</span>
+              </button>
+              </div>
+            </div>
+
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://www.arecofix.com.ar/assets/img/products/iph8plus.webp");'
+              ></div>
+              <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+                <div>
+                  <p class="text-white text-base font-medium leading-normal">iPhone 8 Plus</p>
+                  <p class="text-[#97a2c3] text-sm font-normal leading-normal">Apple Nuevo en Caja | $290 USD | Celulares</p>
+                </div>
+                <button
+                class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                data-id="iphone-8-plus"
+                data-name="iPhone 8 Plus"
+                data-price="290"
+                data-image="https://www.arecofix.com.ar/assets/img/products/iph8plus.webp"
+              >
+                <span class="btn-text">Agregar al Carrito</span>
+              </button>
+              </div>
+            </div>
+
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://www.arecofix.com.ar/assets/img/products/j2.webp");'
+              ></div>
+              <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+                <div>
+                  <p class="text-white text-base font-medium leading-normal">Samsung Galaxy J2 Prime</p>
+                  <p class="text-[#97a2c3] text-sm font-normal leading-normal">Samsung J2 Prime Vidrio Astillado | $29000 | Celulares</p>
+                </div>
+                <button
+                class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                data-id="Samsung Galaxy J2 Prime"
+                data-name="Samsung Galaxy J2 Prime"
+                data-price="599"
+                data-image="https://www.arecofix.com.ar/assets/img/products/j2.webp"
+              >
+                <span class="btn-text">Agregar al Carrito</span>
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<!-- PDF Catalog -->
+<section id="catalogo" class="py-12">
+  <div class="container mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-bold">Catálogo Completo</h2>
+        <p>Consulta todos nuestros repuestos disponibles</p>
+      </div>
+      
+      <div class="p-6">
+        @if (selectedProduct) {
+          <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+            <div class="flex justify-between">
+              <div>
+                <h3 class="font-bold">Seleccionado:</h3>
+                <p class="text-blue-600">{{selectedProduct.name}}</p>
+                <p class="text-gray-600">{{selectedProduct.price}}</p>
+              </div>
+              <button (click)="selectedProduct = null" class="text-blue-600">Cambiar</button>
+            </div>
+          </div>
+        }
+        
+        <div class="aspect-w-16 aspect-h-9 mb-6">
+          <iframe 
+            src="https://docs.google.com/document/d/1ruj8_eUsY87CbLplt5Nn0zLQBbiDopK0/edit?tab=t.0" 
+            class="w-full h-96 border rounded-lg"
+            allow="autoplay"
+          ></iframe>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a 
+            [href]="getWhatsappLink()"
+            target="_blank"
+            class="btn btn-success flex-1"
+            [class.btn-disabled]="!selectedProduct"
+          >
+            Pedir por WhatsApp
+          </a>
+          <a 
+            href="https://docs.google.com/document/d/1ruj8_eUsY87CbLplt5Nn0zLQBbiDopK0/edit?tab=t.0"
+            class="btn btn-outline btn-primary flex-1"
+            download
+          >
+            Descargar Catálogo
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Blog Section -->
+<section class="py-12 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <h2 class="text-2xl font-bold text-center mb-8">Consejos y Tutoriales</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <article class="card bg-white shadow-md hover:shadow-lg">
+        <figure class="h-48 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c" alt="Tutorial" class="w-full h-full object-cover">
+        </figure>
+        <div class="card-body">
+          <h3 class="card-title">Cómo cambiar la pantalla</h3>
+          <p class="text-gray-600 mb-4">Guía paso a paso para reemplazar pantallas de celulares</p>
+          <a href="/blog/pantallas" class="btn btn-ghost text-blue-600">Leer más</a>
+        </div>
+      </article>
+      
+      <article class="card bg-white shadow-md hover:shadow-lg">
+        <figure class="h-48 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a7d5" alt="Tutorial" class="w-full h-full object-cover">
+        </figure>
+        <div class="card-body">
+          <h3 class="card-title">Mantenimiento de baterías</h3>
+          <p class="text-gray-600 mb-4">Consejos para prolongar la vida de la batería</p>
+          <a href="/blog/baterias" class="btn btn-ghost text-blue-600">Leer más</a>
+        </div>
+      </article>
+      
+      <article class="card bg-white shadow-md hover:shadow-lg">
+        <figure class="h-48 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1581094271901-8022df4466f9" alt="Tutorial" class="w-full h-full object-cover">
+        </figure>
+        <div class="card-body">
+          <h3 class="card-title">Herramientas esenciales</h3>
+          <p class="text-gray-600 mb-4">Qué necesitas para reparar celulares</p>
+          <a href="/blog/herramientas" class="btn btn-ghost text-blue-600">Leer más</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

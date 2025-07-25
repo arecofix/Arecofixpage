@@ -409,6 +409,33 @@
   </div>
 </div>
 
+<!-- Componente de Repuestos para Celulares -->
+<section class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-dark">
+  <div class="relative">
+    <!-- Separador con texto -->
+    <div class="relative mb-16 text-center">
+      <h2 class="inline-block bg-dark px-6 text-3xl sm:text-4xl font-bold text-white relative z-10">
+        ¿Necesitas repuestos para tu celular?
+      </h2>
+      <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent z-0"></div>
+    </div>
+    
+    <!-- Botón destacado centrado -->
+    <div class="text-center">
+      <a 
+        href="http://localhost:4200/#/repuestos"
+        class="relative overflow-hidden rounded-full px-8 py-4 text-lg font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-400 hover:-translate-y-1 inline-block"
+        style="background: linear-gradient(45deg, #0066ff, #121212); background-size: 200% 200%; animation: gradientShift 6s ease infinite;"
+        aria-label="Ver lista completa de repuestos y precios"
+      >
+        <span class="relative z-10">Ver lista completa de repuestos y precios</span>
+        <!-- Efecto de brillo superior -->
+        <span class="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-white/30 to-transparent rounded-full"></span>
+      </a>
+    </div>
+  </div>
+</section>
+
 <div class="relative overflow-hidden bg-dark">
   <div class="pt-16 pb-80 sm:pt-24 sm:pb-40 lg:pt-40 lg:pb-48">
     <div class="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
@@ -443,10 +470,10 @@
                 </div>
                 <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
                   <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="https://images.unsplash.com/photo-1579403124614-197f69d8187b?w=600&auto=format" alt="" class="size-full object-cover" />
+                    <img src="assets/img/cursos/yoo.jpg" alt="" class="size-full object-cover" />
                   </div>
-                  x<div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="https://images.unsplash.com/photo-1579403124614-197f69d8187b?w=600&auto=format" alt="" class="size-full object-cover" />
+                  <div class="h-64 w-44 overflow-hidden rounded-lg">
+                    <img src="assets/img/cursos/municipio.jpg" alt="" class="size-full object-cover" />
                   </div>
                 </div>
               </div>
@@ -459,6 +486,61 @@
     </div>
   </div>
 </div>
+
+<section class="py-12 bg-white">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Título + descripción -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Formación Profesional Certificada</h2>
+      <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+        Más de 500 alumnos capacitados con nuestros métodos comprobados
+      </p>
+    </div>
+
+    <!-- Grid de beneficios -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-6 mb-12">
+      <ng-container *ngFor="let item of [
+        { img: 'assets/img/cursos/egresado-2025.jpg', title: 'Tobias Marchi', subtitle: 'Egresado 2025' },
+        { img: 'assets/img/cursos/alumno3.jpg', title: 'Certificación Oficial', subtitle: 'Mejora tus capacidades' },
+        { img: 'assets/img/cursos/alumno2.jpg', title: 'Aulas Equipadas', subtitle: 'Tecnología de última generación' },
+        { img: 'assets/img/cursos/aprendizaje-practico.jpg', title: 'Aprendizaje Práctico', subtitle: '85% práctica - 15% teoría' }
+      ]">
+        <div class="bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition">
+          <div class="aspect-square sm:aspect-video">
+            <img [src]="item.img" [alt]="item.title" class="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div class="p-4 text-center">
+            <p class="text-base font-semibold text-gray-800">{{ item.title }}</p>
+            <p class="text-sm text-gray-500">{{ item.subtitle }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Testimonio + Botón -->
+    <div class="bg-blue-50 rounded-xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div class="md:flex-1">
+        <blockquote class="text-gray-800 italic text-base">
+          "Gracias a la formación recibida, pude abrir mi propio taller en solo 6 meses. Los instructores son profesionales con amplia experiencia real."
+        </blockquote>
+        <p class="mt-3 font-medium text-gray-900">- María González, egresada</p>
+      </div>
+      <div class="md:text-right">
+        <a 
+  href="#/cursos"
+  class="inline-flex items-center px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm sm:text-base shadow-md transition-all duration-300"
+>
+  Ver Cursos y Capacitaciones
+  <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+  </svg>
+</a>
+
+      </div>
+    </div>
+  </div>
+</section>
 
 <div class="relative overflow-hidden bg-dark">
   <div class="pt-16 pb-80 sm:pt-24 sm:pb-40 lg:pt-40 lg:pb-48">
@@ -475,7 +557,7 @@
               <div class="flex items-center space-x-6 lg:space-x-8">
                 <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
                   <div class="h-64 w-44 overflow-hidden rounded-lg sm:opacity-0 lg:opacity-100">
-                    <img src="https://images.pexels.com/photos/270404/pexels-photo-270404.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" class="size-full object-cover" />
+                    <img src="assets/img/cursos/pro.webp" alt="" class="size-full object-cover" />
                   </div>
                   <div class="h-64 w-44 overflow-hidden rounded-lg">
                     <img src="https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" class="size-full object-cover" />

@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ReservationCalendar } from '../../reservation-calendar/reservation-calendar';
 import { DataService, Producto, Categoria } from '../../services/data';
 
 @Component({
   selector: 'app-public-home-page',
-  imports: [ReservationCalendar],
+  imports: [CommonModule, ReservationCalendar],
   templateUrl: './public-home-page.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,

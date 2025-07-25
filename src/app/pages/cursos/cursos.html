@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-base-200 text-base-content">
+  <!-- Header -->
+  <div class="navbar bg-base-100 shadow-md sticky top-0 z-50">
+    <div class="flex-1">
+      <a class="btn btn-ghost text-xl" routerLink="/">Areco Academy</a>
+    </div>
+    <div class="flex-none hidden md:flex gap-2">
+      <a class="btn btn-outline btn-sm" routerLink="/">Volver al inicio</a>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero min-h-[50vh] bg-cover bg-center" style="background-image: url('assets/img/hero-banner.jpg');">
+    <div class="hero-overlay bg-opacity-60"></div>
+    <div class="hero-content text-center text-neutral-content">
+      <div class="max-w-2xl">
+        <h1 class="mb-5 text-5xl font-bold">Nuestros Cursos</h1>
+        <p class="mb-5">Capacitate con clases 100% online, actualizadas y a tu ritmo.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cursos -->
+  <section class="py-16 px-6 container mx-auto">
+    <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div *ngFor="let curso of courses" class="card bg-base-100 shadow-xl transition-transform hover:-translate-y-1">
+        <figure>
+          <img [src]="curso.image" [alt]="curso.title" class="h-48 w-full object-cover" />
+        </figure>
+        <div class="card-body">
+          <h2 class="card-title">{{ curso.title }}</h2>
+          <p>{{ curso.description }}</p>
+          <div class="flex items-center justify-between mt-4">
+            <span class="text-primary font-bold text-lg">{{ formatPrice(curso.price) }}</span>
+            <button class="btn btn-accent btn-sm" (click)="inscribirse(curso.title)">Inscribirme</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer p-10 bg-base-300 text-base-content">
+    <aside>
+      <img src="assets/img/logo.png" class="w-12 h-12" alt="Logo" />
+      <p><strong>Areco Academy</strong><br />Educación online desde 2023</p>
+    </aside>
+    <nav>
+      <h6 class="footer-title">Contacto</h6>
+      <a class="link link-hover" href="mailto:info@arecoacademy.com"></a>
+      <a class="link link-hover" href="https://wa.me/5491112345678" target="_blank">WhatsApp</a>
+      <a class="link link-hover" href="#">Instagram</a>
+    </nav>
+  </footer>
+</div>
