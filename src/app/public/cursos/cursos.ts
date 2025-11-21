@@ -1,0 +1,117 @@
+import { Component, OnInit, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CoursesService, Course } from '../../services/courses.service';
+import { timeout, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs';
+import { IsEmptyComponent, IsErrorComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
+import { CategoryService } from '@app/public/categories/services';
+import { ProductService } from '@app/public/products/services';
+import { ProductCard } from '@app/public/products/components';
+import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
+import { iCategoriesResponse } from '@app/public/categories/interfaces';
+import { iProductsResponse } from '@app/public/products/interfaces';
+
+@Component({
+    selector: 'app-cursos',
+    standalone: true,
+    imports: [CommonModule, IsEmptyComponent, IsErrorComponent, IsLoadingComponent, ProductCard, Pagination],
+    templateUrl: './cursos.html',
+    styleUrls: ['./cursos.scss']
+})
+export class CursosComponent implements OnInit {
+    courses: Course[] = [];
+    loading = true;
+    error: string | null = null;
+
+    benefits = [
+        { icon: 'fa-certificate', title: 'Certificación Oficial', description: 'Título avalado por el municipio' },
+        { icon: 'fa-tools', title: 'Equipamiento Profesional', description: 'Acceso a herramientas de última generación' },
+        { icon: 'fa-users', title: 'Clases Reducidas', description: 'Máximo 15 alumnos por curso' },
+        { icon: 'fa-briefcase', title: 'Salida Laboral', description: 'Bolsa de trabajo y prácticas profesionales' }
+    ];
+
+    constructor(private coursesService: CoursesService, private route: ActivatedRoute, private categoryService: CategoryService, private productService: ProductService, public paginationService: PaginationService) { }
+
+    ngOnInit() {
+        this.loadCourses();
+    }
+
+    loadCourses() {
+        this.loading = true;
+        // Remove ordering by created_at as it might be causing issues if the column is missing or unindexed
+        this.coursesService.getCourses().pipe(
+            timeout(5000), // Timeout after 5 seconds
+            catchError(err => {
+                console.error('Timeout or error fetching courses:', err);
+                return of({ error: err, data: null });
+            })
+        ).subscribe({
+            next: (response) => {
+                if (response.error) {
+                    console.error('Error fetching courses:', response.error);
+                    // Don't show error to user immediately, try fallback
+                    this.courses = this.getMockCourses();
+                } else {
+                    this.courses = response.data || [];
+                    // Add mock data for fields not yet in DB or if DB is empty for demo
+                    if (this.courses.length === 0) {
+                        this.courses = this.getMockCourses(); // Fallback to mock if DB is empty
+                    } else {
+                        // Map optional fields if missing in DB
+                        this.courses = this.courses.map(c => ({
+                            ...c,
+                            rating: c.rating || 4.8,
+                            students: c.students || 0
+                        }));
+                    }
+                }
+                this.loading = false;
+            },
+            error: (err) => {
+                console.error('Unexpected error:', err);
+                this.error = 'Error de conexión.';
+                this.loading = false;
+                this.courses = this.getMockCourses(); // Fallback
+            }
+        });
+    }
+
+    getMockCourses() {
+        return [
+            {
+                id: '1',
+                title: 'Reparación de Celulares - Nivel Básico',
+                slug: 'reparacion-celulares-basico',
+                description: 'Aprende los fundamentos de la reparación de smartphones. Incluye diagnóstico, cambio de pantallas y baterías.',
+                duration: '3 meses',
+                schedule: 'Lunes y Miércoles 18:00-21:00',
+                price: 45000,
+                image_url: 'assets/img/cursos/curso-reparacion-de-celulares.jpg',
+                level: 'Básico',
+                students: 120,
+                rating: 4.8
+            },
+            // ... (rest of the mock data can be kept here as fallback)
+        ];
+    }
+
+    // Productos vinculados a la categoría "cursos"
+    productsRs = rxResource<iProductsResponse, unknown>({
+        stream: () => this.categoryService.getDataBySlug('cursos').pipe(
+            switchMap((category: iCategoriesResponse) => this.productService.getData({
+                category_id: Number(category.data?.[0]?.id),
+                _page: this.paginationService.currentPage() || 1,
+            }))
+        )
+    });
+
+    paginationData = computed<iPagination | null>(() => {
+        const data = this.productsRs.value();
+        if (!data) return null;
+        const { data: products, ...pagination } = data;
+        return pagination as iPagination;
+    });
+}

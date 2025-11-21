@@ -1,0 +1,41 @@
+<!-- Category Card with daisyUI styling -->
+<div
+  class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 h-full"
+>
+  <div class="card-body text-center p-6">
+    <!-- Icon container with background -->
+    <div
+      class="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center"
+    >
+      <span class="text-3xl">
+
+        <i [class]="category().icon"></i>
+      </span>
+    </div>
+
+    <!-- Category name -->
+    <h2 class="card-title text-lg font-bold justify-center mb-2">
+      {{ category().name }}
+    </h2>
+
+    <!-- Category description -->
+    <p class="text-base-content/70 text-sm line-clamp-2 mb-4">
+      {{ category().description }}
+    </p>
+
+    <!-- Featured badge -->
+    @if (category().featured) {
+    <div class="badge badge-primary badge-sm mb-3">⭐ Featured</div>
+    }
+
+    <!-- Action button -->
+    <div class="card-actions justify-center">
+      <a
+        [routerLink]="['/products/category', category().slug]"
+        class="btn btn-primary btn-sm w-full"
+      >
+        View Products
+      </a>
+    </div>
+  </div>
+</div>

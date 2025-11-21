@@ -1,0 +1,24 @@
+@if (categoriesRs.isLoading()) {
+  <is-loading />
+} @else if (!categoriesRs.hasValue()) {
+  <is-empty />
+} @else if (categoriesRs.error()) {
+  <is-error />
+} @else if (categoriesRs.hasValue()) {
+
+  @if (paginationData()) {
+    <pagination
+      [pages]="categoriesRs.value().pages"
+      [currentPage]="paginationService.currentPage()"
+    />
+  }
+
+  <div class="divider"></div>
+
+  <!-- Responsive category grid: 1 column on small, 3 on medium, 5 on large screens -->
+  <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6 p-6">
+    @for (category of filteredCategories(); track $index) {
+      <public-category-card [category]="category" />
+    }
+  </div>
+}

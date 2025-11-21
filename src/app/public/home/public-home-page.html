@@ -1,0 +1,905 @@
+<div class="hero min-h-screen relative">
+  <!-- Imagen de fondo -->
+  <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center"></div>
+
+  <!-- Overlay semitransparente -->
+  <div class="absolute inset-0 bg-black/60"></div>
+
+  <!-- Contenido del héroe -->
+  <div class="hero-content text-center text-neutral-content relative z-10">
+    <div class="max-w-md px-4">
+      <h1 class="mb-5 text-4xl md:text-5xl font-bold drop-shadow-md">{{ title }}</h1>
+      <p class="mb-5 text-base md:text-lg leading-relaxed">
+        {{ message }}
+      </p>
+      <a href="http://arecofix.com.ar/#/products/category/repuestos" class="btn btn-primary" target="_blank">
+        Productos
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="bg-dark pt-10 pb-24 sm:pt-5 sm:pb-9">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl sm:mt-0 lg:mt-0 lg:max-w-7xl">
+      <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+        <!-- Push to deploy -->
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold text-white">
+            <div class="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="size-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+              </svg>
+            </div>
+            Soluciones Informáticas
+          </dt>
+          <dd class="mt-2 text-base text-gray-400">Consultoría IT y desarrollo a medida.</dd>
+        </div>
+
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold text-white">
+            <div class="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="size-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              </svg>
+            </div>
+            Pagos Seguros
+          </dt>
+          <dd class="mt-2 text-base text-gray-400">Aceptamos todos los medios de pago.</dd>
+        </div>
+
+        <!-- Simple queues -->
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold text-white">
+            <div class="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="size-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </div>
+            Devolvciones y cambios
+          </dt>
+          <dd class="mt-2 text-base text-gray-400">Trabajamos con Garantia de 30 dias.</dd>
+        </div>
+
+        <!-- Advanced security -->
+        <div class="relative pl-16">
+          <dt class="text-base font-semibold text-white">
+            <div class="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-indigo-600">
+              <svg class="size-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+              </svg>
+            </div>
+            Soporte Técnico
+          </dt>
+          <dd class="mt-2 text-base text-gray-400">Asistencia técnica y mantenimiento para tu Dispositivo Movil.</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENEDOR DE CARDS -->
+<div class="w-full px-4 py-2">
+  <div class="max-w-3xl mx-auto text-center mb-6">
+    <p class="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-balance">
+      Productos Destacados
+    </p>
+    <p class="mt-4 text-lg text-gray-400">
+      Encuentra todo en tecnología.
+    </p>
+  </div>
+  <div class="mx-auto max-w-7xl">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 place-items-center">
+
+    </div>
+  </div>
+</div>
+
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4"></h3>
+<div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+  <div class="flex items-stretch p-4 gap-3">
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/sam.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Samsung Galaxy A31</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">En venta Samsung Galaxy A31 Color Gris | $79000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="Samsung Galaxy A31"
+          data-price="79000"
+          data-name="Samsung Galaxy A31"
+          data-image="assets/img/products/sam.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/iphx.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">iPhone X</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Apple iPhone tapa trasera astillada | $369 USD | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="iphone-x"
+          data-name="iPhone X"
+          data-price="369"
+          data-image="assets/img/products/iphx.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/iph8plus.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">iPhone 8 Plus</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Apple Nuevo en Caja | $290 USD | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="iphone-8-plus"
+          data-name="iPhone 8 Plus"
+          data-price="290"
+          data-image="assets/img/products/iph8plus.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/j2.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Samsung Galaxy J2 Prime</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Samsung J2 Prime Vidrio Astillado | $29000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="Samsung Galaxy J2 Prime"
+          data-name="Samsung Galaxy J2 Prime"
+          data-price="599"
+          data-image="assets/img/products/j2.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ofertas Especiales</h3>
+<div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+  <div class="flex items-stretch p-4 gap-3">
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/a06.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Samsung Galaxy A06</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Lo ultimo de Samsung | $320 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="Samsung Galaxy A06"
+          data-name="Samsung Galaxy A06"c.
+          data-price="320"
+          data-image="https://lh3.googleusercontent.com/...imagen.jpg"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/arreglo-consolas.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Auriculares P9 Pro Max</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Auriculares Nuevo en Caja | $19000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="auriculares-p9-pro-max"
+          data-name="Auriculares P9 Pro Max"
+          data-price="999"
+          data-image="https://lh3.googleusercontent.com/...imagen.jpg"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/servicio-tecnico-consolas.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Parlante Cargador Inalambrico</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Parlante Nuevo en Caja | $27000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="parlante-cargador-inalambrico"
+          data-name="Parlante Cargador Inalambrico"
+          data-price="27000"
+          data-image="https://lh3.googleusercontent.com/...imagen.jpg"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/reparacion-consolas.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Joystick Play Station 4</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Joystick Nuevo en Caja | $47800 | Consolas</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="joystick-play-station-4"
+          data-name="Joystick Play Station 4"
+          data-price="47800"
+          data-image="https://lh3.googleusercontent.com/...imagen.jpg"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Lo mejor en tecnología</h3>
+<div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+  <div class="flex items-stretch p-4 gap-3">
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/sam.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Samsung Galaxy J8</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">En venta Samsung Galaxy J8 Color Azul | $79000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="Samsung Galaxy J8"
+          data-price="69000"
+          data-name="Samsung Galaxy J8"
+          data-image="assets/img/products/j8.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/iphx.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">Motorola Moto E32</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Motorola Moto E32 | $56000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="motorola-moto-e32"
+          data-name="Motorola Moto E32"
+          data-price="56000"
+          data-image="assets/img/products/motorola.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/iph8plus.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">iPhone 8 Plus</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">Apple Nuevo en Caja | $290 USD | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="iphone-8-plus"
+          data-name="iPhone 8 Plus"
+          data-price="290"
+          data-image="assets/img/products/iph8plus.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-[#1c2131] shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-60">
+      <div
+        class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+        style='background-image: url("assets/img/products/j2.webp");'
+      ></div>
+      <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+        <div>
+          <p class="text-white text-base font-medium leading-normal">TCL 7 SE</p>
+          <p class="text-[#97a2c3] text-sm font-normal leading-normal">TCL 7 SE Vidrio Astillado | $29000 | Celulares</p>
+        </div>
+        <button
+          class="add-to-cart-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#272e44] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+          data-id="TCL 7 SE"
+          data-name="TCL 7 SE"
+          data-price="9800"
+          data-image="https://www.arecofix.com.ar/assets/img/products/tcl.webp"
+          >
+          <span class="btn-text">Agregar al Carrito</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="relative min-h-[600px] overflow-hidden rounded-2xl shadow-2xl bg-black">
+  <!-- Fondo con técnico y celular completo -->
+  <div class="absolute inset-0 z-0">
+    <!-- Imagen del técnico -->
+    <img src="https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+      alt="Técnico reparando smartphone"
+      class="w-full h-full object-cover object-[center_30%] opacity-99">
+      <!-- Degradado personalizado #232548 a negro -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#232548] via-[#232548]/80 to-black/90"></div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="relative z-10 flex flex-col items-center justify-center h-full p-6 md:p-12 text-center">
+      <!-- Título -->
+      <h2 class="text-3xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg max-w-2xl">
+        <span class="text-blue-300">Servicio Técnico</span><br>
+        Reparación rápida y garantizada
+      </h2>
+      <h3 class="text-lg text-white/90">Agenda una cita ahora sin cargo para reparar tu dispositivo en el dia</h3>
+      <br>
+        <!-- Calendario -->
+        <div class="w-full max-w-2xl bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-200">
+          <app-reservation-calendar></app-reservation-calendar>
+        </div>
+
+        <!-- Garantía -->
+        <div class="mt-8 p-4 bg-black/50 rounded-lg border border-[#3a3b6a]">
+          <p class="text-white/90 text-lg font-medium flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Garantía de 30 días en todas las reparaciones
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <main class="bg-slate-900 text-white overflow-hidden">
+
+      <section class="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-blue-600/10 blur-[120px] rounded-full -z-10"></div>
+
+        <div class="max-w-4xl mx-auto text-center space-y-8">
+          <div class="space-y-4">
+            <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight">
+              <span class="block text-white">¿Tu celular necesita vida nueva?</span>
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                Tenemos el repuesto exacto.
+              </span>
+            </h2>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+              Pantallas, baterías y módulos originales con la mejor garantía del mercado.
+            </p>
+          </div>
+
+          <div class="flex justify-center gap-6 text-sm font-medium text-slate-300">
+            <span class="flex items-center gap-2"><i class="fas fa-check-circle text-green-400"></i> Garantía Real</span>
+            <span class="flex items-center gap-2"><i class="fas fa-shipping-fast text-blue-400"></i> Stock Inmediato</span>
+          </div>
+
+          <div class="relative inline-flex group">
+            <div class="absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-full blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
+            <a
+              href="https://arecofix.com.ar/#/repuestos"
+              title="Ver productos electrónicos"
+              class="relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-slate-900 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+              role="button">
+              Ver Productos
+              <svg class="w-5 h-5 ml-2 -mr-1 transition-transform duration-200 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
+
+      <section class="relative py-24 lg:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+
+          <div class="text-left space-y-6 z-10">
+            <div class="inline-flex items-center space-x-2 bg-indigo-900/30 border border-indigo-500/30 rounded-full px-3 py-1">
+              <span class="flex h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
+              <span class="text-indigo-300 text-sm font-medium">Software Factory</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl font-bold text-white leading-tight">
+              Transformamos ideas en <br/>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+                Software de Alto Impacto
+              </span>
+            </h1>
+
+            <p class="text-lg text-slate-400 leading-relaxed max-w-lg">
+              Desarrollo web y móvil a medida. Creamos soluciones escalables que impulsan tu negocio digitalmente.
+            </p>
+
+            <div class="flex flex-wrap gap-4 pt-4">
+              <a href="https://wa.me/541125960900" class="px-7 py-3.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/20">
+                Cotizar Proyecto
+              </a>
+              <a href="https://arecofix.com.ar/#/portfolio" class="px-7 py-3.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition">
+                Ver Portfolio
+              </a>
+            </div>
+
+            <div class="pt-8 border-t border-slate-800">
+              <p class="text-sm text-slate-500 mb-3">Tecnologías que utilizamos:</p>
+              <div class="flex gap-4 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
+                <i class="fab fa-angular text-2xl text-red-600"></i>
+                <i class="fab fa-node text-2xl text-green-500"></i>
+                <i class="fab fa-aws text-2xl text-orange-500"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative lg:h-full flex items-center justify-center">
+            <div class="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-full blur-[100px] opacity-20"></div>
+
+            <div class="relative bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-2 shadow-2xl transform rotate-1 hover:rotate-0 transition duration-500">
+              <img
+                src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop"
+                alt="Coding Interface"
+                class="rounded-xl shadow-inner object-cover w-full h-auto max-h-[500px]"
+                loading="lazy"
+                />
+
+                <div class="absolute -bottom-6 -left-6 bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl flex items-center gap-3 animate-bounce-slow">
+                  <div class="bg-green-500/20 p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-400">Status</p>
+                    <p class="text-sm font-bold text-white">100% Optimizado</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </main>
+
+      <section class="py-12 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+
+          <!-- Título + descripción -->
+
+          <a href="https://arecofix.com.ar/#/cursos" class="block no-underline">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Formación Profesional Certificada</h2>
+              <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                Más de 500 alumnos capacitados con nuestros métodos comprobados
+              </p>
+            </div>
+          </a>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-6 mb-12">
+            @for (item of [
+              { img: 'assets/img/cursos/egresado-2025.jpg', title: 'Tobias Marchi', subtitle: 'Egresado 2025' },
+              { img: 'assets/img/cursos/alumno3.jpg', title: 'Certificación Oficial', subtitle: 'Mejora tus capacidades' },
+              { img: 'assets/img/cursos/alumno2.jpg', title: 'Aulas Equipadas', subtitle: 'Tecnología de última generación' },
+              { img: 'assets/img/cursos/aprendizaje-practico.jpg', title: 'Aprendizaje Práctico', subtitle: '85% práctica - 15% teoría' }
+              ]; track item) {
+              <a href="https://arecofix.com.ar/#/cursos" class="block bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition cursor-pointer">
+                <div class="aspect-square sm:aspect-video">
+                  <img [src]="item.img" [alt]="item.title" class="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div class="p-4 text-center">
+                  <p class="text-base font-semibold text-gray-800">{{ item.title }}</p>
+                  <p class="text-sm text-gray-500">{{ item.subtitle }}</p>
+                </div>
+              </a>
+            }
+          </div>
+
+          <!-- Testimonio + Botón -->
+          <div class="bg-blue-50 rounded-xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div class="md:flex-1">
+              <blockquote class="text-gray-800 italic text-base">
+                "Gracias a la formación recibida, pude abrir mi propio taller en solo 6 meses. Los instructores son profesionales con amplia experiencia real."
+              </blockquote>
+              <p class="mt-3 font-medium text-gray-900">- María González, egresada</p>
+            </div>
+            <div class="md:text-right">
+              <a
+                href="https://arecofix.com.ar/#/cursos"
+
+                class="inline-flex items-center px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm sm:text-base shadow-md transition-all duration-300"
+                >
+                Ver Cursos y Capacitaciones
+                <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+              </a>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="relative overflow-hidden bg-gray-900 py-16 sm:py-24">
+
+        <!-- Fondo decorativo sutil -->
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            <!-- Contenido de Texto (SEO Optimizado) -->
+            <div class="sm:max-w-lg z-10">
+              <div class="inline-flex items-center rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20 mb-6">
+                <i class="fas fa-gamepad mr-2"></i> Servicio Técnico Oficial
+              </div>
+
+              <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl mb-6">
+                Reparación de <br>
+                <span class="text-indigo-500">Consolas de Videojuegos</span>
+              </h2>
+
+              <p class="mt-4 text-xl text-gray-400 leading-relaxed">
+                Recuperamos tu diversión. Ofrecemos mantenimiento preventivo, limpieza profunda y reparación avanzada de hardware para
+                <strong class="text-white">PlayStation, Xbox y Nintendo</strong>.
+              </p>
+
+              <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                <!-- Botón Principal (WhatsApp) -->
+                <a
+                  href="https://wa.me/5491125960900?text=Hola,%20quisiera%20cotizar%20la%20reparación%20de%20mi%20consola."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center justify-center rounded-lg border border-transparent bg-green-600 px-8 py-4 text-base font-semibold text-white hover:bg-green-500 hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                  <i class="fab fa-whatsapp text-xl mr-3"></i>
+                  Cotizar Reparación
+                </a>
+
+                <!-- Botón Secundario (Opcional) -->
+                <a href="https://arecofix.com.ar/#/repuestos" class="inline-flex items-center justify-center rounded-lg border border-gray-700 bg-gray-800/50 px-8 py-4 text-base font-semibold text-gray-300 hover:bg-gray-800 hover:text-white transition-all duration-300 backdrop-blur-sm">
+                  Ver Productos
+                </a>
+              </div>
+            </div>
+
+            <!-- Grilla Decorativa de Imágenes (Visualmente atractiva) -->
+            <div class="relative lg:static" aria-hidden="true">
+              <div class="absolute inset-0 bg-gradient-to-tr from-gray-900 via-transparent to-transparent z-10 lg:hidden"></div>
+
+              <!-- Grid Container -->
+              <div class="absolute transform sm:top-0 sm:left-1/2 sm:translate-x-8 lg:top-1/2 lg:left-1/2 lg:translate-x-8 lg:-translate-y-1/2 w-full">
+                <div class="flex items-center space-x-6 lg:space-x-8">
+
+                  <!-- Columna 1 -->
+                  <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8 animate-pulse-slow">
+                    <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform rotate-3 hover:rotate-0 transition-all duration-500 opacity-0 lg:opacity-100">
+                      <img src="assets/img/cursos/pro.webp" alt="" class="h-full w-full object-cover"
+                        onerror="this.src='https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=600&auto=format&fit=crop'"/>
+                      </div>
+                      <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform -rotate-2 hover:rotate-0 transition-all duration-500">
+                        <img src="https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" class="h-full w-full object-cover" />
+                      </div>
+                    </div>
+
+                    <!-- Columna 2 (Central) -->
+                    <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8 mt-12">
+                      <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform hover:scale-105 transition-all duration-500">
+                        <img src="assets/img/cursos/laboratorio.webp" alt="" class="h-full w-full object-cover"
+                          onerror="this.src='https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop'" />
+                        </div>
+                        <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform hover:scale-105 transition-all duration-500">
+                          <img src="assets/img/cursos/local.webp" alt="" class="h-full w-full object-cover"
+                            onerror="this.src='https://images.unsplash.com/photo-1592840496053-a12a3c73717e?q=80&w=600&auto=format&fit=crop'" />
+                          </div>
+                          <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform hover:scale-105 transition-all duration-500">
+                            <img src="assets/img/cursos/curso-reparacion-de-celulares.jpg" alt="" class="h-full w-full object-cover"
+                              onerror="this.src='https://images.unsplash.com/photo-1597424214790-16cf62935bd0?q=80&w=600&auto=format&fit=crop'" />
+                            </div>
+                          </div>
+
+                          <!-- Columna 3 -->
+                          <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
+                            <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform rotate-3 hover:rotate-0 transition-all duration-500">
+                              <img src="https://images.unsplash.com/photo-1579403124614-197f69d8187b?w=600&auto=format" alt="" class="h-full w-full object-cover" />
+                            </div>
+                            <div class="h-64 w-44 overflow-hidden rounded-xl border border-gray-800 shadow-2xl transform -rotate-3 hover:rotate-0 transition-all duration-500">
+                              <img src="https://images.unsplash.com/photo-1579403124614-197f69d8187b?w=600&auto=format" alt="" class="h-full w-full object-cover" />
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </section>
+
+              <div class="bg-black py-16 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                  <!-- Título -->
+                  <h2 class="text-3xl font-bold text-center text-white mb-12">
+                    Lo que dicen nuestros clientes
+                  </h2>
+
+                  <!-- Contenedor de reseñas -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Reseña 1 -->
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-blue-400 transition-all duration-300">
+                      <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/43.jpg"
+                          alt="Cliente 1"
+                          class="w-12 h-12 rounded-full object-cover mr-4">
+                          <div>
+                            <h4 class="text-white font-medium">Jimena Rodriguez</h4>
+                            <div class="flex items-center mt-1">
+                              <div class="flex text-yellow-400">
+                                ★★★★★
+                              </div>
+                              <span class="text-gray-400 text-sm ml-2">5.0</span>
+                            </div>
+                          </div>
+                        </div>
+                        <p class="text-gray-300 mb-4">
+                          "Rápida reparación de mi pantalla en menos de 2 horas. Excelente servicio."
+                        </p>
+                        <div class="text-gray-500 text-sm">
+                          <i class="far fa-clock mr-1"></i> Hace 1 semana
+                        </div>
+                      </div>
+
+                      <!-- Reseña 2 -->
+                      <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-blue-400 transition-all duration-300">
+                        <div class="flex items-center mb-4">
+                          <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                            alt="Cliente 2"
+                            class="w-12 h-12 rounded-full object-cover mr-4">
+                            <div>
+                              <h4 class="text-white font-medium">Carlos Martínez</h4>
+                              <div class="flex items-center mt-1">
+                                <div class="flex text-yellow-400">
+                                  ★★★★☆
+                                </div>
+                                <span class="text-gray-400 text-sm ml-2">4.5</span>
+                              </div>
+                            </div>
+                          </div>
+                          <p class="text-gray-300 mb-4">
+                            "Buen servicio. Excelente atención y el arreglo quedó perfecto gracias"
+                          </p>
+                          <div class="text-gray-500 text-sm">
+                            <i class="far fa-clock mr-1"></i> Hace 3 semanas
+                          </div>
+                        </div>
+
+                        <!-- Reseña 3 -->
+                        <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-blue-400 transition-all duration-300">
+                          <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg"
+                              alt="Cliente 3"
+                              class="w-12 h-12 rounded-full object-cover mr-4">
+                              <div>
+                                <h4 class="text-white font-medium">Marcela Pita</h4>
+                                <div class="flex items-center mt-1">
+                                  <div class="flex text-yellow-400">
+                                    ★★★★★
+                                  </div>
+                                  <span class="text-gray-400 text-sm ml-2">5.0</span>
+                                </div>
+                              </div>
+                            </div>
+                            <p class="text-gray-300 mb-4">
+                              "La verdad excelente trabajo, responsable muy educado y sobre todo muy honesto. ¡Gracias Ezequiel!!"
+                            </p>
+                            <div class="text-gray-500 text-sm">
+                              <i class="far fa-clock mr-1"></i> Hace 2 meses
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Botón ver más -->
+                        <div class="text-center mt-12">
+                          <a href="https://g.page/r/CQeBPqhRjbRzEAE/review"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-block px-6 py-3 bg-transparent border border-blue-400 text-blue-400 rounded-lg hover:bg-blue-400 hover:text-white transition-colors duration-300">
+                            Ver más reseñas
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    <section class="container mx-auto px-4 py-16 max-w-7xl">
+
+                      <!-- Section Header -->
+                      <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-lg-900 mb-4">
+                          Novedades y Recursos
+                        </h2>
+                        <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                          Explora nuestros últimos artículos sobre software, tecnología GSM y descargas exclusivas.
+                        </p>
+                      </div>
+
+                      <!-- Grid Layout -->
+                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                        <!-- Article Card 1: Software -->
+                        <article class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100">
+                          <figure class="relative overflow-hidden aspect-video">
+                            <img
+                              src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop"
+                              alt="Laboratorio de desarrollo de Software"
+                              class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                              />
+                              <div class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                Tecnología
+                              </div>
+                            </figure>
+
+                            <div class="p-6 flex flex-col flex-grow">
+                              <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                                Software y Desarrollo
+                              </h3>
+                              <p class="text-gray-600 mb-6 line-clamp-3 flex-grow">
+                                Descubre las últimas herramientas de laboratorio y optimización de código.
+                              </p>
+
+                              <div class="mt-auto pt-4 border-t border-gray-100">
+                                <a
+                                  href="https://arecofix.com.ar/#/gsm#Software"
+                                  class="w-full inline-flex items-center justify-center px-5 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-indigo-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+                                  >
+                                  <span>Ver artículo</span>
+                                  <i class="fas fa-arrow-right ml-2 text-sm transition-transform group-hover:translate-x-1"></i>
+                                </a>
+                              </div>
+                            </div>
+                          </article>
+
+                          <!-- Article Card 2: GSM -->
+                          <article class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100">
+                            <figure class="relative overflow-hidden aspect-video">
+                              <img
+                                src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop"
+                                alt="Tecnología GSM"
+                                class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                                />
+                                <div class="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                  Telecomunicaciones
+                                </div>
+                              </figure>
+
+                              <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                                  Soluciones GSM
+                                </h3>
+                                <p class="text-gray-600 mb-6 line-clamp-3 flex-grow">
+                                  Análisis profundo sobre redes móviles y conectividad global.
+                                </p>
+
+                                <div class="mt-auto pt-4 border-t border-gray-100">
+                                  <a
+                                    href="https://arecofix.com.ar/#/gsm"
+                                    class="w-full inline-flex items-center justify-center px-5 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-indigo-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+                                    >
+                                    <span>Ver artículo</span>
+                                    <i class="fas fa-arrow-right ml-2 text-sm transition-transform group-hover:translate-x-1"></i>
+                                  </a>
+                                </div>
+                              </div>
+                            </article>
+
+                            <!-- Article Card 3: Download App (ACTUALIZADO) -->
+                            <article class="group bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col overflow-hidden text-white relative">
+                              <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-green-500 rounded-full opacity-10 blur-2xl"></div>
+
+                              <figure class="relative overflow-hidden aspect-video opacity-80 group-hover:opacity-100 transition-opacity">
+                                <img
+                                  src="https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1000&auto=format&fit=crop"
+                                  alt="Descarga nuestra aplicación móvil"
+                                  class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                  loading="lazy"
+                                  />
+                                  <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-glow">
+                                    Destacado
+                                  </div>
+                                </figure>
+
+                                <div class="p-6 flex flex-col flex-grow relative z-10">
+                                  <h3 class="text-xl font-bold text-white mb-3">
+                                    ¡Descarga Nuestra App!
+                                  </h3>
+                                  <p class="text-gray-300 mb-6 flex-grow">
+                                    Accede a todo nuestro contenido desde tu móvil. Instala el APK directamente.
+                                  </p>
+
+                                  <div class="mt-auto pt-4 border-t border-gray-700">
+
+                                    <a
+                                      href="assets/download/arecofix.apk"
+                                      download="arecofix.apk"
+                                      class="w-full inline-flex items-center justify-center px-5 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-400 transition-colors duration-300 shadow-lg hover:shadow-green-500/30 transform active:scale-95 text-center decoration-none cursor-pointer"
+                                      role="button"
+                                      aria-label="Descargar archivo APK de ArecoFix"
+                                      >
+                                      <i class="fas fa-download mr-2"></i>
+                                      <span>Descargar Ahora</span>
+                                    </a>
+                                  </div>
+                                </div>
+                              </article>
+
+                            </div>
+                          </section>
+
+                          <div class="bg-white py-24 sm:py-32">
+                            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                              <h2 class="text-center text-lg/8 font-semibold text-gray-900">Marcas con las que trabajamos</h2>
+                              <div class="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5">
+                                <img class="col-span-2 max-h-12 w-full object-contain lg:col-span-1" src="assets/img/brands/samsung.webp" alt="Transistor" width="158" height="48" />
+                                <img class="col-span-2 max-h-12 w-full object-contain lg:col-span-1" src="assets/img/brands/iphone.webp" alt="Resistencias" width="158" height="48" />
+                                <img class="col-span-2 max-h-12 w-full object-contain lg:col-span-1" src="assets/img/brands/motorola.webp" alt="Condensadores" width="158" height="48" />
+                                <img class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1" src="assets/img/brands/sunshine.webp" alt="Circuitos integrados" width="158" height="48" />
+                                <img class="col-span-2 col-start-2 max-h-12 w-full object-contain sm:col-start-auto lg:col-span-1" src="assets/img/brands/yaxun.png" alt="Procesadores" width="158" height="48" />
+                              </div>
+                            </div>
+                          </div>
+

@@ -1,0 +1,60 @@
+<div class="max-w-2xl mx-auto">
+  <h2 class="text-lg font-medium mb-4">{{ id ? 'Editar' : 'Nuevo' }} producto</h2>
+
+  <form (ngSubmit)="save()" #f="ngForm" class="grid gap-4">
+    <div>
+      <label class="block text-sm">Nombre</label>
+      <input type="text" [(ngModel)]="form().name" name="name" class="input input-bordered w-full" required />
+    </div>
+
+    <div>
+      <label class="block text-sm">SKU</label>
+      <input type="text" [(ngModel)]="form().sku" name="sku" class="input input-bordered w-full" />
+    </div>
+
+    <div>
+      <label class="block text-sm">Slug</label>
+      <input type="text" [(ngModel)]="form().slug" name="slug" class="input input-bordered w-full" />
+    </div>
+
+    <div>
+      <label class="block text-sm">Descripción</label>
+      <textarea [(ngModel)]="form().description" name="description" class="textarea textarea-bordered w-full" rows="4"></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm">Precio</label>
+        <input type="number" [(ngModel)]="form().price" name="price" class="input input-bordered w-full" required />
+      </div>
+      <div>
+        <label class="block text-sm">Stock</label>
+        <input type="number" [(ngModel)]="form().stock" name="stock" class="input input-bordered w-full" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <input type="checkbox" [(ngModel)]="form().is_active" name="is_active" />
+      <span>Activo</span>
+    </div>
+
+    <div>
+      <label class="block text-sm">Fotos</label>
+      <input type="file" (change)="onFileChange($event)" accept="image/*" />
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+        @for (img of form().images; track img) {
+          <img [src]="img" class="w-full h-32 object-cover rounded" />
+        }
+      </div>
+    </div>
+
+    @if (error) {
+      <div class="text-red-600">{{ error }}</div>
+    }
+
+    <div class="flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="saving">Guardar</button>
+      <a routerLink="/admin/products" class="btn">Cancelar</a>
+    </div>
+  </form>
+</div>

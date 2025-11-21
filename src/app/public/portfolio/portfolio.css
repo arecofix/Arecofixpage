@@ -1,0 +1,171 @@
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Base Styles */
+div {
+  animation: fadeIn 0.6s ease-out;
+}
+
+h1 {
+  animation: slideInLeft 0.7s ease-out;
+}
+
+h2 {
+  animation: slideInRight 0.7s ease-out;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --contrast-bg: #000;
+  --contrast-text: #fff;
+  --contrast-accent: #ffff00;
+  --contrast-border: #fff;
+}
+
+.high-contrast * {
+  background-color: var(--contrast-bg) !important;
+  color: var(--contrast-text) !important;
+  border-color: var(--contrast-border) !important;
+}
+
+.high-contrast a {
+  color: var(--contrast-accent) !important;
+  text-decoration: underline;
+}
+
+.high-contrast button {
+  border: 2px solid var(--contrast-border) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.8);
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.875rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .fixed,
+  [class*="backdrop"],
+  [class*="shadow"] {
+    display: none;
+  }
+  
+  div {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 2px;
+}
+
+/* Link styles */
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Backdrop blur support */
+@supports not (backdrop-filter: blur(1px)) {
+  [class*="backdrop-blur"] {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Sidebar animations */
+.translate-x-full {
+  transform: translateX(100%);
+}
+
+/* Remove animation for children when not needed */
+div > * {
+  animation: none !important;
+}
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+  .pr-80 {
+    padding-right: 0;
+  }
+}

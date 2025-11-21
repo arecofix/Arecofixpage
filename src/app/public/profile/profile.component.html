@@ -1,0 +1,68 @@
+<div class="container mx-auto p-6">
+  @if (loading) {
+    <div class="alert alert-info">Cargando perfil...</div>
+  }
+
+  @if (!loading && !isLoggedIn) {
+    <div class="text-center space-y-4">
+      <h1 class="text-2xl font-bold">No estás logueado</h1>
+      <p class="text-gray-600">Para ver tu perfil, por favor inicia sesión o regístrate.</p>
+      <div class="flex gap-4 justify-center">
+        <a routerLink="/login" class="btn btn-primary">Iniciar sesion</a>
+        <a routerLink="/register" class="btn btn-secondary">Registrarse</a>
+      </div>
+    </div>
+  }
+
+  @if (!loading && isLoggedIn) {
+    <h1 class="text-2xl font-bold mb-4">Mi Perfil</h1>
+    @if (error) {
+      <div class="alert alert-error mb-4">{{ error }}</div>
+    }
+    @if (success) {
+      <div class="alert alert-success mb-4">{{ success }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="updateProfile()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Nombre</label>
+          <input type="text" formControlName="first_name" class="input input-bordered w-full" [readonly]="!isEditing" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Apellido</label>
+          <input type="text" formControlName="last_name" class="input input-bordered w-full" [readonly]="!isEditing" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Email</label>
+          <input type="email" formControlName="email" class="input input-bordered w-full" readonly />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Teléfono</label>
+          <input type="text" formControlName="phone" class="input input-bordered w-full" [readonly]="!isEditing" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium">Biografía</label>
+          <textarea formControlName="bio" rows="4" class="textarea textarea-bordered w-full" [readonly]="!isEditing"></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium">Avatar URL</label>
+          <input type="text" formControlName="avatar_url" class="input input-bordered w-full" [readonly]="!isEditing" />
+        </div>
+      </div>
+      <div class="flex gap-3 mt-4">
+        @if (!saving) {
+          <button type="button" class="btn" (click)="toggleEditMode()">
+            {{ isEditing ? 'Cancelar' : 'Editar perfil' }}
+          </button>
+        }
+        <button type="submit" class="btn btn-primary" [disabled]="saving || !isEditing">
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="resetForm()" [disabled]="saving || !isEditing">Resetear</button>
+        @if (!saving) {
+          <button type="button" class="btn btn-outline" (click)="handleLogout()">Cerrar sesión</button>
+        }
+      </div>
+    </form>
+  }
+</div>

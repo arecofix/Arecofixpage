@@ -1,0 +1,22 @@
+@if (productsRs.isLoading()) {
+<is-loading />
+} @else if (!productsRs.hasValue()) {
+<is-empty />
+} @else if (productsRs.error()) {
+<is-error />
+} @else if (productsRs.hasValue()) { @if (paginationData()) {
+<pagination
+  [pages]="productsRs.value().pages "
+  [currentPage]="paginationService.currentPage()"
+/>
+}
+
+<div class="divider"></div>
+<!-- Responsive product grid: 1 column on small, 3 on medium, 5 on large screens -->
+<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4 p-4">
+  @for (product of productsRs.value().data; track $index) {
+  <product-card [product]="product" />
+  <!--  -->}
+</div>
+
+<!--  -->}

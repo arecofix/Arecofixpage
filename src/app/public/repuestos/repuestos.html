@@ -1,0 +1,191 @@
+<!-- Mini Header -->
+<header class="bg-white shadow-sm sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 py-3">
+    <button (click)="goToHome()" class="flex items-center gap-2 text-blue-600 hover:text-blue-800">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Volver al inicio
+    </button>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="relative bg-blue-700 text-white py-12 overflow-hidden">
+  <div class="absolute inset-0 opacity-10" style="background-image:url('https://images.unsplash.com/photo-1601524909162-ae8725290836?q=80&w=2000'); background-size:cover; background-position:center"></div>
+  <div class="relative max-w-7xl mx-auto px-4 text-center">
+    <h1 class="text-3xl md:text-4xl font-bold mb-3">Repuestos para Celulares</h1>
+    <p class="text-lg mb-6">Los mejores repuestos originales y compatibles</p>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a href="#catalogo" class="btn btn-primary">Ver Catálogo</a>
+      <a href="#destacados" class="btn btn-outline btn-light">Productos Destacados</a>
+    </div>
+  </div>
+</section>
+
+<!-- Filters Toolbar -->
+<section id="catalogo" class="bg-white">
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+      <!-- Search -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+        <input [(ngModel)]="filter.search" (ngModelChange)="applyFilters()" type="text" placeholder="Ej: Pantalla iPhone 12" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+      </div>
+      <!-- Category -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+        <select [(ngModel)]="filter.category" (ngModelChange)="applyFilters()" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+          <option value="all">Todas</option>
+          @for (c of categories; track c.id) { <option [value]="c.name">{{c.name}}</option> }
+        </select>
+      </div>
+      <!-- Brand -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+        <select [(ngModel)]="filter.brand" (ngModelChange)="applyFilters()" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+          <option value="all">Todas</option>
+          @for (b of brandOptions; track b) { <option [value]="b">{{b}}</option> }
+        </select>
+      </div>
+      <!-- Price & Sort -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Precio máximo</label>
+          <input [(ngModel)]="filter.maxPrice" (ngModelChange)="applyFilters()" type="number" min="0" placeholder="Ej: 20000" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ordenar</label>
+          <select [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="relevance">Relevancia</option>
+            <option value="price-asc">Precio: menor a mayor</option>
+            <option value="price-desc">Precio: mayor a menor</option>
+            <option value="rating-desc">Mejor valoración</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Catalog Grid -->
+<section class="bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Catálogo</h2>
+      <span class="text-sm text-gray-600">{{filteredProducts.length}} resultados</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (product of filteredProducts; track product.id) {
+      <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
+        <div class="relative h-44 bg-gray-100">
+          <img [src]="product.image" [alt]="product.name" class="w-full h-full object-cover" />
+          <div class="absolute top-3 right-3">
+            <span class="rounded-full bg-green-500 text-white text-xs font-semibold px-2 py-1">{{product.stock}}</span>
+          </div>
+        </div>
+        <div class="p-4">
+          <h3 class="text-base font-semibold text-gray-900">{{product.name}}</h3>
+          <p class="text-sm text-gray-500">{{product.brand}} · {{product.category}}</p>
+          <div class="flex items-center justify-between mt-3">
+            <div class="flex items-baseline gap-2">
+              <span class="text-lg font-bold text-indigo-600">{{product.priceLabel}}</span>
+            </div>
+            <div class="flex text-yellow-400 text-sm">
+              @for (star of [1,2,3,4,5]; track star) { <i class="fas fa-star" [class.text-gray-300]="star > product.rating"></i> }
+            </div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <a href="https://wa.me/5491125960900?text=Hola,%20consulto%20por%20{{product.name}}" class="flex-1 inline-flex items-center justify-center px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">Consultar</a>
+            <button class="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Agregar</button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<section id="destacados" class="py-12 bg-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-bold text-gray-900">Productos Destacados</h2>
+      <p class="text-gray-600">Ofertas especiales y más vendidos</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (product of featuredProducts; track product.id) {
+      <div class="bg-white rounded-xl shadow overflow-hidden hover:shadow-lg transition">
+        <div class="relative h-44 bg-gray-100">
+          <img [src]="product.image" [alt]="product.name" class="w-full h-full object-cover" />
+          @if (product.originalPrice) { <div class="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">OFERTA</div> }
+          <div class="absolute bottom-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full">{{product.stock}}</div>
+        </div>
+        <div class="p-4">
+          <h3 class="text-base font-semibold text-gray-900">{{product.name}}</h3>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span class="text-lg font-bold text-indigo-600">{{product.price}}</span>
+            @if (product.originalPrice) { <span class="text-sm text-gray-500 line-through">{{product.originalPrice}}</span> }
+          </div>
+          <a href="https://wa.me/5491125960900?text=Hola,%20consulto%20por%20{{product.name}}" class="mt-4 block w-full text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition">Consultar</a>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Brands & Benefits remain from original template -->
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Trabajamos con las Mejores Marcas</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+      @for (brand of brands; track brand.name) {
+        <div class="flex items-center justify-center p-4 grayscale hover:grayscale-0 transition-all">
+          <img [src]="brand.logo" [alt]="brand.name" class="max-h-16 w-auto">
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-indigo-900 text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <i class="fas fa-shipping-fast text-5xl mb-4 text-indigo-300"></i>
+        <h3 class="text-xl font-bold mb-2">Envío Rápido</h3>
+        <p class="text-indigo-200">Entregas en 24-48 horas</p>
+      </div>
+      <div>
+        <i class="fas fa-shield-check text-5xl mb-4 text-indigo-300"></i>
+        <h3 class="text-xl font-bold mb-2">Garantía</h3>
+        <p class="text-indigo-200">Todos los repuestos con garantía</p>
+      </div>
+      <div>
+        <i class="fas fa-tags text-5xl mb-4 text-indigo-300"></i>
+        <h3 class="text-xl font-bold mb-2">Mejores Precios</h3>
+        <p class="text-indigo-200">Precios mayoristas disponibles</p>
+      </div>
+      <div>
+        <i class="fas fa-headset text-5xl mb-4 text-indigo-300"></i>
+        <h3 class="text-xl font-bold mb-2">Asesoramiento</h3>
+        <p class="text-indigo-200">Soporte técnico incluido</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿No encuentras lo que buscas?</h2>
+    <p class="text-xl mb-8">Contáctanos y te ayudamos a encontrar el repuesto que necesitas</p>
+    <a href="https://wa.me/5491125960900?text=Hola,%20busco%20un%20repuesto%20específico" class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
+      <i class="fab fa-whatsapp mr-2 text-2xl"></i>
+      Consultar Ahora
+    </a>
+  </div>
+</section>

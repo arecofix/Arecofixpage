@@ -1,0 +1,154 @@
+<div class="navbar bg-white shadow-sm">
+  <!-- NAVBAR START -->
+  <div class="navbar-start">
+    <!-- Menú hamburguesa (Mobile) -->
+    <div class="dropdown">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+        </svg>
+      </div>
+
+      <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-60 p-2 shadow">
+        <!-- Buscador móvil -->
+        <li class="mb-4">
+          <form class="flex items-center gap-2">
+            <input type="text" placeholder="Buscar..." class="input input-sm input-bordered w-full" />
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
+        </li>
+
+        <!-- Elementos del menú móvil -->
+        @for (item of menuItems(); track $index) {
+        <li>
+          <a class="btn btn-primary" [routerLink]="item.path" routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i [class]="item.icon"></i> {{item.title}}
+          </a>
+        </li>
+        }
+
+        <li>
+          <a class="btn btn-primary" routerLink="products/featured" routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-star"></i> Destacados
+          </a>
+        </li>
+        <li>
+          <a class="btn btn-primary" routerLink="categories" routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-tag"></i> Categorías
+          </a>
+        </li>
+        <li>
+          <a class="btn btn-primary" routerLink="/contacto" routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-envelope"></i> Contacto
+          </a>
+        </li>
+        <li>
+          <a class="btn btn-primary" routerLink="/nosotros" routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-info-circle"></i> Nosotros
+          </a>
+        </li>
+        <li>
+          <a class="btn btn-primary" routerLink="/servicios" routerLinkActive="btn btn-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-concierge-bell"></i> Servicios
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Logo + appName -->
+    <a class="flex items-center gap-2 btn btn-ghost hover:bg-[#E4E8E4]" [routerLink]="['/']">
+      <img src="assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-8 w-auto" />
+      <span class="font-bold text-lg text-[#232548]">{{ appName }}</span>
+    </a>
+  </div>
+
+  <!-- NAVBAR CENTER (desktop) -->
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1">
+      @for (item of menuItems(); track $index) {
+      <li>
+        <a class="link link-primary" [routerLink]="item.path" routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i [class]="item.icon"></i> {{item.title}}
+        </a>
+      </li>
+      }
+
+      <li>
+        <a class="link link-primary" routerLink="products/featured" routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-star"></i> Destacados
+        </a>
+      </li>
+      <li>
+        <a class="link link-primary" routerLink="categories" routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-tag"></i> Categorías
+        </a>
+      </li>
+      <li>
+        <a class="link link-primary" routerLink="/contacto" routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-envelope"></i> Contacto
+        </a>
+      </li>
+      <li>
+        <a class="link link-primary" routerLink="/nosotros" routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-info-circle"></i> Nosotros
+        </a>
+      </li>
+      <li>
+        <a class="link link-primary" routerLink="/servicios" routerLinkActive="link link-secondary"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-concierge-bell"></i> Servicios
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- NAVBAR END -->
+  <div class="navbar-end flex items-center gap-3">
+    <!-- Buscador desktop -->
+    <form class="hidden lg:flex items-center gap-2">
+      <input type="text" placeholder="Buscar productos..." class="input input-sm input-bordered" />
+      <button type="submit" class="btn btn-sm btn-primary">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+
+    <!-- Carrito -->
+    <div class="indicator">
+      <button class="btn btn-circle btn-sm btn-ghost hover:bg-[#E4E8E4]" aria-label="Carrito">
+        <i class="fas fa-shopping-cart text-lg text-[#232548]"></i>
+      </button>
+      <span class="indicator-item badge badge-sm badge-primary">3</span>
+    </div>
+
+    <!-- Botón Perfil con menú -->
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-[#E4E8E4]">
+        <i class="fas fa-user text-lg text-[#232548]"></i>
+      </div>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-48">
+        @let user = (user$ | async);
+        @if (user) {
+        <li><a routerLink="/perfil"><i class="fas fa-user-circle text-[#232548]"></i> Mi Perfil ({{ user?.email
+            }})</a></li>
+        <li><button (click)="logout()"><i class="fas fa-sign-out-alt text-[#232548]"></i> Cerrar Sesión</button></li>
+        } @else {
+        <li><a routerLink="/login"><i class="fas fa-sign-in-alt text-[#232548]"></i> Iniciar Sesión</a></li>
+        <li><a routerLink="/register"><i class="fas fa-user-plus text-[#232548]"></i> Registrarse</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>
