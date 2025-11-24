@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
@@ -10,8 +10,9 @@ import { AuthService } from '@app/services/auth.service';
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminProductsPage {
+export class AdminProductsPage implements OnInit {
   private auth = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
   products: any[] = [];
   loading = true;
   error: string | null = null;
@@ -26,6 +27,7 @@ export class AdminProductsPage {
       this.error = e.message || 'Error al cargar productos';
     } finally {
       this.loading = false;
+      this.cdr.markForCheck();
     }
   }
 }

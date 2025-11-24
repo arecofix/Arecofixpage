@@ -1,0 +1,59 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Servicios</h1>
+    <a routerLink="/admin/services/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Nuevo Servicio
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="6" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (services().length === 0) {
+                <tr>
+                    <td colspan="6" class="text-center py-4">No hay servicios registrados.</td>
+                </tr>
+                } @else {
+                @for (service of services(); track service.id) {
+                <tr>
+                    <td class="font-bold">{{ service.name }}</td>
+                    <td class="max-w-xs truncate">{{ service.description || 'Sin descripción' }}</td>
+                    <td>{{ service.price | currency }}</td>
+                    <td>{{ service.duration_minutes ? service.duration_minutes + ' min' : 'N/A' }}</td>
+                    <td>
+                        <div class="badge" [class.badge-success]="service.is_active"
+                            [class.badge-error]="!service.is_active">
+                            {{ service.is_active ? 'Activo' : 'Inactivo' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <a [routerLink]="['/admin/services', service.id]" class="btn btn-sm btn-ghost">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-sm btn-ghost text-error" (click)="deleteService(service.id)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

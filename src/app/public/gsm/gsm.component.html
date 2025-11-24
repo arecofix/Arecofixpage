@@ -1,6 +1,131 @@
-<section class="gsm-section">
-  <div class="container">
-    <h1>GSM</h1>
-    <p>Bienvenido a la sección GSM</p>
+<section class="gsm-page">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-microchip"></i>
+        <span>Plataforma Profesional GSM</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="brand-name">ARECOFIX</span>
+        <span class="hero-subtitle">Herramientas GSM & Licencias Digitales</span>
+      </h1>
+      <p class="hero-description">
+        Plataforma integral para técnicos GSM, FRP y licencias digitales.
+      </p>
+      <div class="hero-actions">
+        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          <i class="fab fa-whatsapp"></i>
+          Soporte WhatsApp
+        </a>
+        <a href="#tools" class="btn btn-secondary">
+          <i class="fas fa-tools"></i>
+          Ver Herramientas
+        </a>
+      </div>
+    </div>
+    <div class="hero-decoration">
+      <div class="decoration-circle circle-1"></div>
+      <div class="decoration-circle circle-2"></div>
+      <div class="decoration-circle circle-3"></div>
+    </div>
   </div>
+
+  <!-- GSM Tools Section -->
+  <section id="tools" class="tools-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Herramientas GSM & Licencias Digitales</h2>
+        <p class="section-description">
+          Accede a las mejores herramientas profesionales para servicio técnico de dispositivos móviles
+        </p>
+      </div>
+
+      <div class="tools-grid">
+        <div class="tool-card" *ngFor="let tool of gsmTools">
+          <div class="tool-icon">
+            <i [class]="tool.icon"></i>
+          </div>
+          <div class="tool-content">
+            <h3 class="tool-name">{{ tool.name }}</h3>
+            <p class="tool-description">{{ tool.description }}</p>
+          </div>
+          <a [href]="tool.loginUrl" class="tool-login-btn">
+            <span>Inicia sesión</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Brand Services Section -->
+  <section class="brands-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Servicios por Marca</h2>
+        <p class="section-description">
+          Soporte especializado para las principales marcas de dispositivos móviles
+        </p>
+      </div>
+
+      <div class="brands-grid">
+        <div class="brand-card" *ngFor="let brand of brandServices">
+          <div class="brand-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3 class="brand-name">{{ brand.name }}</h3>
+          <div class="brand-overlay">
+            <span>Ver servicios</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Downloads Section -->
+  <section class="downloads-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Descargas Útiles</h2>
+        <p class="section-description">
+          Herramientas esenciales y drivers para tu trabajo diario
+        </p>
+      </div>
+
+      <div class="downloads-grid">
+        <div class="download-card" *ngFor="let download of downloads">
+          <div class="download-icon">
+            <i [class]="download.icon"></i>
+          </div>
+          <div class="download-content">
+            <h3 class="download-name">{{ download.name }}</h3>
+            <p class="download-description" *ngIf="download.description">
+              {{ download.description }}
+            </p>
+          </div>
+          <a [href]="download.downloadUrl" class="download-btn" download>
+            <i class="fas fa-download"></i>
+            <span>Descargar</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿Necesitas ayuda con alguna herramienta?</h2>
+        <p class="cta-description">
+          Nuestro equipo de soporte está disponible para ayudarte con cualquier consulta
+        </p>
+        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-cta">
+          <i class="fab fa-whatsapp"></i>
+          Contactar por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
 </section>

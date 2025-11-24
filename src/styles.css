@@ -1,6 +1,69 @@
 @import "tailwindcss";
 
+/* 
+   VS Code may report "Unknown at rule @plugin" here. 
+   This is a false positive for Tailwind CSS v4. 
+   The syntax is correct and required for the build.
+*/
 @plugin "daisyui" {
     themes: business;
-    /* themes: light, dark, cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, halloween, garden, forest, aqua, lofi, pastel, fantasy, wireframe, black, luxury, dracula, cmyk, autumn, business, acid, lemonade, night, coffee, winter, dim, nord, sunset; */
+}
+
+/* Custom Brand Colors */
+:root {
+    --brand-green: #4fa137;
+    --brand-dark-blue: #282f4f;
+    --brand-light-gray: #ededed;
+    --brand-gray-purple: #777589;
+    --brand-blue: #397dbb;
+    --brand-dark-blue-fav: #2c3454;
+    --brand-green-alt: #4da435;
+}
+
+/* Override Button Colors to match Brand */
+.btn-primary {
+    background-color: var(--brand-dark-blue-fav) !important;
+    border-color: var(--brand-dark-blue-fav) !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-green-alt) !important;
+    border-color: var(--brand-green-alt) !important;
+}
+
+/* Specific override for the "Productos" button */
+.btn-brand-blue {
+    background-color: var(--brand-blue) !important;
+    border-color: var(--brand-blue) !important;
+}
+
+/* Fix for missing bg-dark class used in home page */
+.bg-dark {
+    background-color: var(--brand-dark-blue-fav);
+}
+
+/* Fix for transparent menus (hamburger and profile) */
+.dropdown-content {
+    background-color: var(--brand-dark-blue-fav) !important;
+    border: 1px solid var(--brand-gray-purple);
+}
+
+/* Ensure text visibility in dropdowns */
+.dropdown-content li>a,
+.dropdown-content li>button,
+.dropdown-content li>span {
+    color: white !important;
+}
+
+.dropdown-content li>a:hover,
+.dropdown-content li>button:hover {
+    background-color: var(--brand-blue) !important;
+    color: white !important;
+}
+
+/* Ensure icons in dropdowns are white */
+.dropdown-content li>a i,
+.dropdown-content li>button i {
+    color: white !important;
 }

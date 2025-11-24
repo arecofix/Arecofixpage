@@ -1,0 +1,61 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Proveedores</h1>
+    <a routerLink="/admin/suppliers/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Nuevo Proveedor
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Rubro / Tipo</th>
+                    <th>Contacto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (suppliers().length === 0) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">No hay proveedores registrados.</td>
+                </tr>
+                } @else {
+                @for (supplier of suppliers(); track supplier.id) {
+                <tr>
+                    <td>
+                        <div class="font-bold">{{ supplier.name }}</div>
+                        <div class="text-sm opacity-50">{{ supplier.cuil }}</div>
+                    </td>
+                    <td>
+                        <div class="badge badge-outline">{{ supplier.rubro }}</div>
+                        <div class="text-xs mt-1">{{ supplier.type }}</div>
+                    </td>
+                    <td>
+                        <div class="text-sm">{{ supplier.email }}</div>
+                        <div class="text-xs">{{ supplier.phone }}</div>
+                    </td>
+                    <td>
+                        <span class="badge" [class.badge-success]="supplier.is_active"
+                            [class.badge-ghost]="!supplier.is_active">
+                            {{ supplier.is_active ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td>
+                        <a [routerLink]="['/admin/suppliers', supplier.id]" class="btn btn-sm btn-ghost">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

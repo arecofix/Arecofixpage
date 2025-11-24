@@ -16,6 +16,8 @@ export interface iProduct {
   description: string;
   price: number;
   featured: boolean;
+  image_url?: string;
+  gallery_urls?: string[];
 }
 
 export interface iProductsParams extends Partial<iProduct> {

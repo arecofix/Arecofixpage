@@ -1,0 +1,44 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Facturación</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Número</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (invoices().length === 0) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">No hay facturas registradas.</td>
+                </tr>
+                } @else {
+                @for (invoice of invoices(); track invoice.id) {
+                <tr>
+                    <td>{{ invoice.issued_at | date:'short' }}</td>
+                    <td class="font-mono">{{ invoice.invoice_number || 'Pendiente' }}</td>
+                    <td>{{ invoice.customer_name || 'Consumidor Final' }}</td>
+                    <td class="font-bold">${{ invoice.total_amount }}</td>
+                    <td>
+                        <a [routerLink]="['/admin/invoices', invoice.id]" class="btn btn-sm btn-ghost">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

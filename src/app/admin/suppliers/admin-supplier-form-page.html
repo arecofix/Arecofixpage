@@ -1,0 +1,76 @@
+<div class="max-w-2xl mx-auto">
+    <div class="flex items-center gap-4 mb-6">
+        <a routerLink="/admin/suppliers" class="btn btn-circle btn-ghost">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Proveedor</h1>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        @if (error()) {
+        <div class="alert alert-error mb-4">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error() }}</span>
+        </div>
+        }
+
+        <form (ngSubmit)="save()" class="space-y-4">
+            <div class="form-control">
+                <label class="label">Nombre</label>
+                <input type="text" [(ngModel)]="form().name" name="name" class="input input-bordered" required>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">Tipo</label>
+                    <input type="text" [(ngModel)]="form().type" name="type" class="input input-bordered"
+                        placeholder="Ej: Mayorista, Fabricante">
+                </div>
+                <div class="form-control">
+                    <label class="label">Rubro</label>
+                    <input type="text" [(ngModel)]="form().rubro" name="rubro" class="input input-bordered"
+                        placeholder="Ej: Electrónica">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">CUIL/CUIT</label>
+                    <input type="text" [(ngModel)]="form().cuil" name="cuil" class="input input-bordered">
+                </div>
+                <div class="form-control">
+                    <label class="label">Teléfono</label>
+                    <input type="text" [(ngModel)]="form().phone" name="phone" class="input input-bordered">
+                </div>
+            </div>
+
+            <div class="form-control">
+                <label class="label">Email</label>
+                <input type="email" [(ngModel)]="form().email" name="email" class="input input-bordered">
+            </div>
+
+            <div class="form-control">
+                <label class="label">Dirección</label>
+                <input type="text" [(ngModel)]="form().address" name="address" class="input input-bordered">
+            </div>
+
+            <div class="form-control">
+                <label class="label cursor-pointer justify-start gap-4">
+                    <span class="label-text">Activo</span>
+                    <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+                        class="toggle toggle-primary">
+                </label>
+            </div>
+
+            <div class="flex justify-end gap-4 mt-6">
+                <a routerLink="/admin/suppliers" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary" [disabled]="saving()">
+                    @if (saving()) {
+                    <span class="loading loading-spinner"></span>
+                    }
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

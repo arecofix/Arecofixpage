@@ -24,14 +24,11 @@
     <ul class="menu p-4 w-64 min-h-full bg-gray-900 text-gray-300 gap-2">
       <!-- Logo -->
       <li class="mb-6">
-        <div class="flex items-center gap-3 px-2 hover:bg-transparent">
-          <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">
-            A
-          </div>
+        <a class="flex items-center gap-3 px-2 hover:bg-transparent cursor-pointer" [routerLink]="['/']">
+          <img src="assets/img/brands/logo/logo-normal.PNG" alt="Arecofix Logo" class="h-8 w-auto" height="32" />
           <span class="text-xl font-bold text-white">Arecofix</span>
-        </div>
+        </a>
       </li>
-
       <!-- Menu Items -->
       @for (item of menuItems; track item.path) {
       <li>

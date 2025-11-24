@@ -1,0 +1,66 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Empleados</h1>
+    <a routerLink="/admin/employees/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Nuevo Empleado
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Cargo / Rol</th>
+                    <th>Contacto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (employees().length === 0) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">No hay empleados registrados.</td>
+                </tr>
+                } @else {
+                @for (employee of employees(); track employee.id) {
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="avatar">
+                                <div class="mask mask-squircle w-12 h-12">
+                                    <img [src]="employee.avatar_url || 'assets/img/default-avatar.png'" alt="Avatar" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="font-bold">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                <div class="text-sm opacity-50">{{ employee.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="badge badge-primary badge-outline">{{ employee.role | uppercase }}</div>
+                        <div class="text-xs mt-1">{{ employee.job_title || 'Sin cargo definido' }}</div>
+                    </td>
+                    <td>
+                        <div class="text-sm">{{ employee.phone || 'N/A' }}</div>
+                    </td>
+                    <td>
+                        <span class="badge badge-success">Activo</span>
+                    </td>
+                    <td>
+                        <a [routerLink]="['/admin/employees', employee.id]" class="btn btn-sm btn-ghost">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

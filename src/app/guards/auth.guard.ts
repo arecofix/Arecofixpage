@@ -35,24 +35,24 @@ export const authGuard: CanActivateFn = (route, state) => {
     // Check if accessing admin routes
     if (state.url.startsWith('/admin')) {
       const userProfile = await authService.getUserProfile(session.user.id);
-      
+
       // Allow specific email addresses regardless of role
       const allowedEmails = [
         'ezequielenrico15@gmail.com',
-        'Ezequielenrico1015@hotmail.com'
+        'ezequielenrico1015@hotmail.com'
       ];
-      
+
       if (allowedEmails.includes(session.user.email?.toLowerCase() || '')) {
         resolve(true);
         return;
       }
-      
+
       // Check if user has admin role
       if (userProfile?.role === 'admin') {
         resolve(true);
         return;
       }
-      
+
       // If not admin or allowed email, redirect to home
       router.navigate(['/']);
       resolve(false);

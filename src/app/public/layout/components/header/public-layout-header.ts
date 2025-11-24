@@ -5,6 +5,7 @@ import { CategoryService } from '@app/public/categories/services/category.servic
 import { iCategoriesResponse, iCategory } from '@app/public/categories/interfaces';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AuthService } from '@app/services/auth.service';
+import { CartService } from '@app/shared/services/cart.service';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -26,6 +27,7 @@ export class PublicLayoutHeader {
   public appName: string = environment.appName;
   public categoryService = inject(CategoryService);
   public authService = inject(AuthService);
+  public cartService = inject(CartService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 

@@ -1,0 +1,76 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Inventario</h1>
+    <a routerLink="/admin/purchases/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Registrar Compra
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>SKU / Código</th>
+                    <th>Stock Actual</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (products().length === 0) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">No hay productos registrados.</td>
+                </tr>
+                } @else {
+                @for (product of products(); track product.id) {
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="avatar">
+                                <div class="mask mask-squircle w-12 h-12">
+                                    <img [src]="product.image_url || 'assets/img/no-image.png'" alt="Product" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="font-bold">{{ product.name }}</div>
+                                <div class="text-sm opacity-50">${{ product.price }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-sm">{{ product.sku || 'N/A' }}</div>
+                        <div class="text-xs text-gray-400">{{ product.barcode || 'Sin código de barras' }}</div>
+                    </td>
+                    <td>
+                        <div class="font-bold text-lg"
+                            [class.text-error]="product.stock <= (product.min_stock_alert || 5)"
+                            [class.text-success]="product.stock > (product.min_stock_alert || 5)">
+                            {{ product.stock }}
+                        </div>
+                        @if (product.stock <= (product.min_stock_alert || 5)) { <div class="badge badge-error badge-xs">
+                            Stock Bajo
+    </div>
+    }
+    </td>
+    <td>
+        <span class="badge" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
+            {{ product.is_active ? 'Activo' : 'Inactivo' }}
+        </span>
+    </td>
+    <td>
+        <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost">
+            <i class="fas fa-edit"></i>
+        </a>
+    </td>
+    </tr>
+    }
+    }
+    </tbody>
+    </table>
+</div>
+</div>

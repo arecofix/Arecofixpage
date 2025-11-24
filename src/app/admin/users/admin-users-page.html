@@ -1,0 +1,60 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Usuarios</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Fecha Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="4" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (users().length === 0) {
+                <tr>
+                    <td colspan="4" class="text-center py-4">No hay usuarios registrados.</td>
+                </tr>
+                } @else {
+                @for (user of users(); track user.id) {
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="avatar">
+                                <div class="mask mask-squircle w-12 h-12">
+                                    <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.first_name + '+' + user.last_name"
+                                        alt="Avatar" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="font-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                                <div class="text-sm opacity-50">{{ user.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="badge" [class.badge-primary]="user.role === 'admin'"
+                            [class.badge-secondary]="user.role === 'staff'" [class.badge-ghost]="user.role === 'user'">
+                            {{ user.role | uppercase }}
+                        </div>
+                    </td>
+                    <td>{{ user.created_at | date:'short' }}</td>
+                    <td>
+                        <!-- <button class="btn btn-sm btn-ghost" (click)="toggleRole(user)">
+                  Cambiar Rol
+                </button> -->
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

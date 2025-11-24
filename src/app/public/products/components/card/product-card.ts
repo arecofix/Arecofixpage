@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { iProduct } from '../../interfaces';
+import { inject } from '@angular/core';
+import { CartService } from '@app/shared/services/cart.service';
 @Component({
   selector: 'product-card',
-  imports: [RouterLink], 
+  imports: [RouterLink],
   templateUrl: './product-card.html',
   styles: `
     .line-clamp-2 {
@@ -24,4 +26,11 @@ import { iProduct } from '../../interfaces';
 })
 export class ProductCard {
   product = input.required<iProduct>();
+  private cartService = inject(CartService);
+
+  addToCart(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.cartService.addToCart(this.product());
+  }
 }

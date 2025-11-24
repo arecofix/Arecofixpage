@@ -1,0 +1,121 @@
+<div class="max-w-3xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nueva' }} Reparación</h1>
+        <a routerLink="/admin/repairs" class="btn btn-ghost">
+            <i class="fas fa-arrow-left mr-2"></i> Volver
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        @if (loading()) {
+        <div class="flex justify-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+        } @else {
+        <form (ngSubmit)="save()">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Customer Info -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Nombre del Cliente</span>
+                    </label>
+                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name"
+                        class="input input-bordered w-full" required />
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Teléfono</span>
+                    </label>
+                    <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone"
+                        class="input input-bordered w-full" />
+                </div>
+            </div>
+
+            <!-- Device Info -->
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text font-medium">Modelo del Dispositivo</span>
+                </label>
+                <input type="text" [(ngModel)]="form().device_model" name="device_model"
+                    class="input input-bordered w-full" required
+                    placeholder="Ej: iPhone 11, Samsung A52, Laptop HP..." />
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text font-medium">Descripción del Problema</span>
+                </label>
+                <textarea [(ngModel)]="form().issue_description" name="issue_description"
+                    class="textarea textarea-bordered h-24"
+                    placeholder="Describe la falla reportada por el cliente..."></textarea>
+            </div>
+
+            <div class="divider">Estado y Costos</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Estado</span>
+                    </label>
+                    <select [(ngModel)]="form().status" name="status" class="select select-bordered w-full">
+                        <option value="pending">Pendiente</option>
+                        <option value="in_progress">En Progreso</option>
+                        <option value="completed">Completado</option>
+                        <option value="delivered">Entregado</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Costo Estimado</span>
+                    </label>
+                    <label class="input-group">
+                        <span>$</span>
+                        <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost"
+                            class="input input-bordered w-full" min="0" />
+                    </label>
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Costo Final</span>
+                    </label>
+                    <label class="input-group">
+                        <span>$</span>
+                        <input type="number" [(ngModel)]="form().final_cost" name="final_cost"
+                            class="input input-bordered w-full" min="0" />
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-control mb-6">
+                <label class="label">
+                    <span class="label-text font-medium">Notas del Técnico (Interno)</span>
+                </label>
+                <textarea [(ngModel)]="form().technician_notes" name="technician_notes"
+                    class="textarea textarea-bordered h-24"
+                    placeholder="Detalles de la reparación realizada..."></textarea>
+            </div>
+
+            <!-- Error Message -->
+            @if (error()) {
+            <div class="alert alert-error mb-6">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error() }}</span>
+            </div>
+            }
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-4">
+                <a routerLink="/admin/repairs" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary"
+                    [disabled]="saving() || !form().customer_name || !form().device_model">
+                    @if (saving()) {
+                    <span class="loading loading-spinner loading-xs"></span>
+                    }
+                    Guardar Reparación
+                </button>
+            </div>
+        </form>
+        }
+    </div>
+</div>

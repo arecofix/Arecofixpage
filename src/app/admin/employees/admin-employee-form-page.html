@@ -1,0 +1,81 @@
+<div class="max-w-2xl mx-auto">
+    <div class="flex items-center gap-4 mb-6">
+        <a routerLink="/admin/employees" class="btn btn-circle btn-ghost">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Empleado</h1>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        @if (error()) {
+        <div class="alert alert-error mb-4">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error() }}</span>
+        </div>
+        }
+
+        <form (ngSubmit)="save()" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">Nombre</label>
+                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="input input-bordered"
+                        required>
+                </div>
+                <div class="form-control">
+                    <label class="label">Apellido</label>
+                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="input input-bordered"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-control">
+                <label class="label">Email</label>
+                <input type="email" [(ngModel)]="form().email" name="email" class="input input-bordered"
+                    [disabled]="!!id">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">Rol</label>
+                    <select [(ngModel)]="form().role" name="role" class="select select-bordered">
+                        <option value="admin">Administrador</option>
+                        <option value="staff">Staff / Empleado</option>
+                        <option value="user">Usuario (Degradar)</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label">Cargo</label>
+                    <input type="text" [(ngModel)]="form().job_title" name="job_title" class="input input-bordered"
+                        placeholder="Ej: Técnico, Vendedor">
+                </div>
+            </div>
+
+            <div class="form-control">
+                <label class="label">Teléfono</label>
+                <input type="text" [(ngModel)]="form().phone" name="phone" class="input input-bordered">
+            </div>
+
+            <div class="form-control">
+                <label class="label">Foto de Perfil</label>
+                <input type="file" (change)="onFileChange($event)" class="file-input file-input-bordered w-full"
+                    accept="image/*">
+                @if (form().avatar_url) {
+                <div class="mt-4">
+                    <img [src]="form().avatar_url" alt="Avatar preview"
+                        class="w-20 h-20 rounded-full object-cover border p-1">
+                </div>
+                }
+            </div>
+
+            <div class="flex justify-end gap-4 mt-6">
+                <a routerLink="/admin/employees" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary" [disabled]="saving()">
+                    @if (saving()) {
+                    <span class="loading loading-spinner"></span>
+                    }
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

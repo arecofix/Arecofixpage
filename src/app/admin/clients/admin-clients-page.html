@@ -1,0 +1,57 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Clientes</h1>
+    <a routerLink="/admin/clients/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Nuevo Cliente
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Ubicación</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (clients().length === 0) {
+                <tr>
+                    <td colspan="5" class="text-center py-4">No hay clientes registrados.</td>
+                </tr>
+                } @else {
+                @for (client of clients(); track client.id) {
+                <tr>
+                    <td>
+                        <div class="font-bold">{{ client.first_name }} {{ client.last_name }}</div>
+                        <div class="text-sm opacity-50">{{ client.email }}</div>
+                        <div class="text-xs text-gray-400">DNI: {{ client.dni || 'N/A' }}</div>
+                    </td>
+                    <td>
+                        <div><i class="fas fa-phone text-xs mr-1"></i> {{ client.phone || 'N/A' }}</div>
+                    </td>
+                    <td>
+                        <div class="text-sm">{{ client.address || 'N/A' }}</div>
+                    </td>
+                    <td>
+                        <span class="badge badge-ghost">Activo</span>
+                    </td>
+                    <td>
+                        <a [routerLink]="['/admin/clients', client.id]" class="btn btn-sm btn-ghost">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

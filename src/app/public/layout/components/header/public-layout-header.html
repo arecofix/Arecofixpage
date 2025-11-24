@@ -3,7 +3,7 @@
   <div class="navbar-start">
     <!-- Menú hamburguesa (Mobile) -->
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden" aria-label="Abrir menú">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
         </svg>
@@ -13,8 +13,9 @@
         <!-- Buscador móvil -->
         <li class="mb-4">
           <form class="flex items-center gap-2">
-            <input type="text" placeholder="Buscar..." class="input input-sm input-bordered w-full" />
-            <button type="submit" class="btn btn-sm btn-primary">
+            <input type="text" placeholder="Buscar..."
+              class="input input-sm input-bordered w-full bg-white text-gray-900" />
+            <button type="submit" class="btn btn-sm btn-primary" aria-label="Buscar">
               <i class="fas fa-search"></i>
             </button>
           </form>
@@ -64,9 +65,9 @@
     </div>
 
     <!-- Logo + appName -->
-    <a class="flex items-center gap-2 btn btn-ghost hover:bg-[#E4E8E4]" [routerLink]="['/']">
-      <img src="assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-8 w-auto" />
-      <span class="font-bold text-lg text-[#232548]">{{ appName }}</span>
+    <a class="flex items-center gap-2 btn btn-ghost hover:bg-[#ededed]" [routerLink]="['/']">
+      <img src="assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-8 w-auto" height="32" />
+      <span class="font-bold text-lg text-[#2c3454]">{{ appName }}</span>
     </a>
   </div>
 
@@ -119,34 +120,67 @@
   <div class="navbar-end flex items-center gap-3">
     <!-- Buscador desktop -->
     <form class="hidden lg:flex items-center gap-2">
-      <input type="text" placeholder="Buscar productos..." class="input input-sm input-bordered" />
-      <button type="submit" class="btn btn-sm btn-primary">
+      <input type="text" placeholder="Buscar productos..."
+        class="input input-sm input-bordered bg-white text-gray-900 border-gray-300" />
+      <button type="submit" class="btn btn-sm btn-primary" aria-label="Buscar">
         <i class="fas fa-search"></i>
       </button>
     </form>
 
     <!-- Carrito -->
-    <div class="indicator">
-      <button class="btn btn-circle btn-sm btn-ghost hover:bg-[#E4E8E4]" aria-label="Carrito">
-        <i class="fas fa-shopping-cart text-lg text-[#232548]"></i>
-      </button>
-      <span class="indicator-item badge badge-sm badge-primary">3</span>
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-[#ededed]" aria-label="Carrito">
+        <div class="indicator">
+          <i class="fas fa-shopping-cart text-lg text-[#2c3454]"></i>
+          @if (cartService.totalItems() > 0) {
+          <span class="indicator-item badge badge-sm badge-primary">{{ cartService.totalItems() }}</span>
+          }
+        </div>
+      </div>
+      <div tabindex="0" class="mt-3 z-[1] card card-compact dropdown-content w-80 bg-base-100 shadow">
+        <div class="card-body">
+          <span class="font-bold text-lg">{{ cartService.totalItems() }} Items</span>
+          <span class="text-info">Subtotal: ${{ cartService.totalPrice().toFixed(2) }}</span>
+
+          <div class="max-h-60 overflow-y-auto my-2">
+            @for (item of cartService.cartItems(); track item.product.id) {
+            <div class="flex gap-2 mb-2 items-center">
+              <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.png'"
+                class="w-12 h-12 object-cover rounded" />
+              <div class="flex-1">
+                <p class="text-sm font-bold truncate">{{ item.product.name }}</p>
+                <p class="text-xs">{{ item.quantity }} x ${{ item.product.price }}</p>
+              </div>
+              <button class="btn btn-ghost btn-xs text-error" (click)="cartService.removeFromCart(item.product.id)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            }
+          </div>
+
+          <div class="card-actions">
+            <a routerLink="/checkout" class="btn btn-primary btn-block">Checkout</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Botón Perfil con menú -->
     <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-[#E4E8E4]">
-        <i class="fas fa-user text-lg text-[#232548]"></i>
+      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-[#ededed]"
+        aria-label="Menú de usuario">
+        <i class="fas fa-user text-lg text-[#2c3454]"></i>
       </div>
       <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-48">
         @let user = (user$ | async);
         @if (user) {
-        <li><a routerLink="/perfil"><i class="fas fa-user-circle text-[#232548]"></i> Mi Perfil ({{ user?.email
+        <li><a routerLink="/perfil"><i class="fas fa-user-circle text-[#2c3454]"></i> Mi Perfil ({{ user?.email
             }})</a></li>
-        <li><button (click)="logout()"><i class="fas fa-sign-out-alt text-[#232548]"></i> Cerrar Sesión</button></li>
+        <li><button (click)="logout()"><i class="fas fa-sign-out-alt text-[#2c3454]"></i> Cerrar Sesión</button></li>
+        <li><a routerLink="/admin"><i class="fas fa-user-plus text-[#2c3454]"></i> Admin</a></li>
         } @else {
-        <li><a routerLink="/login"><i class="fas fa-sign-in-alt text-[#232548]"></i> Iniciar Sesión</a></li>
-        <li><a routerLink="/register"><i class="fas fa-user-plus text-[#232548]"></i> Registrarse</a></li>
+        <li><a routerLink="/login"><i class="fas fa-sign-in-alt text-[#2c3454]"></i> Iniciar Sesión</a></li>
+        <li><a routerLink="/register"><i class="fas fa-user-plus text-[#2c3454]"></i> Registrarse</a></li>
         }
       </ul>
     </div>

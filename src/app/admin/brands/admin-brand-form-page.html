@@ -1,0 +1,59 @@
+<div class="max-w-2xl mx-auto">
+    <div class="flex items-center gap-4 mb-6">
+        <a routerLink="/admin/brands" class="btn btn-circle btn-ghost">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nueva' }} Marca</h1>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        @if (error()) {
+        <div class="alert alert-error mb-4">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error() }}</span>
+        </div>
+        }
+
+        <form (ngSubmit)="save()" class="space-y-4">
+            <div class="form-control">
+                <label class="label">Nombre</label>
+                <input type="text" [(ngModel)]="form().name" name="name" class="input input-bordered" required>
+            </div>
+
+            <div class="form-control">
+                <label class="label">Slug (URL)</label>
+                <input type="text" [(ngModel)]="form().slug" name="slug" class="input input-bordered"
+                    placeholder="Se genera automáticamente si se deja vacío">
+            </div>
+
+            <div class="form-control">
+                <label class="label">Logo</label>
+                <input type="file" (change)="onFileChange($event)" class="file-input file-input-bordered w-full"
+                    accept="image/*">
+                @if (form().logo_url) {
+                <div class="mt-2">
+                    <img [src]="form().logo_url" alt="Logo preview" class="h-20 object-contain border rounded p-2">
+                </div>
+                }
+            </div>
+
+            <div class="form-control">
+                <label class="label cursor-pointer justify-start gap-4">
+                    <span class="label-text">Activo</span>
+                    <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+                        class="toggle toggle-primary">
+                </label>
+            </div>
+
+            <div class="flex justify-end gap-4 mt-6">
+                <a routerLink="/admin/brands" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary" [disabled]="saving()">
+                    @if (saving()) {
+                    <span class="loading loading-spinner"></span>
+                    }
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

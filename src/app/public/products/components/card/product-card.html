@@ -1,108 +1,40 @@
-<div
-  class="card card-compact bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300"
->
+<div class="card card-compact bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
   <!-- Product Image Placeholder -->
   <figure class="relative">
-    <img
-      [src]="'https://picsum.photos/400/250?random=' + product().id"
-      [alt]="product().name"
-      class="w-full h-48 object-cover"
-    />
+    <img [src]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" [alt]="product().name"
+      class="w-full h-48 object-cover" />
     <!-- Featured Badge -->
     @if (product().featured) {
-        
     <div class="absolute top-2 right-2">
       <div class="badge badge-primary badge-sm">
         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
           <path
-            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-          />
+            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
         Featured
       </div>
     </div>
     }
-    <!-- Product ID Badge -->
-    <div class="absolute top-2 left-2">
-      <div class="badge badge-ghost badge-sm opacity-75">
-        #{{ product().id }}
-      </div>
-    </div>
   </figure>
 
-  <!-- Card Body -->
-  <div class="card-body p-4">
-    <!-- Product Name -->
-    <h2 class="card-title text-base font-semibold line-clamp-2 mb-2">
+  <div class="card-body">
+    <h2 class="card-title text-base">
       {{ product().name }}
-      <div class="badge badge-secondary badge-xs ml-2">
-        Cat: {{ product().category_id }}
-      </div>
     </h2>
+    <p class="text-sm text-gray-500 line-clamp-2">{{ product().description }}</p>
 
-    <!-- Product Description -->
-    <p class="text-sm text-base-content/70 line-clamp-3 mb-3">
-      {{ product().description }}
-    </p>
-
-    <!-- Price and Slug -->
-    <div class="flex justify-between items-center mb-3">
+    <div class="card-actions justify-between items-center mt-2">
       <div class="text-lg font-bold text-primary">
-        ${{ product().price.toFixed(2) }}
+        ${{ product().price }}
       </div>
-      <div class="text-xs text-base-content/50 font-mono">
-        {{ product().slug }}
-      </div>
-    </div>
-
-    <!-- Card Actions -->
-    <div class="card-actions justify-between items-center">
-      <!-- Product Stats -->
-      <div class="flex gap-1">
-        <div class="badge badge-outline badge-xs">ID: {{ product().id }}</div>
-        <div class="badge badge-outline badge-xs">
-          Cat: {{ product().category_id }}
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
       <div class="flex gap-2">
-        <a class="btn btn-primary btn-sm" title="View Details"
-        [routerLink]="['/products/details/', product().slug]">
-         
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-            />
-          </svg>
+        <a [routerLink]="['/products/details', product().slug]" class="btn btn-primary btn-sm">
+          Ver Detalles
         </a>
-        <button class="btn btn-ghost btn-sm" title="Add to Cart">
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"
-            />
+        <button class="btn btn-ghost btn-sm" title="Add to Cart" (click)="addToCart($event)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
           </svg>
         </button>
       </div>

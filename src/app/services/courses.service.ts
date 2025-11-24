@@ -34,8 +34,8 @@ export class CoursesService {
         return from(
             this.supabase
                 .from('courses')
-                .select('*')
-            // .order('created_at', { ascending: false }) // Commented out to prevent issues if column is missing
+                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at')
+                .order('created_at', { ascending: false })
         );
     }
 

@@ -4,17 +4,22 @@
 
       <!-- Logo + Links + Redes -->
       <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-1/3">
-        <img src="https://arecofix.com.ar/assets/img/log.png" alt="Logo Arecofix" class="h-10" />
+        <img src="https://arecofix.com.ar/assets/img/brands/logo/log.png" alt="Logo Arecofix" class="h-10" height="40"
+          width="136" />
 
         <nav aria-label="Footer navigation" class="w-full">
           <ul class="flex flex-row flex-wrap justify-center gap-5 text-sm text-gray-600">
             <li><a routerLink="./" class="hover:text-cyan-600 transition">Inicio</a></li>
             <li><a routerLink="/recursos" class="hover:text-cyan-600 transition">Recursos</a></li>
-            <a routerLink="/nosotros" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Nosotros</a>
-            <a routerLink="/productos" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Productos</a>
-            <a routerLink="/contacto" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Contacto</a>
+            <a routerLink="/nosotros"
+              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Nosotros</a>
+            <a routerLink="/products/featured"
+              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Productos</a>
+            <a routerLink="/contacto"
+              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Contacto</a>
             <a routerLink="/cursos" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Cursos</a>
-            <a routerLink="/servicios" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Servicios</a>
+            <a routerLink="/servicios"
+              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Servicios</a>
           </ul>
         </nav>
 
@@ -28,7 +33,8 @@
           <a href="https://github.com/arecofix" aria-label="GitHub" class="hover:text-cyan-600 transition">
             <i class="fab fa-github text-xl"></i>
           </a>
-          <a href="https://www.linkedin.com/company/arecofix" aria-label="LinkedIn" class="hover:text-cyan-600 transition">
+          <a href="https://www.linkedin.com/company/arecofix" aria-label="LinkedIn"
+            class="hover:text-cyan-600 transition">
             <i class="fab fa-linkedin-in text-xl"></i>
           </a>
         </div>
@@ -37,50 +43,41 @@
       <!-- Newsletter -->
       <div class="w-full lg:w-1/3 text-center lg:text-left">
         <h4 class="text-lg font-semibold text-gray-900 mb-3">Únete a nuestro Newsletter</h4>
-        <p class="text-gray-500 text-sm mb-6">Sé el primero en enterarte de nuestras novedades, promociones exclusivas y más.</p>
+        <p class="text-gray-500 text-sm mb-6">Sé el primero en enterarte de nuestras novedades, promociones exclusivas y
+          más.</p>
 
         <form (ngSubmit)="subscribe()" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0">
-          <input
-            [(ngModel)]="email"
-            name="email"
-            type="email"
-            required
-            placeholder="Tu email"
+          <input [(ngModel)]="email" name="email" type="email" required placeholder="Tu email"
             class="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-600"
-            [disabled]="isSubmitting"
-            />
-            <button
-              type="submit"
-              [disabled]="isSubmitting"
-              class="bg-cyan-600 text-white rounded-md px-6 py-2 text-sm hover:brightness-110 transition disabled:opacity-50"
-              >
-              {{ isSubmitting ? 'Enviando...' : 'Suscribirse' }}
-            </button>
-          </form>
+            [disabled]="isSubmitting" />
+          <button type="submit" [disabled]="isSubmitting"
+            class="bg-cyan-600 text-white rounded-md px-6 py-2 text-sm hover:brightness-110 transition disabled:opacity-50">
+            {{ isSubmitting ? 'Enviando...' : 'Suscribirse' }}
+          </button>
+        </form>
 
-          @if (successMessage) {
-            <p class="mt-3 text-green-600 text-sm font-semibold">{{ successMessage }}</p>
-          }
-          @if (errorMessage) {
-            <p class="mt-3 text-red-600 text-sm font-semibold">{{ errorMessage }}</p>
-          }
-        </div>
-      </div>
-
-      <!-- Footer inferior -->
-      <div
-        class="pt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-400 gap-4 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12"
-        >
-        <ul class="flex gap-6 text-xs order-2 sm:order-1">
-          <li><a href="https://www.arecofix.com.ar/" class="hover:text-cyan-600 transition">Español</a></li>
-          <li><a href="https://www.arecofix.com.ar/privacy" class="hover:text-cyan-600 transition">Privacidad</a></li>
-          <li><a href="https://www.arecofix.com.ar/terms" class="hover:text-cyan-600 transition">Términos Legales</a></li>
-        </ul>
-        <p class="order-1 sm:order-2">
-          <a routerLink="/portfolio" class="hover:text-blue-400 transition-colors">
-            © 2025 Arecofix. Todos los derechos reservados.
-          </a>
-        </p>
+        @if (successMessage) {
+        <p class="mt-3 text-green-600 text-sm font-semibold">{{ successMessage }}</p>
+        }
+        @if (errorMessage) {
+        <p class="mt-3 text-red-600 text-sm font-semibold">{{ errorMessage }}</p>
+        }
       </div>
     </div>
-  </footer>
+
+    <!-- Footer inferior -->
+    <div
+      class="pt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-400 gap-4 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <ul class="flex gap-6 text-xs order-2 sm:order-1">
+        <li><a href="https://www.arecofix.com.ar/" class="hover:text-cyan-600 transition">Español</a></li>
+        <li><a href="https://www.arecofix.com.ar/privacy" class="hover:text-cyan-600 transition">Privacidad</a></li>
+        <li><a href="https://www.arecofix.com.ar/terms" class="hover:text-cyan-600 transition">Términos Legales</a></li>
+      </ul>
+      <p class="order-1 sm:order-2">
+        <a routerLink="/portfolio" class="hover:text-blue-400 transition-colors">
+          © 2025 Arecofix. Todos los derechos reservados.
+        </a>
+      </p>
+    </div>
+  </div>
+</footer>

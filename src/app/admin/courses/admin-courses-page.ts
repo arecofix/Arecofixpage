@@ -4,10 +4,10 @@ import { RouterLink } from '@angular/router';
 import { CoursesService, Course } from '@app/services/courses.service';
 
 @Component({
-    selector: 'app-admin-courses-page',
-    standalone: true,
-    imports: [CommonModule, RouterLink],
-    template: `
+  selector: 'app-admin-courses-page',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  template: `
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-800">Administrar Cursos</h2>
       <a routerLink="/admin/courses/new" class="btn btn-primary">
@@ -87,36 +87,36 @@ import { CoursesService, Course } from '@app/services/courses.service';
     `
 })
 export class AdminCoursesPage implements OnInit {
-    private coursesService = inject(CoursesService);
-    courses: Course[] = [];
-    loading = true;
+  private coursesService = inject(CoursesService);
+  courses: Course[] = [];
+  loading = true;
 
-    ngOnInit() {
-        this.loadCourses();
-    }
+  ngOnInit() {
+    this.loadCourses();
+  }
 
-    loadCourses() {
-        this.loading = true;
-        this.coursesService.getCourses().subscribe({
-            next: (data) => {
-                this.courses = data || [];
-                this.loading = false;
-            },
-            error: (err) => {
-                console.error('Error loading courses', err);
-                this.loading = false;
-            }
-        });
-    }
+  loadCourses() {
+    this.loading = true;
+    this.coursesService.getCourses().subscribe({
+      next: (response) => {
+        this.courses = response.data || [];
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading courses', err);
+        this.loading = false;
+      }
+    });
+  }
 
-    async deleteCourse(course: Course) {
-        if (!confirm(`¿Estás seguro de eliminar el curso "${course.title}"?`)) return;
+  async deleteCourse(course: Course) {
+    if (!confirm(`¿Estás seguro de eliminar el curso "${course.title}"?`)) return;
 
-        this.coursesService.deleteCourse(course.id).subscribe({
-            next: () => {
-                this.courses = this.courses.filter(c => c.id !== course.id);
-            },
-            error: (err) => alert('Error al eliminar el curso: ' + err.message)
-        });
-    }
+    this.coursesService.deleteCourse(course.id).subscribe({
+      next: () => {
+        this.courses = this.courses.filter(c => c.id !== course.id);
+      },
+      error: (err) => alert('Error al eliminar el curso: ' + err.message)
+    });
+  }
 }

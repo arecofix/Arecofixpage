@@ -1,0 +1,61 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Taller / Reparaciones</h1>
+    <a routerLink="/admin/repairs/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Nueva Reparación
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Dispositivo</th>
+                    <th>Estado</th>
+                    <th>Costo Est.</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="6" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (repairs().length === 0) {
+                <tr>
+                    <td colspan="6" class="text-center py-4">No hay reparaciones registradas.</td>
+                </tr>
+                } @else {
+                @for (repair of repairs(); track repair.id) {
+                <tr>
+                    <td>{{ repair.received_at | date:'shortDate' }}</td>
+                    <td>
+                        <div class="font-bold">{{ repair.customer_name }}</div>
+                        <div class="text-sm opacity-50">{{ repair.customer_phone }}</div>
+                    </td>
+                    <td>{{ repair.device_model }}</td>
+                    <td>
+                        <div class="badge" [ngClass]="getStatusColor(repair.status)">
+                            {{ getStatusLabel(repair.status) }}
+                        </div>
+                    </td>
+                    <td>{{ repair.estimated_cost | currency }}</td>
+                    <td>
+                        <div class="flex gap-2">
+                            <a [routerLink]="['/admin/repairs', repair.id]" class="btn btn-sm btn-ghost">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-sm btn-ghost text-error" (click)="deleteRepair(repair.id)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

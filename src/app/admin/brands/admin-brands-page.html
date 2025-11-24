@@ -1,0 +1,61 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Marcas</h1>
+    <a routerLink="/admin/brands/new" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i> Nueva Marca
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (loading()) {
+                <tr>
+                    <td colspan="4" class="text-center py-4">Cargando...</td>
+                </tr>
+                } @else if (brands().length === 0) {
+                <tr>
+                    <td colspan="4" class="text-center py-4">No hay marcas registradas.</td>
+                </tr>
+                } @else {
+                @for (brand of brands(); track brand.id) {
+                <tr>
+                    <td>
+                        @if (brand.logo_url) {
+                        <img [src]="brand.logo_url" alt="{{brand.name}}" class="w-10 h-10 object-contain">
+                        } @else {
+                        <div class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        }
+                    </td>
+                    <td>
+                        <div class="font-bold">{{ brand.name }}</div>
+                        <div class="text-sm opacity-50">{{ brand.slug }}</div>
+                    </td>
+                    <td>
+                        <button (click)="toggleStatus(brand)" class="badge" [class.badge-success]="brand.is_active"
+                            [class.badge-error]="!brand.is_active">
+                            {{ brand.is_active ? 'Activo' : 'Inactivo' }}
+                        </button>
+                    </td>
+                    <td>
+                        <a [routerLink]="['/admin/brands', brand.id]" class="btn btn-sm btn-ghost">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

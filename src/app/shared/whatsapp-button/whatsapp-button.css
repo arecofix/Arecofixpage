@@ -4,7 +4,7 @@
     bottom: 30px;
     right: 30px;
     z-index: 1000;
-    font-family: sans-serif; /* Asegura que la fuente sea legible */
+    font-family: sans-serif;
 }
 
 /* Botón principal */
@@ -20,84 +20,56 @@
     position: relative;
     transition: all 0.3s ease;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    z-index: 2; /* Asegura que esté sobre la animación de pulso */
 }
 
-/* Estilo del ícono SVG (Agregado nuevo) */
+/* Estilo del ícono SVG */
 .whatsapp-btn svg {
     width: 35px;
     height: 35px;
     fill: white;
-    z-index: 3;
 }
 
-/* Efectos Hover unificados */
+/* Efectos Hover */
 .whatsapp-btn:hover {
     background-color: #128C7E;
     transform: scale(1.1);
     box-shadow: 0 8px 25px rgba(18, 140, 126, 0.5);
-    /* Si prefieres el rebote en lugar de solo agrandar, descomenta la línea de abajo: */
-    /* animation: bounce 0.8s ease; */
-}
-
-/* Animación de pulso (Ondas) */
-.pulse-animation {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: rgba(37, 211, 102, 0.5);
-    animation: pulse 2s infinite;
-    z-index: -1; /* Se va detrás del botón */
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 0.6; }
-    100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* Animación de rebote (Opcional, si decides usarla en hover) */
-@keyframes bounce {
-    0%, 100% { transform: translateY(0) scale(1.1); }
-    50% { transform: translateY(-6px) scale(1.1); }
 }
 
 /* --- TOOLTIP (Cartel flotante) --- */
 .tooltip {
-    visibility: hidden; /* Clave para evitar la mancha gris */
+    visibility: hidden;
     opacity: 0;
-    
+
     width: 160px;
     background-color: #075E54;
     color: white;
     text-align: center;
     border-radius: 8px;
     padding: 8px 10px;
-    
+
     /* Posicionamiento */
     position: absolute;
-    bottom: 100%; /* Se coloca encima del botón */
+    bottom: 100%;
     right: 0;
-    margin-bottom: 15px; /* Espacio entre botón y tooltip */
-    
+    margin-bottom: 15px;
+
     font-size: 14px;
     line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
     /* Animación de entrada */
     transform: translateY(10px);
     transition: all 0.3s ease;
-    pointer-events: none; /* Evita clicks accidentales cuando está invisible */
+    pointer-events: none;
 }
 
 /* Triangulito del tooltip */
 .tooltip::after {
     content: "";
     position: absolute;
-    top: 100%; /* Abajo del tooltip */
-    right: 25px; /* Centrado respecto al botón derecho */
+    top: 100%;
+    right: 25px;
     border-width: 8px;
     border-style: solid;
     border-color: #075E54 transparent transparent transparent;

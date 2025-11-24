@@ -56,7 +56,7 @@
                 "scripts": true,
                 "styles": {
                   "minify": true,
-                  "inlineCritical": true
+                  "inlineCritical": false
                 },
                 "fonts": {
                   "inline": true
@@ -103,8 +103,7 @@
               "buildTarget": "arecofix:build:development"
             }
           },
-          "defaultConfiguration": "development",
-          
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"

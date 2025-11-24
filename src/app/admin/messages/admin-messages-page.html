@@ -1,0 +1,64 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Mensajes de Contacto</h1>
+</div>
+
+<div class="grid gap-4">
+    @if (loading()) {
+    <div class="flex justify-center py-8">
+        <span class="loading loading-spinner loading-lg"></span>
+    </div>
+    } @else if (messages().length === 0) {
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <span>No hay mensajes nuevos.</span>
+    </div>
+    } @else {
+    @for (msg of messages(); track msg.id) {
+    <div class="card bg-white shadow hover:shadow-md transition-shadow" [class.border-l-4]="!msg.is_read"
+        [class.border-primary]="!msg.is_read">
+        <div class="card-body p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold text-lg">{{ msg.name }}</h3>
+                        @if (!msg.is_read) {
+                        <span class="badge badge-primary badge-sm">Nuevo</span>
+                        }
+                        <span class="text-sm text-gray-500">{{ msg.created_at | date:'medium' }}</span>
+                    </div>
+
+                    <div class="text-sm text-gray-600 mb-2">
+                        <div class="flex items-center gap-4">
+                            <span><i class="fas fa-envelope mr-1"></i> {{ msg.email }}</span>
+                            @if (msg.phone) {
+                            <span><i class="fas fa-phone mr-1"></i> {{ msg.phone }}</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (msg.subject) {
+                    <div class="font-medium mb-2">Asunto: {{ msg.subject }}</div>
+                    }
+
+                    <p class="text-gray-700 whitespace-pre-wrap">{{ msg.message }}</p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    @if (!msg.is_read) {
+                    <button class="btn btn-sm btn-ghost" (click)="markAsRead(msg.id)" title="Marcar como leído">
+                        <i class="fas fa-check text-success"></i>
+                    </button>
+                    }
+                    <button class="btn btn-sm btn-ghost text-error" (click)="deleteMessage(msg.id)" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <a [href]="'mailto:' + msg.email" class="btn btn-sm btn-ghost text-info" title="Responder">
+                        <i class="fas fa-reply"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+    }
+</div>

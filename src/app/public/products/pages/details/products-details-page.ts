@@ -24,6 +24,7 @@ import {
 import { PaginationService } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
 import { iProduct } from '../../interfaces';
+import { CartService } from '@app/shared/services/cart.service';
 /*  */
 
 @Component({
@@ -32,7 +33,7 @@ import { iProduct } from '../../interfaces';
     IsEmptyComponent,
     IsErrorComponent,
     IsLoadingComponent
-],
+  ],
   templateUrl: './products-details-page.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +44,7 @@ export class ProductsDetailsPage {
   private productService: ProductService = inject(ProductService);
   public paginationService: PaginationService = inject(PaginationService);
   private location: Location = inject(Location);
+
   productRs = rxResource({
     stream: () =>
       combineLatest([
@@ -70,6 +72,15 @@ export class ProductsDetailsPage {
   // Método para volver atrás
   goBack(): void {
     this.location.back();
+  }
+
+  private cartService = inject(CartService);
+
+  addToCart() {
+    const product = this.product();
+    if (product) {
+      this.cartService.addToCart(product);
+    }
   }
 }
 

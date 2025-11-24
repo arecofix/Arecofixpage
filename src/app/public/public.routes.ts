@@ -100,6 +100,14 @@ export const publicRoutes: Routes = [
             (m) => m.RepuestosComponent
           ),
       },
+      {
+        title: 'Checkout',
+        path: 'checkout',
+        loadComponent: () =>
+          import('@app/public/checkout/checkout-page').then(
+            (m) => m.CheckoutPage
+          ),
+      },
     ],
   },
 ];

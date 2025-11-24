@@ -14,11 +14,22 @@ export class AdminLayout {
 
   menuItems = [
     { title: 'Dashboard', path: '/admin/dashboard', icon: 'fa-chart-line' },
+    { title: 'Ventas', path: '/admin/sales', icon: 'fa-cash-register' },
+    { title: 'Facturación', path: '/admin/invoices', icon: 'fa-file-invoice-dollar' },
     { title: 'Productos', path: '/admin/products', icon: 'fa-box' },
+    { title: 'Categorías', path: '/admin/categories', icon: 'fa-tags' },
+    { title: 'Marcas', path: '/admin/brands', icon: 'fa-copyright' },
+    { title: 'Inventario', path: '/admin/inventory', icon: 'fa-warehouse' },
+    { title: 'Compras', path: '/admin/purchases', icon: 'fa-shopping-bag' },
+    { title: 'Clientes', path: '/admin/clients', icon: 'fa-users' },
+    { title: 'Proveedores', path: '/admin/suppliers', icon: 'fa-truck' },
+    { title: 'Empleados', path: '/admin/employees', icon: 'fa-id-card' },
+    { title: 'Empresa', path: '/admin/company', icon: 'fa-building' },
     { title: 'Cursos', path: '/admin/courses', icon: 'fa-graduation-cap' },
+    { title: 'Pedidos', path: '/admin/orders', icon: 'fa-shopping-cart' },
     { title: 'Servicios', path: '/admin/services', icon: 'fa-tools' },
     { title: 'Taller', path: '/admin/repairs', icon: 'fa-wrench' },
-    { title: 'Pedidos', path: '/admin/orders', icon: 'fa-shopping-cart' },
+    { title: 'Usuarios', path: '/admin/users', icon: 'fa-user-cog' },
     { title: 'Mensajes', path: '/admin/messages', icon: 'fa-envelope' },
   ];
 
