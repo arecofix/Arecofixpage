@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
+import { Product } from '@app/features/products/domain/entities/product.entity';
+import { LoggerService } from '@app/core/services/logger.service';
+
+interface CartItem extends Product {
+    quantity: number;
+}
 
 @Component({
     selector: 'app-admin-sales-page',
@@ -13,9 +19,10 @@ import { AuthService } from '@app/services/auth.service';
 export class AdminSalesPage implements OnInit {
     private auth = inject(AuthService);
     private router = inject(Router);
+    private logger = inject(LoggerService);
 
-    products = signal<any[]>([]);
-    cart = signal<any[]>([]);
+    products = signal<Product[]>([]);
+    cart = signal<CartItem[]>([]);
     searchQuery = signal('');
     loading = signal(false);
     processing = signal(false);
@@ -133,7 +140,7 @@ export class AdminSalesPage implements OnInit {
             this.router.navigate(['/admin/invoices']);
 
         } catch (e: any) {
-            console.error('Checkout error:', e);
+            this.logger.error('Checkout error', e);
             alert('Error al procesar la venta: ' + e.message);
         } finally {
             this.processing.set(false);

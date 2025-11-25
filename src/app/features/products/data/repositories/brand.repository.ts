@@ -1,0 +1,20 @@
+import { Injectable, inject } from '@angular/core';
+import { BaseRepository } from '@app/core/repositories/base.repository';
+import { Brand } from '../../domain/entities/brand.entity';
+import { AuthService } from '@app/services/auth.service';
+import { LoggerService } from '@app/core/services/logger.service';
+
+/**
+ * Brand Repository
+ * Handles all database operations for brands
+ */
+@Injectable({ providedIn: 'root' })
+export class BrandRepository extends BaseRepository<Brand> {
+    protected tableName = 'brands';
+
+    constructor() {
+        const authService = inject(AuthService);
+        const logger = inject(LoggerService);
+        super(authService.getSupabaseClient(), logger);
+    }
+}

@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
+import { Product } from '@app/features/products/domain/entities/product.entity';
 
 @Component({
     selector: 'app-admin-inventory-page',
@@ -11,7 +12,7 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class AdminInventoryPage implements OnInit {
     private auth = inject(AuthService);
-    products = signal<any[]>([]);
+    products = signal<Product[]>([]);
     loading = signal(true);
 
     async ngOnInit() {

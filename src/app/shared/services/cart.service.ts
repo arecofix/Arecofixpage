@@ -1,5 +1,6 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { iProduct } from '@app/public/products/interfaces';
+import { LoggerService } from '@app/core/services/logger.service';
 
 export interface CartItem {
     product: iProduct;
@@ -10,6 +11,7 @@ export interface CartItem {
     providedIn: 'root'
 })
 export class CartService {
+    private logger = inject(LoggerService);
     cartItems = signal<CartItem[]>([]);
 
     constructor() {
@@ -37,7 +39,7 @@ export class CartService {
             }
             return [...items, { product, quantity: 1 }];
         });
-        console.log('Product added to cart:', product.name);
+        this.logger.debug('Product added to cart', { productName: product.name });
     }
 
     removeFromCart(productId: string) {

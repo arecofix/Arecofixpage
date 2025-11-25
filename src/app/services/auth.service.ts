@@ -3,6 +3,7 @@ import { createClient, SupabaseClient, User, Session, AuthChangeEvent } from '@s
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { LoggerService } from '../core/services/logger.service';
 
 export interface AuthResponse {
   user: User | null;
@@ -32,6 +33,7 @@ export interface UserProfile {
 export class AuthService {
   private supabase: SupabaseClient;
   private router = inject(Router);
+  private logger = inject(LoggerService);
   private authState = new BehaviorSubject<{ user: User | null; session: Session | null }>({
     user: null,
     session: null,
@@ -110,7 +112,7 @@ export class AuthService {
       });
 
       if (error) {
-        console.error('Supabase signUp error', error);
+        this.logger.error('Supabase signUp error', error);
         return { user: null, session: null, error: error.message };
       }
 
@@ -133,7 +135,7 @@ export class AuthService {
           .insert(userProfile);
 
         if (profileError) {
-          console.error('Error creating profile manually:', profileError);
+          this.logger.error('Error creating profile manually', profileError);
           // We don't fail the whole signup if profile fails, but we log it.
         }
       }
@@ -146,7 +148,7 @@ export class AuthService {
       return { user: data.user, session: data.session };
 
     } catch (e: any) {
-      console.error('Unexpected error during signup:', e);
+      this.logger.error('Unexpected error during signup', e);
       return { user: null, session: null, error: e.message || 'Unknown error' };
     }
   }
@@ -181,7 +183,7 @@ export class AuthService {
       .single();
 
     if (error) {
-      console.error('Error fetching profile:', error.message);
+      this.logger.error('Error fetching profile', error);
       return null;
     }
 
@@ -197,7 +199,7 @@ export class AuthService {
       .single();
 
     if (error) {
-      console.error('Error updating profile:', error.message);
+      this.logger.error('Error updating profile', error);
       return null;
     }
 
@@ -235,10 +237,10 @@ export class AuthService {
         .select('id')
         .limit(1);
 
-      console.log('Database connection test:', { data, error });
+      this.logger.debug('Database connection test', { data, error });
       return !error;
     } catch (err) {
-      console.error('Database connection test failed:', err);
+      this.logger.error('Database connection test failed', err);
       return false;
     }
   }
@@ -356,7 +358,7 @@ export class AuthService {
     //   return authError.message;
     // }
 
-    console.warn('Account deletion requires backend implementation');
+    this.logger.warn('Account deletion requires backend implementation');
 
     // Sign out
     await this.signOut();
@@ -368,7 +370,7 @@ export class AuthService {
     const { data, error } = await this.supabase.auth.refreshSession();
 
     if (error) {
-      console.error('Error refreshing session:', error.message);
+      this.logger.error('Error refreshing session', error);
       return null;
     }
 

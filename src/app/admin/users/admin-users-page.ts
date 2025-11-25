@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { AuthService } from '@app/services/auth.service';
+import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
 
 @Component({
     selector: 'app-admin-users-page',
@@ -11,7 +11,7 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class AdminUsersPage implements OnInit {
     private auth = inject(AuthService);
-    users = signal<any[]>([]);
+    users = signal<UserProfile[]>([]);
     loading = signal(true);
 
     async ngOnInit() {

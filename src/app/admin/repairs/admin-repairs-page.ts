@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
+import { Repair } from '@app/features/repairs/domain/entities/repair.entity';
 
 @Component({
   selector: 'app-admin-repairs-page',
@@ -11,7 +12,7 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class AdminRepairsPage implements OnInit {
   private auth = inject(AuthService);
-  repairs = signal<any[]>([]);
+  repairs = signal<Repair[]>([]);
   loading = signal(true);
 
   async ngOnInit() {

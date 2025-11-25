@@ -171,11 +171,18 @@
         aria-label="Menú de usuario">
         <i class="fas fa-user text-lg text-[#2c3454]"></i>
       </div>
-      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-48">
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-56">
         @let user = (user$ | async);
         @if (user) {
-        <li><a routerLink="/perfil"><i class="fas fa-user-circle text-[#2c3454]"></i> Mi Perfil ({{ user?.email
-            }})</a></li>
+        <li>
+          <a routerLink="/perfil" class="flex items-center gap-2">
+            <i class="fas fa-user-circle text-[#2c3454]"></i>
+            <span class="flex-1 min-w-0">
+              <span class="block text-sm leading-tight">Mi Perfil</span>
+              <span class="block text-xs text-gray-500 truncate max-w-[160px]">{{ user?.email }}</span>
+            </span>
+          </a>
+        </li>
         <li><button (click)="logout()"><i class="fas fa-sign-out-alt text-[#2c3454]"></i> Cerrar Sesión</button></li>
         <li><a routerLink="/admin"><i class="fas fa-user-plus text-[#2c3454]"></i> Admin</a></li>
         } @else {

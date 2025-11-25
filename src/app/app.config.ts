@@ -1,11 +1,13 @@
 import {
   ApplicationConfig,
+  ErrorHandler,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
+import { GlobalErrorHandler } from './core/errors/global-error-handler';
 
 // Firebase imports
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -23,6 +25,9 @@ const firebaseConfig = {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Global error handler
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+
     // Configuración existente
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),

@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /dashboard/
-Disallow: /assets/download/
-
-Sitemap: https://arecofix.com.ar/sitemap.xml

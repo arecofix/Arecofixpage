@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-// Re-trigger build
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/services/auth.service';
+import { Message } from '@app/features/customers/domain/entities/message.entity';
 
 @Component({
   selector: 'app-admin-messages-page',
@@ -11,7 +11,7 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class AdminMessagesPage implements OnInit {
   private auth = inject(AuthService);
-  messages = signal<any[]>([]);
+  messages = signal<Message[]>([]);
   loading = signal(true);
 
   async ngOnInit() {

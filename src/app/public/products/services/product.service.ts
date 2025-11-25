@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, from, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/services/auth.service';
+import { LoggerService } from '@app/core/services/logger.service';
 import {
   iProductsParams,
   iProductsResponse,
@@ -14,6 +15,7 @@ import {
 })
 export class ProductService {
   private supabase: SupabaseClient;
+  private logger = inject(LoggerService);
 
   constructor(private authService: AuthService) {
     this.supabase = this.authService.getSupabaseClient();
@@ -77,7 +79,7 @@ export class ProductService {
         };
       }),
       catchError((err) => {
-        console.error('Supabase Error:', err);
+        this.logger.error('Supabase product query error', err);
         return of({
           first: 1,
           prev: null,

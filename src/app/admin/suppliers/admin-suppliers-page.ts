@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
+import { Supplier } from '@app/features/customers/domain/entities/supplier.entity';
 
 @Component({
     selector: 'app-admin-suppliers-page',
@@ -11,7 +12,7 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class AdminSuppliersPage implements OnInit {
     private auth = inject(AuthService);
-    suppliers = signal<any[]>([]);
+    suppliers = signal<Supplier[]>([]);
     loading = signal(true);
 
     async ngOnInit() {
