@@ -3,9 +3,9 @@
 
   <div class="drawer-content flex flex-col bg-gray-50 min-h-screen">
     <!-- Navbar -->
-    <div class="w-full navbar bg-white border-b border-gray-200 lg:hidden">
+    <div class="w-full navbar bg-white border-b border-gray-200 lg:hidden text-gray-800">
       <div class="flex-none">
-        <label for="admin-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
+        <label for="admin-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost text-gray-800">
           <i class="fas fa-bars text-xl"></i>
         </label>
       </div>
@@ -32,11 +32,39 @@
       <!-- Menu Items -->
       @for (item of menuItems; track item.path) {
       <li>
+        @if (item.children) {
+        <div class="flex items-center gap-1">
+          <a [routerLink]="item.path" routerLinkActive="bg-indigo-600 text-white"
+            class="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+            <i class="fas {{item.icon}} w-5 text-center"></i>
+            <span class="font-medium">{{item.title}}</span>
+          </a>
+          <button (click)="toggleMenu(item)"
+            class="px-3 py-3 rounded-lg hover:bg-gray-800 transition-colors text-gray-400 hover:text-white">
+            <i class="fas fa-chevron-down transition-transform duration-200" [class.rotate-180]="item.expanded"></i>
+          </button>
+        </div>
+
+        @if (item.expanded) {
+        <ul class="pl-4 mt-1 space-y-1 border-l border-gray-700 ml-6">
+          @for (child of item.children; track child.path) {
+          <li>
+            <a [routerLink]="child.path" routerLinkActive="text-indigo-400"
+              class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm text-gray-400 hover:text-white">
+              <i class="fas {{child.icon}} w-4 text-center"></i>
+              <span>{{child.title}}</span>
+            </a>
+          </li>
+          }
+        </ul>
+        }
+        } @else {
         <a [routerLink]="item.path" routerLinkActive="bg-indigo-600 text-white"
           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
           <i class="fas {{item.icon}} w-5 text-center"></i>
           <span class="font-medium">{{item.title}}</span>
         </a>
+        }
       </li>
       }
 

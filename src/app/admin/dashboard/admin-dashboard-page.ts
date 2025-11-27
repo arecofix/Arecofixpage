@@ -20,59 +20,59 @@ import { environment } from '@env/environment';
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Users Card -->
-            <div class="stats shadow bg-white">
+            <div class="stats shadow bg-white text-gray-800">
                 <div class="stat">
                     <div class="stat-figure text-primary">
                         <i class="fas fa-users text-3xl"></i>
                     </div>
-                    <div class="stat-title">Usuarios</div>
+                    <div class="stat-title text-gray-600">Usuarios</div>
                     <div class="stat-value text-primary">{{ stats().users }}</div>
-                    <div class="stat-desc">Registrados</div>
+                    <div class="stat-desc text-gray-500">Registrados</div>
                 </div>
             </div>
 
             <!-- Products Card -->
-            <div class="stats shadow bg-white">
+            <div class="stats shadow bg-white text-gray-800">
                 <div class="stat">
                     <div class="stat-figure text-secondary">
                         <i class="fas fa-box text-3xl"></i>
                     </div>
-                    <div class="stat-title">Productos</div>
+                    <div class="stat-title text-gray-600">Productos</div>
                     <div class="stat-value text-secondary">{{ stats().products }}</div>
-                    <div class="stat-desc">En catálogo</div>
+                    <div class="stat-desc text-gray-500">En catálogo</div>
                 </div>
             </div>
 
             <!-- Sales Card -->
-            <div class="stats shadow bg-white">
+            <div class="stats shadow bg-white text-gray-800">
                 <div class="stat">
                     <div class="stat-figure text-accent">
                         <i class="fas fa-shopping-cart text-3xl"></i>
                     </div>
-                    <div class="stat-title">Ventas</div>
+                    <div class="stat-title text-gray-600">Ventas</div>
                     <div class="stat-value text-accent">{{ stats().sales }}</div>
-                    <div class="stat-desc">Total realizadas</div>
+                    <div class="stat-desc text-gray-500">Total realizadas</div>
                 </div>
             </div>
 
             <!-- Revenue Card -->
-            <div class="stats shadow bg-white">
+            <div class="stats shadow bg-white text-gray-800">
                 <div class="stat">
                     <div class="stat-figure text-success">
                         <i class="fas fa-dollar-sign text-3xl"></i>
                     </div>
-                    <div class="stat-title">Ingresos</div>
+                    <div class="stat-title text-gray-600">Ingresos</div>
                     <div class="stat-value text-success">{{ stats().revenue | currency }}</div>
-                    <div class="stat-desc">Total facturado</div>
+                    <div class="stat-desc text-gray-500">Total facturado</div>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Quick Actions -->
-            <div class="card bg-white shadow">
+            <div class="card bg-white shadow text-gray-800">
                 <div class="card-body">
-                    <h2 class="card-title mb-4">Acciones Rápidas</h2>
+                    <h2 class="card-title mb-4 text-gray-800">Acciones Rápidas</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <a routerLink="/admin/products/new" class="btn btn-outline btn-primary">
                             <i class="fas fa-plus mr-2"></i> Nuevo Producto
@@ -91,17 +91,17 @@ import { environment } from '@env/environment';
             </div>
 
             <!-- Analytics & System Status -->
-            <div class="card bg-white shadow">
+            <div class="card bg-white shadow text-gray-800">
                 <div class="card-body">
-                    <h2 class="card-title mb-4">Analytics & Sistema</h2>
+                    <h2 class="card-title mb-4 text-gray-800">Analytics & Sistema</h2>
                     <div class="space-y-4">
                         <!-- System Status -->
                         <div class="flex justify-between items-center">
-                            <span>Base de Datos</span>
+                            <span class="text-gray-700">Base de Datos</span>
                             <span class="badge badge-success">Conectado</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span>Analytics (PostHog)</span>
+                            <span class="text-gray-700">Analytics (PostHog)</span>
                             <span class="badge badge-success">{{ posthogStatus() }}</span>
                         </div>
                         

@@ -19,42 +19,42 @@ import { CoursesService } from '@app/core/services/courses.service';
         </a>
       </div>
     
-      <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-lg shadow p-6 space-y-6">
+      <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-lg shadow p-6 space-y-6 text-gray-800">
     
         <!-- Basic Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="form-control">
             <label class="label">Título</label>
-            <input type="text" formControlName="title" class="input input-bordered" placeholder="Ej: Reparación de iPhone" />
+            <input type="text" formControlName="title" class="input input-bordered bg-white text-gray-800" placeholder="Ej: Reparación de iPhone" />
           </div>
     
           <div class="form-control">
             <label class="label">Slug (URL)</label>
-            <input type="text" formControlName="slug" class="input input-bordered" placeholder="ej: reparacion-iphone" />
+            <input type="text" formControlName="slug" class="input input-bordered bg-white text-gray-800" placeholder="ej: reparacion-iphone" />
             <label class="label text-xs text-gray-500">Identificador único para la URL</label>
           </div>
         </div>
     
         <div class="form-control">
           <label class="label">Descripción Corta</label>
-          <textarea formControlName="description" class="textarea textarea-bordered h-24" placeholder="Breve resumen del curso..."></textarea>
+          <textarea formControlName="description" class="textarea textarea-bordered h-24 bg-white text-gray-800" placeholder="Breve resumen del curso..."></textarea>
         </div>
     
         <!-- Details -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="form-control">
             <label class="label">Precio</label>
-            <input type="number" formControlName="price" class="input input-bordered" />
+            <input type="number" formControlName="price" class="input input-bordered bg-white text-gray-800" />
           </div>
     
           <div class="form-control">
             <label class="label">Precio Oferta (Opcional)</label>
-            <input type="number" formControlName="sale_price" class="input input-bordered" />
+            <input type="number" formControlName="sale_price" class="input input-bordered bg-white text-gray-800" />
           </div>
     
           <div class="form-control">
             <label class="label">Nivel</label>
-            <select formControlName="level" class="select select-bordered">
+            <select formControlName="level" class="select select-bordered bg-white text-gray-800">
               <option value="Básico">Básico</option>
               <option value="Intermedio">Intermedio</option>
               <option value="Avanzado">Avanzado</option>
@@ -66,19 +66,19 @@ import { CoursesService } from '@app/core/services/courses.service';
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="form-control">
             <label class="label">Duración</label>
-            <input type="text" formControlName="duration" class="input input-bordered" placeholder="Ej: 3 meses" />
+            <input type="text" formControlName="duration" class="input input-bordered bg-white text-gray-800" placeholder="Ej: 3 meses" />
           </div>
     
           <div class="form-control">
             <label class="label">Horario</label>
-            <input type="text" formControlName="schedule" class="input input-bordered" placeholder="Ej: Lunes 18hs" />
+            <input type="text" formControlName="schedule" class="input input-bordered bg-white text-gray-800" placeholder="Ej: Lunes 18hs" />
           </div>
         </div>
     
         <!-- Media -->
         <div class="form-control">
           <label class="label">URL de Imagen</label>
-          <input type="text" formControlName="image_url" class="input input-bordered" placeholder="https://..." />
+          <input type="text" formControlName="image_url" class="input input-bordered bg-white text-gray-800" placeholder="https://..." />
           @if (form.get('image_url')?.value) {
             <div class="mt-2">
               <img [src]="form.get('image_url')?.value" class="h-32 rounded object-cover border" alt="Preview" />

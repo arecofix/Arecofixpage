@@ -15,10 +15,10 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
       </a>
     </div>
     
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <div class="overflow-x-auto bg-white rounded-lg shadow text-gray-800">
       <table class="table w-full">
         <thead>
-          <tr>
+          <tr class="text-gray-800">
             <th>Imagen</th>
             <th>Título</th>
             <th>Precio</th>

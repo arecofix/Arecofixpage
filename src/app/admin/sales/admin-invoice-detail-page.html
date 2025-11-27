@@ -1,4 +1,4 @@
-<div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-8 print:shadow-none">
+<div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-8 print:shadow-none text-gray-800">
     @if (loading()) {
     <div class="p-8 text-center">Cargando...</div>
     } @else if (invoice()) {
@@ -10,8 +10,17 @@
                 <p class="text-gray-500 mt-1">#{{ invoice().invoice_number || 'Borrador' }}</p>
             </div>
             <div class="text-right">
-                <div class="font-bold text-xl text-indigo-600">Arecofix</div>
-                <p class="text-sm text-gray-500">Servicios Integrales</p>
+                @if (company()?.logo_url) {
+                <img [src]="company().logo_url" alt="Logo" class="h-16 mb-2 ml-auto object-contain">
+                }
+                <div class="font-bold text-xl text-indigo-600">{{ company()?.name || 'Arecofix' }}</div>
+                <p class="text-sm text-gray-500">{{ company()?.location || 'Servicios Integrales' }}</p>
+                <p class="text-sm text-gray-500">{{ company()?.address }}</p>
+                <p class="text-sm text-gray-500">{{ company()?.phone }}</p>
+                <p class="text-sm text-gray-500">{{ company()?.email }}</p>
+                @if (company()?.ruc) {
+                <p class="text-sm text-gray-500">CUIT: {{ company()?.ruc }}</p>
+                }
             </div>
         </div>
 
@@ -33,7 +42,7 @@
         <!-- Items -->
         <table class="w-full mb-8">
             <thead>
-                <tr class="border-b-2 border-gray-200">
+                <tr class="border-b-2 border-gray-200 text-gray-800">
                     <th class="text-left py-3">Descripción</th>
                     <th class="text-center py-3">Cant.</th>
                     <th class="text-right py-3">Precio Unit.</th>

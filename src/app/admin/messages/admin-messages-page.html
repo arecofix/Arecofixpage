@@ -14,7 +14,7 @@
     </div>
     } @else {
     @for (msg of messages(); track msg.id) {
-    <div class="card bg-white shadow hover:shadow-md transition-shadow" [class.border-l-4]="!msg.is_read"
+    <div class="card bg-white shadow hover:shadow-md transition-shadow text-gray-800" [class.border-l-4]="!msg.is_read"
         [class.border-primary]="!msg.is_read">
         <div class="card-body p-6">
             <div class="flex justify-between items-start gap-4">

@@ -5,9 +5,7 @@
    This is a false positive for Tailwind CSS v4. 
    The syntax is correct and required for the build.
 */
-@plugin "daisyui" {
-    themes: business;
-}
+@plugin "daisyui";
 
 /* Custom Brand Colors */
 :root {
@@ -66,4 +64,79 @@
 .dropdown-content li>a i,
 .dropdown-content li>button i {
     color: white !important;
+}
+
+/* Print Styles */
+@media print {
+
+    /* Default page size (for Invoices, etc.) */
+    @page {
+        size: auto;
+        margin: 5mm;
+    }
+
+    /* Specific page size for Repair Orders */
+    @page repair-order {
+        size: auto;
+        /* Use default paper size (usually A4) */
+        margin: 0mm;
+        /* Remove margins to hide headers/footers */
+    }
+
+    /* Hide admin UI elements globally when printing */
+    .drawer-side,
+    .navbar,
+    .drawer-toggle,
+    .btn:not(.print-btn),
+    .no-print,
+    app-admin-layout>.drawer>.drawer-toggle,
+    .drawer-content>.navbar,
+    app-footer,
+    app-whatsapp-button {
+        display: none !important;
+    }
+
+    /* Ensure main content is visible and takes full width by default */
+    .drawer-content,
+    main {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* --- Specific styles for Repair Order --- */
+
+    /* Apply the named page when this class is present on body */
+    body.printing-repair-order {
+        page: repair-order;
+    }
+
+    /* Hide everything by default for repair order */
+    body.printing-repair-order * {
+        visibility: hidden;
+    }
+
+    /* Show only the print container and its children */
+    body.printing-repair-order .print-container,
+    body.printing-repair-order .print-container * {
+        visibility: visible;
+    }
+
+    /* Position and size the container for A6 */
+    body.printing-repair-order .print-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 105mm;
+        /* Fixed A6 width */
+        min-height: 148mm;
+        /* A6 height */
+        margin: 0;
+        padding: 5mm;
+        background: white;
+        color: black;
+        z-index: 9999;
+    }
 }

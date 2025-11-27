@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Configuración de Empresa</h1>
 
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg shadow p-6 text-gray-800">
         @if (error()) {
         <div class="alert alert-error mb-4">
             <i class="fas fa-exclamation-circle"></i>
@@ -20,22 +20,26 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-control">
                     <label class="label">Nombre de la Empresa</label>
-                    <input type="text" [(ngModel)]="form().name" name="name" class="input input-bordered" required>
+                    <input type="text" [(ngModel)]="form().name" name="name"
+                        class="input input-bordered bg-white text-gray-800" required>
                 </div>
                 <div class="form-control">
                     <label class="label">Propietario</label>
-                    <input type="text" [(ngModel)]="form().owner_name" name="owner_name" class="input input-bordered">
+                    <input type="text" [(ngModel)]="form().owner_name" name="owner_name"
+                        class="input input-bordered bg-white text-gray-800">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-control">
                     <label class="label">RUC / CUIT</label>
-                    <input type="text" [(ngModel)]="form().ruc" name="ruc" class="input input-bordered">
+                    <input type="text" [(ngModel)]="form().ruc" name="ruc"
+                        class="input input-bordered bg-white text-gray-800">
                 </div>
                 <div class="form-control">
                     <label class="label">Dirección</label>
-                    <input type="text" [(ngModel)]="form().address" name="address" class="input input-bordered">
+                    <input type="text" [(ngModel)]="form().address" name="address"
+                        class="input input-bordered bg-white text-gray-800">
                 </div>
             </div>
 
@@ -43,18 +47,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-control">
                     <label class="label">Email</label>
-                    <input type="email" [(ngModel)]="form().email" name="email" class="input input-bordered">
+                    <input type="email" [(ngModel)]="form().email" name="email"
+                        class="input input-bordered bg-white text-gray-800">
                 </div>
                 <div class="form-control">
                     <label class="label">Teléfono</label>
-                    <input type="text" [(ngModel)]="form().phone" name="phone" class="input input-bordered">
+                    <input type="text" [(ngModel)]="form().phone" name="phone"
+                        class="input input-bordered bg-white text-gray-800">
                 </div>
             </div>
 
             <div class="form-control">
                 <label class="label">Ubicación</label>
-                <input type="text" [(ngModel)]="form().location" name="location" class="input input-bordered"
-                    placeholder="Ej: Buenos Aires, Argentina">
+                <input type="text" [(ngModel)]="form().location" name="location"
+                    class="input input-bordered bg-white text-gray-800" placeholder="Ej: Buenos Aires, Argentina">
             </div>
 
             <div class="divider">Configuración Fiscal</div>
@@ -63,16 +69,17 @@
                 <div class="form-control">
                     <label class="label">Porcentaje Impuesto (%)</label>
                     <input type="number" [(ngModel)]="form().tax_percentage" name="tax_percentage"
-                        class="input input-bordered">
+                        class="input input-bordered bg-white text-gray-800">
                 </div>
                 <div class="form-control">
                     <label class="label">Abreviatura Impuesto</label>
                     <input type="text" [(ngModel)]="form().tax_abbreviation" name="tax_abbreviation"
-                        class="input input-bordered" placeholder="Ej: IVA">
+                        class="input input-bordered bg-white text-gray-800" placeholder="Ej: IVA">
                 </div>
                 <div class="form-control">
                     <label class="label">Moneda</label>
-                    <select [(ngModel)]="form().currency" name="currency" class="select select-bordered">
+                    <select [(ngModel)]="form().currency" name="currency"
+                        class="select select-bordered bg-white text-gray-800">
                         <option value="ARS">ARS (Peso Argentino)</option>
                         <option value="USD">USD (Dólar Estadounidense)</option>
                     </select>

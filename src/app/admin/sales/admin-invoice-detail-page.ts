@@ -15,13 +15,20 @@ export class AdminInvoiceDetailPage implements OnInit {
 
     invoice = signal<any>(null);
     items = signal<any[]>([]);
+    company = signal<any>(null);
     loading = signal(true);
 
     async ngOnInit() {
         const id = this.route.snapshot.paramMap.get('id');
-        if (id) {
-            const supabase = this.auth.getSupabaseClient();
+        const supabase = this.auth.getSupabaseClient();
 
+        // Fetch company settings
+        const { data: companyData } = await supabase.from('company_settings').select('*').maybeSingle();
+        if (companyData) {
+            this.company.set(companyData);
+        }
+
+        if (id) {
             // Fetch invoice
             const { data: invoice } = await supabase
                 .from('invoices')

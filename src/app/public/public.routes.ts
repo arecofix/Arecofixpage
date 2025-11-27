@@ -94,6 +94,14 @@ export const publicRoutes: Routes = [
       },
       // Repuestos ahora se sirve a través de products/category/repuestos
       {
+        title: 'Seguimiento de Reparación',
+        path: 'tracking/:code',
+        loadComponent: () =>
+          import('@app/public/tracking/tracking-page').then(
+            (m) => m.TrackingPage
+          ),
+      },
+      {
         title: 'Checkout',
         path: 'checkout',
         loadComponent: () =>

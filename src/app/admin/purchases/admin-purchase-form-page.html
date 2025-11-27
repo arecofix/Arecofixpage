@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-gray-800">Registrar Compra</h1>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg shadow p-6 text-gray-800">
         @if (error()) {
         <div class="alert alert-error mb-4">
             <i class="fas fa-exclamation-circle"></i>
@@ -19,7 +19,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="form-control">
                     <label class="label">Proveedor</label>
-                    <select [(ngModel)]="form().supplier_id" name="supplier_id" class="select select-bordered" required>
+                    <select [(ngModel)]="form().supplier_id" name="supplier_id"
+                        class="select select-bordered bg-white text-gray-800" required>
                         <option value="" disabled selected>Seleccionar Proveedor</option>
                         @for (supplier of suppliers(); track supplier.id) {
                         <option [value]="supplier.id">{{ supplier.name }}</option>
@@ -29,11 +30,12 @@
                 <div class="form-control">
                     <label class="label">Fecha</label>
                     <input type="date" [(ngModel)]="form().purchase_date" name="purchase_date"
-                        class="input input-bordered" required>
+                        class="input input-bordered bg-white text-gray-800" required>
                 </div>
                 <div class="form-control">
                     <label class="label">Estado</label>
-                    <select [(ngModel)]="form().status" name="status" class="select select-bordered">
+                    <select [(ngModel)]="form().status" name="status"
+                        class="select select-bordered bg-white text-gray-800">
                         <option value="received">Recibido (Aumenta Stock)</option>
                         <option value="ordered">Ordenado (Pendiente)</option>
                     </select>
@@ -49,7 +51,8 @@
                     <div class="form-control flex-1">
                         <label class="label text-xs" *ngIf="$index === 0">Producto</label>
                         <select [ngModel]="item.product_id" (ngModelChange)="updateItem($index, 'product_id', $event)"
-                            [name]="'product_' + $index" class="select select-bordered w-full select-sm">
+                            [name]="'product_' + $index"
+                            class="select select-bordered w-full select-sm bg-white text-gray-800">
                             <option value="" disabled selected>Seleccionar Producto</option>
                             @for (product of products(); track product.id) {
                             <option [value]="product.id">{{ product.name }} (Stock: {{ product.stock }})</option>
@@ -60,13 +63,13 @@
                         <label class="label text-xs" *ngIf="$index === 0">Cantidad</label>
                         <input type="number" [ngModel]="item.quantity"
                             (ngModelChange)="updateItem($index, 'quantity', $event)" [name]="'qty_' + $index"
-                            class="input input-bordered input-sm" min="1">
+                            class="input input-bordered input-sm bg-white text-gray-800" min="1">
                     </div>
                     <div class="form-control w-32">
                         <label class="label text-xs" *ngIf="$index === 0">Costo Unit.</label>
                         <input type="number" [ngModel]="item.unit_cost"
                             (ngModelChange)="updateItem($index, 'unit_cost', $event)" [name]="'cost_' + $index"
-                            class="input input-bordered input-sm" min="0">
+                            class="input input-bordered input-sm bg-white text-gray-800" min="0">
                     </div>
                     <div class="w-24 text-right font-bold text-sm pb-2">
                         ${{ item.quantity * item.unit_cost }}
