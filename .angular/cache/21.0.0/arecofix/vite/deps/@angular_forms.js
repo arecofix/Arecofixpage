@@ -1,7 +1,7 @@
 import {
   getDOM
-} from "./chunk-4LXEFM7E.js";
-import "./chunk-WOQ47UI3.js";
+} from "./chunk-5ES7C2RN.js";
+import "./chunk-UC72YTJX.js";
 import {
   ApplicationRef,
   ChangeDetectorRef,
@@ -32,7 +32,7 @@ import {
   ɵɵdirectiveInject,
   ɵɵgetInheritedFactory,
   ɵɵlistener
-} from "./chunk-EMLYZLAS.js";
+} from "./chunk-KMIRFRWL.js";
 import {
   DestroyRef,
   EventEmitter,
@@ -47,11 +47,11 @@ import {
   untracked,
   ɵɵdefineInjectable,
   ɵɵdefineInjector
-} from "./chunk-HEYRABEZ.js";
+} from "./chunk-GSHIRZGO.js";
+import "./chunk-N3CADB34.js";
 import {
   forkJoin
 } from "./chunk-J6AWP5HV.js";
-import "./chunk-N3CADB34.js";
 import {
   Subject,
   from,
@@ -996,12 +996,12 @@ var AbstractControl = class {
   set status(v) {
     untracked(() => this.statusReactive.set(v));
   }
-  _status = computed(() => this.statusReactive(), ...ngDevMode ? [{
+  _status = computed(() => this.statusReactive(), __spreadValues({}, ngDevMode ? {
     debugName: "_status"
-  }] : []);
-  statusReactive = signal(void 0, ...ngDevMode ? [{
+  } : {}));
+  statusReactive = signal(void 0, __spreadValues({}, ngDevMode ? {
     debugName: "statusReactive"
-  }] : []);
+  } : {}));
   get valid() {
     return this.status === VALID;
   }
@@ -1024,12 +1024,12 @@ var AbstractControl = class {
   set pristine(v) {
     untracked(() => this.pristineReactive.set(v));
   }
-  _pristine = computed(() => this.pristineReactive(), ...ngDevMode ? [{
+  _pristine = computed(() => this.pristineReactive(), __spreadValues({}, ngDevMode ? {
     debugName: "_pristine"
-  }] : []);
-  pristineReactive = signal(true, ...ngDevMode ? [{
+  } : {}));
+  pristineReactive = signal(true, __spreadValues({}, ngDevMode ? {
     debugName: "pristineReactive"
-  }] : []);
+  } : {}));
   get dirty() {
     return !this.pristine;
   }
@@ -1039,12 +1039,12 @@ var AbstractControl = class {
   set touched(v) {
     untracked(() => this.touchedReactive.set(v));
   }
-  _touched = computed(() => this.touchedReactive(), ...ngDevMode ? [{
+  _touched = computed(() => this.touchedReactive(), __spreadValues({}, ngDevMode ? {
     debugName: "_touched"
-  }] : []);
-  touchedReactive = signal(false, ...ngDevMode ? [{
+  } : {}));
+  touchedReactive = signal(false, __spreadValues({}, ngDevMode ? {
     debugName: "touchedReactive"
-  }] : []);
+  } : {}));
   get untouched() {
     return !this.touched;
   }
@@ -1789,12 +1789,12 @@ var NgForm = class _NgForm extends ControlContainer {
   get submitted() {
     return untracked(this.submittedReactive);
   }
-  _submitted = computed(() => this.submittedReactive(), ...ngDevMode ? [{
+  _submitted = computed(() => this.submittedReactive(), __spreadValues({}, ngDevMode ? {
     debugName: "_submitted"
-  }] : []);
-  submittedReactive = signal(false, ...ngDevMode ? [{
+  } : {}));
+  submittedReactive = signal(false, __spreadValues({}, ngDevMode ? {
     debugName: "submittedReactive"
-  }] : []);
+  } : {}));
   _directives = /* @__PURE__ */ new Set();
   form;
   ngSubmit = new EventEmitter();
@@ -2916,12 +2916,12 @@ var AbstractFormDirective = class _AbstractFormDirective extends ControlContaine
   set submitted(value) {
     this._submittedReactive.set(value);
   }
-  _submitted = computed(() => this._submittedReactive(), ...ngDevMode ? [{
+  _submitted = computed(() => this._submittedReactive(), __spreadValues({}, ngDevMode ? {
     debugName: "_submitted"
-  }] : []);
-  _submittedReactive = signal(false, ...ngDevMode ? [{
+  } : {}));
+  _submittedReactive = signal(false, __spreadValues({}, ngDevMode ? {
     debugName: "_submittedReactive"
-  }] : []);
+  } : {}));
   _oldForm;
   _onCollectionChange = () => this._updateDomValue();
   directives = [];
@@ -4679,7 +4679,7 @@ var UntypedFormBuilder = class _UntypedFormBuilder extends FormBuilder {
     }]
   }], null, null);
 })();
-var VERSION = new Version("21.0.0");
+var VERSION = new Version("21.0.1");
 var FormsModule = class _FormsModule {
   static withConfig(opts) {
     return {

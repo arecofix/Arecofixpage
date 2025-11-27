@@ -1,69 +1,44 @@
-import { Injectable, inject } from '@angular/core';
-import { Router, CanActivateFn, CanDeactivateFn } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
-import { firstValueFrom } from 'rxjs';
+import { ROLES } from '@app/core/constants/roles.constants';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuard {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
-  async canActivate(): Promise<boolean> {
-    const session = await this.authService.getSession();
-    if (!session) {
-      this.router.navigate(['/login']);
-      return false;
-    }
-    return true;
-  }
-}
-
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  return new Promise(async (resolve) => {
-    const session = await authService.getSession();
-    if (!session) {
-      router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-      resolve(false);
-      return;
+  const session = await authService.getSession();
+  if (!session) {
+    router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+    return false;
+  }
+
+  // Check if accessing admin routes
+  if (state.url.startsWith('/admin')) {
+    const userProfile = await authService.getUserProfile(session.user.id);
+
+    // Pure role-based access control
+    if (userProfile?.role === ROLES.ADMIN || userProfile?.role === ROLES.STAFF) {
+      return true;
     }
 
-    // Check if accessing admin routes
-    if (state.url.startsWith('/admin')) {
-      const userProfile = await authService.getUserProfile(session.user.id);
+    // If not admin or staff, redirect to home
+    router.navigate(['/']);
+    return false;
+  }
 
-      // Pure role-based access control
-      // Only users with 'admin' or 'staff' roles can access admin panel
-      if (userProfile?.role === 'admin' || userProfile?.role === 'staff') {
-        resolve(true);
-        return;
-      }
-
-      // If not admin or staff, redirect to home
-      router.navigate(['/']);
-      resolve(false);
-      return;
-    }
-
-    resolve(true);
-  });
+  return true;
 };
 
-export const noAuthGuard: CanActivateFn = (route, state) => {
+export const noAuthGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  return new Promise(async (resolve) => {
-    const session = await authService.getSession();
-    if (session) {
-      router.navigate(['/']);
-      resolve(false);
-    } else {
-      resolve(true);
-    }
-  });
+  const session = await authService.getSession();
+  if (session) {
+    router.navigate(['/']);
+    return false;
+  } else {
+    return true;
+  }
 };

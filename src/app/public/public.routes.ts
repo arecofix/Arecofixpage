@@ -77,14 +77,6 @@ export const publicRoutes: Routes = [
           ),
       },
       {
-        title: 'Cursos',
-        path: 'cursos',
-        loadComponent: () =>
-          import('@app/public/cursos/cursos').then(
-            (m) => m.CursosComponent
-          ),
-      },
-      {
         title: 'Servicios',
         path: 'servicios',
         loadComponent: () =>
@@ -93,13 +85,14 @@ export const publicRoutes: Routes = [
           ),
       },
       {
-        title: 'Repuestos',
-        path: 'repuestos',
+        title: 'Cursos',
+        path: 'cursos',
         loadComponent: () =>
-          import('@app/public/repuestos/repuestos').then(
-            (m) => m.RepuestosComponent
+          import('@app/public/cursos/cursos').then(
+            (m) => m.CursosComponent
           ),
       },
+      // Repuestos ahora se sirve a través de products/category/repuestos
       {
         title: 'Checkout',
         path: 'checkout',

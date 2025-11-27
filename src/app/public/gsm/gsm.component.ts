@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Title, Meta } from '@angular/platform-browser';
 
 interface GsmTool {
@@ -24,7 +24,7 @@ interface Download {
 @Component({
   selector: 'app-gsm',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './gsm.component.html',
   styleUrl: './gsm.component.css',
 })

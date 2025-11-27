@@ -1,16 +1,30 @@
-import { Component, inject } from '@angular/core';
-
+import { Component, inject, OnInit, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { switchMap, of, map, catchError } from 'rxjs';
+import { IsEmptyComponent, IsErrorComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
+import { CategoryService } from '@app/public/categories/services';
+import { ProductService } from '@app/public/products/services';
+import { ProductCard } from '@app/public/products/components';
+import { FallbackService } from '@app/core/services/fallback.service';
+import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
+import { iCategoriesResponse } from '@app/public/categories/interfaces';
 
 @Component({
     selector: 'app-repuestos',
     standalone: true,
-    imports: [FormsModule],
+    imports: [CommonModule, FormsModule, IsEmptyComponent, IsErrorComponent, IsLoadingComponent, ProductCard, Pagination],
     templateUrl: './repuestos.html',
     styleUrl: './repuestos.scss'
 })
-export class RepuestosComponent {
+export class RepuestosComponent implements OnInit {
+    private router = inject(Router);
+    private categoryService = inject(CategoryService);
+    private productService = inject(ProductService);
+    public paginationService = inject(PaginationService);
+
     categories = [
         {
             id: 1,
@@ -183,6 +197,54 @@ export class RepuestosComponent {
 
     filteredProducts: any[] = [];
 
+    // Productos vinculados a la categoría "herramientas" (o cursos si se prefiere)
+    // Usamos 'herramientas' ya que es más relevante para repuestos, pero el usuario pidió "Productos para Estudiantes"
+    // que suele estar asociado a kits de herramientas.
+    // Productos destacados para estudiantes (o general)
+    private fallbackService = inject(FallbackService);
+
+    productsRs = rxResource({
+        stream: () => {
+            const fallbackData = this.fallbackService.getAllFallbackProducts();
+
+            return this.productService.getData({
+                featured: true,
+                _page: this.paginationService.currentPage() || 1,
+                _per_page: 4
+            }).pipe(
+                map(response => {
+                    if (!response.data || response.data.length < 3) {
+                        return { ...response, data: fallbackData, items: fallbackData.length, pages: 1 } as any;
+                    }
+                    return response;
+                }),
+                catchError(() => of({ data: fallbackData, items: fallbackData.length, pages: 1 } as any))
+            );
+        }
+    });
+
+    paginationData = computed<iPagination | null>(() => {
+        const data = this.productsRs.value();
+        if (!data) return null;
+        const {
+            first,
+            prev,
+            next,
+            last,
+            pages,
+            items
+        } = data as any;
+
+        return {
+            first,
+            prev,
+            next,
+            last,
+            pages,
+            items
+        } as iPagination;
+    });
+
     ngOnInit() {
         this.applyFilters();
     }
@@ -223,8 +285,6 @@ export class RepuestosComponent {
     get brandOptions() {
         return ['Samsung', 'Apple', 'Motorola', 'Sunshine'];
     }
-
-    private router = inject(Router)
 
     goToHome() {
         this.router.navigate(['/'])

@@ -5,7 +5,7 @@ import {
   inject,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, switchMap } from 'rxjs';
+import { combineLatest, map, switchMap, of } from 'rxjs';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Location } from '@angular/common';
 /*  */
@@ -25,6 +25,7 @@ import { PaginationService } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
 import { iProduct } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
+import { FallbackService } from '@app/core/services/fallback.service';
 /*  */
 
 @Component({
@@ -45,18 +46,35 @@ export class ProductsDetailsPage {
   public paginationService: PaginationService = inject(PaginationService);
   private location: Location = inject(Location);
 
+  private fallbackService = inject(FallbackService);
+
   productRs = rxResource({
     stream: () =>
       combineLatest([
         this.route.params.pipe(map(({ productSlug }) => productSlug)),
         this.route.queryParams.pipe(map((params) => +params['_page'] || 1)),
       ]).pipe(
-        switchMap(([slug]) =>
-          this.productService.getData({
+        switchMap(([slug]) => {
+          return this.productService.getData({
             _page: 1,
             slug: slug,
-          })
-        )
+          }).pipe(
+            map(response => {
+              const fallbackItem = this.fallbackService.getFallbackProduct(slug);
+
+              if ((!response.data || response.data.length === 0) && fallbackItem) {
+                // Return fallback item if DB empty and we have a fallback
+                return {
+                  ...response,
+                  data: [fallbackItem],
+                  items: 1,
+                  pages: 1
+                } as any;
+              }
+              return response;
+            })
+          );
+        })
       ),
   });
 

@@ -89,12 +89,12 @@ export class CategoryService {
         .from('categories')
         .select('*')
         .eq('slug', slug)
-        .single()
+        .limit(1)
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
-        // Wrap single result in array for compatibility
-        return this.processResponse([data], 1, { _page: 1, _per_page: 1 });
+        // Data is an array now
+        return this.processResponse(data || [], data?.length || 0, { _page: 1, _per_page: 1 });
       }),
       catchError((err) => {
         console.error('Supabase Error:', err);

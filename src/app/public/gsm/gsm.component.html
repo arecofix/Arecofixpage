@@ -42,19 +42,21 @@
       </div>
 
       <div class="tools-grid">
-        <div class="tool-card" *ngFor="let tool of gsmTools">
-          <div class="tool-icon">
-            <i [class]="tool.icon"></i>
+        @for (tool of gsmTools; track tool) {
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i [class]="tool.icon"></i>
+            </div>
+            <div class="tool-content">
+              <h3 class="tool-name">{{ tool.name }}</h3>
+              <p class="tool-description">{{ tool.description }}</p>
+            </div>
+            <a [href]="tool.loginUrl" class="tool-login-btn">
+              <span>Inicia sesión</span>
+              <i class="fas fa-arrow-right"></i>
+            </a>
           </div>
-          <div class="tool-content">
-            <h3 class="tool-name">{{ tool.name }}</h3>
-            <p class="tool-description">{{ tool.description }}</p>
-          </div>
-          <a [href]="tool.loginUrl" class="tool-login-btn">
-            <span>Inicia sesión</span>
-            <i class="fas fa-arrow-right"></i>
-          </a>
-        </div>
+        }
       </div>
     </div>
   </section>
@@ -70,15 +72,17 @@
       </div>
 
       <div class="brands-grid">
-        <div class="brand-card" *ngFor="let brand of brandServices">
-          <div class="brand-icon">
-            <i class="fas fa-mobile-alt"></i>
+        @for (brand of brandServices; track brand) {
+          <div class="brand-card">
+            <div class="brand-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3 class="brand-name">{{ brand.name }}</h3>
+            <div class="brand-overlay">
+              <span>Ver servicios</span>
+            </div>
           </div>
-          <h3 class="brand-name">{{ brand.name }}</h3>
-          <div class="brand-overlay">
-            <span>Ver servicios</span>
-          </div>
-        </div>
+        }
       </div>
     </div>
   </section>
@@ -94,21 +98,25 @@
       </div>
 
       <div class="downloads-grid">
-        <div class="download-card" *ngFor="let download of downloads">
-          <div class="download-icon">
-            <i [class]="download.icon"></i>
+        @for (download of downloads; track download) {
+          <div class="download-card">
+            <div class="download-icon">
+              <i [class]="download.icon"></i>
+            </div>
+            <div class="download-content">
+              <h3 class="download-name">{{ download.name }}</h3>
+              @if (download.description) {
+                <p class="download-description">
+                  {{ download.description }}
+                </p>
+              }
+            </div>
+            <a [href]="download.downloadUrl" class="download-btn" download>
+              <i class="fas fa-download"></i>
+              <span>Descargar</span>
+            </a>
           </div>
-          <div class="download-content">
-            <h3 class="download-name">{{ download.name }}</h3>
-            <p class="download-description" *ngIf="download.description">
-              {{ download.description }}
-            </p>
-          </div>
-          <a [href]="download.downloadUrl" class="download-btn" download>
-            <i class="fas fa-download"></i>
-            <span>Descargar</span>
-          </a>
-        </div>
+        }
       </div>
     </div>
   </section>

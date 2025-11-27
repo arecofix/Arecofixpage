@@ -2,13 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CoursesService } from '@app/services/courses.service';
+import { CoursesService } from '@app/core/services/courses.service';
 
 @Component({
-    selector: 'app-admin-course-form-page',
-    standalone: true,
-    imports: [ReactiveFormsModule, RouterLink],
-    template: `
+  selector: 'app-admin-course-form-page',
+  standalone: true,
+  imports: [ReactiveFormsModule, RouterLink],
+  template: `
     <div class="max-w-4xl mx-auto">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">
@@ -108,68 +108,68 @@ import { CoursesService } from '@app/services/courses.service';
     `
 })
 export class AdminCourseFormPage implements OnInit {
-    private fb = inject(FormBuilder);
-    private coursesService = inject(CoursesService);
-    private router = inject(Router);
-    private route = inject(ActivatedRoute);
+  private fb = inject(FormBuilder);
+  private coursesService = inject(CoursesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-    form: FormGroup;
-    isEditing = false;
-    courseId: string | null = null;
-    saving = false;
+  form: FormGroup;
+  isEditing = false;
+  courseId: string | null = null;
+  saving = false;
 
-    constructor() {
-        this.form = this.fb.group({
-            title: ['', Validators.required],
-            slug: ['', Validators.required],
-            description: ['', Validators.required],
-            price: [0, [Validators.required, Validators.min(0)]],
-            sale_price: [null],
-            level: ['Básico', Validators.required],
-            duration: ['', Validators.required],
-            schedule: ['', Validators.required],
-            image_url: ['', Validators.required],
-            is_active: [true]
-        });
+  constructor() {
+    this.form = this.fb.group({
+      title: ['', Validators.required],
+      slug: ['', Validators.required],
+      description: ['', Validators.required],
+      price: [0, [Validators.required, Validators.min(0)]],
+      sale_price: [null],
+      level: ['Básico', Validators.required],
+      duration: ['', Validators.required],
+      schedule: ['', Validators.required],
+      image_url: ['', Validators.required],
+      is_active: [true]
+    });
+  }
+
+  ngOnInit() {
+    this.courseId = this.route.snapshot.paramMap.get('id');
+    if (this.courseId) {
+      this.isEditing = true;
+      this.loadCourse(this.courseId);
     }
+  }
 
-    ngOnInit() {
-        this.courseId = this.route.snapshot.paramMap.get('id');
-        if (this.courseId) {
-            this.isEditing = true;
-            this.loadCourse(this.courseId);
-        }
-    }
+  loadCourse(id: string) {
+    this.coursesService.getCourseById(id).subscribe({
+      next: (course) => {
+        this.form.patchValue(course);
+      },
+      error: (err) => console.error('Error loading course', err)
+    });
+  }
 
-    loadCourse(id: string) {
-        this.coursesService.getCourseById(id).subscribe({
-            next: (course) => {
-                this.form.patchValue(course);
-            },
-            error: (err) => console.error('Error loading course', err)
-        });
-    }
+  save() {
+    if (this.form.invalid) return;
 
-    save() {
-        if (this.form.invalid) return;
+    this.saving = true;
+    const courseData = this.form.value;
 
-        this.saving = true;
-        const courseData = this.form.value;
+    const request = this.isEditing && this.courseId
+      ? this.coursesService.updateCourse(this.courseId, courseData)
+      : this.coursesService.createCourse(courseData);
 
-        const request = this.isEditing && this.courseId
-            ? this.coursesService.updateCourse(this.courseId, courseData)
-            : this.coursesService.createCourse(courseData);
-
-        request.subscribe({
-            next: () => {
-                this.saving = false;
-                this.router.navigate(['/admin/courses']);
-            },
-            error: (err) => {
-                console.error('Error saving course', err);
-                alert('Error al guardar: ' + err.message);
-                this.saving = false;
-            }
-        });
-    }
+    request.subscribe({
+      next: () => {
+        this.saving = false;
+        this.router.navigate(['/admin/courses']);
+      },
+      error: (err) => {
+        console.error('Error saving course', err);
+        alert('Error al guardar: ' + err.message);
+        this.saving = false;
+      }
+    });
+  }
 }

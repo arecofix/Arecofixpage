@@ -85,6 +85,7 @@ import {
   PROVIDED_NG_ZONE,
   Pipe,
   PlatformRef,
+  ProfilerEvent,
   Query,
   QueryList,
   REQUEST,
@@ -416,7 +417,7 @@ import {
   ɵɵvalidateIframeAttribute,
   ɵɵviewQuery,
   ɵɵviewQuerySignal
-} from "./chunk-EMLYZLAS.js";
+} from "./chunk-KMIRFRWL.js";
 import {
   CONTAINER_HEADER_OFFSET,
   ChangeDetectionScheduler,
@@ -498,9 +499,9 @@ import {
   ɵɵnamespaceSVG,
   ɵɵresetView,
   ɵɵrestoreView
-} from "./chunk-HEYRABEZ.js";
-import "./chunk-J6AWP5HV.js";
+} from "./chunk-GSHIRZGO.js";
 import "./chunk-N3CADB34.js";
+import "./chunk-J6AWP5HV.js";
 import "./chunk-XNA3IKPD.js";
 import "./chunk-BXSU4DDX.js";
 import "./chunk-R327OCYJ.js";
@@ -705,6 +706,7 @@ export {
   PROVIDED_NG_ZONE as ɵPROVIDED_NG_ZONE,
   PROVIDED_ZONELESS as ɵPROVIDED_ZONELESS,
   PendingTasksInternal as ɵPendingTasksInternal,
+  ProfilerEvent as ɵProfilerEvent,
   R3Injector as ɵR3Injector,
   ReflectionCapabilities as ɵReflectionCapabilities,
   ComponentFactory as ɵRender3ComponentFactory,

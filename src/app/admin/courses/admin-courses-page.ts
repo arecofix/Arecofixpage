@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CoursesService, Course } from '@app/services/courses.service';
+import { CoursesService, Course } from '@app/core/services/courses.service';
 
 @Component({
   selector: 'app-admin-courses-page',

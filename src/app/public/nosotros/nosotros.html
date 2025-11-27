@@ -18,12 +18,25 @@
     </div>
   </section>
 
+  <!-- Video Section -->
+  <section class="video-section">
+    <div class="section-container">
+      <div class="video-wrapper">
+        <iframe width="100%" height="500" src="https://www.youtube.com/embed/l93eYkGMxsI?start=15"
+          title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </section>
+
   <!-- Foundation Section -->
   <section class="foundation-section">
     <div class="section-container">
       <h2 class="section-title">{{ currentContent.foundation }}</h2>
       <p class="section-subtitle-text">{{ currentContent.foundationText }}</p>
-      
+
       <div class="mission-vision-grid">
         <div class="mission-card">
           <h3 class="card-title">🎯 {{ currentContent.mission }}</h3>
@@ -51,11 +64,11 @@
       <h2 class="section-title">{{ currentContent.achievements }}</h2>
       <div class="achievements-grid">
         @for (achievement of achievements; track $index) {
-          <div class="achievement-card">
-            <div class="achievement-number">{{ achievement.number }}</div>
-            <h3 class="achievement-label">{{ achievement.label }}</h3>
-            <p class="achievement-description">{{ achievement.description }}</p>
-          </div>
+        <div class="achievement-card">
+          <div class="achievement-number">{{ achievement.number }}</div>
+          <h3 class="achievement-label">{{ achievement.label }}</h3>
+          <p class="achievement-description">{{ achievement.description }}</p>
+        </div>
         }
       </div>
     </div>
@@ -67,11 +80,11 @@
       <h2 class="section-title">{{ currentContent.values }}</h2>
       <div class="values-grid">
         @for (value of values; track $index) {
-          <div class="value-card">
-            <div class="value-icon">{{ value.icon }}</div>
-            <h3 class="value-title">{{ value.title }}</h3>
-            <p class="value-description">{{ value.description }}</p>
-          </div>
+        <div class="value-card">
+          <div class="value-icon">{{ value.icon }}</div>
+          <h3 class="value-title">{{ value.title }}</h3>
+          <p class="value-description">{{ value.description }}</p>
+        </div>
         }
       </div>
     </div>
@@ -83,10 +96,10 @@
       <h2 class="section-title">{{ currentContent.commitments }}</h2>
       <div class="commitments-list">
         @for (commitment of currentContent.commitmentsList; track $index) {
-          <div class="commitment-item">
-            <span class="commitment-icon">✓</span>
-            <span class="commitment-text">{{ commitment }}</span>
-          </div>
+        <div class="commitment-item">
+          <span class="commitment-icon">✓</span>
+          <span class="commitment-text">{{ commitment }}</span>
+        </div>
         }
       </div>
     </div>
@@ -98,10 +111,10 @@
       <h2 class="section-title">{{ currentContent.trust }}</h2>
       <div class="trust-grid">
         @for (point of currentContent.trustPoints; track $index) {
-          <div class="trust-card">
-            <h3 class="trust-title">{{ point.title }}</h3>
-            <p class="trust-description">{{ point.description }}</p>
-          </div>
+        <div class="trust-card">
+          <h3 class="trust-title">{{ point.title }}</h3>
+          <p class="trust-description">{{ point.description }}</p>
+        </div>
         }
       </div>
     </div>
@@ -113,27 +126,22 @@
       <h2 class="section-title">{{ currentContent.faq }}</h2>
       <div class="faq-container">
         @for (faq of faqs; let i = $index; track $index) {
-          <div class="faq-item">
-            <button 
-              class="faq-question"
-              (click)="toggleFAQ(i)"
-              [class.open]="expandedFAQ === i"
-              type="button"
-              [attr.aria-expanded]="expandedFAQ === i"
-            >
-              <span class="faq-question-text">{{ faq.question }}</span>
-              <span class="faq-toggle">
-                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-              </span>
-            </button>
-            @if (expandedFAQ === i) {
-              <div class="faq-answer">
-                <p>{{ faq.answer }}</p>
-              </div>
-            }
+        <div class="faq-item">
+          <button class="faq-question" (click)="toggleFAQ(i)" [class.open]="expandedFAQ === i" type="button"
+            [attr.aria-expanded]="expandedFAQ === i">
+            <span class="faq-question-text">{{ faq.question }}</span>
+            <span class="faq-toggle">
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </span>
+          </button>
+          @if (expandedFAQ === i) {
+          <div class="faq-answer">
+            <p>{{ faq.answer }}</p>
           </div>
+          }
+        </div>
         }
       </div>
     </div>

@@ -1,12 +1,18 @@
 import { Routes } from '@angular/router';
 
 export const productsRoutes: Routes = [
-  // Special route to show Cursos content when visiting products/category/cursos
+  // Special route to show Repuestos content when visiting products/category/repuestos
   {
-    title: 'Cursos',
-    path: 'category/cursos',
+    title: 'Repuestos',
+    path: 'category/repuestos',
     loadComponent: () =>
-      import('@app/public/cursos/cursos').then((m) => m.CursosComponent),
+      import('@app/public/repuestos/repuestos').then((m) => m.RepuestosComponent),
+  },
+  // Redirect /products/category/cursos to /cursos
+  {
+    path: 'category/cursos',
+    redirectTo: '/cursos',
+    pathMatch: 'full'
   },
   {
     title: 'Products by Category',
