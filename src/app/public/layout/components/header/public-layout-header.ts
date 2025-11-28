@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef, signal, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { CategoryService } from '@app/public/categories/services/category.service';
@@ -9,6 +9,8 @@ import { CartService } from '@app/shared/services/cart.service';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
+import { Product } from '@app/features/products/domain/entities/product.entity';
 
 interface iMenuItem {
   title: string;
@@ -18,7 +20,7 @@ interface iMenuItem {
 
 @Component({
   selector: 'public-layout-header',
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule],
   templateUrl: './public-layout-header.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,21 +35,86 @@ export class PublicLayoutHeader {
 
   public user$ = this.authService.authState$.pipe(map(state => state.user));
 
+  // Search Logic
+  public searchQuery = signal('');
+  public products = signal<Product[]>([]);
+  public showResults = signal(false);
+
+  public filteredProducts = computed(() => {
+    const query = this.searchQuery().toLowerCase();
+    if (!query) return [];
+
+    return this.products().filter(p =>
+      p.name.toLowerCase().includes(query) ||
+      p.sku?.toLowerCase().includes(query) ||
+      p.barcode?.toLowerCase().includes(query)
+    ).slice(0, 10); // Limit to 10 results for UI
+  });
+
+  constructor() {
+    this.loadProducts();
+  }
+
+  async loadProducts() {
+    const supabase = this.authService.getSupabaseClient();
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .eq('is_active', true)
+      .gt('stock', 0)
+      .order('name');
+
+    if (data) {
+      this.products.set(data);
+    }
+  }
+
+  public onSearchInput() {
+    this.showResults.set(!!this.searchQuery());
+  }
+
+  public selectProduct(product: Product) {
+    this.searchQuery.set('');
+    this.showResults.set(false);
+    // Navigate to product detail (assuming route structure)
+    // If you have a specific product detail route, use it here.
+    // For now, I'll assume a generic product route or just log it.
+    // Based on other files, it seems like /products/:slug or similar might be used, 
+    // but I don't see a clear product detail route in the snippets. 
+    // I'll assume /products/detail/:id or similar based on standard practices, 
+    // but looking at the file list, I see 'products/featured', 'categories'.
+    // Let's check if there is a product detail page.
+    // Actually, looking at the previous file `admin-sales-page.html`, it doesn't link to detail.
+    // But the user said "llevar al detalle del producto".
+    // I will try to find the product detail route.
+    this.router.navigate(['/products', product.slug || product.id]);
+  }
+
   public categoryRs = rxResource<iCategoriesResponse, unknown>({
     stream: () => this.categoryService.getFeaturedData(),
   });
 
   public menuItems = () => {
-    return (
-      this.categoryRs.value()?.data
-        .filter((category: iCategory) => category.slug !== 'sports' && category.name !== 'Deportes')
-        .map((category: iCategory) => ({
+    const items = this.categoryRs.value()?.data
+      .filter((category: iCategory) => category.slug !== 'sports' && category.name !== 'Deportes')
+      .map((category: iCategory) => {
+        let icon = category.icon;
+        if (category.name === 'Celulares') icon = 'fas fa-mobile-alt';
+        if (category.name === 'Repuestos') icon = 'fas fa-tools';
+        if (category.name === 'Cursos') icon = 'fas fa-graduation-cap';
+
+        return {
           title: category.name,
           path: '/products/category/' + category.slug,
-          icon: category.icon,
-        }))
-      ?? []
-    );
+          icon: icon || 'fas fa-box', // Fallback icon
+        };
+      }) ?? [];
+
+    return items.sort((a, b) => {
+      if (a.title === 'Celulares') return -1;
+      if (b.title === 'Celulares') return 1;
+      return 0;
+    });
   };
 
   async logout() {

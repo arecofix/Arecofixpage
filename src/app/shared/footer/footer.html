@@ -3,40 +3,76 @@
     <div class="flex flex-col lg:flex-row justify-between gap-10 border-b border-neutral-200 pb-10">
 
       <!-- Logo + Links + Redes -->
-      <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-1/3">
+      <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-1/2">
         <img src="https://arecofix.com.ar/assets/img/brands/logo/log.png" alt="Logo Arecofix" class="h-10" height="40"
           width="136" />
 
         <nav aria-label="Footer navigation" class="w-full">
-          <ul class="flex flex-row flex-wrap justify-center gap-5 text-sm text-gray-600">
+          <ul class="flex flex-row flex-wrap justify-center lg:justify-start gap-5 text-sm text-gray-600">
             <li><a routerLink="./" class="hover:text-cyan-600 transition">Inicio</a></li>
             <li><a routerLink="/recursos" class="hover:text-cyan-600 transition">Recursos</a></li>
-            <a routerLink="/nosotros"
-              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Nosotros</a>
-            <a routerLink="/products/featured"
-              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Productos</a>
-            <a routerLink="/contacto"
-              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Contacto</a>
-            <a routerLink="/cursos" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Cursos</a>
-            <a routerLink="/servicios"
-              class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Servicios</a>
+            <li><a routerLink="/nosotros"
+                class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Nosotros</a></li>
+            <li><a routerLink="/products/featured"
+                class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Productos</a></li>
+            <li><a routerLink="/contacto"
+                class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Contacto</a></li>
+            <li><a routerLink="/cursos"
+                class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Cursos</a></li>
+            <li><a routerLink="/servicios"
+                class="text-gray-700 hover:text-indigo-600 transition-colors font-medium">Servicios</a></li>
           </ul>
         </nav>
 
-        <div class="flex gap-6 text-gray-600 mt-4">
-          <a href="https://www.facebook.com/ArecoFix/" aria-label="Facebook" class="hover:text-cyan-600 transition">
-            <i class="fab fa-facebook-f text-xl"></i>
+        <!-- Social Media Buttons -->
+        <div class="flex gap-4 mt-4 flex-wrap justify-center lg:justify-start">
+          <a href="https://www.facebook.com/ArecoFix/" aria-label="Facebook"
+            class="w-12 h-12 rounded-full bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center transition-transform hover:scale-110">
+            <i class="fa-brands fa-facebook-f text-xl"></i>
           </a>
-          <a href="https://www.instagram.com/ArecoFix/" aria-label="Instagram" class="hover:text-cyan-600 transition">
-            <i class="fab fa-instagram text-xl"></i>
+          <a href="https://www.instagram.com/ArecoFix/" aria-label="Instagram"
+            class="w-12 h-12 rounded-full bg-pink-600 text-white hover:bg-pink-700 flex items-center justify-center transition-transform hover:scale-110">
+            <i class="fa-brands fa-instagram text-xl"></i>
           </a>
-          <a href="https://github.com/arecofix" aria-label="GitHub" class="hover:text-cyan-600 transition">
-            <i class="fab fa-github text-xl"></i>
+          <a href="https://github.com/arecofix" aria-label="GitHub"
+            class="w-12 h-12 rounded-full bg-gray-900 text-white hover:bg-gray-800 flex items-center justify-center transition-transform hover:scale-110">
+            <i class="fa-brands fa-github text-xl"></i>
           </a>
           <a href="https://www.linkedin.com/company/arecofix" aria-label="LinkedIn"
-            class="hover:text-cyan-600 transition">
-            <i class="fab fa-linkedin-in text-xl"></i>
+            class="w-12 h-12 rounded-full bg-blue-700 text-white hover:bg-blue-800 flex items-center justify-center transition-transform hover:scale-110">
+            <i class="fa-brands fa-linkedin-in text-xl"></i>
           </a>
+          <a href="https://www.youtube.com/@Arecofix" aria-label="YouTube"
+            class="w-12 h-12 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center transition-transform hover:scale-110">
+            <i class="fa-brands fa-youtube text-xl"></i>
+          </a>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="mt-6 w-full text-center lg:text-left">
+          <h5 class="text-sm font-semibold text-gray-900 mb-3">Compartir esta página:</h5>
+          <div class="flex gap-3 flex-wrap justify-center lg:justify-start">
+            <button (click)="shareOn('facebook')"
+              class="w-10 h-10 rounded-full bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center transition-transform hover:scale-110"
+              aria-label="Compartir en Facebook" title="Compartir en Facebook">
+              <i class="fa-brands fa-facebook-f text-lg"></i>
+            </button>
+            <button (click)="shareOn('twitter')"
+              class="w-10 h-10 rounded-full bg-black text-white hover:bg-gray-800 flex items-center justify-center transition-transform hover:scale-110"
+              aria-label="Compartir en X" title="Compartir en X">
+              <i class="fa-brands fa-twitter text-lg"></i>
+            </button>
+            <button (click)="shareOn('whatsapp')"
+              class="w-10 h-10 rounded-full bg-green-500 text-white hover:bg-green-600 flex items-center justify-center transition-transform hover:scale-110"
+              aria-label="Compartir en WhatsApp" title="Compartir en WhatsApp">
+              <i class="fa-brands fa-whatsapp text-lg"></i>
+            </button>
+            <button (click)="shareOn('linkedin')"
+              class="w-10 h-10 rounded-full bg-blue-700 text-white hover:bg-blue-800 flex items-center justify-center transition-transform hover:scale-110"
+              aria-label="Compartir en LinkedIn" title="Compartir en LinkedIn">
+              <i class="fa-brands fa-linkedin-in text-lg"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -70,8 +106,9 @@
       class="pt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-400 gap-4 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
       <ul class="flex gap-6 text-xs order-2 sm:order-1">
         <li><a href="https://www.arecofix.com.ar/" class="hover:text-cyan-600 transition">Español</a></li>
-        <li><a href="https://www.arecofix.com.ar/privacy" class="hover:text-cyan-600 transition">Privacidad</a></li>
-        <li><a href="https://www.arecofix.com.ar/terms" class="hover:text-cyan-600 transition">Términos Legales</a></li>
+        <li><a href="https://www.arecofix.com.ar/#/privacy" class="hover:text-cyan-600 transition">Privacidad</a></li>
+        <li><a href="https://www.arecofix.com.ar/#/terms" class="hover:text-cyan-600 transition">Términos Legales</a>
+        </li>
       </ul>
       <p class="order-1 sm:order-2">
         <a routerLink="/portfolio" class="hover:text-blue-400 transition-colors">

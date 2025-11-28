@@ -4,7 +4,7 @@
   <div class="navbar-start">
     <!-- Menú hamburguesa (Mobile) -->
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden" aria-label="Abrir menú">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden !text-black opacity-100" aria-label="Abrir menú">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
         </svg>
@@ -13,19 +13,43 @@
       <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-60 p-2 shadow">
         <!-- Buscador móvil -->
         <li class="mb-4">
-          <form class="flex items-center gap-2">
-            <input type="text" placeholder="Buscar..."
-              class="input input-sm input-bordered w-full bg-white text-gray-900" />
-            <button type="submit" class="btn btn-sm btn-primary" aria-label="Buscar">
-              <i class="fas fa-search"></i>
-            </button>
-          </form>
+          <div class="relative">
+            <div class="join w-full">
+              <input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (input)="onSearchInput()"
+                class="input input-sm input-bordered w-full bg-white text-gray-900 join-item" />
+              <button class="btn btn-sm btn-primary join-item" aria-label="Buscar">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+
+            <!-- Live Search Results Dropdown (Mobile) -->
+            @if (showResults() && filteredProducts().length > 0) {
+            <div
+              class="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+              <ul class="menu menu-sm bg-white text-gray-900 p-0">
+                @for (product of filteredProducts(); track product.id) {
+                <li>
+                  <a (click)="selectProduct(product)"
+                    class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none !text-gray-900">
+                    <img [src]="product.image_url || 'assets/img/no-image.png'" alt="{{product.name}}"
+                      class="w-8 h-8 object-contain rounded bg-white border" />
+                    <div class="flex flex-col">
+                      <span class="font-bold text-sm truncate !text-gray-900">{{ product.name }}</span>
+                      <span class="text-xs !text-gray-500">${{ product.price }}</span>
+                    </div>
+                  </a>
+                </li>
+                }
+              </ul>
+            </div>
+            }
+          </div>
         </li>
 
         <!-- Elementos del menú móvil -->
         @for (item of menuItems(); track $index) {
         <li>
-          <a class="btn btn-primary" [routerLink]="item.path" routerLinkActive="btn btn-secondary"
+          <a class="flex gap-3 py-3" [routerLink]="item.path" routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}">
             <i [class]="item.icon"></i> {{item.title}}
           </a>
@@ -33,31 +57,31 @@
         }
 
         <li>
-          <a class="btn btn-primary" routerLink="products/featured" routerLinkActive="btn btn-secondary"
+          <a class="flex gap-3 py-3" routerLink="products/featured" routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-star"></i> Destacados
           </a>
         </li>
         <li>
-          <a class="btn btn-primary" routerLink="categories" routerLinkActive="btn btn-secondary"
+          <a class="flex gap-3 py-3" routerLink="categories" routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-tag"></i> Categorías
           </a>
         </li>
         <li>
-          <a class="btn btn-primary" routerLink="/contacto" routerLinkActive="btn btn-secondary"
+          <a class="flex gap-3 py-3" routerLink="/contacto" routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-envelope"></i> Contacto
           </a>
         </li>
         <li>
-          <a class="btn btn-primary" routerLink="/nosotros" routerLinkActive="btn btn-secondary"
+          <a class="flex gap-3 py-3" routerLink="/nosotros" routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-info-circle"></i> Nosotros
           </a>
         </li>
         <li>
-          <a class="btn btn-primary" routerLink="/servicios" routerLinkActive="btn btn-secondary"
+          <a class="flex gap-3 py-3" routerLink="/servicios" routerLinkActive="active"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-concierge-bell"></i> Servicios
           </a>
@@ -120,13 +144,37 @@
   <!-- NAVBAR END -->
   <div class="navbar-end flex items-center gap-3">
     <!-- Buscador desktop -->
-    <form class="hidden lg:flex items-center gap-2">
-      <input type="text" placeholder="Buscar productos..."
-        class="input input-sm input-bordered bg-white text-gray-900 border-gray-300" />
-      <button type="submit" class="btn btn-sm btn-primary" aria-label="Buscar">
-        <i class="fas fa-search"></i>
-      </button>
-    </form>
+    <div class="hidden lg:flex items-center gap-2 relative">
+      <div class="join">
+        <input type="text" placeholder="Buscar productos..." [(ngModel)]="searchQuery" (input)="onSearchInput()"
+          class="input input-sm input-bordered bg-white text-gray-900 border-gray-300 join-item w-64" />
+        <button class="btn btn-sm btn-primary join-item" aria-label="Buscar">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+
+      <!-- Live Search Results Dropdown -->
+      @if (showResults() && filteredProducts().length > 0) {
+      <div
+        class="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+        <ul class="menu menu-sm bg-white text-gray-900 p-0">
+          @for (product of filteredProducts(); track product.id) {
+          <li>
+            <a (click)="selectProduct(product)"
+              class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none !text-gray-900">
+              <img [src]="product.image_url || 'assets/img/no-image.png'" alt="{{product.name}}"
+                class="w-8 h-8 object-contain rounded bg-white border" />
+              <div class="flex flex-col">
+                <span class="font-bold text-sm truncate !text-gray-900">{{ product.name }}</span>
+                <span class="text-xs !text-gray-500">${{ product.price }}</span>
+              </div>
+            </a>
+          </li>
+          }
+        </ul>
+      </div>
+      }
+    </div>
 
     <!-- Carrito -->
     <div class="dropdown dropdown-end">

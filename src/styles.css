@@ -66,6 +66,12 @@
     color: white !important;
 }
 
+/* Active state for dropdown items */
+.dropdown-content li>a.active {
+    background-color: var(--brand-blue) !important;
+    color: white !important;
+}
+
 /* Print Styles */
 @media print {
 
