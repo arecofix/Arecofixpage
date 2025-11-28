@@ -42,7 +42,8 @@
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
                     <span class="font-semibold text-gray-500">Fecha Ingreso</span>
-                    <span class="font-bold">{{ repair().created_at | date:'dd/MM/yyyy' }}</span>
+                    <span class="font-bold">{{ (repair().received_at || repair().created_at) | date:'dd/MM/yyyy'
+                        }}</span>
                 </div>
 
                 @if (repair().completed_at) {
@@ -87,7 +88,7 @@
             </div>
 
             <div class="mt-8 text-center">
-                <a href="https://wa.me/5492326406976" target="_blank" class="btn btn-success btn-wide text-white">
+                <a href="https://wa.me/5491125960900" target="_blank" class="btn btn-success btn-wide text-white">
                     <i class="fab fa-whatsapp mr-2"></i> Consultar
                 </a>
             </div>

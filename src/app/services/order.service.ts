@@ -145,4 +145,65 @@ export class OrderService {
 
         return { error };
     }
+    async updateOrder(id: string, order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: any }> {
+        try {
+            // Update order details
+            const { data: orderData, error: orderError } = await this.supabase
+                .from('orders')
+                .update({
+                    ...order,
+                    total_amount: order.total,
+                    customer_address: order.customer_address,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id)
+                .select()
+                .maybeSingle();
+
+            if (orderError) throw orderError;
+            if (!orderData) throw new Error('Order not found or permission denied');
+
+            // Handle items
+            // 1. Get existing item IDs
+            const { data: existingItems, error: fetchError } = await this.supabase
+                .from('order_items')
+                .select('id')
+                .eq('order_id', id);
+
+            if (fetchError) throw fetchError;
+
+            const existingIds = existingItems.map(i => i.id);
+            const currentIds = items.filter(i => i.id).map(i => i.id);
+
+            // 2. Delete removed items
+            const idsToDelete = existingIds.filter(id => !currentIds.includes(id));
+            if (idsToDelete.length > 0) {
+                const { error: deleteError } = await this.supabase
+                    .from('order_items')
+                    .delete()
+                    .in('id', idsToDelete);
+                if (deleteError) throw deleteError;
+            }
+
+            // 3. Upsert items (update existing, insert new)
+            const itemsToUpsert = items.map(item => ({
+                ...item,
+                order_id: id,
+                // Ensure we don't send undefined/null IDs for new items if not needed, 
+                // but upsert needs ID to match. New items shouldn't have ID or should have it undefined.
+                // Supabase upsert: if ID is present and matches, update. If not, insert.
+            }));
+
+            const { error: upsertError } = await this.supabase
+                .from('order_items')
+                .upsert(itemsToUpsert);
+
+            if (upsertError) throw upsertError;
+
+            return { data: orderData, error: null };
+        } catch (error) {
+            console.error('Error updating order:', error);
+            return { data: null, error };
+        }
+    }
 }

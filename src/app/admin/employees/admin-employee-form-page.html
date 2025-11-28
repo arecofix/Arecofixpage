@@ -1,4 +1,4 @@
-<div class="max-w-2xl mx-auto">
+<div class="max-w-4xl mx-auto text-gray-800">
     <div class="flex items-center gap-4 mb-6">
         <a routerLink="/admin/employees" class="btn btn-circle btn-ghost">
             <i class="fas fa-arrow-left"></i>
@@ -6,76 +6,75 @@
         <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Empleado</h1>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6">
-        @if (error()) {
-        <div class="alert alert-error mb-4">
-            <i class="fas fa-exclamation-circle"></i>
-            <span>{{ error() }}</span>
-        </div>
-        }
+    <form (ngSubmit)="save()">
+        <div class="admin-form-section">
+            @if (error()) {
+            <div class="alert alert-error mb-6">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error() }}</span>
+            </div>
+            }
 
-        <form (ngSubmit)="save()" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                    <label class="label">Nombre</label>
-                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="input input-bordered"
+            <div class="admin-form-grid">
+                <div>
+                    <label class="admin-form-label">Nombre</label>
+                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="admin-form-input"
                         required>
                 </div>
-                <div class="form-control">
-                    <label class="label">Apellido</label>
-                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="input input-bordered"
+                <div>
+                    <label class="admin-form-label">Apellido</label>
+                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="admin-form-input"
                         required>
                 </div>
             </div>
 
-            <div class="form-control">
-                <label class="label">Email</label>
-                <input type="email" [(ngModel)]="form().email" name="email" class="input input-bordered"
-                    [disabled]="!!id">
+            <div class="mt-4">
+                <label class="admin-form-label">Email</label>
+                <input type="email" [(ngModel)]="form().email" name="email" class="admin-form-input" [disabled]="!!id">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                    <label class="label">Rol</label>
-                    <select [(ngModel)]="form().role" name="role" class="select select-bordered">
+            <div class="admin-form-grid mt-4">
+                <div>
+                    <label class="admin-form-label">Rol</label>
+                    <select [(ngModel)]="form().role" name="role" class="admin-form-select">
                         <option value="admin">Administrador</option>
                         <option value="staff">Staff / Empleado</option>
                         <option value="user">Usuario (Degradar)</option>
                     </select>
                 </div>
-                <div class="form-control">
-                    <label class="label">Cargo</label>
-                    <input type="text" [(ngModel)]="form().job_title" name="job_title" class="input input-bordered"
+                <div>
+                    <label class="admin-form-label">Cargo</label>
+                    <input type="text" [(ngModel)]="form().job_title" name="job_title" class="admin-form-input"
                         placeholder="Ej: Técnico, Vendedor">
                 </div>
             </div>
 
-            <div class="form-control">
-                <label class="label">Teléfono</label>
-                <input type="text" [(ngModel)]="form().phone" name="phone" class="input input-bordered">
+            <div class="mt-4">
+                <label class="admin-form-label">Teléfono</label>
+                <input type="text" [(ngModel)]="form().phone" name="phone" class="admin-form-input">
             </div>
 
-            <div class="form-control">
-                <label class="label">Foto de Perfil</label>
-                <input type="file" (change)="onFileChange($event)" class="file-input file-input-bordered w-full"
-                    accept="image/*">
+            <div class="mt-4">
+                <label class="admin-form-label">Foto de Perfil</label>
+                <input type="file" (change)="onFileChange($event)"
+                    class="file-input file-input-bordered file-input-primary admin-form-file" accept="image/*">
                 @if (form().avatar_url) {
                 <div class="mt-4">
                     <img [src]="form().avatar_url" alt="Avatar preview"
-                        class="w-20 h-20 rounded-full object-cover border p-1">
+                        class="w-24 h-24 rounded-full object-cover border-2 border-gray-200 shadow-sm">
                 </div>
                 }
             </div>
+        </div>
 
-            <div class="flex justify-end gap-4 mt-6">
-                <a routerLink="/admin/employees" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary" [disabled]="saving()">
-                    @if (saving()) {
-                    <span class="loading loading-spinner"></span>
-                    }
-                    Guardar
-                </button>
-            </div>
-        </form>
-    </div>
+        <div class="flex justify-end gap-4 mt-6">
+            <a routerLink="/admin/employees" class="btn btn-ghost">Cancelar</a>
+            <button type="submit" class="btn btn-primary px-8" [disabled]="saving()">
+                @if (saving()) {
+                <span class="loading loading-spinner loading-xs mr-2"></span>
+                }
+                Guardar
+            </button>
+        </div>
+    </form>
 </div>

@@ -178,7 +178,14 @@ export class AdminOrderFormPage implements OnInit {
         this.error = null;
 
         try {
-            const { data, error } = await this.orderService.createOrder(this.form(), this.items());
+            let result;
+            if (this.id) {
+                result = await this.orderService.updateOrder(this.id, this.form(), this.items());
+            } else {
+                result = await this.orderService.createOrder(this.form(), this.items());
+            }
+
+            const { error } = result;
 
             if (error) throw error;
 

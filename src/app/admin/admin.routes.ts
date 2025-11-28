@@ -198,6 +198,11 @@ export const adminRoutes: Routes = [
         path: 'orders/:id',
         loadComponent: () => import('@app/admin/orders/admin-order-form-page').then(m => m.AdminOrderFormPage)
       },
+      {
+        title: 'Editar Pedido',
+        path: 'orders/:id/edit',
+        loadComponent: () => import('@app/admin/orders/admin-order-form-page').then(m => m.AdminOrderFormPage)
+      },
       // Services
       {
         title: 'Servicios',

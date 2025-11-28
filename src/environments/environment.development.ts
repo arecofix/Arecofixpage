@@ -31,4 +31,16 @@ export const environment = {
   whatsappBusinessAccountId: '368379263021902',
   whatsappAppId: '1209190100450173',
   whatsappApiUrl: 'https://graph.facebook.com/v22.0',
+
+  // Contact Information
+  contact: {
+    whatsappNumber: '5491125960900',
+    socialMedia: {
+      facebook: 'https://www.facebook.com/ArecoFix/',
+      instagram: 'https://www.instagram.com/ArecoFix/',
+      github: 'https://github.com/arecofix',
+      linkedin: 'https://www.linkedin.com/company/arecofix',
+      youtube: 'https://www.youtube.com/@Arecofix'
+    }
+  }
 };

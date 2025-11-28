@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -9,7 +10,7 @@ import { Component, Input } from '@angular/core';
   styleUrl: './whatsapp-button.css'
 })
 export class WhatsappButton {
-  @Input() phoneNumber: string = '5491125960900'; // Tu número aquí
+  @Input() phoneNumber: string = environment.contact.whatsappNumber;
   @Input() defaultMessage: string = 'Hola, necesito información';
 
   get encodedMessage(): string {

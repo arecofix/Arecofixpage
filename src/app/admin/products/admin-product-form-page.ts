@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { AdminProductService } from './services/admin-product.service';
 
 @Component({
   selector: 'app-admin-product-form-page',
@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
 export class AdminProductFormPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private auth = inject(AuthService);
+  private productService = inject(AdminProductService);
   private cdr = inject(ChangeDetectorRef);
 
   id: string | null = null;
@@ -41,40 +41,40 @@ export class AdminProductFormPage implements OnInit {
   error: string | null = null;
 
   async ngOnInit() {
-    const supabase = this.auth.getSupabaseClient();
+    try {
+      const [brands, categories] = await Promise.all([
+        this.productService.getBrands(),
+        this.productService.getCategories()
+      ]);
 
-    // Load brands and categories
-    const [brandsRes, categoriesRes] = await Promise.all([
-      supabase.from('brands').select('*').eq('is_active', true).order('name'),
-      supabase.from('categories').select('*').eq('is_active', true).order('name')
-    ]);
+      this.brands.set(brands);
+      this.categories.set(categories);
 
-    if (brandsRes.data) this.brands.set(brandsRes.data);
-    if (categoriesRes.data) this.categories.set(categoriesRes.data);
-
-    this.id = this.route.snapshot.paramMap.get('id');
-    if (this.id) {
-      const { data, error } = await supabase.from('products').select('*').eq('id', this.id).single();
-      if (error) {
-        this.error = error.message;
-      } else if (data) {
-        this.form.set({
-          sku: data.sku || '',
-          barcode: data.barcode || '',
-          name: data.name || '',
-          slug: data.slug || '',
-          description: data.description || '',
-          price: data.price || 0,
-          stock: data.stock || 0,
-          brand_id: data.brand_id || '',
-          category_id: data.category_id || '',
-          is_active: data.is_active ?? true,
-          images: data.gallery_urls || (data.image_url ? [data.image_url] : []),
-        });
+      this.id = this.route.snapshot.paramMap.get('id');
+      if (this.id) {
+        const data = await this.productService.getProduct(this.id);
+        if (data) {
+          this.form.set({
+            sku: data.sku || '',
+            barcode: data.barcode || '',
+            name: data.name || '',
+            slug: data.slug || '',
+            description: data.description || '',
+            price: data.price || 0,
+            stock: data.stock || 0,
+            brand_id: data.brand_id || '',
+            category_id: data.category_id || '',
+            is_active: data.is_active ?? true,
+            images: data.gallery_urls || (data.image_url ? [data.image_url] : []),
+          });
+        }
       }
+    } catch (e: any) {
+      this.error = e.message || 'Error al cargar datos';
+    } finally {
+      this.loading = false;
+      this.cdr.markForCheck();
     }
-    this.loading = false;
-    this.cdr.markForCheck();
   }
 
   async onFileChange(event: any) {
@@ -82,17 +82,9 @@ export class AdminProductFormPage implements OnInit {
     if (!file) return;
 
     this.uploading.set(true);
-    const supabase = this.auth.getSupabaseClient();
-    const filePath = `products/${Date.now()}-${file.name}`;
-
     try {
-      const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file);
-      if (error) {
-        this.error = error.message;
-        return;
-      }
-      const { data: publicUrl } = supabase.storage.from('public-assets').getPublicUrl(data.path);
-      this.form.update((f) => ({ ...f, images: [...f.images, publicUrl.publicUrl] }));
+      const publicUrl = await this.productService.uploadImage(file);
+      this.form.update((f) => ({ ...f, images: [...f.images, publicUrl] }));
     } catch (e: any) {
       this.error = e.message;
     } finally {
@@ -118,12 +110,11 @@ export class AdminProductFormPage implements OnInit {
   async save() {
     this.saving = true;
     this.error = null;
-    const supabase = this.auth.getSupabaseClient();
     const formVal = this.form();
 
     let slug = formVal.slug;
     if (!slug) {
-      slug = this.slugify(formVal.name);
+      slug = this.productService.slugify(formVal.name);
     }
 
     const payload: any = {
@@ -143,11 +134,9 @@ export class AdminProductFormPage implements OnInit {
 
     try {
       if (this.id) {
-        const { error } = await supabase.from('products').update(payload).eq('id', this.id);
-        if (error) throw error;
+        await this.productService.updateProduct(this.id, payload);
       } else {
-        const { error } = await supabase.from('products').insert(payload);
-        if (error) throw error;
+        await this.productService.createProduct(payload);
       }
       this.router.navigate(['/admin/products']);
     } catch (e: any) {
@@ -156,16 +145,5 @@ export class AdminProductFormPage implements OnInit {
       this.saving = false;
       this.cdr.markForCheck();
     }
-  }
-
-  private slugify(text: string): string {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/&/g, '-and-')
-      .replace(/[^a-z0-9-]/g, '')
-      .replace(/-+/g, '-');
   }
 }

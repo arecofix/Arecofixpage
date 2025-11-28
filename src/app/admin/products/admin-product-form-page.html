@@ -1,93 +1,118 @@
-<div class="max-w-2xl mx-auto text-gray-800">
-  <h2 class="text-lg font-medium mb-4">{{ id ? 'Editar' : 'Nuevo' }} producto</h2>
+<div class="max-w-4xl mx-auto text-gray-800">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Producto</h2>
+  </div>
 
-  <form (ngSubmit)="save()" #f="ngForm" class="grid gap-4">
-    <div>
-      <label class="block text-sm">Nombre</label>
-      <input type="text" [(ngModel)]="form().name" name="name" class="input input-bordered w-full" required />
-    </div>
+  <form (ngSubmit)="save()" #f="ngForm">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="form-control">
-        <label class="label">SKU</label>
-        <input type="text" [(ngModel)]="form().sku" name="sku" class="input input-bordered">
+    <!-- Basic Info Section -->
+    <div class="admin-form-section">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Información Básica</h3>
+
+      <div class="mb-4">
+        <label class="admin-form-label">Nombre del Producto</label>
+        <input type="text" [(ngModel)]="form().name" name="name" class="admin-form-input"
+          placeholder="Ej: iPhone 13 Pro Max" required />
       </div>
-      <div class="form-control">
-        <label class="label">Código de Barras</label>
-        <div class="join">
-          <input type="text" [(ngModel)]="form().barcode" name="barcode" class="input input-bordered join-item w-full">
-          <button type="button" class="btn join-item" (click)="generateBarcode()">
-            <i class="fas fa-random"></i>
-          </button>
+
+      <div class="admin-form-grid">
+        <div>
+          <label class="admin-form-label">SKU</label>
+          <input type="text" [(ngModel)]="form().sku" name="sku" class="admin-form-input" placeholder="Código interno">
+        </div>
+        <div>
+          <label class="admin-form-label">Código de Barras</label>
+          <div class="flex gap-2">
+            <input type="text" [(ngModel)]="form().barcode" name="barcode" class="admin-form-input"
+              placeholder="EAN / UPC">
+            <button type="button" class="btn btn-square btn-outline" (click)="generateBarcode()"
+              title="Generar código aleatorio">
+              <i class="fas fa-random"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="form-control">
-      <label class="label">Nombre</label>
-      <input type="text" [(ngModel)]="form().name" name="name" class="input input-bordered" required>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="form-control">
-        <label class="label">Marca</label>
-        <select [(ngModel)]="form().brand_id" name="brand_id" class="select select-bordered">
-          <option value="">Seleccionar Marca</option>
-          @for (brand of brands(); track brand.id) {
-          <option [value]="brand.id">{{ brand.name }}</option>
-          }
-        </select>
-      </div>
-      <div class="form-control">
-        <label class="label">Categoría</label>
-        <select [(ngModel)]="form().category_id" name="category_id" class="select select-bordered">
-          <option value="">Seleccionar Categoría</option>
-          @for (cat of categories(); track cat.id) {
-          <option [value]="cat.id">{{ cat.name }}</option>
-          }
-        </select>
-      </div>
-    </div>
-
-    <div>
-      <label class="block text-sm">Descripción</label>
-      <textarea [(ngModel)]="form().description" name="description" class="textarea textarea-bordered w-full"
-        rows="4"></textarea>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm">Precio</label>
-        <input type="number" [(ngModel)]="form().price" name="price" class="input input-bordered w-full" required />
-      </div>
-      <div>
-        <label class="block text-sm">Stock</label>
-        <input type="number" [(ngModel)]="form().stock" name="stock" class="input input-bordered w-full" />
+    <!-- Categorization Section -->
+    <div class="admin-form-section">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Categorización</h3>
+      <div class="admin-form-grid">
+        <div>
+          <label class="admin-form-label">Marca</label>
+          <select [(ngModel)]="form().brand_id" name="brand_id" class="admin-form-select">
+            <option value="">Seleccionar Marca</option>
+            @for (brand of brands(); track brand.id) {
+            <option [value]="brand.id">{{ brand.name }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="admin-form-label">Categoría</label>
+          <select [(ngModel)]="form().category_id" name="category_id" class="admin-form-select">
+            <option value="">Seleccionar Categoría</option>
+            @for (cat of categories(); track cat.id) {
+            <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <input type="checkbox" [(ngModel)]="form().is_active" name="is_active" />
-      <span>Activo</span>
+    <!-- Details Section -->
+    <div class="admin-form-section">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Detalles</h3>
+      <div class="mb-4">
+        <label class="admin-form-label">Descripción</label>
+        <textarea [(ngModel)]="form().description" name="description" class="admin-form-textarea" rows="4"
+          placeholder="Detalles técnicos, características..."></textarea>
+      </div>
+
+      <div class="admin-form-grid">
+        <div>
+          <label class="admin-form-label">Precio ($)</label>
+          <input type="number" [(ngModel)]="form().price" name="price" class="admin-form-input" required min="0" />
+        </div>
+        <div>
+          <label class="admin-form-label">Stock</label>
+          <input type="number" [(ngModel)]="form().stock" name="stock" class="admin-form-input" min="0" />
+        </div>
+      </div>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium mb-2">Fotos del Producto</label>
-      <input type="file" (change)="onFileChange($event)" accept="image/*" class="file-input file-input-bordered w-full"
-        multiple />
-      <p class="text-sm text-gray-500 mt-1">Puedes subir múltiples imágenes. La primera será la imagen principal.</p>
+    <!-- Status Section -->
+    <div class="admin-form-section">
+      <label class="admin-form-checkbox-container w-fit">
+        <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+          class="checkbox checkbox-primary admin-form-checkbox" />
+        <span class="font-medium text-gray-700">Producto Activo</span>
+      </label>
+    </div>
+
+    <!-- Images Section -->
+    <div class="admin-form-section">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Galería de Imágenes</h3>
+
+      <div class="mb-4">
+        <label class="admin-form-label">Subir Imágenes</label>
+        <input type="file" (change)="onFileChange($event)" accept="image/*"
+          class="file-input file-input-bordered file-input-primary admin-form-file" multiple />
+        <p class="text-sm text-gray-500 mt-2">Formatos soportados: JPG, PNG, WEBP.</p>
+      </div>
 
       @if (form().images.length > 0) {
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         @for (img of form().images; track img; let idx = $index) {
-        <div class="relative group">
-          <img [src]="img" class="w-full h-32 object-cover rounded-lg border-2 border-gray-200" />
-          <button type="button" (click)="removeImage(idx)"
-            class="absolute top-1 right-1 btn btn-circle btn-sm btn-error opacity-0 group-hover:opacity-100 transition-opacity">
-            <i class="fas fa-times"></i>
-          </button>
+        <div class="relative group aspect-square">
+          <img [src]="img" class="w-full h-full object-cover rounded-lg border border-gray-200 shadow-sm" />
+          <div
+            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+            <button type="button" (click)="removeImage(idx)" class="btn btn-circle btn-error btn-sm text-white">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
           @if (idx === 0) {
-          <span class="absolute bottom-1 left-1 badge badge-primary badge-sm">Principal</span>
+          <span class="absolute bottom-2 left-2 badge badge-primary badge-sm shadow-md">Principal</span>
           }
         </div>
         }
@@ -96,17 +121,23 @@
     </div>
 
     @if (error) {
-    <div class="text-red-600">{{ error }}</div>
+    <div class="alert alert-error mb-6">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
+    </div>
     }
 
-    <div class="flex gap-2">
-      <button type="submit" class="btn btn-primary" [disabled]="saving || uploading()">
+    <div class="flex gap-4 justify-end">
+      <a routerLink="/admin/products" class="btn btn-ghost">Cancelar</a>
+      <button type="submit" class="btn btn-primary px-8" [disabled]="saving || uploading()">
         @if (uploading()) {
-        <span class="loading loading-spinner loading-xs"></span>
+        <span class="loading loading-spinner loading-xs mr-2"></span> Subiendo...
+        } @else if (saving) {
+        <span class="loading loading-spinner loading-xs mr-2"></span> Guardando...
+        } @else {
+        Guardar Producto
         }
-        Guardar
       </button>
-      <a routerLink="/admin/products" class="btn">Cancelar</a>
     </div>
   </form>
 </div>

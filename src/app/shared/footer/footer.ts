@@ -1,19 +1,24 @@
 import { Component } from '@angular/core';
-
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-footer',
-  imports: [RouterModule, FormsModule],
+  standalone: true,
+  imports: [RouterLink, FormsModule],
   templateUrl: './footer.html',
   styleUrl: './footer.css'
 })
 export class Footer {
   email: string = '';
-  isSubmitting = false;
-  successMessage = '';
-  errorMessage = '';
+  isSubmitting: boolean = false;
+  successMessage: string = '';
+  errorMessage: string = '';
+
+  // Exposed configuration
+  socialLinks = environment.contact.socialMedia;
+  whatsappNumber = environment.contact.whatsappNumber;
 
   subscribe() {
     if (!this.email) {
@@ -33,9 +38,10 @@ export class Footer {
       this.email = '';
     }, 1500);
   }
+
   shareOn(platform: string) {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent('¡Mira este sitio increíble de Arecofix!');
+    const text = encodeURIComponent('¡Mira esta página de Arecofix!');
     let shareUrl = '';
 
     switch (platform) {
@@ -46,10 +52,10 @@ export class Footer {
         shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
         break;
       case 'whatsapp':
-        shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`;
+        shareUrl = `https://wa.me/?text=${text}%20${url}`;
         break;
       case 'linkedin':
-        shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}`;
+        shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${text}`;
         break;
     }
 
