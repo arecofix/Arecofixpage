@@ -1,0 +1,115 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Entradas</h1>
+            <p class="text-gray-500 mt-1">Gestiona las publicaciones de tu blog</p>
+        </div>
+        <a routerLink="new"
+            class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+            <i class="fas fa-plus mr-2"></i>
+            Nueva Entrada
+        </a>
+    </div>
+
+    <!-- Content -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        @if (loading) {
+        <div class="flex flex-col items-center justify-center p-12">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
+            <p class="text-gray-500">Cargando entradas...</p>
+        </div>
+        } @else if (error) {
+        <div class="flex flex-col items-center justify-center p-12 text-center">
+            <div class="bg-red-50 p-4 rounded-full mb-4">
+                <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar</h3>
+            <p class="text-gray-500 mb-4">{{ error }}</p>
+            <button (click)="loadPosts()" class="text-indigo-600 hover:text-indigo-700 font-medium">
+                Intentar nuevamente
+            </button>
+        </div>
+        } @else if (posts.length === 0) {
+        <div class="flex flex-col items-center justify-center p-16 text-center">
+            <div class="bg-gray-50 p-6 rounded-full mb-6">
+                <i class="fas fa-newspaper text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No hay entradas aún</h3>
+            <p class="text-gray-500 max-w-sm mb-6">Comienza a escribir en tu blog para compartir novedades y tutoriales
+                con tus clientes.</p>
+            <a routerLink="new"
+                class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">
+                Crear primera entrada
+            </a>
+        </div>
+        } @else {
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Entrada</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Estado</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Acciones</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @for (post of posts; track post.id) {
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-10 w-10 flex-shrink-0">
+                                    @if (post.image) {
+                                    <img class="h-10 w-10 rounded-lg object-cover" [src]="post.image"
+                                        [alt]="post.title">
+                                    } @else {
+                                    <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                        <i class="fas fa-image text-gray-400"></i>
+                                    </div>
+                                    }
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ post.title }}</div>
+                                    <div class="text-sm text-gray-500 truncate max-w-xs">{{ post.slug }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                [class.bg-green-100]="post.published" [class.text-green-800]="post.published"
+                                [class.bg-yellow-100]="!post.published" [class.text-yellow-800]="!post.published">
+                                {{ post.published ? 'Publicado' : 'Borrador' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ post.created_at | date:'mediumDate' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end gap-3">
+                                <a [routerLink]="[post.id]"
+                                    class="text-indigo-600 hover:text-indigo-900 transition-colors" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button (click)="deletePost(post.id)"
+                                    class="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>

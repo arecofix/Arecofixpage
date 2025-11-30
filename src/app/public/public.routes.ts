@@ -88,25 +88,16 @@ export const publicRoutes: Routes = [
         title: 'Cursos',
         path: 'cursos',
         loadComponent: () =>
-          import('@app/public/cursos/cursos').then(
-            (m) => m.CursosComponent
-          ),
-      },
-      // Repuestos ahora se sirve a través de products/category/repuestos
-      {
-        title: 'Seguimiento de Reparación',
-        path: 'tracking/:code',
-        loadComponent: () =>
-          import('@app/public/tracking/tracking-page').then(
-            (m) => m.TrackingPage
-          ),
-      },
-      {
-        title: 'Checkout',
-        path: 'checkout',
-        loadComponent: () =>
           import('@app/public/checkout/checkout-page').then(
             (m) => m.CheckoutPage
+          ),
+      },
+      {
+        title: 'Blog Post',
+        path: 'posts/:slug',
+        loadComponent: () =>
+          import('@app/public/posts/post-page').then(
+            (m) => m.PostPage
           ),
       },
     ],

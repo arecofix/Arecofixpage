@@ -45,6 +45,7 @@ export class AdminLayout {
     { title: 'Taller', path: '/admin/repairs', icon: 'fa-wrench' },
     { title: 'Usuarios', path: '/admin/users', icon: 'fa-user-cog' },
     { title: 'Mensajes', path: '/admin/messages', icon: 'fa-envelope' },
+    { title: 'Entradas', path: '/admin/posts', icon: 'fa-newspaper' },
   ];
 
   toggleMenu(item: any) {
