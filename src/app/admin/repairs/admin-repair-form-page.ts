@@ -21,6 +21,7 @@ export class AdminRepairFormPage implements OnInit {
         customer_name: '',
         customer_phone: '',
         device_model: '',
+        imei: '',
         issue_description: '',
         status: 'pending',
         estimated_cost: 0,
@@ -36,7 +37,8 @@ export class AdminRepairFormPage implements OnInit {
         security_pin: '',
         security_pattern: '',
         deposit_amount: 0,
-        tracking_code: ''
+        tracking_code: '',
+        repair_number: 0
     });
 
     loading = signal(true);
@@ -69,6 +71,7 @@ export class AdminRepairFormPage implements OnInit {
                 customer_name: data.customer_name,
                 customer_phone: data.customer_phone || '',
                 device_model: data.device_model,
+                imei: data.imei || '',
                 issue_description: data.issue_description || '',
                 status: data.status,
                 estimated_cost: data.estimated_cost || 0,
@@ -84,7 +87,8 @@ export class AdminRepairFormPage implements OnInit {
                 security_pin: data.security_pin || '',
                 security_pattern: data.security_pattern || '',
                 deposit_amount: data.deposit_amount || 0,
-                tracking_code: data.tracking_code || ''
+                tracking_code: data.tracking_code || '',
+                repair_number: data.repair_number || 0
             });
         }
     }

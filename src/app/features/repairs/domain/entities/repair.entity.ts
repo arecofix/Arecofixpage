@@ -15,47 +15,50 @@ export enum RepairStatus {
  * Represents a repair ticket
  */
 export interface Repair {
-    id: string;
-    tracking_code: string;
-    customer_id: string;
-    customer_name?: string;
-    customer_phone?: string;
-    device_type: string;
-    device_brand: string;
-    device_model: string;
-    issue_description: string;
-    status: RepairStatus;
-    estimated_cost?: number;
-    final_cost?: number;
-    notes?: string;
-    technician_id?: string;
-    received_at?: string;
-    created_at: string;
-    updated_at: string;
-    completed_at?: string;
+    readonly id: string;
+    readonly tracking_code: string;
+    readonly customer_id?: string;
+    readonly customer_name?: string;
+    readonly customer_phone?: string;
+    readonly device_type: string;
+    readonly device_brand: string;
+    readonly device_model: string;
+    readonly imei?: string;
+    readonly repair_number?: number;
+    readonly issue_description: string;
+    readonly status: RepairStatus;
+    readonly estimated_cost?: number;
+    readonly final_cost?: number;
+    readonly notes?: string;
+    readonly technician_id?: string;
+    readonly received_at?: string;
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly completed_at?: string;
 }
 
 /**
  * Repair creation DTO
  */
 export interface CreateRepairDto {
-    customer_id: string;
-    customer_name?: string;
-    customer_phone?: string;
-    device_type: string;
-    device_brand: string;
-    device_model: string;
-    issue_description: string;
-    estimated_cost?: number;
-    notes?: string;
+    readonly customer_id?: string;
+    readonly customer_name?: string;
+    readonly customer_phone?: string;
+    readonly device_type: string;
+    readonly device_brand: string;
+    readonly device_model: string;
+    readonly imei?: string;
+    readonly issue_description: string;
+    readonly estimated_cost?: number;
+    readonly notes?: string;
 }
 
 /**
  * Repair update DTO
  */
 export interface UpdateRepairDto extends Partial<CreateRepairDto> {
-    status?: RepairStatus;
-    final_cost?: number;
-    technician_id?: string;
-    completed_at?: string;
+    readonly status?: RepairStatus;
+    readonly final_cost?: number;
+    readonly technician_id?: string;
+    readonly completed_at?: string;
 }

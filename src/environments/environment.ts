@@ -17,7 +17,7 @@ export const environment = {
   supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
   supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0',
 
-  authRedirectUrl: 'http://localhost:4200/#/login',
+  authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
 
   // Analytics Configuration

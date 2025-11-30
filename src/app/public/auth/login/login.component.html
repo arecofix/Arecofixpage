@@ -51,7 +51,7 @@
                 id="email"
                 formControlName="email"
                 placeholder="ejemplo@correo.com"
-                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900 bg-white"
                 [class.border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
                 [class.border-gray-300]="!(email?.invalid && (email?.touched || email?.dirty))"
                 />
@@ -75,7 +75,7 @@
                     id="password"
                     formControlName="password"
                     placeholder="••••••••"
-                    class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900 bg-white"
                     [class.border-red-500]="password?.invalid && (password?.touched || password?.dirty)"
                     [class.border-gray-300]="!(password?.invalid && (password?.touched || password?.dirty))"
                     />
@@ -212,7 +212,7 @@
                     id="reset-email"
                     formControlName="email"
                     placeholder="ejemplo@correo.com"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 bg-white"
                     />
                   </div>
                   <button

@@ -165,6 +165,23 @@ export class RegisterComponent implements OnInit, OnDestroy {
       console.error('Registration error:', err);
     }
   }
+  
+  async handleGoogleLogin() {
+    this.error = '';
+    this.loading = true;
+    try {
+      const res = await this.authService.signInWithGoogle();
+      if (res.error) {
+        this.error = res.error;
+        this.loading = false;
+      }
+      // Redirect happens automatically by Supabase OAuth
+    } catch (err) {
+      this.loading = false;
+      this.error = 'Error al iniciar sesión con Google.';
+      console.error('Google login error:', err);
+    }
+  }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;

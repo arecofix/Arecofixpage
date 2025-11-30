@@ -1,4 +1,4 @@
-<div class="max-w-3xl mx-auto no-print">
+<div class="container mx-auto p-4 max-w-5xl no-print">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nueva' }} Reparación</h1>
         <a routerLink="/admin/repairs" class="btn btn-ghost">
@@ -32,13 +32,23 @@
             </div>
 
             <!-- Device Info -->
-            <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text font-medium">Modelo del Dispositivo</span>
-                </label>
-                <input type="text" [(ngModel)]="form().device_model" name="device_model"
-                    class="input input-bordered w-full bg-white text-gray-800" required
-                    placeholder="Ej: iPhone 11, Samsung A52, Laptop HP..." />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Modelo del Dispositivo</span>
+                    </label>
+                    <input type="text" [(ngModel)]="form().device_model" name="device_model"
+                        class="input input-bordered w-full bg-white text-gray-800" required
+                        placeholder="Ej: iPhone 11, Samsung A52..." />
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">IMEI / Serie</span>
+                    </label>
+                    <input type="text" [(ngModel)]="form().imei" name="imei"
+                        class="input input-bordered w-full bg-white text-gray-800"
+                        placeholder="Opcional" />
+                </div>
             </div>
 
             <div class="form-control mb-4">
@@ -194,158 +204,143 @@
     </div>
 </div>
 
-<!-- Print Layout (Hidden on screen, visible on print) -->
-<div class="hidden print:block print-container font-sans text-sm">
-    <!-- Header -->
-    <div class="flex justify-between items-start mb-2 border-b pb-1">
-        <div>
-            <h1 class="text-xl font-bold uppercase underline mb-1">Solicitud de Reparación</h1>
-            <div class="text-xs">
-                <p><strong>Fecha:</strong> {{ date | date:'dd/MM/yyyy' }}</p>
-                <p>Tel: {{ company()?.phone }}</p>
-                <p>{{ company()?.email }}</p>
-            </div>
-        </div>
-        <div class="text-right">
-            @if (company()?.logo_url) {
-            <img [src]="company().logo_url" alt="Logo" class="h-10 mb-1 object-contain ml-auto">
-            }
-            <h2 class="font-bold text-lg text-green-700 uppercase">{{ company()?.name || 'ARECOFIX' }}</h2>
-            <div class="text-xs text-gray-600">
-                <p>{{ company()?.address }}</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Customer Info -->
-    <div class="mb-2">
-        <div class="flex mb-1">
-            <span class="w-32 font-bold text-xs">NOMBRE Y APELLIDO:</span>
-            <span class="border-b border-gray-400 flex-1 text-xs">{{ form().customer_name }}</span>
-        </div>
-        <div class="flex mb-1">
-            <span class="w-32 font-bold text-xs">TELÉFONO:</span>
-            <span class="border-b border-gray-400 flex-1 text-xs">{{ form().customer_phone }}</span>
-        </div>
-    </div>
-
-    <!-- Device Info -->
-    <div class="mb-2">
-        <div class="flex mb-1">
-            <span class="w-32 font-bold text-xs">MARCA Y MODELO:</span>
-            <span class="border-b border-gray-400 flex-1 text-xs">{{ form().device_model }}</span>
-        </div>
-        <div class="flex mb-1">
-            <span class="w-32 font-bold text-xs">OBSERVACIONES:</span>
-            <span class="border-b border-gray-400 flex-1 text-xs">{{ form().issue_description }}</span>
-        </div>
-    </div>
-
-    <!-- Accessories Checklist -->
-    <div class="mb-2 text-center">
-        <h3 class="font-bold underline mb-1 text-[10px]">ACCESORIOS</h3>
-        <div class="flex justify-center gap-3 text-[10px]">
-            <div class="flex items-center">
-                <span class="mr-1">CARGADOR</span>
-                <div class="w-3 h-3 border border-black flex items-center justify-center">
-                    {{ form().checklist.charger ? 'X' : '' }}
-                </div>
-            </div>
-            <div class="flex items-center">
-                <span class="mr-1">BATERIA</span>
-                <div class="w-3 h-3 border border-black flex items-center justify-center">
-                    {{ form().checklist.battery ? 'X' : '' }}
-                </div>
-            </div>
-            <div class="flex items-center">
-                <span class="mr-1">CHIP</span>
-                <div class="w-3 h-3 border border-black flex items-center justify-center">
-                    {{ form().checklist.chip ? 'X' : '' }}
-                </div>
-            </div>
-            <div class="flex items-center">
-                <span class="mr-1">TARJETA SD</span>
-                <div class="w-3 h-3 border border-black flex items-center justify-center">
-                    {{ form().checklist.sd ? 'X' : '' }}
-                </div>
-            </div>
-            <div class="flex items-center">
-                <span class="mr-1">FUNDA</span>
-                <div class="w-3 h-3 border border-black flex items-center justify-center">
-                    {{ form().checklist.case ? 'X' : '' }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Security -->
-    <div class="mb-2">
-        <div class="flex items-center gap-4 mb-1">
-            <span class="font-bold text-xs">PATRÓN DE DESBLOQUEO:</span>
-            <!-- Visual Pattern Placeholder -->
-            <div class="grid grid-cols-3 gap-1 w-12">
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-                <div class="w-2 h-2 rounded-full border border-black"></div>
-            </div>
-            <span class="text-xs ml-2">{{ form().security_pattern }}</span>
-        </div>
-        <div class="flex items-end">
-            <span class="font-bold text-xs mr-2">PIN:</span>
-            <span class="border-b border-gray-400 flex-1 text-xs">{{ form().security_pin }}</span>
-        </div>
-    </div>
-
-    <!-- Costs -->
-    <div class="mb-2 text-xs">
-        <div class="flex mb-1">
-            <span class="w-40 font-bold">Diagnóstico de reparación:</span>
-            <span class="border-b border-gray-400 flex-1">{{ form().technician_notes }}</span>
-        </div>
-        <div class="flex mb-1">
-            <span class="w-40 font-bold">Presupuesto:</span>
-            <span class="border-b border-gray-400 flex-1">$ {{ form().estimated_cost }}</span>
-        </div>
-        <div class="flex mb-1">
-            <span class="w-40 font-bold">Seña:</span>
-            <span class="border-b border-gray-400 flex-1">$ {{ form().deposit_amount }}</span>
-        </div>
-    </div>
-
-    <!-- Legal Terms -->
-    <div class="mb-2 text-[7px] leading-tight text-justify">
-        <h4 class="font-bold underline text-center mb-1">CONDICIONES DEL SERVICIO</h4>
-        <p>Se garantiza confidencialidad de datos. No nos responsabilizamos por pérdida de información software.</p>
-        <p>Si el equipo no se retira en 30 días, se considera abandonado (Art 2524/5 CC).</p>
-        <p>La reparación demora 24-72hs para control de calidad.</p>
-        <p>El cliente declara conocer el estado estético del equipo al entregarlo.</p>
-    </div>
-
-    <!-- Signatures -->
-    <div class="flex justify-between items-end mt-4 text-[9px]">
-        <div class="w-2/3 pr-2">
-            <div class="flex items-end gap-2">
-                <div class="text-center flex-1">
-                    <div class="border-t border-black pt-1">FIRMA CLIENTE</div>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between mb-1">
-                        <span>ACLARACIÓN: ........................</span>
+<!-- Print Layout (Hidden on screen via CSS, visible on print via CSS) -->
+<div class="print-container font-sans text-xs leading-tight">
+    <div class="flex flex-col h-full">
+        <!-- Main Ticket (Top) -->
+        <div class="w-full pb-4 border-b-2 border-dashed border-gray-400 mb-4 flex flex-col">
+            <!-- Header -->
+            <div class="flex justify-between items-start mb-2 border-b border-gray-300 pb-2">
+                <div class="flex items-center">
+                    @if (company()?.logo_url) {
+                        <img [src]="company().logo_url" alt="Logo" class="h-10 w-auto mr-3 object-contain">
+                    }
+                    <div>
+                        <h1 class="text-lg font-bold uppercase mb-0">Orden #{{ (form().repair_number | number:'3.0-0') || '---' }}</h1>
+                        <div class="text-[9px] text-gray-600">
+                            <span>{{ date | date:'dd/MM/yyyy' }}</span> |
+                            <span>ID: {{ form().tracking_code }}</span>
+                        </div>
                     </div>
-                    <div class="flex justify-between">
-                        <span>DNI: ........................</span>
+                </div>
+                <div class="text-right">
+                    <h2 class="font-bold text-base text-green-700 uppercase">{{ company()?.name || 'ARECOFIX' }}</h2>
+                    <div class="text-[9px] text-gray-600 leading-tight">
+                        <p>{{ company()?.address }}</p>
+                        <p>{{ company()?.phone }}</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Content Grid (2 Columns) -->
+            <div class="grid grid-cols-2 gap-3 mb-2 flex-grow">
+                <!-- Col 1: Customer, Device, Security -->
+                <div class="flex flex-col gap-2">
+                    <div class="border border-gray-300 rounded p-1">
+                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">CLIENTE & EQUIPO</h3>
+                        <div class="px-1 text-[9px]">
+                            <div class="flex justify-between"><span class="font-bold">Nombre:</span> <span class="truncate ml-1">{{ form().customer_name }}</span></div>
+                            <div class="flex justify-between"><span class="font-bold">Tel:</span> <span class="truncate ml-1">{{ form().customer_phone }}</span></div>
+                            <div class="border-t border-gray-200 my-0.5"></div>
+                            <div class="flex justify-between"><span class="font-bold">Modelo:</span> <span class="truncate ml-1">{{ form().device_model }}</span></div>
+                            <div class="flex justify-between"><span class="font-bold">IMEI:</span> <span class="truncate ml-1">{{ form().imei }}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-300 rounded p-1">
+                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">SEGURIDAD</h3>
+                        <div class="px-1 text-[9px]">
+                            <div class="flex justify-between"><span class="font-bold">PIN:</span> <span>{{ form().security_pin }}</span></div>
+                            <div class="flex justify-between"><span class="font-bold">Patrón:</span> <span>{{ form().security_pattern }}</span></div>
+                            <div class="mt-1 pt-1 border-t border-gray-200">
+                                <div class="grid grid-cols-3 gap-0.5 text-[8px]">
+                                    <span>[{{ form().checklist.charger ? 'X' : ' ' }}] Carg</span>
+                                    <span>[{{ form().checklist.battery ? 'X' : ' ' }}] Bat</span>
+                                    <span>[{{ form().checklist.chip ? 'X' : ' ' }}] Chip</span>
+                                    <span>[{{ form().checklist.sd ? 'X' : ' ' }}] SD</span>
+                                    <span>[{{ form().checklist.case ? 'X' : ' ' }}] Funda</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Costs, Fault -->
+                <div class="flex flex-col gap-2">
+                    <div class="border border-gray-300 rounded p-1">
+                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">COSTOS</h3>
+                        <div class="px-1 text-[9px]">
+                            <div class="flex justify-between">
+                                <span class="font-bold">Presupuesto:</span>
+                                <span>$ {{ form().estimated_cost }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-bold">Seña:</span>
+                                <span>$ {{ form().deposit_amount }}</span>
+                            </div>
+                            <div class="flex justify-between border-t border-gray-300 pt-0.5 mt-0.5 font-bold">
+                                <span>Total:</span>
+                                <span>$ {{ form().final_cost || form().estimated_cost }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border border-gray-300 rounded p-1 flex-grow">
+                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">FALLA / NOTAS</h3>
+                        <div class="px-1 text-[9px] h-full overflow-hidden leading-tight">
+                            {{ form().issue_description }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal & Signatures -->
+            <div class="mt-auto">
+                <div class="flex justify-between items-end text-[9px]">
+                    <div class="w-5/12 text-center border-t border-black pt-1">FIRMA CLIENTE</div>
+                    <div class="w-5/12 text-center border-t border-black pt-1">FIRMA TÉCNICO</div>
+                </div>
+            </div>
         </div>
-        <div class="text-center w-1/3">
-            <div class="border-t border-black pt-1">FIRMA TÉCNICO</div>
+
+        <!-- Stub (Bottom) -->
+        <div class="w-full pt-2 flex flex-col justify-between">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-center mb-3">
+                        <h2 class="font-bold text-xs uppercase border-b border-black pb-1 mb-1">TALÓN DE RETIRO</h2>
+                        <div class="text-[10px] font-bold truncate">{{ company()?.name || 'ARECOFIX' }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="text-sm font-bold mb-0.5 text-center border border-gray-300 rounded bg-gray-50">#{{ (form().repair_number | number:'3.0-0') || '---' }}</div>
+                        <div class="text-[9px] text-center text-gray-600">{{ date | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div>
+                        <div class="font-bold text-[9px] border-b border-gray-200 mb-0.5">CLIENTE</div>
+                        <div class="text-[10px] leading-tight">{{ form().customer_name }}</div>
+                    </div>
+
+                    <div>
+                        <div class="font-bold text-[9px] border-b border-gray-200 mb-0.5">EQUIPO</div>
+                        <div class="text-[10px] leading-tight">{{ form().device_model }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-2">
+                <div class="text-[6px] text-justify leading-none mb-2 text-gray-500 border-t border-gray-200 pt-1">
+                    CONDICIONES: El equipo se recibe para revisión/reparación. La empresa no se responsabiliza por pérdida de información. Pasados los 90 días se considerará abandonado. Garantía sobre la reparación realizada únicamente.
+                </div>
+                <div class="text-center">
+                    <div class="text-[8px] italic mb-2 font-bold">Este talón deberá ser presentado indefectiblemente para retirar el equipo.</div>
+                    <div class="border-t border-black pt-1 text-[9px] font-bold">
+                        RETIRO: ........................
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

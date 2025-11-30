@@ -29,7 +29,7 @@
                 </tr>
                 } @else {
                 @for (repair of repairs(); track repair.id) {
-                <tr>
+                <tr class="text-gray-800">
                     <td>{{ repair.received_at | date:'shortDate' }}</td>
                     <td>
                         <div class="font-bold">{{ repair.customer_name }}</div>

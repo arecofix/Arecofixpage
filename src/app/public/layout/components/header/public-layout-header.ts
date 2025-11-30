@@ -76,18 +76,7 @@ export class PublicLayoutHeader {
   public selectProduct(product: Product) {
     this.searchQuery.set('');
     this.showResults.set(false);
-    // Navigate to product detail (assuming route structure)
-    // If you have a specific product detail route, use it here.
-    // For now, I'll assume a generic product route or just log it.
-    // Based on other files, it seems like /products/:slug or similar might be used, 
-    // but I don't see a clear product detail route in the snippets. 
-    // I'll assume /products/detail/:id or similar based on standard practices, 
-    // but looking at the file list, I see 'products/featured', 'categories'.
-    // Let's check if there is a product detail page.
-    // Actually, looking at the previous file `admin-sales-page.html`, it doesn't link to detail.
-    // But the user said "llevar al detalle del producto".
-    // I will try to find the product detail route.
-    this.router.navigate(['/products', product.slug || product.id]);
+    this.router.navigate(['/products/details', product.slug || product.id]);
   }
 
   public categoryRs = rxResource<iCategoriesResponse, unknown>({

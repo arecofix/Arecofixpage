@@ -67,90 +67,6 @@
 }
 
 /* Active state for dropdown items */
-.dropdown-content li>a.active {
-    background-color: var(--brand-blue) !important;
-    color: white !important;
-}
-
-/* Print Styles */
-@media print {
-
-    /* Default page size (for Invoices, etc.) */
-    @page {
-        size: auto;
-        margin: 5mm;
-    }
-
-    /* Specific page size for Repair Orders */
-    @page repair-order {
-        size: auto;
-        /* Use default paper size (usually A4) */
-        margin: 0mm;
-        /* Remove margins to hide headers/footers */
-    }
-
-    /* Hide admin UI elements globally when printing */
-    .drawer-side,
-    .navbar,
-    .drawer-toggle,
-    .btn:not(.print-btn),
-    .no-print,
-    app-admin-layout>.drawer>.drawer-toggle,
-    .drawer-content>.navbar,
-    app-footer,
-    app-whatsapp-button {
-        display: none !important;
-    }
-
-    /* Ensure main content is visible and takes full width by default */
-    .drawer-content,
-    main {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    /* --- Specific styles for Repair Order --- */
-
-    /* Apply the named page when this class is present on body */
-    body.printing-repair-order {
-        page: repair-order;
-    }
-
-    /* Hide everything by default for repair order */
-    body.printing-repair-order * {
-        visibility: hidden;
-    }
-
-    /* Show only the print container and its children */
-    body.printing-repair-order .print-container,
-    body.printing-repair-order .print-container * {
-        visibility: visible;
-    }
-
-    /* Position and size the container for A6 */
-    body.printing-repair-order .print-container {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 105mm;
-        /* Fixed A6 width */
-        min-height: 148mm;
-        /* A6 height */
-        margin: 0;
-        padding: 5mm;
-        background: white;
-        color: black;
-        z-index: 9999;
-    }
-}
-
-/* Admin Products Form Styles */
-
-/* Base input styles for high contrast and modern look */
-.admin-form-input,
 .admin-form-select,
 .admin-form-textarea {
     @apply w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm;
@@ -190,4 +106,78 @@
 /* Grid layout helper */
 .admin-form-grid {
     @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+/* Hide print container on screen */
+.print-container {
+    display: none;
+}
+
+/* PRINT STYLES - REPAIR ORDER */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    html, body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 0;
+        background-color: white;
+    }
+
+    /* Hide everything by default using visibility to preserve layout structure */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Explicitly hide non-parent UI elements to save space/processing */
+    .no-print, 
+    app-sidebar, 
+    app-header, 
+    nav, 
+    header, 
+    footer, 
+    .drawer-side,
+    .navbar {
+        display: none !important;
+    }
+
+    /* Ensure the print container and its children are visible */
+    .print-container,
+    .print-container *,
+    .printable-content,
+    .printable-content * {
+        visibility: visible !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Position the print container absolutely on the page */
+    .print-container {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 210mm;
+        height: auto; /* Allow content to dictate height */
+        min-height: 100%;
+        background-color: white;
+        z-index: 9999;
+        padding: 15mm; /* Add margin to prevent cutting off */
+        box-sizing: border-box;
+    }
+
+    /* Position the printable content absolutely on the page */
+    .printable-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        margin: 0 !important;
+        background-color: white;
+        z-index: 9999;
+    }
 }

@@ -31,9 +31,21 @@
             <!-- Device Info -->
             <div class="space-y-4">
                 <div class="flex justify-between border-b border-base-200 pb-2">
+                    <span class="font-semibold text-gray-500">Código de Seguimiento</span>
+                    <span class="font-bold text-primary">{{ repair().tracking_code }}</span>
+                </div>
+
+                <div class="flex justify-between border-b border-base-200 pb-2">
                     <span class="font-semibold text-gray-500">Dispositivo</span>
                     <span class="font-bold">{{ repair().device_model }}</span>
                 </div>
+
+                @if (repair().imei) {
+                <div class="flex justify-between border-b border-base-200 pb-2">
+                    <span class="font-semibold text-gray-500">IMEI / Serie</span>
+                    <span class="font-bold">{{ repair().imei }}</span>
+                </div>
+                }
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
                     <span class="font-semibold text-gray-500">Cliente</span>
