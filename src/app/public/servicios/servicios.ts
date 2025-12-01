@@ -12,7 +12,7 @@ export class ServiciosComponent {
     services = [
         {
             id: 1,
-            title: 'Reparación de Smartphones',
+            title: 'Reparación de Celulares',
             description: 'Servicio técnico especializado en todas las marcas: Samsung, iPhone, Motorola, Xiaomi, y más.',
             icon: 'fa-mobile-alt',
             features: [
@@ -23,7 +23,8 @@ export class ServiciosComponent {
                 'Liberación de equipos'
             ],
             price: 'Desde $5,000',
-            image: 'assets/img/products/sam.webp'
+            image: 'assets/img/products/sam.webp',
+            link: '/#/posts/servicio-tcnico-de-celulares-en-marcos-paz'
         },
         {
             id: 2,
@@ -99,6 +100,66 @@ export class ServiciosComponent {
             ],
             price: 'Desde $3,000',
             image: 'assets/img/cursos/local.webp'
+        },
+        {
+            id: 7,
+            title: 'Instalación de Cámaras de Seguridad',
+            description: 'Sistemas de vigilancia para hogares y comercios.',
+            icon: 'fa-video',
+            features: [
+                'Instalación de cámaras IP y CCTV',
+                'Configuración de DVR/NVR',
+                'Monitoreo remoto',
+                'Mantenimiento de sistemas',
+                'Asesoramiento de seguridad'
+            ],
+            price: 'Consultar',
+            image: 'assets/img/cursos/local.webp'
+        },
+        {
+            id: 8,
+            title: 'Electricidad y Plomería',
+            description: 'Soluciones integrales para el hogar y la industria.',
+            icon: 'fa-bolt',
+            features: [
+                'Instalaciones eléctricas',
+                'Reparaciones de plomería',
+                'Mantenimiento general',
+                'Urgencias 24hs',
+                'Certificaciones'
+            ],
+            price: 'Consultar',
+            image: 'assets/img/cursos/local.webp'
+        },
+        {
+            id: 9,
+            title: 'Trading',
+            description: 'Aprende a operar en los mercados financieros.',
+            icon: 'fa-chart-line',
+            features: [
+                'Cursos introductorios',
+                'Análisis técnico',
+                'Gestión de riesgo',
+                'Psicotrading',
+                'Mentoria personalizada'
+            ],
+            price: 'Consultar',
+            image: 'assets/img/cursos/pro.webp'
+        },
+        {
+            id: 10,
+            title: 'Creación de Sitios Web',
+            description: 'Tu presencia online profesional y efectiva.',
+            icon: 'fa-laptop-code',
+            features: [
+                'Diseño web responsive',
+                'Tiendas online (E-commerce)',
+                'Landing pages',
+                'Optimización SEO',
+                'Integración con redes sociales'
+            ],
+            price: 'Consultar',
+            image: 'assets/img/cursos/laboratorio.webp'
         }
     ];
 
