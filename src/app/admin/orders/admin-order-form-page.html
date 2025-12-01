@@ -3,37 +3,37 @@
 
     <form (ngSubmit)="save()" #f="ngForm">
         <!-- Customer Information -->
-        <div class="admin-form-section">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Información del Cliente</h3>
 
-            <div class="admin-form-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="admin-form-label">Nombre *</label>
-                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name" class="admin-form-input"
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre *</label>
+                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
                         required />
                 </div>
 
                 <div>
-                    <label class="admin-form-label">Email *</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
                     <input type="email" [(ngModel)]="form().customer_email" name="customer_email"
-                        class="admin-form-input" required />
+                        class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" required />
                 </div>
 
                 <div>
-                    <label class="admin-form-label">Teléfono</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
                     <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone"
-                        class="admin-form-input" />
+                        class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" />
                 </div>
 
                 <div>
-                    <label class="admin-form-label">Dirección</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Dirección</label>
                     <input type="text" [(ngModel)]="form().customer_address" name="customer_address"
-                        class="admin-form-input" />
+                        class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" />
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="admin-form-label">Estado</label>
-                    <select [(ngModel)]="form().status" name="status" class="admin-form-select">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
+                    <select [(ngModel)]="form().status" name="status" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
                         <option value="pending">Pendiente</option>
                         <option value="processing">Procesando</option>
                         <option value="completed">Completado</option>
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Order Items -->
-        <div class="admin-form-section">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <h3 class="text-lg font-semibold text-gray-800">Productos</h3>
                 <button type="button" (click)="addItem()" class="btn btn-sm btn-primary">
@@ -108,20 +108,20 @@
         </div>
 
         <!-- Totals -->
-        <div class="admin-form-section">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Totales y Notas</h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-4">
                     <div>
-                        <label class="admin-form-label">Descuento</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Descuento</label>
                         <input type="number" [(ngModel)]="form().discount" (ngModelChange)="calculateTotals()"
-                            name="discount" min="0" step="0.01" class="admin-form-input" />
+                            name="discount" min="0" step="0.01" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" />
                     </div>
 
                     <div>
-                        <label class="admin-form-label">Notas</label>
-                        <textarea [(ngModel)]="form().notes" name="notes" class="admin-form-textarea"
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Notas</label>
+                        <textarea [(ngModel)]="form().notes" name="notes" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
                             rows="3"></textarea>
                     </div>
                 </div>

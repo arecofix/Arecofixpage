@@ -1,4 +1,5 @@
 <div class="max-w-4xl mx-auto text-gray-800">
+<div class="max-w-4xl mx-auto text-gray-800">
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Producto</h2>
   </div>
@@ -6,24 +7,24 @@
   <form (ngSubmit)="save()" #f="ngForm">
 
     <!-- Basic Info Section -->
-    <div class="admin-form-section">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
       <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Información Básica</h3>
 
       <div class="mb-4">
-        <label class="admin-form-label">Nombre del Producto</label>
-        <input type="text" [(ngModel)]="form().name" name="name" class="admin-form-input"
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre del Producto</label>
+        <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
           placeholder="Ej: iPhone 13 Pro Max" required />
       </div>
 
-      <div class="admin-form-grid">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="admin-form-label">SKU</label>
-          <input type="text" [(ngModel)]="form().sku" name="sku" class="admin-form-input" placeholder="Código interno">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">SKU</label>
+          <input type="text" [(ngModel)]="form().sku" name="sku" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" placeholder="Código interno">
         </div>
         <div>
-          <label class="admin-form-label">Código de Barras</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Código de Barras</label>
           <div class="flex gap-2">
-            <input type="text" [(ngModel)]="form().barcode" name="barcode" class="admin-form-input"
+            <input type="text" [(ngModel)]="form().barcode" name="barcode" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
               placeholder="EAN / UPC">
             <button type="button" class="btn btn-square btn-outline" (click)="generateBarcode()"
               title="Generar código aleatorio">
@@ -35,12 +36,12 @@
     </div>
 
     <!-- Categorization Section -->
-    <div class="admin-form-section">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
       <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Categorización</h3>
-      <div class="admin-form-grid">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="admin-form-label">Marca</label>
-          <select [(ngModel)]="form().brand_id" name="brand_id" class="admin-form-select">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Marca</label>
+          <select [(ngModel)]="form().brand_id" name="brand_id" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
             <option value="">Seleccionar Marca</option>
             @for (brand of brands(); track brand.id) {
             <option [value]="brand.id">{{ brand.name }}</option>
@@ -48,8 +49,8 @@
           </select>
         </div>
         <div>
-          <label class="admin-form-label">Categoría</label>
-          <select [(ngModel)]="form().category_id" name="category_id" class="admin-form-select">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
+          <select [(ngModel)]="form().category_id" name="category_id" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
             <option value="">Seleccionar Categoría</option>
             @for (cat of categories(); track cat.id) {
             <option [value]="cat.id">{{ cat.name }}</option>
@@ -60,43 +61,43 @@
     </div>
 
     <!-- Details Section -->
-    <div class="admin-form-section">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
       <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Detalles</h3>
       <div class="mb-4">
-        <label class="admin-form-label">Descripción</label>
-        <textarea [(ngModel)]="form().description" name="description" class="admin-form-textarea" rows="4"
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Descripción</label>
+        <textarea [(ngModel)]="form().description" name="description" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" rows="4"
           placeholder="Detalles técnicos, características..."></textarea>
       </div>
 
-      <div class="admin-form-grid">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="admin-form-label">Precio ($)</label>
-          <input type="number" [(ngModel)]="form().price" name="price" class="admin-form-input" required min="0" />
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Precio ($)</label>
+          <input type="number" [(ngModel)]="form().price" name="price" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" required min="0" />
         </div>
         <div>
-          <label class="admin-form-label">Stock</label>
-          <input type="number" [(ngModel)]="form().stock" name="stock" class="admin-form-input" min="0" />
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Stock</label>
+          <input type="number" [(ngModel)]="form().stock" name="stock" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" min="0" />
         </div>
       </div>
     </div>
 
     <!-- Status Section -->
-    <div class="admin-form-section">
-      <label class="admin-form-checkbox-container w-fit">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+      <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer w-fit">
         <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
-          class="checkbox checkbox-primary admin-form-checkbox" />
+          class="checkbox checkbox-primary h-5 w-5 rounded border-gray-300" />
         <span class="font-medium text-gray-700">Producto Activo</span>
       </label>
     </div>
 
     <!-- Images Section -->
-    <div class="admin-form-section">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
       <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Galería de Imágenes</h3>
 
       <div class="mb-4">
-        <label class="admin-form-label">Subir Imágenes</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Subir Imágenes</label>
         <input type="file" (change)="onFileChange($event)" accept="image/*"
-          class="file-input file-input-bordered file-input-primary admin-form-file" multiple />
+          class="file-input file-input-bordered file-input-primary w-full bg-white text-gray-700" multiple />
         <p class="text-sm text-gray-500 mt-2">Formatos soportados: JPG, PNG, WEBP.</p>
       </div>
 

@@ -1,0 +1,362 @@
+
+> arecofix@0.0.0 build
+> ng build --configuration production
+
+[33mÔØ»[39m Building...
+[32mÔ£ö[39m Building...
+Application bundle generation failed. [25.027 seconds] - 2025-11-30T23:36:39.280Z
+
+Ôû▓ [WARNING] NG8113: RouterLink is not used within the template of AdminBrandFormPage [plugin angular-compiler]
+
+    src/app/admin/brands/admin-brand-form-page.ts:10:41:
+      10 Ôöé     imports: [CommonModule, FormsModule, RouterLink],
+         ÔòÁ                                          ~~~~~~~~~~
+
+
+Ôû▓ [WARNING] NG8113: RouterLink is not used within the template of AdminCategoryFormPage [plugin angular-compiler]
+
+    src/app/admin/categories/admin-category-form-page.ts:10:41:
+      10 Ôöé     imports: [CommonModule, FormsModule, RouterLink],
+         ÔòÁ                                          ~~~~~~~~~~
+
+
+Ôû▓ [WARNING] NG8113: RouterLink is not used within the template of AdminClientFormPage [plugin angular-compiler]
+
+    src/app/admin/clients/admin-client-form-page.ts:10:41:
+      10 Ôöé     imports: [CommonModule, FormsModule, RouterLink],
+         ÔòÁ                                          ~~~~~~~~~~
+
+
+Ôû▓ [WARNING] NG8113: RouterLink is not used within the template of AdminEmployeeFormPage [plugin angular-compiler]
+
+    src/app/admin/employees/admin-employee-form-page.ts:10:41:
+      10 Ôöé     imports: [CommonModule, FormsModule, RouterLink],
+         ÔòÁ                                          ~~~~~~~~~~
+
+
+Ôû▓ [WARNING] NG8113: RouterLink is not used within the template of AdminOrderFormPage [plugin angular-compiler]
+
+    src/app/admin/orders/admin-order-form-page.ts:19:27:
+      19 Ôöé     imports: [FormsModule, RouterLink, CommonModule],
+         ÔòÁ                            ~~~~~~~~~~
+
+
+Ôû▓ [WARNING] NG8113: RouterLink is not used within the template of AdminSupplierFormPage [plugin angular-compiler]
+
+    src/app/admin/suppliers/admin-supplier-form-page.ts:10:41:
+      10 Ôöé     imports: [CommonModule, FormsModule, RouterLink],
+         ÔòÁ                                          ~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing block. The block may have been closed earlier. If you meant to write the } character, you should use the "&#125;" HTML entity instead. [plugin angular-compiler]
+
+    src/app/admin/brands/admin-brand-form-page.html:5:16:
+      5 Ôöé                 }
+        ÔòÁ                 ^
+
+  Error occurs in the template of component AdminBrandFormPage.
+
+    src/app/admin/brands/admin-brand-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-brand-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "button". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/brands/admin-brand-form-page.html:7:12:
+      7 Ôöé             </button>
+        ÔòÁ             ~~~~~~~~~
+
+  Error occurs in the template of component AdminBrandFormPage.
+
+    src/app/admin/brands/admin-brand-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-brand-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/brands/admin-brand-form-page.html:8:8:
+      8 Ôöé         </div>
+        ÔòÁ         ~~~~~~
+
+  Error occurs in the template of component AdminBrandFormPage.
+
+    src/app/admin/brands/admin-brand-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-brand-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "form". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/brands/admin-brand-form-page.html:9:4:
+      9 Ôöé     </form>
+        ÔòÁ     ~~~~~~~
+
+  Error occurs in the template of component AdminBrandFormPage.
+
+    src/app/admin/brands/admin-brand-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-brand-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing block. The block may have been closed earlier. If you meant to write the } character, you should use the "&#125;" HTML entity instead. [plugin angular-compiler]
+
+    src/app/admin/categories/admin-category-form-page.html:5:16:
+      5 Ôöé                 }
+        ÔòÁ                 ^
+
+  Error occurs in the template of component AdminCategoryFormPage.
+
+    src/app/admin/categories/admin-category-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-category-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "button". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/categories/admin-category-form-page.html:7:12:
+      7 Ôöé             </button>
+        ÔòÁ             ~~~~~~~~~
+
+  Error occurs in the template of component AdminCategoryFormPage.
+
+    src/app/admin/categories/admin-category-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-category-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/categories/admin-category-form-page.html:8:8:
+      8 Ôöé         </div>
+        ÔòÁ         ~~~~~~
+
+  Error occurs in the template of component AdminCategoryFormPage.
+
+    src/app/admin/categories/admin-category-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-category-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "form". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/categories/admin-category-form-page.html:9:4:
+      9 Ôöé     </form>
+        ÔòÁ     ~~~~~~~
+
+  Error occurs in the template of component AdminCategoryFormPage.
+
+    src/app/admin/categories/admin-category-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-category-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing block. The block may have been closed earlier. If you meant to write the } character, you should use the "&#125;" HTML entity instead. [plugin angular-compiler]
+
+    src/app/admin/clients/admin-client-form-page.html:5:16:
+      5 Ôöé                 }
+        ÔòÁ                 ^
+
+  Error occurs in the template of component AdminClientFormPage.
+
+    src/app/admin/clients/admin-client-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-client-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "button". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/clients/admin-client-form-page.html:7:12:
+      7 Ôöé             </button>
+        ÔòÁ             ~~~~~~~~~
+
+  Error occurs in the template of component AdminClientFormPage.
+
+    src/app/admin/clients/admin-client-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-client-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/clients/admin-client-form-page.html:8:8:
+      8 Ôöé         </div>
+        ÔòÁ         ~~~~~~
+
+  Error occurs in the template of component AdminClientFormPage.
+
+    src/app/admin/clients/admin-client-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-client-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "form". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/clients/admin-client-form-page.html:9:4:
+      9 Ôöé     </form>
+        ÔòÁ     ~~~~~~~
+
+  Error occurs in the template of component AdminClientFormPage.
+
+    src/app/admin/clients/admin-client-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-client-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing block. The block may have been closed earlier. If you meant to write the } character, you should use the "&#125;" HTML entity instead. [plugin angular-compiler]
+
+    src/app/admin/employees/admin-employee-form-page.html:5:16:
+      5 Ôöé                 }
+        ÔòÁ                 ^
+
+  Error occurs in the template of component AdminEmployeeFormPage.
+
+    src/app/admin/employees/admin-employee-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-employee-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "button". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/employees/admin-employee-form-page.html:7:12:
+      7 Ôöé             </button>
+        ÔòÁ             ~~~~~~~~~
+
+  Error occurs in the template of component AdminEmployeeFormPage.
+
+    src/app/admin/employees/admin-employee-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-employee-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/employees/admin-employee-form-page.html:8:8:
+      8 Ôöé         </div>
+        ÔòÁ         ~~~~~~
+
+  Error occurs in the template of component AdminEmployeeFormPage.
+
+    src/app/admin/employees/admin-employee-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-employee-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "form". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/employees/admin-employee-form-page.html:9:4:
+      9 Ôöé     </form>
+        ÔòÁ     ~~~~~~~
+
+  Error occurs in the template of component AdminEmployeeFormPage.
+
+    src/app/admin/employees/admin-employee-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-employee-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/orders/admin-order-form-page.html:1:8:
+      1 Ôöé         </div>
+        ÔòÁ         ~~~~~~
+
+  Error occurs in the template of component AdminOrderFormPage.
+
+    src/app/admin/orders/admin-order-form-page.ts:20:17:
+      20 Ôöé     templateUrl: './admin-order-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing block. The block may have been closed earlier. If you meant to write the } character, you should use the "&#125;" HTML entity instead. [plugin angular-compiler]
+
+    src/app/admin/orders/admin-order-form-page.html:2:8:
+      2 Ôöé         }
+        ÔòÁ         ^
+
+  Error occurs in the template of component AdminOrderFormPage.
+
+    src/app/admin/orders/admin-order-form-page.ts:20:17:
+      20 Ôöé     templateUrl: './admin-order-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "form". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/orders/admin-order-form-page.html:13:4:
+      13 Ôöé     </form>
+         ÔòÁ     ~~~~~~~
+
+  Error occurs in the template of component AdminOrderFormPage.
+
+    src/app/admin/orders/admin-order-form-page.ts:20:17:
+      20 Ôöé     templateUrl: './admin-order-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/orders/admin-order-form-page.html:14:0:
+      14 Ôöé </div>
+         ÔòÁ ~~~~~~
+
+  Error occurs in the template of component AdminOrderFormPage.
+
+    src/app/admin/orders/admin-order-form-page.ts:20:17:
+      20 Ôöé     templateUrl: './admin-order-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing block. The block may have been closed earlier. If you meant to write the } character, you should use the "&#125;" HTML entity instead. [plugin angular-compiler]
+
+    src/app/admin/suppliers/admin-supplier-form-page.html:5:16:
+      5 Ôöé                 }
+        ÔòÁ                 ^
+
+  Error occurs in the template of component AdminSupplierFormPage.
+
+    src/app/admin/suppliers/admin-supplier-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-supplier-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "button". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/suppliers/admin-supplier-form-page.html:7:12:
+      7 Ôöé             </button>
+        ÔòÁ             ~~~~~~~~~
+
+  Error occurs in the template of component AdminSupplierFormPage.
+
+    src/app/admin/suppliers/admin-supplier-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-supplier-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/suppliers/admin-supplier-form-page.html:8:8:
+      8 Ôöé         </div>
+        ÔòÁ         ~~~~~~
+
+  Error occurs in the template of component AdminSupplierFormPage.
+
+    src/app/admin/suppliers/admin-supplier-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-supplier-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG5002: Unexpected closing tag "form". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags [plugin angular-compiler]
+
+    src/app/admin/suppliers/admin-supplier-form-page.html:9:4:
+      9 Ôöé     </form>
+        ÔòÁ     ~~~~~~~
+
+  Error occurs in the template of component AdminSupplierFormPage.
+
+    src/app/admin/suppliers/admin-supplier-form-page.ts:11:17:
+      11 Ôöé     templateUrl: './admin-supplier-form-page.html',
+         ÔòÁ                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+

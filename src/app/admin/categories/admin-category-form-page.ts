@@ -20,6 +20,7 @@ export class AdminCategoryFormPage implements OnInit {
         name: '',
         slug: '',
         description: '',
+        icon: '',
         type: 'product',
         is_active: true,
     });
@@ -38,6 +39,7 @@ export class AdminCategoryFormPage implements OnInit {
                     name: data.name,
                     slug: data.slug,
                     description: data.description || '',
+                    icon: data.icon || '',
                     type: data.type,
                     is_active: data.is_active,
                 });

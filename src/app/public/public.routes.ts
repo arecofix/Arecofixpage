@@ -88,6 +88,14 @@ export const publicRoutes: Routes = [
         title: 'Cursos',
         path: 'cursos',
         loadComponent: () =>
+          import('@app/public/cursos/cursos').then(
+            (m) => m.CursosComponent
+          ),
+      },
+      {
+        title: 'Checkout',
+        path: 'checkout',
+        loadComponent: () =>
           import('@app/public/checkout/checkout-page').then(
             (m) => m.CheckoutPage
           ),
@@ -98,6 +106,14 @@ export const publicRoutes: Routes = [
         loadComponent: () =>
           import('@app/public/posts/post-page').then(
             (m) => m.PostPage
+          ),
+      },
+      {
+        title: 'Seguimiento de Reparación',
+        path: 'tracking/:code',
+        loadComponent: () =>
+          import('@app/public/tracking/tracking-page').then(
+            (m) => m.TrackingPage
           ),
       },
     ],

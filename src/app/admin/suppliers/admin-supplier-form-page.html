@@ -7,7 +7,7 @@
     </div>
 
     <form (ngSubmit)="save()">
-        <div class="admin-form-section">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             @if (error()) {
             <div class="alert alert-error mb-6">
                 <i class="fas fa-exclamation-circle"></i>
@@ -16,48 +16,48 @@
             }
 
             <div class="mb-4">
-                <label class="admin-form-label">Nombre</label>
-                <input type="text" [(ngModel)]="form().name" name="name" class="admin-form-input" required>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
+                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" required>
             </div>
 
-            <div class="admin-form-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="admin-form-label">Tipo</label>
-                    <input type="text" [(ngModel)]="form().type" name="type" class="admin-form-input"
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipo</label>
+                    <input type="text" [(ngModel)]="form().type" name="type" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
                         placeholder="Ej: Mayorista, Fabricante">
                 </div>
                 <div>
-                    <label class="admin-form-label">Rubro</label>
-                    <input type="text" [(ngModel)]="form().rubro" name="rubro" class="admin-form-input"
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Rubro</label>
+                    <input type="text" [(ngModel)]="form().rubro" name="rubro" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
                         placeholder="Ej: Electrónica">
                 </div>
             </div>
 
-            <div class="admin-form-grid mt-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                 <div>
-                    <label class="admin-form-label">CUIL/CUIT</label>
-                    <input type="text" [(ngModel)]="form().cuil" name="cuil" class="admin-form-input">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">CUIL/CUIT</label>
+                    <input type="text" [(ngModel)]="form().cuil" name="cuil" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
                 </div>
                 <div>
-                    <label class="admin-form-label">Teléfono</label>
-                    <input type="text" [(ngModel)]="form().phone" name="phone" class="admin-form-input">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
+                    <input type="text" [(ngModel)]="form().phone" name="phone" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
                 </div>
             </div>
 
             <div class="mt-4">
-                <label class="admin-form-label">Email</label>
-                <input type="email" [(ngModel)]="form().email" name="email" class="admin-form-input">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                <input type="email" [(ngModel)]="form().email" name="email" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
             </div>
 
             <div class="mt-4">
-                <label class="admin-form-label">Dirección</label>
-                <input type="text" [(ngModel)]="form().address" name="address" class="admin-form-input">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Dirección</label>
+                <input type="text" [(ngModel)]="form().address" name="address" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
             </div>
 
             <div class="mt-6">
-                <label class="admin-form-checkbox-container w-fit">
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer w-fit">
                     <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
-                        class="checkbox checkbox-primary admin-form-checkbox">
+                        class="checkbox checkbox-primary h-5 w-5 rounded border-gray-300">
                     <span class="font-medium text-gray-700">Activo</span>
                 </label>
             </div>

@@ -7,7 +7,7 @@
     </div>
 
     <form (ngSubmit)="save()">
-        <div class="admin-form-section">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             @if (error()) {
             <div class="alert alert-error mb-6">
                 <i class="fas fa-exclamation-circle"></i>
@@ -16,25 +16,41 @@
             }
 
             <div class="mb-4">
-                <label class="admin-form-label">Nombre</label>
-                <input type="text" [(ngModel)]="form().name" name="name" class="admin-form-input" required>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
+                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" required>
             </div>
 
             <div class="mb-4">
-                <label class="admin-form-label">Slug (URL)</label>
-                <input type="text" [(ngModel)]="form().slug" name="slug" class="admin-form-input"
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Slug (URL)</label>
+                <input type="text" [(ngModel)]="form().slug" name="slug" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
                     placeholder="Se genera automáticamente si se deja vacío">
             </div>
 
             <div class="mb-4">
-                <label class="admin-form-label">Descripción</label>
-                <textarea [(ngModel)]="form().description" name="description" class="admin-form-textarea"
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Descripción</label>
+                <textarea [(ngModel)]="form().description" name="description" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
                     rows="4"></textarea>
             </div>
 
             <div class="mb-4">
-                <label class="admin-form-label">Tipo</label>
-                <select [(ngModel)]="form().type" name="type" class="admin-form-select">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Icono (Font Awesome)</label>
+                <div class="flex gap-4">
+                    <input type="text" [(ngModel)]="form().icon" name="icon" class="flex-1 bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                        placeholder="Ej: fas fa-mobile-alt">
+                    <div class="w-12 h-10 flex items-center justify-center bg-gray-100 rounded-lg border border-gray-200">
+                        @if (form().icon) {
+                            <i [class]="form().icon" class="text-xl text-gray-700"></i>
+                        } @else {
+                            <span class="text-xs text-gray-400">N/A</span>
+                        }
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Usa clases de Font Awesome (ej: fas fa-mobile-alt, fas fa-laptop)</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipo</label>
+                <select [(ngModel)]="form().type" name="type" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
                     <option value="product">Producto</option>
                     <option value="course">Curso</option>
                     <option value="service">Servicio</option>
@@ -42,9 +58,9 @@
             </div>
 
             <div class="mt-6">
-                <label class="admin-form-checkbox-container w-fit">
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer w-fit">
                     <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
-                        class="checkbox checkbox-primary admin-form-checkbox">
+                        class="checkbox checkbox-primary h-5 w-5 rounded border-gray-300">
                     <span class="font-medium text-gray-700">Activo</span>
                 </label>
             </div>

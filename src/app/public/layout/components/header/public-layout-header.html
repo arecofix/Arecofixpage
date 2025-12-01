@@ -225,18 +225,18 @@
         @if (user) {
         <li>
           <a routerLink="/perfil" class="flex items-center gap-2">
-            <i class="fas fa-user-circle text-[#2c3454]"></i>
+            <i class="fas fa-user-circle"></i>
             <span class="flex-1 min-w-0">
               <span class="block text-sm leading-tight">Mi Perfil</span>
               <span class="block text-xs text-gray-500 truncate" [title]="user?.email">{{ user?.email }}</span>
             </span>
           </a>
         </li>
-        <li><button (click)="logout()"><i class="fas fa-sign-out-alt text-[#2c3454]"></i> Cerrar Sesión</button></li>
-        <li><a routerLink="/admin"><i class="fas fa-user-plus text-[#2c3454]"></i> Admin</a></li>
+        <li><button (click)="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button></li>
+        <li><a routerLink="/admin"><i class="fas fa-user-plus"></i> Admin</a></li>
         } @else {
-        <li><a routerLink="/login"><i class="fas fa-sign-in-alt text-[#2c3454]"></i> Iniciar Sesión</a></li>
-        <li><a routerLink="/register"><i class="fas fa-user-plus text-[#2c3454]"></i> Registrarse</a></li>
+        <li><a routerLink="/login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
+        <li><a routerLink="/register"><i class="fas fa-user-plus"></i> Registrarse</a></li>
         }
       </ul>
     </div>

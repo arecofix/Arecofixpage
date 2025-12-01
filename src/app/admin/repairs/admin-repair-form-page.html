@@ -67,28 +67,60 @@
                 <label class="label">
                     <span class="label-text font-medium">Accesorios Recibidos</span>
                 </label>
-                <div class="flex flex-wrap gap-4">
-                    <label class="cursor-pointer label">
-                        <span class="label-text mr-2">Cargador</span>
-                        <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger"
-                            class="checkbox" />
+                <div class="flex flex-wrap gap-3">
+                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
+                        [class.bg-blue-50]="form().checklist.charger"
+                        [class.border-blue-500]="form().checklist.charger"
+                        [class.text-blue-700]="form().checklist.charger"
+                        [class.bg-white]="!form().checklist.charger"
+                        [class.border-gray-200]="!form().checklist.charger">
+                        <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger" 
+                            class="hidden" />
+                        <span class="font-medium">Cargador</span>
                     </label>
-                    <label class="cursor-pointer label">
-                        <span class="label-text mr-2">Batería</span>
-                        <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery"
-                            class="checkbox" />
+
+                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
+                        [class.bg-blue-50]="form().checklist.battery"
+                        [class.border-blue-500]="form().checklist.battery"
+                        [class.text-blue-700]="form().checklist.battery"
+                        [class.bg-white]="!form().checklist.battery"
+                        [class.border-gray-200]="!form().checklist.battery">
+                        <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery" 
+                            class="hidden" />
+                        <span class="font-medium">Batería</span>
                     </label>
-                    <label class="cursor-pointer label">
-                        <span class="label-text mr-2">Chip</span>
-                        <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" class="checkbox" />
+
+                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
+                        [class.bg-blue-50]="form().checklist.chip"
+                        [class.border-blue-500]="form().checklist.chip"
+                        [class.text-blue-700]="form().checklist.chip"
+                        [class.bg-white]="!form().checklist.chip"
+                        [class.border-gray-200]="!form().checklist.chip">
+                        <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" 
+                            class="hidden" />
+                        <span class="font-medium">Chip</span>
                     </label>
-                    <label class="cursor-pointer label">
-                        <span class="label-text mr-2">Tarjeta SD</span>
-                        <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" class="checkbox" />
+
+                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
+                        [class.bg-blue-50]="form().checklist.sd"
+                        [class.border-blue-500]="form().checklist.sd"
+                        [class.text-blue-700]="form().checklist.sd"
+                        [class.bg-white]="!form().checklist.sd"
+                        [class.border-gray-200]="!form().checklist.sd">
+                        <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" 
+                            class="hidden" />
+                        <span class="font-medium">Tarjeta SD</span>
                     </label>
-                    <label class="cursor-pointer label">
-                        <span class="label-text mr-2">Funda</span>
-                        <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" class="checkbox" />
+
+                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
+                        [class.bg-blue-50]="form().checklist.case"
+                        [class.border-blue-500]="form().checklist.case"
+                        [class.text-blue-700]="form().checklist.case"
+                        [class.bg-white]="!form().checklist.case"
+                        [class.border-gray-200]="!form().checklist.case">
+                        <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" 
+                            class="hidden" />
+                        <span class="font-medium">Funda</span>
                     </label>
                 </div>
             </div>
@@ -318,27 +350,29 @@
                 </div>
 
                 <div class="space-y-2">
-                    <div>
-                        <div class="font-bold text-[9px] border-b border-gray-200 mb-0.5">CLIENTE</div>
-                        <div class="text-[10px] leading-tight">{{ form().customer_name }}</div>
+                    <div class="border border-gray-300 rounded p-1">
+                        <div class="text-[9px]">
+                            <div class="flex justify-between"><span class="font-bold">Cliente:</span> <span class="truncate ml-1">{{ form().customer_name }}</span></div>
+                            <div class="flex justify-between"><span class="font-bold">Equipo:</span> <span class="truncate ml-1">{{ form().device_model }}</span></div>
+                        </div>
                     </div>
 
-                    <div>
-                        <div class="font-bold text-[9px] border-b border-gray-200 mb-0.5">EQUIPO</div>
-                        <div class="text-[10px] leading-tight">{{ form().device_model }}</div>
+                    <div class="border border-gray-300 rounded p-1">
+                        <div class="text-[9px]">
+                            <div class="flex justify-between"><span class="font-bold">Presupuesto:</span> <span>$ {{ form().estimated_cost }}</span></div>
+                            <div class="flex justify-between"><span class="font-bold">Seña:</span> <span>$ {{ form().deposit_amount }}</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-auto pt-2">
-                <div class="text-[6px] text-justify leading-none mb-2 text-gray-500 border-t border-gray-200 pt-1">
-                    CONDICIONES: El equipo se recibe para revisión/reparación. La empresa no se responsabiliza por pérdida de información. Pasados los 90 días se considerará abandonado. Garantía sobre la reparación realizada únicamente.
+            <!-- Conditions & Footer -->
+            <div class="mt-2 pt-2 border-t border-gray-300">
+                <div class="text-[8px] text-gray-500 text-justify leading-tight mb-2">
+                    CONDICIONES: La empresa no se responsabiliza por la pérdida de información. Pasados los 90 días el equipo se considerará abandonado. La garantía cubre únicamente la reparación realizada y por un plazo de 30 días. No cubre daños por mal uso, golpes o humedad.
                 </div>
-                <div class="text-center">
-                    <div class="text-[8px] italic mb-2 font-bold">Este talón deberá ser presentado indefectiblemente para retirar el equipo.</div>
-                    <div class="border-t border-black pt-1 text-[9px] font-bold">
-                        RETIRO: ........................
-                    </div>
+                <div class="text-center font-bold text-[10px]">
+                    Este talón deberá ser presentado indefectiblemente para retirar el equipo.
                 </div>
             </div>
         </div>
