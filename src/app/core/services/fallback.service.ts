@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { iProduct } from '@app/public/products/interfaces';
+import { Product } from '@app/public/products/interfaces';
 
 @Injectable({
     providedIn: 'root'
 })
 export class FallbackService {
 
-    private readonly fallbackProducts: iProduct[] = [
+    private readonly fallbackProducts: Product[] = [
         {
             id: '1001',
             category_id: '0',
@@ -39,11 +39,11 @@ export class FallbackService {
         }
     ];
 
-    getFallbackProduct(slug: string): iProduct | undefined {
+    getFallbackProduct(slug: string): Product | undefined {
         return this.fallbackProducts.find(p => p.slug === slug);
     }
 
-    getAllFallbackProducts(): iProduct[] {
+    getAllFallbackProducts(): Product[] {
         return [...this.fallbackProducts];
     }
 

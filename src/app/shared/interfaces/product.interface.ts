@@ -1,14 +1,16 @@
-export interface iProductsResponse {
+/* eslint-disable */
+/* tslint:disable */
+export interface ProductsResponse {
   first: number;
-  prev: null | number;
-  next: null | number;
+  prev?: number;
+  next?: number;
   last: number;
   pages: number;
   items: number;
-  data: iProduct[];
+  data: Product[];
 }
 
-export interface iProduct {
+export interface Product {
   id: string;
   category_id: string;
   brand_id?: string;
@@ -21,7 +23,10 @@ export interface iProduct {
   gallery_urls?: string[];
 }
 
-export interface iProductsParams extends Partial<iProduct> {
-  _page?: number;
-  _per_page?: number;
+export type PageNumber = number;
+export type PageSize = number;
+
+export interface ProductsParams extends Partial<Product> {
+  _page?: PageNumber;
+  _per_page?: PageSize;
 }

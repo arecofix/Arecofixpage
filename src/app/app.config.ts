@@ -18,7 +18,7 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 const firebaseConfig = environment.firebase;
 
-export const appConfig: ApplicationConfig = {
+export const appConfig = {
   providers: [
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },

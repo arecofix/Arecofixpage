@@ -1,29 +1,34 @@
 <!-- Hero Section -->
-<div class="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white overflow-hidden">
-  <div class="absolute inset-0 bg-black/30"></div>
-  <div
-    class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2000')] bg-cover bg-center opacity-20">
-  </div>
+<div class="relative bg-gray-900 text-white py-12 mb-8 overflow-hidden">
+  <div class="absolute inset-0 opacity-20 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
+  <!-- Decorative circles -->
+  <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
+  
+  <div class="relative container mx-auto px-4">
+    <div class="max-w-3xl">
+      <!-- Breadcrumbs -->
+      <div class="text-sm breadcrumbs text-gray-300 mb-4">
+        <ul>
+          <li><a routerLink="/">Inicio</a></li>
+          <li class="font-semibold text-white">Cursos</li>
+        </ul>
+      </div>
 
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-    <div class="text-center">
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-        Formación Profesional en
-        <span class="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400">
-          Reparación de Dispositivos
-        </span>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+        Formación Profesional
       </h1>
-      <p class="text-xl sm:text-2xl text-gray-200 max-w-3xl mx-auto mb-8">
-        Conviértete en un técnico certificado con nuestros cursos prácticos y profesionales
+      <p class="text-lg text-gray-300 max-w-2xl leading-relaxed">
+        Conviértete en un técnico certificado con nuestros cursos prácticos y profesionales en reparación de dispositivos.
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      
+      <div class="mt-8 flex flex-wrap gap-4">
         <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20información%20sobre%20los%20cursos'"
-          class="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition shadow-lg">
-          <i class="fab fa-whatsapp mr-2 text-xl"></i>
+          class="btn btn-primary border-none bg-green-600 hover:bg-green-500 text-white">
+          <i class="fab fa-whatsapp mr-2 text-lg"></i>
           Consultar por WhatsApp
         </a>
-        <a href="#cursos"
-          class="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg transition border border-white/30">
+        <a href="#cursos" class="btn btn-outline text-white hover:bg-white hover:text-gray-900">
           Ver Cursos Disponibles
         </a>
       </div>
@@ -32,17 +37,16 @@
 </div>
 
 <!-- Benefits Section -->
-<section class="py-16 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">¿Por qué elegir Arecofix?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<section class="py-12 bg-gray-50 dark:bg-gray-800">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       @for (benefit of benefits; track benefit.icon) {
-      <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition text-center">
-        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="fas {{benefit.icon}} text-3xl text-indigo-600"></i>
+      <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600 hover:shadow-md transition text-center">
+        <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas {{benefit.icon}} text-2xl text-indigo-600 dark:text-indigo-400"></i>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">{{benefit.title}}</h3>
-        <p class="text-gray-600">{{benefit.description}}</p>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{benefit.title}}</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300">{{benefit.description}}</p>
       </div>
       }
     </div>
@@ -50,11 +54,11 @@
 </section>
 
 <!-- Courses Catalog -->
-<section id="cursos" class="py-16 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Nuestros Cursos</h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+<section id="cursos" class="py-16 bg-white dark:bg-gray-900">
+  <div class="container mx-auto px-4">
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Nuestros Cursos</h2>
+      <p class="text-gray-600 dark:text-gray-400">
         Programas diseñados para llevarte desde principiante hasta profesional
       </p>
     </div>
@@ -63,13 +67,12 @@
     @if (loading) {
     <div class="flex justify-center items-center py-20">
       <span class="loading loading-spinner loading-lg text-indigo-600"></span>
-      <span class="ml-3 text-lg text-gray-600">Cargando cursos...</span>
     </div>
     }
 
     <!-- Error State -->
     @if (error) {
-    <div class="text-center py-10 text-red-600">
+    <div class="text-center py-10 text-red-600 dark:text-red-400">
       <p>{{error}}</p>
     </div>
     }
@@ -78,52 +81,44 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @for (course of courses; track course.id) {
       <div
-        class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 group">
         <!-- Course Image -->
         <div class="relative h-48 overflow-hidden">
-          <img [src]="course.image_url" [alt]="course.title" class="w-full h-full object-cover">
-          <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+          <img [src]="course.image_url" [alt]="course.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg">
             {{course.level}}
           </div>
         </div>
         <!-- Course Content -->
         <div class="p-6">
-          <h3 class="text-xl font-bold text-gray-900 mb-2">{{course.title}}</h3>
-          <p class="text-gray-600 mb-4 line-clamp-3">{{course.description}}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{course.title}}</h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 text-sm">{{course.description}}</p>
           <!-- Course Info -->
-          <div class="space-y-2 mb-4">
-            <div class="flex items-center text-sm text-gray-600">
-              <i class="fas fa-clock mr-2 text-indigo-600"></i>
-              <span>Duración: {{course.duration}}</span>
+          <div class="space-y-2 mb-6 border-t border-gray-100 dark:border-gray-700 pt-4">
+            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <i class="fas fa-clock w-6 text-center text-indigo-600 dark:text-indigo-400"></i>
+              <span>{{course.duration}}</span>
             </div>
-            <div class="flex items-center text-sm text-gray-600">
-              <i class="fas fa-calendar-alt mr-2 text-indigo-600"></i>
+            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <i class="fas fa-calendar-alt w-6 text-center text-indigo-600 dark:text-indigo-400"></i>
               <span>{{course.schedule}}</span>
             </div>
-            <div class="flex items-center text-sm text-gray-600">
-              <i class="fas fa-users mr-2 text-indigo-600"></i>
+            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <i class="fas fa-users w-6 text-center text-indigo-600 dark:text-indigo-400"></i>
               <span>{{course.students}} estudiantes</span>
             </div>
           </div>
-          <!-- Rating -->
-          <div class="flex items-center mb-4">
-            <div class="flex text-yellow-400">
-              @for (star of [1,2,3,4,5]; track star) {
-              <i class="fas fa-star" [class.text-gray-300]="star > (course.rating || 0)"></i>
-              }
-            </div>
-            <span class="ml-2 text-sm text-gray-600">({{course.rating}})</span>
-          </div>
+          
           <!-- Price and CTA -->
-          <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-between mt-auto">
             <div>
-              <span class="text-2xl font-bold text-indigo-600">{{course.price | currency}}</span>
-              <span class="text-sm text-gray-500 block">por mes</span>
+              <span class="text-2xl font-bold text-gray-900 dark:text-white">{{course.price | currency}}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 block">por mes</span>
             </div>
-            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20información%20sobre%20' + course.title"
-              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition">
+            <button (click)="openRegistration(course)"
+              class="px-4 py-2 bg-gray-900 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors shadow-sm">
               Inscribirme
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -134,44 +129,41 @@
 </section>
 
 <!-- Testimonials -->
-<section class="py-16 bg-gray-900 text-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl font-bold text-center mb-12">Lo que dicen nuestros egresados</h2>
+<section class="py-16 bg-gray-50 dark:bg-gray-800">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Lo que dicen nuestros egresados</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-gray-800 p-6 rounded-xl">
-        <div class="flex items-center mb-4">
+      <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600">
+        <div class="flex items-center mb-6">
           <img src="assets/img/cursos/egresado-2025.jpg" alt="Tobias Marchi"
-            class="w-16 h-16 rounded-full object-cover mr-4">
+            class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-indigo-100 dark:ring-indigo-900">
           <div>
-            <h4 class="font-bold">Tobias Marchi</h4>
-            <p class="text-sm text-gray-400">Egresado 2025</p>
+            <h4 class="font-bold text-gray-900 dark:text-white">Tobias Marchi</h4>
+            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Egresado 2025</p>
           </div>
         </div>
-        <p class="text-gray-300">"Gracias al curso pude abrir mi propio taller. Los profesores son excelentes y
-          el equipamiento es de primera."</p>
+        <p class="text-gray-600 dark:text-gray-300 italic">"Gracias al curso pude abrir mi propio taller. Los profesores son excelentes y el equipamiento es de primera."</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl">
-        <div class="flex items-center mb-4">
+      <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600">
+        <div class="flex items-center mb-6">
           <img src="assets/img/cursos/alumno2.jpg" alt="María González"
-            class="w-16 h-16 rounded-full object-cover mr-4">
+            class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-indigo-100 dark:ring-indigo-900">
           <div>
-            <h4 class="font-bold">María González</h4>
-            <p class="text-sm text-gray-400">Egresada 2024</p>
+            <h4 class="font-bold text-gray-900 dark:text-white">María González</h4>
+            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Egresada 2024</p>
           </div>
         </div>
-        <p class="text-gray-300">"La formación es muy completa y práctica. En 6 meses ya estaba trabajando de
-          forma independiente."</p>
+        <p class="text-gray-600 dark:text-gray-300 italic">"La formación es muy completa y práctica. En 6 meses ya estaba trabajando de forma independiente."</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl">
-        <div class="flex items-center mb-4">
-          <img src="assets/img/cursos/alumno3.jpg" alt="Juan Pérez" class="w-16 h-16 rounded-full object-cover mr-4">
+      <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600">
+        <div class="flex items-center mb-6">
+          <img src="assets/img/cursos/alumno3.jpg" alt="Juan Pérez" class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-indigo-100 dark:ring-indigo-900">
           <div>
-            <h4 class="font-bold">Juan Pérez</h4>
-            <p class="text-sm text-gray-400">Egresado 2024</p>
+            <h4 class="font-bold text-gray-900 dark:text-white">Juan Pérez</h4>
+            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Egresado 2024</p>
           </div>
         </div>
-        <p class="text-gray-300">"El mejor curso de reparación que he tomado. Aprendí técnicas que no se enseñan
-          en ningún otro lugar."</p>
+        <p class="text-gray-600 dark:text-gray-300 italic">"El mejor curso de reparación que he tomado. Aprendí técnicas que no se enseñan en ningún otro lugar."</p>
       </div>
     </div>
   </div>
@@ -181,7 +173,7 @@
 <section class="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿Listo para comenzar tu carrera?</h2>
-    <p class="text-xl mb-8">Inscríbete ahora y obtén un 10% de descuento en tu primer mes</p>
+    <p class="text-xl mb-8 text-indigo-100">Inscríbete ahora y obtén un 10% de descuento en tu primer mes</p>
     <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20inscribirme%20a%20un%20curso'"
       class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
       <i class="fab fa-whatsapp mr-2 text-2xl"></i>
@@ -190,35 +182,93 @@
   </div>
 </section>
 
-<!-- Divider -->
-<div class="divider"></div>
-
 <!-- Productos de la categoría Cursos -->
-<section class="py-16 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Productos para Estudiantes</h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+<section class="py-16 bg-white dark:bg-gray-900">
+  <div class="container mx-auto px-4">
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Productos para Estudiantes</h2>
+      <p class="text-gray-600 dark:text-gray-400">
         Herramientas y accesorios recomendados para potenciar tu aprendizaje
       </p>
     </div>
 
     @if (productsRs.isLoading()) {
     <is-loading />
-    } @else if (!productsRs.hasValue()) {
-    <is-empty />
     } @else if (productsRs.error()) {
     <is-error />
-    } @else if (productsRs.hasValue()) { @if (paginationData()) {
-    <pagination [pages]="productsRs.value().pages" [currentPage]="paginationService.currentPage()" />
-    }
-
-    <div class="divider"></div>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-      @for (product of productsRs.value().data; track $index) {
-      <product-card [product]="product" />
+    } @else if (productsRs.hasValue()) { 
+      @if (productsRs.value().data.length === 0) {
+        <is-empty />
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          @for (product of productsRs.value().data; track $index) {
+          <product-card [product]="product" />
+          }
+        </div>
+        
+        @if (paginationData()) {
+          <div class="mt-12 flex justify-center">
+            <pagination [pages]="productsRs.value().pages" [currentPage]="paginationService.currentPage()" />
+          </div>
+        }
       }
-    </div>
     }
   </div>
 </section>
+
+<!-- Registration Modal (Keep existing logic) -->
+@if (showRegistrationModal) {
+<div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" (click)="closeRegistration()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+      <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+              Inscripción al curso: {{selectedCourse?.title}}
+            </h3>
+            <div class="mt-2">
+              @if (registrationSuccess) {
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                  <strong class="font-bold">¡Registro exitoso!</strong>
+                  <span class="block sm:inline"> Te contactaremos pronto.</span>
+                </div>
+              } @else {
+                <form class="space-y-4 mt-4">
+                  <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Completo</label>
+                    <input type="text" id="full_name" [(ngModel)]="registrationForm.full_name" name="full_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                  </div>
+                  <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                    <input type="email" id="email" [(ngModel)]="registrationForm.email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                  </div>
+                  <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono / WhatsApp</label>
+                    <input type="tel" id="phone" [(ngModel)]="registrationForm.phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                  </div>
+                  @if (registrationError) {
+                    <p class="text-red-500 text-sm">{{registrationError}}</p>
+                  }
+                </form>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        @if (!registrationSuccess) {
+          <button type="button" (click)="submitRegistration()" [disabled]="registering" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+            {{ registering ? 'Enviando...' : 'Enviar Inscripción' }}
+          </button>
+        }
+        <button type="button" (click)="closeRegistration()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-600 dark:text-white dark:border-gray-500 dark:hover:bg-gray-500">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

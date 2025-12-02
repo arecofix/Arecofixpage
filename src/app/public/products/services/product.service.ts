@@ -5,9 +5,9 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import {
-  iProductsParams,
-  iProductsResponse,
-  iProduct,
+  ProductsParams,
+  ProductsResponse,
+  Product,
 } from '@app/public/products/interfaces';
 
 @Injectable({
@@ -21,7 +21,7 @@ export class ProductService {
     this.supabase = this.authService.getSupabaseClient();
   }
 
-  public getData(params: iProductsParams = {}): Observable<iProductsResponse> {
+  public getData(params: ProductsParams = {}): Observable<ProductsResponse> {
     const {
       _page = 1,
       _per_page = 10,
@@ -66,26 +66,26 @@ export class ProductService {
         const productsRaw = (data as any[]) || [];
         const products = productsRaw.map((p: any) => ({
           ...p,
-          // Normaliza el nombre del campo para coincidir con la interfaz iProduct
+          // Normaliza el nombre del campo para coincidir con la interfaz Product
           featured: p?.featured ?? p?.is_featured ?? false,
         }));
 
         return {
           first: 1,
-          prev: _page > 1 ? _page - 1 : null,
-          next: _page < pages ? _page + 1 : null,
+          prev: _page > 1 ? _page - 1 : undefined,
+          next: _page < pages ? _page + 1 : undefined,
           last: pages,
           pages,
           items: totalItems,
-          data: (products as iProduct[]) || [],
+          data: (products as Product[]) || [],
         };
       }),
       catchError((err) => {
         this.logger.error('Supabase product query error', err);
         return of({
           first: 1,
-          prev: null,
-          next: null,
+          prev: undefined,
+          next: undefined,
           last: 1,
           pages: 1,
           items: 0,

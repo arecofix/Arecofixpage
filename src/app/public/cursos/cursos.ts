@@ -14,7 +14,7 @@ import { ProductService } from '@app/public/products/services';
 import { ProductCard } from '@app/public/products/components';
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
 import { iCategoriesResponse } from '@app/public/categories/interfaces';
-import { iProductsResponse } from '@app/public/products/interfaces';
+import { ProductsResponse } from '@app/public/products/interfaces';
 import { environment } from '../../../environments/environment';
 
 @Component({

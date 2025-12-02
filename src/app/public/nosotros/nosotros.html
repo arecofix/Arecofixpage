@@ -1,165 +1,210 @@
-<div class="nosotros-container">
-  <!-- Header/Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">{{ currentContent.title }}</h1>
-      <p class="hero-subtitle">{{ currentContent.subtitle }}</p>
-      <p class="hero-intro">{{ currentContent.intro }}</p>
-    </div>
-  </section>
+<!-- Hero Section -->
+<div class="relative bg-gray-900 text-white py-20 overflow-hidden">
+  <div class="absolute inset-0 opacity-20 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
+  <!-- Decorative circles -->
+  <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
+  
+  <div class="relative container mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+      {{ currentContent.title }}
+    </h1>
+    <p class="text-xl md:text-2xl text-blue-200 mb-8 font-light">
+      {{ currentContent.subtitle }}
+    </p>
+    <p class="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+      {{ currentContent.intro }}
+    </p>
+  </div>
+</div>
 
-  <!-- History Section -->
-  <section class="history-section">
-    <div class="section-container">
-      <div class="section-content">
-        <h2 class="section-title">{{ currentContent.history }}</h2>
-        <p class="section-text">{{ currentContent.historyText }}</p>
+<!-- Stats Section -->
+<section class="py-12 bg-white dark:bg-gray-800 -mt-8 relative z-10 container mx-auto px-4 rounded-xl shadow-lg max-w-6xl">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-100 dark:divide-gray-700">
+    @for (achievement of achievements; track $index) {
+      <div class="p-4">
+        <div class="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">{{ achievement.number }}</div>
+        <div class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">{{ achievement.label }}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ achievement.description }}</div>
       </div>
-    </div>
-  </section>
+    }
+  </div>
+</section>
 
-  <!-- Video Section -->
-  <section class="video-section">
-    <div class="section-container">
-      <div class="video-wrapper">
-        <iframe width="100%" height="500" src="https://www.youtube.com/embed/l93eYkGMxsI?start=15"
-          title="YouTube video player" frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
-  </section>
-
-  <!-- Foundation Section -->
-  <section class="foundation-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.foundation }}</h2>
-      <p class="section-subtitle-text">{{ currentContent.foundationText }}</p>
-
-      <div class="mission-vision-grid">
-        <div class="mission-card">
-          <h3 class="card-title">🎯 {{ currentContent.mission }}</h3>
-          <p class="card-text">{{ currentContent.missionText }}</p>
+<!-- History & Foundation -->
+<section class="py-20 bg-gray-50 dark:bg-gray-900">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="space-y-6">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ currentContent.history }}</h2>
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          {{ currentContent.historyText }}
+        </p>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2">{{ currentContent.foundation }}</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm italic">
+            "{{ currentContent.foundationText }}"
+          </p>
         </div>
-        <div class="vision-card">
-          <h3 class="card-title">🔭 {{ currentContent.vision }}</h3>
-          <p class="card-text">{{ currentContent.visionText }}</p>
+      </div>
+      <div class="relative">
+        <div class="aspect-video rounded-xl overflow-hidden shadow-2xl">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/l93eYkGMxsI" 
+            title="Arecofix Video" frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
         </div>
+        <!-- Decorative dot pattern -->
+        <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full -z-10"></div>
+        <div class="absolute -top-6 -left-6 w-32 h-32 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -z-10"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Objectives Section -->
-  <section class="objectives-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.objectives }}</h2>
-      <p class="section-text">{{ currentContent.objectivesText }}</p>
-    </div>
-  </section>
-
-  <!-- Achievements Section -->
-  <section class="achievements-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.achievements }}</h2>
-      <div class="achievements-grid">
-        @for (achievement of achievements; track $index) {
-        <div class="achievement-card">
-          <div class="achievement-number">{{ achievement.number }}</div>
-          <h3 class="achievement-label">{{ achievement.label }}</h3>
-          <p class="achievement-description">{{ achievement.description }}</p>
+<!-- Mission & Vision -->
+<section class="py-20 bg-white dark:bg-gray-800">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Mission Card -->
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-700 p-8 rounded-2xl border border-blue-100 dark:border-gray-600">
+        <div class="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-lg">
+          🎯
         </div>
-        }
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.mission }}</h3>
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          {{ currentContent.missionText }}
+        </p>
+      </div>
+      
+      <!-- Vision Card -->
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-700 p-8 rounded-2xl border border-purple-100 dark:border-gray-600">
+        <div class="w-12 h-12 bg-purple-600 text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-lg">
+          🔭
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.vision }}</h3>
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          {{ currentContent.visionText }}
+        </p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Values Section -->
-  <section class="values-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.values }}</h2>
-      <div class="values-grid">
-        @for (value of values; track $index) {
-        <div class="value-card">
-          <div class="value-icon">{{ value.icon }}</div>
-          <h3 class="value-title">{{ value.title }}</h3>
-          <p class="value-description">{{ value.description }}</p>
-        </div>
-        }
-      </div>
+<!-- Values Section -->
+<section class="py-20 bg-gray-50 dark:bg-gray-900">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.values }}</h2>
+      <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
     </div>
-  </section>
-
-  <!-- Commitments Section -->
-  <section class="commitments-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.commitments }}</h2>
-      <div class="commitments-list">
-        @for (commitment of currentContent.commitmentsList; track $index) {
-        <div class="commitment-item">
-          <span class="commitment-icon">✓</span>
-          <span class="commitment-text">{{ commitment }}</span>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (value of values; track $index) {
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+          <div class="text-4xl mb-6">{{ value.icon }}</div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ value.title }}</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+            {{ value.description }}
+          </p>
         </div>
-        }
-      </div>
+      }
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Why Trust Us Section -->
-  <section class="trust-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.trust }}</h2>
-      <div class="trust-grid">
-        @for (point of currentContent.trustPoints; track $index) {
-        <div class="trust-card">
-          <h3 class="trust-title">{{ point.title }}</h3>
-          <p class="trust-description">{{ point.description }}</p>
+<!-- Team Section -->
+<section class="py-20 bg-white dark:bg-gray-800">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.team }}</h2>
+      <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        Conoce a las personas detrás de la tecnología.
+      </p>
+    </div>
+
+    <div class="flex justify-center">
+      @for (member of teamMembers; track $index) {
+        <div class="max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 transform hover:-translate-y-1 transition-transform duration-300">
+          <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+          <div class="px-8 pb-8">
+            <div class="relative -mt-16 mb-6">
+              <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-gray-200 shadow-lg flex items-center justify-center text-4xl">
+                <!-- Placeholder for image if not present -->
+                @if (member.image) {
+                  <img [src]="member.image" [alt]="member.name" class="w-full h-full object-cover">
+                } @else {
+                  👨‍💻
+                }
+              </div>
+            </div>
+            <div class="text-center">
+              <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ member.name }}</h3>
+              <p class="text-blue-600 dark:text-blue-400 font-medium mb-4">{{ member.role }}</p>
+              <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">
+                {{ member.bio }}
+              </p>
+              @if (member.linkedin) {
+                <a [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors">
+                  <i class="fab fa-linkedin text-2xl"></i>
+                </a>
+              }
+            </div>
+          </div>
         </div>
-        }
-      </div>
+      }
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FAQ Section -->
-  <section class="faq-section">
-    <div class="section-container">
-      <h2 class="section-title">{{ currentContent.faq }}</h2>
-      <div class="faq-container">
-        @for (faq of faqs; let i = $index; track $index) {
-        <div class="faq-item">
-          <button class="faq-question" (click)="toggleFAQ(i)" [class.open]="expandedFAQ === i" type="button"
-            [attr.aria-expanded]="expandedFAQ === i">
-            <span class="faq-question-text">{{ faq.question }}</span>
-            <span class="faq-toggle">
-              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
+<!-- FAQ Section -->
+<section class="py-20 bg-gray-50 dark:bg-gray-900">
+  <div class="container mx-auto px-4 max-w-4xl">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.faq }}</h2>
+    </div>
+
+    <div class="space-y-4">
+      @for (faq of faqs; let i = $index; track $index) {
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <button (click)="toggleFAQ(i)" 
+            class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <span class="font-semibold text-gray-900 dark:text-white">{{ faq.question }}</span>
+            <span class="transform transition-transform duration-200" [class.rotate-180]="expandedFAQ === i">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </span>
           </button>
           @if (expandedFAQ === i) {
-          <div class="faq-answer">
-            <p>{{ faq.answer }}</p>
-          </div>
+            <div class="px-6 pb-4 pt-0 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-100 dark:border-gray-700 mt-2 pt-4">
+              {{ faq.answer }}
+            </div>
           }
         </div>
-        }
-      </div>
+      }
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="section-container cta-content">
-      <h2>¿Necesitas ayuda con tu dispositivo?</h2>
-      <p>Contacta con nosotros hoy y descubre por qué miles de clientes confían en Arecofix</p>
-      <div class="cta-buttons">
-        <a href="https://wa.me/541125960900" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-          Contactar por WhatsApp
-        </a>
-        <a href="/#/contacto" class="btn btn-secondary">
-          Enviar Consulta
-        </a>
-      </div>
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-blue-900 to-indigo-900 text-white text-center">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl md:text-4xl font-bold mb-6">¿Listo para recuperar tu dispositivo?</h2>
+    <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+      Contacta con nosotros hoy y descubre por qué miles de clientes confían en Arecofix.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://wa.me/541125960900" target="_blank" 
+        class="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg">
+        <i class="fab fa-whatsapp mr-2 text-xl"></i>
+        Contactar por WhatsApp
+      </a>
+      <a routerLink="/contacto" 
+        class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
+        Enviar Consulta
+      </a>
     </div>
-  </section>
-</div>
+  </div>
+</section>

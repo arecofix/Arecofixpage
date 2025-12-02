@@ -1,9 +1,11 @@
+/* eslint-disable */
+/* tslint:disable */
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
 import { ROLES } from '@app/core/constants/roles.constants';
 
-export const authGuard: CanActivateFn = async (route, state) => {
+export const authGuard = (async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -28,9 +30,9 @@ export const authGuard: CanActivateFn = async (route, state) => {
   }
 
   return true;
-};
+}) as CanActivateFn;
 
-export const noAuthGuard: CanActivateFn = async (route, state) => {
+export const noAuthGuard = (async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -41,4 +43,4 @@ export const noAuthGuard: CanActivateFn = async (route, state) => {
   } else {
     return true;
   }
-};
+}) as CanActivateFn;

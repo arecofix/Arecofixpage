@@ -9,17 +9,21 @@ interface PortfolioContent {
   email: string;
   website: string;
   summary: string;
+  about: string;
   workExperience: WorkExperience[];
   education: Education[];
-  technicalSkills: TechnicalSkills;
+  technicalSkills: TechnicalSkill[];
   certifications: string[];
+  projects: Project[];
+  cvUrl: string;
 }
 
 interface WorkExperience {
   position: string;
   company: string;
   period: string;
-  achievements: string[];
+  description?: string;
+  achievements?: string[];
 }
 
 interface Education {
@@ -29,12 +33,20 @@ interface Education {
   details: string[];
 }
 
-interface TechnicalSkills {
-  languages: string;
-  frameworks: string;
-  technologies: string;
-  tools: string;
-  languages_spoken: string;
+interface TechnicalSkill {
+  name: string;
+  icon: string; // FontAwesome class or emoji for now
+  description: string;
+  category: 'language' | 'framework' | 'tool' | 'database' | 'os';
+}
+
+interface Project {
+  title: string;
+  description: string;
+  image: string;
+  tags: string[];
+  link?: string;
+  github?: string;
 }
 
 @Component({
@@ -46,7 +58,7 @@ interface TechnicalSkills {
 })
 export class PortfolioComponent implements OnInit {
   currentLanguage: 'en' | 'es' = 'es';
-  currentBackground: string = 'gradient-1';
+  currentBackground: string = 'gradient-5';
   sidebarOpen = false;
   fontSize: number = 16;
   highContrast = false;
@@ -54,150 +66,175 @@ export class PortfolioComponent implements OnInit {
   portfolioContent: { en: PortfolioContent; es: PortfolioContent } = {
     en: {
       name: 'EZEQUIEL ENRICO ARECO',
-      title: 'Semi-Senior Backend Engineer | Buenos Aires, Argentina',
+      title: 'Fullstack Developer',
       location: 'Buenos Aires, Argentina',
       phone: '+54 11 2596-0900',
       email: 'ezequielenrico15@gmail.com',
       website: 'www.arecofix.com.ar',
-      summary: 'IT Technician with 5+ years of experience in Backend development and electronic device repair. Specialized in Java, Python, and Node.js, with strong knowledge in AWS, Docker, and scalable system design. Focused on process automation, performance optimization, and implementation of cybersecurity best practices.',
+      cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
+      summary: 'Systems professional, Full-Stack developer. Currently working in the government technical team and experienced as an IT instructor. I enjoy teamwork and value collaboration. Seeking new professional opportunities in IT.',
+      about: 'Welcome to my online portfolio. Here you will see examples of the tools I work with as a fullstack developer. I specialize in web development using modern technologies like HTML, CSS, JavaScript, and frameworks like Django and React.',
       workExperience: [
         {
-          position: 'Backend Developer',
-          company: 'Municipality of Marcos Paz',
-          period: '2022 - 2024',
-          achievements: [
-            'Designed and implemented a registration system for the Envión program using Python and Django, reducing administrative errors by 30%.',
-            'Developed RESTful APIs for internal systems and managed PostgreSQL databases.',
-            'Implemented cloud solutions (AWS) and conducted IT workshops for 50+ beneficiaries.'
-          ]
-        },
-        {
-          position: 'Mobile Repair Instructor',
-          company: 'Eddis Educativa',
-          period: '2023 - Present',
-          achievements: [
-            'Delivered theoretical and practical classes on electronics, software, and applied programming.',
-            'Worked with SMD soldering, diagnostics, and software development for embedded systems.'
-          ]
-        },
-        {
-          position: 'Municipal Police Officer',
-          company: 'Dr. Héctor D\'Agnillo Hospital',
-          period: '2020 - 2021',
-          achievements: [
-            'Developed internal cybersecurity and data protection policies.',
-            'Supervised personnel and managed institutional security systems.'
-          ]
-        }
-      ],
-      education: [
-        {
-          degree: 'Bachelor\'s Degree in Computer Science',
-          institution: 'Universidad Nacional del Oeste',
+          position: 'Technical Team',
+          company: 'Envión Program, Municipality of Marcos Paz',
           period: '2022 - Present',
-          details: [
-            'Key project: Institutional website "Arecofix" with e-commerce integration.'
-          ]
+          description: 'Part of the technical team, managing systems and providing support.'
         },
         {
-          degree: 'Python Programming',
-          institution: 'Argentina Programa',
-          period: '2021 - 2022',
-          details: [
-            'GPA: 8.40 / 10'
-          ]
-        }
-      ],
-      technicalSkills: {
-        languages: 'Python, Java, Node.js, TypeScript, SQL',
-        frameworks: 'Django, Express, Vue.js',
-        technologies: 'AWS, Docker, RESTful APIs, PostgreSQL',
-        tools: 'Git, Linux, Bash, PowerShell, Google Cloud, Azure',
-        languages_spoken: 'Spanish (Native), English (C1 Advanced)'
-      },
-      certifications: [
-        'Database Fundamentals – City of Buenos Aires',
-        'Home Electrical Installation',
-        'Driver\'s License'
-      ]
-    },
-    es: {
-      name: 'EZEQUIEL ENRICO ARECO',
-      title: 'Ingeniero Backend Semi-Senior | Buenos Aires, Argentina',
-      location: 'Buenos Aires, Argentina',
-      phone: '+54 11 2596-0900',
-      email: 'ezequielenrico15@gmail.com',
-      website: 'www.arecofix.com.ar',
-      summary: 'Técnico en informática con más de 5 años de experiencia en desarrollo Backend y reparación de dispositivos electrónicos. Especializado en Java, Python y Node.js, con experiencia en AWS, Docker y desarrollo de sistemas escalables. Apasionado por la automatización, la optimización de procesos tecnológicos y la aplicación de buenas prácticas de ciberseguridad.',
-      workExperience: [
-        {
-          position: 'Backend Developer',
-          company: 'Municipio de Marcos Paz',
-          period: '2022 - 2024',
-          achievements: [
-            'Diseñé e implementé un sistema de registro para el programa Envión utilizando Python y Django, reduciendo errores administrativos en un 30%.',
-            'Desarrollé APIs RESTful para integración de sistemas internos y gestioné bases de datos en PostgreSQL.',
-            'Implementé soluciones en la nube (AWS) y realicé talleres de informática para más de 50 beneficiarios.'
-          ]
-        },
-        {
-          position: 'Profesor de Reparación de Celulares',
-          company: 'Eddis Educativa',
-          period: '2023 - Actualidad',
-          achievements: [
-            'Imparto clases teóricas y prácticas sobre electrónica, software y programación aplicada.',
-            'Trabajo con soldadura SMD, diagnóstico y desarrollo de software orientado a hardware.'
-          ]
-        },
-        {
-          position: 'Policía Municipal Contravencional',
-          company: 'Hospital Dr. Héctor D\'Agnillo',
+          position: 'Contraventional Police',
+          company: 'Security Secretariat',
           period: '2020 - 2021',
-          achievements: [
-            'Desarrollé políticas internas de ciberseguridad y protección de datos.',
-            'Supervisé personal y monitoreé sistemas de seguridad institucional.'
-          ]
+          description: 'Served in the security secretariat.'
+        },
+        {
+          position: 'Instructor',
+          company: 'Eddis Educativa (Morón & Marcos Paz)',
+          period: '2023 - Present',
+          description: 'Teaching IT courses including Cell Phone Repair.'
         }
       ],
       education: [
         {
           degree: 'Licenciatura en Informática',
-          institution: 'Universidad Nacional del Oeste',
-          period: '2022 - Actualidad',
+          institution: 'Universidad Nacional del Oeste (UNO)',
+          period: 'Expected 2024',
           details: [
-            'Proyecto destacado: Sitio web institucional "Arecofix" con integración de comercio electrónico.'
-          ]
-        },
-        {
-          degree: 'Programación en Python',
-          institution: 'Argentina Programa',
-          period: '2021 - 2022',
-          details: [
-            'Promedio: 8,40'
+            'Currently finishing final subjects.',
+            'Acquired knowledge in C#, HTML, CSS, JS, Python, PHP, ReactJS, SQL.'
           ]
         }
       ],
-      technicalSkills: {
-        languages: 'Python, Java, Node.js, TypeScript, SQL',
-        frameworks: 'Django, Express, Vue.js',
-        technologies: 'AWS, Docker, RESTful APIs, PostgreSQL',
-        tools: 'Git, Linux, Bash, PowerShell, Google Cloud, Azure',
-        languages_spoken: 'Español (nativo), Inglés (C1 avanzado)'
-      },
+      technicalSkills: [
+        { name: 'Python', icon: 'fab fa-python', category: 'language', description: 'Passionate about Python development, focusing on AI and Machine Learning.' },
+        { name: 'JavaScript', icon: 'fab fa-js', category: 'language', description: 'Building interactive and dynamic web applications, DOM manipulation, and API interactions.' },
+        { name: 'C# .NET', icon: 'fab fa-microsoft', category: 'language', description: 'Developed business management applications using Windows Forms and OOP.' },
+        { name: 'Django', icon: 'fas fa-leaf', category: 'framework', description: 'Creating robust dynamic websites with URL routing, templates, and DB management.' },
+        { name: 'Node.js', icon: 'fab fa-node', category: 'framework', description: 'Building REST APIs, CRUD systems, and handling authentication.' },
+        { name: 'PHP', icon: 'fab fa-php', category: 'language', description: 'Developing robust web apps with frameworks like Laravel.' },
+        { name: 'Docker', icon: 'fab fa-docker', category: 'tool', description: 'Containerization for consistent development and deployment environments.' },
+        { name: 'Git', icon: 'fab fa-git-alt', category: 'tool', description: 'Version control and collaboration.' },
+        { name: 'MySQL', icon: 'fas fa-database', category: 'database', description: 'Relational database management.' },
+        { name: 'Linux', icon: 'fab fa-linux', category: 'os', description: 'Server management and command line proficiency.' }
+      ],
       certifications: [
-        'Fundamentos de Bases de Datos – Ciudad de Buenos Aires',
-        'Instalación Eléctrica Domiciliaria',
-        'Licencia de Conducir'
+        'Codo a Codo Fullstack Python (2022)',
+        'JavaScript, ReactJS, SQL - Coderhouse (2021)',
+        'Database Course - Udemy (2021)',
+        'Full-Stack Web Developer - LinkedIn Learning (2020)',
+        'English B2 (Advanced)'
+      ],
+      projects: [
+        {
+          title: 'Arecofix Page',
+          description: 'Institutional website and e-commerce for Arecofix. Built with Angular and Tailwind CSS.',
+          image: '/assets/img/projects/arecofix.png',
+          tags: ['Angular', 'Tailwind', 'TypeScript'],
+          link: 'https://arecofix.com.ar'
+        },
+        {
+          title: 'Management System',
+          description: 'Desktop application for business management developed in C# .NET.',
+          image: 'assets/img/projects/panel.png',
+          tags: ['C#', '.NET', 'SQL Server']
+        },
+        {
+          title: 'Envión Registration',
+          description: 'Web platform for beneficiary registration using Django and Python.',
+          image: 'assets/img/projects/data.png',
+          tags: ['Django', 'Python', 'PostgreSQL']
+        }
+      ]
+    },
+    es: {
+      name: 'EZEQUIEL ENRICO ARECO',
+      title: 'Desarrollador Fullstack',
+      location: 'Buenos Aires, Argentina',
+      phone: '+54 11 2596-0900',
+      email: 'ezequielenrico15@gmail.com',
+      website: 'www.arecofix.com.ar',
+      cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
+      summary: 'Profesional de sistemas, desarrollador Full-Stack. Actualmente trabajo en el sector gubernamental de equipo técnico y tengo experiencia como profesor de informática y tutor en cursos de Reparación de Celulares. Disfruto trabajando en equipo y valoro la colaboración y el intercambio de ideas. Busco nuevas oportunidades profesionales en el campo de la tecnología de la información.',
+      about: 'Bienvenido a mi portafolio en línea. Recuerda que en la sección acerca de encontrarás mi información personal. Aquí verás ejemplos de las herramientas con las que trabajo como desarrollador fullstack. Estoy especializado en el desarrollo web, utilizando tecnologías modernas como Angular, Tailwind CSS, TypeScript y frameworks como Django y Node.js.',
+      workExperience: [
+        {
+          position: 'Equipo Técnico',
+          company: 'Programa Envión, Municipio de Marcos Paz',
+          period: '2022 - Presente',
+          description: 'Formo parte del equipo técnico, gestionando sistemas y brindando soporte.'
+        },
+        {
+          position: 'Policía Contravencional',
+          company: 'Secretaría de Seguridad',
+          period: '2020 - 2021',
+          description: 'Desempeño en la secretaría de seguridad.'
+        },
+        {
+          position: 'Docente',
+          company: 'Eddis Educativa (Sede Morón y Marcos Paz)',
+          period: '2023 - Presente',
+          description: 'Dictado de cursos de informática y Reparación de Celulares.'
+        }
+      ],
+      education: [
+        {
+          degree: 'Licenciatura en Informática',
+          institution: 'Universidad Nacional del Oeste (UNO)',
+          period: 'Proyección 2024',
+          details: [
+            'Actualmente cursando las últimas materias.',
+            'Conocimientos en C#, HTML, CSS, JS, Python, PHP, ReactJS, SQL.',
+            'Frameworks: Bootstrap, Tailwind, Django.',
+            'Paquete Office (Avanzado).'
+          ]
+        }
+      ],
+      technicalSkills: [
+        { name: 'Python', icon: 'fab fa-python', category: 'language', description: 'Me apasiona el desarrollo de Python, enfocándome en machine learning e inteligencia artificial.' },
+        { name: 'JavaScript', icon: 'fab fa-js', category: 'language', description: 'Creación de aplicaciones web interactivas, manipulación del DOM e interacción con APIs.' },
+        { name: 'C# .NET', icon: 'fab fa-microsoft', category: 'language', description: 'Desarrollo de aplicaciones de gestión empresarial utilizando Windows Forms y POO.' },
+        { name: 'Django', icon: 'fas fa-leaf', category: 'framework', description: 'Sitios web dinámicos y robustos con enrutamiento de URL, plantillas y gestión de BD.' },
+        { name: 'Node.js', icon: 'fab fa-node', category: 'framework', description: 'Construcción de APIs REST y CRUD, autenticación y bases de datos.' },
+        { name: 'PHP', icon: 'fab fa-php', category: 'language', description: 'Desarrollo de aplicaciones web robustas con frameworks como Laravel.' },
+        { name: 'Docker', icon: 'fab fa-docker', category: 'tool', description: 'Contenedorización para entornos de desarrollo y despliegue consistentes.' },
+        { name: 'Git', icon: 'fab fa-git-alt', category: 'tool', description: 'Control de versiones y trabajo colaborativo.' },
+        { name: 'MySQL', icon: 'fas fa-database', category: 'database', description: 'Gestión de bases de datos relacionales.' },
+        { name: 'Linux', icon: 'fab fa-linux', category: 'os', description: 'Manejo de servidores y línea de comandos.' }
+      ],
+      certifications: [
+        'Capacitación Codo a Codo Fullstack Python (2022)',
+        'Cursos JavaScript, ReactJS y SQL - Coderhouse (2021)',
+        'Curso de Base de Datos - Udemy (2021)',
+        'Curso Desarrollador Web Full-Stack - LinkedIn Learning (2020)',
+        'Inglés B2 (Avanzado)'
+      ],
+      projects: [
+        {
+          title: 'Arecofix Page',
+          description: 'Sitio institucional y e-commerce para Arecofix. Construido con Angular y Tailwind CSS.',
+          image: 'assets/img/projects/arecofix.jpg',
+          tags: ['Angular', 'Tailwind', 'TypeScript'],
+          link: 'https://arecofix.com.ar'
+        },
+        {
+          title: 'Sistema de Gestión',
+          description: 'Aplicación de escritorio para gestión empresarial desarrollada en C# .NET.',
+          image: 'assets/img/projects/management.jpg',
+          tags: ['C#', '.NET', 'SQL Server']
+        },
+        {
+          title: 'Registro Envión',
+          description: 'Plataforma web para registro de beneficiarios utilizando Django y Python.',
+          image: 'assets/img/projects/envion.jpg',
+          tags: ['Django', 'Python', 'PostgreSQL']
+        }
       ]
     }
   };
 
   backgroundOptions = [
-    { id: 'gradient-1', name: 'Blue Gradient', class: 'bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900' },
-    { id: 'gradient-2', name: 'Purple Gradient', class: 'bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900' },
-    { id: 'gradient-3', name: 'Dark Blue', class: 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' },
-    { id: 'gradient-4', name: 'Teal Gradient', class: 'bg-gradient-to-br from-teal-900 via-cyan-800 to-blue-900' },
-    { id: 'gradient-5', name: 'Dark Gray', class: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black' }
+    { id: 'gradient-5', name: 'Dark Gray', class: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black' },
+    { id: 'gradient-1', name: 'Blue Gradient', class: 'bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900' }
   ];
 
   get currentContent(): PortfolioContent {

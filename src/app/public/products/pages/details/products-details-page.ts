@@ -23,7 +23,7 @@ import {
 } from '@app/public/categories/interfaces';
 import { PaginationService } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
-import { iProduct } from '../../interfaces';
+import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
 /*  */
@@ -79,7 +79,7 @@ export class ProductsDetailsPage {
   });
 
   // Computed para obtener el producto individual
-  product = computed<iProduct | null>(() => {
+  product = computed<Product | null>(() => {
     const data = this.productRs.value();
     if (!data || !data.data || data.data.length === 0) return null;
 

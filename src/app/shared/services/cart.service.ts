@@ -1,9 +1,9 @@
 import { Injectable, signal, computed, effect, inject } from '@angular/core';
-import { iProduct } from '@app/public/products/interfaces';
+import { Product } from '@app/public/products/interfaces';
 import { LoggerService } from '@app/core/services/logger.service';
 
 export interface CartItem {
-    product: iProduct;
+    product: Product;
     quantity: number;
 }
 
@@ -27,7 +27,7 @@ export class CartService {
         });
     }
 
-    addToCart(product: iProduct) {
+    addToCart(product: Product) {
         this.cartItems.update(items => {
             const existingItem = items.find(item => item.product.id === product.id);
             if (existingItem) {

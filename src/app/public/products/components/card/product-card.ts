@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { iProduct } from '../../interfaces';
+import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 
 @Component({
@@ -26,7 +26,7 @@ import { CartService } from '@app/shared/services/cart.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCard {
-  product = input.required<iProduct>();
+  product = input.required<Product>();
   private cartService = inject(CartService);
 
   addToCart(event: Event) {

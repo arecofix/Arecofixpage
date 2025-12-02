@@ -1,70 +1,110 @@
-<!-- Mini Header -->
-<header class="bg-white shadow-sm sticky top-0 z-40">
-  <div class="max-w-7xl mx-auto px-4 py-3">
-    <button (click)="goToHome()" class="flex items-center gap-2 text-blue-600 hover:text-blue-800">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-      </svg>
-      Volver al inicio
-    </button>
-  </div>
-</header>
-
 <!-- Hero Section -->
-<section class="relative bg-blue-700 text-white py-12 overflow-hidden">
-  <div class="absolute inset-0 opacity-10"
-    style="background-image:url('https://images.unsplash.com/photo-1601524909162-ae8725290836?q=80&w=2000'); background-size:cover; background-position:center">
-  </div>
-  <div class="relative max-w-7xl mx-auto px-4 text-center">
-    <h1 class="text-3xl md:text-4xl font-bold mb-3">Repuestos para Celulares</h1>
-    <p class="text-lg mb-6">Los mejores repuestos originales y compatibles</p>
-    <div class="flex flex-wrap justify-center gap-3">
-      <a href="#catalogo" class="btn btn-primary">Ver Catálogo</a>
+<div class="relative bg-gray-900 text-white py-12 mb-8 overflow-hidden">
+  <div class="absolute inset-0 opacity-20 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
+  <!-- Decorative circles -->
+  <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
+  <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
+  
+  <div class="relative container mx-auto px-4">
+    <div class="max-w-3xl">
+      <!-- Breadcrumbs -->
+      <div class="text-sm breadcrumbs text-gray-300 mb-4">
+        <ul>
+          <li><a routerLink="/">Inicio</a></li>
+          <li><a routerLink="/products">Productos</a></li>
+          <li class="font-semibold text-white">Repuestos</li>
+        </ul>
+      </div>
+
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+        Repuestos para Celulares
+      </h1>
+      <p class="text-lg text-gray-300 max-w-2xl leading-relaxed">
+        Los mejores repuestos originales y compatibles para tu dispositivo.
+      </p>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Filters Toolbar -->
-<section id="catalogo" class="bg-white">
-  <div class="max-w-7xl mx-auto px-4 py-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-      <!-- Search -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
-        <input [(ngModel)]="filterState.search" (ngModelChange)="applyFilters()" type="text"
-          placeholder="Ej: Pantalla iPhone 12"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
-      </div>
-      <!-- Category -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-        <select [(ngModel)]="filterState.category" (ngModelChange)="applyFilters()"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
-          <option value="all">Todas</option>
-          @for (c of categories(); track c.id) { <option [value]="c.id">{{c.name}}</option> }
-        </select>
-      </div>
-      <!-- Brand -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
-        <select [(ngModel)]="filterState.brand" (ngModelChange)="applyFilters()"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
-          <option value="all">Todas</option>
-          @for (b of brands(); track b.id) { <option [value]="b.id">{{b.name}}</option> }
-        </select>
-      </div>
-      <!-- Price & Sort -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Precio máximo</label>
-          <input [(ngModel)]="filterState.maxPrice" (ngModelChange)="applyFilters()" type="number" min="0"
-            placeholder="Ej: 20000"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+<div class="container mx-auto px-4 pb-16">
+  <div class="flex flex-col lg:flex-row gap-8">
+    
+    <!-- Sidebar (Filters) -->
+    <aside class="hidden lg:block w-64 flex-shrink-0">
+      <div class="sticky top-24 space-y-8">
+        
+        <!-- Search Widget -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Buscar</h3>
+          <input [(ngModel)]="filterState.search" (ngModelChange)="applyFilters()" type="text"
+            placeholder="Ej: Pantalla iPhone 12"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Ordenar</label>
+
+        <!-- Categories Widget -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Categorías</h3>
+          <ul class="space-y-2">
+            <li>
+              <button (click)="filterState.category = 'all'; applyFilters()" 
+                [class.text-blue-600]="filterState.category === 'all'"
+                [class.font-semibold]="filterState.category === 'all'"
+                [class.bg-blue-50]="filterState.category === 'all'"
+                class="w-full text-left block px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 transition-colors">
+                Todas
+              </button>
+            </li>
+            @for (c of categories(); track c.id) {
+              <li>
+                <button (click)="filterState.category = c.id; applyFilters()"
+                  [class.text-blue-600]="filterState.category === c.id"
+                  [class.font-semibold]="filterState.category === c.id"
+                  [class.bg-blue-50]="filterState.category === c.id"
+                  class="w-full text-left block px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 transition-colors">
+                  {{c.name}}
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Brands Widget -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Marcas</h3>
+          <select [(ngModel)]="filterState.brand" (ngModelChange)="applyFilters()"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="all">Todas</option>
+            @for (b of brands(); track b.id) { <option [value]="b.id">{{b.name}}</option> }
+          </select>
+        </div>
+
+        <!-- Price Filter Widget -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Precio Máximo</h3>
+          <div class="space-y-4">
+            <input [(ngModel)]="filterState.maxPrice" (ngModelChange)="applyFilters()" type="number" min="0"
+              placeholder="Ej: 20000"
+              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+      <!-- Toolbar -->
+      <div class="flex flex-wrap items-center justify-between mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="text-gray-600 dark:text-gray-300">
+          @if (productsRs.hasValue()) {
+            Mostrando <span class="font-semibold text-gray-900 dark:text-white">{{ productsRs.value().items }}</span> resultados
+          } @else {
+            Cargando...
+          }
+        </div>
+        
+        <div class="flex items-center gap-4">
           <select [(ngModel)]="filterState.sort" (ngModelChange)="applyFilters()"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+            class="select select-bordered select-sm w-full max-w-xs bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
             <option value="relevance">Relevancia</option>
             <option value="price-asc">Precio: menor a mayor</option>
             <option value="price-desc">Precio: mayor a menor</option>
@@ -72,68 +112,39 @@
           </select>
         </div>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- Catalog Grid -->
-<section class="bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">Catálogo</h2>
-      <span class="text-sm text-gray-600">
-        @if (productsRs.hasValue()) {
-          {{productsRs.value().items}} resultados
+      <!-- Products Grid -->
+      @if (productsRs.isLoading()) {
+        <is-loading />
+      } @else if (productsRs.error()) {
+        <is-error />
+      } @else if (productsRs.hasValue()) {
+        @if (productsRs.value().data.length === 0) {
+          <is-empty />
         } @else {
-          Cargando...
-        }
-      </span>
-    </div>
-
-    @if (productsRs.isLoading()) {
-      <is-loading />
-    } @else if (productsRs.error()) {
-      <is-error />
-    } @else if (productsRs.hasValue()) {
-      @if (productsRs.value().data.length === 0) {
-        <is-empty />
-      } @else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          @for (product of productsRs.value().data; track product.id) {
-            <product-card [product]="product" />
-          }
-        </div>
-        
-        @if (paginationData()) {
-          <div class="mt-8">
-             <pagination [pages]="paginationData()?.pages ?? 0" [currentPage]="paginationService.currentPage()" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @for (product of productsRs.value().data; track product.id) {
+              <product-card [product]="product" />
+            }
           </div>
+
+          <!-- Pagination -->
+          @if (paginationData()) {
+            <div class="mt-12 flex justify-center">
+              <pagination
+                [pages]="productsRs.value().pages"
+                [currentPage]="paginationService.currentPage()"
+              />
+            </div>
+          }
         }
       }
-    }
+    </main>
   </div>
-</section>
+</div>
 
-<!-- Brands -->
-<section class="py-16 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Trabajamos con las Mejores Marcas</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-      @for (brand of brands(); track brand.id) {
-      <div class="flex items-center justify-center p-4 grayscale hover:grayscale-0 transition-all">
-         @if (brand.logo_url) {
-            <img [src]="brand.logo_url" [alt]="brand.name" class="max-h-16 w-auto">
-         } @else {
-            <span class="text-xl font-bold text-gray-400">{{brand.name}}</span>
-         }
-      </div>
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Benefits -->
-<section class="py-16 bg-indigo-900 text-white">
+<!-- Benefits (Optional, kept at bottom as footer-like content) -->
+<section class="py-16 bg-indigo-900 text-white mt-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
       <div>
@@ -157,18 +168,5 @@
         <p class="text-indigo-200">Soporte técnico incluido</p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="py-16 bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿No encuentras lo que buscas?</h2>
-    <p class="text-xl mb-8">Contáctanos y te ayudamos a encontrar el repuesto que necesitas</p>
-    <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20busco%20un%20repuesto%20específico'"
-      class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
-      <i class="fab fa-whatsapp mr-2 text-2xl"></i>
-      Consultar Ahora
-    </a>
   </div>
 </section>
