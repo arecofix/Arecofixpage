@@ -17,7 +17,7 @@
         Conviértete en un técnico certificado con nuestros cursos prácticos y profesionales
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="https://wa.me/5491125960900?text=Hola,%20quiero%20información%20sobre%20los%20cursos"
+        <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20información%20sobre%20los%20cursos'"
           class="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition shadow-lg">
           <i class="fab fa-whatsapp mr-2 text-xl"></i>
           Consultar por WhatsApp
@@ -120,7 +120,7 @@
               <span class="text-2xl font-bold text-indigo-600">{{course.price | currency}}</span>
               <span class="text-sm text-gray-500 block">por mes</span>
             </div>
-            <a href="https://wa.me/5491125960900?text=Hola,%20quiero%20información%20sobre%20{{course.title}}"
+            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20información%20sobre%20' + course.title"
               class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition">
               Inscribirme
             </a>
@@ -182,7 +182,7 @@
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿Listo para comenzar tu carrera?</h2>
     <p class="text-xl mb-8">Inscríbete ahora y obtén un 10% de descuento en tu primer mes</p>
-    <a href="https://wa.me/5491125960900?text=Hola,%20quiero%20inscribirme%20a%20un%20curso"
+    <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20inscribirme%20a%20un%20curso'"
       class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
       <i class="fab fa-whatsapp mr-2 text-2xl"></i>
       Inscribirme Ahora

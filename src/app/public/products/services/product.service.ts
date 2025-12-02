@@ -26,6 +26,7 @@ export class ProductService {
       _page = 1,
       _per_page = 10,
       category_id,
+      brand_id,
       description,
       featured,
       id,
@@ -44,6 +45,7 @@ export class ProductService {
 
     // Apply filters
     if (category_id !== undefined && category_id !== null) query = query.eq('category_id', category_id);
+    if (brand_id) query = query.eq('brand_id', brand_id);
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
     if (id) query = query.eq('id', id);

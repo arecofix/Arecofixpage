@@ -147,9 +147,10 @@ export class AuthService {
 
       return { user: data.user, session: data.session };
 
-    } catch (e: any) {
+    } catch (e: unknown) {
       this.logger.error('Unexpected error during signup', e);
-      return { user: null, session: null, error: e.message || 'Unknown error' };
+      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+      return { user: null, session: null, error: errorMessage };
     }
   }
 

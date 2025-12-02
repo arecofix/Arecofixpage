@@ -438,7 +438,7 @@
         </p>
 
         <div class="flex flex-wrap gap-4 pt-4">
-          <a href="https://wa.me/541125960900"
+          <a [href]="'https://wa.me/' + whatsappNumber"
             class="px-7 py-3.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/20">
             Cotizar Proyecto
           </a>
@@ -574,7 +574,7 @@
 
         <div class="mt-10 flex flex-col sm:flex-row gap-4">
           <!-- Botón Principal (WhatsApp) -->
-          <a href="https://wa.me/5491125960900?text=Hola,%20quisiera%20cotizar%20la%20reparación%20de%20mi%20consola."
+          <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quisiera%20cotizar%20la%20reparación%20de%20mi%20consola.'"
             target="_blank" rel="noopener noreferrer"
             class="inline-flex items-center justify-center rounded-lg border border-transparent bg-green-600 px-8 py-4 text-base font-semibold text-white hover:bg-green-500 hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 transform hover:-translate-y-1">
             <i class="fab fa-whatsapp text-xl mr-3"></i>
@@ -655,7 +655,6 @@
     </div>
   </div>
 </section>
-
 
 
 
@@ -740,7 +739,7 @@
 
     <!-- Botón ver más -->
     <div class="text-center mt-12">
-      <a href="https://g.page/r/CQeBPqhRjbRzEAE/review" target="_blank" rel="noopener noreferrer"
+      <a [href]="googleMapsLink" target="_blank" rel="noopener noreferrer"
         class="inline-block px-6 py-3 bg-transparent border border-blue-400 text-blue-400 rounded-lg hover:bg-blue-400 hover:text-white transition-colors duration-300">
         Ver más reseñas
       </a>
@@ -798,86 +797,3 @@
     <article
       class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100">
       <figure class="relative overflow-hidden aspect-video">
-        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop"
-          alt="Tecnología GSM"
-          class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div
-          class="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-          Telecomunicaciones
-        </div>
-      </figure>
-
-      <div class="p-6 flex flex-col flex-grow">
-        <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
-          Soluciones GSM
-        </h3>
-        <p class="text-gray-600 mb-6 line-clamp-3 flex-grow">
-          Análisis profundo sobre redes móviles y conectividad global.
-        </p>
-
-        <div class="mt-auto pt-4 border-t border-gray-100">
-          <a href="https://arecofix.com.ar/#/gsm"
-            class="w-full inline-flex items-center justify-center px-5 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-indigo-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
-            <span>Ver artículo</span>
-            <i class="fas fa-arrow-right ml-2 text-sm transition-transform group-hover:translate-x-1"></i>
-          </a>
-        </div>
-      </div>
-    </article>
-
-    <!-- Article Card 3: Download App (ACTUALIZADO) -->
-    <article
-      class="group bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col overflow-hidden text-white relative">
-      <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-green-500 rounded-full opacity-10 blur-2xl"></div>
-
-      <figure class="relative overflow-hidden aspect-video opacity-80 group-hover:opacity-100 transition-opacity">
-        <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1000&auto=format&fit=crop"
-          alt="Descarga nuestra aplicación móvil"
-          class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div
-          class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-glow">
-          Destacado
-        </div>
-      </figure>
-
-      <div class="p-6 flex flex-col flex-grow relative z-10">
-        <h3 class="text-xl font-bold text-white mb-3">
-          ¡Descarga Nuestra App!
-        </h3>
-        <p class="text-gray-300 mb-6 flex-grow">
-          Accede a todo nuestro contenido desde tu móvil. Instala el APK directamente.
-        </p>
-
-        <div class="mt-auto pt-4 border-t border-gray-700">
-
-          <a href="assets/download/arecofix.apk" download="arecofix.apk"
-            class="w-full inline-flex items-center justify-center px-5 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-400 transition-colors duration-300 shadow-lg hover:shadow-green-500/30 transform active:scale-95 text-center decoration-none cursor-pointer"
-            role="button" aria-label="Descargar archivo APK de ArecoFix">
-            <i class="fas fa-download mr-2"></i>
-            <span>Descargar Ahora</span>
-          </a>
-        </div>
-      </div>
-    </article>
-
-  </div>
-</section>
-
-<div class="bg-white py-24 sm:py-32">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <h2 class="text-center text-lg/8 font-semibold text-gray-900">Marcas con las que trabajamos</h2>
-    <div
-      class="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5">
-      <img class="col-span-2 max-h-12 w-full object-contain lg:col-span-1" src="assets/img/brands/samsung.webp"
-        alt="Transistor" width="158" height="48" loading="lazy" />
-      <img class="col-span-2 max-h-12 w-full object-contain lg:col-span-1" src="assets/img/brands/iphone.webp"
-        alt="Resistencias" width="158" height="48" loading="lazy" />
-      <img class="col-span-2 max-h-12 w-full object-contain lg:col-span-1" src="assets/img/brands/motorola.webp"
-        alt="Condensadores" width="158" height="48" loading="lazy" />
-      <img class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
-        src="assets/img/brands/sunshine.webp" alt="Circuitos integrados" width="158" height="48" loading="lazy" />
-      <img class="col-span-2 col-start-2 max-h-12 w-full object-contain sm:col-start-auto lg:col-span-1"
-        src="assets/img/brands/yaxun.png" alt="Procesadores" width="158" height="48" loading="lazy" />
-    </div>
-  </div>
-</div>

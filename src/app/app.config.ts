@@ -8,6 +8,7 @@ import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
+import { environment } from '../environments/environment';
 
 // Firebase imports
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -15,14 +16,7 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD5JCGp6wVHlHKzJRssRtTstNHSoaLj2i4",
-  authDomain: "arecofix-ca60b.firebaseapp.com",
-  projectId: "arecofix-ca60b",
-  storageBucket: "arecofix-ca60b.appspot.com",
-  messagingSenderId: "301262429786",
-  appId: "1:301262429786:web:0aca5a5c777b7ab1d08263"
-};
+const firebaseConfig = environment.firebase;
 
 export const appConfig: ApplicationConfig = {
   providers: [

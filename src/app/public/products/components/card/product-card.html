@@ -3,9 +3,10 @@
   <!-- Image Container -->
   <div class="relative aspect-[4/3] overflow-hidden bg-gray-50 p-4">
     <img 
-      [src]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
+      [ngSrc]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
       [alt]="product().name"
-      class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
+      fill
+      class="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
     />
     
     <!-- Badges -->

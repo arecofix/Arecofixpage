@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
+import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { iProduct } from '../../interfaces';
-import { inject } from '@angular/core';
 import { CartService } from '@app/shared/services/cart.service';
+
 @Component({
   selector: 'product-card',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, NgOptimizedImage],
   templateUrl: './product-card.html',
   styles: `
     .line-clamp-2 {

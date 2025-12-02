@@ -1,1 +1,1 @@
-export * from './product.interface';
+export * from '@app/shared/interfaces/product.interface';

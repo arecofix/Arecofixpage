@@ -20,7 +20,6 @@
     <p class="text-lg mb-6">Los mejores repuestos originales y compatibles</p>
     <div class="flex flex-wrap justify-center gap-3">
       <a href="#catalogo" class="btn btn-primary">Ver Catálogo</a>
-      <a href="#destacados" class="btn btn-outline btn-light">Productos Destacados</a>
     </div>
   </div>
 </section>
@@ -32,39 +31,39 @@
       <!-- Search -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
-        <input [(ngModel)]="filter.search" (ngModelChange)="applyFilters()" type="text"
+        <input [(ngModel)]="filterState.search" (ngModelChange)="applyFilters()" type="text"
           placeholder="Ej: Pantalla iPhone 12"
           class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
       </div>
       <!-- Category -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-        <select [(ngModel)]="filter.category" (ngModelChange)="applyFilters()"
+        <select [(ngModel)]="filterState.category" (ngModelChange)="applyFilters()"
           class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
           <option value="all">Todas</option>
-          @for (c of categories; track c.id) { <option [value]="c.name">{{c.name}}</option> }
+          @for (c of categories(); track c.id) { <option [value]="c.id">{{c.name}}</option> }
         </select>
       </div>
       <!-- Brand -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
-        <select [(ngModel)]="filter.brand" (ngModelChange)="applyFilters()"
+        <select [(ngModel)]="filterState.brand" (ngModelChange)="applyFilters()"
           class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
           <option value="all">Todas</option>
-          @for (b of brandOptions; track b) { <option [value]="b">{{b}}</option> }
+          @for (b of brands(); track b.id) { <option [value]="b.id">{{b.name}}</option> }
         </select>
       </div>
       <!-- Price & Sort -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Precio máximo</label>
-          <input [(ngModel)]="filter.maxPrice" (ngModelChange)="applyFilters()" type="number" min="0"
+          <input [(ngModel)]="filterState.maxPrice" (ngModelChange)="applyFilters()" type="number" min="0"
             placeholder="Ej: 20000"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Ordenar</label>
-          <select [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()"
+          <select [(ngModel)]="filterState.sort" (ngModelChange)="applyFilters()"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
             <option value="relevance">Relevancia</option>
             <option value="price-asc">Precio: menor a mayor</option>
@@ -82,84 +81,51 @@
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-bold text-gray-900">Catálogo</h2>
-      <span class="text-sm text-gray-600">{{filteredProducts.length}} resultados</span>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      @for (product of filteredProducts; track product.id) {
-      <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
-        <div class="relative h-44 bg-gray-100">
-          <img [src]="product.image" [alt]="product.name" class="w-full h-full object-cover" />
-          <div class="absolute top-3 right-3">
-            <span class="rounded-full bg-green-500 text-white text-xs font-semibold px-2 py-1">{{product.stock}}</span>
-          </div>
-        </div>
-        <div class="p-4">
-          <h3 class="text-base font-semibold text-gray-900">{{product.name}}</h3>
-          <p class="text-sm text-gray-500">{{product.brand}} · {{product.category}}</p>
-          <div class="flex items-center justify-between mt-3">
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-indigo-600">{{product.priceLabel}}</span>
-            </div>
-            <div class="flex text-yellow-400 text-sm">
-              @for (star of [1,2,3,4,5]; track star) { <i class="fas fa-star"
-                [class.text-gray-300]="star > product.rating"></i> }
-            </div>
-          </div>
-          <div class="mt-4 flex gap-2">
-            <a href="https://wa.me/5491125960900?text=Hola,%20consulto%20por%20{{product.name}}"
-              class="flex-1 inline-flex items-center justify-center px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">Consultar</a>
-            <button
-              class="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Agregar</button>
-          </div>
-        </div>
-      </div>
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Featured Products (Productos para Estudiantes) -->
-<section id="destacados" class="py-16 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Productos para Estudiantes</h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-        Herramientas y accesorios recomendados para potenciar tu aprendizaje
-      </p>
+      <span class="text-sm text-gray-600">
+        @if (productsRs.hasValue()) {
+          {{productsRs.value().items}} resultados
+        } @else {
+          Cargando...
+        }
+      </span>
     </div>
 
     @if (productsRs.isLoading()) {
-    <is-loading />
-    } @else if (!productsRs.hasValue()) {
-    <is-empty />
+      <is-loading />
     } @else if (productsRs.error()) {
-    <is-error />
-    } @else if (productsRs.hasValue()) { @if (paginationData()) {
-    <pagination [pages]="paginationData()?.pages ?? 0" [currentPage]="paginationService.currentPage()" />
-    }
-
-    <div class="divider"></div>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-      @for (product of productsRs.value().data; track $index) {
-      <product-card [product]="product" />
+      <is-error />
+    } @else if (productsRs.hasValue()) {
+      @if (productsRs.value().data.length === 0) {
+        <is-empty />
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          @for (product of productsRs.value().data; track product.id) {
+            <product-card [product]="product" />
+          }
+        </div>
+        
+        @if (paginationData()) {
+          <div class="mt-8">
+             <pagination [pages]="paginationData()?.pages ?? 0" [currentPage]="paginationService.currentPage()" />
+          </div>
+        }
       }
-    </div>
     }
   </div>
 </section>
-
-<!-- Divider -->
-<div class="divider"></div>
 
 <!-- Brands -->
 <section class="py-16 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Trabajamos con las Mejores Marcas</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-      @for (brand of brands; track brand.name) {
+      @for (brand of brands(); track brand.id) {
       <div class="flex items-center justify-center p-4 grayscale hover:grayscale-0 transition-all">
-        <img [src]="brand.logo" [alt]="brand.name" class="max-h-16 w-auto">
+         @if (brand.logo_url) {
+            <img [src]="brand.logo_url" [alt]="brand.name" class="max-h-16 w-auto">
+         } @else {
+            <span class="text-xl font-bold text-gray-400">{{brand.name}}</span>
+         }
       </div>
       }
     </div>
@@ -199,7 +165,7 @@
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿No encuentras lo que buscas?</h2>
     <p class="text-xl mb-8">Contáctanos y te ayudamos a encontrar el repuesto que necesitas</p>
-    <a href="https://wa.me/5491125960900?text=Hola,%20busco%20un%20repuesto%20específico"
+    <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20busco%20un%20repuesto%20específico'"
       class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
       <i class="fab fa-whatsapp mr-2 text-2xl"></i>
       Consultar Ahora

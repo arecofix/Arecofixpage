@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -9,6 +10,7 @@ import { Component } from '@angular/core';
     styleUrl: './servicios.scss'
 })
 export class ServiciosComponent {
+    whatsappNumber = environment.contact.whatsappNumber;
     services = [
         {
             id: 1,

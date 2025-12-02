@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-tracking-page',
@@ -12,6 +13,7 @@ import { AuthService } from '@app/services/auth.service';
 export class TrackingPage implements OnInit {
     private route = inject(ActivatedRoute);
     private auth = inject(AuthService);
+    whatsappNumber = environment.contact.whatsappNumber;
 
     code: string | null = null;
     repair = signal<any>(null);

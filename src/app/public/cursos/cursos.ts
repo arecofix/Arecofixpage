@@ -15,6 +15,7 @@ import { ProductCard } from '@app/public/products/components';
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
 import { iCategoriesResponse } from '@app/public/categories/interfaces';
 import { iProductsResponse } from '@app/public/products/interfaces';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-cursos',
@@ -24,6 +25,7 @@ import { iProductsResponse } from '@app/public/products/interfaces';
     styleUrls: ['./cursos.scss']
 })
 export class CursosComponent implements OnInit {
+    whatsappNumber = environment.contact.whatsappNumber;
     courses: Course[] = [];
     loading = true;
     error: string | null = null;

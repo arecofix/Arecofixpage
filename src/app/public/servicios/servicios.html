@@ -17,7 +17,7 @@
                 Reparación especializada de smartphones, tablets, consolas y desarrollo de software
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="https://wa.me/5491125960900?text=Hola,%20necesito%20un%20servicio%20técnico"
+                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20servicio%20técnico'"
                     class="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition shadow-lg">
                     <i class="fab fa-whatsapp mr-2 text-xl"></i>
                     Solicitar Servicio
@@ -96,7 +96,7 @@
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-2xl font-bold text-indigo-600">{{service.price}}</span>
                         </div>
-                        <a [href]="service.link ? service.link : 'https://wa.me/5491125960900?text=Hola,%20necesito%20el%20servicio%20de%20' + service.title"
+                        <a [href]="service.link ? service.link : 'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20el%20servicio%20de%20' + service.title"
                             class="block w-full text-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition">
                             Solicitar Ahora
                         </a>
@@ -137,7 +137,7 @@
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿Necesitas reparar tu dispositivo?</h2>
         <p class="text-xl mb-8">Contáctanos ahora y obtén un diagnóstico gratuito</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://wa.me/5491125960900?text=Hola,%20necesito%20un%20diagnóstico%20gratuito"
+            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20diagnóstico%20gratuito'"
                 class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
                 <i class="fab fa-whatsapp mr-2 text-2xl"></i>
                 Diagnóstico Gratuito

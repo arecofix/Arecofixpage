@@ -17,7 +17,7 @@ export const environment = {
   supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
   supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0',
 
-  authRedirectUrl: 'http://localhost:4200/#/login',
+  authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
 
   // Analytics Configuration
@@ -30,7 +30,7 @@ export const environment = {
   whatsappPhoneNumberId: '322928504245092',
   whatsappBusinessAccountId: '368379263021902',
   whatsappAppId: '1209190100450173',
-  whatsappApiUrl: 'https://graph.facebook.com/v22.0',
+  whatsappApiUrl: 'https://graph.facebook.com/v22.0', // Base URL, phone ID to be appended in service
 
   // Contact Information
   contact: {
@@ -40,7 +40,16 @@ export const environment = {
       instagram: 'https://www.instagram.com/ArecoFix/',
       github: 'https://github.com/arecofix',
       linkedin: 'https://www.linkedin.com/company/arecofix',
-      youtube: 'https://www.youtube.com/@Arecofix'
+      youtube: 'https://www.youtube.com/@Arecofix',
+      googleMaps: 'https://g.page/r/CQeBPqhRjbRzEAE/review'
     }
+  },
+  firebase: {
+    apiKey: "AIzaSyD5JCGp6wVHlHKzJRssRtTstNHSoaLj2i4",
+    authDomain: "arecofix-ca60b.firebaseapp.com",
+    projectId: "arecofix-ca60b",
+    storageBucket: "arecofix-ca60b.appspot.com",
+    messagingSenderId: "301262429786",
+    appId: "1:301262429786:web:0aca5a5c777b7ab1d08263"
   }
 };
