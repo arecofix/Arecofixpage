@@ -9,7 +9,7 @@ export class FallbackService {
     private readonly fallbackProducts: iProduct[] = [
         {
             id: '1001',
-            category_id: 0,
+            category_id: '0',
             slug: 'joystick-play-station-4',
             name: 'Joystick Play Station 4',
             description: 'En venta Joystick nuevo de play station 4 DUALSHOCK',
@@ -19,7 +19,7 @@ export class FallbackService {
         },
         {
             id: '1002',
-            category_id: 0,
+            category_id: '0',
             slug: 'iphone-8-plus',
             name: 'iPhone 8 Plus',
             description: 'En venta iPhone 8 Plus vidrio astillado no afecta su uso',
@@ -29,7 +29,7 @@ export class FallbackService {
         },
         {
             id: '1003',
-            category_id: 0,
+            category_id: '0',
             slug: 'iphone-x',
             name: 'iPhone X',
             description: 'En venta celular iphone x a wifi',

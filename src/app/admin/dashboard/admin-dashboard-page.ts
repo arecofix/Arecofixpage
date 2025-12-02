@@ -1,150 +1,17 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/services/auth.service';
 import { RouterLink } from '@angular/router';
 import posthog from 'posthog-js';
 import { environment } from '@env/environment';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  template: `
-    <div class="p-6">
-      <h1 class="text-2xl font-bold mb-6 text-gray-800">Panel de Control</h1>
-      
-      @if (loading()) {
-        <div class="flex justify-center py-12">
-            <span class="loading loading-spinner loading-lg"></span>
-        </div>
-      } @else {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Users Card -->
-            <div class="stats shadow bg-white text-gray-800">
-                <div class="stat">
-                    <div class="stat-figure text-primary">
-                        <i class="fas fa-users text-3xl"></i>
-                    </div>
-                    <div class="stat-title text-gray-600">Usuarios</div>
-                    <div class="stat-value text-primary">{{ stats().users }}</div>
-                    <div class="stat-desc text-gray-500">Registrados</div>
-                </div>
-            </div>
-
-            <!-- Products Card -->
-            <div class="stats shadow bg-white text-gray-800">
-                <div class="stat">
-                    <div class="stat-figure text-secondary">
-                        <i class="fas fa-box text-3xl"></i>
-                    </div>
-                    <div class="stat-title text-gray-600">Productos</div>
-                    <div class="stat-value text-secondary">{{ stats().products }}</div>
-                    <div class="stat-desc text-gray-500">En catálogo</div>
-                </div>
-            </div>
-
-            <!-- Sales Card -->
-            <div class="stats shadow bg-white text-gray-800">
-                <div class="stat">
-                    <div class="stat-figure text-accent">
-                        <i class="fas fa-shopping-cart text-3xl"></i>
-                    </div>
-                    <div class="stat-title text-gray-600">Ventas</div>
-                    <div class="stat-value text-accent">{{ stats().sales }}</div>
-                    <div class="stat-desc text-gray-500">Total realizadas</div>
-                </div>
-            </div>
-
-            <!-- Revenue Card -->
-            <div class="stats shadow bg-white text-gray-800">
-                <div class="stat">
-                    <div class="stat-figure text-success">
-                        <i class="fas fa-dollar-sign text-3xl"></i>
-                    </div>
-                    <div class="stat-title text-gray-600">Ingresos</div>
-                    <div class="stat-value text-success">{{ stats().revenue | currency }}</div>
-                    <div class="stat-desc text-gray-500">Total facturado</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Quick Actions -->
-            <div class="card bg-white shadow text-gray-800">
-                <div class="card-body">
-                    <h2 class="card-title mb-4 text-gray-800">Acciones Rápidas</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <a routerLink="/admin/products/new" class="btn btn-outline btn-primary">
-                            <i class="fas fa-plus mr-2"></i> Nuevo Producto
-                        </a>
-                        <a routerLink="/admin/sales" class="btn btn-outline btn-accent">
-                            <i class="fas fa-cash-register mr-2"></i> Nueva Venta
-                        </a>
-                        <a routerLink="/admin/users" class="btn btn-outline">
-                            <i class="fas fa-user-plus mr-2"></i> Gestionar Usuarios
-                        </a>
-                        <a routerLink="/admin/repairs" class="btn btn-outline btn-secondary">
-                            <i class="fas fa-tools mr-2"></i> Taller
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analytics & System Status -->
-            <div class="card bg-white shadow text-gray-800">
-                <div class="card-body">
-                    <h2 class="card-title mb-4 text-gray-800">Analytics & Sistema</h2>
-                    <div class="space-y-4">
-                        <!-- System Status -->
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Base de Datos</span>
-                            <span class="badge badge-success">Conectado</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Analytics (PostHog)</span>
-                            <span class="badge badge-success">{{ posthogStatus() }}</span>
-                        </div>
-                        
-                        <!-- PostHog Metrics -->
-                        @if (analyticsStats().enabled) {
-                          <div class="divider my-2"></div>
-                          <div class="space-y-3">
-                            <div class="flex justify-between items-center text-sm">
-                              <span class="flex items-center gap-2">
-                                <i class="fas fa-eye text-info"></i>
-                                <span>Sesión Actual</span>
-                              </span>
-                              <span class="font-semibold">{{ analyticsStats().sessionId ? 'Activa' : 'N/A' }}</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                              <span class="flex items-center gap-2">
-                                <i class="fas fa-user text-primary"></i>
-                                <span>Usuario</span>
-                              </span>
-                              <span class="font-semibold text-xs">{{ analyticsStats().distinctId || 'Anónimo' }}</span>
-                            </div>
-                            <a 
-                              href="https://us.posthog.com/project/253677/dashboard/791256" 
-                              target="_blank" 
-                              class="btn btn-sm btn-outline btn-info w-full mt-2"
-                            >
-                              <i class="fas fa-chart-line mr-2"></i>
-                              Ver Dashboard Completo
-                            </a>
-                          </div>
-                        } @else {
-                          <div class="alert alert-warning text-xs mt-4">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>PostHog no está inicializado correctamente</span>
-                          </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-      }
-    </div>
-  `
+  imports: [CommonModule, RouterLink, BaseChartDirective],
+  templateUrl: 'admin-dashboard-page.html'
 })
 export class AdminDashboardPage implements OnInit {
   private auth = inject(AuthService);
@@ -163,6 +30,57 @@ export class AdminDashboardPage implements OnInit {
   });
 
   loading = signal(true);
+
+  // Sales over the Year Chart
+  public salesChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, position: 'bottom' },
+      title: { display: true, text: 'Ventas del Año' }
+    }
+  };
+  public salesChartType: ChartType = 'line';
+  public salesChartData: ChartData<'line'> = {
+    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    datasets: [
+      { data: [65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 110, 120], label: 'Ventas ($)', borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.2)', fill: true },
+    ]
+  };
+
+  // Top Products Chart
+  public productsChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: 'Productos Más Vendidos' }
+    }
+  };
+  public productsChartType: ChartType = 'bar';
+  public productsChartData: ChartData<'bar'> = {
+    labels: ['iPhone 11', 'Samsung A52', 'Modulo iPhone X', 'Cargador 20W', 'Funda Silicona'],
+    datasets: [
+      { data: [28, 48, 40, 19, 86], label: 'Unidades', backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'] }
+    ]
+  };
+
+  // Sales by Category Chart
+  public categoryChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, position: 'right' },
+      title: { display: true, text: 'Ventas por Categoría' }
+    }
+  };
+  public categoryChartType: ChartType = 'doughnut';
+  public categoryChartData: ChartData<'doughnut'> = {
+    labels: ['Repuestos', 'Accesorios', 'Servicios', 'Cursos'],
+    datasets: [
+      { data: [300, 500, 100, 50], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'] }
+    ]
+  };
 
   async ngOnInit() {
     await this.loadStats();
@@ -187,7 +105,7 @@ export class AdminDashboardPage implements OnInit {
       // Sales count and revenue
       const { data: salesData } = await supabase
         .from('sales')
-        .select('total_amount');
+        .select('total_amount, created_at');
 
       const salesCount = salesData?.length || 0;
       const revenue = salesData?.reduce((sum, sale) => sum + (sale.total_amount || 0), 0) || 0;
@@ -198,6 +116,9 @@ export class AdminDashboardPage implements OnInit {
         sales: salesCount,
         revenue: revenue
       });
+
+      // TODO: Process real data for charts here
+      // For now, we use the mock data defined in properties
 
     } catch (error) {
       console.error('Error loading dashboard stats:', error);

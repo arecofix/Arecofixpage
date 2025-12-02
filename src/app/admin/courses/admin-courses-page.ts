@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CoursesService, Course } from '@app/core/services/courses.service';
@@ -28,7 +28,7 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
           </tr>
         </thead>
         <tbody>
-          @for (course of courses; track course.id) {
+          @for (course of courses(); track course.id) {
             <tr>
               <td>
                 <div class="avatar">
@@ -68,7 +68,7 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
               </td>
             </tr>
           }
-          @if (courses.length === 0 && !loading) {
+          @if (courses().length === 0 && !loading()) {
             <tr>
               <td colspan="6" class="text-center py-8 text-gray-500">
                 No hay cursos registrados.
@@ -79,7 +79,7 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
       </table>
     </div>
     
-    @if (loading) {
+    @if (loading()) {
       <div class="flex justify-center py-8">
         <span class="loading loading-spinner loading-lg"></span>
       </div>
@@ -88,23 +88,27 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
 })
 export class AdminCoursesPage implements OnInit {
   private coursesService = inject(CoursesService);
-  courses: Course[] = [];
-  loading = true;
+  private cdr = inject(ChangeDetectorRef);
+  
+  courses = signal<Course[]>([]);
+  loading = signal(true);
 
   ngOnInit() {
     this.loadCourses();
   }
 
   loadCourses() {
-    this.loading = true;
+    this.loading.set(true);
     this.coursesService.getCourses().subscribe({
       next: (response) => {
-        this.courses = response.data || [];
-        this.loading = false;
+        this.courses.set(response.data || []);
+        this.loading.set(false);
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error loading courses', err);
-        this.loading = false;
+        this.loading.set(false);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -114,7 +118,8 @@ export class AdminCoursesPage implements OnInit {
 
     this.coursesService.deleteCourse(course.id).subscribe({
       next: () => {
-        this.courses = this.courses.filter(c => c.id !== course.id);
+        this.courses.update(current => current.filter(c => c.id !== course.id));
+        this.cdr.markForCheck();
       },
       error: (err) => alert('Error al eliminar el curso: ' + err.message)
     });

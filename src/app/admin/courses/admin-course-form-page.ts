@@ -81,7 +81,10 @@ import { CoursesService } from '@app/core/services/courses.service';
           <input type="text" formControlName="image_url" class="input input-bordered bg-white text-gray-800" placeholder="https://..." />
           @if (form.get('image_url')?.value) {
             <div class="mt-2">
-              <img [src]="form.get('image_url')?.value" class="h-32 rounded object-cover border" alt="Preview" />
+              <img [src]="form.get('image_url')?.value" 
+                   class="h-32 rounded object-cover border" 
+                   alt="Preview" 
+                   onerror="this.style.display='none'" />
             </div>
           }
         </div>

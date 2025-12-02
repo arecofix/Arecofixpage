@@ -63,7 +63,7 @@ export class CategoryService {
     // Assuming featured means something specific or just top categories
     // For now, let's just get the first 3
     const _page = 1;
-    const _per_page = 3;
+    const _per_page = 50;
 
     return from(
       this.supabase

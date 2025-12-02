@@ -56,6 +56,6 @@ export class AdminLayout {
 
   async logout() {
     await this.authService.signOut();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']);
   }
 }

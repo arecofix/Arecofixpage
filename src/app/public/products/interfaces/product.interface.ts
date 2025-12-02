@@ -10,7 +10,7 @@ export interface iProductsResponse {
 
 export interface iProduct {
   id: string;
-  category_id: number;
+  category_id: string;
   slug: string;
   name: string;
   description: string;

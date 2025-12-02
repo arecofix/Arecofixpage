@@ -13,6 +13,7 @@ import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD5JCGp6wVHlHKzJRssRtTstNHSoaLj2i4",
@@ -44,7 +45,10 @@ export const appConfig: ApplicationConfig = {
     // Configuración de Firebase
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideFirestore(() => getFirestore()),
-    provideAuth(() => getAuth())
+    provideAuth(() => getAuth()),
+
+    // Charts
+    provideCharts(withDefaultRegisterables()),
 
     // Agrega otros módulos de Firebase según necesites:
     // provideStorage(() => getStorage()), // Para Firebase Storage

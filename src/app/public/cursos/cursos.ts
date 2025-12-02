@@ -104,7 +104,7 @@ export class CursosComponent implements OnInit {
     productsRs = rxResource({
         stream: () => this.categoryService.getDataBySlug('cursos').pipe(
             switchMap((category: iCategoriesResponse) => this.productService.getData({
-                category_id: Number(category.data?.[0]?.id),
+                category_id: category.data?.[0]?.id,
                 _page: this.paginationService.currentPage() || 1,
             }))
         )

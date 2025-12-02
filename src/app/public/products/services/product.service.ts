@@ -43,7 +43,7 @@ export class ProductService {
       .eq('is_active', true);
 
     // Apply filters
-    if (category_id) query = query.eq('category_id', category_id);
+    if (category_id !== undefined && category_id !== null) query = query.eq('category_id', category_id);
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
     if (id) query = query.eq('id', id);

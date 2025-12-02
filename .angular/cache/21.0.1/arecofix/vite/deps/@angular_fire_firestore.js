@@ -2,6 +2,8 @@ import {
   AppCheckInstances,
   AuthInstances
 } from "./chunk-F4NMUNP7.js";
+import "./chunk-5ES7C2RN.js";
+import "./chunk-UC72YTJX.js";
 import {
   Component,
   FirebaseApp,
@@ -35,8 +37,6 @@ import {
   ɵzoneWrap
 } from "./chunk-3DWOCZU5.js";
 import "./chunk-GPLNZVPR.js";
-import "./chunk-5ES7C2RN.js";
-import "./chunk-UC72YTJX.js";
 import {
   NgModule,
   Optional,
