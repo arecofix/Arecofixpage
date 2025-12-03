@@ -31,7 +31,7 @@
                     <td>{{ invoice.customer_name || 'Consumidor Final' }}</td>
                     <td class="font-bold">${{ invoice.total_amount }}</td>
                     <td>
-                        <a [routerLink]="['/admin/invoices', invoice.id]" class="btn btn-sm btn-ghost">
+                        <a [routerLink]="['/admin/sales/invoices', invoice.id]" class="btn btn-sm btn-ghost">
                             <i class="fas fa-eye"></i>
                         </a>
                     </td>

@@ -1,5 +1,5 @@
 <div
-  class="fixed right-0 top-24 h-[calc(100vh-6rem)] w-80 bg-gray-950/95 backdrop-blur-lg border-l-2 border-brand-blue/30 transform transition-transform duration-300 z-[2000] overflow-y-auto rounded-l-xl shadow-2xl"
+  class="fixed right-0 top-24 h-[calc(100vh-6rem)] w-80 bg-gray-950/95 backdrop-blur-lg border-l-2 border-brand-blue/30 transform transition-transform duration-300 z-2000 overflow-y-auto rounded-l-xl shadow-2xl"
   [class.translate-x-full]="!(preferencesService.sidebarOpen$ | async)"
 >
   <!-- Sidebar Header -->
@@ -131,7 +131,7 @@
 <!-- Toggle Sidebar Button -->
 <button
   (click)="preferencesService.toggleSidebar()"
-  class="fixed right-0 top-32 z-[2000] p-3 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-l-lg transition-all shadow-lg"
+  class="fixed right-0 top-32 z-2000 p-3 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-l-lg transition-all shadow-lg"
   [class.hidden]="(preferencesService.sidebarOpen$ | async)"
   [attr.aria-label]="(preferencesService.language$ | async) === 'es' ? 'Abrir panel de accesibilidad' : 'Open accessibility panel'"
   title="Accessibility"

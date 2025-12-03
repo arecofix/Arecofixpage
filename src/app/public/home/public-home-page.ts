@@ -264,7 +264,7 @@ export class PublicHomePage {
         subtitle: 'Software de Alto Impacto',
         description: 'Desarrollo web y móvil a medida. Creamos soluciones escalables que impulsan tu negocio digitalmente.',
         ctaQuote: 'Cotizar Proyecto',
-        ctaPortfolio: 'View Portfolio',
+        ctaPortfolio: 'Ver Portfolio',
         techUsed: 'Tecnologías que utilizamos:'
       },
       courses: {

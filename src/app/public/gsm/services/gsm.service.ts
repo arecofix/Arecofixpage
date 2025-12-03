@@ -6,7 +6,7 @@ export interface GsmTool {
   description: string;
   price: string;
   icon: string;
-  link: string;
+  loginUrl: string; // Renamed from link
 }
 
 export interface BrandService {
@@ -19,8 +19,9 @@ export interface DownloadItem {
   name: string;
   version: string;
   size: string;
-  link: string;
+  downloadUrl: string; // Renamed from link
   icon: string;
+  description: string; // Added
 }
 
 @Injectable({
@@ -35,28 +36,28 @@ export class GsmService {
         description: 'Herramienta profesional para desbloqueo de FRP, Mi Account y Flasheo.',
         price: 'Consultar',
         icon: 'fas fa-unlock-alt',
-        link: 'https://unlocktool.net'
+        loginUrl: 'https://unlocktool.net'
       },
       {
         name: 'Chimera Tool',
         description: 'Soporte multimarca para reparación de IMEI, desbloqueo y más.',
         price: 'Consultar',
         icon: 'fas fa-dragon',
-        link: 'https://chimeratool.com'
+        loginUrl: 'https://chimeratool.com'
       },
       {
         name: 'Z3X Box',
         description: 'Especializada en Samsung y LG. Reparación de IMEI y Flasheo.',
         price: 'Consultar',
         icon: 'fas fa-box-open',
-        link: 'https://z3x-team.com'
+        loginUrl: 'https://z3x-team.com'
       },
       {
         name: 'SigmaKey',
         description: 'Solución para Huawei, Motorola y otras marcas MTK/Qualcomm.',
         price: 'Consultar',
         icon: 'fas fa-key',
-        link: 'https://sigmakey.com'
+        loginUrl: 'https://sigmakey.com'
       }
     ]);
   }
@@ -92,29 +93,33 @@ export class GsmService {
         name: 'Samsung USB Drivers',
         version: 'v1.7.59',
         size: '35 MB',
-        link: 'https://developer.samsung.com/android-usb-driver',
-        icon: 'fab fa-usb'
+        downloadUrl: 'https://developer.samsung.com/android-usb-driver',
+        icon: 'fab fa-usb',
+        description: 'Drivers oficiales para dispositivos Samsung.'
       },
       {
         name: 'Odin Flash Tool',
         version: 'v3.14.4',
         size: '2.5 MB',
-        link: 'https://odindownload.com/',
-        icon: 'fas fa-bolt'
+        downloadUrl: 'https://odindownload.com/',
+        icon: 'fas fa-bolt',
+        description: 'Herramienta de flasheo para Samsung.'
       },
       {
         name: 'Xiaomi ADB/Fastboot Tools',
         version: 'v7.0.3',
         size: '15 MB',
-        link: 'https://github.com/Szaki/XiaomiADBFastbootTools',
-        icon: 'fas fa-tools'
+        downloadUrl: 'https://github.com/Szaki/XiaomiADBFastbootTools',
+        icon: 'fas fa-tools',
+        description: 'Herramienta para gestionar dispositivos Xiaomi.'
       },
       {
         name: 'Platform Tools (ADB/Fastboot)',
         version: 'Latest',
         size: '12 MB',
-        link: 'https://developer.android.com/studio/releases/platform-tools',
-        icon: 'fas fa-terminal'
+        downloadUrl: 'https://developer.android.com/studio/releases/platform-tools',
+        icon: 'fas fa-terminal',
+        description: 'Herramientas de línea de comandos del SDK de Android.'
       }
     ]);
   }

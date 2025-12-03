@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -37,7 +37,7 @@ export class AdminLayout {
       children: [
         { title: 'Empleados', path: '/admin/employees', icon: 'fa-id-card' },
         { title: 'Proveedores', path: '/admin/suppliers', icon: 'fa-truck' },
-        { title: 'Facturación', path: '/admin/invoices', icon: 'fa-file-invoice-dollar' },
+        { title: 'Facturación', path: '/admin/sales/invoices', icon: 'fa-file-invoice-dollar' },
       ]
     },
     { title: 'Cursos', path: '/admin/courses', icon: 'fa-graduation-cap' },

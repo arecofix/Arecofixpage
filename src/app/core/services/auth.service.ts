@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { createClient, SupabaseClient, User, Session, AuthChangeEvent } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
-import { LoggerService } from '../core/services/logger.service';
+import { LoggerService } from './logger.service';
 
 export interface AuthResponse {
   user: User | null;
@@ -112,7 +112,7 @@ export class AuthService {
       });
 
       if (error) {
-        this.logger.error('Supabase signUp error', error);
+        this.logger.error('Supabase signUp error', error as any);
         return { user: null, session: null, error: error.message };
       }
 
@@ -135,7 +135,7 @@ export class AuthService {
           .insert(userProfile);
 
         if (profileError) {
-          this.logger.error('Error creating profile manually', profileError);
+          this.logger.error('Error creating profile manually', profileError as any);
           // We don't fail the whole signup if profile fails, but we log it.
         }
       }
@@ -147,7 +147,7 @@ export class AuthService {
 
       return { user: data.user, session: data.session };
 
-    } catch (e: unknown) {
+    } catch (e: any) {
       this.logger.error('Unexpected error during signup', e);
       const errorMessage = e instanceof Error ? e.message : 'Unknown error';
       return { user: null, session: null, error: errorMessage };
@@ -184,7 +184,7 @@ export class AuthService {
       .single();
 
     if (error) {
-      this.logger.error('Error fetching profile', error);
+      this.logger.error('Error fetching profile', error as any);
       return null;
     }
 
@@ -200,7 +200,7 @@ export class AuthService {
       .single();
 
     if (error) {
-      this.logger.error('Error updating profile', error);
+      this.logger.error('Error updating profile', error as any);
       return null;
     }
 
@@ -238,10 +238,10 @@ export class AuthService {
         .select('id')
         .limit(1);
 
-      this.logger.debug('Database connection test', { data, error });
+      this.logger.debug('Database connection test', { data, error } as any);
       return !error;
     } catch (err) {
-      this.logger.error('Database connection test failed', err);
+      this.logger.error('Database connection test failed', err as any);
       return false;
     }
   }
@@ -371,7 +371,7 @@ export class AuthService {
     const { data, error } = await this.supabase.auth.refreshSession();
 
     if (error) {
-      this.logger.error('Error refreshing session', error);
+      this.logger.error('Error refreshing session', error as any);
       return null;
     }
 
