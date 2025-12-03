@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
 import { Post } from '@app/features/posts/domain/entities/post.entity';
 
 @Injectable({

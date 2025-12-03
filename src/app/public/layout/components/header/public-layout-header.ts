@@ -1,14 +1,14 @@
-import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef, signal, computed, AfterViewInit, OnDestroy, PLATFORM_ID, ElementRef, Renderer2, HostListener } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { CategoryService } from '@app/public/categories/services/category.service';
 import { iCategoriesResponse, iCategory } from '@app/public/categories/interfaces';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
 import { CartService } from '@app/shared/services/cart.service';
-import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Observable, fromEvent, Subject } from 'rxjs';
+import { map, distinctUntilChanged, filter, pairwise, share, throttleTime, takeUntil } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 
@@ -22,16 +22,34 @@ interface iMenuItem {
   selector: 'public-layout-header',
   imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule],
   templateUrl: './public-layout-header.html',
-  styles: ``,
+  styles: `
+    :host {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      transition: transform 0.3s ease-in-out;
+      width: 100%;
+      will-change: transform;
+    }
+    :host.hidden-navbar {
+      transform: translateY(-100%) !important;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicLayoutHeader {
+export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
   public appName: string = environment.appName;
   public categoryService = inject(CategoryService);
   public authService = inject(AuthService);
   public cartService = inject(CartService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private platformId = inject(PLATFORM_ID);
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
 
   public user$ = this.authService.authState$.pipe(map(state => state.user));
 
@@ -39,6 +57,10 @@ export class PublicLayoutHeader {
   public searchQuery = signal('');
   public products = signal<Product[]>([]);
   public showResults = signal(false);
+
+  // Navbar Visibility Logic
+  public isVisible = signal(true);
+  private destroy$ = new Subject<void>();
 
   public filteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
@@ -53,6 +75,63 @@ export class PublicLayoutHeader {
 
   constructor() {
     this.loadProducts();
+  }
+
+  private lastScrollTop = 0;
+
+  ngAfterViewInit() {
+    // No-op: Logic moved to HostListener for reliability
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const currentScroll = window.scrollY || document.documentElement.scrollTop;
+
+    // Safety check: always show if near top
+    if (currentScroll < 50) {
+      this.showNavbar();
+      this.lastScrollTop = currentScroll;
+      return;
+    }
+
+    const scrollDelta = currentScroll - this.lastScrollTop;
+
+    if (scrollDelta > 0) {
+      // Scrolling Down
+      // Only hide if we've scrolled down a significant amount (e.g. > 10px) to avoid jitter
+      if (Math.abs(scrollDelta) > 10) {
+        this.hideNavbar();
+        this.lastScrollTop = currentScroll;
+      }
+    } else {
+      // Scrolling Up
+      // Show immediately on ANY upward scroll
+      this.showNavbar();
+      this.lastScrollTop = currentScroll;
+    }
+  }
+
+  private showNavbar() {
+    if (!this.isVisible()) {
+      this.isVisible.set(true);
+      this.renderer.removeClass(this.el.nativeElement, 'hidden-navbar');
+      this.cdr.markForCheck();
+    }
+  }
+
+  private hideNavbar() {
+    if (this.isVisible()) {
+      this.isVisible.set(false);
+      this.renderer.addClass(this.el.nativeElement, 'hidden-navbar');
+      this.cdr.markForCheck();
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   async loadProducts() {

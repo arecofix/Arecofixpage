@@ -1,218 +1,119 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-
-interface GsmTool {
-  name: string;
-  description: string;
-  icon: string;
-  loginUrl?: string;
-}
-
-interface BrandService {
-  name: string;
-  logo?: string;
-}
-
-interface Download {
-  name: string;
-  description?: string;
-  downloadUrl?: string;
-  icon: string;
-}
+import { PreferencesService } from '../../shared/services/preferences.service';
+import { GsmService, GsmTool, BrandService, DownloadItem } from './services/gsm.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-gsm',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule],
   templateUrl: './gsm.component.html',
   styleUrl: './gsm.component.css',
 })
-export class GsmComponent implements OnInit {
+export class GsmComponent implements OnInit, OnDestroy {
 
-  gsmTools: GsmTool[] = [
-    {
-      name: 'Octoplus FRP Digital',
-      description: 'Solución profesional para servicio de LG, Samsung y otros.',
-      icon: 'fas fa-mobile-alt',
-      loginUrl: '#'
-    },
-    {
-      name: 'Borneo Schematics',
-      description: 'Solución de esquemáticos y hardware para técnicos.',
-      icon: 'fas fa-project-diagram',
-      loginUrl: '#'
-    },
-    {
-      name: 'DFT Pro Tool',
-      description: 'Herramienta profesional para servicios en dispositivos Android.',
-      icon: 'fab fa-android',
-      loginUrl: '#'
-    },
-    {
-      name: 'SigmaKey',
-      description: 'Herramienta de flasheo y desbloqueo para múltiples marcas.',
-      icon: 'fas fa-key',
-      loginUrl: '#'
-    },
-    {
-      name: 'UMT Pro Digital',
-      description: 'Ultimate Multi Tool para servicio de móviles.',
-      icon: 'fas fa-toolbox',
-      loginUrl: '#'
-    },
-    {
-      name: 'Pandora Tool',
-      description: 'Herramienta de Z3X Team para dispositivos Mediatek.',
-      icon: 'fas fa-box-open',
-      loginUrl: '#'
-    },
-    {
-      name: 'DFT Tool Pro',
-      description: 'Herramienta avanzada para flasheo y reparación de software.',
-      icon: 'fas fa-download',
-      loginUrl: '#'
-    },
-    {
-      name: 'TSM Pro',
-      description: 'Herramienta de servicio para dispositivos Samsung.',
-      icon: 'fas fa-mobile',
-      loginUrl: '#'
-    },
-    {
-      name: 'Chimera Tool',
-      description: 'Herramienta de servicio universal para una amplia gama de teléfonos.',
-      icon: 'fas fa-wrench',
-      loginUrl: '#'
-    },
-    {
-      name: 'UnlockTool',
-      description: 'Potente herramienta para desbloqueo y reparación de múltiples marcas.',
-      icon: 'fas fa-unlock-alt',
-      loginUrl: '#'
-    },
-    {
-      name: 'Cheetah Tool',
-      description: 'Herramienta de servicio para dispositivos Qualcomm y Mediatek.',
-      icon: 'fas fa-bolt',
-      loginUrl: '#'
-    },
-    {
-      name: 'TFM Tool Pro',
-      description: 'Software de servicio para dispositivos Mediatek, Qualcomm y más.',
-      icon: 'fas fa-cogs',
-      loginUrl: '#'
-    },
-    {
-      name: 'MRT Tool',
-      description: 'Mobile Repair Tool, especializada en marcas chinas.',
-      icon: 'fas fa-tools',
-      loginUrl: '#'
-    },
-    {
-      name: 'EFT Pro Dongle',
-      description: 'Easy-Firmware Team Dongle para desbloqueo y reparación.',
-      icon: 'fas fa-usb',
-      loginUrl: '#'
-    },
-    {
-      name: 'e-GSM Tool',
-      description: 'Solución de software para reparación y mantenimiento de móviles.',
-      icon: 'fas fa-laptop-code',
-      loginUrl: '#'
-    },
-    {
-      name: 'Hydra Tool',
-      description: 'Herramienta todo en uno para una gran variedad de CPUs.',
-      icon: 'fas fa-microchip',
-      loginUrl: '#'
-    },
-    {
-      name: 'GCPro Key',
-      description: 'Herramienta para servicio de Samsung, LG, Huawei y más.',
-      icon: 'fas fa-shield-alt',
-      loginUrl: '#'
-    },
-    {
-      name: 'NCK Pro Digital',
-      description: 'Herramienta de servicio para una gran variedad de CPUs.',
-      icon: 'fas fa-server',
-      loginUrl: '#'
-    }
-  ];
-
-  brandServices: BrandService[] = [
-    { name: 'BLU' },
-    { name: 'Hisense' },
-    { name: 'Infinix' },
-    { name: 'Motorola' },
-    { name: 'Oppo' },
-    { name: 'Realme' },
-    { name: 'Samsung' },
-    { name: 'TCL' },
-    { name: 'Tecno' },
-    { name: 'Vivo' },
-    { name: 'Xiaomi' },
-    { name: 'ZTE' }
-  ];
-
-  downloads: Download[] = [
-    {
-      name: '3uTools',
-      description: 'Herramienta completa para dispositivos iOS',
-      icon: 'fab fa-apple',
-      downloadUrl: '#'
-    },
-    {
-      name: 'Redirector 1.9.7',
-      description: 'Herramienta de redirección',
-      icon: 'fas fa-exchange-alt',
-      downloadUrl: '#'
-    },
-    {
-      name: 'AnyDesk',
-      description: 'Software de escritorio remoto',
-      icon: 'fas fa-desktop',
-      downloadUrl: '#'
-    },
-    {
-      name: 'Drivers MTK SPD',
-      description: 'Drivers para dispositivos Mediatek y Spreadtrum',
-      icon: 'fas fa-hdd',
-      downloadUrl: '#'
-    },
-    {
-      name: 'VirtualHere Client',
-      description: 'Cliente USB sobre red',
-      icon: 'fas fa-network-wired',
-      downloadUrl: '#'
-    },
-    {
-      name: 'UltraViewer',
-      description: 'Software de control remoto',
-      icon: 'fas fa-eye',
-      downloadUrl: '#'
-    },
-    {
-      name: 'Tool Bypass ARECOFIX A12 2.0',
-      description: 'Herramienta de bypass para Android 12',
-      icon: 'fas fa-unlock',
-      downloadUrl: '#'
-    },
-    {
-      name: 'Tool Activator A12+ XR to 17P MAX',
-      description: 'Activador para dispositivos Android 12+',
-      icon: 'fas fa-check-circle',
-      downloadUrl: '#'
-    }
-  ];
+  gsmTools: GsmTool[] = [];
+  brandServices: BrandService[] = [];
+  downloads: DownloadItem[] = [];
 
   whatsappUrl = 'https://wa.me/541125960900?text=Hola,%20necesito%20ayuda%20con%20herramientas%20GSM';
 
+  // Translations
+  translations: any = {
+    es: {
+      badge: 'Plataforma Profesional GSM',
+      title_sub: 'Herramientas & Licencias',
+      description: 'Plataforma integral para técnicos GSM, FRP y licencias digitales. Soluciones profesionales al alcance de un clic.',
+      btn_whatsapp: 'Soporte WhatsApp',
+      btn_tools: 'Ver Herramientas',
+      offer_badge: 'Oferta Activada',
+      offer_desc: 'Descuento exclusivo por tiempo limitado',
+      region: 'Región',
+      mac_support: 'Podemos hacerlo en una MAC',
+      btn_offer: 'Ver Oferta',
+      calc_title: 'Conversor Rápido',
+      calc_desc: 'Calculá tus operaciones de manera transparente y segura.',
+      calc_label: 'Calculadora USDT',
+      calc_sub: 'Cotización en tiempo real',
+      input_label: 'Cantidad USDT',
+      btn_calc: 'CALCULAR TOTAL',
+      total_est: 'Total Estimado (ARS)',
+      cot_ref: 'Cotización ref',
+      tools_title: 'Herramientas GSM & Licencias',
+      tools_desc: 'Software profesional para desbloqueo, flasheo y reparación de dispositivos móviles.',
+      btn_login: 'Inicia sesión',
+      brands_title: 'Catálogo de Servicios',
+      brands_desc: 'Selecciona una marca para ver los servicios disponibles',
+      btn_view_services: 'Ver Servicios',
+      downloads_title: 'Descargas Útiles',
+      downloads_desc: 'Drivers y herramientas esenciales para tu taller.',
+      btn_view_all: 'Ver todo',
+      btn_download: 'Descargar ahora',
+      utility: 'Utilidad',
+      days: 'Días',
+      hours: 'Hs',
+      min: 'Min',
+      sec: 'Seg'
+    },
+    en: {
+      badge: 'Professional GSM Platform',
+      title_sub: 'Tools & Licenses',
+      description: 'Comprehensive platform for GSM technicians, FRP, and digital licenses. Professional solutions just a click away.',
+      btn_whatsapp: 'WhatsApp Support',
+      btn_tools: 'View Tools',
+      offer_badge: 'Offer Activated',
+      offer_desc: 'Exclusive discount for a limited time',
+      region: 'Region',
+      mac_support: 'We can do it on a MAC',
+      btn_offer: 'View Offer',
+      calc_title: 'Quick Converter',
+      calc_desc: 'Calculate your operations transparently and securely.',
+      calc_label: 'USDT Calculator',
+      calc_sub: 'Real-time quotation',
+      input_label: 'USDT Amount',
+      btn_calc: 'CALCULATE TOTAL',
+      total_est: 'Estimated Total (ARS)',
+      cot_ref: 'Ref quote',
+      tools_title: 'GSM Tools & Licenses',
+      tools_desc: 'Professional software for unlocking, flashing, and repairing mobile devices.',
+      btn_login: 'Login',
+      brands_title: 'Service Catalog',
+      brands_desc: 'Select a brand to view available services',
+      btn_view_services: 'View Services',
+      downloads_title: 'Useful Downloads',
+      downloads_desc: 'Essential drivers and tools for your workshop.',
+      btn_view_all: 'View all',
+      btn_download: 'Download now',
+      utility: 'Utility',
+      days: 'Days',
+      hours: 'Hrs',
+      min: 'Min',
+      sec: 'Sec'
+    }
+  };
+
   constructor(
     private titleService: Title,
-    private metaService: Meta
+    private metaService: Meta,
+    public preferencesService: PreferencesService,
+    private gsmService: GsmService
   ) { }
+
+  // Calculator
+  usdtAmount: number | null = null;
+  usdtRate: number = 1240; // Example rate, could be dynamic
+  usdtTotal: number | null = null;
+
+  // Countdown
+  countdown = {
+    days: 5,
+    hours: 9,
+    minutes: 8,
+    seconds: 19
+  };
+  private countdownInterval: any;
 
   ngOnInit(): void {
     // SEO Optimization
@@ -230,5 +131,54 @@ export class GsmComponent implements OnInit {
       { name: 'twitter:title', content: 'Herramientas GSM Profesionales | ARECOFIX' },
       { name: 'twitter:description', content: 'Plataforma integral para técnicos GSM con herramientas profesionales y licencias digitales.' }
     ]);
+
+    this.loadData();
+    this.startCountdown();
+  }
+
+  loadData() {
+    this.gsmService.getGsmTools().subscribe(data => this.gsmTools = data);
+    this.gsmService.getBrandServices().subscribe(data => this.brandServices = data);
+    this.gsmService.getDownloads().subscribe(data => this.downloads = data);
+  }
+
+  ngOnDestroy() {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+  }
+
+  calculateUsdt() {
+    if (this.usdtAmount) {
+      this.usdtTotal = this.usdtAmount * this.usdtRate;
+    } else {
+      this.usdtTotal = null;
+    }
+  }
+
+  startCountdown() {
+    this.countdownInterval = setInterval(() => {
+      if (this.countdown.seconds > 0) {
+        this.countdown.seconds--;
+      } else {
+        this.countdown.seconds = 59;
+        if (this.countdown.minutes > 0) {
+          this.countdown.minutes--;
+        } else {
+          this.countdown.minutes = 59;
+          if (this.countdown.hours > 0) {
+            this.countdown.hours--;
+          } else {
+            this.countdown.hours = 23;
+            if (this.countdown.days > 0) {
+              this.countdown.days--;
+            } else {
+              // Reset or stop
+              this.countdown = { days: 5, hours: 9, minutes: 8, seconds: 19 };
+            }
+          }
+        }
+      }
+    }, 1000);
   }
 }

@@ -57,55 +57,55 @@
                 <h2 class="card-title mb-4">Datos del Cliente</h2>
 
                 <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()" class="space-y-4">
-                    <div class="form-control">
+                    <div class="form-control w-full">
                         <label class="label">
                             <span class="label-text">Nombre Completo</span>
                         </label>
-                        <input type="text" formControlName="name" class="input input-bordered"
+                        <input type="text" formControlName="name" class="input input-bordered w-full"
                             [class.input-error]="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" />
                         @if (checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched) {
                         <span class="text-error text-xs mt-1">El nombre es requerido</span>
                         }
                     </div>
 
-                    <div class="form-control">
+                    <div class="form-control w-full">
                         <label class="label">
                             <span class="label-text">Email</span>
                         </label>
-                        <input type="email" formControlName="email" class="input input-bordered"
+                        <input type="email" formControlName="email" class="input input-bordered w-full"
                             [class.input-error]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" />
                         @if (checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched) {
                         <span class="text-error text-xs mt-1">Email inválido</span>
                         }
                     </div>
 
-                    <div class="form-control">
+                    <div class="form-control w-full">
                         <label class="label">
                             <span class="label-text">Teléfono</span>
                         </label>
-                        <input type="tel" formControlName="phone" class="input input-bordered"
+                        <input type="tel" formControlName="phone" class="input input-bordered w-full"
                             [class.input-error]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" />
                         @if (checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched) {
                         <span class="text-error text-xs mt-1">El teléfono es requerido</span>
                         }
                     </div>
 
-                    <div class="form-control">
+                    <div class="form-control w-full">
                         <label class="label">
                             <span class="label-text">Dirección de Envío</span>
                         </label>
-                        <textarea formControlName="address" class="textarea textarea-bordered h-24"
+                        <textarea formControlName="address" class="textarea textarea-bordered h-24 w-full"
                             [class.textarea-error]="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched"></textarea>
                         @if (checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched) {
                         <span class="text-error text-xs mt-1">La dirección es requerida</span>
                         }
                     </div>
 
-                    <div class="form-control">
+                    <div class="form-control w-full">
                         <label class="label">
                             <span class="label-text">Notas (Opcional)</span>
                         </label>
-                        <textarea formControlName="notes" class="textarea textarea-bordered"></textarea>
+                        <textarea formControlName="notes" class="textarea textarea-bordered w-full"></textarea>
                     </div>
 
                     <div class="mt-6">

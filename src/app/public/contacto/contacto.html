@@ -1,298 +1,247 @@
-<div class="min-h-screen flex flex-col">
-  <!-- Header -->
-  <header class="bg-white shadow-sm sticky top-0 z-10">
-    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="./" class="text-gray-800 flex items-center" aria-label="Volver">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-          <path
-            d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z">
-          </path>
-        </svg>
-      </a>
-      <h1 class="text-gray-900 text-lg font-bold leading-tight tracking-tight flex-1 text-center px-4">Contacto</h1>
-      <div class="w-6"></div> <!-- Spacer para balancear el diseño -->
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="flex-grow container mx-auto px-4 py-6">
-    <div class="max-w-4xl mx-auto">
-      <!-- Hero Section -->
-      <section class="mb-8">
-        <h2 class="text-lg text-2xl md:text-3xl font-bold leading-tight mb-2">Contáctanos</h2>
-        <p class="text-lg-700 text-base md:text-lg leading-normal">
-          Si tienes alguna pregunta o necesitas ayuda, no dudes en ponerte en contacto con nosotros.
-          Estamos aquí para ayudarte y responderemos lo antes posible.
-        </p>
-      </section>
-
-      <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Form Section -->
-        <section class="flex-1 bg-white rounded-xl shadow-md p-6">
-          <h3 class="text-gray-900 text-xl font-bold mb-6">Envía un mensaje</h3>
-
-          <form id="contactForm" action="https://formspree.io/f/mpwrwebv" method="POST" class="space-y-4">
-            <!-- Campo oculto para redirección después del envío (opcional) -->
-            <input type="hidden" name="_next" value="https://arecofix.com.ar">
-
-            <!-- Campo para el asunto del correo -->
-            <input type="hidden" name="_subject" value="Nuevo mensaje de contacto desde Arecofix">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Nombre -->
-              <div>
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-                <input type="text" id="name" name="name" required placeholder="Tu nombre completo"
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus transition-all placeholder-gray-400">
-                <p class="mt-1 text-sm text-red-600 hidden" id="name-error">Por favor ingresa tu nombre</p>
-              </div>
-
-              <!-- Email -->
-              <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico *</label>
-                <input type="email" id="email" name="email" required placeholder="tu@email.com"
-                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus transition-all placeholder-gray-400">
-                <p class="mt-1 text-sm text-red-600 hidden" id="email-error">Por favor ingresa un email válido</p>
-              </div>
-            </div>
-
-            <!-- Teléfono -->
-            <div>
-              <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-              <input type="tel" id="phone" name="phone" placeholder="+54 11 1234-5678"
-                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus transition-all placeholder-gray-400">
-            </div>
-
-            <!-- Asunto -->
-            <div>
-              <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Asunto *</label>
-              <select id="subject" name="subject" required
-                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus transition-all bg-white">
-                <option value="" disabled selected>Selecciona un asunto</option>
-                <option value="Consulta general">Consulta general</option>
-                <option value="Soporte técnico">Soporte técnico</option>
-                <option value="Información de ventas">Información de ventas</option>
-                <option value="Oportunidades de trabajo">Oportunidades de trabajo</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </div>
-
-            <!-- Mensaje -->
-            <div>
-              <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Mensaje *</label>
-              <textarea id="message" name="message" rows="5" required placeholder="Escribe tu mensaje aquí..."
-                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus transition-all placeholder-gray-400"></textarea>
-              <p class="mt-1 text-sm text-red-600 hidden" id="message-error">Por favor escribe tu mensaje</p>
-            </div>
-
-            <!-- Términos y condiciones -->
-            <div class="flex items-start">
-              <div class="flex items-center h-5">
-                <input id="terms" name="terms" type="checkbox" required
-                  class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-              </div>
-              <div class="ml-3 text-sm">
-                <label for="terms" class="font-medium text-gray-700">
-                  Acepto los <a href="#" class="text-blue-600 hover:text-blue-500">términos y condiciones</a> y la
-                  <a href="#" class="text-blue-600 hover:text-blue-500">política de privacidad</a>.
-                </label>
-              </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="pt-2">
-              <button type="submit"
-                class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all btn-hover btn-active">
-                Enviar mensaje
-              </button>
-            </div>
-
-            <!-- Loading and Success/Error Messages -->
-            <div id="formFeedback" class="hidden mt-4 p-4 rounded-lg"></div>
-          </form>
-        </section>
-
-        <!-- Contact Info Section -->
-        <section class="flex-1 bg-white rounded-xl shadow-md p-6">
-          <h3 class="text-gray-900 text-xl font-bold mb-6">Información de contacto</h3>
-
-          <!-- Mapa Responsive -->
-          <div class="map-container mb-6 rounded-lg overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3277.1107045226386!2d-58.83009858824027!3d-34.77798827277916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceb2312bb37c9%3A0xfcb30b96618694fe!2sARECOFIX%20Soluciones%20Digitales.!5e0!3m2!1ses-419!2sar!4v1749052590838!5m2!1ses-419!2sar"
-              class="responsive-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-              title="Ubicación de Arecofix en el mapa"></iframe>
-          </div>
-
-          <!-- Contact Details -->
-          <div class="space-y-4">
-            <div class="flex items-start gap-4">
-              <div class="flex items-center justify-center rounded-lg bg-gray-100 shrink-0 size-10 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z">
-                  </path>
-                </svg>
-              </div>
-              <div>
-                <h4 class="text-gray-900 font-medium">Dirección</h4>
-                <p class="text-gray-600">Jorge Newbery 69, Marcos paz, Buenos Aires, Argentina</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-4">
-              <div class="flex items-center justify-center rounded-lg bg-gray-100 shrink-0 size-10 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z">
-                  </path>
-                </svg>
-              </div>
-              <div>
-                <h4 class="text-gray-900 font-medium">Teléfono</h4>
-                <p class="text-gray-600">+54 11 2596-0900</p>
-                <p class="text-gray-500 text-sm mt-1">Lunes a Viernes de 9:00 a 18:00</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-4">
-              <div class="flex items-center justify-center rounded-lg bg-gray-100 shrink-0 size-10 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z">
-                  </path>
-                </svg>
-              </div>
-              <div>
-                <h4 class="text-gray-900 font-medium">Correo electrónico</h4>
-                <p class="text-gray-500 text-sm mt-1">Respuesta en menos de 24 horas</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-4">
-              <div class="flex items-center justify-center rounded-lg bg-gray-100 shrink-0 size-10 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z">
-                  </path>
-                </svg>
-              </div>
-              <div>
-                <h4 class="text-gray-900 font-medium">Soporte</h4>
-                <p class="text-gray-500 text-sm mt-1">Asistencia técnica especializada</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Social Media -->
-          <div class="mt-8">
-            <h4 class="text-gray-900 font-medium mb-3">Síguenos en redes</h4>
-            <div class="flex gap-4">
-              <a href="https://facebook.com/arecofix" aria-label="Facebook"
-                class="text-gray-600 hover:text-blue-600 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z">
-                  </path>
-                </svg>
-              </a>
-              <a href="https://linkedin.com/in/ezequiel-enrico-areco" aria-label="LinkedIn"
-                class="text-gray-600 hover:text-blue-700 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z">
-                  </path>
-                </svg>
-              </a>
-              <a href="https://instagram.com/arecofix" aria-label="Instagram"
-                class="text-gray-600 hover:text-pink-600 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                  viewBox="0 0 256 256">
-                  <path
-                    d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z">
-                  </path>
-                </svg>
-              </a>
-            </div>
-          </div>
-        </section>
+<ng-container *ngIf="content$ | async as content">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white dark:bg-white/5 backdrop-blur-sm shadow-sm sticky top-0 z-10 border-b border-gray-200 dark:border-white/10">
+      <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="./" class="text-gray-900 dark:text-white flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Volver">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+            <path
+              d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z">
+            </path>
+          </svg>
+        </a>
+        <h1 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center px-4">{{ content.title }}</h1>
+        <div class="w-6"></div> <!-- Spacer para balancear el diseño -->
       </div>
-    </div>
-  </main>
-
-
-</div>
-
-<script>
-  document.getElementById('contactForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    // Reset error messages
-    document.querySelectorAll('[id$="-error"]').forEach(el => el.classList.add('hidden'));
-    document.getElementById('formFeedback').classList.add('hidden');
-
-    // Validate form
-    let isValid = true;
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const message = document.getElementById('message').value.trim();
-
-    if (!name) {
-      document.getElementById('name-error').classList.remove('hidden');
-      isValid = false;
-    }
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      document.getElementById('email-error').classList.remove('hidden');
-      isValid = false;
-    }
-
-    if (!message) {
-      document.getElementById('message-error').classList.remove('hidden');
-      isValid = false;
-    }
-
-    if (!isValid) return;
-
-    // Show loading state
-    const feedback = document.getElementById('formFeedback');
-    feedback.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'bg-green-50', 'text-green-800');
-    feedback.innerHTML = '<div class="flex items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Enviando mensaje...</div>';
-
-    try {
-      // Create FormData object
-      const formData = new FormData(this);
-
-      // Send data to Formspree
-      const response = await fetch(this.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        // Show success message
-        feedback.classList.add('bg-green-50', 'text-green-800');
-        feedback.innerHTML = '¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.';
-
-        // Reset form
-        this.reset();
-      } else {
-        throw new Error('Error en el servidor');
-      }
-    } catch (error) {
-      // Show error message
-      feedback.classList.add('bg-red-50', 'text-red-800');
-      feedback.innerHTML = 'Hubo un error al enviar el mensaje. Por favor, inténtalo de nuevo más tarde.';
-      console.error('Error:', error);
-    }
-  });
-</script>
+    </header>
+  
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+      <div class="max-w-4xl mx-auto">
+        <!-- Hero Section -->
+        <section class="mb-8 text-center">
+          <h2 class="text-2xl md:text-3xl font-bold leading-tight mb-2 text-gray-900 dark:text-white">{{ content.subtitle }}</h2>
+          <p class="text-base md:text-lg leading-normal text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            {{ content.intro }}
+          </p>
+        </section>
+  
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Form Section -->
+          <section class="flex-1 bg-white dark:bg-white/5 backdrop-blur-sm rounded-xl shadow-md p-6 border border-gray-200 dark:border-white/10">
+            <h3 class="text-gray-900 dark:text-white text-xl font-bold mb-6">{{ content.formTitle }}</h3>
+  
+            <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Nombre -->
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.nameLabel }}</label>
+                  <input type="text" id="name" formControlName="name" [placeholder]="content.namePlaceholder"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+                  @if (contactForm.get('name')?.invalid && contactForm.get('name')?.touched) {
+                    <p class="mt-1 text-sm text-red-500 dark:text-red-400">{{ content.nameError }}</p>
+                  }
+                </div>
+  
+                <!-- Email -->
+                <div>
+                  <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.emailLabel }}</label>
+                  <input type="email" id="email" formControlName="email" [placeholder]="content.emailPlaceholder"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+                  @if (contactForm.get('email')?.invalid && contactForm.get('email')?.touched) {
+                    <p class="mt-1 text-sm text-red-500 dark:text-red-400">{{ content.emailError }}</p>
+                  }
+                </div>
+              </div>
+  
+              <!-- Teléfono -->
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.phoneLabel }}</label>
+                <input type="tel" id="phone" formControlName="phone" [placeholder]="content.phonePlaceholder"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+              </div>
+  
+              <!-- Asunto -->
+              <div>
+                <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.subjectLabel }}</label>
+                <select id="subject" formControlName="subject"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                  <option value="" disabled selected>{{ content.subjectPlaceholder }}</option>
+                  @for (option of content.subjectOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+  
+              <!-- Mensaje -->
+              <div>
+                <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.messageLabel }}</label>
+                <textarea id="message" formControlName="message" rows="5" [placeholder]="content.messagePlaceholder"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500"></textarea>
+                @if (contactForm.get('message')?.invalid && contactForm.get('message')?.touched) {
+                  <p class="mt-1 text-sm text-red-500 dark:text-red-400">{{ content.messageError }}</p>
+                }
+              </div>
+  
+              <!-- Términos y condiciones -->
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input id="terms" formControlName="terms" type="checkbox"
+                    class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded bg-gray-50 dark:bg-white/5">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="terms" class="font-medium text-gray-700 dark:text-gray-300">
+                    {{ content.termsText }} <a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">{{ content.termsLink }}</a> y la
+                    <a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">{{ content.privacyLink }}</a>.
+                  </label>
+                </div>
+              </div>
+  
+              <!-- Submit Button -->
+              <div class="pt-2">
+                <button type="submit" [disabled]="isLoading"
+                  class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ content.submitButton }}
+                </button>
+              </div>
+  
+              <!-- Loading and Success/Error Messages -->
+              @if (isLoading) {
+                <div class="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 flex items-center border border-blue-200 dark:border-blue-500/30">
+                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {{ content.sendingMessage }}
+                </div>
+              }
+  
+              @if (showSuccess) {
+                <div class="mt-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-500/30">
+                  {{ content.successMessage }}
+                </div>
+              }
+  
+              @if (showError) {
+                <div class="mt-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-500/30">
+                  {{ content.errorMessage }}
+                </div>
+              }
+            </form>
+          </section>
+  
+          <!-- Contact Info Section -->
+          <section class="flex-1 bg-white dark:bg-white/5 backdrop-blur-sm rounded-xl shadow-md p-6 border border-gray-200 dark:border-white/10">
+            <h3 class="text-gray-900 dark:text-white text-xl font-bold mb-6">{{ content.contactInfoTitle }}</h3>
+  
+            <!-- Mapa Responsive -->
+            <div class="map-container mb-6 rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-white/10">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3277.1107045226386!2d-58.83009858824027!3d-34.77798827277916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceb2312bb37c9%3A0xfcb30b96618694fe!2sARECOFIX%20Soluciones%20Digitales.!5e0!3m2!1ses-419!2sar!4v1749052590838!5m2!1ses-419!2sar"
+                class="w-full h-64" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                title="Ubicación de Arecofix en el mapa"></iframe>
+            </div>
+  
+            <!-- Contact Details -->
+            <div class="space-y-4">
+              <div class="flex items-start gap-4">
+                <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="text-gray-900 dark:text-white font-medium">{{ content.addressLabel }}</h4>
+                  <p class="text-gray-600 dark:text-gray-300">{{ content.addressValue }}</p>
+                </div>
+              </div>
+  
+              <div class="flex items-start gap-4">
+                <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="text-gray-900 dark:text-white font-medium">{{ content.phoneInfoLabel }}</h4>
+                  <p class="text-gray-600 dark:text-gray-300">{{ content.phoneInfoValue }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{ content.phoneInfoHours }}</p>
+                </div>
+              </div>
+  
+              <div class="flex items-start gap-4">
+                <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="text-gray-900 dark:text-white font-medium">{{ content.emailInfoLabel }}</h4>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{ content.emailInfoValue }}</p>
+                </div>
+              </div>
+  
+              <div class="flex items-start gap-4">
+                <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z">
+                    </path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="text-gray-900 dark:text-white font-medium">{{ content.supportLabel }}</h4>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{ content.supportValue }}</p>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Social Media -->
+            <div class="mt-8">
+              <h4 class="text-gray-900 dark:text-white font-medium mb-3">{{ content.socialTitle }}</h4>
+              <div class="flex gap-4">
+                <a href="https://facebook.com/arecofix" aria-label="Facebook"
+                  class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z">
+                    </path>
+                  </svg>
+                </a>
+                <a href="https://linkedin.com/in/ezequiel-enrico-areco" aria-label="LinkedIn"
+                  class="text-gray-400 hover:text-blue-700 dark:hover:text-blue-600 transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z">
+                    </path>
+                  </svg>
+                </a>
+                <a href="https://instagram.com/arecofix" aria-label="Instagram"
+                  class="text-gray-400 hover:text-pink-600 dark:hover:text-pink-500 transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                      d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z">
+                    </path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</ng-container>

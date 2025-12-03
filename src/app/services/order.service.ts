@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
+import { AuthService } from '../core/services/auth.service';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -95,14 +95,23 @@ export class OrderService {
             const orderNumber = `ORD-${Date.now()}`;
 
             // Insert order
+            const insertPayload = {
+                customer_name: order.customer_name,
+                customer_email: order.customer_email,
+                customer_phone: order.customer_phone,
+                customer_address: order.customer_address,
+                status: order.status,
+                subtotal: order.subtotal,
+                tax: order.tax,
+                discount: order.discount,
+                total_amount: order.total, // Map total to total_amount
+                notes: order.notes,
+                order_number: orderNumber
+            };
+
             const { data: orderData, error: orderError } = await this.supabase
                 .from('orders')
-                .insert({
-                    ...order,
-                    order_number: orderNumber,
-                    total_amount: order.total,
-                    customer_address: order.customer_address // Map address
-                })
+                .insert(insertPayload)
                 .select()
                 .single();
 
@@ -148,14 +157,24 @@ export class OrderService {
     async updateOrder(id: string, order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: any }> {
         try {
             // Update order details
+            // Update order details
+            const updatePayload = {
+                customer_name: order.customer_name,
+                customer_email: order.customer_email,
+                customer_phone: order.customer_phone,
+                customer_address: order.customer_address,
+                status: order.status,
+                subtotal: order.subtotal,
+                tax: order.tax,
+                discount: order.discount,
+                total_amount: order.total,
+                notes: order.notes,
+                updated_at: new Date().toISOString()
+            };
+
             const { data: orderData, error: orderError } = await this.supabase
                 .from('orders')
-                .update({
-                    ...order,
-                    total_amount: order.total,
-                    customer_address: order.customer_address,
-                    updated_at: new Date().toISOString()
-                })
+                .update(updatePayload)
                 .eq('id', id)
                 .select()
                 .maybeSingle();

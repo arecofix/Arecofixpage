@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { PreferencesService } from '../../shared/services/preferences.service';
 
 interface PortfolioContent {
   name: string;
@@ -8,6 +9,7 @@ interface PortfolioContent {
   phone: string;
   email: string;
   website: string;
+  linkedin: string;
   summary: string;
   about: string;
   workExperience: WorkExperience[];
@@ -58,10 +60,6 @@ interface Project {
 })
 export class PortfolioComponent implements OnInit {
   currentLanguage: 'en' | 'es' = 'es';
-  currentBackground: string = 'gradient-5';
-  sidebarOpen = false;
-  fontSize: number = 16;
-  highContrast = false;
 
   portfolioContent: { en: PortfolioContent; es: PortfolioContent } = {
     en: {
@@ -71,6 +69,7 @@ export class PortfolioComponent implements OnInit {
       phone: '+54 11 2596-0900',
       email: 'ezequielenrico15@gmail.com',
       website: 'www.arecofix.com.ar',
+      linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
       cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
       summary: 'Systems professional, Full-Stack developer. Currently working in the government technical team and experienced as an IT instructor. I enjoy teamwork and value collaboration. Seeking new professional opportunities in IT.',
       about: 'Welcome to my online portfolio. Here you will see examples of the tools I work with as a fullstack developer. I specialize in web development using modern technologies like HTML, CSS, JavaScript, and frameworks like Django and React.',
@@ -96,7 +95,7 @@ export class PortfolioComponent implements OnInit {
       ],
       education: [
         {
-          degree: 'Licenciatura en Informática',
+          degree: 'Bachelors in computer science',
           institution: 'Universidad Nacional del Oeste (UNO)',
           period: 'Expected 2024',
           details: [
@@ -153,6 +152,7 @@ export class PortfolioComponent implements OnInit {
       phone: '+54 11 2596-0900',
       email: 'ezequielenrico15@gmail.com',
       website: 'www.arecofix.com.ar',
+      linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
       cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
       summary: 'Profesional de sistemas, desarrollador Full-Stack. Actualmente trabajo en el sector gubernamental de equipo técnico y tengo experiencia como profesor de informática y tutor en cursos de Reparación de Celulares. Disfruto trabajando en equipo y valoro la colaboración y el intercambio de ideas. Busco nuevas oportunidades profesionales en el campo de la tecnología de la información.',
       about: 'Bienvenido a mi portafolio en línea. Recuerda que en la sección acerca de encontrarás mi información personal. Aquí verás ejemplos de las herramientas con las que trabajo como desarrollador fullstack. Estoy especializado en el desarrollo web, utilizando tecnologías modernas como Angular, Tailwind CSS, TypeScript y frameworks como Django y Node.js.',
@@ -212,20 +212,20 @@ export class PortfolioComponent implements OnInit {
         {
           title: 'Arecofix Page',
           description: 'Sitio institucional y e-commerce para Arecofix. Construido con Angular y Tailwind CSS.',
-          image: 'assets/img/projects/arecofix.jpg',
+          image: 'assets/img/projects/arecofix.png',
           tags: ['Angular', 'Tailwind', 'TypeScript'],
           link: 'https://arecofix.com.ar'
         },
         {
           title: 'Sistema de Gestión',
           description: 'Aplicación de escritorio para gestión empresarial desarrollada en C# .NET.',
-          image: 'assets/img/projects/management.jpg',
+          image: 'assets/img/projects/panel.png',
           tags: ['C#', '.NET', 'SQL Server']
         },
         {
           title: 'Registro Envión',
           description: 'Plataforma web para registro de beneficiarios utilizando Django y Python.',
-          image: 'assets/img/projects/envion.jpg',
+          image: 'assets/img/projects/data.png',
           tags: ['Django', 'Python', 'PostgreSQL']
         }
       ]
@@ -237,86 +237,20 @@ export class PortfolioComponent implements OnInit {
     { id: 'gradient-1', name: 'Blue Gradient', class: 'bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900' }
   ];
 
+  constructor(public preferencesService: PreferencesService) {}
+
   get currentContent(): PortfolioContent {
     return this.portfolioContent[this.currentLanguage];
   }
 
   get backgroundClass(): string {
-    const selected = this.backgroundOptions.find(bg => bg.id === this.currentBackground);
+    const selected = this.backgroundOptions.find(bg => bg.id === this.preferencesService.getCurrentTheme());
     return selected?.class || this.backgroundOptions[0].class;
   }
 
   ngOnInit(): void {
-    this.loadPreferences();
-  }
-
-  toggleLanguage(lang: 'en' | 'es'): void {
-    this.currentLanguage = lang;
-    this.savePreferences();
-  }
-
-  changeBackground(bgId: string): void {
-    this.currentBackground = bgId;
-    this.savePreferences();
-  }
-
-  toggleSidebar(): void {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
-
-  closeSidebar(): void {
-    this.sidebarOpen = false;
-  }
-
-  increaseFontSize(): void {
-    if (this.fontSize < 24) {
-      this.fontSize += 2;
-      this.saveFontSize();
-    }
-  }
-
-  decreaseFontSize(): void {
-    if (this.fontSize > 12) {
-      this.fontSize -= 2;
-      this.saveFontSize();
-    }
-  }
-
-  toggleHighContrast(): void {
-    this.highContrast = !this.highContrast;
-    this.saveAccessibility();
-  }
-
-  private saveFontSize(): void {
-    localStorage.setItem('portfolio-font-size', this.fontSize.toString());
-  }
-
-  private saveAccessibility(): void {
-    localStorage.setItem('portfolio-high-contrast', this.highContrast.toString());
-  }
-
-  private savePreferences(): void {
-    localStorage.setItem('portfolio-language', this.currentLanguage);
-    localStorage.setItem('portfolio-background', this.currentBackground);
-  }
-
-  private loadPreferences(): void {
-    const savedLanguage = localStorage.getItem('portfolio-language') as 'en' | 'es' | null;
-    const savedBackground = localStorage.getItem('portfolio-background');
-    const savedFontSize = localStorage.getItem('portfolio-font-size');
-    const savedContrast = localStorage.getItem('portfolio-high-contrast');
-    
-    if (savedLanguage) {
-      this.currentLanguage = savedLanguage;
-    }
-    if (savedBackground) {
-      this.currentBackground = savedBackground;
-    }
-    if (savedFontSize) {
-      this.fontSize = parseInt(savedFontSize, 10);
-    }
-    if (savedContrast) {
-      this.highContrast = savedContrast === 'true';
-    }
+    this.preferencesService.language$.subscribe(lang => {
+      this.currentLanguage = lang;
+    });
   }
 }

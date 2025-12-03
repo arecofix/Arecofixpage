@@ -1,142 +1,142 @@
-<!-- Hero Section -->
-<div class="relative bg-gray-900 text-white py-20 overflow-hidden">
-  <div class="absolute inset-0 opacity-20 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
-  <!-- Decorative circles -->
-  <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
-  <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
-  
-  <div class="relative container mx-auto px-4 text-center">
-    <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-      {{ currentContent.title }}
-    </h1>
-    <p class="text-xl md:text-2xl text-blue-200 mb-8 font-light">
-      {{ currentContent.subtitle }}
-    </p>
-    <p class="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
-      {{ currentContent.intro }}
-    </p>
+<ng-container *ngIf="content$ | async as content">
+  <!-- Hero Section -->
+  <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-gray-50 dark:bg-gray-900">
+    <!-- Background Image/Gradient -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-b from-white/80 to-white/90 dark:from-transparent dark:to-black/80 z-10"></div>
+        <!-- Decorative circles -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500/10 dark:bg-blue-500/20 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-3xl"></div>
+    </div>
+    
+    <div class="relative z-10 container mx-auto px-4 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-gray-900 dark:text-white drop-shadow-lg">
+        {{ content.title }}
+      </h1>
+      <p class="text-xl md:text-2xl text-blue-600 dark:text-blue-200 mb-8 font-light drop-shadow-md">
+        {{ content.subtitle }}
+      </p>
+      <p class="text-lg text-gray-600 dark:text-gray-200 max-w-3xl mx-auto leading-relaxed drop-shadow-sm">
+        {{ content.intro }}
+      </p>
+    </div>
   </div>
-</div>
 
-<!-- Stats Section -->
-<section class="py-12 bg-white dark:bg-gray-800 -mt-8 relative z-10 container mx-auto px-4 rounded-xl shadow-lg max-w-6xl">
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-100 dark:divide-gray-700">
-    @for (achievement of achievements; track $index) {
-      <div class="p-4">
+  <!-- Stats Section -->
+  <section class="py-12 bg-white dark:bg-white/5 backdrop-blur-sm -mt-8 relative z-10 container mx-auto px-4 rounded-xl shadow-lg max-w-6xl border border-gray-200 dark:border-white/10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-200 dark:divide-white/10">
+      <div *ngFor="let achievement of content.achievements" class="p-4">
         <div class="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">{{ achievement.number }}</div>
         <div class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">{{ achievement.label }}</div>
         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ achievement.description }}</div>
       </div>
-    }
-  </div>
-</section>
+    </div>
+  </section>
 
-<!-- History & Foundation -->
-<section class="py-20 bg-gray-50 dark:bg-gray-900">
-  <div class="container mx-auto px-4">
-    <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="space-y-6">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ currentContent.history }}</h2>
-        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-          {{ currentContent.historyText }}
-        </p>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
-          <h3 class="font-bold text-gray-900 dark:text-white mb-2">{{ currentContent.foundation }}</h3>
-          <p class="text-gray-600 dark:text-gray-300 text-sm italic">
-            "{{ currentContent.foundationText }}"
+  <!-- History & Foundation -->
+  <section class="py-20 bg-gray-50 dark:bg-transparent">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="space-y-6">
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ content.history }}</h2>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            {{ content.historyText }}
+          </p>
+          <div class="bg-white dark:bg-white/5 p-6 rounded-lg shadow-sm border-l-4 border-blue-500 backdrop-blur-sm">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-2">{{ content.foundation }}</h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm italic">
+              "{{ content.foundationText }}"
+            </p>
+          </div>
+        </div>
+        <div class="relative">
+          <div class="aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/l93eYkGMxsI" 
+              title="Arecofix Video" frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+          <!-- Decorative dot pattern -->
+          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500/10 dark:bg-blue-500/20 rounded-full -z-10 blur-xl"></div>
+          <div class="absolute -top-6 -left-6 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full -z-10 blur-xl"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission & Vision -->
+  <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Mission Card -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-600/80 text-blue-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
+            🎯
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.mission }}</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            {{ content.missionText }}
+          </p>
+        </div>
+        
+        <!-- Vision Card -->
+        <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
+          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-600/80 text-purple-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
+            🔭
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.vision }}</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            {{ content.visionText }}
           </p>
         </div>
       </div>
-      <div class="relative">
-        <div class="aspect-video rounded-xl overflow-hidden shadow-2xl">
-          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/l93eYkGMxsI" 
-            title="Arecofix Video" frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
-        </div>
-        <!-- Decorative dot pattern -->
-        <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full -z-10"></div>
-        <div class="absolute -top-6 -left-6 w-32 h-32 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -z-10"></div>
-      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Mission & Vision -->
-<section class="py-20 bg-white dark:bg-gray-800">
-  <div class="container mx-auto px-4">
-    <div class="grid md:grid-cols-2 gap-8">
-      <!-- Mission Card -->
-      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-700 p-8 rounded-2xl border border-blue-100 dark:border-gray-600">
-        <div class="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-lg">
-          🎯
-        </div>
-        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.mission }}</h3>
-        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-          {{ currentContent.missionText }}
-        </p>
+  <!-- Values Section -->
+  <section class="py-20 bg-gray-50 dark:bg-transparent">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.valuesTitle }}</h2>
+        <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
       </div>
       
-      <!-- Vision Card -->
-      <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-700 p-8 rounded-2xl border border-purple-100 dark:border-gray-600">
-        <div class="w-12 h-12 bg-purple-600 text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-lg">
-          🔭
-        </div>
-        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.vision }}</h3>
-        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-          {{ currentContent.visionText }}
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Values Section -->
-<section class="py-20 bg-gray-50 dark:bg-gray-900">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.values }}</h2>
-      <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      @for (value of values; track $index) {
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let value of content.values" class="bg-white dark:bg-white/5 p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
           <div class="text-4xl mb-6">{{ value.icon }}</div>
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ value.title }}</h3>
           <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
             {{ value.description }}
           </p>
         </div>
-      }
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Team Section -->
-<section class="py-20 bg-white dark:bg-gray-800">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.team }}</h2>
-      <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-        Conoce a las personas detrás de la tecnología.
-      </p>
-    </div>
+  <!-- Team Section -->
+  <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.teamTitle }}</h2>
+        <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          {{ content.teamSubtitle }}
+        </p>
+      </div>
 
-    <div class="flex justify-center">
-      @for (member of teamMembers; track $index) {
-        <div class="max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 transform hover:-translate-y-1 transition-transform duration-300">
-          <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+      <div class="flex justify-center flex-wrap gap-8">
+        <div *ngFor="let member of content.teamMembers" class="max-w-md w-full bg-white dark:bg-white/5 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-white/10 transform hover:-translate-y-1 transition-transform duration-300 backdrop-blur-md">
+          <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-80"></div>
           <div class="px-8 pb-8">
             <div class="relative -mt-16 mb-6">
-              <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-gray-200 shadow-lg flex items-center justify-center text-4xl">
+              <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl">
                 <!-- Placeholder for image if not present -->
-                @if (member.image) {
+                <ng-container *ngIf="member.image; else noImage">
                   <img [src]="member.image" [alt]="member.name" class="w-full h-full object-cover">
-                } @else {
+                </ng-container>
+                <ng-template #noImage>
                   👨‍💻
-                }
+                </ng-template>
               </div>
             </div>
             <div class="text-center">
@@ -145,66 +145,60 @@
               <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">
                 {{ member.bio }}
               </p>
-              @if (member.linkedin) {
-                <a [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors">
-                  <i class="fab fa-linkedin text-2xl"></i>
-                </a>
-              }
+              <a *ngIf="member.linkedin" [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block p-2">
+                <i class="fab fa-linkedin text-2xl"></i>
+              </a>
             </div>
           </div>
         </div>
-      }
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- FAQ Section -->
-<section class="py-20 bg-gray-50 dark:bg-gray-900">
-  <div class="container mx-auto px-4 max-w-4xl">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ currentContent.faq }}</h2>
-    </div>
+  <!-- FAQ Section -->
+  <section class="py-20 bg-gray-50 dark:bg-transparent">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.faqTitle }}</h2>
+      </div>
 
-    <div class="space-y-4">
-      @for (faq of faqs; let i = $index; track $index) {
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div class="space-y-4">
+        <div *ngFor="let faq of content.faqs; let i = index" class="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden backdrop-blur-sm">
           <button (click)="toggleFAQ(i)" 
-            class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
             <span class="font-semibold text-gray-900 dark:text-white">{{ faq.question }}</span>
             <span class="transform transition-transform duration-200" [class.rotate-180]="expandedFAQ === i">
-              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </span>
           </button>
-          @if (expandedFAQ === i) {
-            <div class="px-6 pb-4 pt-0 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-100 dark:border-gray-700 mt-2 pt-4">
-              {{ faq.answer }}
-            </div>
-          }
+          <div *ngIf="expandedFAQ === i" class="px-6 pb-4 pt-0 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">
+            {{ faq.answer }}
+          </div>
         </div>
-      }
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- CTA Section -->
-<section class="py-20 bg-gradient-to-r from-blue-900 to-indigo-900 text-white text-center">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl md:text-4xl font-bold mb-6">¿Listo para recuperar tu dispositivo?</h2>
-    <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-      Contacta con nosotros hoy y descubre por qué miles de clientes confían en Arecofix.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="https://wa.me/541125960900" target="_blank" 
-        class="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg">
-        <i class="fab fa-whatsapp mr-2 text-xl"></i>
-        Contactar por WhatsApp
-      </a>
-      <a routerLink="/contacto" 
-        class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
-        Enviar Consulta
-      </a>
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 dark:from-blue-900/80 dark:to-indigo-900/80 text-white text-center backdrop-blur-md border-t border-white/10">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">{{ content.ctaTitle }}</h2>
+      <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+        {{ content.ctaText }}
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="https://wa.me/541125960900" target="_blank" 
+          class="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg">
+          <i class="fab fa-whatsapp mr-2 text-xl"></i>
+          {{ content.ctaWhatsapp }}
+        </a>
+        <a routerLink="/contacto" 
+          class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
+          {{ content.ctaContact }}
+        </a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+</ng-container>

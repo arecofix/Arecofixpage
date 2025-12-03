@@ -24,6 +24,10 @@
     {
       "name": "@variant",
       "description": "Tailwind CSS v4 variant directive"
+    },
+    {
+      "name": "@apply",
+      "description": "Tailwind CSS apply directive"
     }
   ]
 }

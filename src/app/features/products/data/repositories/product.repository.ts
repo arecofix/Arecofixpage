@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { Product } from '../../domain/entities/product.entity';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 
 /**

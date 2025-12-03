@@ -1,59 +1,363 @@
-<section class="gsm-page">
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <div class="hero-content">
-      <div class="hero-badge">
-        <i class="fas fa-microchip"></i>
-        <span>Plataforma Profesional GSM</span>
-      </div>
-      <h1 class="hero-title">
-        <span class="brand-name">ARECOFIX</span>
-        <span class="hero-subtitle">Herramientas GSM & Licencias Digitales</span>
-      </h1>
-      <p class="hero-description">
-        Plataforma integral para técnicos GSM, FRP y licencias digitales.
-      </p>
-      <div class="hero-actions">
-        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-          <i class="fab fa-whatsapp"></i>
-          Soporte WhatsApp
-        </a>
-        <a href="#tools" class="btn btn-secondary">
-          <i class="fas fa-tools"></i>
-          Ver Herramientas
-        </a>
-      </div>
-    </div>
-    <div class="hero-decoration">
-      <div class="decoration-circle circle-1"></div>
-      <div class="decoration-circle circle-2"></div>
-      <div class="decoration-circle circle-3"></div>
-    </div>
-  </div>
+<div class="min-h-screen font-sans transition-colors duration-300"
+  [class.bg-gray-50]="(preferencesService.theme$ | async) === 'light'"
+  [class.bg-gray-900]="(preferencesService.theme$ | async) === 'dark'"
+  [class.bg-black]="(preferencesService.theme$ | async) === 'high-contrast'"
+  [class.text-gray-900]="(preferencesService.theme$ | async) === 'light'"
+  [class.text-white]="(preferencesService.theme$ | async) !== 'light'">
+  
+  @let lang = (preferencesService.language$ | async) || 'es';
+  @let theme = (preferencesService.theme$ | async) || 'light';
 
-  <!-- GSM Tools Section -->
-  <section id="tools" class="tools-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Herramientas GSM & Licencias Digitales</h2>
-        <p class="section-description">
-          Accede a las mejores herramientas profesionales para servicio técnico de dispositivos móviles
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden transition-colors duration-300"
+    [class.bg-linear-to-br]="theme === 'dark'"
+    [class.from-gray-900]="theme === 'dark'"
+    [class.via-blue-900]="theme === 'dark'"
+    [class.to-gray-900]="theme === 'dark'"
+    [class.bg-blue-600]="theme === 'light'"
+    [class.bg-black]="theme === 'high-contrast'"
+    [class.text-white]="true">
+    
+    <!-- Background Decoration -->
+    @if (theme !== 'high-contrast') {
+      <div class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
+      </div>
+    }
+
+    <div class="container mx-auto px-4 py-12 lg:py-20 relative z-10">
+      <div class="flex flex-col lg:flex-row items-center gap-12">
+        
+        <!-- Hero Content (Left) -->
+        <div class="lg:w-1/2 text-center lg:text-left space-y-6">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium backdrop-blur-sm"
+            [class.bg-blue-500-20]="theme !== 'high-contrast'"
+            [class.border-blue-500-30]="theme !== 'high-contrast'"
+            [class.text-blue-300]="theme !== 'high-contrast'"
+            [class.bg-white]="theme === 'high-contrast'"
+            [class.text-black]="theme === 'high-contrast'"
+            [class.border-white]="theme === 'high-contrast'">
+            <i class="fas fa-microchip"></i>
+            <span>{{ translations[lang].badge }}</span>
+          </div>
+          
+          <h1 class="text-4xl lg:text-6xl font-bold leading-tight">
+            <span class="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400"
+              [class.text-white]="theme === 'high-contrast'"
+              [class.bg-none]="theme === 'high-contrast'">ARECOFIX</span>
+            <br>
+            <span class="text-2xl lg:text-3xl font-normal"
+              [class.text-gray-300]="theme !== 'high-contrast'"
+              [class.text-white]="theme === 'high-contrast'">{{ translations[lang].title_sub }}</span>
+          </h1>
+          
+          <p class="text-lg max-w-xl mx-auto lg:mx-0"
+            [class.text-gray-400]="theme !== 'high-contrast'"
+            [class.text-white]="theme === 'high-contrast'">
+            {{ translations[lang].description }}
+          </p>
+          
+          <div class="flex flex-wrap justify-center lg:justify-start gap-4">
+            <a [href]="whatsappUrl" target="_blank" class="btn btn-lg gap-2 border-none text-white transition-all"
+               [class.bg-linear-to-r]="theme !== 'high-contrast'"
+               [class.from-blue-600]="theme !== 'high-contrast'"
+               [class.to-blue-500]="theme !== 'high-contrast'"
+               [class.hover-from-blue-700]="theme !== 'high-contrast'"
+               [class.hover-to-blue-600]="theme !== 'high-contrast'"
+               [class.shadow-lg]="theme !== 'high-contrast'"
+               [class.shadow-blue-500-20]="theme !== 'high-contrast'"
+               [class.bg-white]="theme === 'high-contrast'"
+               [class.text-black]="theme === 'high-contrast'"
+               [class.border-2]="theme === 'high-contrast'"
+               [class.border-white]="theme === 'high-contrast'">
+              <i class="fab fa-whatsapp text-xl"></i>
+              {{ translations[lang].btn_whatsapp }}
+            </a>
+            <a href="#tools" class="btn btn-ghost btn-lg gap-2 text-white hover:bg-white/10"
+               [class.border]="theme === 'high-contrast'"
+               [class.border-white]="theme === 'high-contrast'">
+              <i class="fas fa-tools"></i>
+              {{ translations[lang].btn_tools }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Offer Card (Right) -->
+        <div class="lg:w-1/2 w-full max-w-md">
+          <div class="backdrop-blur-md border rounded-2xl p-6 lg:p-8 shadow-2xl relative overflow-hidden group transition-all duration-300"
+            [class.bg-white-10]="theme !== 'high-contrast'"
+            [class.border-white-20]="theme !== 'high-contrast'"
+            [class.hover-border-white-30]="theme !== 'high-contrast'"
+            [class.bg-black]="theme === 'high-contrast'"
+            [class.border-white]="theme === 'high-contrast'"
+            [class.border-2]="theme === 'high-contrast'">
+            
+            <!-- Shine Effect -->
+            @if (theme !== 'high-contrast') {
+              <div class="absolute top-0 -left-full w-full h-full bg-linear-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 group-hover:animate-shine transition-all"></div>
+            }
+
+            <div class="flex justify-between items-start mb-6">
+              <div>
+                <span class="px-3 py-1 rounded text-xs font-bold uppercase tracking-wider animate-pulse"
+                  [class.bg-red-500]="theme !== 'high-contrast'"
+                  [class.text-white]="true"
+                  [class.bg-white]="theme === 'high-contrast'"
+                  [class.text-black]="theme === 'high-contrast'">
+                  {{ translations[lang].offer_badge }}
+                </span>
+                <h3 class="text-2xl font-bold mt-2 text-white">BYPASS IPHONE</h3>
+                <p class="text-sm"
+                  [class.text-blue-200]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ translations[lang].offer_desc }}</p>
+              </div>
+              <div class="text-right">
+                <div class="text-xs uppercase tracking-wider"
+                  [class.text-gray-400]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ translations[lang].region }}</div>
+                <div class="font-bold text-white">CH/A-L (CHINA)</div>
+              </div>
+            </div>
+
+            <!-- Countdown -->
+            <div class="grid grid-cols-4 gap-2 mb-6">
+              <div class="rounded-lg p-2 text-center border"
+                [class.bg-black-40]="theme !== 'high-contrast'"
+                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">
+                <div class="text-2xl font-bold font-mono text-white">{{ countdown.days }}</div>
+                <div class="text-[10px] uppercase"
+                  [class.text-gray-400]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ translations[lang].days }}</div>
+              </div>
+              <div class="rounded-lg p-2 text-center border"
+                [class.bg-black-40]="theme !== 'high-contrast'"
+                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">
+                <div class="text-2xl font-bold font-mono text-white">{{ countdown.hours | number:'2.0' }}</div>
+                <div class="text-[10px] uppercase"
+                  [class.text-gray-400]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ translations[lang].hours }}</div>
+              </div>
+              <div class="rounded-lg p-2 text-center border"
+                [class.bg-black-40]="theme !== 'high-contrast'"
+                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">
+                <div class="text-2xl font-bold font-mono text-white">{{ countdown.minutes | number:'2.0' }}</div>
+                <div class="text-[10px] uppercase"
+                  [class.text-gray-400]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ translations[lang].min }}</div>
+              </div>
+              <div class="rounded-lg p-2 text-center border"
+                [class.bg-black-40]="theme !== 'high-contrast'"
+                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">
+                <div class="text-2xl font-bold font-mono"
+                  [class.text-red-400]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ countdown.seconds | number:'2.0' }}</div>
+                <div class="text-[10px] uppercase"
+                  [class.text-gray-400]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ translations[lang].sec }}</div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-center gap-3 text-sm p-3 rounded-lg"
+                [class.text-gray-300]="theme !== 'high-contrast'"
+                [class.bg-black-20]="theme !== 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'"
+                [class.border]="theme === 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">
+                <i class="fab fa-apple text-xl"></i>
+                <span>{{ translations[lang].mac_support }}</span>
+              </div>
+              <button class="btn btn-block border-none font-bold"
+                [class.bg-white]="theme !== 'high-contrast'"
+                [class.text-blue-900]="theme !== 'high-contrast'"
+                [class.hover-bg-gray-100]="theme !== 'high-contrast'"
+                [class.bg-black]="theme === 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'"
+                [class.border-2]="theme === 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">
+                {{ translations[lang].btn_offer }}
+                <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- USDT Calculator Section -->
+  <section class="py-12 border-b transition-colors duration-300"
+    [class.bg-white]="theme === 'light'"
+    [class.border-gray-200]="theme === 'light'"
+    [class.bg-gray-800]="theme === 'dark'"
+    [class.border-gray-700]="theme === 'dark'"
+    [class.bg-black]="theme === 'high-contrast'"
+    [class.border-white]="theme === 'high-contrast'">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto rounded-2xl shadow-xl border overflow-hidden flex flex-col md:flex-row"
+        [class.bg-white]="theme === 'light'"
+        [class.border-gray-100]="theme === 'light'"
+        [class.bg-gray-900]="theme === 'dark'"
+        [class.border-gray-700]="theme === 'dark'"
+        [class.bg-black]="theme === 'high-contrast'"
+        [class.border-white]="theme === 'high-contrast'">
+        
+        <div class="md:w-1/2 p-8 text-white flex flex-col justify-center"
+          [class.bg-blue-600]="theme === 'light'"
+          [class.bg-blue-900]="theme === 'dark'"
+          [class.bg-black]="theme === 'high-contrast'"
+          [class.border-r]="theme === 'high-contrast'"
+          [class.border-white]="theme === 'high-contrast'">
+          <h2 class="text-2xl font-bold mb-2">{{ translations[lang].calc_title }}</h2>
+          <p class="mb-6"
+            [class.text-blue-100]="theme !== 'high-contrast'"
+            [class.text-white]="theme === 'high-contrast'">{{ translations[lang].calc_desc }}</p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+              [class.bg-white-20]="theme !== 'high-contrast'"
+              [class.border]="theme === 'high-contrast'"
+              [class.border-white]="theme === 'high-contrast'">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <div>
+              <div class="font-bold">{{ translations[lang].calc_label }}</div>
+              <div class="text-sm"
+                [class.text-blue-200]="theme !== 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'">{{ translations[lang].calc_sub }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="md:w-1/2 p-8">
+          <div class="form-control mb-4">
+            <label class="label">
+              <span class="label-text font-medium"
+                [class.text-gray-700]="theme === 'light'"
+                [class.text-gray-300]="theme === 'dark'"
+                [class.text-white]="theme === 'high-contrast'">{{ translations[lang].input_label }}</span>
+            </label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="usdtAmount" placeholder="Ej: 100" 
+                class="input input-bordered w-full pl-10"
+                [class.bg-white]="theme === 'light'"
+                [class.text-gray-900]="theme === 'light'"
+                [class.bg-gray-800]="theme === 'dark'"
+                [class.text-white]="theme === 'dark'"
+                [class.border-gray-600]="theme === 'dark'"
+                [class.bg-black]="theme === 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'" />
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+            </div>
+          </div>
+          
+          <button (click)="calculateUsdt()" class="btn btn-primary w-full mb-6"
+            [class.btn-outline]="theme === 'high-contrast'"
+            [class.text-white]="theme === 'high-contrast'">
+            {{ translations[lang].btn_calc }}
+          </button>
+
+          @if (usdtTotal !== null) {
+            <div class="rounded-xl p-4 text-center border animate-fade-in"
+              [class.bg-gray-50]="theme === 'light'"
+              [class.border-gray-200]="theme === 'light'"
+              [class.bg-gray-800]="theme === 'dark'"
+              [class.border-gray-700]="theme === 'dark'"
+              [class.bg-black]="theme === 'high-contrast'"
+              [class.border-white]="theme === 'high-contrast'">
+              <div class="text-sm mb-1"
+                [class.text-gray-500]="theme === 'light'"
+                [class.text-gray-400]="theme === 'dark'"
+                [class.text-white]="theme === 'high-contrast'">{{ translations[lang].total_est }}</div>
+              <div class="text-3xl font-bold"
+                [class.text-gray-800]="theme === 'light'"
+                [class.text-white]="theme !== 'light'">$ {{ usdtTotal | number:'1.0-2' }}</div>
+              <div class="text-xs mt-1"
+                [class.text-gray-400]="theme !== 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'">{{ translations[lang].cot_ref }}: $ {{ usdtRate }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section id="tools" class="py-16 transition-colors duration-300"
+    [class.bg-gray-50]="theme === 'light'"
+    [class.bg-gray-900]="theme === 'dark'"
+    [class.bg-black]="theme === 'high-contrast'">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold mb-4"
+          [class.text-gray-900]="theme === 'light'"
+          [class.text-white]="theme !== 'light'">{{ translations[lang].tools_title }}</h2>
+        <p class="max-w-2xl mx-auto"
+          [class.text-gray-600]="theme === 'light'"
+          [class.text-gray-400]="theme === 'dark'"
+          [class.text-white]="theme === 'high-contrast'">
+          {{ translations[lang].tools_desc }}
         </p>
       </div>
 
-      <div class="tools-grid">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (tool of gsmTools; track tool) {
-          <div class="tool-card">
-            <div class="tool-icon">
-              <i [class]="tool.icon"></i>
+          <div class="rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border group"
+            [class.bg-white]="theme === 'light'"
+            [class.border-gray-100]="theme === 'light'"
+            [class.bg-gray-800]="theme === 'dark'"
+            [class.border-gray-700]="theme === 'dark'"
+            [class.bg-black]="theme === 'high-contrast'"
+            [class.border-white]="theme === 'high-contrast'">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl transition-colors"
+                [class.bg-blue-50]="theme === 'light'"
+                [class.text-blue-600]="theme === 'light'"
+                [class.group-hover-bg-blue-600]="theme === 'light'"
+                [class.group-hover-text-white]="theme === 'light'"
+                [class.bg-gray-700]="theme === 'dark'"
+                [class.text-blue-400]="theme === 'dark'"
+                [class.group-hover-bg-blue-500]="theme === 'dark'"
+                [class.border]="theme === 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'">
+                <i [class]="tool.icon"></i>
+              </div>
+              <span class="px-2 py-1 text-xs rounded font-medium"
+                [class.bg-gray-100]="theme === 'light'"
+                [class.text-gray-600]="theme === 'light'"
+                [class.bg-gray-700]="theme === 'dark'"
+                [class.text-gray-300]="theme === 'dark'"
+                [class.bg-black]="theme === 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'"
+                [class.border]="theme === 'high-contrast'"
+                [class.border-white]="theme === 'high-contrast'">Software</span>
             </div>
-            <div class="tool-content">
-              <h3 class="tool-name">{{ tool.name }}</h3>
-              <p class="tool-description">{{ tool.description }}</p>
-            </div>
-            <a [href]="tool.loginUrl" class="tool-login-btn">
-              <span>Inicia sesión</span>
-              <i class="fas fa-arrow-right"></i>
+            
+            <h3 class="text-xl font-bold mb-2 transition-colors"
+              [class.text-gray-900]="theme === 'light'"
+              [class.group-hover-text-blue-600]="theme === 'light'"
+              [class.text-white]="theme !== 'light'"
+              [class.group-hover-text-blue-400]="theme === 'dark'">{{ tool.name }}</h3>
+            <p class="text-sm mb-6 line-clamp-2"
+              [class.text-gray-500]="theme === 'light'"
+              [class.text-gray-400]="theme === 'dark'"
+              [class.text-white]="theme === 'high-contrast'">{{ tool.description }}</p>
+            
+            <a [href]="tool.loginUrl" class="btn btn-outline btn-sm w-full"
+              [class.group-hover-btn-primary]="theme !== 'high-contrast'"
+              [class.text-white]="theme === 'high-contrast'"
+              [class.border-white]="theme === 'high-contrast'">
+              {{ translations[lang].btn_login }}
+              <i class="fas fa-arrow-right ml-2"></i>
             </a>
           </div>
         }
@@ -61,25 +365,55 @@
     </div>
   </section>
 
-  <!-- Brand Services Section -->
-  <section class="brands-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Servicios por Marca</h2>
-        <p class="section-description">
-          Soporte especializado para las principales marcas de dispositivos móviles
-        </p>
+  <!-- Brands Section -->
+  <section class="py-16 transition-colors duration-300"
+    [class.bg-white]="theme === 'light'"
+    [class.bg-gray-800]="theme === 'dark'"
+    [class.bg-black]="theme === 'high-contrast'">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold mb-4"
+          [class.text-gray-900]="theme === 'light'"
+          [class.text-white]="theme !== 'light'">{{ translations[lang].brands_title }}</h2>
+        <p [class.text-gray-600]="theme === 'light'"
+           [class.text-gray-400]="theme === 'dark'"
+           [class.text-white]="theme === 'high-contrast'">{{ translations[lang].brands_desc }}</p>
       </div>
 
-      <div class="brands-grid">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         @for (brand of brandServices; track brand) {
-          <div class="brand-card">
-            <div class="brand-icon">
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h3 class="brand-name">{{ brand.name }}</h3>
-            <div class="brand-overlay">
-              <span>Ver servicios</span>
+          <div class="group cursor-pointer">
+            <div class="rounded-xl p-6 text-center border transition-all duration-300 relative overflow-hidden"
+              [class.bg-gray-50]="theme === 'light'"
+              [class.border-gray-100]="theme === 'light'"
+              [class.hover-border-blue-500]="theme === 'light'"
+              [class.hover-shadow-lg]="theme === 'light'"
+              [class.bg-gray-900]="theme === 'dark'"
+              [class.border-gray-700]="theme === 'dark'"
+              [class.hover-border-blue-400]="theme === 'dark'"
+              [class.bg-black]="theme === 'high-contrast'"
+              [class.border-white]="theme === 'high-contrast'">
+              <div class="text-3xl mb-3 transition-colors"
+                [class.text-gray-400]="theme === 'light'"
+                [class.group-hover-text-blue-600]="theme === 'light'"
+                [class.text-gray-500]="theme === 'dark'"
+                [class.group-hover-text-blue-400]="theme === 'dark'"
+                [class.text-white]="theme === 'high-contrast'">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <h3 class="font-bold"
+                [class.text-gray-700]="theme === 'light'"
+                [class.group-hover-text-blue-700]="theme === 'light'"
+                [class.text-gray-300]="theme === 'dark'"
+                [class.group-hover-text-blue-300]="theme === 'dark'"
+                [class.text-white]="theme === 'high-contrast'">{{ brand.name }}</h3>
+              
+              <!-- Hover Overlay -->
+              @if (theme !== 'high-contrast') {
+                <div class="absolute inset-0 bg-blue-600/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span class="text-white font-bold text-sm">{{ translations[lang].btn_view_services }}</span>
+                </div>
+              }
             </div>
           </div>
         }
@@ -88,32 +422,59 @@
   </section>
 
   <!-- Downloads Section -->
-  <section class="downloads-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Descargas Útiles</h2>
-        <p class="section-description">
-          Herramientas esenciales y drivers para tu trabajo diario
-        </p>
+  <section class="py-16 text-white transition-colors duration-300"
+    [class.bg-gray-900]="theme !== 'high-contrast'"
+    [class.bg-black]="theme === 'high-contrast'">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+        <div>
+          <h2 class="text-3xl font-bold mb-4">{{ translations[lang].downloads_title }}</h2>
+          <p class="text-gray-400" [class.text-white]="theme === 'high-contrast'">{{ translations[lang].downloads_desc }}</p>
+        </div>
+        <button class="btn btn-outline text-white hover:bg-white hover:text-gray-900"
+          [class.border-white]="theme === 'high-contrast'">
+          {{ translations[lang].btn_view_all }}
+          <i class="fas fa-arrow-right ml-2"></i>
+        </button>
       </div>
 
-      <div class="downloads-grid">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         @for (download of downloads; track download) {
-          <div class="download-card">
-            <div class="download-icon">
-              <i [class]="download.icon"></i>
+          <div class="rounded-xl p-6 border transition-colors group"
+            [class.bg-gray-800]="theme !== 'high-contrast'"
+            [class.border-gray-700]="theme !== 'high-contrast'"
+            [class.hover-border-gray-500]="theme !== 'high-contrast'"
+            [class.bg-black]="theme === 'high-contrast'"
+            [class.border-white]="theme === 'high-contrast'">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-10 h-10 rounded flex items-center justify-center transition-colors"
+                [class.bg-gray-700]="theme !== 'high-contrast'"
+                [class.text-blue-400]="theme !== 'high-contrast'"
+                [class.group-hover-text-white]="theme !== 'high-contrast'"
+                [class.bg-white]="theme === 'high-contrast'"
+                [class.text-black]="theme === 'high-contrast'">
+                <i [class]="download.icon"></i>
+              </div>
+              <div>
+                <h3 class="font-bold"
+                  [class.text-gray-200]="theme !== 'high-contrast'"
+                  [class.group-hover-text-white]="theme !== 'high-contrast'"
+                  [class.text-white]="theme === 'high-contrast'">{{ download.name }}</h3>
+                <div class="text-xs text-gray-500" [class.text-white]="theme === 'high-contrast'">{{ translations[lang].utility }}</div>
+              </div>
             </div>
-            <div class="download-content">
-              <h3 class="download-name">{{ download.name }}</h3>
-              @if (download.description) {
-                <p class="download-description">
-                  {{ download.description }}
-                </p>
-              }
-            </div>
-            <a [href]="download.downloadUrl" class="download-btn" download>
-              <i class="fas fa-download"></i>
-              <span>Descargar</span>
+            @if (download.description) {
+              <p class="text-sm mb-4 line-clamp-2"
+                [class.text-gray-400]="theme !== 'high-contrast'"
+                [class.text-white]="theme === 'high-contrast'">{{ download.description }}</p>
+            }
+            <a [href]="download.downloadUrl" class="flex items-center text-sm font-medium transition-colors"
+              [class.text-blue-400]="theme !== 'high-contrast'"
+              [class.hover-text-blue-300]="theme !== 'high-contrast'"
+              [class.text-white]="theme === 'high-contrast'"
+              [class.underline]="theme === 'high-contrast'">
+              <i class="fas fa-download mr-2"></i>
+              {{ translations[lang].btn_download }}
             </a>
           </div>
         }
@@ -121,19 +482,4 @@
     </div>
   </section>
 
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="container">
-      <div class="cta-content">
-        <h2 class="cta-title">¿Necesitas ayuda con alguna herramienta?</h2>
-        <p class="cta-description">
-          Nuestro equipo de soporte está disponible para ayudarte con cualquier consulta
-        </p>
-        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-cta">
-          <i class="fab fa-whatsapp"></i>
-          Contactar por WhatsApp
-        </a>
-      </div>
-    </div>
-  </section>
-</section>
+</div>

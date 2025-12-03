@@ -11,7 +11,7 @@ import { CoursesService } from '@app/core/services/courses.service';
   template: `
     <div class="max-w-4xl mx-auto">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">
+        <h2 class="text-2xl font-bold">
           {{ isEditing ? 'Editar Curso' : 'Nuevo Curso' }}
         </h2>
         <a routerLink="/admin/courses" class="btn btn-ghost">
@@ -19,94 +19,139 @@ import { CoursesService } from '@app/core/services/courses.service';
         </a>
       </div>
     
-      <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-lg shadow p-6 space-y-6 text-gray-800">
-    
-        <!-- Basic Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="form-control">
-            <label class="label">Título</label>
-            <input type="text" formControlName="title" class="input input-bordered bg-white text-gray-800" placeholder="Ej: Reparación de iPhone" />
-          </div>
-    
-          <div class="form-control">
-            <label class="label">Slug (URL)</label>
-            <input type="text" formControlName="slug" class="input input-bordered bg-white text-gray-800" placeholder="ej: reparacion-iphone" />
-            <label class="label text-xs text-gray-500">Identificador único para la URL</label>
-          </div>
-        </div>
-    
-        <div class="form-control">
-          <label class="label">Descripción Corta</label>
-          <textarea formControlName="description" class="textarea textarea-bordered h-24 bg-white text-gray-800" placeholder="Breve resumen del curso..."></textarea>
-        </div>
-    
-        <!-- Details -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="form-control">
-            <label class="label">Precio</label>
-            <input type="number" formControlName="price" class="input input-bordered bg-white text-gray-800" />
-          </div>
-    
-          <div class="form-control">
-            <label class="label">Precio Oferta (Opcional)</label>
-            <input type="number" formControlName="sale_price" class="input input-bordered bg-white text-gray-800" />
-          </div>
-    
-          <div class="form-control">
-            <label class="label">Nivel</label>
-            <select formControlName="level" class="select select-bordered bg-white text-gray-800">
-              <option value="Básico">Básico</option>
-              <option value="Intermedio">Intermedio</option>
-              <option value="Avanzado">Avanzado</option>
-              <option value="Todos los niveles">Todos los niveles</option>
-            </select>
-          </div>
-        </div>
-    
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="form-control">
-            <label class="label">Duración</label>
-            <input type="text" formControlName="duration" class="input input-bordered bg-white text-gray-800" placeholder="Ej: 3 meses" />
-          </div>
-    
-          <div class="form-control">
-            <label class="label">Horario</label>
-            <input type="text" formControlName="schedule" class="input input-bordered bg-white text-gray-800" placeholder="Ej: Lunes 18hs" />
-          </div>
-        </div>
-    
-        <!-- Media -->
-        <div class="form-control">
-          <label class="label">URL de Imagen</label>
-          <input type="text" formControlName="image_url" class="input input-bordered bg-white text-gray-800" placeholder="https://..." />
-          @if (form.get('image_url')?.value) {
-            <div class="mt-2">
-              <img [src]="form.get('image_url')?.value" 
-                   class="h-32 rounded object-cover border" 
-                   alt="Preview" 
-                   onerror="this.style.display='none'" />
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body p-6">
+          <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+        
+            <!-- Basic Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Título</span>
+                </label>
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-heading text-gray-400"></i>
+                  <input type="text" formControlName="title" class="grow" placeholder="Ej: Reparación de iPhone" />
+                </label>
+              </div>
+        
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Slug (URL)</span>
+                </label>
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-link text-gray-400"></i>
+                  <input type="text" formControlName="slug" class="grow" placeholder="ej: reparacion-iphone" />
+                </label>
+                <label class="label">
+                  <span class="label-text-alt text-xs text-gray-500">Identificador único para la URL</span>
+                </label>
+              </div>
             </div>
-          }
+        
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-medium">Descripción Corta</span>
+              </label>
+              <textarea formControlName="description" class="textarea textarea-bordered h-24 leading-relaxed" placeholder="Breve resumen del curso..."></textarea>
+            </div>
+        
+            <!-- Details -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Precio</span>
+                </label>
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-dollar-sign text-gray-400"></i>
+                  <input type="number" formControlName="price" class="grow" />
+                </label>
+              </div>
+        
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Precio Oferta (Opcional)</span>
+                </label>
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-tag text-gray-400"></i>
+                  <input type="number" formControlName="sale_price" class="grow" />
+                </label>
+              </div>
+        
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Nivel</span>
+                </label>
+                <select formControlName="level" class="select select-bordered w-full">
+                  <option value="Básico">Básico</option>
+                  <option value="Intermedio">Intermedio</option>
+                  <option value="Avanzado">Avanzado</option>
+                  <option value="Todos los niveles">Todos los niveles</option>
+                </select>
+              </div>
+            </div>
+        
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Duración</span>
+                </label>
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-clock text-gray-400"></i>
+                  <input type="text" formControlName="duration" class="grow" placeholder="Ej: 3 meses" />
+                </label>
+              </div>
+        
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Horario</span>
+                </label>
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-calendar-alt text-gray-400"></i>
+                  <input type="text" formControlName="schedule" class="grow" placeholder="Ej: Lunes 18hs" />
+                </label>
+              </div>
+            </div>
+        
+            <!-- Media -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-medium">URL de Imagen</span>
+              </label>
+              <label class="input input-bordered flex items-center gap-2">
+                <i class="fas fa-image text-gray-400"></i>
+                <input type="text" formControlName="image_url" class="grow" placeholder="https://..." />
+              </label>
+              @if (form.get('image_url')?.value) {
+                <div class="mt-4 p-4 border rounded-lg bg-base-200 flex justify-center">
+                  <img [src]="form.get('image_url')?.value" 
+                       class="h-48 rounded object-cover shadow-sm" 
+                       alt="Preview" 
+                       onerror="this.style.display='none'" />
+                </div>
+              }
+            </div>
+        
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-4 p-0">
+                <span class="label-text font-medium">Curso Activo</span>
+                <input type="checkbox" formControlName="is_active" class="toggle toggle-success" />
+              </label>
+            </div>
+        
+            <!-- Actions -->
+            <div class="flex justify-end gap-4 pt-6 border-t border-base-200">
+              <a routerLink="/admin/courses" class="btn btn-ghost">Cancelar</a>
+              <button type="submit" class="btn btn-primary px-8" [disabled]="form.invalid || saving">
+                @if (saving) {
+                  <span class="loading loading-spinner"></span>
+                }
+                {{ isEditing ? 'Actualizar' : 'Crear Curso' }}
+              </button>
+            </div>
+          </form>
         </div>
-    
-        <div class="form-control">
-          <label class="label cursor-pointer justify-start gap-4">
-            <span class="label-text font-bold">Curso Activo</span>
-            <input type="checkbox" formControlName="is_active" class="toggle toggle-success" />
-          </label>
-        </div>
-    
-        <!-- Actions -->
-        <div class="flex justify-end gap-4 pt-4 border-t">
-          <a routerLink="/admin/courses" class="btn btn-ghost">Cancelar</a>
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
-            @if (saving) {
-              <span class="loading loading-spinner"></span>
-            }
-            {{ isEditing ? 'Actualizar' : 'Crear Curso' }}
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
     `
 })

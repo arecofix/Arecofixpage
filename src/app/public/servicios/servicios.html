@@ -1,151 +1,138 @@
-<!-- Hero Section -->
-<div class="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white overflow-hidden">
-    <div class="absolute inset-0 bg-black/30"></div>
-    <div
-        class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2000')] bg-cover bg-center opacity-20">
-    </div>
-
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-        <div class="text-center">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-                Servicios Técnicos
-                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                    Profesionales
+<ng-container *ngIf="content$ | async as content">
+    <!-- Hero Section -->
+    <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2000" 
+                 class="w-full h-full object-cover opacity-10 dark:opacity-20" alt="Background">
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-b from-white/80 to-white/90 dark:from-transparent dark:to-black/80"></div>
+        </div>
+    
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 dark:text-white drop-shadow-lg">
+                {{ content.heroTitle }}
+                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400">
+                    {{ content.heroSubtitle }}
                 </span>
             </h1>
-            <p class="text-xl sm:text-2xl text-gray-200 max-w-3xl mx-auto mb-8">
-                Reparación especializada de smartphones, tablets, consolas y desarrollo de software
+            <p class="text-xl sm:text-2xl text-gray-600 dark:text-gray-200 max-w-3xl mx-auto mb-8 drop-shadow-md">
+                {{ content.heroDescription }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20servicio%20técnico'"
-                    class="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition shadow-lg">
+                    class="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition shadow-lg transform hover:scale-105">
                     <i class="fab fa-whatsapp mr-2 text-xl"></i>
-                    Solicitar Servicio
+                    {{ content.heroCtaWhatsapp }}
                 </a>
                 <a href="#servicios"
-                    class="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg transition border border-white/30">
-                    Ver Todos los Servicios
+                    class="inline-flex items-center justify-center px-8 py-4 bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white font-semibold rounded-lg transition border border-gray-200 dark:border-white/30 transform hover:scale-105 shadow-sm">
+                    {{ content.heroCtaAll }}
                 </a>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Process Section -->
-<section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Nuestro Proceso</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            @for (item of process; track item.step) {
-            <div class="text-center">
-                <div class="relative">
-                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas {{item.icon}} text-3xl text-white"></i>
-                    </div>
-                    <div
-                        class="absolute -top-2 -right-2 w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
-                        {{item.step}}
-                    </div>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">{{item.title}}</h3>
-                <p class="text-gray-600">{{item.description}}</p>
-            </div>
-            }
-        </div>
-    </div>
-</section>
-
-<!-- Services Grid -->
-<section id="servicios" class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Nuestros Servicios</h2>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                Soluciones técnicas profesionales con garantía y atención personalizada
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @for (service of services; track service.id) {
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
-                <!-- Service Image -->
-                <div class="relative h-48 overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600">
-                    <img [src]="service.image" [alt]="service.title" class="w-full h-full object-cover opacity-80">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <i class="fas {{service.icon}} text-6xl text-white"></i>
-                    </div>
-                </div>
-
-                <!-- Service Content -->
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{service.title}}</h3>
-                    <p class="text-gray-600 mb-4">{{service.description}}</p>
-
-                    <!-- Features List -->
-                    <ul class="space-y-2 mb-6">
-                        @for (feature of service.features; track feature) {
-                        <li class="flex items-start text-sm text-gray-700">
-                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1 flex-shrink-0"></i>
-                            <span>{{feature}}</span>
-                        </li>
-                        }
-                    </ul>
-
-                    <!-- Price and CTA -->
-                    <div class="pt-4 border-t border-gray-200">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-2xl font-bold text-indigo-600">{{service.price}}</span>
+    
+    <!-- Process Section -->
+    <section class="py-16 bg-white dark:bg-white/5 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">{{ content.processTitle }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div *ngFor="let item of content.process" class="text-center">
+                    <div class="relative">
+                        <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+                            <i class="fas {{item.icon}} text-3xl text-white"></i>
                         </div>
-                        <a [href]="service.link ? service.link : 'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20el%20servicio%20de%20' + service.title"
-                            class="block w-full text-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition">
-                            Solicitar Ahora
-                        </a>
+                        <div
+                            class="absolute -top-2 -right-2 w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                            {{item.step}}
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{item.title}}</h3>
+                    <p class="text-gray-600 dark:text-gray-300">{{item.description}}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Grid -->
+    <section id="servicios" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ content.servicesTitle }}</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    {{ content.servicesDescription }}
+                </p>
+            </div>
+    
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div *ngFor="let service of content.services" class="bg-white dark:bg-white/5 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm group hover:-translate-y-1">
+                    <!-- Service Image -->
+                    <div class="relative h-48 overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600">
+                        <img [src]="service.image" [alt]="service.title" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                            <i class="fas {{service.icon}} text-6xl text-white drop-shadow-lg"></i>
+                        </div>
+                    </div>
+    
+                    <!-- Service Content -->
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">{{service.title}}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">{{service.description}}</p>
+    
+                        <!-- Features List -->
+                        <ul class="space-y-2 mb-6">
+                            <li *ngFor="let feature of service.features" class="flex items-start text-sm text-gray-600 dark:text-gray-300">
+                                <i class="fas fa-check-circle text-green-500 dark:text-green-400 mr-2 mt-1 flex-shrink-0"></i>
+                                <span>{{feature}}</span>
+                            </li>
+                        </ul>
+    
+                        <!-- Price and CTA -->
+                        <div class="pt-4 border-t border-gray-200 dark:border-white/10">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{service.price}}</span>
+                            </div>
+                            <a [href]="service.link ? service.link : 'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20el%20servicio%20de%20' + service.title"
+                                class="block w-full text-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition shadow-md">
+                                {{ content.servicesCta }}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            }
         </div>
-    </div>
-</section>
-
-<!-- Guarantees Section -->
-<section class="py-16 bg-indigo-900 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-                <i class="fas fa-shield-alt text-5xl mb-4 text-indigo-300"></i>
-                <h3 class="text-2xl font-bold mb-2">Garantía de 30 Días</h3>
-                <p class="text-indigo-200">Todas nuestras reparaciones incluyen garantía escrita</p>
-            </div>
-            <div>
-                <i class="fas fa-clock text-5xl mb-4 text-indigo-300"></i>
-                <h3 class="text-2xl font-bold mb-2">Servicio Rápido</h3>
-                <p class="text-indigo-200">La mayoría de reparaciones en 24-48 horas</p>
-            </div>
-            <div>
-                <i class="fas fa-certificate text-5xl mb-4 text-indigo-300"></i>
-                <h3 class="text-2xl font-bold mb-2">Técnicos Certificados</h3>
-                <p class="text-indigo-200">Personal capacitado y con años de experiencia</p>
+    </section>
+    
+    <!-- Guarantees Section -->
+    <section class="py-16 bg-indigo-600 dark:bg-indigo-900/50 backdrop-blur-md text-white border-y border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div *ngFor="let guarantee of content.guarantees">
+                    <i class="fas {{guarantee.icon}} text-5xl mb-4 text-indigo-200 dark:text-indigo-300"></i>
+                    <h3 class="text-2xl font-bold mb-2">{{guarantee.title}}</h3>
+                    <p class="text-indigo-100 dark:text-indigo-200">{{guarantee.description}}</p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿Necesitas reparar tu dispositivo?</h2>
-        <p class="text-xl mb-8">Contáctanos ahora y obtén un diagnóstico gratuito</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20diagnóstico%20gratuito'"
-                class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
-                <i class="fab fa-whatsapp mr-2 text-2xl"></i>
-                Diagnóstico Gratuito
-            </a>
-            <a href="#/contacto"
-                class="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition text-lg">
-                Formulario de Contacto
-            </a>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 text-white backdrop-blur-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">{{ content.ctaTitle }}</h2>
+            <p class="text-xl mb-8">{{ content.ctaDescription }}</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20diagnóstico%20gratuito'"
+                    class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg transform hover:scale-105">
+                    <i class="fab fa-whatsapp mr-2 text-2xl"></i>
+                    {{ content.ctaWhatsapp }}
+                </a>
+                <a href="#/contacto"
+                    class="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition text-lg transform hover:scale-105">
+                    {{ content.ctaForm }}
+                </a>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+</ng-container>

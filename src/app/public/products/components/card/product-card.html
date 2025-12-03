@@ -1,12 +1,12 @@
-<div class="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full overflow-hidden">
+<div class="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full overflow-hidden">
   
   <!-- Image Container -->
-  <div class="relative aspect-[4/3] overflow-hidden bg-gray-50 p-4">
+  <div class="relative aspect-[4/3] overflow-hidden bg-gray-50 dark:bg-gray-700 p-4">
     <img 
       [ngSrc]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
       [alt]="product().name"
       fill
-      class="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
+      class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-105 transition-transform duration-500" 
     />
     
     <!-- Badges -->
@@ -36,25 +36,25 @@
     <!-- Category/Brand (Optional) -->
     <!-- <p class="text-xs text-gray-500 mb-1">Categoría</p> -->
 
-    <h3 class="font-medium text-gray-900 mb-1 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+    <h3 class="font-medium text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
       <a [routerLink]="['/products/details', product().slug]">
         {{ product().name }}
       </a>
     </h3>
     
-    <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">
+    <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4 flex-1">
       {{ product().description }}
     </p>
 
-    <div class="flex items-end justify-between mt-auto pt-4 border-t border-gray-50">
+    <div class="flex items-end justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
       <div class="flex flex-col">
-        <span class="text-xs text-gray-400">Precio</span>
-        <span class="text-xl font-bold text-gray-900">
+        <span class="text-xs text-gray-400 dark:text-gray-500">Precio</span>
+        <span class="text-xl font-bold text-gray-900 dark:text-white">
           ${{ product().price | number:'1.0-0' }}
         </span>
       </div>
       
-      <a [routerLink]="['/products/details', product().slug]" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
+      <a [routerLink]="['/products/details', product().slug]" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium flex items-center">
         Ver más
         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

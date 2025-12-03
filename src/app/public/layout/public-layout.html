@@ -1,4 +1,11 @@
 <public-layout-header></public-layout-header>
+<div
+  [ngClass]="[preferencesService.getBackgroundClass((preferencesService.theme$ | async)!), (preferencesService.highContrast$ | async) ? 'high-contrast' : '']"
+  [style.font-size.px]="(preferencesService.fontSize$ | async)"
+  class="min-h-screen transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans pt-16"
+>
+  <router-outlet></router-outlet>
+</div>
 
-<router-outlet></router-outlet>
+<app-accessibility-sidebar></app-accessibility-sidebar>
 

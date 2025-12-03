@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core'
-import { AuthService, UserProfile } from '@app/services/auth.service'
+import { AuthService, UserProfile } from '@app/core/services/auth.service'
 import { Router, RouterLink } from '@angular/router'
 
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms'

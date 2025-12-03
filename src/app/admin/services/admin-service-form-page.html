@@ -1,87 +1,93 @@
 <div class="max-w-2xl mx-auto">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Servicio</h1>
+        <h1 class="text-2xl font-bold">{{ id ? 'Editar' : 'Nuevo' }} Servicio</h1>
         <a routerLink="/admin/services" class="btn btn-ghost">
             <i class="fas fa-arrow-left mr-2"></i> Volver
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6 text-gray-800">
-        @if (loading()) {
-        <div class="flex justify-center py-8">
-            <span class="loading loading-spinner loading-lg"></span>
-        </div>
-        } @else {
-        <form (ngSubmit)="save()">
-            <!-- Name -->
-            <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text font-medium">Nombre del Servicio</span>
-                </label>
-                <input type="text" [(ngModel)]="form().name" name="name"
-                    class="input input-bordered w-full bg-white text-gray-800" required />
+    <div class="card bg-base-100 shadow-lg">
+        <div class="card-body p-6">
+            @if (loading()) {
+            <div class="flex justify-center py-12">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
             </div>
-
-            <!-- Description -->
-            <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text font-medium">Descripción</span>
-                </label>
-                <textarea [(ngModel)]="form().description" name="description"
-                    class="textarea textarea-bordered h-24 bg-white text-gray-800"></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <!-- Price -->
+            } @else {
+            <form (ngSubmit)="save()" class="space-y-6">
+                <!-- Name -->
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">Precio</span>
+                        <span class="label-text font-medium">Nombre del Servicio</span>
                     </label>
-                    <label class="input-group">
-                        <span>$</span>
-                        <input type="number" [(ngModel)]="form().price" name="price"
-                            class="input input-bordered w-full bg-white text-gray-800" min="0" step="0.01" />
+                    <label class="input input-bordered flex items-center gap-2">
+                        <i class="fas fa-tag text-gray-400"></i>
+                        <input type="text" [(ngModel)]="form().name" name="name" class="grow" required />
                     </label>
                 </div>
 
-                <!-- Duration -->
+                <!-- Description -->
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">Duración (minutos)</span>
+                        <span class="label-text font-medium">Descripción</span>
                     </label>
-                    <input type="number" [(ngModel)]="form().duration_minutes" name="duration_minutes"
-                        class="input input-bordered w-full bg-white text-gray-800" min="0" />
+                    <textarea [(ngModel)]="form().description" name="description"
+                        class="textarea textarea-bordered h-32 leading-relaxed" 
+                        placeholder="Describe los detalles del servicio..."></textarea>
                 </div>
-            </div>
 
-            <!-- Is Active -->
-            <div class="form-control mb-6">
-                <label class="label cursor-pointer justify-start gap-4">
-                    <span class="label-text font-medium">Activo</span>
-                    <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
-                        class="toggle toggle-primary" />
-                </label>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Price -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Precio</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-dollar-sign text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().price" name="price" class="grow" min="0" step="0.01" />
+                        </label>
+                    </div>
 
-            <!-- Error Message -->
-            @if (error()) {
-            <div class="alert alert-error mb-6">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ error() }}</span>
-            </div>
+                    <!-- Duration -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Duración (minutos)</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-clock text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().duration_minutes" name="duration_minutes" class="grow" min="0" />
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Is Active -->
+                <div class="form-control">
+                    <label class="label cursor-pointer justify-start gap-4 p-0">
+                        <span class="label-text font-medium">Activo</span>
+                        <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+                            class="toggle toggle-primary" />
+                    </label>
+                </div>
+
+                <!-- Error Message -->
+                @if (error()) {
+                <div class="alert alert-error mb-6 shadow-sm">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ error() }}</span>
+                </div>
+                }
+
+                <!-- Actions -->
+                <div class="flex justify-end gap-4 pt-6 border-t border-base-200">
+                    <a routerLink="/admin/services" class="btn btn-ghost">Cancelar</a>
+                    <button type="submit" class="btn btn-primary px-8" [disabled]="saving() || !form().name">
+                        @if (saving()) {
+                        <span class="loading loading-spinner loading-xs"></span>
+                        }
+                        Guardar
+                    </button>
+                </div>
+            </form>
             }
-
-            <!-- Actions -->
-            <div class="flex justify-end gap-4">
-                <a routerLink="/admin/services" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary" [disabled]="saving() || !form().name">
-                    @if (saving()) {
-                    <span class="loading loading-spinner loading-xs"></span>
-                    }
-                    Guardar
-                </button>
-            </div>
-        </form>
-        }
+        </div>
     </div>
 </div>

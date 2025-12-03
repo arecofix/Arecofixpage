@@ -1,73 +1,199 @@
 @import "tailwindcss";
 
-/* 
-   VS Code may report "Unknown at rule @plugin" here. 
-   This is a false positive for Tailwind CSS v4. 
-   The syntax is correct and required for the build.
-*/
 @plugin "daisyui";
 
-/* Custom Brand Colors */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand Colors */
+  --color-brand-green: #4fa137;
+  --color-brand-dark-blue: #282f4f;
+  --color-brand-light-gray: #ededed;
+  --color-brand-gray-purple: #777589;
+  --color-brand-blue: #397dbb;
+  --color-brand-dark-blue-fav: #2c3454;
+  --color-brand-green-alt: #4da435;
+
+  /* High Contrast Colors */
+  --color-hc-bg: #000000;
+  --color-hc-text: #ffffff;
+  --color-hc-accent: #ffff00;
+  --color-hc-border: #ffffff;
+}
+
+/* 
+   DaisyUI Theme Configuration 
+   We can override DaisyUI semantic colors using the brand colors defined above.
+*/
 :root {
-    --brand-green: #4fa137;
-    --brand-dark-blue: #282f4f;
-    --brand-light-gray: #ededed;
-    --brand-gray-purple: #777589;
-    --brand-blue: #397dbb;
-    --brand-dark-blue-fav: #2c3454;
-    --brand-green-alt: #4da435;
+    --primary: var(--color-brand-dark-blue-fav);
+    --primary-content: #ffffff;
+    --secondary: var(--color-brand-blue);
+    --secondary-content: #ffffff;
+    --accent: var(--color-brand-green);
+    --accent-content: #ffffff;
+    --neutral: var(--color-brand-gray-purple);
+    --neutral-content: #ffffff;
+    --base-100: #ffffff;
+    --base-content: #1f2937;
 }
 
-/* Override Button Colors to match Brand */
-.btn-primary {
-    background-color: var(--brand-dark-blue-fav) !important;
-    border-color: var(--brand-dark-blue-fav) !important;
-    color: white !important;
+.dark {
+    --base-100: #1f2937; /* Gray 800 */
+    --base-content: #f3f4f6; /* Gray 100 */
 }
 
-.btn-primary:hover {
-    background-color: var(--brand-green-alt) !important;
-    border-color: var(--brand-green-alt) !important;
+/* Global Styles */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
 }
 
-/* Specific override for the "Productos" button */
-.btn-brand-blue {
-    background-color: var(--brand-blue) !important;
-    border-color: var(--brand-blue) !important;
-}
+/* 
+   Button Overrides 
+   Ideally, we should rely on DaisyUI 'btn-primary', 'btn-secondary', etc.
+   which are now mapped to our brand colors in :root.
+   Keeping specific overrides only if strictly necessary.
+*/
 
 /* Fix for missing bg-dark class used in home page */
 .bg-dark {
-    background-color: var(--brand-dark-blue-fav);
+    background-color: var(--color-brand-dark-blue-fav);
 }
 
-/* Fix for transparent menus (hamburger and profile) */
-.dropdown-content {
-    background-color: var(--brand-dark-blue-fav) !important;
-    border: 1px solid var(--brand-gray-purple);
+/* Component Visibility Overrides */
+.card {
+    background-color: #ffffff;
+    color: #1f2937;
 }
 
-/* Ensure text visibility in dropdowns */
-.dropdown-content li>a,
-.dropdown-content li>button,
-.dropdown-content li>span {
+.stats {
+    background-color: #ffffff;
+    color: #1f2937;
+}
+
+.stat-title, .stat-desc {
+    color: #4b5563; /* Gray 600 */
+}
+
+.input, .textarea, .select {
+    background-color: #ffffff;
+    color: #1f2937;
+    border-color: #d1d5db;
+}
+
+.label-text {
+    color: #1f2937;
+}
+
+.dark .card {
+    background-color: #1f2937;
+    color: #f3f4f6;
+}
+
+.dark .stats {
+    background-color: #1f2937;
+    color: #f3f4f6;
+}
+
+.dark .stat-title, .dark .stat-desc {
+    color: #9ca3af; /* Gray 400 */
+}
+
+.dark .input, .dark .textarea, .dark .select {
+    background-color: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+}
+
+.dark .label-text {
+    color: #f3f4f6;
+}
+
+.dropdown-content li > a,
+.dropdown-content li > button,
+.dropdown-content li > span {
+    color: white;
+}
+
+.dropdown-content li > a:hover,
+.dropdown-content li > button:hover {
+    background-color: var(--color-brand-blue);
+    color: white;
+}
+
+/* HIGH CONTRAST MODE */
+.high-contrast {
+    background-color: var(--color-hc-bg);
+    color: var(--color-hc-text);
+}
+
+.high-contrast body {
+    background-color: var(--color-hc-bg);
+    color: var(--color-hc-text);
+}
+
+.high-contrast :where(
+    .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500, 
+    .text-gray-400, .text-gray-300, .text-gray-200, .text-gray-100, .text-white, 
+    .text-black, .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, 
+    .text-slate-500, .text-slate-400
+) {
+    color: var(--color-hc-text);
+}
+
+.high-contrast :where(
+    .text-indigo-600, .text-indigo-500, .text-indigo-400, .text-indigo-300, 
+    .text-blue-600, .text-purple-600, .text-blue-400, .text-cyan-300
+) {
+    color: var(--color-hc-accent);
+}
+
+.high-contrast :where(
+    .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-800, .bg-gray-900, 
+    .bg-slate-900, .bg-slate-800, .bg-black
+) {
+    background-color: black !important;
+    border: 1px solid white !important;
+}
+
+.high-contrast img,
+.high-contrast [style*="background-image"] {
+    filter: grayscale(100%) contrast(120%);
+    opacity: 1 !important;
+}
+
+.high-contrast :where(button, a.btn, .btn) {
+    background-color: black !important;
+    border: 2px solid var(--color-hc-accent) !important;
+    color: var(--color-hc-accent) !important;
+    font-weight: bold !important;
+}
+
+.high-contrast :where(button:hover, a.btn:hover) {
+    background-color: var(--color-hc-accent) !important;
+    color: black !important;
+}
+
+.high-contrast :where(
+    .blur-3xl, .bg-gradient-to-br, .bg-gradient-to-t, 
+    .bg-gradient-to-r, .bg-gradient-to-b, .bg-clip-text
+) {
+    background: none !important;
+    -webkit-text-fill-color: var(--color-hc-text) !important;
+}
+
+.high-contrast :where(input, textarea, select) {
+    background-color: black !important;
     color: white !important;
+    border: 1px solid white !important;
 }
 
-.dropdown-content li>a:hover,
-.dropdown-content li>button:hover {
-    background-color: var(--brand-blue) !important;
-    color: white !important;
-}
-
-/* Ensure icons in dropdowns are white */
-
-/* Hide print container on screen */
+/* PRINT STYLES */
 .print-container {
     display: none;
 }
 
-/* PRINT STYLES - REPAIR ORDER */
 @media print {
     @page {
         size: A4 portrait;
@@ -82,12 +208,10 @@
         background-color: white;
     }
 
-    /* Hide everything by default using visibility to preserve layout structure */
     body * {
         visibility: hidden;
     }
 
-    /* Explicitly hide non-parent UI elements to save space/processing */
     .no-print, 
     app-sidebar, 
     app-header, 
@@ -99,7 +223,6 @@
         display: none !important;
     }
 
-    /* Ensure the print container and its children are visible */
     .print-container,
     .print-container *,
     .printable-content,
@@ -109,22 +232,20 @@
         print-color-adjust: exact;
     }
 
-    /* Position the print container absolutely on the page */
     .print-container {
         display: block !important;
         position: absolute;
         top: 0;
         left: 0;
         width: 210mm;
-        height: auto; /* Allow content to dictate height */
+        height: auto;
         min-height: 100%;
         background-color: white;
         z-index: 9999;
-        padding: 15mm; /* Add margin to prevent cutting off */
+        padding: 15mm;
         box-sizing: border-box;
     }
 
-    /* Position the printable content absolutely on the page */
     .printable-content {
         position: absolute;
         top: 0;

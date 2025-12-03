@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { from, Observable, of } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from './auth.service';
 
 export interface Course {
     id: string;

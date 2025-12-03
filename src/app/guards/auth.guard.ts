@@ -2,7 +2,7 @@
 /* tslint:disable */
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
 import { ROLES } from '@app/core/constants/roles.constants';
 
 export const authGuard = (async (route, state) => {

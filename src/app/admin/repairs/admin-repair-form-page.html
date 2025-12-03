@@ -1,238 +1,252 @@
 <div class="container mx-auto p-4 max-w-5xl no-print">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nueva' }} Reparación</h1>
+        <h1 class="text-2xl font-bold">{{ id ? 'Editar' : 'Nueva' }} Reparación</h1>
         <a routerLink="/admin/repairs" class="btn btn-ghost">
             <i class="fas fa-arrow-left mr-2"></i> Volver
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6 text-gray-800">
-        @if (loading()) {
-        <div class="flex justify-center py-8">
-            <span class="loading loading-spinner loading-lg"></span>
-        </div>
-        } @else {
-        <form (ngSubmit)="save()">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Customer Info -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Nombre del Cliente</span>
-                    </label>
-                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name"
-                        class="input input-bordered w-full bg-white text-gray-800" required />
-                </div>
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Teléfono</span>
-                    </label>
-                    <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone"
-                        class="input input-bordered w-full bg-white text-gray-800" />
-                </div>
+    <div class="card bg-base-100 shadow-lg">
+        <div class="card-body p-6">
+            @if (loading()) {
+            <div class="flex justify-center py-12">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
             </div>
+            } @else {
+            <form (ngSubmit)="save()" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Customer Info -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Nombre del Cliente</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-user text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().customer_name" name="customer_name" class="grow" required />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Teléfono</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-phone text-gray-400"></i>
+                            <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone" class="grow" />
+                        </label>
+                    </div>
+                </div>
 
-            <!-- Device Info -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                <!-- Device Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Modelo del Dispositivo</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-mobile-alt text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().device_model" name="device_model" class="grow" required
+                                placeholder="Ej: iPhone 11, Samsung A52..." />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">IMEI / Serie</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-barcode text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().imei" name="imei" class="grow" placeholder="Opcional" />
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">Modelo del Dispositivo</span>
+                        <span class="label-text font-medium">Descripción del Problema</span>
                     </label>
-                    <input type="text" [(ngModel)]="form().device_model" name="device_model"
-                        class="input input-bordered w-full bg-white text-gray-800" required
-                        placeholder="Ej: iPhone 11, Samsung A52..." />
+                    <textarea [(ngModel)]="form().issue_description" name="issue_description"
+                        class="textarea textarea-bordered h-24 leading-relaxed"
+                        placeholder="Describe la falla reportada por el cliente..."></textarea>
                 </div>
+
+                <div class="divider text-sm font-medium text-gray-500">Detalles del Equipo</div>
+
+                <!-- Checklist -->
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">IMEI / Serie</span>
+                        <span class="label-text font-medium">Accesorios Recibidos</span>
                     </label>
-                    <input type="text" [(ngModel)]="form().imei" name="imei"
-                        class="input input-bordered w-full bg-white text-gray-800"
-                        placeholder="Opcional" />
+                    <div class="flex flex-wrap gap-3">
+                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
+                            [class.bg-primary-content]="form().checklist.charger"
+                            [class.border-primary]="form().checklist.charger"
+                            [class.text-primary]="form().checklist.charger"
+                            [class.bg-gray-100]="!form().checklist.charger"
+                            [class.border-gray-300]="!form().checklist.charger"
+                            [class.text-gray-700]="!form().checklist.charger">
+                            <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger" 
+                                class="checkbox checkbox-primary checkbox-sm" />
+                            <span class="font-medium">Cargador</span>
+                        </label>
+
+                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
+                            [class.bg-primary-content]="form().checklist.battery"
+                            [class.border-primary]="form().checklist.battery"
+                            [class.text-primary]="form().checklist.battery"
+                            [class.bg-gray-100]="!form().checklist.battery"
+                            [class.border-gray-300]="!form().checklist.battery"
+                            [class.text-gray-700]="!form().checklist.battery">
+                            <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery" 
+                                class="checkbox checkbox-primary checkbox-sm" />
+                            <span class="font-medium">Batería</span>
+                        </label>
+
+                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
+                            [class.bg-primary-content]="form().checklist.chip"
+                            [class.border-primary]="form().checklist.chip"
+                            [class.text-primary]="form().checklist.chip"
+                            [class.bg-gray-100]="!form().checklist.chip"
+                            [class.border-gray-300]="!form().checklist.chip"
+                            [class.text-gray-700]="!form().checklist.chip">
+                            <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" 
+                                class="checkbox checkbox-primary checkbox-sm" />
+                            <span class="font-medium">Chip</span>
+                        </label>
+
+                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
+                            [class.bg-primary-content]="form().checklist.sd"
+                            [class.border-primary]="form().checklist.sd"
+                            [class.text-primary]="form().checklist.sd"
+                            [class.bg-gray-100]="!form().checklist.sd"
+                            [class.border-gray-300]="!form().checklist.sd"
+                            [class.text-gray-700]="!form().checklist.sd">
+                            <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" 
+                                class="checkbox checkbox-primary checkbox-sm" />
+                            <span class="font-medium">Tarjeta SD</span>
+                        </label>
+
+                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
+                            [class.bg-primary-content]="form().checklist.case"
+                            [class.border-primary]="form().checklist.case"
+                            [class.text-primary]="form().checklist.case"
+                            [class.bg-gray-100]="!form().checklist.case"
+                            [class.border-gray-300]="!form().checklist.case"
+                            [class.text-gray-700]="!form().checklist.case">
+                            <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" 
+                                class="checkbox checkbox-primary checkbox-sm" />
+                            <span class="font-medium">Funda</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text font-medium">Descripción del Problema</span>
-                </label>
-                <textarea [(ngModel)]="form().issue_description" name="issue_description"
-                    class="textarea textarea-bordered h-24 bg-white text-gray-800"
-                    placeholder="Describe la falla reportada por el cliente..."></textarea>
-            </div>
-
-            <div class="divider">Detalles del Equipo</div>
-
-            <!-- Checklist -->
-            <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text font-medium">Accesorios Recibidos</span>
-                </label>
-                <div class="flex flex-wrap gap-3">
-                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
-                        [class.bg-blue-50]="form().checklist.charger"
-                        [class.border-blue-500]="form().checklist.charger"
-                        [class.text-blue-700]="form().checklist.charger"
-                        [class.bg-white]="!form().checklist.charger"
-                        [class.border-gray-200]="!form().checklist.charger">
-                        <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger" 
-                            class="hidden" />
-                        <span class="font-medium">Cargador</span>
-                    </label>
-
-                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
-                        [class.bg-blue-50]="form().checklist.battery"
-                        [class.border-blue-500]="form().checklist.battery"
-                        [class.text-blue-700]="form().checklist.battery"
-                        [class.bg-white]="!form().checklist.battery"
-                        [class.border-gray-200]="!form().checklist.battery">
-                        <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery" 
-                            class="hidden" />
-                        <span class="font-medium">Batería</span>
-                    </label>
-
-                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
-                        [class.bg-blue-50]="form().checklist.chip"
-                        [class.border-blue-500]="form().checklist.chip"
-                        [class.text-blue-700]="form().checklist.chip"
-                        [class.bg-white]="!form().checklist.chip"
-                        [class.border-gray-200]="!form().checklist.chip">
-                        <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" 
-                            class="hidden" />
-                        <span class="font-medium">Chip</span>
-                    </label>
-
-                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
-                        [class.bg-blue-50]="form().checklist.sd"
-                        [class.border-blue-500]="form().checklist.sd"
-                        [class.text-blue-700]="form().checklist.sd"
-                        [class.bg-white]="!form().checklist.sd"
-                        [class.border-gray-200]="!form().checklist.sd">
-                        <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" 
-                            class="hidden" />
-                        <span class="font-medium">Tarjeta SD</span>
-                    </label>
-
-                    <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-50"
-                        [class.bg-blue-50]="form().checklist.case"
-                        [class.border-blue-500]="form().checklist.case"
-                        [class.text-blue-700]="form().checklist.case"
-                        [class.bg-white]="!form().checklist.case"
-                        [class.border-gray-200]="!form().checklist.case">
-                        <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" 
-                            class="hidden" />
-                        <span class="font-medium">Funda</span>
-                    </label>
+                <!-- Security -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">PIN / Contraseña</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-lock text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().security_pin" name="security_pin" class="grow" placeholder="1234" />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Patrón de Desbloqueo</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-draw-polygon text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().security_pattern" name="security_pattern" class="grow"
+                                placeholder="Descripción del patrón (ej: Z, L, etc)" />
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Security -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="divider text-sm font-medium text-gray-500">Estado y Costos</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Estado</span>
+                        </label>
+                        <select [(ngModel)]="form().status" name="status" class="select select-bordered w-full">
+                            <option value="pending">Pendiente</option>
+                            <option value="in_progress">En Progreso</option>
+                            <option value="completed">Completado</option>
+                            <option value="delivered">Entregado</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Costo Estimado</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-dollar-sign text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost" class="grow" min="0" />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Seña / Adelanto</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-hand-holding-usd text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().deposit_amount" name="deposit_amount" class="grow" min="0" />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Costo Final</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-cash-register text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().final_cost" name="final_cost" class="grow" min="0" />
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">PIN / Contraseña</span>
+                        <span class="label-text font-medium">Notas del Técnico (Interno)</span>
                     </label>
-                    <input type="text" [(ngModel)]="form().security_pin" name="security_pin"
-                        class="input input-bordered w-full bg-white text-gray-800" placeholder="1234" />
+                    <textarea [(ngModel)]="form().technician_notes" name="technician_notes"
+                        class="textarea textarea-bordered h-24 leading-relaxed"
+                        placeholder="Detalles de la reparación realizada..."></textarea>
                 </div>
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Patrón de Desbloqueo</span>
-                    </label>
-                    <input type="text" [(ngModel)]="form().security_pattern" name="security_pattern"
-                        class="input input-bordered w-full bg-white text-gray-800"
-                        placeholder="Descripción del patrón (ej: Z, L, etc)" />
-                </div>
-            </div>
 
-            <div class="divider">Estado y Costos</div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Estado</span>
-                    </label>
-                    <select [(ngModel)]="form().status" name="status"
-                        class="select select-bordered w-full bg-white text-gray-800">
-                        <option value="pending">Pendiente</option>
-                        <option value="in_progress">En Progreso</option>
-                        <option value="completed">Completado</option>
-                        <option value="delivered">Entregado</option>
-                        <option value="cancelled">Cancelado</option>
-                    </select>
+                <!-- Error Message -->
+                @if (error()) {
+                <div class="alert alert-error mb-6 shadow-sm">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ error() }}</span>
                 </div>
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Costo Estimado</span>
-                    </label>
-                    <label class="input-group">
-                        <span>$</span>
-                        <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost"
-                            class="input input-bordered w-full bg-white text-gray-800" min="0" />
-                    </label>
-                </div>
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Seña / Adelanto</span>
-                    </label>
-                    <label class="input-group">
-                        <span>$</span>
-                        <input type="number" [(ngModel)]="form().deposit_amount" name="deposit_amount"
-                            class="input input-bordered w-full bg-white text-gray-800" min="0" />
-                    </label>
-                </div>
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Costo Final</span>
-                    </label>
-                    <label class="input-group">
-                        <span>$</span>
-                        <input type="number" [(ngModel)]="form().final_cost" name="final_cost"
-                            class="input input-bordered w-full bg-white text-gray-800" min="0" />
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-control mb-6">
-                <label class="label">
-                    <span class="label-text font-medium">Notas del Técnico (Interno)</span>
-                </label>
-                <textarea [(ngModel)]="form().technician_notes" name="technician_notes"
-                    class="textarea textarea-bordered h-24 bg-white text-gray-800"
-                    placeholder="Detalles de la reparación realizada..."></textarea>
-            </div>
-
-            <!-- Error Message -->
-            @if (error()) {
-            <div class="alert alert-error mb-6">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ error() }}</span>
-            </div>
-            }
-
-            <!-- Actions -->
-            <div class="flex flex-col sm:flex-row justify-end gap-4">
-                @if (id && form().tracking_code) {
-                <button type="button" (click)="shareWhatsApp()"
-                    class="btn bg-green-600 hover:bg-green-700 text-white border-none w-full sm:w-auto">
-                    <i class="fab fa-whatsapp mr-2"></i> Compartir
-                </button>
                 }
 
-                <button type="button" (click)="printOrder()" class="btn btn-outline w-full sm:w-auto"
-                    [disabled]="saving()">
-                    <i class="fas fa-print mr-2"></i> Imprimir Orden
-                </button>
-                <a routerLink="/admin/repairs" class="btn btn-ghost w-full sm:w-auto">Cancelar</a>
-                <button type="submit" class="btn btn-primary w-full sm:w-auto"
-                    [disabled]="saving() || !form().customer_name || !form().device_model">
-                    @if (saving()) {
-                    <span class="loading loading-spinner loading-xs"></span>
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-base-200">
+                    @if (id && form().tracking_code) {
+                    <button type="button" (click)="shareWhatsApp()"
+                        class="btn bg-green-600 hover:bg-green-700 text-white border-none w-full sm:w-auto">
+                        <i class="fab fa-whatsapp mr-2"></i> Compartir
+                    </button>
                     }
-                    Guardar Reparación
-                </button>
-            </div>
-        </form>
-        }
+
+                    <button type="button" (click)="printOrder()" class="btn btn-outline w-full sm:w-auto"
+                        [disabled]="saving()">
+                        <i class="fas fa-print mr-2"></i> Imprimir Orden
+                    </button>
+                    <a routerLink="/admin/repairs" class="btn btn-ghost w-full sm:w-auto">Cancelar</a>
+                    <button type="submit" class="btn btn-primary w-full sm:w-auto"
+                        [disabled]="saving() || !form().customer_name || !form().device_model">
+                        @if (saving()) {
+                        <span class="loading loading-spinner loading-xs"></span>
+                        }
+                        Guardar Reparación
+                    </button>
+                </div>
+            </form>
+            }
+        </div>
     </div>
 </div>
 
@@ -265,7 +279,7 @@
             </div>
 
             <!-- Content Grid (2 Columns) -->
-            <div class="grid grid-cols-2 gap-3 mb-2 flex-grow">
+            <div class="grid grid-cols-2 gap-3 mb-2 grow">
                 <!-- Col 1: Customer, Device, Security -->
                 <div class="flex flex-col gap-2">
                     <div class="border border-gray-300 rounded p-1">
@@ -316,7 +330,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="border border-gray-300 rounded p-1 flex-grow">
+                    <div class="border border-gray-300 rounded p-1 grow">
                         <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">FALLA / NOTAS</h3>
                         <div class="px-1 text-[9px] h-full overflow-hidden leading-tight">
                             {{ form().issue_description }}
