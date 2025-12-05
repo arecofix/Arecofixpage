@@ -5,10 +5,12 @@ import { GsmService, GsmTool, BrandService, DownloadItem } from './services/gsm.
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-gsm',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './gsm.component.html',
   styleUrl: './gsm.component.css',
 })

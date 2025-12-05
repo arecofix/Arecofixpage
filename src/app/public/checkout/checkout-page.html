@@ -115,7 +115,7 @@
 
                     <div class="mt-6">
                         <button type="submit" class="btn btn-primary btn-block btn-lg"
-                            [disabled]="checkoutForm.invalid || isProcessing() || cartService.cartItems().length === 0">
+                            [disabled]="isProcessing() || cartService.cartItems().length === 0">
                             @if (isProcessing()) {
                             <span class="loading loading-spinner"></span>
                             }
