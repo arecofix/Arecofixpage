@@ -101,29 +101,8 @@ export class AuthService {
         return { user: null, session: null, error: error.message };
       }
 
-      // 2. Manually Create Profile (Client-side)
-      if (data.user && profile) {
-        const userProfile: UserProfile = {
-          id: data.user.id,
-          email: data.user.email || email,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          display_name: profile.display_name || `${profile.first_name} ${profile.last_name}`,
-          phone: profile.phone,
-          full_name: `${profile.first_name} ${profile.last_name}`,
-          updated_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        };
-
-        const { error: profileError } = await this.supabase
-          .from('profiles')
-          .insert(userProfile);
-
-        if (profileError) {
-          this.logger.error('Error creating profile manually', profileError);
-          // We don't fail the whole signup if profile fails, but we log it.
-        }
-      }
+      // 2. Profile creation is now handled by the Supabase Database Trigger 'on_auth_user_created'
+      // We no longer need to manually insert into the profiles table from the client.
 
       this.authState.next({
         user: data.user,

@@ -6,7 +6,7 @@ const WHATSAPP_API_URL = "https://graph.facebook.com/v22.0";
 const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN")!;
 const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")!;
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
     return new Response("ok", {

@@ -26,6 +26,7 @@
     "strictTemplates": true
   },
   "files": [],
+  "exclude": ["supabase"],
   "references": [
     {
       "path": "./tsconfig.app.json"
