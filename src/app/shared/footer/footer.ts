@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { PreferencesService } from '../services/preferences.service';
 
 @Component({
   selector: 'app-footer',
@@ -19,6 +20,16 @@ export class Footer {
   // Exposed configuration
   socialLinks = environment.contact.socialMedia;
   whatsappNumber = environment.contact.whatsappNumber;
+  currentYear = new Date().getFullYear();
+
+  constructor(private preferencesService: PreferencesService) {}
+
+  openAccessibilityMenu(event?: Event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.preferencesService.toggleSidebar();
+  }
 
   subscribe() {
     if (!this.email) {

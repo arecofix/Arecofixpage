@@ -1,42 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from '../core/services/auth.service';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, PostgrestError } from '@supabase/supabase-js';
 import { Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-
-export interface Order {
-    id?: string;
-    order_number?: string;
-    customer_id?: string;
-    customer_name: string;
-    customer_email: string;
-    customer_phone?: string;
-    customer_address?: string; // Added address field
-    status: 'pending' | 'processing' | 'completed' | 'cancelled';
-    subtotal: number;
-    tax: number;
-    discount: number;
-    total: number;
-    notes?: string;
-    created_at?: string;
-    updated_at?: string;
-}
-
-export interface OrderItem {
-    id?: string;
-    order_id?: string;
-    product_id?: string;
-    product_name: string;
-    product_sku?: string;
-    quantity: number;
-    unit_price: number;
-    subtotal: number;
-    created_at?: string;
-}
-
-export interface OrderWithItems extends Order {
-    items: OrderItem[];
-}
+import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -89,7 +56,7 @@ export class OrderService {
         );
     }
 
-    async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: any }> {
+    async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | null }> {
         try {
             // Generate order number
             const orderNumber = `ORD-${Date.now()}`;
@@ -132,11 +99,11 @@ export class OrderService {
             return { data: orderData, error: null };
         } catch (error) {
             console.error('Error creating order:', error);
-            return { data: null, error };
+            return { data: null, error: error as any };
         }
     }
 
-    async updateOrderStatus(id: string, status: Order['status']): Promise<{ error: any }> {
+    async updateOrderStatus(id: string, status: Order['status']): Promise<{ error: PostgrestError | null }> {
         const { error } = await this.supabase
             .from('orders')
             .update({ status, updated_at: new Date().toISOString() })
@@ -145,7 +112,7 @@ export class OrderService {
         return { error };
     }
 
-    async deleteOrder(id: string): Promise<{ error: any }> {
+    async deleteOrder(id: string): Promise<{ error: PostgrestError | null }> {
         // Order items will be deleted automatically due to CASCADE
         const { error } = await this.supabase
             .from('orders')
@@ -154,7 +121,7 @@ export class OrderService {
 
         return { error };
     }
-    async updateOrder(id: string, order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: any }> {
+    async updateOrder(id: string, order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | Error | null }> {
         try {
             // Update order details
             // Update order details
@@ -222,7 +189,7 @@ export class OrderService {
             return { data: orderData, error: null };
         } catch (error) {
             console.error('Error updating order:', error);
-            return { data: null, error };
+            return { data: null, error: error as any };
         }
     }
 }

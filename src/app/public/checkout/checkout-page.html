@@ -1,14 +1,14 @@
 <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-3xl font-bold mb-8 text-center">Checkout</h1>
+    <h1 class="text-3xl font-bold mb-8 text-center text-base-content">Checkout</h1>
 
     @if (orderSuccess()) {
-    <div class="card bg-base-100 shadow-xl text-center p-10">
+    <div class="card bg-base-100 shadow-xl text-center p-10 border border-base-200">
         <div class="card-body items-center">
             <div class="text-success text-6xl mb-4">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h2 class="card-title text-2xl">¡Orden Recibida!</h2>
-            <p>Gracias por tu compra. Nos pondremos en contacto contigo pronto.</p>
+            <h2 class="card-title text-2xl text-base-content">¡Orden Recibida!</h2>
+            <p class="text-base-content/80">Gracias por tu compra. Nos pondremos en contacto contigo pronto.</p>
             <div class="card-actions mt-6">
                 <a routerLink="/" class="btn btn-primary">Volver al Inicio</a>
             </div>
@@ -17,25 +17,30 @@
     } @else {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Cart Summary -->
-        <div class="card bg-base-100 shadow-xl h-fit">
+        <div class="card bg-base-100 shadow-xl h-fit border border-base-200">
             <div class="card-body">
-                <h2 class="card-title mb-4">Resumen del Carrito</h2>
+                <h2 class="card-title mb-4 text-base-content">Resumen del Carrito</h2>
 
                 @if (cartService.cartItems().length === 0) {
-                <p>Tu carrito está vacío.</p>
-                <a routerLink="/" class="btn btn-link px-0">Ir a comprar</a>
+                <p class="text-base-content/70">Tu carrito está vacío.</p>
+                <a routerLink="/products" class="btn btn-link px-0">Ir a comprar</a>
                 } @else {
                 <div class="space-y-4">
                     @for (item of cartService.cartItems(); track item.product.id) {
-                    <div class="flex gap-4 items-center">
+                    <div class="flex gap-4 items-center p-2 hover:bg-base-200 rounded-lg transition-colors">
                         <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.png'"
-                            class="w-16 h-16 object-cover rounded-lg" />
+                            class="w-16 h-16 object-cover rounded-lg border border-base-300" />
                         <div class="flex-1">
-                            <h3 class="font-bold">{{ item.product.name }}</h3>
-                            <p class="text-sm text-gray-500">${{ item.product.price }} x {{ item.quantity }}</p>
+                            <h3 class="font-bold text-base-content">{{ item.product.name }}</h3>
+                            <p class="text-sm text-base-content/70">${{ item.product.price }} x {{ item.quantity }}</p>
                         </div>
-                        <div class="font-bold">
-                            ${{ (item.product.price * item.quantity).toFixed(2) }}
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="font-bold text-base-content">
+                                ${{ (item.product.price * item.quantity).toFixed(2) }}
+                            </span>
+                            <button (click)="cartService.removeFromCart(item.product.id)" class="btn btn-ghost btn-xs text-error" aria-label="Eliminar">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
                     }
@@ -43,7 +48,7 @@
 
                 <div class="divider"></div>
 
-                <div class="flex justify-between text-xl font-bold">
+                <div class="flex justify-between text-xl font-bold text-base-content">
                     <span>Total</span>
                     <span>${{ cartService.totalPrice().toFixed(2) }}</span>
                 </div>
@@ -52,16 +57,16 @@
         </div>
 
         <!-- Customer Form -->
-        <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-base-100 shadow-xl border border-base-200">
             <div class="card-body">
-                <h2 class="card-title mb-4">Datos del Cliente</h2>
+                <h2 class="card-title mb-4 text-base-content">Datos del Cliente</h2>
 
                 <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()" class="space-y-4">
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text">Nombre Completo</span>
+                            <span class="label-text text-base-content">Nombre Completo</span>
                         </label>
-                        <input type="text" formControlName="name" class="input input-bordered w-full"
+                        <input type="text" formControlName="name" class="input input-bordered w-full bg-base-100 text-base-content"
                             [class.input-error]="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" />
                         @if (checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched) {
                         <span class="text-error text-xs mt-1">El nombre es requerido</span>
@@ -70,9 +75,9 @@
 
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text">Email</span>
+                            <span class="label-text text-base-content">Email</span>
                         </label>
-                        <input type="email" formControlName="email" class="input input-bordered w-full"
+                        <input type="email" formControlName="email" class="input input-bordered w-full bg-base-100 text-base-content"
                             [class.input-error]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" />
                         @if (checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched) {
                         <span class="text-error text-xs mt-1">Email inválido</span>
@@ -81,9 +86,9 @@
 
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text">Teléfono</span>
+                            <span class="label-text text-base-content">Teléfono</span>
                         </label>
-                        <input type="tel" formControlName="phone" class="input input-bordered w-full"
+                        <input type="tel" formControlName="phone" class="input input-bordered w-full bg-base-100 text-base-content"
                             [class.input-error]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" />
                         @if (checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched) {
                         <span class="text-error text-xs mt-1">El teléfono es requerido</span>
@@ -92,9 +97,9 @@
 
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text">Dirección de Envío</span>
+                            <span class="label-text text-base-content">Dirección de Envío</span>
                         </label>
-                        <textarea formControlName="address" class="textarea textarea-bordered h-24 w-full"
+                        <textarea formControlName="address" class="textarea textarea-bordered h-24 w-full bg-base-100 text-base-content"
                             [class.textarea-error]="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched"></textarea>
                         @if (checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched) {
                         <span class="text-error text-xs mt-1">La dirección es requerida</span>
@@ -103,9 +108,9 @@
 
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text">Notas (Opcional)</span>
+                            <span class="label-text text-base-content">Notas (Opcional)</span>
                         </label>
-                        <textarea formControlName="notes" class="textarea textarea-bordered w-full"></textarea>
+                        <textarea formControlName="notes" class="textarea textarea-bordered w-full bg-base-100 text-base-content"></textarea>
                     </div>
 
                     <div class="mt-6">
@@ -114,7 +119,7 @@
                             @if (isProcessing()) {
                             <span class="loading loading-spinner"></span>
                             }
-                            Confirmar Pedido
+                            Finalizar Compra
                         </button>
                     </div>
                 </form>

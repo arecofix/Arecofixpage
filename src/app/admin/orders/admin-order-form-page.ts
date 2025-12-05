@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { OrderService, Order, OrderItem } from '@app/services/order.service';
+import { OrderService } from '@app/services/order.service';
+import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { AuthService } from '@app/core/services/auth.service';
 import { CommonModule } from '@angular/common';
 

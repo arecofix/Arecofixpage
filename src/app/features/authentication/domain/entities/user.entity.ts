@@ -54,5 +54,4 @@ export interface UpdateUserProfileDto {
     phone?: string;
     dni?: string;
     address?: string;
-    job_title?: string;
 }

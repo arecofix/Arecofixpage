@@ -182,8 +182,8 @@
              class="px-7 py-3.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/20">
             {{ content.software.ctaQuote }}
           </a>
-          <a href="#/portfolio"
-             class="px-7 py-3.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition">
+          <a routerLink="/portfolio"
+             class="px-7 py-3.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition cursor-pointer">
             {{ content.software.ctaPortfolio }}
           </a>
         </div>
@@ -282,7 +282,7 @@
               <i class="fab fa-whatsapp text-xl mr-3"></i>
               {{ content.consoles.ctaQuote }}
             </a>
-            <a href="#/products?category=consolas"
+            <a href="#/products/category/electronicos"
                class="inline-flex items-center justify-center rounded-lg border border-gray-700 bg-gray-800/50 px-8 py-4 text-base font-semibold text-gray-300 hover:bg-gray-800 hover:text-white transition-all duration-300 backdrop-blur-sm">
               <i class="fas fa-box-open mr-2"></i> {{ content.consoles.ctaProducts }}
             </a>

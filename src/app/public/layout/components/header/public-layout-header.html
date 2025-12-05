@@ -4,7 +4,7 @@
   <div class="navbar-start">
     <!-- Menú hamburguesa (Mobile) -->
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden !text-black opacity-100" aria-label="Abrir menú">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden text-black! opacity-100" aria-label="Abrir menú">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
         </svg>
@@ -30,12 +30,12 @@
                 @for (product of filteredProducts(); track product.id) {
                 <li>
                   <a (click)="selectProduct(product)"
-                    class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none !text-gray-900">
+                    class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none text-gray-900!">
                     <img [src]="product.image_url || 'assets/img/no-image.png'" alt="{{product.name}}"
                       class="w-8 h-8 object-contain rounded bg-white border" />
                     <div class="flex flex-col">
-                      <span class="font-bold text-sm truncate !text-gray-900">{{ product.name }}</span>
-                      <span class="text-xs !text-gray-500">${{ product.price }}</span>
+                      <span class="font-bold text-sm truncate text-gray-900!">{{ product.name }}</span>
+                      <span class="text-xs text-gray-500!">${{ product.price }}</span>
                     </div>
                   </a>
                 </li>
@@ -49,10 +49,27 @@
         <!-- Elementos del menú móvil -->
         @for (item of menuItems(); track $index) {
         <li>
-          <a class="flex gap-3 py-3" [routerLink]="item.path" routerLinkActive="active"
-            [routerLinkActiveOptions]="{exact: true}">
-            <i [class]="item.icon"></i> {{item.title}}
-          </a>
+          @if (item.children && item.children.length > 0) {
+            <details>
+              <summary class="flex gap-3 py-3">
+                <i [class]="item.icon"></i> {{item.title}}
+              </summary>
+              <ul>
+                @for (child of item.children; track child.path) {
+                  <li>
+                    <a class="flex gap-3 py-3" [routerLink]="child.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                      <i [class]="child.icon"></i> {{child.title}}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </details>
+          } @else {
+            <a class="flex gap-3 py-3" [routerLink]="item.path" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i [class]="item.icon"></i> {{item.title}}
+            </a>
+          }
         </li>
         }
 
@@ -90,9 +107,9 @@
     </div>
 
     <!-- Logo + appName -->
-    <a class="flex items-center gap-2 btn btn-ghost hover:bg-[#ededed]" [routerLink]="['/']">
-      <img src="assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-8 w-auto" height="32" />
-      <span class="font-bold text-lg text-[#2c3454]">{{ appName }}</span>
+    <a class="flex items-center gap-2 btn btn-ghost hover:bg-brand-light-gray" [routerLink]="['/']">
+      <img src="assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-8 w-auto" height="32" width="108" />
+      <span class="font-bold text-lg text-brand-dark-blue-fav">{{ appName }}</span>
     </a>
   </div>
 
@@ -101,10 +118,27 @@
     <ul class="menu menu-horizontal px-1">
       @for (item of menuItems(); track $index) {
       <li>
-        <a class="link link-primary" [routerLink]="item.path" routerLinkActive="link link-secondary"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i [class]="item.icon"></i> {{item.title}}
-        </a>
+        @if (item.children && item.children.length > 0) {
+          <details>
+            <summary class="link link-primary" [routerLinkActive]="['link', 'link-secondary']" [routerLinkActiveOptions]="{exact: false}">
+              <i [class]="item.icon"></i> {{item.title}}
+            </summary>
+            <ul class="p-2 bg-base-100 rounded-t-none z-50">
+              @for (child of item.children; track child.path) {
+                <li>
+                  <a [routerLink]="child.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                    <i [class]="child.icon"></i> {{child.title}}
+                  </a>
+                </li>
+              }
+            </ul>
+          </details>
+        } @else {
+          <a class="link link-primary" [routerLink]="item.path" routerLinkActive="link link-secondary"
+            [routerLinkActiveOptions]="{exact: true}">
+            <i [class]="item.icon"></i> {{item.title}}
+          </a>
+        }
       </li>
       }
 
@@ -161,12 +195,12 @@
           @for (product of filteredProducts(); track product.id) {
           <li>
             <a (click)="selectProduct(product)"
-              class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none !text-gray-900">
+              class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none text-gray-900!">
               <img [src]="product.image_url || 'assets/img/no-image.png'" alt="{{product.name}}"
                 class="w-8 h-8 object-contain rounded bg-white border" />
               <div class="flex flex-col">
-                <span class="font-bold text-sm truncate !text-gray-900">{{ product.name }}</span>
-                <span class="text-xs !text-gray-500">${{ product.price }}</span>
+                <span class="font-bold text-sm truncate text-gray-900!">{{ product.name }}</span>
+                <span class="text-xs text-gray-500!">${{ product.price }}</span>
               </div>
             </a>
           </li>
@@ -178,49 +212,58 @@
 
     <!-- Carrito -->
     <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-[#ededed]" aria-label="Carrito">
+      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-brand-light-gray" aria-label="Carrito">
         <div class="indicator">
-          <i class="fas fa-shopping-cart text-lg text-[#2c3454]"></i>
+          <i class="fas fa-shopping-cart text-lg text-brand-dark-blue-fav"></i>
           @if (cartService.totalItems() > 0) {
-          <span class="indicator-item badge badge-sm badge-primary">{{ cartService.totalItems() }}</span>
+          <span class="badge badge-sm indicator-item bg-red-500 text-white border-none">{{ cartService.totalItems() }}</span>
           }
         </div>
       </div>
-      <div tabindex="0" class="mt-3 z-[1] card card-compact dropdown-content w-80 bg-base-100 shadow">
+      <div tabindex="0" class="mt-3 z-1 card card-compact dropdown-content w-80 bg-base-100 shadow-xl">
         <div class="card-body">
-          <span class="font-bold text-lg">{{ cartService.totalItems() }} Items</span>
-          <span class="text-info">Subtotal: ${{ cartService.totalPrice().toFixed(2) }}</span>
-
-          <div class="max-h-60 overflow-y-auto my-2">
-            @for (item of cartService.cartItems(); track item.product.id) {
-            <div class="flex gap-2 mb-2 items-center">
-              <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.png'"
-                class="w-12 h-12 object-cover rounded" />
-              <div class="flex-1">
-                <p class="text-sm font-bold truncate">{{ item.product.name }}</p>
-                <p class="text-xs">{{ item.quantity }} x ${{ item.product.price }}</p>
+          <span class="font-bold text-lg text-base-content">{{ cartService.totalItems() }} Productos</span>
+          <span class="text-base-content">Subtotal: {{ cartService.totalPrice() | currency }}</span>
+          
+          <!-- Cart Items Preview (Max 3) -->
+          <div class="py-2 space-y-2 max-h-48 overflow-y-auto">
+            @for (item of cartService.cartItems().slice(0, 3); track item.product.id) {
+              <div class="flex items-center gap-3 p-1 hover:bg-base-200 rounded transition-colors">
+                <img [src]="item.product.image_url || 'assets/img/no-image.png'" [alt]="item.product.name" class="w-10 h-10 object-cover rounded border border-base-300">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-base-content truncate">
+                    {{ item.product.name }}
+                  </p>
+                  <p class="text-xs text-base-content/70 truncate">
+                    {{ item.quantity }} x {{ item.product.price | currency }}
+                  </p>
+                </div>
+                <button (click)="cartService.removeFromCart(item.product.id); $event.stopPropagation()" class="btn btn-ghost btn-xs text-error" aria-label="Eliminar producto">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
               </div>
-              <button class="btn btn-ghost btn-xs text-error" (click)="cartService.removeFromCart(item.product.id)">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
+            }
+            @if (cartService.totalItems() > 3) {
+              <p class="text-xs text-center text-base-content/60 pt-2">
+                y {{ cartService.totalItems() - 3 }} más...
+              </p>
             }
           </div>
 
           <div class="card-actions">
-            <a routerLink="/checkout" class="btn btn-primary btn-block">Checkout</a>
+            <a routerLink="/checkout" class="btn btn-primary btn-block">Finalizar Compra</a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Botón Perfil con menú -->
+    <!-- User Menu -->
     <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-[#ededed]"
+      <div tabindex="0" role="button" class="btn btn-circle btn-sm btn-ghost hover:bg-brand-light-gray"
         aria-label="Menú de usuario">
-        <i class="fas fa-user text-lg text-[#2c3454]"></i>
+        <i class="fas fa-user text-lg text-brand-dark-blue-fav"></i>
       </div>
-      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-64">
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-64">
         @let user = (user$ | async);
         @if (user) {
         <li>

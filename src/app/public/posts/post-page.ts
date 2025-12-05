@@ -41,6 +41,15 @@ export class PostPage implements OnInit {
             if (this.post) {
                 this.updateMetaTags(this.post);
             } else {
+                // Retry with corrected slug if 'tcnico' is present (common typo/encoding issue)
+                if (slug.includes('tcnico')) {
+                    const correctedSlug = slug.replace('tcnico', 'tecnico');
+                    this.post = await this.postService.getPostBySlug(correctedSlug);
+                    if (this.post) {
+                        this.updateMetaTags(this.post);
+                        return;
+                    }
+                }
                 this.error = 'Entrada no encontrada';
             }
         } catch (e: any) {

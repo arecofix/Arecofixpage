@@ -63,13 +63,14 @@ export class CategoryService {
     // Assuming featured means something specific or just top categories
     // For now, let's just get the first 3
     const _page = 1;
-    const _per_page = 50;
+    const _per_page = 100;
 
     return from(
       this.supabase
         .from('categories')
         .select('*', { count: 'exact' })
         .eq('is_active', true)
+        .order('name')
         .limit(_per_page)
     ).pipe(
       map(({ data, count, error }) => {
@@ -99,6 +100,25 @@ export class CategoryService {
       catchError((err) => {
         console.error('Supabase Error:', err);
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
+      })
+    );
+  }
+
+  public getById(id: string): Observable<iCategory | null> {
+    return from(
+      this.supabase
+        .from('categories')
+        .select('*')
+        .eq('id', id)
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data as iCategory;
+      }),
+      catchError((err) => {
+        console.error('Supabase Error:', err);
+        return of(null);
       })
     );
   }

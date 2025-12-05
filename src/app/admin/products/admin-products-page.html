@@ -1,8 +1,17 @@
 <div class="flex justify-between items-center mb-6">
   <h1 class="text-2xl font-bold text-gray-800">Productos</h1>
-  <a routerLink="/admin/products/new" class="btn btn-primary">
-    <i class="fas fa-plus mr-2"></i> Nuevo Producto
-  </a>
+  <div class="flex gap-2">
+    <button (click)="exportProducts()" class="btn btn-outline btn-primary">
+      <i class="fas fa-file-export mr-2"></i> Exportar CSV
+    </button>
+    <button (click)="fileInput.click()" class="btn btn-outline btn-secondary">
+      <i class="fas fa-file-import mr-2"></i> Importar CSV
+    </button>
+    <input #fileInput type="file" accept=".csv" class="hidden" (change)="importProducts($event)" />
+    <a routerLink="/admin/products/new" class="btn btn-primary">
+      <i class="fas fa-plus mr-2"></i> Nuevo Producto
+    </a>
+  </div>
 </div>
 
 @if (loading) {

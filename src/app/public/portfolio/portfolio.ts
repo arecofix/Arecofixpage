@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
 
 interface PortfolioContent {
@@ -54,7 +55,7 @@ interface Project {
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './portfolio.html',
   styleUrls: ['./portfolio.css']
 })

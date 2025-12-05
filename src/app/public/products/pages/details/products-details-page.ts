@@ -6,8 +6,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, switchMap, of } from 'rxjs';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { Location } from '@angular/common';
+import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { Location, NgOptimizedImage } from '@angular/common';
 /*  */
 import {
   IsEmptyComponent,
@@ -17,12 +17,6 @@ import {
 /*  */
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
-import {
-  iCategoriesResponse,
-  iRequestParams,
-} from '@app/public/categories/interfaces';
-import { PaginationService } from '@app/shared/components/pagination';
-import { ProductCard } from '@app/public/products/components';
 import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
@@ -33,7 +27,8 @@ import { FallbackService } from '@app/core/services/fallback.service';
   imports: [
     IsEmptyComponent,
     IsErrorComponent,
-    IsLoadingComponent
+    IsLoadingComponent,
+    NgOptimizedImage
   ],
   templateUrl: './products-details-page.html',
   styles: ``,
@@ -43,7 +38,6 @@ export class ProductsDetailsPage {
   private route: ActivatedRoute = inject(ActivatedRoute);
   private categoryService: CategoryService = inject(CategoryService);
   private productService: ProductService = inject(ProductService);
-  public paginationService: PaginationService = inject(PaginationService);
   private location: Location = inject(Location);
 
   private fallbackService = inject(FallbackService);
@@ -87,6 +81,15 @@ export class ProductsDetailsPage {
     return data.data[0];
   });
 
+  categoryRs = rxResource({
+    stream: () => toObservable(this.product).pipe(
+      switchMap(product => {
+        if (!product) return of(null);
+        return this.categoryService.getById(product.category_id);
+      })
+    )
+  });
+
   // Método para volver atrás
   goBack(): void {
     this.location.back();
@@ -98,6 +101,27 @@ export class ProductsDetailsPage {
     const product = this.product();
     if (product) {
       this.cartService.addToCart(product);
+    }
+  }
+
+  shareProduct() {
+    const product = this.product();
+    if (!product) return;
+
+    const shareData = {
+      title: product.name,
+      text: `Mira este producto: ${product.name}`,
+      url: window.location.href
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData)
+        .catch((err) => console.error('Error sharing:', err));
+    } else {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => alert('Enlace copiado al portapapeles!'))
+        .catch(err => console.error('Error copying to clipboard:', err));
     }
   }
 }

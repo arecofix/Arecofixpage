@@ -22,7 +22,6 @@ export class AdminEmployeeFormPage implements OnInit {
         email: '',
         phone: '',
         role: 'staff',
-        job_title: '',
         avatar_url: '',
     });
 
@@ -42,7 +41,6 @@ export class AdminEmployeeFormPage implements OnInit {
                     email: data.email || '',
                     phone: data.phone || '',
                     role: data.role || 'staff',
-                    job_title: data.job_title || '',
                     avatar_url: data.avatar_url || '',
                 });
             }

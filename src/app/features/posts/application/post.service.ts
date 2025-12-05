@@ -11,35 +11,38 @@ export class PostService {
 
     async getPostBySlug(slug: string): Promise<Post | null> {
         const { data, error } = await this.supabase
-            .from('posts')
+            .from('blog_posts')
             .select('*')
             .eq('slug', slug)
-            .single();
+            .maybeSingle();
 
         if (error) {
             console.error('PostService Error:', error);
-            if (error.code === 'PGRST116') return null;
             throw error;
         }
+
+        if (!data) return null;
         
-        return {
-            ...data,
-            image: data.image
-        } as Post;
+        return this.mapToEntity(data);
     }
 
     async getRecentPosts(limit = 5): Promise<Post[]> {
         const { data, error } = await this.supabase
-            .from('posts')
+            .from('blog_posts')
             .select('*')
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (error) throw error;
         
-        return (data || []).map((post: any) => ({
-            ...post,
-            image: post.featured_image || post.image || post.image_url
-        })) as Post[];
+        return (data || []).map((item: any) => this.mapToEntity(item));
+    }
+
+    private mapToEntity(data: any): Post {
+        return {
+            ...data,
+            // Robustly map image from possible DB fields
+            image: data.featured_image || data.image || data.image_url || null
+        } as Post;
     }
 }

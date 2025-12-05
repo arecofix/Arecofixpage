@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -113,7 +115,7 @@ interface HomeContent {
 @Component({
   selector: 'app-public-home-page',
   standalone: true,
-  imports: [CommonModule, ReservationCalendar, ProductCarouselComponent, ReviewGridComponent, ArticleGridComponent],
+  imports: [CommonModule, RouterLink, ReservationCalendar, ProductCarouselComponent, ReviewGridComponent, ArticleGridComponent],
   templateUrl: './public-home-page.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -204,7 +206,7 @@ export class PublicHomePage {
         description: 'Explore our latest articles on software, GSM technology, and exclusive downloads.',
         cta: 'Read article',
         items: [
-          { image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop', category: 'Technology', title: 'Software and Development', description: 'Discover the latest lab tools and code optimization.', link: '/#/gsm#Software', color: 'bg-blue-600' },
+          { image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop', category: 'Technology', title: 'Software and Development', description: 'Discover the latest lab tools and code optimization.', link: '/#/gsm', color: 'bg-blue-600' },
           { image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop', category: 'GSM', title: 'GSM Solutions', description: 'Everything about unlocking, flashing, and advanced software repairs.', link: '/#/gsm', color: 'bg-purple-600' },
           { image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop', category: 'Resources', title: 'Useful Downloads', description: 'Access schematics, boardviews, and technical service software.', link: '/#/recursos', color: 'bg-green-600' }
         ]
@@ -299,9 +301,10 @@ export class PublicHomePage {
         description: 'Explora nuestros últimos artículos sobre software, tecnología GSM y descargas exclusivas.',
         cta: 'Ver artículo',
         items: [
-          { image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop', category: 'Tecnología', title: 'Software y Desarrollo', description: 'Descubre las últimas herramientas de laboratorio y optimización de código.', link: '/#/gsm#Software', color: 'bg-blue-600' },
+          { image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop', category: 'Tecnología', title: 'Software y Desarrollo', description: 'Descubre las últimas herramientas de laboratorio y optimización de código.', link: '/#/gsm', color: 'bg-blue-600' },
           { image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop', category: 'GSM', title: 'Soluciones GSM', description: 'Todo sobre desbloqueos, flasheos y reparaciones de software avanzado.', link: '/#/gsm', color: 'bg-purple-600' },
-          { image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop', category: 'Recursos', title: 'Descargas Útiles', description: 'Accede a esquemáticos, boardviews y software de servicio técnico.', link: '/#/recursos', color: 'bg-green-600' }
+          { image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop', category: 'Recursos', title: 'Descargas Útiles', description: 'Accede a esquemáticos, boardviews y software de servicio técnico.', link: '/#/gsm'
+            , color: 'bg-green-600' }
         ]
       },
       partsPromo: {

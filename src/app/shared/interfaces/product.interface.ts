@@ -21,6 +21,7 @@ export interface Product {
   featured: boolean;
   image_url?: string;
   gallery_urls?: string[];
+  sku?: string;
 }
 
 export type PageNumber = number;
@@ -29,4 +30,6 @@ export type PageSize = number;
 export interface ProductsParams extends Partial<Product> {
   _page?: PageNumber;
   _per_page?: PageSize;
+  _sort?: string;
+  _order?: 'asc' | 'desc';
 }

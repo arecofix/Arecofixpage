@@ -39,14 +39,14 @@
                 </svg>
                 {{ currentLanguage === 'es' ? 'Descargar CV' : 'Download CV' }}
               </a>
-              <a href="/#/contacto" class="px-8 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white font-bold rounded-xl transition-all backdrop-blur-sm border border-gray-200 dark:border-white/10">
+              <a routerLink="/contacto" class="px-8 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white font-bold rounded-xl transition-all backdrop-blur-sm border border-gray-200 dark:border-white/10">
                 {{ currentLanguage === 'es' ? 'Contactar' : 'Contact Me' }}
               </a>
             </div>
           </div>
           
           <!-- Profile Image Placeholder -->
-          <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-white dark:border-white/10 shadow-2xl overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0">
+          <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-white dark:border-white/10 shadow-2xl overflow-hidden bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0">
              <img src="/assets/img/perfil.jpeg" alt="Profile" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity">
           </div>
         </div>
@@ -68,7 +68,7 @@
         </div>
         
         <!-- Quick Stats / Highlights -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-600/20 dark:to-purple-600/20 backdrop-blur-lg border border-indigo-200 dark:border-indigo-500/20 rounded-3xl p-8 flex flex-col justify-center shadow-lg dark:shadow-none">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-600/20 dark:to-purple-600/20 backdrop-blur-lg border border-indigo-200 dark:border-indigo-500/20 rounded-3xl p-8 flex flex-col justify-center shadow-lg dark:shadow-none">
           <div class="space-y-6">
             <div>
               <div class="text-3xl font-bold text-indigo-700 dark:text-white mb-1">5+</div>
@@ -116,7 +116,7 @@
             <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 group shadow-lg dark:shadow-none">
               <div class="h-48 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
                 <!-- Placeholder for project image -->
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60 z-10"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-gray-900 to-transparent opacity-60 z-10"></div>
                 <img [src]="project.image" [alt]="project.title" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
               </div>
               <div class="p-6">

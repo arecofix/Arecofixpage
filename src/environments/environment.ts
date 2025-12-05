@@ -25,13 +25,6 @@ export const environment = {
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
 
-  // WhatsApp Configuration
-  whatsappToken: 'EAARLwIJnO30BQJVYYg23XHI8YlOxew5mmmNrQJT5ZCbKj27RmMxVPslyaTfYKnJA4P5JZCk80JwnzOgZCF0zR5ZC2gDRm6TidoX0jHVE9rp77QHcehimvSmZClobDmSZAGXVv7NyK5RGuSZBbh5Fie1ykDfxeGw7NZCR2DkJabcZB6odycEjRgeBjEMqA9587UPZAPzVoPZAquACqZA0et2Q0pWcZCYDX3gsZC2VY6tlJ86oM5o7AEmaKDbUtveRLRAAAZCaa77S2MOerzRZCP4c394xVYQVH0RVyf9j5plybQZDZD',
-  whatsappPhoneNumberId: '322928504245092',
-  whatsappBusinessAccountId: '368379263021902',
-  whatsappAppId: '1209190100450173',
-  whatsappApiUrl: 'https://graph.facebook.com/v22.0', // Base URL, phone ID to be appended in service
-
   // Contact Information
   contact: {
     whatsappNumber: '5491125960900',

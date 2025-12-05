@@ -16,10 +16,7 @@ export class AdminPostService {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []).map((post: any) => ({
-            ...post,
-            image: post.featured_image || post.image || post.image_url // Try all likely names
-        }));
+        return (data || []).map((post: any) => this.mapToEntity(post));
     }
 
     async getPost(id: string): Promise<Post> {
@@ -30,6 +27,10 @@ export class AdminPostService {
             .single();
 
         if (error) throw error;
+        return this.mapToEntity(data);
+    }
+
+    private mapToEntity(data: any): Post {
         return {
             ...data,
             image: data.featured_image || data.image || data.image_url

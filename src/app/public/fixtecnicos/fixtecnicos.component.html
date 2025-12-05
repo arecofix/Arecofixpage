@@ -1,0 +1,198 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Hero Section -->
+  <section class="relative bg-blue-900 text-white py-20 overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1581092921461-eab32e97f633?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
+    <div class="container mx-auto px-4 relative z-10 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">Comunidad FixTécnicos</h1>
+      <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+        El espacio definitivo para técnicos de celulares e informática. Recursos, comunidad y herramientas profesionales.
+      </p>
+      
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="https://www.facebook.com/share/g/1HH4Rqrfdr/" target="_blank" 
+           class="btn btn-lg bg-[#1877F2] hover:bg-[#166fe5] text-white border-none gap-2">
+          <i class="fab fa-facebook-f"></i> Unirse al Grupo
+        </a>
+        <button (click)="downloadPdf()" class="btn btn-lg btn-outline text-white hover:bg-white hover:text-blue-900 gap-2">
+          <i class="fas fa-file-pdf"></i> Descargar Guía PDF
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Navigation -->
+  <section class="py-12 -mt-8 relative z-20">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Cursos -->
+        <a routerLink="/cursos" class="card bg-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer group">
+          <div class="card-body items-center text-center">
+            <div class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2 class="card-title">Cursos Disponibles</h2>
+            <p class="text-gray-600">Capacítate con los mejores cursos de reparación y software.</p>
+          </div>
+        </a>
+
+        <!-- Herramientas -->
+        <a routerLink="/products" [queryParams]="{category: 'herramientas'}" class="card bg-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer group">
+          <div class="card-body items-center text-center">
+            <div class="w-16 h-16 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-2xl mb-2 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+              <i class="fas fa-tools"></i>
+            </div>
+            <h2 class="card-title">Herramientas</h2>
+            <p class="text-gray-600">Equipamiento profesional para tu taller.</p>
+          </div>
+        </a>
+
+        <!-- Repuestos -->
+        <a routerLink="/products" [queryParams]="{category: 'repuestos'}" class="card bg-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer group">
+          <div class="card-body items-center text-center">
+            <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-2xl mb-2 group-hover:bg-green-600 group-hover:text-white transition-colors">
+              <i class="fas fa-microchip"></i>
+            </div>
+            <h2 class="card-title">Repuestos</h2>
+            <p class="text-gray-600">Componentes de calidad para todas las marcas.</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMEI Checker & Software Promo -->
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        
+        <!-- IMEI Checker -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="p-3 bg-red-100 text-red-600 rounded-lg">
+              <i class="fas fa-mobile-alt text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Verificar IMEI</h2>
+          </div>
+          <p class="text-gray-600 mb-6">Consulta el estado de reporte de cualquier dispositivo al instante. Base de datos actualizada.</p>
+          
+          <div class="form-control mb-4">
+            <label class="label">
+              <span class="label-text font-medium">Número de IMEI (15 dígitos)</span>
+            </label>
+            <div class="relative">
+              <input type="text" [(ngModel)]="imeiInput" placeholder="Ej: 3529..." maxlength="15" 
+                     class="input input-bordered w-full pl-10 font-mono text-lg"
+                     [class.input-error]="imeiResult?.status === 'stolen'"
+                     [class.input-success]="imeiResult?.status === 'clean'">
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <i class="fas fa-barcode"></i>
+              </div>
+            </div>
+          </div>
+
+          <button (click)="checkImei()" [disabled]="checkingImei" class="btn btn-primary w-full mb-4">
+            @if(checkingImei) {
+              <span class="loading loading-spinner"></span> Verificando...
+            } @else {
+              Verificar Estado
+            }
+          </button>
+
+          @if (imeiResult) {
+            <div class="alert" [class.alert-success]="imeiResult.status === 'clean'" [class.alert-error]="imeiResult.status === 'stolen'">
+              <i class="fas" [class.fa-check-circle]="imeiResult.status === 'clean'" [class.fa-exclamation-triangle]="imeiResult.status === 'stolen'"></i>
+              <span>{{ imeiResult.message }}</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-2 text-center">* Resultado de demostración. Para validación legal consulte ENACOM.</p>
+          }
+        </div>
+
+        <!-- Software Promo -->
+        <div class="bg-gray-900 rounded-2xl shadow-lg p-8 text-white relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full blur-3xl opacity-20 -mr-16 -mt-16"></div>
+          
+          <div class="relative z-10">
+            <div class="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-bold mb-4">
+              SOFTWARE PREMIUM
+            </div>
+            <h2 class="text-3xl font-bold mb-4">Gestión de Taller Pro</h2>
+            <p class="text-gray-300 mb-6 text-lg">
+              Optimiza tu negocio con nuestro software especializado. Control de reparaciones, stock, clientes y facturación en un solo lugar.
+            </p>
+            
+            <ul class="space-y-3 mb-8">
+              <li class="flex items-center gap-3">
+                <i class="fas fa-check text-green-400"></i> Seguimiento de órdenes en tiempo real
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fas fa-check text-green-400"></i> Impresión de tickets y etiquetas
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fas fa-check text-green-400"></i> Control de inventario y caja
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fas fa-check text-green-400"></i> Notificaciones automáticas por WhatsApp
+              </li>
+            </ul>
+
+            <button class="btn btn-primary btn-lg w-full gap-2 shadow-lg shadow-blue-500/30">
+              <i class="fas fa-rocket"></i> Obtener Licencia
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Community Feed -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-10">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800">Comunidad Técnica</h2>
+          <p class="text-gray-600 mt-2">Últimas discusiones, aportes y consultas.</p>
+        </div>
+        <button class="btn btn-outline btn-primary">
+          <i class="fas fa-plus"></i> Nueva Publicación
+        </button>
+      </div>
+
+      @if (loadingPosts()) {
+        <div class="flex justify-center py-12">
+          <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          @for (post of posts(); track post.id) {
+            <article class="card bg-base-100 shadow-lg hover:shadow-xl transition-all border border-gray-100">
+              <figure class="h-48 overflow-hidden">
+                <img [src]="post.image || 'assets/img/no-image.png'" [alt]="post.title" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </figure>
+              <div class="card-body">
+                <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                  <span class="badge badge-ghost badge-sm">Aporte</span>
+                  <time>{{ post.created_at | date:'mediumDate' }}</time>
+                </div>
+                <h3 class="card-title text-lg">
+                  <a [routerLink]="['/posts', post.slug]" class="hover:text-blue-600 transition-colors">
+                    {{ post.title }}
+                  </a>
+                </h3>
+                <p class="text-gray-600 text-sm line-clamp-3">{{ post.content }}</p>
+                <div class="card-actions justify-end mt-4 pt-4 border-t border-gray-100">
+                  <button class="btn btn-sm btn-ghost gap-2">
+                    <i class="far fa-comment"></i> Comentar
+                  </button>
+                  <button class="btn btn-sm btn-ghost gap-2">
+                    <i class="far fa-heart"></i> Me gusta
+                  </button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  </section>
+</div>

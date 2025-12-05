@@ -1,4 +1,4 @@
-import { Component, OnInit, computed } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 // Trigger rebuild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -29,6 +29,10 @@ export class CursosComponent implements OnInit {
     courses: Course[] = [];
     loading = true;
     error: string | null = null;
+
+    // Sorting signals
+    sort = signal('created_at');
+    order = signal<'asc' | 'desc'>('desc');
 
     benefits = [
         { icon: 'fa-certificate', title: 'Certificación Oficial', description: 'Título avalado por el municipio' },
@@ -108,6 +112,8 @@ export class CursosComponent implements OnInit {
             switchMap((category: iCategoriesResponse) => this.productService.getData({
                 category_id: category.data?.[0]?.id,
                 _page: this.paginationService.currentPage() || 1,
+                _sort: this.sort(),
+                _order: this.order()
             }))
         )
     });
@@ -176,21 +182,18 @@ export class CursosComponent implements OnInit {
         this.coursesService.registerStudent({
             course_id: this.selectedCourse.id,
             ...this.registrationForm
-        }).subscribe({
-            next: (response: { data: any, error: any }) => {
-                this.registering = false;
-                if (response.error) {
-                    this.registrationError = 'Error al registrarse. Intenta nuevamente.';
-                } else {
-                    this.registrationSuccess = true;
-                    setTimeout(() => this.closeRegistration(), 3000);
-                }
-            },
-            error: (err: any) => {
-                console.error('Registration error:', err);
-                this.registering = false;
-                this.registrationError = 'Error de conexión. Intenta nuevamente.';
+        }).then((response) => {
+            this.registering = false;
+            if (response.error) {
+                this.registrationError = 'Error al registrarse. Intenta nuevamente.';
+            } else {
+                this.registrationSuccess = true;
+                setTimeout(() => this.closeRegistration(), 3000);
             }
+        }).catch((err) => {
+            console.error('Registration error:', err);
+            this.registering = false;
+            this.registrationError = 'Error de conexión. Intenta nuevamente.';
         });
     }
 

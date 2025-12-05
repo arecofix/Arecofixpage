@@ -13,9 +13,12 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 
 interface iMenuItem {
+  id?: string;
   title: string;
   path: string;
   icon: string;
+  parentId?: string;
+  children?: iMenuItem[];
 }
 
 @Component({
@@ -162,28 +165,62 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
     stream: () => this.categoryService.getFeaturedData(),
   });
 
-  public menuItems = () => {
-    const items = this.categoryRs.value()?.data
-      .filter((category: iCategory) => category.slug !== 'sports' && category.name !== 'Deportes')
-      .map((category: iCategory) => {
-        let icon = category.icon;
-        if (category.name === 'Celulares') icon = 'fas fa-mobile-alt';
-        if (category.name === 'Repuestos') icon = 'fas fa-tools';
-        if (category.name === 'Cursos') icon = 'fas fa-graduation-cap';
+  public menuItems = computed(() => {
+    const rawItems = this.categoryRs.value()?.data ?? [];
+    
+    // Filter out unwanted categories
+    const filteredItems = rawItems.filter((category: iCategory) => 
+      category.slug !== 'sports' && category.name !== 'Deportes'
+    );
 
-        return {
-          title: category.name,
-          path: '/products/category/' + category.slug,
-          icon: icon || 'fas fa-box', // Fallback icon
-        };
-      }) ?? [];
+    // Map to menu items
+    const allMenuItems: iMenuItem[] = filteredItems.map((category: iCategory) => {
+      let icon = category.icon;
+      if (category.name === 'Celulares') icon = 'fas fa-mobile-alt';
+      if (category.name === 'Repuestos') icon = 'fas fa-tools';
+      if (category.name === 'Cursos') icon = 'fas fa-graduation-cap';
+      if (category.name === 'Herramientas') icon = 'fas fa-wrench';
 
-    return items.sort((a, b) => {
+      let slug = category.slug;
+      if (slug === 'electrnicos') slug = 'electronicos';
+
+      return {
+        id: String(category.id), // Keep track of ID for nesting
+        title: category.name,
+        path: '/products/category/' + slug,
+        icon: icon || 'fas fa-box',
+        parentId: category.parent_id ? String(category.parent_id) : undefined,
+        children: []
+      };
+    });
+
+    // Build tree structure
+    const rootItems: iMenuItem[] = [];
+    const itemMap = new Map<string, iMenuItem>();
+
+    // First pass: map items by ID
+    allMenuItems.forEach(item => {
+      if (item.id) itemMap.set(item.id, item);
+    });
+
+    // Second pass: link children to parents
+    allMenuItems.forEach(item => {
+      if (item.parentId && itemMap.has(item.parentId)) {
+        const parent = itemMap.get(item.parentId)!;
+        parent.children = parent.children || [];
+        parent.children.push(item);
+      } else {
+        rootItems.push(item);
+      }
+    });
+
+    // Sort root items
+    return rootItems.sort((a, b) => {
       if (a.title === 'Celulares') return -1;
       if (b.title === 'Celulares') return 1;
       return 0;
     });
-  };
+  });
 
   async logout() {
     try {

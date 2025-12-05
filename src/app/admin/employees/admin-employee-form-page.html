@@ -29,32 +29,6 @@
             </div>
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                <input type="email" [(ngModel)]="form().email" name="email" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" [disabled]="!!id">
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Rol</label>
-                    <select [(ngModel)]="form().role" name="role" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
-                        <option value="admin">Administrador</option>
-                        <option value="staff">Staff / Empleado</option>
-                        <option value="user">Usuario (Degradar)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Cargo</label>
-                    <input type="text" [(ngModel)]="form().job_title" name="job_title" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
-                        placeholder="Ej: Técnico, Vendedor">
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
-                <input type="text" [(ngModel)]="form().phone" name="phone" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
-            </div>
-
-            <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Foto de Perfil</label>
                 <input type="file" (change)="onFileChange($event)"
                     class="file-input file-input-bordered file-input-primary w-full bg-white text-gray-700" accept="image/*">

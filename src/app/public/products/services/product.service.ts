@@ -53,6 +53,14 @@ export class ProductService {
     if (price) query = query.eq('price', price);
     if (slug) query = query.eq('slug', slug);
 
+    // Apply sorting
+    if (params._sort) {
+      query = query.order(params._sort, { ascending: params._order === 'asc' });
+    } else {
+      // Default sort
+      query = query.order('created_at', { ascending: false });
+    }
+
     // Apply pagination
     query = query.range(start, end);
 

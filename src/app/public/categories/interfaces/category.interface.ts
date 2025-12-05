@@ -15,4 +15,5 @@ export interface iCategory {
     icon:        string;
     slug:        string;
     featured:    boolean;
+    parent_id?:  string;
 }

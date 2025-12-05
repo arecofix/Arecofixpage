@@ -1,6 +1,6 @@
 <!-- Hero Section -->
 <div class="relative bg-gray-900 text-white py-12 mb-8 overflow-hidden">
-  <div class="absolute inset-0 opacity-20 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
+  <div class="absolute inset-0 opacity-20 bg-linear-to-r from-blue-900 to-indigo-900"></div>
   <!-- Decorative circles -->
   <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
   <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
@@ -170,7 +170,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+<section class="py-16 bg-linear-to-r from-indigo-600 to-purple-600 text-white">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿Listo para comenzar tu carrera?</h2>
     <p class="text-xl mb-8 text-indigo-100">Inscríbete ahora y obtén un 10% de descuento en tu primer mes</p>
@@ -190,6 +190,19 @@
       <p class="text-gray-600 dark:text-gray-400">
         Herramientas y accesorios recomendados para potenciar tu aprendizaje
       </p>
+      
+      <!-- Sorting Controls -->
+      <div class="mt-6 flex justify-end gap-4">
+        <select [ngModel]="sort()" (ngModelChange)="sort.set($event)" class="select select-bordered select-sm w-full max-w-xs">
+          <option value="created_at">Más recientes</option>
+          <option value="price">Precio</option>
+          <option value="name">Nombre</option>
+        </select>
+        <select [ngModel]="order()" (ngModelChange)="order.set($event)" class="select select-bordered select-sm w-full max-w-xs">
+          <option value="asc">Ascendente</option>
+          <option value="desc">Descendente</option>
+        </select>
+      </div>
     </div>
 
     @if (productsRs.isLoading()) {

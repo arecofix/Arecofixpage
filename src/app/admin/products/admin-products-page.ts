@@ -27,4 +27,36 @@ export class AdminProductsPage implements OnInit {
       this.cdr.markForCheck();
     }
   }
+
+  async exportProducts() {
+    try {
+      this.loading = true;
+      await this.productService.exportProductsToCSV();
+    } catch (e: any) {
+      this.error = e.message || 'Error al exportar productos';
+    } finally {
+      this.loading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  async importProducts(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      this.loading = true;
+      const result = await this.productService.importProductsFromCSV(file);
+      alert(`Importación completada: ${result.success} productos importados/actualizados. ${result.errors} errores.`);
+      // Reload products
+      this.products = await this.productService.getProducts();
+    } catch (e: any) {
+      this.error = e.message || 'Error al importar productos';
+    } finally {
+      this.loading = false;
+      // Reset file input
+      event.target.value = '';
+      this.cdr.markForCheck();
+    }
+  }
 }

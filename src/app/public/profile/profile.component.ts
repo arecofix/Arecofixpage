@@ -1,10 +1,9 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core'
-import { AuthService, UserProfile } from '@app/core/services/auth.service'
-import { Router, RouterLink } from '@angular/router'
-
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms'
-import { Subject } from 'rxjs'
-import { takeUntil } from 'rxjs/operators'
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { AuthService } from '@app/core/services/auth.service';
+import { UserProfile } from '@app/shared/interfaces/user.interface';
+import { Router, RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -60,6 +59,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     } finally {
       this.loading = false;
     }
+    
+    // Safety timeout
+    setTimeout(() => {
+      if (this.loading) {
+        this.loading = false;
+        this.error = 'Tiempo de espera agotado al cargar el perfil.';
+      }
+    }, 5000);
   }
 
   ngOnDestroy() {

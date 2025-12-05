@@ -56,7 +56,7 @@ export const publicRoutes: Routes = [
         title: 'Portfolio',
         path: 'portfolio',
         loadComponent: () =>
-          import('@app/public/portfolio/portfolio').then(
+          import('./portfolio/portfolio').then(
             (m) => m.PortfolioComponent
           ),
       },
@@ -114,6 +114,46 @@ export const publicRoutes: Routes = [
         loadComponent: () =>
           import('@app/public/tracking/tracking-page').then(
             (m) => m.TrackingPage
+          ),
+      },
+      {
+        title: 'Política de Privacidad',
+        path: 'privacy',
+        loadComponent: () =>
+          import('@app/public/privacy/privacy.component').then(
+            (m) => m.PrivacyComponent
+          ),
+      },
+      {
+        title: 'Términos y Condiciones',
+        path: 'terms',
+        loadComponent: () =>
+          import('@app/public/terms/terms.component').then(
+            (m) => m.TermsComponent
+          ),
+      },
+      {
+        title: 'Blog',
+        path: 'blog',
+        loadComponent: () =>
+          import('@app/public/blog/blog.component').then(
+            (m) => m.BlogComponent
+          ),
+      },
+      {
+        title: 'Mapa del Sitio',
+        path: 'sitemap',
+        loadComponent: () =>
+          import('@app/public/sitemap/sitemap.component').then(
+            (m) => m.SitemapComponent
+          ),
+      },
+      {
+        title: 'FixTécnicos',
+        path: 'fixtecnicos',
+        loadComponent: () =>
+          import('@app/public/fixtecnicos/fixtecnicos.component').then(
+            (m) => m.FixtecnicosComponent
           ),
       },
     ],

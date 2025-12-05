@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { OrderService, Order } from '@app/services/order.service';
+import { OrderService } from '@app/services/order.service';
+import { Order } from '@app/shared/interfaces/order.interface';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -40,7 +41,7 @@ export class AdminOrdersPage implements OnInit {
     }
 
     getStatusBadgeClass(status: Order['status']): string {
-        const classes = {
+        const classes: Record<Order['status'], string> = {
             pending: 'badge-warning',
             processing: 'badge-info',
             completed: 'badge-success',
@@ -50,7 +51,7 @@ export class AdminOrdersPage implements OnInit {
     }
 
     getStatusText(status: Order['status']): string {
-        const texts = {
+        const texts: Record<Order['status'], string> = {
             pending: 'Pendiente',
             processing: 'Procesando',
             completed: 'Completado',

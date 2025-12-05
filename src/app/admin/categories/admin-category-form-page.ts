@@ -16,12 +16,14 @@ export class AdminCategoryFormPage implements OnInit {
     private auth = inject(AuthService);
 
     id: string | null = null;
+    categories = signal<any[]>([]);
     form = signal({
         name: '',
         slug: '',
         description: '',
-        icon: '',
+        image_url: '',
         type: 'product',
+        parent_id: '' as string | null,
         is_active: true,
     });
 
@@ -31,16 +33,24 @@ export class AdminCategoryFormPage implements OnInit {
 
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
+        const supabase = this.auth.getSupabaseClient();
+        
+        // Fetch all categories for the parent dropdown
+        const { data: categoriesData } = await supabase.from('categories').select('id, name').eq('is_active', true).order('name');
+        if (categoriesData) {
+            this.categories.set(categoriesData);
+        }
+
         if (this.id) {
-            const supabase = this.auth.getSupabaseClient();
             const { data, error } = await supabase.from('categories').select('*').eq('id', this.id).single();
             if (data) {
                 this.form.set({
                     name: data.name,
                     slug: data.slug,
                     description: data.description || '',
-                    icon: data.icon || '',
+                    image_url: data.image_url || data.icon || '',
                     type: data.type,
+                    parent_id: data.parent_id || null,
                     is_active: data.is_active,
                 });
             }

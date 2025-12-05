@@ -120,6 +120,110 @@ export class GsmService {
         downloadUrl: 'https://developer.android.com/studio/releases/platform-tools',
         icon: 'fas fa-terminal',
         description: 'Herramientas de línea de comandos del SDK de Android.'
+      },
+      {
+        name: 'FlexiHub',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://www.flexihub.com/download/',
+        icon: 'fas fa-network-wired',
+        description: 'Acceso remoto a dispositivos USB y puertos COM.'
+      },
+      {
+        name: 'Radmin VPN',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://www.radmin-vpn.com/',
+        icon: 'fas fa-shield-alt',
+        description: 'Red privada virtual segura y fácil de usar.'
+      },
+      {
+        name: 'USB Redirector 2.5',
+        version: 'v2.5',
+        size: '-',
+        downloadUrl: 'https://www.incentivespro.com/downloads.html',
+        icon: 'fas fa-plug',
+        description: 'Redirección de dispositivos USB por red.'
+      },
+      {
+        name: 'USB Redirector 1.9.7',
+        version: 'v1.9.7',
+        size: '-',
+        downloadUrl: 'https://www.incentivespro.com/downloads.html',
+        icon: 'fas fa-plug',
+        description: 'Versión legacy para compatibilidad específica.'
+      },
+      {
+        name: 'RustDesk',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://rustdesk.com/',
+        icon: 'fas fa-desktop',
+        description: 'Software de escritorio remoto de código abierto.'
+      },
+      {
+        name: 'TeamViewer',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://www.teamviewer.com/download/',
+        icon: 'fas fa-exchange-alt',
+        description: 'Solución líder para soporte remoto.'
+      },
+      {
+        name: 'UltraViewer',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://www.ultraviewer.net/en/download.html',
+        icon: 'fas fa-eye',
+        description: 'Control remoto de escritorio alternativo.'
+      },
+      {
+        name: 'Psiphon',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://psiphon.ca/en/download.html',
+        icon: 'fas fa-globe',
+        description: 'Herramienta de elusión de censura en Internet.'
+      },
+      {
+        name: 'AnyDesk',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://anydesk.com/en/downloads',
+        icon: 'fas fa-laptop-house',
+        description: 'Aplicación de escritorio remoto rápida.'
+      },
+      {
+        name: 'VirtualHere Client',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://www.virtualhere.com/usb_client_software',
+        icon: 'fas fa-server',
+        description: 'Cliente para compartir USB sobre IP.'
+      },
+      {
+        name: 'SamFw Tool',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://samfw.com/blog/samfw-tool',
+        icon: 'fab fa-android',
+        description: 'Herramienta gratuita para Samsung FRP y más.'
+      },
+      {
+        name: 'SamFirm',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'https://samfirmtool.com/',
+        icon: 'fas fa-download',
+        description: 'Descarga firmwares oficiales de Samsung.'
+      },
+      {
+        name: '3uTools',
+        version: 'Latest',
+        size: '-',
+        downloadUrl: 'http://www.3u.com/',
+        icon: 'fab fa-apple',
+        description: 'Herramienta todo en uno para dispositivos iOS.'
       }
     ]);
   }

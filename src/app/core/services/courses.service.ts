@@ -107,11 +107,27 @@ export class CoursesService {
         });
     }
 
-    registerStudent(data: any): Observable<{ data: any, error: any }> {
-        // TODO: Implement actual API call with Supabase
-        return of({
-            data: { success: true },
-            error: null
-        });
+    async registerStudent(data: any): Promise<{ data: any, error: any }> {
+        try {
+            const { data: enrollment, error } = await this.supabase
+                .from('course_enrollments')
+                .insert([{
+                    course_id: data.course_id,
+                    full_name: data.full_name,
+                    email: data.email,
+                    phone: data.phone,
+                    status: 'pending', // Default status
+                    created_at: new Date().toISOString()
+                }])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            return { data: enrollment, error: null };
+        } catch (error: any) {
+            console.error('Error registering student:', error);
+            return { data: null, error };
+        }
     }
 }

@@ -1,30 +1,15 @@
 import { Injectable, inject } from '@angular/core';
-import { createClient, SupabaseClient, User, Session, AuthChangeEvent } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoggerService } from './logger.service';
+import { UserProfile } from '@app/shared/interfaces/user.interface';
 
 export interface AuthResponse {
   user: User | null;
   session: Session | null;
   error?: string;
-}
-
-export interface UserProfile {
-  id: string;
-  email: string;
-  first_name?: string | null;
-  last_name?: string | null;
-  display_name?: string | null;
-  full_name?: string | null;
-  avatar_url?: string | null;
-  bio?: string | null;
-  phone?: string | null;
-  created_at?: string;
-  updated_at?: string;
-  is_active?: boolean;
-  role?: 'user' | 'admin' | 'staff';
 }
 
 @Injectable({
@@ -112,7 +97,7 @@ export class AuthService {
       });
 
       if (error) {
-        this.logger.error('Supabase signUp error', error as any);
+        this.logger.error('Supabase signUp error', error);
         return { user: null, session: null, error: error.message };
       }
 
@@ -135,7 +120,7 @@ export class AuthService {
           .insert(userProfile);
 
         if (profileError) {
-          this.logger.error('Error creating profile manually', profileError as any);
+          this.logger.error('Error creating profile manually', profileError);
           // We don't fail the whole signup if profile fails, but we log it.
         }
       }
@@ -147,7 +132,7 @@ export class AuthService {
 
       return { user: data.user, session: data.session };
 
-    } catch (e: any) {
+    } catch (e: unknown) {
       this.logger.error('Unexpected error during signup', e);
       const errorMessage = e instanceof Error ? e.message : 'Unknown error';
       return { user: null, session: null, error: errorMessage };
@@ -184,7 +169,7 @@ export class AuthService {
       .single();
 
     if (error) {
-      this.logger.error('Error fetching profile', error as any);
+      this.logger.error('Error fetching profile', error);
       return null;
     }
 
@@ -200,7 +185,7 @@ export class AuthService {
       .single();
 
     if (error) {
-      this.logger.error('Error updating profile', error as any);
+      this.logger.error('Error updating profile', error);
       return null;
     }
 
@@ -238,10 +223,10 @@ export class AuthService {
         .select('id')
         .limit(1);
 
-      this.logger.debug('Database connection test', { data, error } as any);
+      this.logger.debug('Database connection test', { data, error });
       return !error;
-    } catch (err) {
-      this.logger.error('Database connection test failed', err as any);
+    } catch (err: unknown) {
+      this.logger.error('Database connection test failed', err);
       return false;
     }
   }
@@ -264,7 +249,7 @@ export class AuthService {
     const { data, error } = await this.supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: environment.authRedirectUrl,
+        redirectTo: window.location.origin,
       },
     });
 
@@ -279,7 +264,22 @@ export class AuthService {
     const { data, error } = await this.supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: environment.authRedirectUrl,
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      return { user: null, session: null, error: error.message };
+    }
+
+    return { user: null, session: null };
+  }
+
+  async signInWithFacebook(): Promise<AuthResponse> {
+    const { data, error } = await this.supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: window.location.origin,
       },
     });
 
@@ -371,7 +371,7 @@ export class AuthService {
     const { data, error } = await this.supabase.auth.refreshSession();
 
     if (error) {
-      this.logger.error('Error refreshing session', error as any);
+      this.logger.error('Error refreshing session', error);
       return null;
     }
 

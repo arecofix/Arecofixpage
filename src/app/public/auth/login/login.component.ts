@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   socialLoading: { [key: string]: boolean } = {
     google: false,
     github: false,
+    facebook: false,
   };
 
   private fb = inject(FormBuilder);
@@ -118,6 +119,33 @@ export class LoginComponent implements OnInit, OnDestroy {
     } catch (err) {
       this.socialLoading['google'] = false;
       this.error = 'Error al iniciar sesión con Google.';
+    }
+  }
+
+
+
+  async loginWithFacebook() {
+    this.error = '';
+    this.success = '';
+    this.socialLoading['facebook'] = true;
+    
+    try {
+      const res = await this.authService.signInWithFacebook();
+      this.socialLoading['facebook'] = false;
+      
+      if (res.error) {
+        this.error = this.parseAuthError(res.error);
+        return;
+      }
+      
+      this.success = '¡Bienvenido! Redirigiendo...';
+      const target = this.sanitizeReturnUrl(this.returnUrl);
+      setTimeout(() => {
+        this.router.navigate([target]);
+      }, 1500);
+    } catch (err) {
+      this.socialLoading['facebook'] = false;
+      this.error = 'Error al iniciar sesión con Facebook.';
     }
   }
 

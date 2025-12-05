@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CoursesService } from '@app/core/services/courses.service';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
   selector: 'app-admin-course-form-page',
@@ -116,14 +117,29 @@ import { CoursesService } from '@app/core/services/courses.service';
             <!-- Media -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-medium">URL de Imagen</span>
+                <span class="label-text font-medium">Imagen del Curso</span>
               </label>
-              <label class="input input-bordered flex items-center gap-2">
-                <i class="fas fa-image text-gray-400"></i>
-                <input type="text" formControlName="image_url" class="grow" placeholder="https://..." />
-              </label>
+              
+              <div class="flex flex-col gap-4">
+                <!-- URL Input (Optional fallback) -->
+                <label class="input input-bordered flex items-center gap-2">
+                  <i class="fas fa-link text-gray-400"></i>
+                  <input type="text" formControlName="image_url" class="grow" placeholder="https://..." />
+                </label>
+
+                <!-- File Upload -->
+                <input type="file" 
+                       (change)="onFileChange($event)" 
+                       accept="image/*"
+                       class="file-input file-input-bordered w-full" />
+                
+                <label class="label">
+                  <span class="label-text-alt text-xs text-gray-500">Sube una imagen o pega una URL</span>
+                </label>
+              </div>
+
               @if (form.get('image_url')?.value) {
-                <div class="mt-4 p-4 border rounded-lg bg-base-200 flex justify-center">
+                <div class="mt-4 p-4 border rounded-lg bg-base-200 flex justify-center relative group">
                   <img [src]="form.get('image_url')?.value" 
                        class="h-48 rounded object-cover shadow-sm" 
                        alt="Preview" 
@@ -160,6 +176,7 @@ export class AdminCourseFormPage implements OnInit {
   private coursesService = inject(CoursesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
 
   form: FormGroup;
   isEditing = false;
@@ -189,10 +206,42 @@ export class AdminCourseFormPage implements OnInit {
     }
   }
 
+  async onFileChange(event: any) {
+    const file: File = event.target.files?.[0];
+    if (!file) return;
+
+    this.saving = true;
+    const supabase = this.auth.getSupabaseClient();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `courses/${fileName}`;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('public-assets')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: publicUrl } = supabase.storage
+        .from('public-assets')
+        .getPublicUrl(filePath);
+
+      this.form.patchValue({ image_url: publicUrl.publicUrl });
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      alert('Error al subir la imagen: ' + error.message);
+    } finally {
+      this.saving = false;
+    }
+  }
+
   loadCourse(id: string) {
     this.coursesService.getCourseById(id).subscribe({
-      next: (course) => {
-        this.form.patchValue(course);
+      next: (response) => {
+        if (response.data) {
+          this.form.patchValue(response.data);
+        }
       },
       error: (err) => console.error('Error loading course', err)
     });

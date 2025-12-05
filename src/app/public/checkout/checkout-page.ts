@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '@app/shared/services/cart.service';
-import { OrderService, Order, OrderItem } from '@app/services/order.service';
+import { OrderService } from '@app/services/order.service';
+import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { NotificationService } from '@app/core/services/notification.service';
 
 @Component({
