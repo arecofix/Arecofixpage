@@ -39,10 +39,24 @@ export class PostService {
     }
 
     private mapToEntity(data: any): Post {
+        const rawImage = data.featured_image || data.image || data.image_url;
         return {
             ...data,
             // Robustly map image from possible DB fields
-            image: data.featured_image || data.image || data.image_url || null
+            image: this.getImageUrl(rawImage)
         } as Post;
+    }
+
+    private getImageUrl(pathOrUrl: string | null): string | null {
+        if (!pathOrUrl) return null;
+        if (pathOrUrl.startsWith('http') || pathOrUrl.startsWith('assets/')) return pathOrUrl;
+        
+        // If it's a raw path, assume it's in 'public-assets' bucket
+        // Check if it already has the bucket name in path
+        if (pathOrUrl.includes('public-assets/')) {
+             return this.supabase.storage.from('public-assets').getPublicUrl(pathOrUrl.split('public-assets/')[1]).data.publicUrl;
+        }
+
+        return this.supabase.storage.from('public-assets').getPublicUrl(pathOrUrl).data.publicUrl;
     }
 }

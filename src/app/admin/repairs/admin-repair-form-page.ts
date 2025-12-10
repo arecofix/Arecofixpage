@@ -38,13 +38,15 @@ export class AdminRepairFormPage implements OnInit {
         security_pattern: '',
         deposit_amount: 0,
         tracking_code: '',
-        repair_number: 0
+        repair_number: 0,
+        images: [] as string[]
     });
 
     loading = signal(true);
     saving = signal(false);
     error = signal<string | null>(null);
     company = signal<any>(null);
+    uploadingImages = signal(false);
 
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
@@ -53,6 +55,56 @@ export class AdminRepairFormPage implements OnInit {
             await this.loadRepair();
         }
         this.loading.set(false);
+    }
+
+    async onFileSelected(event: any) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        this.uploadingImages.set(true);
+        const supabase = this.auth.getSupabaseClient();
+        const uploadedUrls: string[] = [];
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('repair-images')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data } = supabase.storage
+                    .from('repair-images')
+                    .getPublicUrl(filePath);
+
+                uploadedUrls.push(data.publicUrl);
+            }
+
+            this.form.update(f => ({
+                ...f,
+                images: [...f.images, ...uploadedUrls]
+            }));
+        } catch (e: any) {
+            console.error('Error uploading images:', e);
+            this.error.set('Error al subir imágenes: ' + e.message);
+        } finally {
+            this.uploadingImages.set(false);
+            // Clear input
+            event.target.value = '';
+        }
+    }
+
+    removeImage(index: number) {
+        this.form.update(f => {
+            const newImages = [...f.images];
+            newImages.splice(index, 1);
+            return { ...f, images: newImages };
+        });
     }
 
     async loadCompanySettings() {
@@ -88,7 +140,8 @@ export class AdminRepairFormPage implements OnInit {
                 security_pattern: data.security_pattern || '',
                 deposit_amount: data.deposit_amount || 0,
                 tracking_code: data.tracking_code || '',
-                repair_number: data.repair_number || 0
+                repair_number: data.repair_number || 0,
+                images: data.images || []
             });
         }
     }

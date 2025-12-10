@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -8,82 +9,85 @@ import { AuthService } from '@app/core/services/auth.service';
 @Component({
   selector: 'app-admin-course-form-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="max-w-4xl mx-auto">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">
+        <h2 class="text-2xl font-bold text-base-content">
           {{ isEditing ? 'Editar Curso' : 'Nuevo Curso' }}
         </h2>
-        <a routerLink="/admin/courses" class="btn btn-ghost">
+        <a routerLink="/admin/courses" class="btn btn-ghost text-base-content">
           <i class="fas fa-arrow-left mr-2"></i> Volver
         </a>
       </div>
     
-      <div class="card bg-base-100 shadow-lg">
-        <div class="card-body p-6">
+      <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body p-8">
           <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
         
             <!-- Basic Info -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text font-medium">Título</span>
+                  <span class="label-text font-medium text-base-content/80">Título</span>
                 </label>
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-heading text-gray-400"></i>
-                  <input type="text" formControlName="title" class="grow" placeholder="Ej: Reparación de iPhone" />
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-heading text-base-content/50"></i>
+                  <input type="text" formControlName="title" class="grow placeholder:text-base-content/30" placeholder="Ej: Reparación de iPhone" />
                 </label>
+                @if (form.get('title')?.invalid && form.get('title')?.touched) {
+                  <span class="text-error text-xs mt-1">El título es requerido</span>
+                }
               </div>
         
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text font-medium">Slug (URL)</span>
+                  <span class="label-text font-medium text-base-content/80">Slug (URL)</span>
                 </label>
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-link text-gray-400"></i>
-                  <input type="text" formControlName="slug" class="grow" placeholder="ej: reparacion-iphone" />
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-link text-base-content/50"></i>
+                  <input type="text" formControlName="slug" class="grow placeholder:text-base-content/30" placeholder="ej: reparacion-iphone" />
                 </label>
                 <label class="label">
-                  <span class="label-text-alt text-xs text-gray-500">Identificador único para la URL</span>
+                  <span class="label-text-alt text-xs text-base-content/50">Identificador único para la URL</span>
                 </label>
               </div>
             </div>
         
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-medium">Descripción Corta</span>
+                <span class="label-text font-medium text-base-content/80">Descripción Corta</span>
               </label>
-              <textarea formControlName="description" class="textarea textarea-bordered h-24 leading-relaxed" placeholder="Breve resumen del curso..."></textarea>
+              <textarea formControlName="description" class="textarea textarea-bordered h-24 leading-relaxed bg-base-100 text-base-content placeholder:text-base-content/30" placeholder="Breve resumen del curso..."></textarea>
             </div>
         
             <!-- Details -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text font-medium">Precio</span>
+                  <span class="label-text font-medium text-base-content/80">Precio</span>
                 </label>
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-dollar-sign text-gray-400"></i>
-                  <input type="number" formControlName="price" class="grow" />
-                </label>
-              </div>
-        
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Precio Oferta (Opcional)</span>
-                </label>
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-tag text-gray-400"></i>
-                  <input type="number" formControlName="sale_price" class="grow" />
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-dollar-sign text-base-content/50"></i>
+                  <input type="number" formControlName="price" class="grow placeholder:text-base-content/30" />
                 </label>
               </div>
         
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text font-medium">Nivel</span>
+                  <span class="label-text font-medium text-base-content/80">Precio Oferta (Opcional)</span>
                 </label>
-                <select formControlName="level" class="select select-bordered w-full">
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-tag text-base-content/50"></i>
+                  <input type="number" formControlName="sale_price" class="grow placeholder:text-base-content/30" />
+                </label>
+              </div>
+        
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium text-base-content/80">Nivel</span>
+                </label>
+                <select formControlName="level" class="select select-bordered w-full bg-base-100 text-base-content">
                   <option value="Básico">Básico</option>
                   <option value="Intermedio">Intermedio</option>
                   <option value="Avanzado">Avanzado</option>
@@ -95,21 +99,21 @@ import { AuthService } from '@app/core/services/auth.service';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text font-medium">Duración</span>
+                  <span class="label-text font-medium text-base-content/80">Duración</span>
                 </label>
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-clock text-gray-400"></i>
-                  <input type="text" formControlName="duration" class="grow" placeholder="Ej: 3 meses" />
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-clock text-base-content/50"></i>
+                  <input type="text" formControlName="duration" class="grow placeholder:text-base-content/30" placeholder="Ej: 3 meses" />
                 </label>
               </div>
         
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text font-medium">Horario</span>
+                  <span class="label-text font-medium text-base-content/80">Horario</span>
                 </label>
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-calendar-alt text-gray-400"></i>
-                  <input type="text" formControlName="schedule" class="grow" placeholder="Ej: Lunes 18hs" />
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-calendar-alt text-base-content/50"></i>
+                  <input type="text" formControlName="schedule" class="grow placeholder:text-base-content/30" placeholder="Ej: Lunes 18hs" />
                 </label>
               </div>
             </div>
@@ -117,24 +121,24 @@ import { AuthService } from '@app/core/services/auth.service';
             <!-- Media -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-medium">Imagen del Curso</span>
+                <span class="label-text font-medium text-base-content/80">Imagen del Curso</span>
               </label>
               
               <div class="flex flex-col gap-4">
                 <!-- URL Input (Optional fallback) -->
-                <label class="input input-bordered flex items-center gap-2">
-                  <i class="fas fa-link text-gray-400"></i>
-                  <input type="text" formControlName="image_url" class="grow" placeholder="https://..." />
+                <label class="input input-bordered flex items-center gap-2 bg-base-100 text-base-content">
+                  <i class="fas fa-link text-base-content/50"></i>
+                  <input type="text" formControlName="image_url" class="grow placeholder:text-base-content/30" placeholder="https://..." />
                 </label>
 
                 <!-- File Upload -->
                 <input type="file" 
                        (change)="onFileChange($event)" 
                        accept="image/*"
-                       class="file-input file-input-bordered w-full" />
+                       class="file-input file-input-bordered w-full bg-base-100 text-base-content" />
                 
                 <label class="label">
-                  <span class="label-text-alt text-xs text-gray-500">Sube una imagen o pega una URL</span>
+                  <span class="label-text-alt text-xs text-base-content/50">Sube una imagen o pega una URL</span>
                 </label>
               </div>
 
@@ -150,15 +154,15 @@ import { AuthService } from '@app/core/services/auth.service';
         
             <div class="form-control">
               <label class="label cursor-pointer justify-start gap-4 p-0">
-                <span class="label-text font-medium">Curso Activo</span>
+                <span class="label-text font-medium text-base-content/80">Curso Activo</span>
                 <input type="checkbox" formControlName="is_active" class="toggle toggle-success" />
               </label>
             </div>
         
             <!-- Actions -->
             <div class="flex justify-end gap-4 pt-6 border-t border-base-200">
-              <a routerLink="/admin/courses" class="btn btn-ghost">Cancelar</a>
-              <button type="submit" class="btn btn-primary px-8" [disabled]="form.invalid || saving">
+              <a routerLink="/admin/courses" class="btn btn-ghost text-base-content">Cancelar</a>
+              <button type="submit" class="btn btn-primary px-8 text-white" [disabled]="saving">
                 @if (saving) {
                   <span class="loading loading-spinner"></span>
                 }
@@ -248,7 +252,11 @@ export class AdminCourseFormPage implements OnInit {
   }
 
   save() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      alert('Por favor completa todos los campos requeridos');
+      return;
+    }
 
     this.saving = true;
     const courseData = this.form.value;

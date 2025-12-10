@@ -165,6 +165,15 @@ export class ServiciosComponent {
                     features: ['Diseño web responsive', 'Tiendas online (E-commerce)', 'Landing pages', 'Optimización SEO', 'Integración con redes sociales'],
                     price: 'Consultar',
                     image: 'assets/img/cursos/laboratorio.webp'
+                },
+                {
+                    id: 11,
+                    title: 'Reparación de Impresoras',
+                    description: 'Servicio técnico especializado para impresoras láser, inkjet y matriciales.',
+                    icon: 'fa-print',
+                    features: ['Limpieza de cabezales', 'Reparación de sistema continuo', 'Cambio de rodillos', 'Mantenimiento preventivo', 'Configuración de red'],
+                    price: 'Desde $12,000',
+                    image: 'assets/img/cursos/local.webp'
                 }
             ],
             servicesCta: 'Solicitar Ahora',
@@ -284,6 +293,15 @@ export class ServiciosComponent {
                     features: ['Responsive web design', 'Online stores (E-commerce)', 'Landing pages', 'SEO optimization', 'Social media integration'],
                     price: 'Consult',
                     image: 'assets/img/cursos/laboratorio.webp'
+                },
+                {
+                    id: 11,
+                    title: 'Printer Repair',
+                    description: 'Specialized technical service for laser, inkjet, and dot matrix printers.',
+                    icon: 'fa-print',
+                    features: ['Printhead cleaning', 'CISS repair', 'Roller replacement', 'Preventive maintenance', 'Network configuration'],
+                    price: 'From $12,000',
+                    image: 'assets/img/cursos/local.webp'
                 }
             ],
             servicesCta: 'Request Now',

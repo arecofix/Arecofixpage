@@ -105,6 +105,7 @@ export class CategoryService {
   }
 
   public getById(id: string): Observable<iCategory | null> {
+    if (!id || id === 'null') return of(null);
     return from(
       this.supabase
         .from('categories')

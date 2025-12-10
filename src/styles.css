@@ -19,28 +19,41 @@
   --color-hc-text: #ffffff;
   --color-hc-accent: #ffff00;
   --color-hc-border: #ffffff;
+
+  /* DaisyUI / Tailwind Theme Overrides */
+  --color-primary: var(--color-brand-dark-blue-fav);
+  --color-primary-content: #ffffff;
+  --color-secondary: var(--color-brand-blue);
+  --color-secondary-content: #ffffff;
+  --color-accent: var(--color-brand-green);
+  --color-accent-content: #ffffff;
+  --color-neutral: var(--color-brand-gray-purple);
+  --color-neutral-content: #ffffff;
+  
+  --color-base-100: #ffffff;
+  --color-base-200: #f3f4f6; /* Gray 100 */
+  --color-base-300: #d1d5db; /* Gray 300 */
+  --color-base-content: #1f2937; /* Gray 800 */
+  
+  --color-info: #3abff8;
+  --color-success: #36d399;
+  --color-warning: #fbbd23;
+  --color-error: #f87272;
 }
 
 /* 
-   DaisyUI Theme Configuration 
-   We can override DaisyUI semantic colors using the brand colors defined above.
+   Dark Mode Overrides
+   We define these CSS variables for runtime switching if needed, 
+   but @theme handles the Tailwind classes.
 */
 :root {
-    --primary: var(--color-brand-dark-blue-fav);
-    --primary-content: #ffffff;
-    --secondary: var(--color-brand-blue);
-    --secondary-content: #ffffff;
-    --accent: var(--color-brand-green);
-    --accent-content: #ffffff;
-    --neutral: var(--color-brand-gray-purple);
-    --neutral-content: #ffffff;
     --base-100: #ffffff;
     --base-content: #1f2937;
 }
 
 .dark {
-    --base-100: #1f2937; /* Gray 800 */
-    --base-content: #f3f4f6; /* Gray 100 */
+    --base-100: #1f2937;
+    --base-content: #f3f4f6;
 }
 
 /* Global Styles */
@@ -51,9 +64,6 @@ html, body {
 
 /* 
    Button Overrides 
-   Ideally, we should rely on DaisyUI 'btn-primary', 'btn-secondary', etc.
-   which are now mapped to our brand colors in :root.
-   Keeping specific overrides only if strictly necessary.
 */
 
 /* Fix for missing bg-dark class used in home page */
@@ -63,13 +73,13 @@ html, body {
 
 /* Component Visibility Overrides */
 .card {
-    background-color: #ffffff;
-    color: #1f2937;
+    background-color: var(--color-base-100);
+    color: var(--color-base-content);
 }
 
 .stats {
-    background-color: #ffffff;
-    color: #1f2937;
+    background-color: var(--color-base-100);
+    color: var(--color-base-content);
 }
 
 .stat-title, .stat-desc {
@@ -77,13 +87,13 @@ html, body {
 }
 
 .input, .textarea, .select {
-    background-color: #ffffff;
-    color: #1f2937;
+    background-color: var(--color-base-100);
+    color: var(--color-base-content);
     border-color: #d1d5db;
 }
 
 .label-text {
-    color: #1f2937;
+    color: var(--color-base-content);
 }
 
 .dark .card {

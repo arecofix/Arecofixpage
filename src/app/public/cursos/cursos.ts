@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CoursesService, Course } from '@app/core/services/courses.service';
 import { timeout, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 import { IsEmptyComponent, IsErrorComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'app-cursos',
     standalone: true,
-    imports: [CommonModule, IsEmptyComponent, IsErrorComponent, IsLoadingComponent, ProductCard, Pagination, FormsModule],
+    imports: [CommonModule, RouterModule, IsEmptyComponent, IsErrorComponent, IsLoadingComponent, ProductCard, Pagination, FormsModule],
     templateUrl: './cursos.html',
     styleUrls: ['./cursos.scss']
 })
@@ -72,7 +72,10 @@ export class CursosComponent implements OnInit {
                         this.courses = this.courses.map(c => ({
                             ...c,
                             rating: c.rating || 4.8,
-                            students: c.students || 0
+                            students: c.students || 0,
+                            image_url: c.image_url === 'assets/img/cursos/curso-reparacion-de-celulares.jpg' 
+                                ? 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg' 
+                                : c.image_url
                         }));
                     }
                 }
@@ -97,7 +100,7 @@ export class CursosComponent implements OnInit {
                 duration: '3 meses',
                 schedule: 'Lunes y Miércoles 18:00-21:00',
                 price: 45000,
-                image_url: 'assets/img/cursos/curso-reparacion-de-celulares.jpg',
+                image_url: 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg',
                 level: 'Básico',
                 students: 120,
                 rating: 4.8
@@ -188,7 +191,7 @@ export class CursosComponent implements OnInit {
                 this.registrationError = 'Error al registrarse. Intenta nuevamente.';
             } else {
                 this.registrationSuccess = true;
-                setTimeout(() => this.closeRegistration(), 3000);
+                // Removed auto-close
             }
         }).catch((err) => {
             console.error('Registration error:', err);

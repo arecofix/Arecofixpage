@@ -92,39 +92,77 @@ export class AdminDashboardPage implements OnInit {
     const supabase = this.auth.getSupabaseClient();
 
     try {
-      // Users count
-      const { count: usersCount } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
+      const { data, error } = await supabase.rpc('get_dashboard_stats');
 
-      // Products count
-      const { count: productsCount } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true });
+      if (error) throw error;
 
-      // Sales count and revenue
-      const { data: salesData } = await supabase
-        .from('sales')
-        .select('total_amount, created_at');
+      if (data) {
+        // Update Summary Stats
+        this.stats.set({
+          users: data.users || 0,
+          products: data.products || 0,
+          sales: data.sales || 0,
+          revenue: data.revenue || 0
+        });
 
-      const salesCount = salesData?.length || 0;
-      const revenue = salesData?.reduce((sum, sale) => sum + (sale.total_amount || 0), 0) || 0;
+        // Update Sales Chart (Line)
+        if (data.sales_chart && data.sales_chart.length > 0) {
+            const months = data.sales_chart.map((d: any) => this.formatMonth(d.period));
+            const totals = data.sales_chart.map((d: any) => d.total);
+            
+            this.salesChartData = {
+                labels: months,
+                datasets: [
+                    { data: totals, label: 'Ventas ($)', borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.2)', fill: true }
+                ]
+            };
+        }
 
-      this.stats.set({
-        users: usersCount || 0,
-        products: productsCount || 0,
-        sales: salesCount,
-        revenue: revenue
-      });
+        // Update Products Chart (Bar)
+        if (data.products_chart && data.products_chart.length > 0) {
+            const productNames = data.products_chart.map((d: any) => d.name);
+            const quantities = data.products_chart.map((d: any) => d.quantity);
 
-      // TODO: Process real data for charts here
-      // For now, we use the mock data defined in properties
+            this.productsChartData = {
+                labels: productNames,
+                datasets: [
+                    { 
+                        data: quantities, 
+                        label: 'Unidades', 
+                        backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#6366f1', '#ec4899'] 
+                    }
+                ]
+            };
+        }
+
+        // Update Category Chart (Doughnut)
+        if (data.category_chart && data.category_chart.length > 0) {
+            const catNames = data.category_chart.map((d: any) => d.name);
+            const catCounts = data.category_chart.map((d: any) => d.count);
+
+            this.categoryChartData = {
+                labels: catNames,
+                datasets: [
+                    { 
+                        data: catCounts, 
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'] 
+                    }
+                ]
+            };
+        }
+      }
 
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private formatMonth(yearMonth: string): string {
+      const [year, month] = yearMonth.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+      return date.toLocaleDateString('es-ES', { month: 'short' }); // e.g. "ene", "feb"
   }
 
   loadAnalyticsInfo() {

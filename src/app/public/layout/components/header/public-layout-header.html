@@ -50,11 +50,16 @@
         @for (item of menuItems(); track $index) {
         <li>
           @if (item.children && item.children.length > 0) {
-            <details>
-              <summary class="flex gap-3 py-3">
-                <i [class]="item.icon"></i> {{item.title}}
+            <details class="group">
+              <summary class="flex items-center justify-between py-3 pr-2 list-none outline-none cursor-pointer [&::-webkit-details-marker]:hidden after:content-none!">
+                <!-- Parent Link: Stop propagation to prevent toggle, handle navigation -->
+                <a [routerLink]="item.path" (click)="$event.stopPropagation()" class="flex gap-3 flex-1 items-center" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                  <i [class]="item.icon"></i> {{item.title}}
+                </a>
+                <!-- Toggle Indicator -->
+                <i class="fas fa-chevron-down text-sm transition-transform group-open:rotate-180"></i>
               </summary>
-              <ul>
+              <ul class="pl-4">
                 @for (child of item.children; track child.path) {
                   <li>
                     <a class="flex gap-3 py-3" [routerLink]="child.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
@@ -119,11 +124,12 @@
       @for (item of menuItems(); track $index) {
       <li>
         @if (item.children && item.children.length > 0) {
-          <details>
-            <summary class="link link-primary" [routerLinkActive]="['link', 'link-secondary']" [routerLinkActiveOptions]="{exact: false}">
+          <div class="dropdown dropdown-hover">
+            <!-- Parent Link Desktop: Change div to a for semantics and proper navigation -->
+            <a tabindex="0" role="button" class="link link-primary flex items-center gap-1" [routerLink]="item.path" routerLinkActive="link-secondary" [routerLinkActiveOptions]="{exact: false}">
               <i [class]="item.icon"></i> {{item.title}}
-            </summary>
-            <ul class="p-2 bg-base-100 rounded-t-none z-50">
+            </a>
+            <ul tabindex="0" class="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">
               @for (child of item.children; track child.path) {
                 <li>
                   <a [routerLink]="child.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
@@ -132,7 +138,7 @@
                 </li>
               }
             </ul>
-          </details>
+          </div>
         } @else {
           <a class="link link-primary" [routerLink]="item.path" routerLinkActive="link link-secondary"
             [routerLinkActiveOptions]="{exact: true}">

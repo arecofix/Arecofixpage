@@ -58,11 +58,14 @@ export class OrderService {
 
     async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | null }> {
         try {
+            // Generate order ID client-side to avoid needing SELECT permissions
+            const orderId = crypto.randomUUID();
             // Generate order number
             const orderNumber = `ORD-${Date.now()}`;
 
             // Insert order
             const insertPayload = {
+                id: orderId,
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone,
@@ -76,18 +79,17 @@ export class OrderService {
                 order_number: orderNumber
             };
 
-            const { data: orderData, error: orderError } = await this.supabase
+            const { error: orderError } = await this.supabase
                 .from('orders')
-                .insert(insertPayload)
-                .select()
-                .single();
+                .insert(insertPayload);
+                // .select() .single() removed to avoid RLS 42501 error
 
             if (orderError) throw orderError;
 
             // Insert order items
             const itemsWithOrderId = items.map(item => ({
                 ...item,
-                order_id: orderData.id
+                order_id: orderId
             }));
 
             const { error: itemsError } = await this.supabase
@@ -96,7 +98,9 @@ export class OrderService {
 
             if (itemsError) throw itemsError;
 
-            return { data: orderData, error: null };
+            // Construct the return object since we can't select it back
+            const orderData = { ...insertPayload, created_at: new Date().toISOString() };
+            return { data: orderData as any, error: null };
         } catch (error) {
             console.error('Error creating order:', error);
             return { data: null, error: error as any };

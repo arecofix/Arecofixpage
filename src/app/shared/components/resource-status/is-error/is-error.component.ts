@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -9,10 +9,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       role="alert"
       class="alert alert-error alert-outline text-center p-10 m-10"
     >
-      <span> Ups! Ocurrio Un Error Al Cargar Los Datos </span>
+      <span> {{ message }} </span>
     </div>
   `,
 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IsErrorComponent {}
+export class IsErrorComponent {
+  @Input() message: string = 'Ups! Ocurrio Un Error Al Cargar Los Datos';
+}

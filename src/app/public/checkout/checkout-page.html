@@ -1,5 +1,5 @@
 <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-3xl font-bold mb-8 text-center text-base-content">Checkout</h1>
+    <h1 class="text-3xl font-bold mb-8 text-center text-primary">Checkout</h1>
 
     @if (orderSuccess()) {
     <div class="card bg-base-100 shadow-xl text-center p-10 border border-base-200">
@@ -7,10 +7,35 @@
             <div class="text-success text-6xl mb-4">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h2 class="card-title text-2xl text-base-content">¡Orden Recibida!</h2>
-            <p class="text-base-content/80">Gracias por tu compra. Nos pondremos en contacto contigo pronto.</p>
-            <div class="card-actions mt-6">
-                <a routerLink="/" class="btn btn-primary">Volver al Inicio</a>
+            <h2 class="card-title text-2xl text-base-content mb-2">¡Orden Recibida!</h2>
+            <p class="text-base-content/80 mb-6">Gracias por tu compra. Para procesar el envío, por favor realiza el pago:</p>
+            
+            <div class="bg-base-200 p-6 rounded-xl w-full max-w-md mb-6 text-left border border-base-300">
+                <p class="font-bold text-base-content mb-2 border-b border-base-content/10 pb-2">Datos Bancarios:</p>
+                <div class="space-y-2">
+                    <p class="text-base-content/70 flex justify-between">
+                        <span>Alias:</span> 
+                        <span class="font-mono font-bold text-base-content select-all bg-base-100 px-2 rounded">arecofix</span>
+                    </p>
+                    <p class="text-base-content/70 flex justify-between">
+                        <span>CBU:</span> 
+                        <span class="font-mono font-bold text-base-content select-all bg-base-100 px-2 rounded">ecocell</span>
+                    </p>
+                </div>
+            </div>
+
+            <p class="text-sm mb-4 text-base-content/80">
+                Una vez realizado el pago, envía el comprobante al: <br>
+                <strong class="text-lg text-primary">+54 9 11 2596-0900</strong>
+            </p>
+
+            <div class="card-actions flex flex-col gap-3 w-full max-w-md">
+                <a [href]="'https://wa.me/5491125960900?text=Hola,%20hice%20un%20pedido%20a%20nombre%20de%20' + checkoutForm.get('name')?.value + '.%20Adjunto%20comprobante.'"
+                   target="_blank" 
+                   class="btn btn-success text-white w-full btn-lg">
+                    <i class="fab fa-whatsapp text-xl mr-2"></i> Enviar Comprobante
+                </a>
+                <a routerLink="/" class="btn btn-ghost w-full">Volver al Inicio</a>
             </div>
         </div>
     </div>
@@ -22,8 +47,8 @@
                 <h2 class="card-title mb-4 text-base-content">Resumen del Carrito</h2>
 
                 @if (cartService.cartItems().length === 0) {
-                <p class="text-base-content/70">Tu carrito está vacío.</p>
-                <a routerLink="/products" class="btn btn-link px-0">Ir a comprar</a>
+                <p class="text-base-content">Tu carrito está vacío.</p>
+                <a routerLink="/products/featured" class="btn btn-link px-0">Ir a comprar</a>
                 } @else {
                 <div class="space-y-4">
                     @for (item of cartService.cartItems(); track item.product.id) {

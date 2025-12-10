@@ -1,12 +1,10 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
 const WHATSAPP_API_URL = "https://graph.facebook.com/v22.0";
 // These should be set in Supabase Secrets
 // Run: supabase secrets set WHATSAPP_TOKEN=... WHATSAPP_PHONE_NUMBER_ID=...
 const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN")!;
 const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")!;
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
     return new Response("ok", {
@@ -14,6 +12,7 @@ serve(async (req: Request) => {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
       },
+      status: 200
     });
   }
 

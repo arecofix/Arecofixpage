@@ -22,6 +22,7 @@ export class PostPage implements OnInit {
     post: Post | null = null;
     loading = true;
     error: string | null = null;
+    currentSlug: string | null = null;
 
     async ngOnInit() {
         this.route.paramMap.subscribe(async params => {
@@ -37,6 +38,7 @@ export class PostPage implements OnInit {
             this.loading = true;
             this.error = null;
             this.post = await this.postService.getPostBySlug(slug);
+            this.currentSlug = slug;
 
             if (this.post) {
                 this.updateMetaTags(this.post);

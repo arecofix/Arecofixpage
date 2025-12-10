@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  Injector,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, switchMap, of } from 'rxjs';
@@ -81,8 +82,10 @@ export class ProductsDetailsPage {
     return data.data[0];
   });
 
+  private injector = inject(Injector);
+
   categoryRs = rxResource({
-    stream: () => toObservable(this.product).pipe(
+    stream: () => toObservable(this.product, { injector: this.injector }).pipe(
       switchMap(product => {
         if (!product) return of(null);
         return this.categoryService.getById(product.category_id);

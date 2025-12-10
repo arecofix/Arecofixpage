@@ -31,25 +31,19 @@ export class TrackingPage implements OnInit {
     }
 
     async loadRepair() {
-        console.log('TrackingPage: loadRepair started. Code:', this.code);
         const supabase = this.auth.getSupabaseClient();
-        console.log('TrackingPage: Supabase client obtained:', !!supabase);
 
         try {
             // Use the RPC function we defined in the migration for secure access
-            console.log('TrackingPage: Calling rpc get_repair_by_tracking...');
             const { data, error } = await supabase.rpc('get_repair_by_tracking', { code: this.code });
-            console.log('TrackingPage: RPC result:', { data, error });
 
             if (error) {
                 console.error('Error fetching repair:', error);
                 // Show the actual error message to the user for debugging
                 this.error.set(`Error: ${error.message || JSON.stringify(error)}`);
             } else if (data && data.length > 0) {
-                console.log('TrackingPage: Repair found:', data[0]);
                 this.repair.set(data[0]);
             } else {
-                console.warn('TrackingPage: No repair found for code:', this.code);
                 this.error.set('No se encontró ninguna reparación con este código.');
             }
         } catch (e: any) {
@@ -57,7 +51,6 @@ export class TrackingPage implements OnInit {
             this.error.set(`Error inesperado: ${e.message || e}`);
         } finally {
             this.loading.set(false);
-            console.log('TrackingPage: Loading set to false');
         }
     }
 
@@ -81,5 +74,9 @@ export class TrackingPage implements OnInit {
             'cancelled': 'badge-error'
         };
         return colorMap[status] || 'badge-ghost';
+    }
+
+    openImage(url: string) {
+        window.open(url, '_blank');
     }
 }

@@ -93,6 +93,14 @@ export const publicRoutes: Routes = [
           ),
       },
       {
+        title: 'Detalle del Curso',
+        path: 'cursos/:slug',
+        loadComponent: () =>
+          import('@app/public/cursos/course-detail/course-detail.component').then(
+            (m) => m.CourseDetailComponent
+          ),
+      },
+      {
         title: 'Checkout',
         path: 'checkout',
         loadComponent: () =>

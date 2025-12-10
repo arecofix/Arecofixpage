@@ -194,6 +194,14 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
       };
     });
 
+    // CUSTOM LOGIC: Nest 'Herramientas' under 'Repuestos'
+    const repuestosItem = allMenuItems.find(i => i.title === 'Repuestos');
+    const herramientasItem = allMenuItems.find(i => i.title === 'Herramientas');
+
+    if (repuestosItem && herramientasItem) {
+      herramientasItem.parentId = repuestosItem.id;
+    }
+
     // Build tree structure
     const rootItems: iMenuItem[] = [];
     const itemMap = new Map<string, iMenuItem>();

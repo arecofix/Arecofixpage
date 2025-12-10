@@ -17,3 +17,4 @@ posthog.init(
 
 bootstrapApplication(App, appConfig)
   .catch((err) => console.error(err));
+// Trigger rebuild

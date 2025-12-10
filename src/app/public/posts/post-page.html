@@ -16,6 +16,386 @@
         </a>
     </div>
     } @else if (post) {
+      @if (currentSlug === 'servicio-tecnico-de-celulares-en-marcos-paz') {
+        <!-- SERVICE LANDING PAGE -->
+        <div class="font-sans text-gray-800">
+            <!-- Hero Section -->
+            <div class="relative bg-gray-900 text-white overflow-hidden">
+                <div class="absolute inset-0 z-0">
+                    <img [src]="post.image || 'assets/img/hero-repair.jpg'" alt="Reparación de Celulares" class="w-full h-full object-cover opacity-30">
+                </div>
+                <div class="relative z-10 container mx-auto px-4 py-24 md:py-32 flex flex-col items-center text-center">
+                    <span class="text-indigo-400 font-bold tracking-widest uppercase mb-4 text-sm md:text-base">Servicio Técnico Especializado</span>
+                    <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+                        Somos <span class="text-indigo-400">Arecofix</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mb-10 leading-relaxed">
+                        Reparamos celulares de forma <span class="text-white font-bold">segura</span>, <span class="text-white font-bold">rápida</span> y <span class="text-white font-bold">transparente</span>.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        <a href="https://wa.me/5491125960900" target="_blank" class="btn btn-primary bg-indigo-600 border-none hover:bg-indigo-500 text-white px-8 py-4 h-auto text-lg rounded-full shadow-lg hover:shadow-indigo-500/30 transition-all">
+                            <i class="fab fa-whatsapp mr-2"></i> Pedir Cotización
+                        </a>
+                        <button class="btn btn-outline text-white hover:bg-white hover:text-gray-900 px-8 py-4 h-auto text-lg rounded-full" (click)="servicesSection.scrollIntoView({behavior: 'smooth'})">
+                            Ver Servicios
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About / Stats Section -->
+            <div class="py-16 bg-white">
+                <div class="container mx-auto px-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                        <div>
+                             <h2 class="text-3xl font-bold text-gray-900 mb-6">Experiencia y Trayectoria</h2>
+                             <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                                Contamos con más de <span class="font-bold text-indigo-600">7 años de experiencia</span> en el rubro. 
+                                En febrero de 2022 inauguramos nuestro local en Marcos Paz centro norte y en noviembre de 2024 expandimos nuestra presencia.
+                             </p>
+                             <div class="grid grid-cols-2 gap-6">
+                                 <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                     <i class="fas fa-medal text-3xl text-indigo-500 mb-2"></i>
+                                     <h4 class="font-bold text-gray-900">Repuestos Premium</h4>
+                                     <p class="text-sm text-gray-500">Originales y Service Pack</p>
+                                 </div>
+                                 <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                     <i class="fas fa-shipping-fast text-3xl text-indigo-500 mb-2"></i>
+                                     <h4 class="font-bold text-gray-900">Servicio Exprés</h4>
+                                     <p class="text-sm text-gray-500">Reparaciones en el día</p>
+                                 </div>
+                                 <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                     <i class="fas fa-shield-alt text-3xl text-indigo-500 mb-2"></i>
+                                     <h4 class="font-bold text-gray-900">Garantía Escrita</h4>
+                                     <p class="text-sm text-gray-500">30 días por fallas</p>
+                                 </div>
+                                 <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                     <i class="fas fa-user-check text-3xl text-indigo-500 mb-2"></i>
+                                     <h4 class="font-bold text-gray-900">Certificados</h4>
+                                     <p class="text-sm text-gray-500">Técnicos calificados</p>
+                                 </div>
+                             </div>
+                        </div>
+                        <div class="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                             <img src="assets/img/cursos/academy/eddis_educativa.jpeg" class="w-full h-full object-cover" alt="Nuestro Local">
+                             <div class="absolute inset-0 bg-blue-900/40"></div>
+                             <div class="absolute bottom-6 left-6 text-white">
+                                 <p class="font-bold text-xl">Sede Marcos Paz</p>
+                                 <p class="text-sm text-gray-300">Tu servicio técnico de confianza</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Slider (Multimarca) -->
+            <div class="py-10 bg-gray-50 border-y border-gray-200 overflow-hidden">
+                <div class="container mx-auto px-4 text-center mb-6">
+                     <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">Reparación Multimarca</span>
+                </div>
+                <div class="flex justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 flex-wrap px-4">
+                    <div class="flex items-center gap-2 text-2xl font-bold text-gray-600"><i class="fab fa-apple"></i> Apple</div>
+                    <div class="flex items-center gap-2 text-2xl font-bold text-gray-600"><i class="fab fa-android"></i> Samsung</div>
+                    <div class="flex items-center gap-2 text-2xl font-bold text-gray-600">Motorola</div>
+                    <div class="flex items-center gap-2 text-2xl font-bold text-gray-600">Xiaomi</div>
+                    <div class="flex items-center gap-2 text-2xl font-bold text-gray-600">Huawei</div>
+                    <div class="flex items-center gap-2 text-2xl font-bold text-gray-600">LG</div>
+                </div>
+            </div>
+
+            <!-- Services Section -->
+            <div class="py-20" #servicesSection>
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Reparación de Celulares</h2>
+                        <p class="text-gray-500 max-w-2xl mx-auto">Soluciones integrales para todas las marcas y modelos.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Service Card 1: Module -->
+                        <div class="bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow overflow-hidden group">
+                             <div class="bg-indigo-600 h-2 w-full"></div>
+                             <div class="p-8">
+                                 <div class="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 text-2xl mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                     <i class="fas fa-mobile-alt"></i>
+                                 </div>
+                                 <h3 class="text-xl font-bold text-gray-900 mb-3">Cambio de Módulo</h3>
+                                 <p class="text-gray-500 mb-6 text-sm">Reemplazo de pantalla completa (Display + Touch). Solución para pantallas rotas, manchadas o sin imagen.</p>
+                                 <div class="text-xs text-gray-400 uppercase tracking-wide mb-4 font-semibold">Marcas Soportadas</div>
+                                 <p class="text-sm text-gray-600 mb-6">Apple, Samsung, Motorola, Xiaomi, LG, Huawei, ZTE, TCL, Nokia, Alcatel</p>
+                                 <button class="btn btn-outline btn-sm w-full group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600">Pedir Presupuesto</button>
+                             </div>
+                        </div>
+
+                         <!-- Service Card 2: Glass -->
+                         <div class="bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow overflow-hidden group">
+                             <div class="bg-blue-500 h-2 w-full"></div>
+                             <div class="p-8">
+                                 <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                     <i class="fas fa-layer-group"></i>
+                                 </div>
+                                 <h3 class="text-xl font-bold text-gray-900 mb-3">Cambio de Vidrio (Glass)</h3>
+                                 <p class="text-gray-500 mb-6 text-sm">Si tu imagen se ve bien y el táctil funciona, cambiamos solo el vidrio roto. Mantené tu pantalla original.</p>
+                                 <div class="text-xs text-gray-400 uppercase tracking-wide mb-4 font-semibold">Marcas Soportadas</div>
+                                 <p class="text-sm text-gray-600 mb-6">Apple, Samsung, Motorola, Xiaomi, LG, Huawei, ZTE, TCL, Nokia, Alcatel</p>
+                                 <button class="btn btn-outline btn-sm w-full group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600">Pedir Presupuesto</button>
+                             </div>
+                        </div>
+
+                         <!-- Service Card 3: Battery/Charging -->
+                         <div class="bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow overflow-hidden group">
+                             <div class="bg-green-500 h-2 w-full"></div>
+                             <div class="p-8">
+                                 <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center text-green-600 text-2xl mb-6 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                                     <i class="fas fa-bolt"></i>
+                                 </div>
+                                 <h3 class="text-xl font-bold text-gray-900 mb-3">Carga y Energía</h3>
+                                 <p class="text-gray-500 mb-6 text-sm">Cambio de Batería, Pin de Carga, solucionamos problemas de encendido y duración.</p>
+                                 <div class="text-xs text-gray-400 uppercase tracking-wide mb-4 font-semibold">Servicios</div>
+                                 <ul class="text-sm text-gray-600 mb-6 space-y-1">
+                                     <li><i class="fas fa-check text-green-500 mr-2"></i> Cambio de Pin de Carga</li>
+                                     <li><i class="fas fa-check text-green-500 mr-2"></i> Cambio de Batería</li>
+                                     <li><i class="fas fa-check text-green-500 mr-2"></i> Reparación de Placa</li>
+                                 </ul>
+                                 <button class="btn btn-outline btn-sm w-full group-hover:bg-green-600 group-hover:text-white group-hover:border-green-600">Pedir Presupuesto</button>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-12">
+                        <button class="btn btn-link text-indigo-600 font-bold no-underline hover:underline">
+                            VER TODOS LOS SERVICIOS <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How it Works -->
+            <div class="bg-gray-900 text-white py-20">
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-16">
+                        <span class="text-indigo-400 font-bold tracking-widest uppercase text-sm">Proceso Simple</span>
+                        <h2 class="text-3xl md:text-4xl font-bold mt-2">Así Trabajamos</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
+                        <!-- Connecting Line (Desktop) -->
+                        <div class="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-gray-700 z-0"></div>
+
+                        <div class="relative z-10 px-6">
+                            <div class="w-24 h-24 mx-auto bg-gray-800 rounded-full border-4 border-gray-700 flex items-center justify-center text-3xl mb-6 shadow-xl">
+                                <i class="fas fa-store text-indigo-400"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">1. Trae tu equipo</h3>
+                            <p class="text-gray-400">Acercate a nuestro local para un diagnóstico inicial gratuito.</p>
+                        </div>
+                        <div class="relative z-10 px-6">
+                            <div class="w-24 h-24 mx-auto bg-gray-800 rounded-full border-4 border-indigo-600 flex items-center justify-center text-3xl mb-6 shadow-xl shadow-indigo-900/20">
+                                <i class="fas fa-tools text-indigo-400"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">2. Lo reparamos</h3>
+                            <p class="text-gray-400">Técnicos certificados trabajan en tu equipo con repuestos de calidad.</p>
+                        </div>
+                        <div class="relative z-10 px-6">
+                            <div class="w-24 h-24 mx-auto bg-gray-800 rounded-full border-4 border-green-600 flex items-center justify-center text-3xl mb-6 shadow-xl shadow-green-900/20">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">3. Retiralo con garantía</h3>
+                            <p class="text-gray-400">Te avisamos cuando esté listo. Disfrutá de 30 días de garantía.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Partners / Featured In -->
+            <div class="py-12 bg-gray-50 border-b border-gray-200">
+                <div class="container mx-auto px-4 text-center">
+                    <p class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Mencionado En</p>
+                    <a href="https://mobidoc.com.ar/servicio-tecnico/arecofix-servicio-tecnico-de-celulares-venta-de-repuestos/" target="_blank" class="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow group">
+                        <i class="fas fa-external-link-alt text-indigo-500 group-hover:text-indigo-600"></i>
+                        <span class="font-bold text-gray-700 group-hover:text-indigo-700 transition-colors">Ver perfil verificado en MobiDoc.com.ar</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="py-20 bg-white">
+                <div class="container mx-auto px-4 max-w-4xl">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4">Preguntas Frecuentes</h2>
+                        <p class="text-gray-500">Todo lo que necesitás saber antes de tu reparación.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- FAQ 1 -->
+                        <div class="collapse collapse-arrow bg-gray-50 border border-gray-200 rounded-xl">
+                            <input type="radio" name="my-accordion-2" checked="checked" /> 
+                            <div class="collapse-title text-xl font-medium text-gray-800">
+                                ¿Cuánto tiempo demora la reparación?
+                            </div>
+                            <div class="collapse-content"> 
+                                <p class="text-gray-600">La mayoría de los cambios de módulo y batería se realizan en <strong>el día</strong> (aprox. 2-4 horas) si contamos con el repuesto. Reparaciones de placa o mojados pueden demorar 48-72hs para un diagnóstico preciso.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="collapse collapse-arrow bg-gray-50 border border-gray-200 rounded-xl">
+                            <input type="radio" name="my-accordion-2" /> 
+                            <div class="collapse-title text-xl font-medium text-gray-800">
+                                ¿Qué garantía tienen?
+                            </div>
+                            <div class="collapse-content"> 
+                                <p class="text-gray-600">Todas nuestras reparaciones cuentan con <strong>30 días de garantía escrita</strong> sobre la falla reparada y el repuesto colocado. La garantía no cubre roturas físicas posteriores o daños por agua.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="collapse collapse-arrow bg-gray-50 border border-gray-200 rounded-xl">
+                            <input type="radio" name="my-accordion-2" /> 
+                            <div class="collapse-title text-xl font-medium text-gray-800">
+                                ¿Se borran mis datos?
+                            </div>
+                            <div class="collapse-content"> 
+                                <p class="text-gray-600">No. Para reparaciones de hardware (pantalla, batería, carga) <strong>tus datos NO se borran</strong>. Siempre recomendamos tener copia de seguridad, pero nosotros no reseteamos el equipo salvo que sea un problema de software y nos des tu consentimiento.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="collapse collapse-arrow bg-gray-50 border border-gray-200 rounded-xl">
+                            <input type="radio" name="my-accordion-2" /> 
+                            <div class="collapse-title text-xl font-medium text-gray-800">
+                                ¿Aceptan tarjetas?
+                            </div>
+                            <div class="collapse-content"> 
+                                <p class="text-gray-600">Sí, aceptamos Efectivo, Transferencia, Débito y Crédito. Recordá que el <strong>descuento del 10%</strong> (Cupón WEB-ARECO-2025) aplica solo para pagos en efectivo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="py-20 bg-white">
+                <div class="container mx-auto px-4">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                         <div>
+                             <h2 class="text-3xl font-bold text-gray-900 mb-2">Opiniones de Clientes</h2>
+                             <div class="flex items-center gap-2">
+                                 <span class="font-bold text-2xl text-gray-800">4.9</span>
+                                 <div class="flex text-yellow-400 text-lg">
+                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                 </div>
+                                 <span class="text-gray-500 text-sm ml-2">A base de 270 reseñas en Google</span>
+                             </div>
+                         </div>
+                         <button class="btn btn-outline btn-sm hidden md:flex">Ver todas las opiniones</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Review 1 -->
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center text-purple-700 font-bold mr-3">CR</div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Carolina Rambau</h4>
+                                    <div class="flex text-yellow-400 text-xs">
+                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <span class="ml-auto text-gray-400 text-xs"><i class="fab fa-google"></i></span>
+                            </div>
+                            <p class="text-gray-600 text-sm italic">"Llegué al local por los buenos comentarios y la verdad es el mejor lugar para arreglar celulares... el chico me explico todo y la chica que atiende un amor! Gracias ☺️"</p>
+                        </div>
+
+                        <!-- Review 2 -->
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                             <div class="flex items-center mb-4">
+                                 <div class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold mr-3">MA</div>
+                                 <div>
+                                     <h4 class="font-bold text-sm">Mariana Arganaraz</h4>
+                                     <div class="flex text-yellow-400 text-xs">
+                                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                     </div>
+                                 </div>
+                                 <span class="ml-auto text-gray-400 text-xs"><i class="fab fa-google"></i></span>
+                             </div>
+                             <p class="text-gray-600 text-sm italic">"Respuesta muy rápida para presupuestar y reparación en menos de 24 hs. Destaco la excelente atención y la claridad en la explicación. Super recomendable!!!"</p>
+                         </div>
+
+                         <!-- Review 3 -->
+                         <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                             <div class="flex items-center mb-4">
+                                 <div class="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center text-green-700 font-bold mr-3">US</div>
+                                 <div>
+                                     <h4 class="font-bold text-sm">Uno Al sur</h4>
+                                     <div class="flex text-yellow-400 text-xs">
+                                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                     </div>
+                                 </div>
+                                 <span class="ml-auto text-gray-400 text-xs"><i class="fab fa-google"></i></span>
+                             </div>
+                             <p class="text-gray-600 text-sm italic">"Simplemente IMPECABLE!! muy,muy recomendables! Tanto en la atención al cliente como en el servicio técnico... el teléfono me quedo nuevo LITERALMENTE"</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Use a simpler background class for now to avoid parser issues with complex arbitrary value strings -->
+            <div class="py-20 bg-indigo-900 text-white relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10 bg-black"></div>
+                <div class="container mx-auto px-4 relative z-10">
+                    <h2 class="text-3xl font-bold text-center mb-12">Resultados Reales</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-bold text-indigo-300">Resucitamos tu equipo</h3>
+                            <p class="text-lg text-indigo-100">
+                                Desde pantallas estalladas hasta equipos mojados que no encienden. Nuestro laboratorio cuenta con la tecnología para devolverle la vida a tu dispositivo.
+                            </p>
+                            <ul class="space-y-4">
+                                <li class="flex items-center bg-white/10 p-3 rounded-lg"><i class="fas fa-magic text-yellow-400 mr-3"></i> Recuperación de estética original</li>
+                                <li class="flex items-center bg-white/10 p-3 rounded-lg"><i class="fas fa-microchip text-yellow-400 mr-3"></i> Recuperación de datos</li>
+                            </ul>
+                        </div>
+                        <div class="relative h-64 md:h-80 bg-black rounded-xl overflow-hidden shadow-2xl border-4 border-indigo-700/50 group">
+                             <!-- Before Image -->
+                             <img src="assets/img/cursos/academy/curso-reparacion-de-celulares.jpg" class="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:opacity-0 transition-opacity duration-700 ease-in-out" alt="Antes">
+                             <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow">ANTES</div>
+                             
+                             <!-- After Image -->
+                             <img src="assets/img/cursos/academy/capacitaciones.jpeg" class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out" alt="Después">
+                             <div class="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-700">DESPUÉS</div>
+
+                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition-opacity duration-300">
+                                 <span class="bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">Pasa el mouse para ver el resultado</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA / Coupons -->
+            <div class="py-20 bg-indigo-600 text-white text-center">
+                 <div class="container mx-auto px-4">
+                     <h2 class="text-3xl md:text-5xl font-bold mb-6">¿Listo para reparar tu equipo?</h2>
+                     <p class="text-xl md:text-2xl text-indigo-100 mb-10">Obtené un <span class="font-bold text-yellow-300">10% OFF</span> mencionando que venís de la web.</p>
+                     
+                     <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl inline-block mb-10 max-w-md w-full">
+                         <div class="text-sm uppercase tracking-widest mb-2 text-indigo-200">Tu Cupón</div>
+                         <div class="text-3xl font-mono font-bold text-white tracking-widest select-all bg-black/20 p-4 rounded-lg border border-dashed border-white/30">WEB-ARECO-2025</div>
+                         <p class="text-xs mt-2 text-indigo-200">*Válido para reparaciones en efectivo</p>
+                     </div>
+
+                     <br>
+                     <a href="https://wa.me/5491125960900?text=Hola,%20tengo%20el%20cupón%20WEB-ARECO-2025%20y%20quiero%20consultar%20por..." target="_blank" class="btn btn-warning btn-lg rounded-full text-gray-900 border-none hover:bg-yellow-400 font-bold px-10 shadow-xl transform hover:scale-105 transition-transform">
+                         <i class="fab fa-whatsapp mr-2 text-2xl"></i> Hablar con un Técnico
+                     </a>
+                 </div>
+            </div>
+
+        </div>
+      } @else {
+        <!-- STANDARD POST LAYOUT -->
     <article>
         <!-- Hero Section -->
         @if (post.image) {
@@ -87,5 +467,6 @@
             </div>
         </div>
     </article>
+      }
     }
 </div>

@@ -58,6 +58,39 @@
                         </label>
                     </div>
                 </div>
+                
+                <!-- Images -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Imágenes del Equipo</span>
+                    </label>
+                    <div class="flex flex-col gap-4">
+                        <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" 
+                            class="file-input file-input-bordered w-full" 
+                            [disabled]="uploadingImages()" />
+                        
+                        @if (uploadingImages()) {
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <span class="loading loading-spinner loading-xs"></span>
+                                Subiendo imágenes...
+                            </div>
+                        }
+
+                        @if (form().images.length > 0) {
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                @for (img of form().images; track img; let i = $index) {
+                                    <div class="relative group aspect-square bg-base-200 rounded-lg overflow-hidden border border-base-300">
+                                        <img [src]="img" class="w-full h-full object-cover" alt="Repair image" />
+                                        <button type="button" (click)="removeImage(i)" 
+                                            class="absolute top-1 right-1 btn btn-circle btn-xs btn-error opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
 
                 <div class="form-control">
                     <label class="label">

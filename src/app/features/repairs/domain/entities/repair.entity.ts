@@ -35,6 +35,7 @@ export interface Repair {
     readonly created_at: string;
     readonly updated_at: string;
     readonly completed_at?: string;
+    readonly images?: string[];
 }
 
 /**
@@ -51,6 +52,7 @@ export interface CreateRepairDto {
     readonly issue_description: string;
     readonly estimated_cost?: number;
     readonly notes?: string;
+    readonly images?: string[];
 }
 
 /**
