@@ -1,11 +1,11 @@
-<div class="py-12 bg-gray-50 dark:bg-[#0f111a]">
+<div class="py-12 bg-gray-50 dark:bg-surface-dark">
   <div class="container mx-auto px-4">
     <div class="text-center mb-12">
       <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ title }}</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div *ngFor="let item of items" class="bg-white dark:bg-[#1c2131] p-6 rounded-xl shadow-lg dark:shadow-[0_0_4px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-gray-800">
+      <div *ngFor="let item of items" class="bg-white dark:bg-card-dark p-6 rounded-xl shadow-lg dark:shadow-[0_0_4px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-gray-800">
         <div class="flex items-center gap-4 mb-4">
           <img [src]="item.image" [alt]="item.name" class="w-12 h-12 rounded-full object-cover">
           <div>

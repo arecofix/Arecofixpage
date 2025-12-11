@@ -90,7 +90,7 @@ export class AdminSalesPage implements OnInit {
                     staff_id: user?.id,
                     total_amount: this.total(),
                     status: 'completed',
-                    payment_method: 'cash' // TODO: Add payment method selection
+                    payment_method: 'cash'
                 })
                 .select()
                 .single();

@@ -126,7 +126,7 @@
         @if (item.children && item.children.length > 0) {
           <div class="dropdown dropdown-hover">
             <!-- Parent Link Desktop: Change div to a for semantics and proper navigation -->
-            <a tabindex="0" role="button" class="link link-primary flex items-center gap-1" [routerLink]="item.path" routerLinkActive="link-secondary" [routerLinkActiveOptions]="{exact: false}">
+            <a class="link link-primary flex items-center gap-1" [routerLink]="item.path" routerLinkActive="link-secondary" [routerLinkActiveOptions]="{exact: false}">
               <i [class]="item.icon"></i> {{item.title}}
             </a>
             <ul tabindex="0" class="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">

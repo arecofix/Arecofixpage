@@ -1,39 +1,39 @@
-<div class="max-w-4xl mx-auto text-gray-800">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Pedido</h2>
+<div class="max-w-4xl mx-auto text-base-content">
+    <h2 class="text-2xl font-bold mb-6 text-green-600">{{ id ? 'Editar' : 'Nuevo' }} Pedido</h2>
 
     <form (ngSubmit)="save()" #f="ngForm">
         <!-- Customer Information -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-            <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Información del Cliente</h3>
+        <div class="bg-base-100 p-6 rounded-xl shadow-sm border border-base-200 mb-6 text-base-content">
+            <h3 class="text-lg font-semibold mb-4 text-base-content border-b border-base-200 pb-2">Información del Cliente</h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre *</label>
-                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Nombre *</label>
+                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         required />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Email *</label>
                     <input type="email" [(ngModel)]="form().customer_email" name="customer_email"
-                        class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" required />
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
                     <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone"
-                        class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" />
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Dirección</label>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Dirección</label>
                     <input type="text" [(ngModel)]="form().customer_address" name="customer_address"
-                        class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" />
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
-                    <select [(ngModel)]="form().status" name="status" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Estado</label>
+                    <select [(ngModel)]="form().status" name="status" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                         <option value="pending">Pendiente</option>
                         <option value="processing">Procesando</option>
                         <option value="completed">Completado</option>
@@ -44,9 +44,9 @@
         </div>
 
         <!-- Order Items -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="text-lg font-semibold text-gray-800">Productos</h3>
+        <div class="bg-base-100 p-6 rounded-xl shadow-sm border border-base-200 mb-6 text-base-content">
+            <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-2">
+                <h3 class="text-lg font-semibold text-base-content">Productos</h3>
                 <button type="button" (click)="addItem()" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus mr-2"></i>
                     Agregar Producto
@@ -62,7 +62,7 @@
             <div class="overflow-x-auto">
                 <table class="table w-full">
                     <thead>
-                        <tr class="text-gray-700 border-b-2 border-gray-100">
+                        <tr class="text-base-content border-b-2 border-base-200">
                             <th class="font-semibold">Producto</th>
                             <th class="font-semibold w-24">Cantidad</th>
                             <th class="font-semibold text-right">Precio Unit.</th>
@@ -72,11 +72,11 @@
                     </thead>
                     <tbody>
                         @for (item of items(); track $index; let idx = $index) {
-                        <tr class="border-b border-gray-50">
+                        <tr class="border-b border-base-200 hover:bg-base-200/50">
                             <td class="min-w-[200px]">
                                 <select [value]="item.product_id"
                                     (change)="onProductSelect(idx, $any($event.target).value)"
-                                    class="select select-bordered select-sm w-full bg-white" required>
+                                    class="select select-bordered select-sm w-full bg-base-100 text-base-content border-base-300" required>
                                     <option value="">Seleccionar producto...</option>
                                     @for (product of products; track product.id) {
                                     <option [value]="product.id">
@@ -88,10 +88,10 @@
                             <td>
                                 <input type="number" [(ngModel)]="item.quantity" (ngModelChange)="onQuantityChange(idx)"
                                     [name]="'quantity_' + idx" min="1"
-                                    class="input input-bordered input-sm w-full bg-white" />
+                                    class="input input-bordered input-sm w-full bg-base-100 text-base-content border-base-300" />
                             </td>
-                            <td class="font-mono text-right text-gray-600">${{ item.unit_price.toFixed(2) }}</td>
-                            <td class="font-mono font-semibold text-right text-gray-800">${{ item.subtotal.toFixed(2) }}
+                            <td class="font-mono text-right text-base-content/80">${{ item.unit_price.toFixed(2) }}</td>
+                            <td class="font-mono font-semibold text-right text-base-content">${{ item.subtotal.toFixed(2) }}
                             </td>
                             <td class="text-right">
                                 <button type="button" (click)="removeItem(idx)"
@@ -108,40 +108,40 @@
         </div>
 
         <!-- Totals -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-            <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Totales y Notas</h3>
+        <div class="bg-base-100 p-6 rounded-xl shadow-sm border border-base-200 mb-6 text-base-content">
+            <h3 class="text-lg font-semibold mb-4 text-base-content border-b border-base-200 pb-2">Totales y Notas</h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Descuento</label>
+                        <label class="block text-sm font-medium text-base-content mb-1.5">Descuento</label>
                         <input type="number" [(ngModel)]="form().discount" (ngModelChange)="calculateTotals()"
-                            name="discount" min="0" step="0.01" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" />
+                            name="discount" min="0" step="0.01" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Notas</label>
-                        <textarea [(ngModel)]="form().notes" name="notes" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                        <label class="block text-sm font-medium text-base-content mb-1.5">Notas</label>
+                        <textarea [(ngModel)]="form().notes" name="notes" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                             rows="3"></textarea>
                     </div>
                 </div>
 
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 h-fit">
+                <div class="bg-base-200 p-6 rounded-xl border border-base-300 h-fit">
                     <div class="space-y-3">
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-base-content/80">
                             <span>Subtotal:</span>
                             <span class="font-mono font-medium">${{ form().subtotal.toFixed(2) }}</span>
                         </div>
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-base-content/80">
                             <span>Descuento:</span>
                             <span class="font-mono font-medium text-error">-${{ form().discount.toFixed(2) }}</span>
                         </div>
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-base-content/80">
                             <span>IVA (21%):</span>
                             <span class="font-mono font-medium">${{ form().tax.toFixed(2) }}</span>
                         </div>
                         <div class="divider my-2"></div>
-                        <div class="flex justify-between text-xl font-bold text-gray-800">
+                        <div class="flex justify-between text-xl font-bold text-base-content">
                             <span>Total:</span>
                             <span class="font-mono text-primary">${{ form().total.toFixed(2) }}</span>
                         </div>
@@ -158,7 +158,7 @@
         }
 
         <div class="flex gap-4 justify-end mb-8">
-            <a routerLink="/admin/orders" class="btn btn-ghost">Cancelar</a>
+            <a routerLink="/admin/orders" class="btn btn-error text-white">Cancelar</a>
             <button type="submit" class="btn btn-primary px-8" [disabled]="saving || f.invalid">
                 @if (saving) {
                 <span class="loading loading-spinner loading-xs mr-2"></span>

@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-base-200 py-10 px-4">
-    <div class="max-w-md mx-auto bg-base-100 rounded-xl shadow-xl overflow-hidden">
+<div class="py-10 px-4">
+    <div class="max-w-md mx-auto bg-base-100 rounded-xl shadow-xl overflow-hidden text-base-content">
         <!-- Header -->
         <div class="bg-primary p-6 text-center">
             <h1 class="text-2xl font-bold text-white mb-2">Estado de Reparación</h1>
@@ -10,7 +10,7 @@
             @if (loading()) {
             <div class="flex flex-col items-center justify-center py-8">
                 <span class="loading loading-spinner loading-lg text-primary"></span>
-                <p class="mt-4 text-gray-500">Buscando reparación...</p>
+                <p class="mt-4 text-base-content/70">Buscando reparación...</p>
             </div>
             } @else if (error()) {
             <div class="alert alert-error">
@@ -31,49 +31,49 @@
             <!-- Device Info -->
             <div class="space-y-4">
                 <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-gray-700">Código de Seguimiento</span>
+                    <span class="font-semibold text-base-content/70">Código de Seguimiento</span>
                     <span class="font-bold text-primary">{{ repair().tracking_code }}</span>
                 </div>
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-gray-700">Dispositivo</span>
-                    <span class="font-bold text-gray-900">{{ repair().device_model }}</span>
+                    <span class="font-semibold text-base-content/70">Dispositivo</span>
+                    <span class="font-bold text-base-content">{{ repair().device_model }}</span>
                 </div>
 
                 @if (repair().imei) {
                 <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-gray-700">IMEI / Serie</span>
-                    <span class="font-bold text-gray-900">{{ repair().imei }}</span>
+                    <span class="font-semibold text-base-content/70">IMEI / Serie</span>
+                    <span class="font-bold text-base-content">{{ repair().imei }}</span>
                 </div>
                 }
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-gray-700">Cliente</span>
-                    <span class="font-bold text-gray-900">{{ repair().customer_name }}</span>
+                    <span class="font-semibold text-base-content/70">Cliente</span>
+                    <span class="font-bold text-base-content">{{ repair().customer_name }}</span>
                 </div>
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-gray-700">Fecha Ingreso</span>
-                    <span class="font-bold text-gray-900">{{ (repair().received_at || repair().created_at) | date:'dd/MM/yyyy'
+                    <span class="font-semibold text-base-content/70">Fecha Ingreso</span>
+                    <span class="font-bold text-base-content">{{ (repair().received_at || repair().created_at) | date:'dd/MM/yyyy'
                         }}</span>
                 </div>
 
                 @if (repair().completed_at) {
                 <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-gray-700">Fecha Completado</span>
-                    <span class="font-bold text-gray-900">{{ repair().completed_at | date:'dd/MM/yyyy' }}</span>
+                    <span class="font-semibold text-base-content/70">Fecha Completado</span>
+                    <span class="font-bold text-base-content">{{ repair().completed_at | date:'dd/MM/yyyy' }}</span>
                 </div>
                 }
 
                 <div class="py-2">
-                    <span class="block font-semibold text-gray-700 mb-1">Problema Reportado</span>
-                    <p class="text-sm bg-base-200 p-3 rounded-lg text-gray-800">{{ repair().issue_description }}</p>
+                    <span class="block font-semibold text-base-content/70 mb-1">Problema Reportado</span>
+                    <p class="text-sm bg-base-200 p-3 rounded-lg text-base-content">{{ repair().issue_description }}</p>
                 </div>
 
                 @if (repair().technician_notes && (repair().status === 'completed' || repair().status === 'delivered'))
                 {
                 <div class="py-2">
-                    <span class="block font-semibold text-gray-700 mb-1">Diagnóstico / Solución</span>
+                    <span class="block font-semibold text-base-content/70 mb-1">Diagnóstico / Solución</span>
                     <p class="text-sm bg-green-50 p-3 rounded-lg border border-green-100 text-green-800">
                         {{ repair().technician_notes }}
                     </p>
@@ -82,7 +82,7 @@
 
                 @if (repair().images && repair().images.length > 0) {
                 <div class="py-2">
-                    <span class="block font-semibold text-gray-700 mb-2">Imágenes del Estado</span>
+                    <span class="block font-semibold text-base-content/70 mb-2">Imágenes del Estado</span>
                     <div class="grid grid-cols-2 gap-2">
                         @for (img of repair().images; track img) {
                         <div class="aspect-square bg-base-200 rounded-lg overflow-hidden border border-base-300">
@@ -97,16 +97,16 @@
                 <!-- Costs -->
                 <div class="bg-base-200 p-4 rounded-lg mt-4">
                     <div class="flex justify-between mb-1">
-                        <span class="text-sm text-gray-700">Presupuesto</span>
-                        <span class="font-bold text-gray-900">${{ repair().estimated_cost }}</span>
+                        <span class="text-sm text-base-content/70">Presupuesto</span>
+                        <span class="font-bold text-base-content">${{ repair().estimated_cost }}</span>
                     </div>
-                    <div class="flex justify-between mb-1 text-green-600">
+                    <div class="flex justify-between mb-1 text-green-600 dark:text-green-400">
                         <span class="text-sm">Seña</span>
                         <span class="font-bold">-${{ repair().deposit_amount }}</span>
                     </div>
                     <div class="divider my-1"></div>
                     <div class="flex justify-between text-lg">
-                        <span class="font-bold text-gray-900">Total a Pagar</span>
+                        <span class="font-bold text-base-content">Total a Pagar</span>
                         <span class="font-bold text-primary">${{ (repair().final_cost || repair().estimated_cost) -
                             repair().deposit_amount }}</span>
                     </div>

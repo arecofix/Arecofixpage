@@ -44,7 +44,12 @@ export class ProductService {
       .eq('is_active', true);
 
     // Apply filters
-    if (category_id !== undefined && category_id !== null) query = query.eq('category_id', category_id);
+    if (params.category_ids && params.category_ids.length > 0) {
+
+      query = query.in('category_id', params.category_ids);
+    } else if (category_id !== undefined && category_id !== null) {
+      query = query.eq('category_id', category_id);
+    }
     if (brand_id) query = query.eq('brand_id', brand_id);
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);

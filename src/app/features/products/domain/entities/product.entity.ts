@@ -11,6 +11,7 @@ export interface Product {
     category_id: string;
     brand_id?: string;
     image_url?: string;
+    gallery_urls?: string[];
     is_featured: boolean;
     is_active: boolean;
     condition?: 'new' | 'used' | 'refurbished';
@@ -34,6 +35,7 @@ export interface CreateProductDto {
     category_id: string;
     brand_id?: string;
     image_url?: string;
+    gallery_urls?: string[];
     is_featured?: boolean;
     condition?: 'new' | 'used' | 'refurbished';
     warranty?: string;

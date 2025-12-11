@@ -1,10 +1,17 @@
-import { Routes } from '@angular/router';
+import { Routes, UrlSegment } from '@angular/router';
 
 export const productsRoutes: Routes = [
   // Special route to show Repuestos content when visiting products/category/repuestos
   {
     title: 'Repuestos',
-    path: 'category/repuestos',
+    matcher: (segments: UrlSegment[]) => {
+      if (segments.length === 2 && 
+          segments[0].path === 'category' && 
+          segments[1].path.toLowerCase() === 'repuestos') {
+        return { consumed: segments };
+      }
+      return null;
+    },
     loadComponent: () =>
       import('@app/public/repuestos/repuestos').then((m) => m.RepuestosComponent),
   },

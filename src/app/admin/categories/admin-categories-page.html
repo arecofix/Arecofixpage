@@ -1,15 +1,15 @@
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Categorías</h1>
+    <h1 class="text-2xl font-bold text-green-600">Categorías</h1>
     <a routerLink="/admin/categories/new" class="btn btn-primary">
         <i class="fas fa-plus mr-2"></i> Nueva Categoría
     </a>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden text-gray-800">
+<div class="bg-base-100 rounded-lg shadow overflow-hidden text-base-content">
     <div class="overflow-x-auto">
         <table class="table w-full">
             <thead>
-                <tr class="text-gray-800">
+                <tr class="text-base-content font-bold">
                     <th>Nombre</th>
                     <th>Tipo</th>
                     <th>Estado</th>
@@ -19,15 +19,15 @@
             <tbody>
                 @if (loading()) {
                 <tr>
-                    <td colspan="4" class="text-center py-4">Cargando...</td>
+                    <td colspan="4" class="text-center py-4 text-base-content/70">Cargando...</td>
                 </tr>
                 } @else if (categories().length === 0) {
                 <tr>
-                    <td colspan="4" class="text-center py-4">No hay categorías registradas.</td>
+                    <td colspan="4" class="text-center py-4 text-base-content/70">No hay categorías registradas.</td>
                 </tr>
                 } @else {
                 @for (category of categories(); track category.id) {
-                <tr>
+                <tr class="hover:bg-base-200/50">
                     <td>
                         <div class="font-bold">{{ category.name }}</div>
                         <div class="text-sm opacity-50">{{ category.slug }}</div>
@@ -42,7 +42,7 @@
                         </button>
                     </td>
                     <td>
-                        <a [routerLink]="['/admin/categories', category.id]" class="btn btn-sm btn-ghost">
+                        <a [routerLink]="['/admin/categories', category.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
                             <i class="fas fa-edit"></i>
                         </a>
                     </td>

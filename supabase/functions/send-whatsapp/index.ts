@@ -1,3 +1,5 @@
+/// <reference path="../deno.d.ts" />
+
 const WHATSAPP_API_URL = "https://graph.facebook.com/v22.0";
 // These should be set in Supabase Secrets
 // Run: supabase secrets set WHATSAPP_TOKEN=... WHATSAPP_PHONE_NUMBER_ID=...

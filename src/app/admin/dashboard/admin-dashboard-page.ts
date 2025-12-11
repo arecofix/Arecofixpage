@@ -7,6 +7,8 @@ import { environment } from '@env/environment';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
+import { CHART_COLORS } from './constants/chart-colors.constant';
+
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
@@ -44,7 +46,13 @@ export class AdminDashboardPage implements OnInit {
   public salesChartData: ChartData<'line'> = {
     labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
     datasets: [
-      { data: [65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 110, 120], label: 'Ventas ($)', borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.2)', fill: true },
+      { 
+        data: [65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 110, 120], 
+        label: 'Ventas ($)', 
+        borderColor: CHART_COLORS.primary, 
+        backgroundColor: CHART_COLORS.primaryTransparent, 
+        fill: true 
+      },
     ]
   };
 
@@ -61,7 +69,11 @@ export class AdminDashboardPage implements OnInit {
   public productsChartData: ChartData<'bar'> = {
     labels: ['iPhone 11', 'Samsung A52', 'Modulo iPhone X', 'Cargador 20W', 'Funda Silicona'],
     datasets: [
-      { data: [28, 48, 40, 19, 86], label: 'Unidades', backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'] }
+      { 
+        data: [28, 48, 40, 19, 86], 
+        label: 'Unidades', 
+        backgroundColor: CHART_COLORS.palette
+      }
     ]
   };
 
@@ -78,7 +90,7 @@ export class AdminDashboardPage implements OnInit {
   public categoryChartData: ChartData<'doughnut'> = {
     labels: ['Repuestos', 'Accesorios', 'Servicios', 'Cursos'],
     datasets: [
-      { data: [300, 500, 100, 50], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'] }
+      { data: [300, 500, 100, 50], backgroundColor: CHART_COLORS.paletteAlt }
     ]
   };
 
@@ -113,7 +125,13 @@ export class AdminDashboardPage implements OnInit {
             this.salesChartData = {
                 labels: months,
                 datasets: [
-                    { data: totals, label: 'Ventas ($)', borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.2)', fill: true }
+                    { 
+                      data: totals, 
+                      label: 'Ventas ($)', 
+                      borderColor: CHART_COLORS.primary, 
+                      backgroundColor: CHART_COLORS.primaryTransparent, 
+                      fill: true 
+                    }
                 ]
             };
         }
@@ -129,7 +147,7 @@ export class AdminDashboardPage implements OnInit {
                     { 
                         data: quantities, 
                         label: 'Unidades', 
-                        backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#6366f1', '#ec4899'] 
+                        backgroundColor: CHART_COLORS.palette 
                     }
                 ]
             };
@@ -145,7 +163,7 @@ export class AdminDashboardPage implements OnInit {
                 datasets: [
                     { 
                         data: catCounts, 
-                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'] 
+                        backgroundColor: CHART_COLORS.paletteAlt
                     }
                 ]
             };

@@ -1,4 +1,4 @@
-<section class="container mx-auto px-4 py-16 max-w-7xl bg-white dark:bg-[#0f111a]">
+<section class="container mx-auto px-4 py-16 max-w-7xl bg-white dark:bg-surface-dark">
   <div class="text-center mb-12">
     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ title }}</h2>
     <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">{{ description }}</p>
@@ -6,7 +6,7 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
     <article *ngFor="let item of items"
-             class="group bg-white dark:bg-[#1c2131] rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100 dark:border-gray-800">
+             class="group bg-white dark:bg-card-dark rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100 dark:border-gray-800">
       <figure class="relative overflow-hidden aspect-video">
         <img [src]="item.image" [alt]="item.title" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" loading="lazy" />
         <div class="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide" [ngClass]="item.color">
@@ -14,11 +14,11 @@
         </div>
       </figure>
 
-      <div class="p-6 flex flex-col flex-grow">
+      <div class="p-6 flex flex-col grow">
         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
           {{ item.title }}
         </h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-6 line-clamp-3 flex-grow">
+        <p class="text-gray-600 dark:text-gray-400 mb-6 line-clamp-3 grow">
           {{ item.description }}
         </p>
 

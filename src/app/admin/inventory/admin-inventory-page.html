@@ -1,15 +1,15 @@
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Inventario</h1>
+    <h1 class="text-2xl font-bold text-green-600">Inventario</h1>
     <a routerLink="/admin/purchases/new" class="btn btn-primary">
         <i class="fas fa-plus mr-2"></i> Registrar Compra
     </a>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden text-gray-800">
+<div class="bg-base-100 rounded-lg shadow overflow-hidden text-base-content">
     <div class="overflow-x-auto">
         <table class="table w-full">
             <thead>
-                <tr class="text-gray-800">
+                <tr class="text-base-content font-bold">
                     <th>Producto</th>
                     <th>SKU / Código</th>
                     <th>Stock Actual</th>
@@ -20,15 +20,15 @@
             <tbody>
                 @if (loading()) {
                 <tr>
-                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                    <td colspan="5" class="text-center py-4 text-base-content/70">Cargando...</td>
                 </tr>
                 } @else if (products().length === 0) {
                 <tr>
-                    <td colspan="5" class="text-center py-4">No hay productos registrados.</td>
+                    <td colspan="5" class="text-center py-4 text-base-content/70">No hay productos registrados.</td>
                 </tr>
                 } @else {
                 @for (product of products(); track product.id) {
-                <tr>
+                <tr class="hover:bg-base-200/50">
                     <td>
                         <div class="flex items-center gap-3">
                             <div class="avatar">
@@ -44,7 +44,7 @@
                     </td>
                     <td>
                         <div class="text-sm">{{ product.sku || 'N/A' }}</div>
-                        <div class="text-xs text-gray-400">{{ product.barcode || 'Sin código de barras' }}</div>
+                        <div class="text-xs opacity-50">{{ product.barcode || 'Sin código de barras' }}</div>
                     </td>
                     <td>
                         <div class="font-bold text-lg"
@@ -63,7 +63,8 @@
         </span>
     </td>
     <td>
-        <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost">
+        <!-- Actions removed as per original file if not needed or add edit button back if standard -->
+        <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
             <i class="fas fa-edit"></i>
         </a>
     </td>

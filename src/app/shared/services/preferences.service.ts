@@ -122,11 +122,19 @@ export class PreferencesService {
 
   private applyTheme(themeId: string): void {
     const theme = this.backgroundOptions.find(t => t.id === themeId) || this.backgroundOptions[0];
+    
+    // Toggle .dark class for Tailwind @custom-variant
     if (theme.isDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+
+    // Set data-theme for DaisyUI (and semantic colors)
+    // We assume themeId maps to a DaisyUI theme name or we use generic 'light'/'dark'
+    // Since backgroundOptions has 'gradient-5' etc which are custom, let's map to light/dark
+    const daisyTheme = theme.isDark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', daisyTheme);
   }
 
   private applyHighContrast(isHighContrast: boolean): void {

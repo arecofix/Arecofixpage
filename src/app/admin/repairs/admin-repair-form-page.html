@@ -1,8 +1,8 @@
 <div class="container mx-auto p-4 max-w-5xl no-print">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">{{ id ? 'Editar' : 'Nueva' }} Reparación</h1>
-        <a routerLink="/admin/repairs" class="btn btn-ghost">
-            <i class="fas fa-arrow-left mr-2"></i> Volver
+        <h1 class="text-2xl font-bold text-green-600">{{ id ? 'Editar Reparación' : 'Nueva Reparación' }}</h1>
+        <a routerLink="/admin/repairs" class="btn btn-circle btn-ghost text-base-content">
+            <i class="fas fa-arrow-left"></i>
         </a>
     </div>
 
@@ -268,7 +268,7 @@
                         [disabled]="saving()">
                         <i class="fas fa-print mr-2"></i> Imprimir Orden
                     </button>
-                    <a routerLink="/admin/repairs" class="btn btn-ghost w-full sm:w-auto">Cancelar</a>
+                    <a routerLink="/admin/repairs" class="btn btn-error text-white w-full sm:w-auto">Cancelar</a>
                     <button type="submit" class="btn btn-primary w-full sm:w-auto"
                         [disabled]="saving() || !form().customer_name || !form().device_model">
                         @if (saving()) {

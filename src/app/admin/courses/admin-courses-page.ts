@@ -9,16 +9,16 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
   imports: [CommonModule, RouterLink],
   template: `
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-800">Administrar Cursos</h2>
+      <h2 class="text-2xl font-bold text-green-600">Administrar Cursos</h2>
       <a routerLink="/admin/courses/new" class="btn btn-primary">
         <i class="fas fa-plus mr-2"></i> Nuevo Curso
       </a>
     </div>
     
-    <div class="overflow-x-auto bg-white rounded-lg shadow text-gray-800">
+    <div class="overflow-x-auto bg-base-100 rounded-lg shadow text-base-content">
       <table class="table w-full">
         <thead>
-          <tr class="text-gray-800">
+          <tr class="text-base-content">
             <th>Imagen</th>
             <th>Título</th>
             <th>Precio</th>

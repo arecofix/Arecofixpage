@@ -1,12 +1,12 @@
-<div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto text-base-content">
     <div class="flex items-center gap-4 mb-6">
-        <a routerLink="/admin/purchases" class="btn btn-circle btn-ghost">
+        <a routerLink="/admin/purchases" class="btn btn-circle btn-ghost text-base-content">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <h1 class="text-2xl font-bold text-gray-800">Registrar Compra</h1>
+        <h1 class="text-2xl font-bold text-green-600">Registrar Compra</h1>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6 text-gray-800">
+    <div class="bg-base-100 rounded-lg shadow p-6 text-base-content">
         @if (error()) {
         <div class="alert alert-error mb-4">
             <i class="fas fa-exclamation-circle"></i>
@@ -18,24 +18,24 @@
             <!-- Header Info -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="form-control">
-                    <label class="label">Proveedor</label>
+                    <label class="label text-base-content">Proveedor</label>
                     <select [(ngModel)]="form().supplier_id" name="supplier_id"
-                        class="select select-bordered bg-white text-gray-800" required>
+                        class="select select-bordered bg-base-100 text-base-content border-base-300" required>
                         <option value="" disabled selected>Seleccionar Proveedor</option>
                         @for (supplier of suppliers(); track supplier.id) {
-                        <option [value]="supplier.id">{{ supplier.name }}</option>
+                        <option [value]="supplier.id" class="text-gray-900 bg-white dark:text-white dark:bg-gray-800">{{ supplier.name }}</option>
                         }
                     </select>
                 </div>
                 <div class="form-control">
-                    <label class="label">Fecha</label>
+                    <label class="label text-base-content">Fecha</label>
                     <input type="date" [(ngModel)]="form().purchase_date" name="purchase_date"
-                        class="input input-bordered bg-white text-gray-800" required>
+                        class="input input-bordered bg-base-100 text-base-content border-base-300" required>
                 </div>
                 <div class="form-control">
-                    <label class="label">Estado</label>
+                    <label class="label text-base-content">Estado</label>
                     <select [(ngModel)]="form().status" name="status"
-                        class="select select-bordered bg-white text-gray-800">
+                        class="select select-bordered bg-base-100 text-base-content border-base-300">
                         <option value="received">Recibido (Aumenta Stock)</option>
                         <option value="ordered">Ordenado (Pendiente)</option>
                     </select>
@@ -47,34 +47,34 @@
             <!-- Items -->
             <div class="space-y-4">
                 @for (item of items(); track $index) {
-                <div class="flex gap-4 items-end bg-gray-50 p-4 rounded">
+                <div class="flex gap-4 items-end bg-base-200 p-4 rounded text-base-content">
                     <div class="form-control flex-1">
-                        <label class="label text-xs" *ngIf="$index === 0">Producto</label>
+                        <label class="label text-xs text-base-content/70" *ngIf="$index === 0">Producto</label>
                         <select [ngModel]="item.product_id" (ngModelChange)="updateItem($index, 'product_id', $event)"
                             [name]="'product_' + $index"
-                            class="select select-bordered w-full select-sm bg-white text-gray-800">
-                            <option value="" disabled selected>Seleccionar Producto</option>
+                            class="select select-bordered w-full select-sm bg-base-100 text-base-content border-base-300">
+                            <option value="" disabled selected class="text-gray-400">Seleccionar Producto</option>
                             @for (product of products(); track product.id) {
-                            <option [value]="product.id">{{ product.name }} (Stock: {{ product.stock }})</option>
+                            <option [value]="product.id" class="text-gray-900 bg-white dark:text-white dark:bg-gray-800">{{ product.name }} (Stock: {{ product.stock }})</option>
                             }
                         </select>
                     </div>
                     <div class="form-control w-24">
-                        <label class="label text-xs" *ngIf="$index === 0">Cantidad</label>
+                        <label class="label text-xs text-base-content/70" *ngIf="$index === 0">Cantidad</label>
                         <input type="number" [ngModel]="item.quantity"
                             (ngModelChange)="updateItem($index, 'quantity', $event)" [name]="'qty_' + $index"
-                            class="input input-bordered input-sm bg-white text-gray-800" min="1">
+                            class="input input-bordered input-sm bg-base-100 text-base-content border-base-300" min="1">
                     </div>
                     <div class="form-control w-32">
-                        <label class="label text-xs" *ngIf="$index === 0">Costo Unit.</label>
+                        <label class="label text-xs text-base-content/70" *ngIf="$index === 0">Costo Unit.</label>
                         <input type="number" [ngModel]="item.unit_cost"
                             (ngModelChange)="updateItem($index, 'unit_cost', $event)" [name]="'cost_' + $index"
-                            class="input input-bordered input-sm bg-white text-gray-800" min="0">
+                            class="input input-bordered input-sm bg-base-100 text-base-content border-base-300" min="0">
                     </div>
-                    <div class="w-24 text-right font-bold text-sm pb-2">
+                    <div class="w-24 text-right font-bold text-sm pb-2 text-base-content">
                         ${{ item.quantity * item.unit_cost }}
                     </div>
-                    <button type="button" (click)="removeItem($index)" class="btn btn-ghost btn-sm text-red-500">
+                    <button type="button" (click)="removeItem($index)" class="btn btn-ghost btn-sm text-error hover:bg-base-300">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -88,7 +88,7 @@
             <div class="flex justify-between items-center mt-8 pt-4 border-t">
                 <div class="text-2xl font-bold">Total: ${{ total() }}</div>
                 <div class="flex gap-4">
-                    <a routerLink="/admin/purchases" class="btn btn-ghost">Cancelar</a>
+                    <a routerLink="/admin/purchases" class="btn btn-error text-white">Cancelar</a>
                     <button type="submit" class="btn btn-primary" [disabled]="saving()">
                         @if (saving()) {
                         <span class="loading loading-spinner"></span>

@@ -1,8 +1,8 @@
-<div class="w-full px-4 py-12 bg-white dark:bg-[#0f111a]">
+<div class="w-full px-4 py-12 bg-white dark:bg-surface-dark">
   <h3 class="text-gray-900 dark:text-white text-2xl font-bold leading-tight tracking-tight px-4 pb-6">{{ title }}</h3>
   <div class="flex overflow-x-auto pb-4 [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     <div class="flex items-stretch px-4 gap-4">
-      <div *ngFor="let item of items" class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-gray-50 dark:bg-[#1c2131] shadow-md dark:shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-[280px] border border-gray-200 dark:border-gray-800">
+      <div *ngFor="let item of items" class="flex h-full flex-1 flex-col gap-4 rounded-xl bg-gray-50 dark:bg-card-dark shadow-md dark:shadow-[0_0_4px_rgba(0,0,0,0.1)] min-w-[280px] border border-gray-200 dark:border-gray-800">
         <div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-t-xl"
              [style.background-image]="'url(' + item.image + ')'" role="img" [attr.aria-label]="item.name"></div>
         <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">

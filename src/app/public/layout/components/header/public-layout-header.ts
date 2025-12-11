@@ -187,7 +187,7 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
       return {
         id: String(category.id), // Keep track of ID for nesting
         title: category.name,
-        path: '/products/category/' + slug,
+        path: '/products/category/' + slug.toLowerCase(),
         icon: icon || 'fas fa-box',
         parentId: category.parent_id ? String(category.parent_id) : undefined,
         children: []

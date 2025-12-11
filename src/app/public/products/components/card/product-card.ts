@@ -27,6 +27,7 @@ import { CartService } from '@app/shared/services/cart.service';
 })
 export class ProductCard {
   product = input.required<Product>();
+  isPriority = input(false);
   private cartService = inject(CartService);
 
   addToCart(event: Event) {

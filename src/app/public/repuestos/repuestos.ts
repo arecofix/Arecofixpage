@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
-import { IsEmptyComponent, IsErrorComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
+import { Observable, map, of } from 'rxjs';
+import { IsEmptyComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
+import { ProductsResponse } from '@app/public/products/interfaces';
 import { ProductCard } from '@app/public/products/components';
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
 import { iCategory } from '@app/public/categories/interfaces';
@@ -17,7 +18,7 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'app-repuestos',
     standalone: true,
-    imports: [CommonModule, FormsModule, IsEmptyComponent, IsErrorComponent, IsLoadingComponent, ProductCard, Pagination],
+    imports: [CommonModule, FormsModule, IsEmptyComponent, IsLoadingComponent, ProductCard, Pagination],
     templateUrl: './repuestos.html',
     styleUrl: './repuestos.scss'
 })
@@ -33,15 +34,29 @@ export class RepuestosComponent implements OnInit {
     // Signals for data
     categories = signal<iCategory[]>([]);
     brands = signal<Brand[]>([]);
+
+    repuestosRootId = signal<string | null>(null);
+
+    // Visible Categories: Only direct children of Repuestos
+    visibleCategories = computed(() => {
+        const rootId = this.repuestosRootId();
+        if (!rootId) return [];
+        return this.categories().filter(c => c.parent_id === rootId);
+    });
     
     // Filter state (bound to template)
     filterState = {
         search: '',
         category: 'all',
+        category_ids: [] as string[], // NEW: Store list of IDs
         brand: 'all',
         maxPrice: null as number | null,
         sort: 'relevance' as 'relevance' | 'price-asc' | 'price-desc' | 'rating-desc',
     };
+
+    // Initialization state
+    isInitialized = signal(false);
+    initError = signal<string | null>(null);
 
     // Active filter (triggers resource)
     activeFilter = signal({ ...this.filterState });
@@ -49,6 +64,13 @@ export class RepuestosComponent implements OnInit {
     // Resource for products
     productsRs = rxResource({
         stream: () => {
+             // Guard: Don't fetch until initialized to prevent "leaking" all products
+            if (!this.isInitialized()) {
+                return of({ 
+                    data: [], items: 0, pages: 0, first: 1, last: 1, prev: undefined, next: undefined 
+                } as ProductsResponse);
+            }
+
             const f = this.activeFilter();
             const page = this.paginationService.currentPage() || 1;
             
@@ -59,9 +81,26 @@ export class RepuestosComponent implements OnInit {
             };
 
             if (f.search) params.name = f.search;
-            if (f.category !== 'all') params.category_id = f.category;
+            
+            // LOGIC CHANGE: 
+            // 1. If 'category' is specific (not 'all'), find IT and ITS children.
+            // 2. If 'category' is 'all', use the pre-calculated 'category_ids' (which contains all repuestos).
+            if (f.category !== 'all') {
+                 // RECURSIVE SUB-FILTERING: Find all children of the selected sub-category
+                 const subCatIds = this.getAllChildIds(f.category, this.categories());
+                 params.category_ids = subCatIds;
+            } else if (f.category_ids.length > 0) {
+                 params.category_ids = f.category_ids;
+            } else {
+                // Safety net: If initialized but no IDs found (empty repuestos), return empty result
+                // Do NOT fallback to showing all products.
+                return of({ 
+                    data: [], items: 0, pages: 0, first: 1, last: 1, prev: undefined, next: undefined 
+                } as ProductsResponse);
+            }
+
             if (f.brand !== 'all') params.brand_id = f.brand;
-            if (f.maxPrice) params.price = f.maxPrice; // Note: ProductService uses exact match for price currently, might need range later
+            if (f.maxPrice) params.price = f.maxPrice; 
             
             return this.productService.getData(params);
         }
@@ -80,9 +119,64 @@ export class RepuestosComponent implements OnInit {
     }
 
     async loadCategories() {
-        this.categoryService.getData({ _page: 1, _per_page: 100 }).subscribe(res => {
-            this.categories.set(res.data);
+
+        // Fetch ALL categories to ensure we have the full tree
+        this.categoryService.getData({ _page: 1, _per_page: 500 }).subscribe(res => {
+            const allCategories = res.data;
+            this.categories.set(allCategories);
+            console.log(`RepuestosPage: Loaded ${allCategories.length} categories.`);
+            
+            // Find 'Repuestos' Root Category
+            let repuestosCat = allCategories.find(c => 
+                c.slug.toLowerCase() === 'repuestos' || 
+                c.name.toLowerCase() === 'repuestos' ||
+                c.slug.toLowerCase().includes('repuesto')
+            );
+            
+            if (!repuestosCat) {
+                console.warn('RepuestosPage: "Repuestos" not found in initial list. Trying slug fetch...');
+                // Fallback: Try to fetch by slug if not in list
+                this.categoryService.getDataBySlug('repuestos').subscribe(res => {
+                    if (res.data && res.data.length > 0) {
+                        repuestosCat = res.data[0];
+
+                        this.initializeRepuestosFilter(repuestosCat, allCategories);
+                    } else {
+                         console.error('RepuestosPage: FATAL - Could not find Repuestos category even by slug!');
+                         this.initError.set('No se pudo encontrar la categoría Repuestos.');
+                         this.isInitialized.set(true); 
+                    }
+                });
+            } else {
+                console.log('RepuestosPage: Found Repuestos in list:', repuestosCat);
+                this.initializeRepuestosFilter(repuestosCat, allCategories);
+            }
         });
+    }
+
+    initializeRepuestosFilter(repuestosCat: iCategory, allCategories: iCategory[]) {
+        this.repuestosRootId.set(repuestosCat.id);
+        
+        // Initialize default state with RECURSIVE children
+        const allRepuestosIds = this.getAllChildIds(repuestosCat.id, allCategories);
+        console.log(`RepuestosPage: Generated ${allRepuestosIds.length} recursive IDs for filter:`, allRepuestosIds);
+        
+        this.filterState.category = 'all'; 
+        this.filterState.category_ids = allRepuestosIds; 
+        this.activeFilter.set({ ...this.filterState });
+        this.isInitialized.set(true); 
+    }
+
+    // Helper to get ID and all descendant IDs
+    getAllChildIds(parentId: string, allCategories: iCategory[]): string[] {
+        let ids = [parentId];
+        const children = allCategories.filter(c => c.parent_id === parentId);
+        
+        children.forEach(child => {
+            ids = [...ids, ...this.getAllChildIds(child.id, allCategories)];
+        });
+        
+        return ids;
     }
 
     async loadBrands() {
@@ -95,6 +189,8 @@ export class RepuestosComponent implements OnInit {
     }
 
     applyFilters() {
+        // If user selects specific category in UI, update state. 
+        // Logic in productsRs stream handles priority (specific category > list of IDs)
         this.activeFilter.set({ ...this.filterState });
         this.router.navigate([], {
             relativeTo: this.route,

@@ -2,7 +2,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Entradas</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-green-400">Entradas</h1>
             <p class="text-gray-500 mt-1">Gestiona las publicaciones de tu blog</p>
         </div>
         <a routerLink="new"
@@ -67,7 +67,7 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="h-10 w-10 flex-shrink-0">
+                                <div class="h-10 w-10 shrink-0">
                                     @if (post.image) {
                                     <img class="h-10 w-10 rounded-lg object-cover" [src]="post.image"
                                         [alt]="post.title">

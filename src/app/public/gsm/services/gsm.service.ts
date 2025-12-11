@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { GSM_TOOLS, BRAND_SERVICES } from '@app/core/data/gsm.data';
 
 export interface GsmTool {
   name: string;
@@ -30,61 +31,11 @@ export interface DownloadItem {
 export class GsmService {
 
   getGsmTools(): Observable<GsmTool[]> {
-    return of([
-      {
-        name: 'UnlockTool',
-        description: 'Herramienta profesional para desbloqueo de FRP, Mi Account y Flasheo.',
-        price: 'Consultar',
-        icon: 'fas fa-unlock-alt',
-        loginUrl: 'https://unlocktool.net'
-      },
-      {
-        name: 'Chimera Tool',
-        description: 'Soporte multimarca para reparación de IMEI, desbloqueo y más.',
-        price: 'Consultar',
-        icon: 'fas fa-dragon',
-        loginUrl: 'https://chimeratool.com'
-      },
-      {
-        name: 'Z3X Box',
-        description: 'Especializada en Samsung y LG. Reparación de IMEI y Flasheo.',
-        price: 'Consultar',
-        icon: 'fas fa-box-open',
-        loginUrl: 'https://z3x-team.com'
-      },
-      {
-        name: 'SigmaKey',
-        description: 'Solución para Huawei, Motorola y otras marcas MTK/Qualcomm.',
-        price: 'Consultar',
-        icon: 'fas fa-key',
-        loginUrl: 'https://sigmakey.com'
-      }
-    ]);
+    return of(GSM_TOOLS);
   }
 
   getBrandServices(): Observable<BrandService[]> {
-    return of([
-      {
-        name: 'Apple',
-        logo: 'fab fa-apple',
-        services: ['iCloud Bypass', 'FMI Off', 'Carrier Unlock']
-      },
-      {
-        name: 'Samsung',
-        logo: 'fab fa-android', // Using android icon as generic for Samsung if brand icon not available
-        services: ['FRP Unlock', 'KG Unlock', 'Network Unlock']
-      },
-      {
-        name: 'Xiaomi',
-        logo: 'fas fa-mobile',
-        services: ['Mi Account Remove', 'Bootloader Unlock', 'Unbrick']
-      },
-      {
-        name: 'Motorola',
-        logo: 'fas fa-mobile-alt',
-        services: ['FRP Reset', 'Repair IMEI', 'Flash Firmware']
-      }
-    ]);
+    return of(BRAND_SERVICES);
   }
 
   getDownloads(): Observable<DownloadItem[]> {

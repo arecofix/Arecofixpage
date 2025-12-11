@@ -1,16 +1,20 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
+import { PreferencesService } from '@app/shared/services/preferences.service';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AccessibilitySidebarComponent],
   templateUrl: './admin-layout.html',
 })
 export class AdminLayout {
   private authService = inject(AuthService);
   private router = inject(Router);
+  public preferencesService = inject(PreferencesService);
 
   menuItems: any[] = [
     { title: 'Dashboard', path: '/admin/dashboard', icon: 'fa-chart-line' },

@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
+import { Brand } from '@app/features/products/domain/entities/brand.entity';
+import { Category } from '@app/features/products/domain/entities/category.entity';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +21,7 @@ export class AdminProductService {
         return data || [];
     }
 
-    async getProduct(id: string): Promise<any> {
+    async getProduct(id: string): Promise<Product> {
         const { data, error } = await this.supabase
             .from('products')
             .select('*')
@@ -27,10 +29,10 @@ export class AdminProductService {
             .single();
 
         if (error) throw error;
-        return data;
+        return data as Product;
     }
 
-    async getBrands(): Promise<any[]> {
+    async getBrands(): Promise<Brand[]> {
         const { data, error } = await this.supabase
             .from('brands')
             .select('*')
@@ -38,10 +40,10 @@ export class AdminProductService {
             .order('name');
 
         if (error) throw error;
-        return data || [];
+        return (data as Brand[]) || [];
     }
 
-    async getCategories(): Promise<any[]> {
+    async getCategories(): Promise<Category[]> {
         const { data, error } = await this.supabase
             .from('categories')
             .select('*')
@@ -49,15 +51,15 @@ export class AdminProductService {
             .order('name');
 
         if (error) throw error;
-        return data || [];
+        return (data as Category[]) || [];
     }
 
-    async createProduct(payload: any): Promise<void> {
+    async createProduct(payload: Partial<Product>): Promise<void> {
         const { error } = await this.supabase.from('products').insert(payload);
         if (error) throw error;
     }
 
-    async updateProduct(id: string, payload: any): Promise<void> {
+    async updateProduct(id: string, payload: Partial<Product>): Promise<void> {
         const { error } = await this.supabase.from('products').update(payload).eq('id', id);
         if (error) throw error;
     }

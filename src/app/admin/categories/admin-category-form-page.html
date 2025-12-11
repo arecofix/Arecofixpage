@@ -1,13 +1,13 @@
-<div class="max-w-4xl mx-auto text-gray-800">
+<div class="max-w-4xl mx-auto text-base-content">
     <div class="flex items-center gap-4 mb-6">
-        <a routerLink="/admin/categories" class="btn btn-circle btn-ghost">
+        <a routerLink="/admin/categories" class="btn btn-circle btn-ghost text-base-content">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nueva' }} Categoría</h1>
+        <h1 class="text-2xl font-bold text-green-600">{{ id ? 'Editar' : 'Nueva' }} Categoría</h1>
     </div>
 
     <form (ngSubmit)="save()">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+        <div class="bg-base-100 p-6 rounded-xl shadow-sm border border-base-200 mb-6 text-base-content">
             @if (error()) {
             <div class="alert alert-error mb-6">
                 <i class="fas fa-exclamation-circle"></i>
@@ -16,41 +16,41 @@
             }
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
-                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400" required>
+                <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Slug (URL)</label>
-                <input type="text" [(ngModel)]="form().slug" name="slug" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                <label class="block text-sm font-medium text-base-content mb-1.5">Slug (URL)</label>
+                <input type="text" [(ngModel)]="form().slug" name="slug" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                     placeholder="Se genera automáticamente si se deja vacío">
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Descripción</label>
-                <textarea [(ngModel)]="form().description" name="description" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                <label class="block text-sm font-medium text-base-content mb-1.5">Descripción</label>
+                <textarea [(ngModel)]="form().description" name="description" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                     rows="4"></textarea>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Icono (Font Awesome)</label>
+                <label class="block text-sm font-medium text-base-content mb-1.5">Icono (Font Awesome)</label>
                 <div class="flex gap-4">
-                    <input type="text" [(ngModel)]="form().image_url" name="image_url" class="flex-1 bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                    <input type="text" [(ngModel)]="form().image_url" name="image_url" class="flex-1 bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         placeholder="Ej: fas fa-mobile-alt">
-                    <div class="w-12 h-10 flex items-center justify-center bg-gray-100 rounded-lg border border-gray-200">
+                    <div class="w-12 h-10 flex items-center justify-center bg-base-200 rounded-lg border border-base-300">
                         @if (form().image_url) {
-                            <i [class]="form().image_url" class="text-xl text-gray-700"></i>
+                            <i [class]="form().image_url" class="text-xl text-primary"></i>
                         } @else {
-                            <span class="text-xs text-gray-400">N/A</span>
+                            <span class="text-xs text-base-content/50">N/A</span>
                         }
                     </div>
                 </div>
-                <p class="text-xs text-gray-500 mt-1">Usa clases de Font Awesome (ej: fas fa-mobile-alt, fas fa-laptop)</p>
+                <p class="text-xs text-base-content/60 mt-1">Usa clases de Font Awesome (ej: fas fa-mobile-alt, fas fa-laptop)</p>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipo</label>
-                <select [(ngModel)]="form().type" name="type" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
+                <label class="block text-sm font-medium text-base-content mb-1.5">Tipo</label>
+                <select [(ngModel)]="form().type" name="type" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                     <option value="product">Producto</option>
                     <option value="course">Curso</option>
                     <option value="service">Servicio</option>
@@ -58,8 +58,8 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría Padre</label>
-                <select [(ngModel)]="form().parent_id" name="parent_id" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400">
+                <label class="block text-sm font-medium text-base-content mb-1.5">Categoría Padre</label>
+                <select [(ngModel)]="form().parent_id" name="parent_id" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                     <option [ngValue]="null">Ninguna (Categoría Principal)</option>
                     @for (cat of categories(); track cat.id) {
                         @if (cat.id !== id) {
@@ -67,20 +67,20 @@
                         }
                     }
                 </select>
-                <p class="text-xs text-gray-500 mt-1">Selecciona una categoría padre para anidar esta categoría dentro de ella.</p>
+                <p class="text-xs text-base-content/60 mt-1">Selecciona una categoría padre para anidar esta categoría dentro de ella.</p>
             </div>
 
             <div class="mt-6">
-                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer w-fit">
+                <label class="flex items-center gap-3 p-3 bg-base-100 border border-base-300 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
                     <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
-                        class="checkbox checkbox-primary h-5 w-5 rounded border-gray-300">
-                    <span class="font-medium text-gray-700">Activo</span>
+                        class="checkbox checkbox-primary h-5 w-5 rounded border-base-300">
+                    <span class="font-medium text-base-content">Activo</span>
                 </label>
             </div>
         </div>
 
         <div class="flex justify-end gap-4 mt-6">
-            <a routerLink="/admin/categories" class="btn btn-ghost">Cancelar</a>
+            <a routerLink="/admin/categories" class="btn btn-error text-white">Cancelar</a>
             <button type="submit" class="btn btn-primary px-8" [disabled]="saving()">
                 @if (saving()) {
                 <span class="loading loading-spinner loading-xs mr-2"></span>

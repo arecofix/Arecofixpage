@@ -1,5 +1,5 @@
 <div class="flex justify-between items-center mb-6">
-  <h1 class="text-2xl font-bold text-gray-800">Productos</h1>
+  <h1 class="text-2xl font-bold text-gray-800 dark:text-green-400">Productos</h1>
   <div class="flex gap-2">
     <button (click)="exportProducts()" class="btn btn-outline btn-primary">
       <i class="fas fa-file-export mr-2"></i> Exportar CSV
@@ -14,21 +14,44 @@
   </div>
 </div>
 
-@if (loading) {
+<!-- Filters Bar -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  <div class="form-control">
+      <div class="input-group">
+          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+              placeholder="Buscar por nombre, SKU o código de barras..."
+              class="input input-bordered w-full bg-base-100 text-base-content" />
+          <button class="btn btn-square">
+              <i class="fas fa-search"></i>
+          </button>
+      </div>
+  </div>
+  <div class="flex justify-end">
+      <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered bg-base-100 text-base-content max-w-xs">
+          <option value="name_asc">Nombre (A-Z)</option>
+          <option value="price_asc">Precio: Menor a Mayor</option>
+          <option value="price_desc">Precio: Mayor a Menor</option>
+          <option value="stock_asc">Stock: Menor a Mayor</option>
+          <option value="stock_desc">Stock: Mayor a Menor</option>
+      </select>
+  </div>
+</div>
+
+@if (loading()) {
 <div class="flex justify-center py-12">
   <span class="loading loading-spinner loading-lg"></span>
 </div>
-} @else if (error) {
+} @else if (error()) {
 <div class="alert alert-error">
   <i class="fas fa-exclamation-circle"></i>
-  <span>{{ error }}</span>
+  <span>{{ error() }}</span>
 </div>
 } @else {
-<div class="bg-white rounded-lg shadow overflow-hidden text-gray-800">
+<div class="bg-white rounded-lg shadow overflow-hidden text-gray-800 dark:text-white dark:bg-gray-800">
   <div class="overflow-x-auto">
     <table class="table w-full">
       <thead>
-        <tr class="text-gray-800">
+        <tr class="text-gray-800 dark:text-white">
           <th>Producto</th>
           <th>Precio</th>
           <th>Stock</th>
@@ -37,7 +60,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (p of products; track p.id) {
+        @for (p of filteredProducts(); track p.id) {
         <tr>
           <td>
             <div class="flex items-center gap-3">

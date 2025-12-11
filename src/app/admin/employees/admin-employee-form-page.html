@@ -1,13 +1,13 @@
-<div class="max-w-4xl mx-auto text-gray-800">
+<div class="max-w-4xl mx-auto text-base-content">
     <div class="flex items-center gap-4 mb-6">
-        <a routerLink="/admin/employees" class="btn btn-circle btn-ghost">
+        <a routerLink="/admin/employees" class="btn btn-circle btn-ghost text-base-content">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <h1 class="text-2xl font-bold text-gray-800">{{ id ? 'Editar' : 'Nuevo' }} Empleado</h1>
+        <h1 class="text-2xl font-bold text-green-600">{{ id ? 'Editar' : 'Nuevo' }} Empleado</h1>
     </div>
 
     <form (ngSubmit)="save()">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+        <div class="bg-base-100 p-6 rounded-xl shadow-sm border border-base-200 mb-6 text-base-content">
             @if (error()) {
             <div class="alert alert-error mb-6">
                 <i class="fas fa-exclamation-circle"></i>
@@ -17,25 +17,25 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
-                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Apellido</label>
-                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-gray-400"
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
+                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         required>
                 </div>
             </div>
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Foto de Perfil</label>
+                <label class="block text-sm font-medium text-base-content mb-1.5">Foto de Perfil</label>
                 <input type="file" (change)="onFileChange($event)"
-                    class="file-input file-input-bordered file-input-primary w-full bg-white text-gray-700" accept="image/*">
+                    class="file-input file-input-bordered file-input-primary w-full bg-base-100 text-base-content" accept="image/*">
                 @if (form().avatar_url) {
                 <div class="mt-4">
                     <img [src]="form().avatar_url" alt="Avatar preview"
-                        class="w-24 h-24 rounded-full object-cover border-2 border-gray-200 shadow-sm">
+                        class="w-24 h-24 rounded-full object-cover border-2 border-base-200 shadow-sm">
                 </div>
                 }
             </div>

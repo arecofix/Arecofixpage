@@ -32,4 +32,5 @@ export interface ProductsParams extends Partial<Product> {
   _per_page?: PageSize;
   _sort?: string;
   _order?: 'asc' | 'desc';
+  category_ids?: string[];
 }

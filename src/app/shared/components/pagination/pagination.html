@@ -1,18 +1,42 @@
-<div class="join flex justify-center items-center">
-  @for (page of getPagesList(); track page) {
-  <button
-    class="join-item btn"
-    [class.btn-primary]="page === activePage()"
-    [routerLink]="[]"
-    [queryParams]="{ _page: page }"
-    (click)="activePage.set(page)"
-  >
-    {{ page }}
+<div class="join flex flex-wrap justify-center items-center gap-1 shadow-sm bg-white dark:bg-gray-800 p-1 rounded-lg">
+  
+  <!-- Previous Button -->
+  <button 
+    class="join-item btn btn-sm md:btn-md" 
+    [class.btn-disabled]="activePage() === 1" 
+    (click)="prev()"
+    aria-label="Página anterior">
+    <i class="fas fa-chevron-left"></i>
   </button>
 
+  @for (page of getPagesList(); track $index) {
+    @if (page === '...') {
+      <button class="join-item btn btn-sm md:btn-md btn-disabled text-gray-400">...</button>
+    } @else {
+      <button
+        class="join-item btn btn-sm md:btn-md min-w-[32px] md:min-w-[40px]"
+        [class.btn-primary]="page === activePage()"
+        [class.btn-ghost]="page !== activePage()"
+        [routerLink]="[]"
+        [queryParams]="{ _page: page }"
+        queryParamsHandling="merge"
+        (click)="onPageChange(page)"
+      >
+        {{ page }}
+      </button>
+    }
+  } @empty {
+    <!-- Fallback if empty -->
+    <button class="join-item btn btn-sm md:btn-md btn-primary">1</button>
   }
-  <!--  -->
-  @empty {
-  <!-- <p>No hay páginas</p> -->
-  }
+
+  <!-- Next Button -->
+  <button 
+    class="join-item btn btn-sm md:btn-md" 
+    [class.btn-disabled]="activePage() === pages()" 
+    (click)="next()"
+    aria-label="Página siguiente">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+
 </div>

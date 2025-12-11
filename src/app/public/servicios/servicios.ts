@@ -174,6 +174,15 @@ export class ServiciosComponent {
                     features: ['Limpieza de cabezales', 'Reparación de sistema continuo', 'Cambio de rodillos', 'Mantenimiento preventivo', 'Configuración de red'],
                     price: 'Desde $12,000',
                     image: 'assets/img/cursos/local.webp'
+                },
+                {
+                    id: 12,
+                    title: 'Otros Servicios',
+                    description: 'Soluciones especializadas para necesidades específicas.',
+                    icon: 'fa-layer-group',
+                    features: ['Reparación de Electrónica', 'Diagnóstico de ECUs Automotriz', 'Electricidad de Motos', 'Alquiler de Trajes', 'Desarrollo de Software a Medida'],
+                    price: 'Consultar',
+                    image: 'assets/img/brands/logo/logo-normal.PNG'
                 }
             ],
             servicesCta: 'Solicitar Ahora',
@@ -302,6 +311,15 @@ export class ServiciosComponent {
                     features: ['Printhead cleaning', 'CISS repair', 'Roller replacement', 'Preventive maintenance', 'Network configuration'],
                     price: 'From $12,000',
                     image: 'assets/img/cursos/local.webp'
+                },
+                {
+                    id: 12,
+                    title: 'Other Services',
+                    description: 'Specialized solutions for specific needs.',
+                    icon: 'fa-layer-group',
+                    features: ['Electronics Repair', 'Automotive ECU Diagnostics', 'Motorcycle Electricity', 'Suit Rental', 'Custom Software Development'],
+                    price: 'Consult',
+                    image: 'assets/img/brands/logo/logo-normal.PNG'
                 }
             ],
             servicesCta: 'Request Now',
@@ -319,9 +337,36 @@ export class ServiciosComponent {
 
     content$: Observable<ServiciosContent>;
 
+    // Modal State
+    public showModal = false;
+    public selectedService: Service | null = null;
+    
+    // Exact list provided by user for the modal
+    public otherServicesList = [
+        'Reparación de Electrónica',
+        'Diagnóstico Eléctrico y Electrónico de Ecus AutoMotriz',
+        'Electricidad de Motos',
+        'Alquiler de Trajes',
+        'Desarrollo de Software a Medida'
+    ];
+
     constructor(public preferencesService: PreferencesService) {
         this.content$ = this.preferencesService.language$.pipe(
             map(lang => this.serviciosContent[lang])
         );
+    }
+
+    openService(service: Service, event: Event) {
+        // If it's the "Other Services" card (ID 12), open modal
+        if (service.id === 12) {
+            event.preventDefault();
+            this.selectedService = service;
+            this.showModal = true;
+        }
+    }
+
+    closeModal() {
+        this.showModal = false;
+        this.selectedService = null;
     }
 }
