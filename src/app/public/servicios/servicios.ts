@@ -83,7 +83,7 @@ export class ServiciosComponent {
                     features: ['Cambio de pantallas y displays', 'Reemplazo de baterías', 'Reparación de placas madre', 'Actualización de software', 'Liberación de equipos'],
                     price: 'Desde $5,000',
                     image: 'assets/img/products/sam.webp',
-                    link: '/#/posts/servicio-tcnico-de-celulares-en-marcos-paz'
+                    link: '/#/posts/servicio-tecnico-de-celulares-en-marcos-paz'
                 },
                 {
                     id: 2,
@@ -220,7 +220,7 @@ export class ServiciosComponent {
                     features: ['Screen and display replacement', 'Battery replacement', 'Motherboard repair', 'Software update', 'Unlocking'],
                     price: 'From $5,000',
                     image: 'assets/img/products/sam.webp',
-                    link: '/#/posts/servicio-tcnico-de-celulares-en-marcos-paz'
+                    link: '/#/posts/servicio-tecnico-de-celulares-en-marcos-paz'
                 },
                 {
                     id: 2,

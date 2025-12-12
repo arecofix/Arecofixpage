@@ -41,6 +41,8 @@ export class RepuestosComponent implements OnInit {
     visibleCategories = computed(() => {
         const rootId = this.repuestosRootId();
         if (!rootId) return [];
+        // If we found a root, show its children. If heuristic found multiple roots, this might be partial.
+        // For UI purposes, we prefer showing categories that have the root as parent.
         return this.categories().filter(c => c.parent_id === rootId);
     });
     
@@ -64,15 +66,16 @@ export class RepuestosComponent implements OnInit {
     // Resource for products
     productsRs = rxResource({
         stream: () => {
-             // Guard: Don't fetch until initialized to prevent "leaking" all products
-            if (!this.isInitialized()) {
+            const f = this.activeFilter();
+            const initialized = this.isInitialized();
+            const page = this.paginationService.currentPage() || 1;
+
+             // If not initialized or no categories found yet, return empty (but don't stop tracking signals)
+            if (!initialized || (f.category === 'all' && (!f.category_ids || f.category_ids.length === 0))) {
                 return of({ 
                     data: [], items: 0, pages: 0, first: 1, last: 1, prev: undefined, next: undefined 
                 } as ProductsResponse);
             }
-
-            const f = this.activeFilter();
-            const page = this.paginationService.currentPage() || 1;
             
             // Build params
             const params: any = {
@@ -82,21 +85,12 @@ export class RepuestosComponent implements OnInit {
 
             if (f.search) params.name = f.search;
             
-            // LOGIC CHANGE: 
-            // 1. If 'category' is specific (not 'all'), find IT and ITS children.
-            // 2. If 'category' is 'all', use the pre-calculated 'category_ids' (which contains all repuestos).
             if (f.category !== 'all') {
-                 // RECURSIVE SUB-FILTERING: Find all children of the selected sub-category
+                 // RECURSIVE SUB-FILTERING
                  const subCatIds = this.getAllChildIds(f.category, this.categories());
                  params.category_ids = subCatIds;
-            } else if (f.category_ids.length > 0) {
-                 params.category_ids = f.category_ids;
             } else {
-                // Safety net: If initialized but no IDs found (empty repuestos), return empty result
-                // Do NOT fallback to showing all products.
-                return of({ 
-                    data: [], items: 0, pages: 0, first: 1, last: 1, prev: undefined, next: undefined 
-                } as ProductsResponse);
+                 params.category_ids = f.category_ids;
             }
 
             if (f.brand !== 'all') params.brand_id = f.brand;
@@ -119,55 +113,65 @@ export class RepuestosComponent implements OnInit {
     }
 
     async loadCategories() {
-
         // Fetch ALL categories to ensure we have the full tree
         this.categoryService.getData({ _page: 1, _per_page: 500 }).subscribe(res => {
             const allCategories = res.data;
             this.categories.set(allCategories);
             console.log(`RepuestosPage: Loaded ${allCategories.length} categories.`);
             
-            // Find 'Repuestos' Root Category
-            let repuestosCat = allCategories.find(c => 
-                c.slug.toLowerCase() === 'repuestos' || 
-                c.name.toLowerCase() === 'repuestos' ||
-                c.slug.toLowerCase().includes('repuesto')
-            );
+            // Heuristic Strategy: Find ALL categories relevant to "Repuestos"
+            // This handles cases where the DB hierarchy is flat or broken (e.g. "Módulos" is a root category).
+            const keywords = [
+                'repuesto', 'modulo', 'módulo', 'bateria', 'batería', 'display', 'screen', 'pantalla', 
+                'glass', 'tapa', 'flex', 'pin', 'carga', 'auricular', 'microfono', 'micrófono', 
+                'camara', 'cámara', 'lente', 'touch', 'vidrio', 'bandeja', 'sim', 'buzzer', 'speaker', 
+                'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power'
+            ];
             
-            if (!repuestosCat) {
-                console.warn('RepuestosPage: "Repuestos" not found in initial list. Trying slug fetch...');
-                // Fallback: Try to fetch by slug if not in list
-                this.categoryService.getDataBySlug('repuestos').subscribe(res => {
-                    if (res.data && res.data.length > 0) {
-                        repuestosCat = res.data[0];
+            const relevantCategories = allCategories.filter(c => 
+                keywords.some(k => c.name.toLowerCase().includes(k) || c.slug.toLowerCase().includes(k))
+            );
 
-                        this.initializeRepuestosFilter(repuestosCat, allCategories);
-                    } else {
-                         console.error('RepuestosPage: FATAL - Could not find Repuestos category even by slug!');
-                         this.initError.set('No se pudo encontrar la categoría Repuestos.');
-                         this.isInitialized.set(true); 
-                    }
+            // Find 'Repuestos' Root for the "Root ID" reference (optional, for breadcrumbs/logic)
+            // We prefer looking for exact slug 'repuestos'
+            let repuestosCat = allCategories.find(c => c.slug.toLowerCase() === 'repuestos');
+            
+            // If not found, use the first relevant one as a proxy root (or just null)
+            if (!repuestosCat && relevantCategories.length > 0) {
+                repuestosCat = relevantCategories[0];
+            }
+
+            if (relevantCategories.length > 0) {
+                console.log(`RepuestosPage: Heuristic found ${relevantCategories.length} relevant categories:`, relevantCategories.map(c => c.name));
+                
+                // Collect IDs of these categories AND their children
+                let allIds = new Set<string>();
+                relevantCategories.forEach(cat => {
+                    // Add the category itself
+                    allIds.add(cat.id);
+                    // Add its children (if any)
+                    const treeIds = this.getAllChildIds(cat.id, allCategories);
+                    treeIds.forEach(id => allIds.add(id));
                 });
+
+                this.repuestosRootId.set(repuestosCat?.id || null);
+                this.filterState.category = 'all';
+                this.filterState.category_ids = Array.from(allIds);
+                
+                this.activeFilter.set({ ...this.filterState });
+                this.isInitialized.set(true);
+                
+                // FORCE RELOAD: Ensure the resource wakes up now that we have data
+                this.productsRs.reload();
             } else {
-                console.log('RepuestosPage: Found Repuestos in list:', repuestosCat);
-                this.initializeRepuestosFilter(repuestosCat, allCategories);
+                 console.error('RepuestosPage: FATAL - No repuestos-related categories found via keywords!');
+                 this.initError.set('No se encontraron categorías de repuestos.');
+                 this.isInitialized.set(true); 
             }
         });
     }
 
-    initializeRepuestosFilter(repuestosCat: iCategory, allCategories: iCategory[]) {
-        this.repuestosRootId.set(repuestosCat.id);
-        
-        // Initialize default state with RECURSIVE children
-        const allRepuestosIds = this.getAllChildIds(repuestosCat.id, allCategories);
-        console.log(`RepuestosPage: Generated ${allRepuestosIds.length} recursive IDs for filter:`, allRepuestosIds);
-        
-        this.filterState.category = 'all'; 
-        this.filterState.category_ids = allRepuestosIds; 
-        this.activeFilter.set({ ...this.filterState });
-        this.isInitialized.set(true); 
-    }
-
-    // Helper to get ID and all descendant IDs
+    // Helper to get ID and all descendant IDs (Recursive)
     getAllChildIds(parentId: string, allCategories: iCategory[]): string[] {
         let ids = [parentId];
         const children = allCategories.filter(c => c.parent_id === parentId);

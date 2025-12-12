@@ -145,19 +145,19 @@ export class PublicHomePage {
       specialOffers: {
         title: 'Special Offers',
         items: [
-          { image: 'assets/img/products/a06.webp', name: 'Samsung Galaxy A06', description: 'Latest Samsung | $320 | Cellphones', price: '$320', category: 'Cellphones', link: '/#/products/details/samsung-galaxy-a06' },
-          { image: 'assets/img/products/arreglo-consolas.webp', name: 'P9 Pro Max Headphones', description: 'New in Box | $19000 | Accessories', price: '$19000', category: 'Accessories', link: '/#/products/details/p9-pro-max' },
-          { image: 'assets/img/products/servicio-tecnico-consolas.webp', name: 'Wireless Charger Speaker', description: 'New in Box | $27000 | Accessories', price: '$27000', category: 'Accessories', link: '/#/products/details/wireless-speaker' },
-          { image: 'assets/img/products/reparacion-consolas.webp', name: 'PS4 Joystick', description: 'New in Box | $47800 | Consoles', price: '$47800', category: 'Consoles', link: '/#/products/details/ps4-joystick' }
+          { image: 'assets/img/products/a06.webp', name: 'Samsung Galaxy A06', description: 'Latest Samsung | $320 | Cellphones', price: '$320', category: 'Cellphones', link: '/#/products' },
+          { image: 'assets/img/products/arreglo-consolas.webp', name: 'P9 Pro Max Headphones', description: 'New in Box | $19000 | Accessories', price: '$19000', category: 'Accessories', link: '/#/products' },
+          { image: 'assets/img/products/servicio-tecnico-consolas.webp', name: 'Wireless Charger Speaker', description: 'New in Box | $27000 | Accessories', price: '$27000', category: 'Accessories', link: '/#/products' },
+          { image: 'assets/img/products/reparacion-consolas.webp', name: 'PS4 Joystick', description: 'New in Box | $47800 | Consoles', price: '$47800', category: 'Consoles', link: '/#/products' }
         ]
       },
       techBest: {
         title: 'The Best in Technology',
         items: [
-          { image: 'assets/img/products/sam.webp', name: 'Samsung Galaxy J8', description: 'Samsung Galaxy J8 Blue | $79000 | Cellphones', price: '$79000', category: 'Cellphones', link: '/#/products/details/samsung-galaxy-j8' },
-          { image: 'assets/img/products/iphx.webp', name: 'Motorola Moto E32', description: 'Motorola Moto E32 | $56000 | Cellphones', price: '$56000', category: 'Cellphones', link: '/#/products/details/motorola-moto-e32' },
-          { image: 'assets/img/products/iph8plus.webp', name: 'iPhone 8 Plus', description: 'Apple New in Box | $290 USD | Cellphones', price: '$290 USD', category: 'Cellphones', link: '/#/products/details/iphone-8-plus' },
-          { image: 'assets/img/products/j2.webp', name: 'TCL 7 SE', description: 'TCL 7 SE Cracked Glass | $9800 | Cellphones', price: '$9800', category: 'Cellphones', link: '/#/products/details/tcl-7-se' }
+          { image: 'assets/img/products/sam.webp', name: 'Samsung Galaxy J8', description: 'Samsung Galaxy J8 Blue | $79000 | Cellphones', price: '$79000', category: 'Cellphones', link: '/#/products' },
+          { image: 'assets/img/products/iphx.webp', name: 'Motorola Moto E32', description: 'Motorola Moto E32 | $56000 | Cellphones', price: '$56000', category: 'Cellphones', link: '/#/products' },
+          { image: 'assets/img/products/iph8plus.webp', name: 'iPhone 8 Plus', description: 'Apple New in Box | $290 USD | Cellphones', price: '$290 USD', category: 'Cellphones', link: '/#/products' },
+          { image: 'assets/img/products/j2.webp', name: 'TCL 7 SE', description: 'TCL 7 SE Cracked Glass | $9800 | Cellphones', price: '$9800', category: 'Cellphones', link: '/#/products' }
         ]
       },
       service: {
@@ -240,19 +240,19 @@ export class PublicHomePage {
       specialOffers: {
         title: 'Ofertas Especiales',
         items: [
-          { image: 'assets/img/products/a06.webp', name: 'Samsung Galaxy A06', description: 'Lo ultimo de Samsung | $320 | Celulares', price: '$320', category: 'Celulares', link: '/#/products/details/samsung-galaxy-a06' },
-          { image: 'assets/img/products/arreglo-consolas.webp', name: 'Auriculares P9 Pro Max', description: 'Auriculares Nuevo en Caja | $19000 | Celulares', price: '$19000', category: 'Celulares', link: '/#/products/details/auriculares-p9-pro-max' },
-          { image: 'assets/img/products/servicio-tecnico-consolas.webp', name: 'Parlante Cargador Inalambrico', description: 'Parlante Nuevo en Caja | $27000 | Celulares', price: '$27000', category: 'Celulares', link: '/#/products/details/parlante-cargador-inalambrico' },
-          { image: 'assets/img/products/reparacion-consolas.webp', name: 'Joystick Play Station 4', description: 'Joystick Nuevo en Caja | $47800 | Consolas', price: '$47800', category: 'Consolas', link: '/#/products/details/joystick-play-station-4' }
+          { image: 'assets/img/products/a06.webp', name: 'Samsung Galaxy A06', description: 'Lo ultimo de Samsung | $320 | Celulares', price: '$320', category: 'Celulares', link: '/#/products' },
+          { image: 'assets/img/products/arreglo-consolas.webp', name: 'Auriculares P9 Pro Max', description: 'Auriculares Nuevo en Caja | $19000 | Celulares', price: '$19000', category: 'Celulares', link: '/#/products' },
+          { image: 'assets/img/products/servicio-tecnico-consolas.webp', name: 'Parlante Cargador Inalambrico', description: 'Parlante Nuevo en Caja | $27000 | Celulares', price: '$27000', category: 'Celulares', link: '/#/products' },
+          { image: 'assets/img/products/reparacion-consolas.webp', name: 'Joystick Play Station 4', description: 'Joystick Nuevo en Caja | $47800 | Consolas', price: '$47800', category: 'Consolas', link: '/#/products' }
         ]
       },
       techBest: {
         title: 'Lo mejor en tecnología',
         items: [
-          { image: 'assets/img/products/sam.webp', name: 'Samsung Galaxy J8', description: 'En venta Samsung Galaxy J8 Color Azul | $79000 | Celulares', price: '$79000', category: 'Celulares', link: '/#/products/details/samsung-galaxy-j8' },
-          { image: 'assets/img/products/iphx.webp', name: 'Motorola Moto E32', description: 'Motorola Moto E32 | $56000 | Celulares', price: '$56000', category: 'Celulares', link: '/#/products/details/motorola-moto-e32' },
-          { image: 'assets/img/products/iph8plus.webp', name: 'iPhone 8 Plus', description: 'Apple Nuevo en Caja | $290 USD | Celulares', price: '$290 USD', category: 'Celulares', link: '/#/products/details/iphone-8-plus' },
-          { image: 'assets/img/products/j2.webp', name: 'TCL 7 SE', description: 'TCL 7 SE Vidrio Astillado | $29000 | Celulares', price: '$29000', category: 'Celulares', link: '/#/products/details/tcl-7-se' }
+          { image: 'assets/img/products/sam.webp', name: 'Samsung Galaxy J8', description: 'En venta Samsung Galaxy J8 Color Azul | $79000 | Celulares', price: '$79000', category: 'Celulares', link: '/#/products' },
+          { image: 'assets/img/products/iphx.webp', name: 'Motorola Moto E32', description: 'Motorola Moto E32 | $56000 | Celulares', price: '$56000', category: 'Celulares', link: '/#/products' },
+          { image: 'assets/img/products/iph8plus.webp', name: 'iPhone 8 Plus', description: 'Apple Nuevo en Caja | $290 USD | Celulares', price: '$290 USD', category: 'Celulares', link: '/#/products' },
+          { image: 'assets/img/products/j2.webp', name: 'TCL 7 SE', description: 'TCL 7 SE Vidrio Astillado | $29000 | Celulares', price: '$29000', category: 'Celulares', link: '/#/products' }
         ]
       },
       service: {

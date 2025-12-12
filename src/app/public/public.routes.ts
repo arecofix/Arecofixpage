@@ -164,6 +164,14 @@ export const publicRoutes: Routes = [
             (m) => m.FixtecnicosComponent
           ),
       },
+      {
+        title: 'Centro de Recursos',
+        path: 'recursos',
+        loadComponent: () =>
+          import('@app/public/recursos/recursos.component').then(
+            (m) => m.RecursosComponent
+          ),
+      },
     ],
   },
 ];

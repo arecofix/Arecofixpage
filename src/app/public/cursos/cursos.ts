@@ -73,7 +73,7 @@ export class CursosComponent implements OnInit {
                             ...c,
                             rating: c.rating || 4.8,
                             students: c.students || 0,
-                            image_url: c.image_url === 'assets/img/cursos/curso-reparacion-de-celulares.jpg' 
+                            image_url: (c.image_url && c.image_url.includes('curso-reparacion-de-celulares.jpg'))
                                 ? 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg' 
                                 : c.image_url
                         }));

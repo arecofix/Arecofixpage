@@ -33,7 +33,9 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
               <td>
                 <div class="avatar">
                   <div class="mask mask-squircle w-12 h-12">
-                    <img [src]="course.image_url" [alt]="course.title" />
+                    <img [src]="getImageSrc(course.image_url)" 
+                         [alt]="course.title"
+                         (error)="handleImageError($event)" />
                   </div>
                 </div>
               </td>
@@ -123,5 +125,17 @@ export class AdminCoursesPage implements OnInit {
       },
       error: (err) => alert('Error al eliminar el curso: ' + err.message)
     });
+  }
+
+  handleImageError(event: any) {
+    event.target.src = '/assets/img/cursos/1.jpg'; // Fallback to a valid image with absolute path
+  }
+
+  getImageSrc(url: string | null): string {
+    if (!url) return 'assets/placeholder.png'; // Handled by || in template, but good practice
+    if (url.startsWith('http') || url.startsWith('/')) {
+      return url;
+    }
+    return '/' + url;
   }
 }

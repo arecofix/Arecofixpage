@@ -1,16 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
   selector: 'app-reservation-calendar',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reservation-calendar.html',
   styleUrl: './reservation-calendar.css'
 })
 export class ReservationCalendar implements OnInit {
+  private auth = inject(AuthService);
+
   // Configuración
-  whatsappNumber = '5491123456789'; // Reemplazar con tu número
+  whatsappNumber = '5491125960900'; 
   availableHours = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
   monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -22,14 +26,22 @@ export class ReservationCalendar implements OnInit {
   selectedTime: string | null = null;
   showTimeSelection = false;
   showConfirmation = false;
+  
+  // Form Data
+  customerName = '';
+  customerPhone = '';
+  saving = false;
 
   private initializeCalendar(): void {
-  this.currentDate = new Date();
-  this.selectedDate = null;
-  this.selectedTime = null;
-  this.showTimeSelection = false;
-  this.showConfirmation = false;
-}
+    this.currentDate = new Date();
+    this.selectedDate = null;
+    this.selectedTime = null;
+    this.showTimeSelection = false;
+    this.showConfirmation = false;
+    this.customerName = '';
+    this.customerPhone = '';
+  }
+
   ngOnInit(): void {
     this.initializeCalendar();
   }
@@ -118,21 +130,60 @@ export class ReservationCalendar implements OnInit {
     return date < today;
   }
 
+  async confirmReservation() {
+    if (!this.selectedDate || !this.selectedTime || !this.customerName || !this.customerPhone) {
+      alert('Por favor completa todos los datos para continuar.');
+      return;
+    }
+
+    this.saving = true;
+
+    try {
+      const supabase = this.auth.getSupabaseClient();
+      const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      };
+      const formattedDate = this.selectedDate.toLocaleDateString('es-ES', options);
+      
+      // Save to DB
+      await supabase.from('contact_messages').insert({
+        name: this.customerName,
+        phone: this.customerPhone,
+        email: 'reserva@web.com', // Placeholder if email not asked
+        subject: `Nueva Reserva: ${formattedDate} ${this.selectedTime}`,
+        message: `Reserva solicitada para el ${formattedDate} a las ${this.selectedTime}. Teléfono: ${this.customerPhone}`,
+        is_read: false
+      });
+
+      // Send WhatsApp
+      const message = `¡Hola! Soy ${this.customerName}. Quiero confirmar mi reserva para el ${formattedDate} a las ${this.selectedTime} horas.`;
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`, '_blank');
+
+      // Reset
+      this.resetSelection();
+      this.customerName = '';
+      this.customerPhone = '';
+      
+    } catch (error) {
+      console.error('Error saving reservation:', error);
+      // Still open WhatsApp as fallback
+      this.sendWhatsAppMessage(); 
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  // Deprecated but kept as fallback
   sendWhatsAppMessage(): void {
     if (!this.selectedDate || !this.selectedTime) return;
-
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const formattedDate = this.selectedDate.toLocaleDateString('es-ES', options);
-    const message = `¡Hola! Quiero reservar una cita para el ${formattedDate} a las ${this.selectedTime} horas. Por favor, envíenme más información.`;
-    const encodedMessage = encodeURIComponent(message);
-    
-    window.open(`https://wa.me/${541125960900}?text=${encodedMessage}`, '_blank');
+    const message = `¡Hola! Quiero reservar una cita para el ${formattedDate} a las ${this.selectedTime} horas.`;
+    window.open(`https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   }
 
   get currentMonthYear(): string {
@@ -141,14 +192,7 @@ export class ReservationCalendar implements OnInit {
 
   get formattedSelectedDate(): string {
     if (!this.selectedDate) return '';
-    
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return this.selectedDate.toLocaleDateString('es-ES', options);
   }
 }

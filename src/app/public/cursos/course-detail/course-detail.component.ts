@@ -70,7 +70,60 @@ export class CourseDetailComponent implements OnInit {
     }
   ];
 
-  getVideoUrl(): SafeResourceUrl {
+  // Sales Content Types
+  audienceList = [
+      'No tenés experiencia pero querés una salida laboral rápida.',
+      'Ya reparás celulares pero querés subir de nivel.',
+      'Querés trabajar desde tu casa o armar tu propio taller.',
+      'Buscás independizarte y tener horarios flexibles.',
+      'Querés un trabajo rentable sin depender de terceros.'
+  ];
+
+  benefitsList = [
+      { icon: 'fas fa-microscope', text: 'Laboratorio real equipado con microscopios y estaciones.' },
+      { icon: 'fas fa-hands-on', text: 'Clases 100% prácticas desde el día 1.' },
+      { icon: 'fas fa-user-tie', text: 'Instructor con experiencia real en taller.' },
+      { icon: 'fas fa-certificate', text: 'Certificado con validez y matrícula.' },
+      { icon: 'fas fa-users', text: 'Bolsa de trabajo y comunidad de alumnos.' },
+      { icon: 'fas fa-video', text: 'Acceso a Aula Virtual con material premium.' }
+  ];
+
+  syllabusTimeline = [
+      { week: 'Semana 1', title: 'Fundamentos y Desarme', desc: 'Conceptos, herramientas, seguridad y desarme de equipos.' },
+      { week: 'Semana 2', title: 'Diagnóstico Inicial', desc: 'Manejo de multímetro, fuentes y detección de fallas comunes.' },
+      { week: 'Semana 3', title: 'Reparaciones Modulares', desc: 'Cambio de pantallas, baterías, cámaras y periféricos.' },
+      { week: 'Semana 4', title: 'Electrónica Aplicada', desc: 'Medición de componentes, cortos y fugas en placa.' },
+      { week: 'Semana 5', title: 'Microsoldadura I', desc: 'Pin de carga, botones, micrófonos y técnica de soldado.' },
+      { week: 'Semana 6', title: 'Software', desc: 'Flasheo, desbloqueo, cuentas Google y sistemas operativos.' },
+      { week: 'Semana 7', title: 'Práctica Real', desc: 'Trabajos con equipos reales traídos por los alumnos.' },
+      { week: 'Semana 8', title: 'Examen Final', desc: 'Evaluación teórica-práctica y entrega de certificados.' }
+  ];
+
+  roiExamples = [
+      { job: 'Cambio de Módulo', range: '$15.000 – $40.000', earning: true },
+      { job: 'Cambio de Batería', range: '$8.000 – $20.000', earning: true },
+      { job: 'Cambio de Pin de Carga', range: '$10.000 – $30.000', earning: true },
+      { job: 'Limpieza de Software/Flasheo', range: '$5.000 – $15.000', earning: true }
+  ];
+
+  inclusions = [
+      { icon: 'fas fa-laptop', text: 'Aula Virtual 24/7' },
+      { icon: 'fas fa-file-pdf', text: 'Material PDF' },
+      { icon: 'fas fa-video', text: 'Clases Grabadas' },
+      { icon: 'fas fa-certificate', text: 'Certificado Oficial' },
+      { icon: 'fas fa-users', text: 'Comunidad VIP' },
+      { icon: 'fas fa-briefcase', text: 'Bolsa de Trabajo' }
+  ];
+
+  faqs = [
+      { question: '¿Necesito experiencia previa?', answer: 'No, el curso inicia desde cero absoluto. Te guiamos paso a paso.' },
+      { question: '¿Qué herramientas necesito?', answer: 'Durante la cursada proveemos todo en el taller. Solo necesitas ganas de aprender.' },
+      { question: '¿Realmente voy a poder reparar después?', answer: 'Sí. El enfoque es 100% práctico para que salgas con la confianza de trabajar.' },
+      { question: '¿Entregan certificado?', answer: 'Sí, entregamos certificado de asistencia y aprobación al finalizar el curso.' },
+      { question: '¿Puedo pagar en cuotas?', answer: 'Sí, aceptamos todas las tarjetas y ofrecemos financiación propia.' }
+  ];
+
+  getVideoUrl() {
       // YouTube embed with start time 45s
       return this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/l93eYkGMxsI?start=45');
   }
@@ -92,20 +145,27 @@ export class CourseDetailComponent implements OnInit {
           const courseData = response.data;
           
           // Patch image URL if it matches the broken one from DB
-          // Check for both exact match and just filename to be safe
-          if (courseData && (courseData.image_url === 'assets/img/cursos/curso-reparacion-de-celulares.jpg' || courseData.image_url.endsWith('curso-reparacion-de-celulares.jpg'))) {
+          if (courseData && courseData.image_url && courseData.image_url.includes('curso-reparacion-de-celulares.jpg')) {
               courseData.image_url = 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg';
+          }
+          
+          // HARDCODED CONTENT OVERRIDES (User Request)
+          // Since we can't easily update the DB row from here and this is a specific request for this course:
+          if (courseData && courseData.slug === 'reparacion-celulares-basico') {
+              courseData.schedule = 'Lunes y Miércoles 18:00-21:00'; // Changed from 16 to 18
           }
 
           this.course = courseData;
           this.loadModules(this.course!.id);
           this.loading = false;
+          this.cd.detectChanges(); // Fix "stuck loading" issue
         }
       },
       error: (err) => {
         // Suppress specific 404 or connection errors for cleaner console in dev
         // console.error('Error loading course:', err);
         this.handleMockFallback();
+        this.cd.detectChanges(); // Fix "stuck loading" issue
       }
     });
   }
@@ -138,6 +198,7 @@ export class CourseDetailComponent implements OnInit {
           this.error = 'Curso no encontrado';
           this.loading = false;
       }
+      this.cd.detectChanges(); // Fix "stuck loading" in fallback too
   }
 
   loadModules(courseId: string) {

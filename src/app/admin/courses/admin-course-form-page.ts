@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -144,7 +144,7 @@ import { AuthService } from '@app/core/services/auth.service';
 
               @if (form.get('image_url')?.value) {
                 <div class="mt-4 p-4 border rounded-lg bg-base-200 flex justify-center relative group">
-                  <img [src]="form.get('image_url')?.value" 
+                  <img [src]="getImageSrc(form.get('image_url')?.value)" 
                        class="h-48 rounded object-cover shadow-sm" 
                        alt="Preview" 
                        onerror="this.style.display='none'" />
@@ -181,6 +181,8 @@ export class AdminCourseFormPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
+
 
   form: FormGroup;
   isEditing = false;
@@ -210,20 +212,39 @@ export class AdminCourseFormPage implements OnInit {
     }
   }
 
+  getImageSrc(url: string | null): string {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('/')) {
+      return url;
+    }
+    // If it is a relative path (e.g. from existing database seed), prepend /
+    return '/' + url;
+  }
+
   async onFileChange(event: any) {
     const file: File = event.target.files?.[0];
     if (!file) return;
 
     this.saving = true;
+    this.cdr.markForCheck(); // Force update UI to show spinner
+
     const supabase = this.auth.getSupabaseClient();
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `courses/${fileName}`;
 
     try {
-      const { data, error } = await supabase.storage
+      // Create a timeout promise
+      const timeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Tiempo de espera agotado al subir la imagen')), 15000)
+      );
+
+      // Race between upload and timeout
+      const uploadPromise = supabase.storage
         .from('public-assets')
         .upload(filePath, file);
+      
+      const { data, error } = await Promise.race([uploadPromise, timeout]) as any;
 
       if (error) throw error;
 
@@ -232,11 +253,15 @@ export class AdminCourseFormPage implements OnInit {
         .getPublicUrl(filePath);
 
       this.form.patchValue({ image_url: publicUrl.publicUrl });
+      this.cdr.markForCheck(); // Update preview
     } catch (error: any) {
       console.error('Error uploading image:', error);
-      alert('Error al subir la imagen: ' + error.message);
+      alert('Error al subir la imagen: ' + (error.message || error));
     } finally {
       this.saving = false;
+      this.cdr.markForCheck(); // Ensure spinner stops
+      // Reset input so same file can be selected again if needed
+      if (event.target) event.target.value = '';
     }
   }
 

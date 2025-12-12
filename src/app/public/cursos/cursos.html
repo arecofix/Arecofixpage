@@ -214,8 +214,8 @@
         <is-empty />
       } @else {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          @for (product of productsRs.value().data; track $index) {
-          <product-card [product]="product" />
+          @for (product of productsRs.value().data; track product.id; let i = $index) {
+          <product-card [product]="product" [isPriority]="i < 8" />
           }
         </div>
         

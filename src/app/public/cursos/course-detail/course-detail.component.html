@@ -104,24 +104,71 @@
 
              <!-- Tab Content: Info -->
              @if (activeTab === 'info') {
-                 <div class="space-y-12 fade-in">
+                 <div class="space-y-16 fade-in pb-12">
                      
-                     <!-- Section 1: Introduction (Video/Hero Text) -->
-                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
-                         <h2 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Domina la Tecnología, Construye tu Futuro</h2>
-                         <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
-                             <p class="font-semibold text-xl text-indigo-600 dark:text-indigo-400 mb-4">
-                                 ¿Te gustaría tener una profesión rentable, con alta demanda y libertad horaria?
+                     <!-- 1. Intro + Audience (From Initial Version - RESTORED) -->
+                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 sm:p-10">
+                         <div class="max-w-3xl mx-auto text-center mb-10">
+                             <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">¿Buscas una profesión con futuro?</h2>
+                             <p class="text-xl text-gray-600 dark:text-gray-300">
+                                 La reparación de celulares es uno de los oficios más rentables y demandados de la actualidad.
                              </p>
-                             <p>{{course.description}}</p>
-                             <p>
-                                 En <strong>Arecofix Academy</strong>, no solo enseñamos a reparar; formamos técnicos profesionales capaces de diagnosticar, solucionar y emprender. 
-                                 Nuestro método combina la teoría fundamental con la práctica intensiva en taller real.
-                             </p>
+                         </div>
+
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                             <div>
+                                 <h3 class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Este curso es para vos si:</h3>
+                                 <ul class="space-y-4">
+                                     @for (item of audienceList; track item) {
+                                         <li class="flex items-start">
+                                             <div class="mr-3 mt-1 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center shrink-0">
+                                                 <i class="fas fa-check text-indigo-600 dark:text-indigo-400 text-xs"></i>
+                                             </div>
+                                             <span class="text-gray-700 dark:text-gray-200">{{item}}</span>
+                                         </li>
+                                     }
+                                 </ul>
+                             </div>
+                             <div class="relative h-64 sm:h-80 rounded-xl overflow-hidden shadow-lg transform rotate-2 hover:rotate-0 transition-all duration-500">
+                                 <img src="assets/img/cursos/academy/salida_laboral_propia.jpeg" class="w-full h-full object-cover" alt="Alumno reparando">
+                                 <div class="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-6">
+                                     <p class="text-white font-bold text-lg">"Hoy tengo mi propio taller"</p>
+                                 </div>
+                             </div>
                          </div>
                      </div>
 
-                     <!-- Section 2: Methodology (Image: Capacitaciones) -->
+                     <!-- 2. ROI & Salida Laboral (From Initial Version - RESTORED) -->
+                     <section class="bg-indigo-900 rounded-2xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
+                         <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+                         <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+                         
+                         <div class="relative z-10 text-center mb-12">
+                             <span class="inline-block py-1 px-3 rounded-full bg-green-500/20 border border-green-500/30 text-green-300 text-sm font-bold tracking-wide uppercase mb-4">Oportunidad de Negocio</span>
+                             <h2 class="text-3xl sm:text-4xl font-bold mb-4">Recupera tu inversión en menos de un mes</h2>
+                             <p class="text-indigo-100 text-lg max-w-2xl mx-auto">
+                                 No necesitas miles de clientes. Con solo 3 o 4 reparaciones básicas ya cubrís el costo del curso. El resto es ganancia pura.
+                             </p>
+                         </div>
+
+                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                             @for (roi of roiExamples; track roi.job) {
+                                 <div class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors">
+                                     <div class="flex justify-between items-start mb-4">
+                                         <i class="fas fa-tools text-2xl text-indigo-300"></i>
+                                         @if (roi.earning) {
+                                             <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded font-bold">Ganancia</span>
+                                         }
+                                     </div>
+                                     <h3 class="font-bold text-lg mb-2">{{roi.job}}</h3>
+                                     <p class="text-2xl font-bold text-green-300">{{roi.range}}</p>
+                                     <p class="text-xs text-indigo-200 mt-1">promedio por trabajo</p>
+                                 </div>
+                             }
+                         </div>
+                     </section>
+
+                     <!-- 3. Methodology (Visual Section) -->
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                          <div class="rounded-xl overflow-hidden shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-500">
                              <img src="assets/img/cursos/academy/capacitaciones.jpeg" class="w-full h-full object-cover" alt="Clases 100% Prácticas">
@@ -135,27 +182,21 @@
                                  Creemos que la única forma de aprender a reparar es reparando. Desde las primeras clases, trabajarás con equipos reales, multímetros, estaciones de soldado y microscopios.
                              </p>
                              <ul class="space-y-2">
-                                 <li class="flex items-center text-gray-700 dark:text-gray-300">
-                                     <i class="fas fa-check-circle text-green-500 mr-3"></i> Diagnóstico de placas
-                                 </li>
-                                 <li class="flex items-center text-gray-700 dark:text-gray-300">
-                                     <i class="fas fa-check-circle text-green-500 mr-3"></i> Microsoldadura y reballing
-                                 </li>
-                                 <li class="flex items-center text-gray-700 dark:text-gray-300">
-                                     <i class="fas fa-check-circle text-green-500 mr-3"></i> Cambio de módulos y baterías
-                                 </li>
+                                 <li class="flex items-center text-gray-700 dark:text-gray-300"><i class="fas fa-check-circle text-green-500 mr-3"></i> Diagnóstico de placas</li>
+                                 <li class="flex items-center text-gray-700 dark:text-gray-300"><i class="fas fa-check-circle text-green-500 mr-3"></i> Microsoldadura y reballing</li>
+                                 <li class="flex items-center text-gray-700 dark:text-gray-300"><i class="fas fa-check-circle text-green-500 mr-3"></i> Cambio de módulos y baterías</li>
                              </ul>
                          </div>
                      </div>
 
-                     <!-- Section 3: Instructors (Image: Profe) -->
+                     <!-- 4. Instructors (Visual Section) -->
                      <div class="bg-indigo-900 text-white rounded-xl shadow-xl overflow-hidden">
                          <div class="grid grid-cols-1 md:grid-cols-2">
                              <div class="p-10 flex flex-col justify-center">
                                  <span class="text-indigo-300 font-bold tracking-wider uppercase text-sm mb-2">Mentoria Experta</span>
                                  <h3 class="text-3xl font-bold mb-6">Aprende de los Mejores</h3>
                                  <p class="text-indigo-100 text-lg mb-6">
-                                     Nuestros instructores son técnicos activos con años de experiencia en el rubro. Ellos te transmitirán no solo el conocimiento técnico, sino los secretos del oficio que no están en los libros.
+                                     Nuestros instructores son técnicos activos con años de experiencia en el rubro. Transmiten los secretos del oficio que no están en los libros.
                                  </p>
                                  <div class="flex items-center space-x-4">
                                      <div class="flex -space-x-4">
@@ -166,13 +207,13 @@
                                      <span class="text-sm font-medium">Acompañamiento personalizado</span>
                                  </div>
                              </div>
-                             <div class="h-64 md:h-auto relative">
-                                 <img src="assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg" class="absolute inset-0 w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" alt="Instructor Experto">
+                             <div class="h-164 md:h-auto relative">
+                                 <img src="assets/img/cursos/academy/eddis_educativa.jpeg" class="absolute inset-0 w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" alt="Instructor Experto">
                              </div>
                          </div>
                      </div>
 
-                     <!-- Section 4: Facilities (Image: Eddis/CIC) -->
+                     <!-- 5. Facilities (Visual Section) -->
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                          <div class="order-2 md:order-1 space-y-4">
                              <div class="w-12 h-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-2xl mb-2">
@@ -180,18 +221,48 @@
                              </div>
                              <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Instalaciones Profesionales</h3>
                              <p class="text-gray-600 dark:text-gray-300 text-lg">
-                                 Nuestras sedes están equipadas para simular un entorno real de trabajo. Contamos con laboratorios modernos en alianzas estratégicas.
-                             </p>
-                             <p class="text-sm text-gray-500">
-                                 * Clases dictadas en sedes equipadas (CIC, Puntos Digitales, y Aulas Propias).
+                                 Laboratorios equipados simulando un entorno real de trabajo. 
+                                 <br><span class="text-sm text-gray-500">* Clases en sedes equipadas (CIC, Puntos Digitales, y Aulas Propias).</span>
                              </p>
                          </div>
                          <div class="order-1 md:order-2 rounded-xl overflow-hidden shadow-lg transform -rotate-1 hover:rotate-0 transition-transform duration-500">
-                             <img src="assets/img/cursos/academy/eddis_educativa.jpeg" class="w-full h-full object-cover" alt="Instalaciones">
+                             <img src="assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg" class="w-full h-64 object-cover" alt="Instalaciones">
                          </div>
                      </div>
 
-                     <!-- Section 5: Community & Learning (Image: Aprender/Cursos) -->
+                     <!-- 6. Timeline (Syllabus) -->
+                     <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+                         <div class="flex flex-col md:flex-row gap-10">
+                             <div class="md:w-1/3">
+                                 <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Plan de Estudio</h3>
+                                 <p class="text-gray-600 dark:text-gray-400 mb-6">
+                                     Un programa diseñado paso a paso para llevarte de cero a experto. Sin rellenos, directo a la práctica.
+                                 </p>
+                                 <button (click)="activeTab = 'temario'" class="btn btn-outline w-full normal-case hidden md:block">
+                                     Ver Temario Completo
+                                 </button>
+                             </div>
+                             <div class="md:w-2/3 space-y-6">
+                                 @for (step of syllabusTimeline; track step.week) {
+                                     <div class="flex gap-4">
+                                         <div class="flex flex-col items-center">
+                                             <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                                                 {{$index + 1}}
+                                             </div>
+                                             <div class="h-full w-0.5 bg-indigo-100 dark:bg-gray-700 my-2" *ngIf="!$last"></div>
+                                         </div>
+                                         <div class="pb-6">
+                                             <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">{{step.week}}</span>
+                                             <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{step.title}}</h4>
+                                             <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">{{step.desc}}</p>
+                                         </div>
+                                     </div>
+                                 }
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- 7. Community (Visual Section) -->
                      <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-8 border border-gray-100 dark:border-gray-700">
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                              <div class="h-64 rounded-xl overflow-hidden shadow-sm">
@@ -200,38 +271,27 @@
                              <div>
                                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Más que un Curso, una Comunidad</h3>
                                  <p class="text-gray-600 dark:text-gray-300 mb-4">
-                                     Al unirte a Arecofix, pasas a formar parte de una red de técnicos y egresados. Participa de foros, grupos de WhatsApp exclusivos y actualizaciones constantes.
+                                     Participa de foros, grupos de WhatsApp exclusivos y actualizaciones constantes.
                                  </p>
-                                 <button class="btn btn-outline btn-sm">Ver Testimonios de Alumni</button>
+                                 <button (click)="activeTab = 'testimonios'" class="btn btn-outline btn-sm">Ver Testimonios de Alumni</button>
                              </div>
                          </div>
                      </div>
 
-                     <!-- Features Grid -->
-                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                         <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-xs hover:shadow-md transition-shadow">
-                             <i class="fas fa-graduation-cap text-3xl text-indigo-500 mb-3"></i>
-                             <h4 class="font-bold text-gray-900 dark:text-white mb-2">Certificado</h4>
-                             <p class="text-sm text-gray-500">Diploma de finalización avalado.</p>
-                         </div>
-                         <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-xs hover:shadow-md transition-shadow">
-                             <i class="fas fa-briefcase text-3xl text-indigo-500 mb-3"></i>
-                             <h4 class="font-bold text-gray-900 dark:text-white mb-2">Bolsa de Trabajo</h4>
-                             <p class="text-sm text-gray-500">Conexión directa con empleadores.</p>
-                         </div>
-                         <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-xs hover:shadow-md transition-shadow">
-                             <i class="fas fa-infinity text-3xl text-indigo-500 mb-3"></i>
-                             <h4 class="font-bold text-gray-900 dark:text-white mb-2">Acceso Vitalicio</h4>
-                             <p class="text-sm text-gray-500">Material digital siempre disponible.</p>
-                         </div>
-                         <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-xs hover:shadow-md transition-shadow">
-                             <i class="fas fa-hand-holding-usd text-3xl text-indigo-500 mb-3"></i>
-                             <h4 class="font-bold text-gray-900 dark:text-white mb-2">Rentabilidad</h4>
-                             <p class="text-sm text-gray-500">Recupera tu inversión en un mes.</p>
+                     <!-- 8. Inclusions (Grid) -->
+                     <div>
+                         <h2 class="text-2xl font-bold text-center mb-10 text-gray-900 dark:text-white">Todo lo que incluye tu inscripción</h2>
+                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                             @for (inc of inclusions; track inc.text) {
+                                 <div class="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-center h-32">
+                                     <i [class]="inc.icon + ' text-3xl text-gray-400 dark:text-gray-500 mb-3'"></i>
+                                     <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{inc.text}}</span>
+                                 </div>
+                             }
                          </div>
                      </div>
 
-                     <!-- Press Section -->
+                     <!-- 9. Press Section -->
                      <div class="pt-8 border-t border-gray-100 dark:border-gray-700">
                          <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
                              <i class="fas fa-newspaper text-indigo-500 mr-3"></i> Arecofix en los medios
@@ -252,6 +312,62 @@
                                  </a>
                              }
                          </div>
+                     </div>
+
+                     <!-- 10. Guarantee -->
+                     <div class="bg-gray-900 text-white rounded-xl p-8 flex flex-col md:flex-row items-center gap-8 border border-gray-800">
+                         <div class="shrink-0">
+                             <div class="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center text-4xl text-yellow-400">
+                                 <i class="fas fa-shield-alt"></i>
+                             </div>
+                         </div>
+                         <div class="text-center md:text-left">
+                             <h3 class="text-2xl font-bold mb-2">Garantía de Confianza Arecofix</h3>
+                             <p class="text-gray-400 mb-0">
+                                 Estamos tan seguros de nuestra calidad educativa que te ofrecemos una garantía de aprendizaje. 
+                                 Si sentís que necesitas reforzar algún tema, podrás asistir a clases de repaso sin costo adicional hasta que domines la técnica.
+                             </p>
+                         </div>
+                     </div>
+
+                     <!-- 11. FAQ -->
+                     <div class="max-w-3xl mx-auto">
+                         <h2 class="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">Preguntas Frecuentes</h2>
+                         <div class="space-y-4">
+                             @for (faq of faqs; track faq.question) {
+                                 <div class="collapse collapse-plus bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+                                     <input type="radio" name="faq-accordion" /> 
+                                     <div class="collapse-title text-base font-bold text-gray-900 dark:text-white">
+                                         {{faq.question}}
+                                     </div>
+                                     <div class="collapse-content"> 
+                                         <p class="text-gray-600 dark:text-gray-300">{{faq.answer}}</p>
+                                     </div>
+                                 </div>
+                             }
+                         </div>
+                     </div>
+
+                     <!-- 12. Final CTA -->
+                     <div class="text-center pt-8">
+                         <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">¿Estás listo para dar el siguiente paso?</h3>
+                         <div class="flex flex-col sm:flex-row justify-center gap-4">
+                             <button (click)="openRegistration()" class="btn btn-primary btn-lg shadow-xl shadow-indigo-500/30">
+                                 Quiero Reservar mi Lugar
+                             </button>
+                             <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-outline btn-lg">
+                                 <i class="fab fa-whatsapp mr-2"></i> Hablar con un Asesor
+                             </a>
+                         </div>
+                         <p class="mt-4 text-sm text-gray-500">Cupos limitados por disponibilidad de laboratorio.</p>
+                     </div>
+
+                     <!-- Mini Instructor Bio -->
+                     <div class="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700 text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <img src="assets/img/brands/logo/log.png" alt="Arecofix Academy" class="h-8 mx-auto mb-4 grayscale">
+                        <p class="text-sm">
+                            <strong>Instructor Certificado:</strong> Ezequiel. Especialista en microsoldadura y reparación de dispositivos móviles con más de 10 años de experiencia en el gremio.
+                        </p>
                      </div>
 
                  </div>
@@ -402,8 +518,23 @@
                              <i class="fas fa-map-marker-alt w-8 text-indigo-500"></i>
                              <span>Modalidad</span>
                          </div>
-                         <span class="font-semibold text-gray-900 dark:text-white">Presencial</span>
+                         <div class="text-right">
+                             <span class="block font-semibold text-gray-900 dark:text-white">Presencial + Virtual</span>
+                             <span class="text-xs text-green-600 font-medium">¡Incluye Aula Virtual!</span>
+                         </div>
                     </div>
+                </div>
+                
+                <div class="bg-indigo-50 dark:bg-gray-700 p-4 rounded-lg mb-6 text-sm">
+                    <h4 class="font-bold text-indigo-700 dark:text-indigo-300 mb-2"><i class="fas fa-laptop-house mr-2"></i>Capacitación Híbrida</h4>
+                    <p class="text-gray-600 dark:text-gray-300 mb-2">
+                        Además de las clases presenciales, tendrás acceso a nuestra <strong>Aula Virtual</strong> exclusiva y soporte mediante <strong>Google Meet</strong>.
+                    </p>
+                    <ul class="space-y-1 text-gray-500 dark:text-gray-400">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Clases grabadas de repaso</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Material PDF descargable</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Consultas en vivo online</li>
+                    </ul>
                 </div>
 
                 <button (click)="openRegistration()" class="w-full btn btn-primary bg-indigo-600 hover:bg-indigo-500 border-none text-white mb-3">
@@ -501,4 +632,12 @@
       </form>
     </dialog>
   }
+
+  <!-- Global Floating WhatsApp -->
+  <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20tengo%20consultas%20sobre%20los%20cursos'" 
+     target="_blank"
+     class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 animate-bounce-slow"
+     aria-label="Chat en WhatsApp">
+      <i class="fab fa-whatsapp text-3xl"></i>
+  </a>
 </div>

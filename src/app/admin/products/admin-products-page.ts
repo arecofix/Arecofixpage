@@ -1,30 +1,37 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { AdminProductService } from './services/admin-product.service';
+import { Pagination } from '@app/shared/components/pagination/pagination';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, Pagination],
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminProductsPage implements OnInit {
   private productService = inject(AdminProductService);
   public cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
   
   // Signals
   public products = signal<Product[]>([]);
   public searchQuery = signal<string>('');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
   
+  // Pagination Signals
+  public currentPage = signal<number>(1);
+  public itemsPerPage = signal<number>(10);
+  
   public loading = signal<boolean>(true);
   public error = signal<string | null>(null);
 
-  // Computed Filtered & Sorted Products
-  public filteredProducts = computed(() => {
+  // Computed: Filtered & Sorted (Full List)
+  public allFilteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
     let result = this.products();
 
@@ -51,7 +58,28 @@ export class AdminProductsPage implements OnInit {
     });
   });
 
+  // Computed: Paginated Slice
+  public paginatedProducts = computed(() => {
+    const all = this.allFilteredProducts();
+    const page = this.currentPage();
+    const perPage = this.itemsPerPage();
+    
+    const start = (page - 1) * perPage;
+    return all.slice(start, start + perPage);
+  });
+
+  // Computed: Total Pages
+  public totalPages = computed(() => {
+     return Math.ceil(this.allFilteredProducts().length / this.itemsPerPage());
+  });
+
   async ngOnInit() {
+    // Sync URL params
+    this.route.queryParams.subscribe(params => {
+      const page = params['_page'] ? Number(params['_page']) : 1;
+      this.currentPage.set(page || 1);
+    });
+
     try {
       const data = await this.productService.getProducts();
       this.products.set(data);

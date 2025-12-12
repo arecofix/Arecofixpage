@@ -33,8 +33,8 @@
                     class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none text-gray-900!">
                     <img [src]="product.image_url || 'assets/img/no-image.png'" alt="{{product.name}}"
                       class="w-8 h-8 object-contain rounded bg-white border" />
-                    <div class="flex flex-col">
-                      <span class="font-bold text-sm truncate text-gray-900!">{{ product.name }}</span>
+                    <div class="flex flex-col flex-1 min-w-0">
+                      <span class="font-bold text-sm text-gray-900! whitespace-normal leading-tight line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ product.name }}</span>
                       <span class="text-xs text-gray-500!">${{ product.price }}</span>
                     </div>
                   </a>
@@ -204,8 +204,8 @@
               class="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-none text-gray-900!">
               <img [src]="product.image_url || 'assets/img/no-image.png'" alt="{{product.name}}"
                 class="w-8 h-8 object-contain rounded bg-white border" />
-              <div class="flex flex-col">
-                <span class="font-bold text-sm truncate text-gray-900!">{{ product.name }}</span>
+              <div class="flex flex-col flex-1 min-w-0">
+                <span class="font-bold text-sm text-gray-900! whitespace-normal leading-tight line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ product.name }}</span>
                 <span class="text-xs text-gray-500!">${{ product.price }}</span>
               </div>
             </a>
