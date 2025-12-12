@@ -8,6 +8,7 @@ export interface ArticleItem {
   description: string;
   link: string;
   color: string;
+  cta?: string;
 }
 
 @Component({

@@ -91,8 +91,15 @@ export class PostPage implements OnInit, OnDestroy {
 
             this.metaService.updateTag({
                 name: 'keywords',
-                content: 'servicio tecnico celulares marcos paz, reparacion celulares, cambio pantalla iphone, arreglo samsung, cambio bateria celular, marcos paz'
+                content: 'servicio tecnico celulares marcos paz, reparacion celulares, cambio pantalla iphone, arreglo samsung, cambio bateria celular, marcos paz, motorola, xiaomi, lg'
             });
+
+            // Open Graph (Social)
+            this.metaService.updateTag({ property: 'og:title', content: 'Reparación de Celulares en Marcos Paz | Arecofix' });
+            this.metaService.updateTag({ property: 'og:description', content: 'Servicio técnico especializado. Reparamos iPhone, Samsung, Motorola y más en el acto. ¡Tu celular en las mejores manos!' });
+            this.metaService.updateTag({ property: 'og:image', content: 'https://arecofix.com.ar/assets/img/repair/1.jpg' });
+            this.metaService.updateTag({ property: 'og:url', content: 'https://arecofix.com.ar/posts/servicio-tecnico-de-celulares-en-marcos-paz' });
+            this.metaService.updateTag({ property: 'og:type', content: 'website' });
 
             this.injectJsonLd();
         } else {

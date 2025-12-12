@@ -1,7 +1,7 @@
-import "./chunk-HYMRNJCR.js";
+import "./chunk-3MZ737U7.js";
 import {
   getDOM
-} from "./chunk-Q35RKGFF.js";
+} from "./chunk-M6P7AK2S.js";
 import {
   ApplicationRef,
   ChangeDetectorRef,
@@ -32,7 +32,7 @@ import {
   ɵɵdirectiveInject,
   ɵɵgetInheritedFactory,
   ɵɵlistener
-} from "./chunk-63PX7PEC.js";
+} from "./chunk-6SRBUQCV.js";
 import {
   DestroyRef,
   EventEmitter,
@@ -47,11 +47,11 @@ import {
   untracked,
   ɵɵdefineInjectable,
   ɵɵdefineInjector
-} from "./chunk-NTOQDLJV.js";
+} from "./chunk-MO5IOCYW.js";
+import "./chunk-N3CADB34.js";
 import {
   forkJoin
 } from "./chunk-J6AWP5HV.js";
-import "./chunk-N3CADB34.js";
 import {
   Subject,
   from,
@@ -4679,7 +4679,7 @@ var UntypedFormBuilder = class _UntypedFormBuilder extends FormBuilder {
     }]
   }], null, null);
 })();
-var VERSION = new Version("21.0.4");
+var VERSION = new Version("21.0.5");
 var FormsModule = class _FormsModule {
   static withConfig(opts) {
     return {

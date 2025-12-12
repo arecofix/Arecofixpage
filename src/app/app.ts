@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Footer } from './shared/footer/footer';
 import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button';
 import { AnalyticsService } from './services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
@@ -11,7 +10,6 @@ import posthog from 'posthog-js';
   standalone: true,
   imports: [
     RouterOutlet,
-    Footer,
     WhatsappButton,
   ],
   templateUrl: './app.html'

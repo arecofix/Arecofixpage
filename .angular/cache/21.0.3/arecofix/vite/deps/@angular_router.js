@@ -1,7 +1,7 @@
 import {
   Title
-} from "./chunk-AQ3ZF5Y5.js";
-import "./chunk-X4BUCBUK.js";
+} from "./chunk-RA3C6N7P.js";
+import "./chunk-OW7VJD5G.js";
 import {
   HashLocationStrategy,
   Location,
@@ -10,10 +10,10 @@ import {
   PathLocationStrategy,
   PlatformNavigation,
   ViewportScroller
-} from "./chunk-HYMRNJCR.js";
+} from "./chunk-3MZ737U7.js";
 import {
   LOCATION_INITIALIZED
-} from "./chunk-Q35RKGFF.js";
+} from "./chunk-M6P7AK2S.js";
 import {
   APP_BOOTSTRAP_LISTENER,
   ApplicationRef,
@@ -62,7 +62,7 @@ import {
   ɵɵloadQuery,
   ɵɵqueryRefresh,
   ɵɵsanitizeUrlOrResourceUrl
-} from "./chunk-63PX7PEC.js";
+} from "./chunk-6SRBUQCV.js";
 import {
   DOCUMENT,
   DestroyRef,
@@ -88,12 +88,12 @@ import {
   ɵɵdefineInjectable,
   ɵɵdefineInjector,
   ɵɵinject
-} from "./chunk-NTOQDLJV.js";
+} from "./chunk-MO5IOCYW.js";
+import "./chunk-N3CADB34.js";
 import {
   defer,
   isObservable
 } from "./chunk-J6AWP5HV.js";
-import "./chunk-N3CADB34.js";
 import {
   BehaviorSubject,
   EMPTY,
@@ -5875,7 +5875,7 @@ function mapToCanDeactivate(providers) {
 function mapToResolve(provider) {
   return (...params) => inject(provider).resolve(...params);
 }
-var VERSION = new Version("21.0.4");
+var VERSION = new Version("21.0.5");
 export {
   ActivatedRoute,
   ActivatedRouteSnapshot,

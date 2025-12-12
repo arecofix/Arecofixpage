@@ -37,6 +37,7 @@ interface ArticleItem {
   description: string;
   link: string;
   color: string;
+  cta?: string;
 }
 
 interface HomeContent {
@@ -303,8 +304,7 @@ export class PublicHomePage {
         items: [
           { image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop', category: 'Tecnología', title: 'Software y Desarrollo', description: 'Descubre las últimas herramientas de laboratorio y optimización de código.', link: '/#/gsm', color: 'bg-blue-600' },
           { image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop', category: 'GSM', title: 'Soluciones GSM', description: 'Todo sobre desbloqueos, flasheos y reparaciones de software avanzado.', link: '/#/gsm', color: 'bg-purple-600' },
-          { image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop', category: 'Recursos', title: 'Descargas Útiles', description: 'Accede a esquemáticos, boardviews y software de servicio técnico.', link: '/#/gsm'
-            , color: 'bg-green-600' }
+          { image: 'assets/img/android-card.png', category: 'Recursos', title: 'Descargas Útiles', description: 'Accede a esquemáticos, boardviews y software de servicio técnico.', link: 'assets/app/arecofix.rar', cta: 'Descargar Aplicación', color: 'bg-green-600' }
         ]
       },
       partsPromo: {
