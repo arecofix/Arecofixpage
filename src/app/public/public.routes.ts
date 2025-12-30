@@ -14,7 +14,13 @@ export const publicRoutes: Routes = [
         component: PublicHomePage,
       },
       {
+        title: 'Servicio Técnico de Celulares en Marcos Paz',
+        path: 'celular',
+        loadComponent: () => import('@app/public/landing/celular/celular-landing.component').then(m => m.CelularLandingComponent),
+      },
+      {
         title: 'Categories',
+
         path: 'categories',
         loadChildren: () => import('@app/public/categories/categories.routes'),
       },

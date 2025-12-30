@@ -5,6 +5,8 @@ import { OrderService } from '@app/services/order.service';
 import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { AuthService } from '@app/core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { RepairStatusService } from '@app/features/orders/services/repair-status'; // Import service
+
 
 interface ProductOption {
     id: string;
@@ -26,12 +28,16 @@ export class AdminOrderFormPage implements OnInit {
     private router = inject(Router);
     private orderService = inject(OrderService);
     private authService = inject(AuthService);
+    private repairStatusService = inject(RepairStatusService); // Inject service
     private cdr = inject(ChangeDetectorRef);
+
 
     id: string | null = null;
     loading = true;
     saving = false;
     error: string | null = null;
+    private originalStatus: string | null = null; // Store original status
+
 
     products: ProductOption[] = [];
 
@@ -40,7 +46,9 @@ export class AdminOrderFormPage implements OnInit {
         customer_email: '',
         customer_phone: '',
         customer_address: '',
+        imei: '', // Init IMEI
         status: 'pending',
+
         subtotal: 0,
         tax: 0,
         discount: 0,
@@ -93,10 +101,14 @@ export class AdminOrderFormPage implements OnInit {
                     tax: order.tax,
                     discount: order.discount,
                     total: order.total,
-                    notes: order.notes
+                    notes: order.notes,
+                    imei: order.imei || '' // Load IMEI
                 });
                 this.items.set(order.items);
+
+                this.originalStatus = order.status; // Capture original status
                 this.cdr.markForCheck();
+
             },
             error: (err) => {
                 this.error = err.message;
@@ -190,11 +202,36 @@ export class AdminOrderFormPage implements OnInit {
 
             if (error) throw error;
 
+            // Check for status change and notify
+            if (this.id && this.originalStatus && this.form().status !== this.originalStatus) {
+                const orderData = this.form();
+                // Heuristic to find device name from items if possible, otherwise 'tu equipo'
+                const deviceName = this.items().length > 0 ? this.items()[0].product_name : 'tu equipo';
+
+                // Assuming order number is available in result or we use ID/generic placeholder if not returned immediately
+                // The current interface has order_number optional. We might need to fetch it or just use "Actualización".
+                // Ideally backend returns the updated order. Let's try to assume we can proceed or fetch it.
+                // For now, let's use ID or generic.
+                const link = this.repairStatusService.generateWhatsAppLink(
+                    orderData.customer_phone || '',
+                    orderData.customer_name,
+                    orderData.status,
+                    this.id.substring(0, 8).toUpperCase(), // Use short ID as fallback
+                    deviceName
+                );
+
+                if (link) {
+                    // Open WhatsApp in new tab
+                    window.open(link, '_blank');
+                }
+            }
+
             this.router.navigate(['/admin/orders']);
         } catch (e: any) {
             this.error = e.message || 'Error al guardar pedido';
             this.saving = false;
             this.cdr.markForCheck();
         }
+
     }
 }

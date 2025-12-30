@@ -1,0 +1,58 @@
+<div class="min-h-screen bg-base-100 py-10 px-4">
+    <div class="max-w-7xl mx-auto">
+
+        <h1 class="text-4xl font-bold text-center mb-12">Nuestros Productos</h1>
+
+        @if (loading()) {
+        <div class="flex justify-center p-10">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+        } @else {
+
+        <!-- Section: Celulares -->
+        <section class="mb-16">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold border-l-4 border-primary pl-4">Celulares</h2>
+                <a routerLink="/products/category/celulares" class="btn btn-sm btn-ghost">Ver todos <i
+                        class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+
+            @if (celulares().length > 0) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @for (product of celulares(); track product.id) {
+                <product-card [product]="product"></product-card>
+                }
+            </div>
+            } @else {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span>No hay celulares disponibles por el momento.</span>
+            </div>
+            }
+        </section>
+
+        <!-- Section: Repuestos -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold border-l-4 border-secondary pl-4">Repuestos</h2>
+                <a routerLink="/products/category/repuestos" class="btn btn-sm btn-ghost">Ver todos <i
+                        class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+
+            @if (repuestos().length > 0) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @for (product of repuestos(); track product.id) {
+                <product-card [product]="product"></product-card>
+                }
+            </div>
+            } @else {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span>No hay repuestos disponibles por el momento.</span>
+            </div>
+            }
+        </section>
+
+        }
+    </div>
+</div>

@@ -40,12 +40,11 @@
                     <span class="font-bold text-base-content">{{ repair().device_model }}</span>
                 </div>
 
-                @if (repair().imei) {
                 <div class="flex justify-between border-b border-base-200 pb-2">
                     <span class="font-semibold text-base-content/70">IMEI / Serie</span>
-                    <span class="font-bold text-base-content">{{ repair().imei }}</span>
+                    <span class="font-bold text-base-content">{{ repair().imei || 'N/A' }}</span>
                 </div>
-                }
+
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
                     <span class="font-semibold text-base-content/70">Cliente</span>
@@ -54,7 +53,8 @@
 
                 <div class="flex justify-between border-b border-base-200 pb-2">
                     <span class="font-semibold text-base-content/70">Fecha Ingreso</span>
-                    <span class="font-bold text-base-content">{{ (repair().received_at || repair().created_at) | date:'dd/MM/yyyy'
+                    <span class="font-bold text-base-content">{{ (repair().received_at || repair().created_at) |
+                        date:'dd/MM/yyyy'
                         }}</span>
                 </div>
 
@@ -86,8 +86,9 @@
                     <div class="grid grid-cols-2 gap-2">
                         @for (img of repair().images; track img) {
                         <div class="aspect-square bg-base-200 rounded-lg overflow-hidden border border-base-300">
-                            <img [src]="img" class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity" alt="Estado del equipo" 
-                                (click)="openImage(img)">
+                            <img [src]="img"
+                                class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                alt="Estado del equipo" (click)="openImage(img)">
                         </div>
                         }
                     </div>
@@ -114,7 +115,8 @@
             </div>
 
             <div class="mt-8 text-center">
-                <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-success btn-wide text-white">
+                <a [href]="'https://wa.me/' + whatsappNumber" target="_blank"
+                    class="btn btn-success btn-wide text-white">
                     <i class="fab fa-whatsapp mr-2"></i> Consultar
                 </a>
             </div>

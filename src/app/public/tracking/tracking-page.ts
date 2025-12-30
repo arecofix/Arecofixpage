@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
 import { environment } from '../../../environments/environment';
+import { TrackingService } from './services/tracking.service';
 
 @Component({
     selector: 'app-tracking-page',
@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
 })
 export class TrackingPage implements OnInit {
     private route = inject(ActivatedRoute);
-    private auth = inject(AuthService);
+    private trackingService = inject(TrackingService);
     whatsappNumber = environment.contact.whatsappNumber;
 
     code: string | null = null;
@@ -31,15 +31,13 @@ export class TrackingPage implements OnInit {
     }
 
     async loadRepair() {
-        const supabase = this.auth.getSupabaseClient();
+        if (!this.code) return;
 
         try {
-            // Use the RPC function we defined in the migration for secure access
-            const { data, error } = await supabase.rpc('get_repair_by_tracking', { code: this.code });
+            const { data, error } = await this.trackingService.getRepairByCode(this.code);
 
             if (error) {
                 console.error('Error fetching repair:', error);
-                // Show the actual error message to the user for debugging
                 this.error.set(`Error: ${error.message || JSON.stringify(error)}`);
             } else if (data && data.length > 0) {
                 this.repair.set(data[0]);

@@ -1,0 +1,388 @@
+<div class="bg-base-100 min-h-screen font-sans">
+
+    <!-- HERO SECTION -->
+    <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <!-- Optimized Background Image (WebP) -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80&fm=webp"
+                srcset="https://images.unsplash.com/photo-1591488320449-011701bb6704?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=webp 800w,
+                          https://images.unsplash.com/photo-1591488320449-011701bb6704?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80&fm=webp 1920w"
+                class="w-full h-full object-cover" alt="Servicio Técnico Celulares Marcos Paz">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40"></div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12 mt-16">
+            <div class="md:w-1/2 text-left">
+                <span
+                    class="inline-block py-1 px-3 rounded-full bg-primary/20 border border-primary/50 text-primary-content text-sm font-bold tracking-wide uppercase mb-6 animate-fade-in-up backdrop-blur-sm">
+                    En Marcos Paz, Merlo y Zona Oeste
+                </span>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
+                    Reparación de <br> <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Celulares</span>
+                    en el Día
+                </h1>
+                <p class="text-xl text-gray-200 mb-8 max-w-lg leading-relaxed font-light">
+                    Devolvele la vida a tu equipo. Pantallas, baterías y servicio técnico oficial para iPhone, Samsung y
+                    Motorola.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button (click)="appointmentSection.scrollIntoView({behavior: 'smooth'})"
+                        class="btn btn-primary btn-lg rounded-full shadow-lg shadow-primary/40 hover:scale-105 transition-transform border-none text-white px-8">
+                        <i class="far fa-calendar-check mr-2"></i> Reservar Turno
+                    </button>
+                    <a [href]="'https://wa.me/' + whatsappNumber" target="_blank"
+                        class="btn btn-outline btn-lg rounded-full text-white hover:bg-white hover:text-black hover:border-white px-8">
+                        <i class="fab fa-whatsapp mr-2"></i> Consultar Ahora
+                    </a>
+                </div>
+                <!-- Trust Badges -->
+                <div class="mt-12 flex gap-6 text-sm font-medium text-gray-400">
+                    <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> Garantía
+                        Escrita</div>
+                    <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> Repuestos
+                        Originales</div>
+                </div>
+            </div>
+
+            <!-- Dynamic Hero Visual (Floating Phone or Workbench) -->
+            <div class="md:w-1/2 relative hidden md:block">
+                <div
+                    class="relative w-80 h-[550px] mx-auto bg-gray-900 rounded-[3rem] border-8 border-gray-800 shadow-2xl overflow-hidden ring-4 ring-white/10 transform rotate-[-5deg] hover:rotate-0 transition-all duration-500 z-10">
+                    <div class="absolute top-0 left-1/2 -ml-20 w-40 h-6 bg-gray-800 rounded-b-xl z-20"></div>
+                    <img src="assets/img/repair/1.jpg" class="w-full h-full object-cover opacity-80"
+                        alt="Reparando iPhone">
+                    <!-- Floating Card Overlay -->
+                    <div
+                        class="absolute bottom-6 left-4 right-4 bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase text-primary">Estado</span>
+                            <span class="badge badge-success badge-sm">Reparado</span>
+                        </div>
+                        <p class="text-sm font-medium">Cambio de Módulo iPhone 11</p>
+                        <p class="text-xs text-gray-300">Tiempo: 45 min</p>
+                    </div>
+                </div>
+                <!-- Decorative Blobs -->
+                <div class="absolute top-1/4 -right-10 w-72 h-72 bg-primary/30 rounded-full blur-[100px] z-0"></div>
+                <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-secondary/30 rounded-full blur-[100px] z-0"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRANDS CAROUSEL (Top Persuasion) -->
+    <section class="bg-neutral text-neutral-content py-6 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 overflow-hidden">
+            <p class="text-center text-xs uppercase tracking-widest opacity-50 mb-4">Especialistas en todas las marcas
+            </p>
+            <div class="flex justify-between md:justify-center md:gap-20 items-center opacity-60 grayscale text-3xl">
+                <i class="fab fa-apple hover:text-white hover:opacity-100 transition-all" title="iPhone"></i>
+                <i class="fab fa-android hover:text-green-400 hover:opacity-100 transition-all" title="Android"></i>
+                <span
+                    class="font-bold hover:text-blue-500 hover:opacity-100 transition-all cursor-default">SAMSUNG</span>
+                <span
+                    class="font-bold hover:text-orange-500 hover:opacity-100 transition-all cursor-default">XIAOMI</span>
+                <span
+                    class="font-bold hover:text-blue-300 hover:opacity-100 transition-all cursor-default">MOTOROLA</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- APPOINTMENT / CALENDAR SECTION (Priority as requested) -->
+    <section class="py-20 bg-base-100 relative" #appointmentSection>
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2">
+                    <span class="text-primary font-bold tracking-widest uppercase text-sm mb-2 block">Agenda Tu
+                        Visita</span>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-6 text-base-content">
+                        Evitá esperas innecesarias.<br>
+                        <span class="text-primary">Reservá tu turno</span> hoy.
+                    </h2>
+                    <p class="text-lg text-base-content/70 mb-8">
+                        Nuestro laboratorio en <strong>Marcos Paz</strong> está listo para recibirte.
+                        Seleccioná el día y horario que mejor te quede. El diagnóstico básico es sin cargo.
+                        <br><br>
+                        <i class="fas fa-map-marker-alt text-error mr-2"></i> <strong>Jorge Newbery 69</strong>, Marcos
+                        Paz.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="p-4 bg-base-200 rounded-xl">
+                            <i class="fas fa-clock text-2xl text-primary mb-2"></i>
+                            <h4 class="font-bold">Rápido</h4>
+                            <p class="text-xs">Prioridad por turno</p>
+                        </div>
+                        <div class="p-4 bg-base-200 rounded-xl">
+                            <i class="fas fa-shield-alt text-2xl text-secondary mb-2"></i>
+                            <h4 class="font-bold">Seguro</h4>
+                            <p class="text-xs">Datos protegidos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Calendar -->
+                <div class="lg:w-1/2 w-full">
+                    <div class="card bg-base-100 shadow-2xl border border-base-200 overflow-hidden">
+                        <div class="card-body p-0">
+                            <div class="bg-primary text-primary-content p-4 text-center">
+                                <h3 class="font-bold text-lg">Calendario de Turnos</h3>
+                            </div>
+                            <div class="p-4">
+                                <app-reservation-calendar></app-reservation-calendar>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MIGRATED: SPECIAL OFFERS (Product Carousel) -->
+    <section class="py-16 bg-base-200">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Ofertas Especiales</h2>
+                <p class="text-base-content/60">Equipos nuevos y accesorios seleccionados para vos.</p>
+            </div>
+            <app-product-carousel [title]="''" [items]="specialOffers"
+                [addToCartText]="'Ver Detalles'"></app-product-carousel>
+        </div>
+    </section>
+
+    <!-- PARTS PROMO SECTION -->
+    <section class="relative py-20 bg-neutral text-neutral-content overflow-hidden">
+        <div
+            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20">
+        </div>
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <span class="badge badge-accent mb-4 p-3">Repuestos Originales</span>
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">¿Tu celular necesita vida nueva?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+                Tenemos el repuesto exacto: Pantallas, baterías y módulos originales con la mejor garantía del mercado.
+                No pongas en riesgo tu equipo con copias baratas.
+            </p>
+            <div class="flex justify-center gap-8 mb-10 text-lg font-medium">
+                <span class="flex items-center gap-2"><i class="fas fa-certificate text-yellow-400"></i> Garantía
+                    Real</span>
+                <span class="flex items-center gap-2"><i class="fas fa-boxes text-blue-400"></i> Stock Inmediato</span>
+            </div>
+            <a routerLink="/products/category/repuestos"
+                class="btn btn-accent btn-lg shadow-lg hover:scale-105 transition-transform">
+                Ver Catálogo de Repuestos
+            </a>
+        </div>
+    </section>
+
+    <!-- MIGRATED: TECH BEST (More Products) -->
+    <section class="py-16 bg-base-100">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold">Lo mejor en tecnología</h2>
+                    <p class="text-base-content/60 mt-2">Equipos usados seleccionados con garantía.</p>
+                </div>
+                <a routerLink="/products" class="btn btn-link no-underline">Ver Todo <i
+                        class="fas fa-arrow-right ml-2"></i></a>
+            </div>
+            <app-product-carousel [title]="''" [items]="techBest"
+                [addToCartText]="'Me Interesa'"></app-product-carousel>
+        </div>
+    </section>
+
+    <!-- MIGRATED: CONSOLES SECTION -->
+    <section class="relative py-20 bg-gray-900 text-white overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-purple-900/40 to-transparent"></div>
+
+        <div class="container mx-auto px-4 relative z-10 flex flex-col lg:flex-row items-center gap-12">
+            <div class="lg:w-1/2">
+                <div class="badge badge-secondary mb-4 p-3"><i class="fas fa-gamepad mr-2"></i> Gamer Zone</div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Reparación de Consolas de Videojuegos</h2>
+                <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+                    Recuperamos tu diversión. Ofrecemos mantenimiento preventivo (limpieza profunda + pasta térmica),
+                    reballing, y reparación de hardware para PlayStation 4/5, Xbox y Nintendo Switch.
+                </p>
+                <div class="flex gap-4">
+                    <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20tengo%20una%20consola%20para%20reparar'"
+                        target="_blank" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-wrench mr-2"></i> Cotizar Reparación
+                    </a>
+                    <a routerLink="/products/category/consolas"
+                        class="btn btn-outline text-white hover:bg-white hover:text-black">
+                        Ver Accesorios
+                    </a>
+                </div>
+            </div>
+            <div class="lg:w-1/2 flex justify-center">
+                <img src="assets/img/products/arreglo-consolas.webp"
+                    class="rounded-2xl shadow-2xl border-4 border-purple-500/30 w-full max-w-md hover:scale-105 transition-transform duration-500"
+                    alt="Reparación Consolas">
+            </div>
+        </div>
+    </section>
+
+    <!-- MIGRATED: COURSES SECTION -->
+    <section class="py-20 bg-base-200">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Formación Profesional Certificada</h2>
+                <p class="text-lg text-base-content/70 max-w-2xl mx-auto">
+                    ¿Te apasiona la tecnología? Aprendé a reparar celulares con nosotros.
+                    Más de 500 alumnos capacitados con nuestros métodos comprobados (85% práctica).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                @for(course of coursesList; track course.title) {
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+                    <figure class="aspect-video overflow-hidden">
+                        <img [src]="course.img" [alt]="course.title" class="w-full h-full object-cover">
+                    </figure>
+                    <div class="card-body p-4">
+                        <h3 class="font-bold text-lg">{{ course.title }}</h3>
+                        <p class="text-sm text-base-content/60">{{ course.subtitle }}</p>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="text-center">
+                <a routerLink="/cursos" class="btn btn-primary btn-wide btn-lg shadow-lg">Ver Cursos y
+                    Capacitaciones</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOG CONTENT INTEGRATION: "Why Us" / Differentiators -->
+    <section class="py-20 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="p-6">
+                    <div
+                        class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 dark:text-white">7+ Años de Experiencia</h3>
+                    <p class="text-gray-500 dark:text-gray-400">Conocemos cada tornillo de tu equipo. Trayectoria
+                        comprobable en Marcos
+                        Paz.</p>
+                </div>
+                <div class="p-6">
+                    <div
+                        class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 dark:text-white">Garantía Real (30-90 días)</h3>
+                    <p class="text-gray-500 dark:text-gray-400">Te damos un comprobante escrito. Si algo falla,
+                        respondemos sin vueltas.
+                    </p>
+                </div>
+                <div class="p-6">
+                    <div
+                        class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 dark:text-white">Laboratorio Propio</h3>
+                    <p class="text-gray-500 dark:text-gray-400">Tu equipo no "viaja" a otros lados. Se repara acá, con
+                        nuestras
+                        herramientas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MIGRATED: LOCATION SECTION -->
+    <section class="py-0 grid grid-cols-1 md:grid-cols-2 bg-neutral text-neutral-content">
+        <div class="p-12 flex flex-col justify-center">
+            <span class="text-primary font-bold tracking-widest uppercase mb-4">Donde Estamos</span>
+            <h2 class="text-3xl font-bold mb-6">A 3 Cuadras de Ruta 40</h2>
+            <div class="space-y-4 text-lg">
+                <p><i class="fas fa-map-marker-alt text-error w-8"></i> Jorge Newbery 69, Marcos Paz, Bs. As.</p>
+                <p><i class="fas fa-clock text-primary w-8"></i> Lun a Sab: 09:00 - 13:00 / 16:00 - 20:00</p>
+                <p><i class="fas fa-phone text-success w-8"></i> {{ whatsappNumber }}</p>
+            </div>
+            <a href="https://goo.gl/maps/PLACEHOLDER" target="_blank" class="btn btn-outline btn-white w-fit mt-8">
+                <i class="fas fa-directions mr-2"></i> Cómo Llegar
+            </a>
+        </div>
+        <div class="h-80 md:h-auto bg-gray-200">
+            <!-- Placeholder Map -->
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13106.58784650532!2d-58.8373756!3d-34.7891734!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceadeecc85815%3A0xc3dc3f3c473177!2sMarcos%20Paz%2C%20Provincia%20de%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1700000000000!5m2!1ses!2sar"
+                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="py-20 max-w-3xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-10 text-base-content">Preguntas Frecuentes</h2>
+        <div class="join join-vertical w-full bg-base-100 rounded-2xl border border-base-200 shadow-sm">
+            @for(faq of faqs; track faq.question; let i = $index) {
+            <div class="collapse collapse-arrow join-item border-b border-base-200">
+                <input type="radio" name="my-accordion-4" [checked]="i === 0" />
+                <div class="collapse-title text-xl font-medium text-base-content">
+                    {{ faq.question }}
+                </div>
+                <div class="collapse-content text-base-content/70">
+                    <p>{{ faq.answer }}</p>
+                </div>
+            </div>
+            }
+        </div>
+    </section>
+
+    <!-- CONTACT FORM -->
+    <section class="py-20 bg-base-200" id="contact">
+        <div class="max-w-2xl mx-auto px-4">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-3xl justify-center mb-6 text-base-content">¿Tenés otra consulta?</h2>
+                    <form (ngSubmit)="sendContactForm()">
+                        <div class="form-control mb-4">
+                            <label class="label"><span class="label-text">Nombre</span></label>
+                            <input type="text" [(ngModel)]="contactName" name="name"
+                                class="input input-bordered w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="Tu nombre" required>
+                        </div>
+                        <div class="form-control mb-4">
+                            <label class="label"><span class="label-text">Teléfono / WhatsApp</span></label>
+                            <input type="tel" [(ngModel)]="contactPhone" name="phone"
+                                class="input input-bordered w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="11 1234 5678" required>
+                        </div>
+                        <div class="form-control mb-6">
+                            <label class="label"><span class="label-text">Mensaje</span></label>
+                            <textarea [(ngModel)]="contactMessage" name="message"
+                                class="textarea textarea-bordered h-32 w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                placeholder="Hola, quería saber el precio de..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full text-lg" [disabled]="sendingContact">
+                            @if(sendingContact) { <span class="loading loading-spinner"></span> }
+                            Enviar Mensaje
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRANDS CAROUSEL (Bottom) -->
+    <section class="bg-white dark:bg-gray-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h3 class="text-lg font-bold text-gray-400 mb-8 uppercase tracking-widest">Trabajamos con las mejores marcas
+            </h3>
+            <div class="flex flex-wrap justify-center gap-12 opacity-50 grayscale transition-all hover:grayscale-0">
+                <!-- Simple text/icon representation as placeholders -->
+                <div class="flex items-center gap-2 text-3xl font-bold dark:text-white"><i class="fab fa-apple"></i>
+                    Apple</div>
+                <div class="flex items-center gap-2 text-3xl font-bold text-blue-600">Samsung</div>
+                <div class="flex items-center gap-2 text-3xl font-bold text-blue-900 dark:text-blue-400">Motorola</div>
+                <div class="flex items-center gap-2 text-3xl font-bold text-orange-500">Xiaomi</div>
+                <div class="flex items-center gap-2 text-3xl font-bold text-red-600">LG</div>
+                <div class="flex items-center gap-2 text-3xl font-bold text-black dark:text-gray-200">Sony</div>
+            </div>
+        </div>
+    </section>
+
+</div>

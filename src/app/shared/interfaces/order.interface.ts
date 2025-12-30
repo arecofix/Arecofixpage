@@ -6,7 +6,9 @@ export interface Order {
     customer_email: string;
     customer_phone?: string;
     customer_address?: string;
+    imei?: string; // Added IMEI field
     status: 'pending' | 'processing' | 'completed' | 'cancelled';
+
     subtotal: number;
     tax: number;
     discount: number;
