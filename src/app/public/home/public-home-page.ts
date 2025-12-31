@@ -54,6 +54,32 @@ interface ReviewItem {
   text: string;
 }
 
+interface IndustrySolution {
+  title: string;
+  description: string;
+  icon: string;
+  examples: string[];
+}
+
+interface TechServiceDetailed {
+  title: string;
+  description: string;
+  icon: string;
+  image: string;
+  features: string[];
+}
+
+interface MethodologyStep {
+  title: string;
+  description: string;
+  icon?: string; // Made optional to match usage
+}
+
+interface MetricItem {
+  value: string;
+  label: string;
+}
+
 interface HomeContent {
   hero: {
     title: string;
@@ -66,6 +92,27 @@ interface HomeContent {
     subtitle: string;
     items: ServiceItem[];
   };
+  industries: {
+    title: string;
+    subtitle: string;
+    items: IndustrySolution[];
+  };
+  techServices: {
+    title: string;
+    subtitle: string;
+    items: TechServiceDetailed[];
+  };
+  methodology: {
+    title: string;
+    subtitle: string;
+    description: string;
+    steps: MethodologyStep[];
+  };
+  metrics: {
+    title: string;
+    subtitle: string;
+    items: MetricItem[];
+  };
   techStack: {
     title: string;
     subtitle: string;
@@ -76,13 +123,9 @@ interface HomeContent {
     subtitle: string;
     items: ProjectItem[];
   };
-  partners: {
-    title: string;
-    subtitle: string;
-    items: PartnerItem[];
-  };
   reviews: {
     title: string;
+    subtitle: string;
     items: ReviewItem[];
   };
   quote: {
@@ -98,6 +141,22 @@ interface HomeContent {
       description: string;
       cta: string;
     }
+  };
+  coursesTeaser: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    link: string;
+  };
+  cellServicePromo: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    link: string;
+  };
+  novedadesFooter: {
+    title: string;
+    links: { text: string; url: string }[];
   };
 }
 
@@ -136,134 +195,186 @@ export class PublicHomePage implements OnInit {
 
   homeContent: { en: HomeContent; es: HomeContent } = {
     en: {
-      hero: {
-        title: 'High Impact Digital Solutions',
-        subtitle: 'Custom Software Development, IT Consulting, and Cloud Solutions for Companies and SMEs.',
-        ctaPrimary: 'Get a Quote',
-        ctaSecondary: 'View Portfolio'
-      },
-      services: {
-        title: 'Our Services',
-        subtitle: 'We transform your business with technology.',
-        items: [
-          { icon: 'fas fa-code', title: 'Custom Software', description: 'Web, mobile, and desktop applications tailored to your specific needs using modern scalable architectures.' },
-          { icon: 'fas fa-cloud', title: 'Cloud Solutions', description: 'Migration and management on Azure/AWS. Scalable infrastructure and containerization with Docker.' },
-          { icon: 'fas fa-chart-line', title: 'IT Consulting', description: 'Digital transformation strategies, process optimization, and technical advisory for startups and enterprises.' },
-          { icon: 'fas fa-mobile-alt', title: 'Mobile Development', description: 'Native and cross-platform apps (React Native/Ionic) that engage users and drive growth.' }
-        ]
-      },
-      techStack: {
-        title: 'Technologies',
-        subtitle: 'We master the modern ecosystem.',
-        items: [
-          { name: 'Python', icon: 'fab fa-python', category: 'backend' },
-          { name: 'Node.js', icon: 'fab fa-node', category: 'backend' },
-          { name: 'Angular', icon: 'fab fa-angular', category: 'frontend' },
-          { name: 'React', icon: 'fab fa-react', category: 'frontend' },
-          { name: 'C# .NET', icon: 'fab fa-microsoft', category: 'backend' },
-          { name: 'Docker', icon: 'fab fa-docker', category: 'tools' },
-          { name: 'Azure', icon: 'fab fa-microsoft', category: 'cloud' },
-          { name: 'AWS', icon: 'fab fa-aws', category: 'cloud' }
-        ]
-      },
-      projects: {
-        title: 'Featured Projects',
-        subtitle: 'Success stories and delivered solutions.',
-        items: [
-          { title: 'Envión Management Platform', description: 'Registration and management system for government social program.', image: 'assets/img/projects/data.png', tags: ['Django', 'Python', 'PostgreSQL'] },
-          { title: 'Business ERP System', description: 'Desktop application for stock, sales, and personnel management.', image: 'assets/img/projects/panel.png', tags: ['.NET', 'C#', 'SQL Server'] },
-          { title: 'Arecofix E-commerce', description: 'Full-featured e-commerce and booking platform.', image: 'assets/img/projects/arecofix.png', tags: ['Angular', 'Node.js', 'Supabase'] }
-        ]
-      },
-      partners: {
-        title: 'Strategic Alliances',
-        subtitle: 'Companies we collaborate and innovate with.',
-        items: [
-          { name: 'Globant', logo: 'assets/img/partners/globant.png' }, // Placeholder paths, need to ensure assets exist or use text/CDN
-          { name: 'Microsoft Azure', logo: 'assets/img/partners/azure.png' },
-          { name: 'Accenture', logo: 'assets/img/partners/accenture.png' }
-        ]
-      },
-      reviews: {
-        title: 'What our clients say',
-        items: [
-          { image: 'https://randomuser.me/api/portraits/men/45.jpg', name: 'Roberto Mendez', role: 'CTO', company: 'Logistica Interior', text: 'The custom ERP system they built transformed our logistics operation completely. Highly recommended.' },
-          { image: 'https://randomuser.me/api/portraits/women/68.jpg', name: 'Laura Gomez', role: 'Founder', company: 'StartApp', text: 'Excellent consulting on our cloud architecture. Migrating to Azure was seamless thanks to their team.' }
-        ]
-      },
-      quote: {
-        title: 'Start your Project',
-        subtitle: 'Tell us about your idea and we will provide a detailed proposal.',
-        form: {
-          name: 'Name', email: 'Email', phone: 'Phone', company: 'Company',
-          projectType: 'Project Type', budget: 'Estimated Budget', description: 'Project Details', cta: 'Request Quote'
-        }
-      }
+        // Keeping EN minimal/placeholder
+        hero: {
+            title: 'Transform Your Business', subtitle: 'Digital Solutions', ctaPrimary: 'Explore', ctaSecondary: 'Contact'
+        },
+        services: { title: 'Services', subtitle: 'Our Services', items: [] },
+        industries: { title: 'Industries', subtitle: 'Sectors we serve', items: [] },
+        techServices: { title: 'Tech Capabilities', subtitle: 'What we build', items: [] },
+        methodology: { title: 'Methodology', subtitle: 'How we work', description: '', steps: [] },
+        metrics: { title: 'Metrics', subtitle: 'Our numbers', items: [] },
+        techStack: { title: 'Tech Stack', subtitle: 'Technologies', items: [] },
+        projects: { title: 'Projects', subtitle: 'Case Studies', items: [] },
+        reviews: { title: 'Testimonials', subtitle: 'Client feedback', items: [] },
+        quote: { title: 'Contact', subtitle: 'Get in touch', form: { name: '', email: '', phone: '', company: '', projectType: '', budget: '', description: '', cta: '' } },
+        coursesTeaser: { title: 'Learn a New Skill', subtitle: 'Train with professionals.', cta: 'View Courses', link: '/cursos' },
+        cellServicePromo: { title: 'Need Technical Service?', subtitle: 'Repair your device with warranty.', cta: 'Request Quote', link: '/celular' },
+        novedadesFooter: { title: 'News', links: [] }
     },
     es: {
       hero: {
-        title: 'Soluciones Digitales de Alto Impacto',
-        subtitle: 'Desarrollo de Software a Medida, Consultoría IT y Soluciones Cloud para Empresas y PyMEs.',
-        ctaPrimary: 'Cotizar Proyecto',
-        ctaSecondary: 'Ver Portfolio'
+        title: 'Transforma Tu Negocio Con Soluciones Digitales Innovadoras',
+        subtitle: 'Impulsa el potencial digital de tu empresa con software personalizado y tecnologías avanzadas.',
+        ctaPrimary: 'Explorar Casos de Éxito',
+        ctaSecondary: 'Conversemos'
       },
       services: {
         title: 'Nuestros Servicios',
-        subtitle: 'Transformamos tu negocio con tecnología de punta.',
+        subtitle: 'Soluciones Que Impulsan el Futuro',
         items: [
-          { icon: 'fas fa-code', title: 'Software a Medida', description: 'Aplicaciones web, móviles y de escritorio adaptadas a tus necesidades reales con arquitecturas escalables.' },
-          { icon: 'fas fa-cloud', title: 'Soluciones Cloud', description: 'Migración y gestión en Azure/AWS. Infraestructura escalable y containerización con Docker.' },
-          { icon: 'fas fa-chart-line', title: 'Consultoría IT', description: 'Estrategias de transformación digital, optimización de procesos y asesoría técnica para startups y empresas.' },
-          { icon: 'fas fa-database', title: 'Gestión de Datos', description: 'Diseño de bases de datos, APIs RESTful y sistemas de backend robustos y seguros.' }
+          { icon: 'fas fa-laptop-code', title: 'Desarrollo Web & App', description: 'Plataformas web y aplicaciones móviles de última generación que combinan diseño excepcional con funcionalidades avanzadas a medida.' },
+          { icon: 'fas fa-cogs', title: 'Automatizaciones RPA', description: 'Robots que ejecutan tareas repetitivas con precisión perfecta, liberando a los equipos humanos para el trabajo más valioso: el trabajo estratégico.' },
+          { icon: 'fas fa-comments', title: 'Chatbots & Asistentes Virtuales', description: 'Asistentes multimodal que se encargan de gestionar la atención omnicanal en las redes sociales de las empresas. WhatsApp, Telegram, Messenger, Instagram, entre otras.' },
+          { icon: 'fas fa-brain', title: 'Infraestructura & Agentes de IA', description: 'Sistemas cognitivos de Inteligencia Artificial que toman decisiones complejas, procesan lenguaje natural y se adaptan a los escenarios cambiantes de cada empresa para tomar acciones.' },
+          { icon: 'fas fa-chart-pie', title: 'Business Intelligence & Data Analytics', description: 'Sistemas que analizan datos para generar reportes visuales, predicciones y estrategias que impulsan el rendimiento empresarial y reducen riesgos en las operaciones.' }
+        ]
+      },
+      industries: {
+        title: 'Soluciones para Tu Negocio',
+        subtitle: 'Tecnología diseñada para resolver los desafíos reales de tu industria.',
+        items: [
+            {
+                title: 'Comercios y Retail',
+                description: 'Control de stock inteligente, facturación electrónica y gestión de clientes.',
+                icon: 'fas fa-store',
+                examples: ['Ferreterías', 'Farmacias', 'Forrajerías', 'Pet Shops']
+            },
+            {
+                title: 'Servicios y Turnos',
+                description: 'Sistemas de agendamiento de citas, recordatorios automáticos por WhatsApp y gestión de personal.',
+                icon: 'fas fa-calendar-check',
+                examples: ['Barberías', 'Peluquerías', 'Veterinarias', 'Consultorios']
+            },
+            {
+                title: 'Gastronomía',
+                description: 'Comandas digitales, menú QR interactivo y gestión de mesas y delivery.',
+                icon: 'fas fa-utensils',
+                examples: ['Restaurantes', 'Cafeterías', 'Dark Kitchens']
+            },
+            {
+                title: 'Profesionales',
+                description: 'Portfolios digitales, gestión de clientes y automatización de documentos.',
+                icon: 'fas fa-user-tie',
+                examples: ['Contadores', 'Abogados', 'Arquitectos']
+            }
+        ]
+      },
+      techServices: {
+        title: 'Capacidades Técnicas',
+        subtitle: 'Dominamos todas las plataformas para dar vida a tu idea.',
+        items: [
+            {
+                title: 'Desarrollo Web',
+                description: 'Sitios corporativos y aplicaciones web complejas, rápidas y responsive.',
+                icon: 'fas fa-globe',
+                image: 'assets/img/services/web-dev.svg',
+                features: ['E-commerce', 'Portales de Cliente', 'Dashboards Administrativos']
+            },
+            {
+                title: 'Aplicaciones de Escritorio',
+                description: 'Software robusto para gestión interna, puntos de venta (POS) y administración.',
+                icon: 'fas fa-desktop',
+                image: 'assets/img/services/desktop-dev.svg',
+                features: ['Java Swing/JavaFX', '.NET / C#', 'Gestión Offline']
+            },
+            {
+                title: 'Aplicaciones Móviles',
+                description: 'Llevá tu negocio al bolsillo de tus clientes con apps nativas o híbridas.',
+                icon: 'fas fa-mobile-screen',
+                image: 'assets/img/services/mobile-dev.svg',
+                features: ['Android & iOS', 'Notificaciones Push', 'Geolocalización']
+            },
+            {
+                title: 'Scripts & Automatización',
+                description: 'Scripts a medida para conectar sistemas, APIs y bases de datos.',
+                icon: 'fas fa-terminal',
+                image: 'assets/img/services/scripts.svg',
+                features: ['Integración de APIs', 'Web Scraping', 'Migración de Datos']
+            }
+        ]
+      },
+      methodology: {
+        title: 'Nuestro Método de Trabajo',
+        subtitle: 'De la Idea a la Realidad Digital',
+        description: 'Construimos soluciones robustas y escalables combinando tecnología propia con componentes verificados y frameworks ágiles, garantizando eficiencia y menor riesgo en cada proyecto.',
+        steps: [
+            { title: 'Descubrimiento', description: 'Entendemos tu negocio.', icon: 'fas fa-search' },
+            { title: 'Planificación', description: 'Diseñamos la solución.', icon: 'fas fa-map' },
+            { title: 'Desarrollo', description: 'Construimos iterativamente.', icon: 'fas fa-code' },
+            { title: 'Testing', description: 'Aseguramos la calidad.', icon: 'fas fa-vial' },
+            { title: 'Despliegue', description: 'Lanzamos al mercado.', icon: 'fas fa-rocket' }
+        ]
+      },
+      metrics: {
+        title: 'Nuestros Números',
+        subtitle: 'En un mercado en donde la complejidad es común, aportamos simplicidad y experiencia.',
+        items: [
+            { value: '14', label: 'Clientes confían en nosotros' },
+            { value: '+125', label: 'Proyectos participados al 2025' },
+            { value: '4', label: 'Años de trayectoria' },
+            { value: '3', label: 'Países presentes (Perú, México, USA)' }
         ]
       },
       techStack: {
-        title: 'Stack Tecnológico',
-        subtitle: 'Dominamos el ecosistema moderno.',
+        title: 'Tecnologías',
+        subtitle: 'Stack moderno y escalable.',
         items: [
-          { name: 'Python', icon: 'fab fa-python', category: 'backend' },
-          { name: 'Node.js', icon: 'fab fa-node', category: 'backend' },
-          { name: 'Angular', icon: 'fab fa-angular', category: 'frontend' },
-          { name: 'React', icon: 'fab fa-react', category: 'frontend' },
-          { name: 'C# .NET', icon: 'fab fa-microsoft', category: 'backend' },
-          { name: 'Docker', icon: 'fab fa-docker', category: 'tools' },
-          { name: 'Azure', icon: 'fas fa-cloud', category: 'cloud' }, // FA doesn't have azure branding always free, using cloud generic or specific if avail
-          { name: 'SQL / Postgres', icon: 'fas fa-database', category: 'backend' }
+            { name: 'Python', icon: 'fab fa-python', category: 'backend' },
+            { name: 'Node.js', icon: 'fab fa-node', category: 'backend' },
+            { name: 'Angular', icon: 'fab fa-angular', category: 'frontend' },
+            { name: 'React', icon: 'fab fa-react', category: 'frontend' },
+            { name: '.NET', icon: 'fab fa-microsoft', category: 'backend' },
+            { name: 'AWS', icon: 'fab fa-aws', category: 'cloud' },
+            { name: 'Azure', icon: 'fab fa-microsoft', category: 'cloud' }
         ]
       },
       projects: {
-        title: 'Proyectos Destacados',
-        subtitle: 'Casos de éxito y soluciones entregadas.',
+        title: 'Casos de Éxito',
+        subtitle: 'Nuestros Clientes. Nuestra Mejor Presentación.',
         items: [
-          { title: 'Plataforma de Gestión Envión', description: 'Sistema de registro y administración para programa social gubernamental.', image: 'assets/img/projects/data.png', tags: ['Django', 'Python', 'PostgreSQL'] },
-          { title: 'Sistema ERP Empresarial', description: 'Aplicación de escritorio para control de stock, ventas y personal.', image: 'assets/img/projects/panel.png', tags: ['.NET', 'C#', 'SQL Server'] },
-          { title: 'Arecofix E-commerce', description: 'Plataforma completa de e-commerce y reservas.', image: 'assets/img/projects/arecofix.png', tags: ['Angular', 'Node.js', 'Supabase'] }
-        ]
-      },
-      partners: {
-        title: 'Alianzas Estratégicas',
-        subtitle: 'Empresas con las que colaboramos e innovamos.',
-        items: [
-          { name: 'Globant', logo: '' }, // We will use text or generic placeholder if img missing
-          { name: 'Microsoft Azure', logo: '' },
-          { name: 'Accenture', logo: '' }
+          { title: 'Universidad Continental', description: 'Participamos en el proceso de transformación del ecosistema digital educativo: Modernización de Admisiones, Aulas Virtuales, etc.', image: 'assets/img/projects/continental.jpg', tags: ['Educación', 'Desarrollo de Software'], link: '#' },
+          { title: 'SUNAT', description: 'Desarrollamos mejoras críticas en los sistemas aduaneros SINE y SIGCO, automatizando procesos de carga y validación.', image: 'assets/img/projects/sunat.jpg', tags: ['Sector Público', 'Modernización'], link: '#' },
+          { title: 'Copeinca', description: 'Automatizamos procesos pesqueros con RPA y web scraping, integrando plataformas Produce, SAP Solman y Wrike.', image: 'assets/img/projects/copeinca.jpg', tags: ['Pesca', 'RPA'], link: '#' },
+          { title: 'SAT', description: 'Modernizamos el sistema tributario del SAT implementando procesos automatizados para arbitrios municipales e impuesto predial.', image: 'assets/img/projects/sat.jpg', tags: ['Sector Público', 'Modernización'], link: '#' }
         ]
       },
       reviews: {
-        title: 'Lo que dicen nuestros clientes corporativos',
+        title: 'Testimonios',
+        subtitle: 'Soluciones Que Marcan La Diferencia',
         items: [
-          { image: 'https://randomuser.me/api/portraits/men/45.jpg', name: 'Roberto Mendez', role: 'CTO', company: 'Logistica Interior', text: 'El sistema ERP a medida transformó nuestra operación logística. Altamente recomendados por su profesionalismo.' },
-          { image: 'https://randomuser.me/api/portraits/women/68.jpg', name: 'Laura Gomez', role: 'Fundadora', company: 'StartApp', text: 'Excelente consultoría en arquitectura cloud. La migración a Azure fue transparente gracias a su equipo.' },
-          { image: 'https://randomuser.me/api/portraits/men/32.jpg', name: 'Carlos Ruiz', role: 'Gerente', company: 'Distribuidora Oeste', text: 'Gran capacidad para entender nuestros problemas de negocio y plantear soluciones de software efectivas.' }
+          { image: 'assets/img/testimonials/fernando.jpg', name: 'Fernando Palomino', role: 'Jefe de Sistemas', company: 'Compartamos Financiera', text: 'Recomendamos a Soluciones Digitales como proveedor confiable y profesional de infraestructura tecnológica. Cumplieron con nuestras expectativas.' },
+          { image: 'assets/img/testimonials/justo.jpg', name: 'Justo Pérez', role: 'Gerente de Operaciones', company: 'SUNAT', text: 'Soluciones Digitales Group ha cumplido satisfactoriamente con los objetivos propuestos, habiendo demostrado eficiencia, seriedad y mejora continua.' }
         ]
       },
       quote: {
-        title: 'Comenzá tu Proyecto',
-        subtitle: 'Contanos tu idea y te armamos una propuesta detallada.',
+        title: 'Contacto',
+        subtitle: 'Lidera El Cambio Hoy',
         form: {
           name: 'Nombre Completo', email: 'Correo Electrónico', phone: 'Teléfono', company: 'Empresa',
-          projectType: 'Tipo de Proyecto', budget: 'Presupuesto Estimado', description: 'Detales del Proyecto', cta: 'Solicitar Cotización'
+          projectType: 'Tipo de Proyecto', budget: 'Presupuesto', description: 'Mensaje', cta: 'Conversemos'
         }
+      },
+      coursesTeaser: {
+        title: 'Aprende una Nueva Habilidad',
+        subtitle: 'Capacitate con los mejores profesionales y obtené una salida laboral inmediata.',
+        cta: 'Ver Cursos',
+        link: '/cursos'
+      },
+      cellServicePromo: {
+        title: '¿Necesitas Servicio Técnico?',
+        subtitle: 'Reparamos tu celular, tablet o consola con garantía y repuestos originales.',
+        cta: 'Solicitar Presupuesto',
+        link: '/celular'
+      },
+      novedadesFooter: {
+        title: 'Novedades',
+        links: [
+            { text: 'Sobre Nosotros', url: '/nosotros' },
+            { text: 'Contacto', url: '/contacto' },
+            { text: 'GSM', url: '/gsm' },
+            { text: 'Blog', url: '/blog' }
+        ]
       }
     }
   };
@@ -272,7 +383,14 @@ export class PublicHomePage implements OnInit {
 
   constructor(public preferencesService: PreferencesService) {
     this.content$ = this.preferencesService.language$.pipe(
-      map(lang => this.homeContent[lang])
+      map(lang => {
+          // Merge missing keys for ES if needed (quick patch logic, ideally strictly typed)
+          const content = this.homeContent[lang] as any;
+          if (lang === 'es') {
+             content.coursesTeaser = this.homeContent.es.coursesTeaser || this.homeContent['es']['coursesTeaser'];
+          }
+          return content;
+      })
     );
   }
 
@@ -281,14 +399,14 @@ export class PublicHomePage implements OnInit {
   }
 
   setSEO() {
-    const title = 'Arecofix Software Factory | Desarrollo de Software a Medida Buenos Aires & Córdoba';
-    const description = 'Empresa de desarrollo de software, consultoría IT y soluciones digitales para empresas y PyMEs. Especialistas en Python, .NET, Angular y Cloud Services. Buenos Aires, Córdoba.';
+    const title = 'Soluciones Informáticas y Consultoría IT | Arecofix Software Factory';
+    const description = 'Transformamos ideas en software de alto impacto. Consultoría IT, Desarrollo Web, Apps Móviles y Servicio Técnico en Marcos Paz. Soluciones informáticas integrales.';
 
     this.titleService.setTitle(title);
     this.metaService.updateTag({ name: 'description', content: description });
     this.metaService.updateTag({
       name: 'keywords',
-      content: 'software factory, desarrollo de software, programacion a medida, consultoria it, sistemas erp, desarrollo web argentina, buenos aires, cordoba, contratar programadores'
+      content: 'soluciones informaticas, consultoria it, software factory, desarrollo de software, programacion a medida, sistemas erp, desarrollo web argentina, servicio tecnico celulares'
     });
   }
 

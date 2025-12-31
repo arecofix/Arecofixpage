@@ -1,290 +1,338 @@
 <ng-container *ngIf="content$ | async as content">
 
-  <!-- HERO SECTION with IT/Code Background -->
-  <header class="relative min-h-[95vh] flex items-center justify-center overflow-hidden bg-gray-900">
-    <!-- Matrix/Code Background Effect (Static Image for now, could be canvas later) -->
-    <div class="absolute inset-0 z-0">
-      <img
-        src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-        class="w-full h-full object-cover opacity-20" alt="Code Background">
-      <div class="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/60 to-gray-900"></div>
-    </div>
-
-    <div class="relative z-10 container mx-auto px-4 text-center">
-      <div class="inline-block mb-4 px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 backdrop-blur-sm">
-        <span class="text-blue-400 font-mono text-sm tracking-widest uppercase">Software Factory & IT Consulting</span>
+  <!-- HERO SECTION: Vibrant, Professional, "Humaaans" vibe -->
+  <header class="relative min-h-[90vh] flex items-center overflow-hidden bg-white dark:bg-gray-900">
+    <!-- Abstract Shapes / Vibrant Background -->
+    <div class="absolute top-0 right-0 w-2/3 h-full bg-linear-to-bl from-blue-100/50 via-purple-100/30 to-transparent dark:from-blue-900/20 dark:via-purple-900/10 rounded-l-[100px] skew-x-12 opacity-70"></div>
+    <div class="absolute bottom-0 left-0 w-1/3 h-1/2 bg-linear-to-tr from-green-100/40 to-transparent dark:from-green-900/10 rounded-tr-[100px] -skew-x-12 opacity-60"></div>
+    
+    <div class="container mx-auto px-4 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- Text Content -->
+      <div class="text-left animate-fade-in-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-bold tracking-widest uppercase mb-6 border border-blue-100 dark:border-blue-800">
+          <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+          Software Factory
+        </div>
+        
+        <h1 class="text-5xl lg:text-7xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.1] tracking-tight">
+          {{ content.hero.title }}
+        </h1>
+        
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-lg leading-relaxed">
+          {{ content.hero.subtitle }}
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button (click)="portfolioSection.scrollIntoView({behavior: 'smooth'})" 
+            class="btn bg-blue-600 hover:bg-blue-700 text-white border-none rounded-xl px-8 h-14 text-lg shadow-lg shadow-blue-500/30 hover:-translate-y-1 transition-all">
+            {{ content.hero.ctaPrimary }}
+          </button>
+          <button (click)="quoteSection.scrollIntoView({behavior: 'smooth'})" 
+            class="btn btn-ghost hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-white rounded-xl px-8 h-14 text-lg border border-gray-200 dark:border-gray-700">
+            {{ content.hero.ctaSecondary }}
+          </button>
+        </div>
       </div>
-      <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-        {{ content.hero.title }}
-      </h1>
-      <p class="text-xl md:text-2xl text-gray-300 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
-        {{ content.hero.subtitle }}
-      </p>
-      <div class="flex flex-col sm:flex-row gap-5 justify-center">
-        <button (click)="quoteSection.scrollIntoView({behavior: 'smooth'})"
-          class="btn btn-primary btn-lg rounded-full px-10 shadow-lg shadow-primary/25 hover:scale-105 transition-transform text-white border-none">
-          {{ content.hero.ctaPrimary }}
-        </button>
-        <button (click)="portfolioSection.scrollIntoView({behavior: 'smooth'})"
-          class="btn btn-outline btn-lg rounded-full px-10 text-white hover:bg-white hover:text-black hover:border-white">
-          {{ content.hero.ctaSecondary }}
-        </button>
+
+      <!-- Hero Image / Illustration -->
+      <div class="relative hidden lg:block h-full">
+         <img src="assets/img/hero-illustration.svg" onerror="this.src='https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop'" 
+              alt="Team Collaboration" 
+              class="w-full h-auto object-contain drop-shadow-2xl rounded-tr-[80px] rounded-bl-[80px] z-10 relative transform hover:scale-[1.02] transition-transform duration-700">
+         
+         <!-- Decorative Elements around image -->
+         <div class="absolute -top-10 -right-10 w-24 h-24 bg-yellow-400 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+         <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-500 rounded-full blur-3xl opacity-30"></div>
       </div>
     </div>
   </header>
 
-  <!-- CELL PHONE REPAIR BANNER (Cross-link) -->
-  <div class="bg-gradient-to-r from-gray-800 to-gray-900 border-y border-gray-700 py-3">
-    <div class="container mx-auto px-4 flex justify-center items-center gap-4 text-sm md:text-base">
-      <span class="text-gray-300"><i class="fas fa-wrench text-yellow-500 mr-2"></i> ¿Buscás servicio técnico de
-        celulares?</span>
-      <a routerLink="/celular" class="link link-accent font-bold hover:text-white transition-colors">Ir al Laboratorio
-        <i class="fas fa-arrow-right ml-1"></i></a>
-    </div>
-  </div>
+  <!-- METRICS SECTION (New) -->
+  <section class="py-12 bg-gray-900 text-white border-y border-gray-800">
+      <div class="container mx-auto px-4">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-800/50">
+              @for(metric of content.metrics.items; track metric.label) {
+                  <div class="flex flex-col items-center p-4">
+                      <span class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-green-400 mb-2">{{ metric.value }}</span>
+                      <span class="text-sm text-gray-400 font-medium uppercase tracking-wide">{{ metric.label }}</span>
+                  </div>
+              }
+          </div>
+      </div>
+  </section>
 
   <!-- SERVICES SECTION -->
-  <section class="py-24 bg-gray-50 dark:bg-gray-900">
-    <div class="container mx-auto px-4">
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <h2 class="text-3xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">{{ content.services.title }}</h2>
-        <p class="text-lg text-gray-600 dark:text-gray-400">{{ content.services.subtitle }}</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        @for (item of content.services.items; track item.title) {
-        <div
-          class="card bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700/50 hover:-translate-y-2 group">
-          <div class="card-body">
-            <div
-              class="w-14 h-14 rounded-2xl bg-blue-600/10 dark:bg-blue-500/20 flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors duration-300">
-              <i
-                [class]="item.icon + ' text-2xl text-blue-600 dark:text-blue-400 group-hover:text-white transition-colors'"></i>
-            </div>
-            <h3 class="card-title text-xl font-bold mb-2 dark:text-gray-100">{{ item.title }}</h3>
-            <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">{{ item.description }}</p>
-          </div>
-        </div>
-        }
-      </div>
+  <section class="py-32 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+    <div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+        <i class="fas fa-code text-[400px]"></i>
     </div>
-  </section>
-
-  <!-- TECH STACK SECTION -->
-  <section class="py-24 bg-white dark:bg-black relative overflow-hidden">
-    <!-- Decoration -->
-    <div
-      class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent">
-    </div>
-
-    <div class="container mx-auto px-4">
-      <div class="flex flex-col lg:flex-row items-center gap-16">
-        <div class="lg:w-1/3">
-          <span class="text-blue-600 font-bold tracking-widest uppercase text-sm mb-2 block">Stack & Herramientas</span>
-          <h2 class="text-4xl font-bold mb-6 dark:text-white">{{ content.techStack.title }}</h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">{{ content.techStack.subtitle }}</p>
-          <p class="text-gray-500 text-sm leading-relaxed">
-            Utilizamos las últimas tecnologías para garantizar escalabilidad, seguridad y performance.
-            Desde arquitecturas serverless en la nube hasta interfaces reactivas modernas.
-          </p>
-        </div>
-
-        <div class="lg:w-2/3">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            @for (tech of content.techStack.items; track tech.name) {
-            <div
-              class="flex flex-col items-center justify-center p-6 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 hover:border-blue-500/30 transition-colors group">
-              <i [class]="tech.icon + ' text-4xl mb-3 text-gray-400 group-hover:text-blue-500 transition-colors'"></i>
-              <span class="font-bold text-gray-700 dark:text-gray-300 font-mono text-sm">{{ tech.name }}</span>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROJECTS / PORTFOLIO SECTION -->
-  <section class="py-24 bg-gray-50 dark:bg-gray-900" #portfolioSection>
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-5xl font-bold mb-4 dark:text-white">{{ content.projects.title }}</h2>
-        <p class="text-gray-600 dark:text-gray-400">{{ content.projects.subtitle }}</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        @for (project of content.projects.items; track project.title) {
-        <div
-          class="group relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 transition-all hover:shadow-2xl">
-          <div class="h-48 overflow-hidden bg-gray-200">
-            <!-- Project Image Placeholder if real one fails -->
-            <img [src]="project.image" alt="{{ project.title }}"
-              class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-          </div>
-          <div class="p-6">
-            <div class="flex flex-wrap gap-2 mb-3">
-              @for (tag of project.tags; track tag) {
-              <span class="badge badge-sm badge-outline text-xs border-gray-300 text-gray-500">{{ tag }}</span>
-              }
-            </div>
-            <h3 class="text-xl font-bold mb-2 dark:text-white group-hover:text-blue-600 transition-colors">{{
-              project.title }}</h3>
-            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
-            <button class="text-blue-600 font-bold text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
-              Ver Caso de Estudio <i class="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- PARTNERS / ALLIANCES -->
-  <section class="py-16 bg-white dark:bg-black border-y border-gray-100 dark:border-gray-800">
-    <div class="container mx-auto px-4 text-center">
-      <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">{{ content.partners.title }}</p>
-      <div
-        class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-        <!-- Using text representation with icons for now as assets might replace this later -->
-
-        <!-- Globant -->
-        <div class="flex items-center gap-2 text-2xl font-bold text-gray-600 dark:text-gray-400 hover:text-[#bfd730]">
-          <span class="font-sans">Globant</span>
-        </div>
-
-        <!-- Azure -->
-        <div class="flex items-center gap-2 text-2xl font-bold text-gray-600 dark:text-gray-400 hover:text-[#0078d4]">
-          <i class="fab fa-microsoft"></i> Azure
-        </div>
-
-        <!-- Accenture -->
-        <div class="flex items-center gap-2 text-2xl font-bold text-gray-600 dark:text-gray-400 hover:text-[#a100ff]">
-          <span class="font-mono">&gt;</span> accenture
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS SECTION -->
-  <section class="py-24 bg-gray-50 dark:bg-gray-900">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-12 dark:text-white">{{ content.reviews.title }}</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        @for (review of content.reviews.items; track review.name) {
-        <div
-          class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative">
-          <i class="fas fa-quote-right text-4xl text-blue-100 dark:text-blue-900/30 absolute top-6 right-6"></i>
-          <p class="text-gray-600 dark:text-gray-300 mb-6 relative z-10 italic">"{{ review.text }}"</p>
-          <div class="flex items-center gap-4">
-            <div class="avatar">
-              <div class="w-12 rounded-full">
-                <img [src]="review.image" />
-              </div>
-            </div>
-            <div>
-              <h4 class="font-bold text-sm dark:text-white">{{ review.name }}</h4>
-              <p class="text-xs text-gray-500">{{ review.role }} at <span class="text-blue-600">{{ review.company
-                  }}</span></p>
-            </div>
-          </div>
-        </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- QUOTE FORM SECTION -->
-  <section class="py-24 bg-blue-600 text-white relative overflow-hidden" #quoteSection>
-    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
     <div class="container mx-auto px-4 relative z-10">
-      <div class="flex flex-col lg:flex-row gap-16 items-start">
-        <div class="lg:w-1/2 pt-10">
-          <h2 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">{{ content.quote.title }}</h2>
-          <p class="text-xl text-blue-100 mb-8 max-w-lg">{{ content.quote.subtitle }}</p>
+      <div class="text-center max-w-3xl mx-auto mb-20">
+        <span class="text-blue-600 font-bold tracking-widest uppercase text-xs mb-3 block">Nuestros Servicios</span>
+        <h2 class="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900 dark:text-white">{{ content.services.title }}</h2>
+        <p class="text-xl text-gray-600 dark:text-gray-400">{{ content.services.subtitle }}</p>
+      </div>
 
-          <ul class="space-y-4 text-blue-100">
-            <li class="flex items-center gap-3"><i class="fas fa-check-circle text-blue-300"></i> Presupuesto detallado
-              en 24hs.</li>
-            <li class="flex items-center gap-3"><i class="fas fa-check-circle text-blue-300"></i> Asesoramiento técnico
-              inicial sin cargo.</li>
-            <li class="flex items-center gap-3"><i class="fas fa-check-circle text-blue-300"></i> Confidencialidad
-              garantizada (NDA).</li>
-          </ul>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @for (item of content.services.items; track item.title) {
+        <div class="group bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 dark:border-gray-700">
+            <div class="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-8 group-hover:bg-blue-600 transition-colors duration-300">
+              <i [class]="item.icon + ' text-3xl text-blue-600 dark:text-blue-400 group-hover:text-white transition-colors'"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{{ item.title }}</h3>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ item.description }}</p>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY SECTION (New) -->
+  <section class="py-32 bg-white dark:bg-gray-800">
+      <div class="container mx-auto px-4">
+          <div class="flex flex-col lg:flex-row gap-16 items-center">
+              <div class="lg:w-1/3">
+                  <span class="text-green-600 font-bold tracking-widest uppercase text-xs mb-3 block">{{ content.methodology.title }}</span>
+                  <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">{{ content.methodology.subtitle }}</h2>
+                  <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 border-l-4 border-green-500 pl-4">
+                      {{ content.methodology.description }}
+                  </p>
+                  
+                  <div class="space-y-6">
+                       <div class="flex items-center gap-4">
+                           <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl font-bold"><i class="fas fa-cube"></i></div>
+                           <div>
+                               <h4 class="font-bold text-gray-900 dark:text-white">Módulos Propietarios</h4>
+                               <p class="text-sm text-gray-500">Componentes in-house a medida.</p>
+                           </div>
+                       </div>
+                       <div class="flex items-center gap-4">
+                           <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-bold"><i class="fas fa-check-shield"></i></div>
+                           <div>
+                               <h4 class="font-bold text-gray-900 dark:text-white">Software Verificado</h4>
+                               <p class="text-sm text-gray-500">Soluciones probadas y seguras.</p>
+                           </div>
+                       </div>
+                  </div>
+              </div>
+
+              <div class="lg:w-2/3">
+                  <!-- Steps Visual -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      @for(step of content.methodology.steps; track step.title; let i = $index) {
+                          <div class="relative bg-gray-50 dark:bg-gray-700/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-700 hover:shadow-xl transition-all duration-300 group">
+                              <span class="absolute top-4 right-4 text-6xl font-black text-gray-200 dark:text-gray-600/50 z-0">{{ i + 1 }}</span>
+                              <div class="text-3xl text-gray-800 dark:text-white mb-4 relative z-10"><i [class]="step.icon"></i></div>
+                              <h4 class="text-xl font-bold mb-2 relative z-10">{{ step.title }}</h4>
+                              <p class="text-sm text-gray-500 dark:text-gray-400 relative z-10">{{ step.description }}</p>
+                          </div>
+                      }
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- PROJECTS SECTION -->
+  <section class="py-32 bg-gray-900 text-white" #portfolioSection>
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+        <div class="max-w-2xl">
+            <span class="text-blue-400 font-bold tracking-widest uppercase text-xs mb-3 block">Casos de Éxito</span>
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-4">{{ content.projects.title }}</h2>
+            <p class="text-xl text-gray-400">{{ content.projects.subtitle }}</p>
+        </div>
+        <div class="flex gap-4">
+            <button class="btn bg-blue-600 hover:bg-blue-700 text-white border-none rounded-full px-6 shadow-lg shadow-blue-600/20" (click)="quoteSection.scrollIntoView({behavior: 'smooth'})">
+                Cotizar Proyecto <i class="fas fa-file-invoice-dollar ml-2"></i>
+            </button>
+            <a routerLink="/portfolio" class="btn btn-outline text-white border-white hover:bg-white hover:text-black rounded-full px-6">
+                Ver Portfolio <i class="fas fa-images ml-2"></i>
+            </a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        @for (project of content.projects.items; track project.title) {
+        <div class="group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer">
+            <img [src]="project.image" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" [alt]="project.title">
+            <div class="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+            
+            <div class="absolute bottom-0 left-0 p-8 w-full">
+                <div class="flex flex-wrap gap-2 mb-3">
+                    @for(tag of project.tags; track tag) {
+                        <span class="bg-blue-600/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">{{ tag }}</span>
+                    }
+                </div>
+                <h3 class="text-2xl font-bold mb-2 text-white">{{ project.title }}</h3>
+                <p class="text-gray-300 text-sm line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">{{ project.description }}</p>
+                <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300 delay-100">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS SECTION -->
+  <section class="py-32 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+      <div class="container mx-auto px-4">
+          <div class="text-center max-w-3xl mx-auto mb-20">
+              <span class="text-purple-600 font-bold tracking-widest uppercase text-xs mb-3 block">Testimonios</span>
+              <h2 class="text-4xl font-extrabold mb-6 text-gray-900 dark:text-white">{{ content.reviews.title }}</h2>
+              <p class="text-lg text-gray-500">{{ content.reviews.subtitle }}</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              @for (review of content.reviews.items; track review.name) {
+                  <div class="bg-gray-50 dark:bg-gray-800 p-10 rounded-4xl relative">
+                      <div class="text-6xl text-purple-200 dark:text-purple-900/30 font-serif absolute top-8 left-8">“</div>
+                      <p class="text-xl text-gray-700 dark:text-gray-300 italic mb-8 relative z-10 leading-relaxed">
+                          {{ review.text }}
+                      </p>
+                      <div class="flex items-center gap-4">
+                          <img [src]="review.image" class="w-14 h-14 rounded-full object-cover ring-4 ring-white dark:ring-gray-700" [alt]="review.name">
+                          <div>
+                              <h4 class="font-bold text-gray-900 dark:text-white text-lg">{{ review.name }}</h4>
+                              <p class="text-sm text-gray-500">{{ review.role }} <br> <span class="font-bold text-purple-600">{{ review.company }}</span></p>
+                          </div>
+                      </div>
+                  </div>
+              }
+          </div>
+      </div>
+  </section>
+
+  <!-- CELL SERVICE PROMO (New) -->
+  <section class="py-24 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div class="container mx-auto px-4">
+          <div class="bg-blue-600 rounded-3xl p-12 relative overflow-hidden text-center text-white shadow-2xl">
+              <!-- Decorative -->
+              <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+              <div class="absolute bottom-0 right-0 w-64 h-64 bg-purple-500/30 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+
+              <div class="relative z-10 max-w-2xl mx-auto">
+                  <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                      <i class="fas fa-tools"></i>
+                  </div>
+                  <h2 class="text-4xl font-extrabold mb-4">{{ content.cellServicePromo.title }}</h2>
+                  <p class="text-xl text-blue-100 mb-8">{{ content.cellServicePromo.subtitle }}</p>
+                  <a [routerLink]="content.cellServicePromo.link" class="inline-flex items-center gap-3 bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                      {{ content.cellServicePromo.cta }} <i class="fas fa-arrow-right"></i>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- COURSES TEASER (New) -->
+  <section class="py-24 bg-white dark:bg-gray-900">
+      <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row items-center gap-12 bg-gray-900 text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+               <div class="md:w-1/2 relative z-10">
+                   <h2 class="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">{{ content.coursesTeaser.title }}</h2>
+                   <p class="text-lg text-gray-400 mb-8">{{ content.coursesTeaser.subtitle }}</p>
+                   <a [routerLink]="content.coursesTeaser.link" class="btn bg-green-500 hover:bg-green-600 text-white border-none rounded-xl px-8 h-14 text-lg font-bold shadow-lg shadow-green-500/20">
+                       {{ content.coursesTeaser.cta }} <i class="fas fa-graduation-cap ml-2"></i>
+                   </a>
+               </div>
+               <div class="md:w-1/2 relative z-10 flex justify-center">
+                   <img src="assets/img/cursos/egresado-2025.jpg" class="rounded-2xl shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500 max-w-sm w-full border-4 border-gray-800" alt="Cursos Arecofix">
+               </div>
+               <!-- Background Gradient -->
+               <div class="absolute inset-0 bg-linear-to-r from-gray-900 via-gray-900 to-gray-800 opacity-90"></div>
+          </div>
+      </div>
+  </section>
+
+  <!-- QUOTE FORM SECTION (Updated Style) -->
+  <section class="py-32 bg-gray-900 text-white relative overflow-hidden" #quoteSection>
+    <!-- Background Effects -->
+    <div class="absolute inset-0 bg-blue-600/10"></div>
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-full h-1/2 bg-linear-to-t from-gray-900 to-transparent"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="flex flex-col lg:flex-row gap-16 items-center">
+        <div class="lg:w-1/2">
+          <span class="text-blue-400 font-bold tracking-widest uppercase text-xs mb-3 block">Contacto</span>
+          <h2 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">{{ content.quote.title }}</h2>
+          <p class="text-xl text-gray-300 mb-10 leading-relaxed">{{ content.quote.subtitle }}</p>
+
+          <div class="space-y-6">
+              <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                  <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-xl"><i class="fas fa-envelope"></i></div>
+                  <div>
+                      <p class="text-xs text-gray-400 uppercase tracking-widest">Escribinos</p>
+                      <p class="text-lg font-bold">contacto@arecofix.com.ar</p>
+                  </div>
+              </div>
+              <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                  <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-xl"><i class="fab fa-whatsapp"></i></div>
+                  <div>
+                      <p class="text-xs text-gray-400 uppercase tracking-widest">Whatsapp</p>
+                      <p class="text-lg font-bold">+54 9 11 25960900</p>
+                  </div>
+              </div>
+          </div>
         </div>
 
         <div class="lg:w-1/2 w-full">
-          <div class="bg-white text-gray-900 rounded-3xl p-8 shadow-2xl">
-            <form class="space-y-4" (ngSubmit)="sendQuote()">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-2xl">
+            <form class="space-y-5" (ngSubmit)="sendQuote()">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="form-control">
-                  <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.name }}</label>
-                  <input type="text" [(ngModel)]="quoteModel.name" name="name"
-                    class="input input-bordered w-full bg-gray-50" placeholder="Juan Perez">
+                  <label class="label text-xs font-bold text-gray-300 uppercase pl-2">{{ content.quote.form.name }}</label>
+                  <input type="text" [(ngModel)]="quoteModel.name" name="name" class="input input-lg w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:bg-white/10 focus:border-blue-500 rounded-2xl" placeholder="Tu Nombre">
                 </div>
                 <div class="form-control">
-                  <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.company
-                    }}</label>
-                  <input type="text" [(ngModel)]="quoteModel.company" name="company"
-                    class="input input-bordered w-full bg-gray-50" placeholder="Empresa S.A.">
+                  <label class="label text-xs font-bold text-gray-300 uppercase pl-2">{{ content.quote.form.email }}</label>
+                  <input type="email" [(ngModel)]="quoteModel.email" name="email" class="input input-lg w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:bg-white/10 focus:border-blue-500 rounded-2xl" placeholder="tu@email.com">
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="form-control">
-                  <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.email }}</label>
-                  <input type="email" [(ngModel)]="quoteModel.email" name="email"
-                    class="input input-bordered w-full bg-gray-50" placeholder="juan@empresa.com">
+                  <label class="label text-xs font-bold text-gray-300 uppercase pl-2">{{ content.quote.form.phone }}</label>
+                  <input type="tel" [(ngModel)]="quoteModel.phone" name="phone" class="input input-lg w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:bg-white/10 focus:border-blue-500 rounded-2xl" placeholder="+54...">
                 </div>
                 <div class="form-control">
-                  <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.phone }}</label>
-                  <input type="tel" [(ngModel)]="quoteModel.phone" name="phone"
-                    class="input input-bordered w-full bg-gray-50" placeholder="+54 11...">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                  <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.projectType
-                    }}</label>
-                  <select [(ngModel)]="quoteModel.projectType" name="type"
-                    class="select select-bordered w-full bg-gray-50">
-                    <option value="web">Web App</option>
-                    <option value="mobile">Mobile App</option>
-                    <option value="ecommerce">E-commerce</option>
-                    <option value="consulting">Consultoría/Cloud</option>
-                  </select>
-                </div>
-                <div class="form-control">
-                  <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.budget }}</label>
-                  <select [(ngModel)]="quoteModel.budget" name="budget"
-                    class="select select-bordered w-full bg-gray-50">
-                    <option value="low">&lt; $1.000 USD</option>
-                    <option value="mid">$1.000 - $5.000 USD</option>
-                    <option value="high">$5.000 - $10.000 USD</option>
-                    <option value="enterprise">&gt; $10.000 USD</option>
-                  </select>
+                  <label class="label text-xs font-bold text-gray-300 uppercase pl-2">{{ content.quote.form.company }}</label>
+                  <input type="text" [(ngModel)]="quoteModel.company" name="company" class="input input-lg w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:bg-white/10 focus:border-blue-500 rounded-2xl" placeholder="Tu Empresa">
                 </div>
               </div>
 
               <div class="form-control">
-                <label class="label text-sm font-bold text-gray-500 uppercase">{{ content.quote.form.description
-                  }}</label>
-                <textarea [(ngModel)]="quoteModel.description" name="description"
-                  class="textarea textarea-bordered h-24 bg-gray-50"
-                  placeholder="Breve descripción de la necesidad..."></textarea>
+                <label class="label text-xs font-bold text-gray-300 uppercase pl-2">{{ content.quote.form.description }}</label>
+                <textarea [(ngModel)]="quoteModel.description" name="description" class="textarea textarea-lg h-32 w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:bg-white/10 focus:border-blue-500 rounded-2xl" placeholder="¿En qué podemos ayudarte?"></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary w-full btn-lg text-lg mt-4" [disabled]="sendingQuote">
+              <button type="submit" class="btn bg-blue-600 hover:bg-blue-700 border-none text-white w-full btn-lg h-16 rounded-2xl text-lg font-bold shadow-lg shadow-blue-600/30 mt-4" [disabled]="sendingQuote">
                 @if(sendingQuote) { <span class="loading loading-spinner"></span> }
-                {{ content.quote.form.cta }}
+                {{ content.quote.form.cta }} <i class="fas fa-paper-plane ml-2"></i>
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- NOVEDADES FOOTER LINKS (New) -->
+  <section class="py-12 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <div class="container mx-auto px-4 text-center">
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">{{ content.novedadesFooter.title }}</h3>
+          <div class="flex flex-wrap justify-center gap-4 md:gap-8">
+              @for(link of content.novedadesFooter.links; track link.text) {
+                  <a [routerLink]="link.url" class="px-6 py-3 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all text-gray-700 dark:text-gray-200 font-bold border border-gray-100 dark:border-gray-600 hover:-translate-y-1">
+                      {{ link.text }} <i class="fas fa-chevron-right text-xs ml-2 opacity-50"></i>
+                  </a>
+              }
+          </div>
+      </div>
   </section>
 
 </ng-container>

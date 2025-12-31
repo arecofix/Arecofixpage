@@ -273,18 +273,38 @@ export class CelularLandingComponent implements OnInit {
         {
              title: 'Venta de Repuestos',
              desc: 'Catálogo completo de módulos, baterías y herramientas para el técnico.',
-             img: 'assets/img/products/repuestos-varios.jpg',
+             img: 'assets/img/repuestos/1.webp',
              link: '/products/category/repuestos'
         }
     ];
 
-    // App Info
     appInfo = {
         title: 'Llevá Arecofix en tu bolsillo',
         desc: 'Seguí tus reparaciones en tiempo real, pedí presupuestos y accedé a descuentos exclusivos desde nuestra App.',
         features: ['Seguimiento de Orden', 'Historial de Reparaciones', 'Turnos Prioritarios'],
-        downloadLink: 'https://play.google.com/store/apps/details?id=com.arecofix.app&hl=es_AR&gl=US' // Placeholder or real
+        downloadLink: 'https://play.google.com/store/apps/details?id=com.arecofix.app&hl=es_AR&gl=US'
     };
+
+    relatedServices = [
+        {
+            title: 'Reparación de Tablets',
+            desc: 'Reparación especializada en tablets Android, iPad y Windows.',
+            icon: 'fa-tablet-alt',
+            link: '/servicios'
+        },
+        {
+            title: 'Reparación de Consolas',
+            desc: 'Servicio técnico para PlayStation, Xbox y Nintendo Switch.',
+            icon: 'fa-gamepad',
+            link: '/servicios'
+        },
+        {
+            title: 'Micro Soldadura',
+            desc: 'Reparaciones a nivel componente (IC, Pistas) con tecnología de punta.',
+            icon: 'fa-microchip',
+            link: '/servicios'
+        }
+    ];
 
 
   ngOnInit() {

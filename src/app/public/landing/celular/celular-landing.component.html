@@ -695,72 +695,112 @@
   </div>
 
   <!-- NOVEDADES Y RECURSOS (App & Blog) -->
-  <section class="py-20 bg-base-100 relative overflow-hidden">
-      <div class="absolute inset-0 bg-base-200/50 skew-y-3 transform origin-bottom-right"></div>
+  <section class="py-24 bg-gray-50 relative overflow-hidden">
+      <!-- Background Blotches -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
       
       <div class="container mx-auto px-4 relative z-10">
           <div class="text-center mb-16">
-              <h2 class="text-3xl md:text-4xl font-bold mb-4">Novedades y Recursos</h2>
-              <p class="text-base-content/60">Todo lo que necesitas saber sobre tecnología y nuestra comunidad.</p>
+              <span class="text-blue-600 font-bold tracking-widest uppercase text-sm mb-2 block">Blog & Comunidad</span>
+              <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Novedades y Recursos</h2>
+              <p class="text-xl text-gray-600 max-w-2xl mx-auto">Mantenete al día con lo último en tecnología, guías de reparación y novedades de Arecofix.</p>
           </div>
 
-          <div class="flex flex-col lg:flex-row gap-12 items-center">
+          <!-- Unified Grid Layout -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               
-              <!-- Blog Carousel / Grid -->
-              <div class="lg:w-2/3 w-full">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      @for(post of blogFeatures; track post.title) {
-                          <a [routerLink]="post.link" class="group card bg-base-100 shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden h-full">
-                              <figure class="h-48 overflow-hidden">
-                                  <img [src]="post.img" [alt]="post.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                              </figure>
-                              <div class="card-body p-6">
-                                  <h3 class="card-title text-lg font-bold group-hover:text-primary transition-colors">{{ post.title }}</h3>
-                                  <p class="text-sm text-base-content/70">{{ post.desc }}</p>
-                                  <div class="card-actions justify-end mt-4">
-                                      <span class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">Leer más <i class="fas fa-arrow-right"></i></span>
-                                  </div>
-                              </div>
-                          </a>
-                      }
-                  </div>
-              </div>
-
-              <!-- App Download Card -->
-              <div class="lg:w-1/3 w-full">
-                  <div class="card bg-gray-900 text-white shadow-2xl overflow-hidden relative group">
-                      <!-- Background Pattern -->
-                      <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                      <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/50 rounded-full blur-[60px]"></div>
-                      
-                      <div class="card-body relative z-10 text-center">
-                          <div class="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-md shadow-inner border border-white/20">
-                              <i class="fas fa-mobile-alt text-4xl text-primary"></i>
-                          </div>
-                          <h3 class="text-2xl font-bold mb-2">{{ appInfo.title }}</h3>
-                          <p class="text-gray-300 text-sm mb-6">{{ appInfo.desc }}</p>
-                          
-                          <ul class="text-left text-sm space-y-3 mb-8 mx-auto w-fit">
-                              @for(feature of appInfo.features; track feature) {
-                                  <li class="flex items-center gap-2 text-gray-400">
-                                      <i class="fas fa-check-circle text-green-400"></i> {{ feature }}
-                                  </li>
-                              }
-                          </ul>
-
-                          <a [href]="appInfo.downloadLink" target="_blank" class="btn btn-primary btn-block shadow-lg hover:scale-105 transition-transform border-none flex items-center gap-2">
-                              <i class="fab fa-google-play text-xl"></i>
-                              <div>
-                                  <span class="block text-[10px] leading-none uppercase tracking-wide opacity-80">Disponible en</span>
-                                  <span class="text-base font-bold leading-none">Google Play</span>
-                              </div>
-                          </a>
+              <!-- Blog Posts (Dynamically Rendered) -->
+              @for(post of blogFeatures; track post.title) {
+                  <a [routerLink]="post.link" class="group relative flex flex-col bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
+                      <!-- Image Container -->
+                      <div class="h-48 overflow-hidden relative">
+                          <div class="absolute inset-0 bg-gray-900/10 group-hover:bg-transparent transition-colors z-10"></div>
+                          <img [src]="post.img" [alt]="post.title" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
                       </div>
-                  </div>
-              </div>
+                      
+                      <!-- Content -->
+                      <div class="p-6 flex flex-col grow">
+                          <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors">{{ post.title }}</h3>
+                          <p class="text-gray-600 text-sm mb-6 line-clamp-3 grow">{{ post.desc }}</p>
+                          
+                          <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-blue-600 font-bold text-sm">
+                              <span>Leer Más</span>
+                              <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                          </div>
+                      </div>
+                  </a>
+              }
+
+              <!-- App Download Card (Takes 1 column) -->
+  <div class="lg:col-span-1 h-full">
+    <div class="bg-[#1f2937] text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden group border border-gray-700 h-full flex flex-col">
+      <!-- Decorative Elements -->
+      <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 bg-green-500/20 rounded-full blur-2xl"></div>
+      
+      <div class="relative z-10 flex flex-col items-center text-center grow justify-between">
+        <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 border border-white/10 shadow-inner backdrop-blur-sm">
+             <i class="fas fa-mobile-screen-button text-4xl text-blue-400"></i>
+        </div>
+        
+        <h3 class="text-2xl font-bold mb-3">{{ appInfo.title }}</h3>
+        <p class="text-gray-400 text-sm mb-8 leading-relaxed">{{ appInfo.desc }}</p>
+        
+        <ul class="text-left space-y-4 mb-8 w-full px-4">
+          @for(feature of appInfo.features; track feature) {
+            <li class="flex items-center gap-3 text-sm text-gray-300">
+              <i class="fas fa-check-circle text-green-400"></i>
+              <span>{{ feature }}</span>
+            </li>
+          }
+        </ul>
+
+        <a [href]="appInfo.downloadLink" target="_blank" class="w-full bg-white text-gray-900 rounded-xl p-3 flex items-center justify-center gap-3 hover:bg-gray-100 hover:scale-[1.02] transition-all duration-300 shadow-lg group-hover:shadow-blue-500/20">
+          <i class="fab fa-google-play text-2xl text-green-600"></i>
+          <div class="text-left">
+            <div class="text-[10px] uppercase font-bold tracking-wider text-gray-500">Disponible en</div>
+            <div class="text-lg font-bold leading-none">Google Play</div>
           </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
       </div>
   </section>
+
+<!-- RELATED SERVICES SECTION -->
+<div class="mt-24 mb-12">
+    <div class="text-center mb-12">
+        <span class="text-blue-600 font-bold tracking-widest uppercase text-xs mb-3 block">Soluciones Integrales</span>
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Otros Servicios Relacionados</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">Además de reparar celulares, somos expertos en una amplia gama de dispositivos electrónicos.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        @for(service of relatedServices; track service.title) {
+            <div class="bg-gray-50 rounded-2xl p-8 hover:bg-white hover:shadow-xl transition-all border border-gray-100 group text-center">
+                <div class="w-16 h-16 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                    <i [class]="'fas ' + service.icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ service.title }}</h3>
+                <p class="text-gray-600 text-sm mb-6">{{ service.desc }}</p>
+                <!-- Using RouterLink to navigate to services page -->
+                <a [routerLink]="service.link" class="text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors inline-flex items-center gap-2">
+                    Ver Detalles <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        }
+    </div>
+
+    <div class="text-center">
+        <a routerLink="/servicios" class="inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 hover:-translate-y-1 transition-all shadow-lg shadow-gray-900/20">
+            Ver Todos los Servicios <i class="fas fa-layer-group"></i>
+        </a>
+    </div>
+</div>
 
   <!-- BRANDS CAROUSEL (Bottom) -->
   <section class="bg-white dark:bg-gray-900 py-12">
