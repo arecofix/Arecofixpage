@@ -1,0 +1,8 @@
+npm install //para instalar las dependencias necesarias 
+
+npm run build
+
+npm run start
+
+el servidor esta alojado en la pagina:
+localhost:4200

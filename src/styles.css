@@ -6,13 +6,13 @@
 
 @theme {
   /* Brand Colors - Keep static as they define the palette */
-  --color-brand-green: #4fa137;
-  --color-brand-dark-blue: #282f4f;
+  --color-brand-green: #4ea036;
+  --color-brand-dark-blue: #222144;
   --color-brand-light-gray: #ededed;
-  --color-brand-gray-purple: #777589;
-  --color-brand-blue: #397dbb;
-  --color-brand-dark-blue-fav: #2c3454;
-  --color-brand-green-alt: #4da435;
+  --color-brand-gray-purple: #222047;
+  --color-brand-blue: #327cbe;
+  --color-brand-dark-blue-fav: #222144;
+  --color-brand-green-alt: #4ba12b;
 
   /* High Contrast Colors */
   --color-hc-bg: #000000;

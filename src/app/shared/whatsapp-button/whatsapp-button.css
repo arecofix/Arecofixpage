@@ -1,103 +1,117 @@
 /* Contenedor principal */
 .whatsapp-btn-container {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 10000;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 10000;
 
-    font-family: sans-serif;
+  /* Hardware acceleration to prevent ghosting */
+  backface-visibility: hidden;
+  transform: translateZ(0);
+
+  font-family: sans-serif;
 }
 
 /* Botón principal */
 .whatsapp-btn {
-    width: 60px;
-    height: 60px;
-    background-color: #25D366;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    position: relative;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    animation: pulse-green 2s infinite;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  /* Removed duplication-causing animation from main element */
+  z-index: 2;
 }
 
-@keyframes pulse-green {
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
-    }
-
-    70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
-    }
-
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-    }
+/* New Pulse Animation via Pseudo-element to prevent ghosting */
+.whatsapp-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #25d366;
+  z-index: -1;
+  animation: pulse-ring 2s infinite;
 }
 
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
 
 /* Estilo del ícono SVG */
 .whatsapp-btn svg {
-    width: 35px;
-    height: 35px;
-    fill: white;
+  width: 35px;
+  height: 35px;
+  fill: white;
+  position: relative;
+  z-index: 3;
 }
 
 /* Efectos Hover */
 .whatsapp-btn:hover {
-    background-color: #128C7E;
-    transform: scale(1.1);
-    box-shadow: 0 8px 25px rgba(18, 140, 126, 0.5);
+  background-color: #128c7e;
+  transform: scale(1.05); /* Subtle scale */
+  box-shadow: 0 8px 25px rgba(18, 140, 126, 0.5);
 }
 
 /* --- TOOLTIP (Cartel flotante) --- */
 .tooltip {
-    visibility: hidden;
-    opacity: 0;
+  visibility: hidden;
+  opacity: 0;
 
-    width: 160px;
-    background-color: #075E54;
-    color: white;
-    text-align: center;
-    border-radius: 8px;
-    padding: 8px 10px;
+  width: 160px;
+  background-color: #075e54;
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 10px;
 
-    /* Posicionamiento */
-    position: absolute;
-    bottom: 100%;
-    right: 0;
-    margin-bottom: 15px;
+  /* Posicionamiento */
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 15px;
 
-    font-size: 14px;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-    /* Animación de entrada */
-    transform: translateY(10px);
-    transition: all 0.3s ease;
-    pointer-events: none;
+  /* Animación de entrada */
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
 }
 
 /* Triangulito del tooltip */
 .tooltip::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    right: 25px;
-    border-width: 8px;
-    border-style: solid;
-    border-color: #075E54 transparent transparent transparent;
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 25px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: #075e54 transparent transparent transparent;
 }
 
 /* Mostrar Tooltip al pasar el mouse por el contenedor */
 .whatsapp-btn-container:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
 }
