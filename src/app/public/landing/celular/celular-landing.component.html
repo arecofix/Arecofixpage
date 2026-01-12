@@ -1,26 +1,33 @@
 <div class="bg-base-100 min-h-screen font-sans">
   <!-- HERO SECTION -->
   <section
-    class="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+    class="relative min-h-[65vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden"
   >
     <!-- Optimized Background Image (WebP) -->
     <div class="absolute inset-0 z-0">
       <img
-        src="assets/img/repair/10.jpg"
-        class="w-full h-full object-cover"
+        ngSrc="assets/img/repair/10.jpg"
+        class="w-full h-full object-cover object-[0%_0%] md:object-center"
         alt="Servicio Técnico Celulares Marcos Paz"
+        priority
+        fill
       />
       <div
         class="absolute inset-0 bg-linear-to-r from-black/90 via-black/70 to-black/40"
       ></div>
     </div>
 
+    <!-- Breadcrumbs (Absolute Top Left) -->
+    <div class="absolute top-0 left-0 w-full z-20 pt-20 md:pt-28 px-4 md:px-8">
+         <app-breadcrumbs [items]="breadcrumbItems"></app-breadcrumbs>
+    </div>
+
     <div
       class="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12 mt-16"
     >
-      <div class="md:w-1/2 text-left">
+      <div class="md:w-1/2 text-left pt-20">
         <span
-          class="inline-block py-1 px-3 rounded-full bg-primary/20 border border-primary/50 text-primary-content text-sm font-bold tracking-wide uppercase mb-6 animate-fade-in-up backdrop-blur-sm"
+          class="inline-block py-1 px-3 rounded-full bg-primary/20 border border-primary/50 text-focus text-sm font-bold tracking-wide uppercase mb-6 animate-fade-in-up backdrop-blur-sm"
         >
           En Marcos Paz, Merlo y Zona Oeste
         </span>
@@ -106,34 +113,80 @@
   </section>
 
   <!-- BRANDS CAROUSEL (Top Persuasion) -->
-  <section class="bg-neutral text-neutral-content py-6 border-b border-white/5">
+  <section class="bg-neutral text-neutral-content py-8 border-b border-white/5">
     <div class="max-w-7xl mx-auto px-4 overflow-hidden">
-      <p class="text-center text-xs uppercase tracking-widest opacity-50 mb-4">
+      <p class="text-center text-xs uppercase tracking-widest opacity-70 mb-6">
         Especialistas en todas las marcas
       </p>
       <div
-        class="flex justify-between md:justify-center md:gap-20 items-center opacity-60 grayscale text-3xl"
+        class="flex flex-row flex-nowrap justify-center items-center opacity-60 grayscale text-2xl md:text-4xl overflow-x-auto no-scrollbar py-4 px-2"
       >
-        <i
-          class="fab fa-apple hover:text-white hover:opacity-100 transition-all"
-          title="iPhone"
-        ></i>
-        <i
-          class="fab fa-android hover:text-green-400 hover:opacity-100 transition-all"
-          title="Android"
-        ></i>
-        <span
-          class="font-bold hover:text-blue-500 hover:opacity-100 transition-all cursor-default"
-          >SAMSUNG</span
-        >
-        <span
-          class="font-bold hover:text-orange-500 hover:opacity-100 transition-all cursor-default"
-          >XIAOMI</span
-        >
-        <span
-          class="font-bold hover:text-blue-300 hover:opacity-100 transition-all cursor-default"
-          >MOTOROLA</span
-        >
+        <div class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300">
+          <span class="font-bold hover:text-blue-500 hover:opacity-100 transition-colors cursor-default tracking-tighter">SAMSUNG</span>
+        </div>
+        <div class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300">
+          <span class="font-bold hover:text-orange-500 hover:opacity-100 transition-colors cursor-default tracking-tighter">XIAOMI</span>
+        </div>
+        <div class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300">
+          <span class="font-bold hover:text-blue-300 hover:opacity-100 transition-colors cursor-default tracking-tighter">MOTOROLA</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT SECTION -->
+  <section class="py-16 bg-white dark:bg-gray-800">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="prose prose-lg dark:prose-invert mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-8">
+          Local de Reparación y Accesorios para Celulares en Marcos Paz
+        </h2>
+        
+        <p class="lead">
+          <strong>¿Donde reparar mi celular en marcos paz?</strong> En Arecofix, entendemos que tu celular es vital para tu día a día. Somos el <strong>Servicio Técnico enfocado en la telefonía móvil</strong> líder en la zona.
+        </p>
+
+        <h3>Soluciones Integrales para tu Dispositivo</h3>
+        <p>
+          El núcleo de nuestra oferta reside en la reparación especializada. Ya sea una pantalla rota, una batería que no retiene carga o un puerto defectuoso, abordamos estas problemáticas con repuestos de calidad y mano de obra calificada.
+          Trabajamos con las principales marcas: <strong>Apple (iPhone), Samsung, Motorola, Xiaomi</strong> y más.
+        </p>
+
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 list-none pl-0 my-8">
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+            <div><strong>Cambiamos Módulos y Pantallas:</strong> Solución a roturas y fallas de táctil.</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+            <div><strong>Reemplazo de Baterías:</strong> Recuperá la autonomía de tu equipo.</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+            <div><strong>Reparación de Puertos de Carga:</strong> Si tu celular no carga, lo solucionamos.</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+            <div><strong>Soluciones de Software:</strong> Actualizaciones, liberaciones y recuperación de datos.</div>
+          </li>
+        </ul>
+
+        <h3>Más allá de los Móviles</h3>
+        <p>
+          Fiel a nuestro nombre, brindamos soluciones digitales completas. También reparamos <strong>Tablets, Notebooks y PCs</strong>. Centralizá la reparación de tus dispositivos electrónicos en un solo lugar de confianza en Marcos Paz.
+        </p>
+
+        <h3>Tienda de Accesorios</h3>
+        <p>
+          Complementamos nuestro servicio técnico con una amplia variedad de accesorios para proteger y equipar tu móvil:
+        </p>
+        <div class="flex flex-wrap gap-2 not-prose mb-8">
+          <span class="badge badge-outline badge-lg p-3">Fundas y Carcasas</span>
+          <span class="badge badge-outline badge-lg p-3">Vidrio Templado</span>
+          <span class="badge badge-outline badge-lg p-3">Cargadores Rápidos</span>
+          <span class="badge badge-outline badge-lg p-3">Cables USB-C / Lightning</span>
+          <span class="badge badge-outline badge-lg p-3">Auriculares</span>
+        </div>
       </div>
     </div>
   </section>
@@ -162,12 +215,12 @@
           <div class="grid grid-cols-2 gap-4 mb-8">
             <div class="p-4 bg-base-200 rounded-xl">
               <i class="fas fa-clock text-2xl text-primary mb-2"></i>
-              <h4 class="font-bold">Rápido</h4>
+              <h3 class="font-bold">Rápido</h3>
               <p class="text-xs">Prioridad por turno</p>
             </div>
             <div class="p-4 bg-base-200 rounded-xl">
               <i class="fas fa-shield-alt text-2xl text-secondary mb-2"></i>
-              <h4 class="font-bold">Seguro</h4>
+              <h3 class="font-bold">Seguro</h3>
               <p class="text-xs">Datos protegidos</p>
             </div>
           </div>
@@ -211,7 +264,7 @@
         <a 
           routerLink="/products" 
           [queryParams]="{ category: 'all' }"
-          class="btn btn-primary btn-wide btn-lg shadow-lg hover:scale-105 transition-transform"
+          class="btn btn-primary btn-wide btn-lg shadow-lg hover:scale-105 transition-transform border-2 border-primary-focus hover:border-white text-white font-bold"
         >
           Ver Todos los Productos <i class="fas fa-store ml-2"></i>
         </a>
@@ -365,8 +418,9 @@
       <div class="text-center">
         <a
           routerLink="/cursos"
-          class="btn btn-wide btn-lg shadow-lg border-none bg-linear-to-r from-[#352F85] to-[#5CE638] text-white hover:shadow-xl hover:scale-105 transition-all"
-          ><i class="fas fa-graduation-cap mr-2"></i> Ver Cursos y Capacitaciones</a
+          class="btn btn-lg rounded-full px-12 min-w-[280px] shadow-2xl border-none bg-linear-to-r from-[#352F85] to-[#5CE638] text-white hover:scale-105 hover:shadow-blue-600/40 transition-all duration-300 font-bold tracking-wide group relative overflow-hidden"
+          ><div class="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -skew-x-12"></div>
+          <i class="fas fa-graduation-cap mr-3 text-xl"></i> Ver Cursos y Capacitaciones</a
         >
       </div>
     </div>
@@ -454,13 +508,16 @@
     </div>
     <div class="h-80 md:h-auto bg-gray-200">
       <!-- Placeholder Map -->
+      <!-- Placeholder Map -->
       <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13106.58784650532!2d-58.8373756!3d-34.7891734!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceadeecc85815%3A0xc3dc3f3c473177!2sMarcos%20Paz%2C%20Provincia%20de%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1700000000000!5m2!1ses!2sar"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3277.539502732569!2d-58.81797292339245!3d-34.76719126615129!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceb46770c86eb%3A0x73b48d51a83e8107!2sARECOFIX%20Servicio%20t%C3%A9cnico%20de%20celulares%20%7C%20Venta%20de%20Repuestos.!5e0!3m2!1ses-419!2sar!4v1767203451962!5m2!1ses-419!2sar"
         width="100%"
         height="100%"
         style="border: 0"
         allowfullscreen=""
         loading="lazy"
+        title="Ubicación de Arecofix en Google Maps"
+        referrerpolicy="no-referrer-when-downgrade"
       ></iframe>
     </div>
   </section>
@@ -479,7 +536,7 @@
             <div [class]="'w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-lg transition-transform group-hover:scale-110 ' + step.bg + ' ' + step.color">
                 <i [class]="step.icon"></i>
             </div>
-            <h4 class="text-xl font-bold mb-2">{{ step.title }}</h4>
+            <h3 class="text-xl font-bold mb-2">{{ step.title }}</h3>
             <p class="text-gray-400 text-center text-sm px-4">{{ step.desc }}</p>
         </div>
         }
@@ -572,7 +629,7 @@
                         <p class="text-xs text-base-content/60">{{ review.date }}</p>
                     </div>
                     <!-- Google Icon (optional branding) -->
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" class="w-5 h-5 ml-auto opacity-70">
+                    <i class="fab fa-google text-blue-500 w-5 h-5 ml-auto opacity-70 text-lg"></i>
                 </div>
 
                 <!-- Stars -->
@@ -596,7 +653,7 @@
       </div>
       
       <div class="text-center mt-10">
-        <a href="https://search.google.com/local/writereview?placeid=PLACEHOLDER" target="_blank" class="btn btn-outline btn-primary">
+        <a href="https://share.google/Fnume9zIn9XpY4Xiu" target="_blank" class="btn btn-outline btn-primary">
             <i class="fas fa-pen mr-2"></i> Dejar una Reseña
         </a>
       </div>
@@ -613,7 +670,7 @@
     >
       @for(faq of faqs; track faq.question; let i = $index) {
       <div class="collapse collapse-arrow join-item border-b border-base-200">
-        <input type="radio" name="my-accordion-4" [checked]="i === 0" />
+        <input type="radio" name="my-accordion-4" [checked]="i === 0" [attr.aria-label]="faq.question" />
         <div class="collapse-title text-xl font-medium text-base-content">
           {{ faq.question }}
         </div>
@@ -635,11 +692,12 @@
           </h2>
           <form (ngSubmit)="sendContactForm()">
             <div class="form-control mb-4">
-              <label class="label"
+              <label class="label" for="contactName"
                 ><span class="label-text">Nombre</span></label
               >
               <input
                 type="text"
+                id="contactName"
                 [(ngModel)]="contactName"
                 name="name"
                 class="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
@@ -648,11 +706,12 @@
               />
             </div>
             <div class="form-control mb-4">
-              <label class="label"
+              <label class="label" for="contactPhone"
                 ><span class="label-text">Teléfono / WhatsApp</span></label
               >
               <input
                 type="tel"
+                id="contactPhone"
                 [(ngModel)]="contactPhone"
                 name="phone"
                 class="input input-bordered w-full bg-base-200 text-base-content placeholder:text-base-content/60"
@@ -661,10 +720,11 @@
               />
             </div>
             <div class="form-control mb-6">
-              <label class="label"
+              <label class="label" for="contactMessage"
                 ><span class="label-text">Mensaje</span></label
               >
               <textarea
+                id="contactMessage"
                 [(ngModel)]="contactMessage"
                 name="message"
                 class="textarea textarea-bordered h-32 w-full bg-base-200 text-base-content placeholder:text-base-content/60"
@@ -695,7 +755,7 @@
   </div>
 
   <!-- NOVEDADES Y RECURSOS (App & Blog) -->
-  <section class="py-24 bg-gray-50 relative overflow-hidden">
+  <section class="pt-24 pb-48 bg-gray-50 relative overflow-hidden">
       <!-- Background Blotches -->
       <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
       <div class="absolute bottom-0 left-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
@@ -757,7 +817,7 @@
         </ul>
 
         <a [href]="appInfo.downloadLink" target="_blank" class="w-full bg-white text-gray-900 rounded-xl p-3 flex items-center justify-center gap-3 hover:bg-gray-100 hover:scale-[1.02] transition-all duration-300 shadow-lg group-hover:shadow-blue-500/20">
-          <i class="fab fa-google-play text-2xl text-green-600"></i>
+
           <div class="text-left">
             <div class="text-[10px] uppercase font-bold tracking-wider text-gray-500">Disponible en</div>
             <div class="text-lg font-bold leading-none">Google Play</div>
@@ -803,40 +863,5 @@
 </div>
 
   <!-- BRANDS CAROUSEL (Bottom) -->
-  <section class="bg-white dark:bg-gray-900 py-12">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-      <h3
-        class="text-lg font-bold text-gray-400 mb-8 uppercase tracking-widest"
-      >
-        Trabajamos con las mejores marcas
-      </h3>
-      <div
-        class="flex flex-wrap justify-center gap-12 opacity-50 grayscale transition-all hover:grayscale-0"
-      >
-        <!-- Simple text/icon representation as placeholders -->
-        <div class="flex items-center gap-2 text-3xl font-bold dark:text-white">
-          <i class="fab fa-apple"></i> Apple
-        </div>
-        <div class="flex items-center gap-2 text-3xl font-bold text-blue-600">
-          Samsung
-        </div>
-        <div
-          class="flex items-center gap-2 text-3xl font-bold text-blue-900 dark:text-blue-400"
-        >
-          Motorola
-        </div>
-        <div class="flex items-center gap-2 text-3xl font-bold text-orange-500">
-          Xiaomi
-        </div>
-        <div class="flex items-center gap-2 text-3xl font-bold text-red-600">
-          LG
-        </div>
-        <div
-          class="flex items-center gap-2 text-3xl font-bold text-black dark:text-gray-200"
-        >
-          Sony
-        </div>
-      </div>
-    </div>
-  </section>
+
 </div>

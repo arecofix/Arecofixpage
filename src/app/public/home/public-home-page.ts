@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Title, Meta } from '@angular/platform-browser';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import { PreferencesService } from '../../shared/services/preferences.service';
+import { SeoService } from '../../shared/services/seo.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '@app/core/services/auth.service';
 
@@ -175,8 +175,7 @@ interface HomeContent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicHomePage implements OnInit {
-  private titleService = inject(Title);
-  private metaService = inject(Meta);
+  private seoService = inject(SeoService);
   private auth = inject(AuthService);
 
   whatsappNumber = environment.contact.whatsappNumber;
@@ -362,8 +361,8 @@ export class PublicHomePage implements OnInit {
         link: '/cursos'
       },
       cellServicePromo: {
-        title: '¿Necesitas Servicio Técnico?',
-        subtitle: 'Reparamos tu celular, tablet o consola con garantía y repuestos originales.',
+        title: 'Servicio Técnico de Celulares en Marcos Paz',
+        subtitle: 'Expertos en reparacion de celulares en Marcos Paz. Arreglo de celulares, tablets y consolas con repuestos originales y garantía garantizada.',
         cta: 'Solicitar Presupuesto',
         link: '/celular'
       },
@@ -399,14 +398,14 @@ export class PublicHomePage implements OnInit {
   }
 
   setSEO() {
-    const title = 'Soluciones Informáticas y Consultoría IT | Arecofix Software Factory';
-    const description = 'Transformamos ideas en software de alto impacto. Consultoría IT, Desarrollo Web, Apps Móviles y Servicio Técnico en Marcos Paz. Soluciones informáticas integrales.';
-
-    this.titleService.setTitle(title);
-    this.metaService.updateTag({ name: 'description', content: description });
-    this.metaService.updateTag({
-      name: 'keywords',
-      content: 'soluciones informaticas, consultoria it, software factory, desarrollo de software, programacion a medida, sistemas erp, desarrollo web argentina, servicio tecnico celulares'
+    this.seoService.setSeoData({
+      title: 'Servicio Técnico de Celulares en Marcos Paz | Arecofix Software Factory',
+      description: 'Líderes en reparacion de celulares en Marcos Paz. Realizamos arreglo de celulares, cambios de pantalla, baterías y software. Servicio técnico especializado con garantía.',
+      keywords: 'servicio tecnico de celulares en marcos paz, reparacion de celulares en marcos paz, arreglo de celulares en marcos paz, cambio de pantalla, cambio de bateria, software factory, desarrollo web',
+      ogTitle: 'Servicio Técnico de Celulares en Marcos Paz | Arecofix',
+      ogDescription: 'Reparación profesional de celulares. Confía en los expertos en Marcos Paz para el arreglo de tu dispositivo. Solicita tu presupuesto online.',
+      ogImage: 'assets/img/services/mobile-repair-og.jpg', // Placeholder, ideally should be a real image
+      ogUrl: 'https://arecofix.com.ar/'
     });
   }
 

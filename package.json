@@ -38,7 +38,7 @@
     "@capacitor/core": "^7.4.4",
     "@dataconnect/generated": "file:src/dataconnect-generated",
     "@fortawesome/fontawesome-free": "^7.1.0",
-    "@ionic/angular": "^8.7.12",
+    "@ionic/angular": "8.4.1",
     "@supabase/supabase-js": "^2.81.1",
     "@tailwindcss/postcss": "^4.1.10",
     "cally": "^0.8.0",

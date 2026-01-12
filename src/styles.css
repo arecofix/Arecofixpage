@@ -177,53 +177,60 @@ html, body {
         margin: 0;
         padding: 0;
         background-color: white;
+        overflow: hidden;
     }
 
-    body * {
-        visibility: hidden;
+    /* Hide everything by default */
+    body > *:not(.print-container) {
+        display: none !important;
     }
 
-    .no-print, 
+    /* Specifically hide UI components if they are direct children or portaled */
     app-sidebar, 
     app-header, 
     nav, 
     header, 
     footer, 
     .drawer-side,
-    .navbar {
+    .navbar,
+    .toast,
+    .file-input, 
+    button, 
+    .btn,
+    .no-print {
         display: none !important;
     }
 
-    .print-container,
-    .print-container *,
-    .printable-content,
-    .printable-content * {
-        visibility: visible !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
+    /* Show Print Container */
     .print-container {
         display: block !important;
-        position: absolute;
+        position: fixed; /* Fixed to ensure it stays at top */
         top: 0;
         left: 0;
         width: 210mm;
-        height: auto;
-        min-height: 100%;
+        height: 100%;
         background-color: white;
         z-index: 9999;
-        padding: 15mm;
-        box-sizing: border-box;
+        padding: 5mm; /* Reduced padding slightly */
     }
 
-    .printable-content {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        margin: 0 !important;
-        background-color: white;
-        z-index: 9999;
+    /* Ensure contents are visible and styled for print */
+    .print-container * {
+        visibility: visible !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important; /* Force black text for contrast */
+    }
+    
+    /* Specific overrides for print readability */
+    .print-container .border {
+        border-color: #000 !important;
+        border-width: 1px !important;
+    }
+    
+    .print-container .bg-gray-100, 
+    .print-container .bg-gray-50,
+    .print-container .bg-base-200 {
+        background-color: #f3f4f6 !important; /* Ensure light grays print */
     }
 }
