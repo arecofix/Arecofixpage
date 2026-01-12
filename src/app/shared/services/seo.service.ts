@@ -11,6 +11,7 @@ export interface SeoData {
   ogImage?: string;
   ogUrl?: string;
   ogType?: string;
+  additionalMetaTags?: { name?: string; property?: string; content: string }[];
 }
 
 @Injectable({
@@ -53,5 +54,12 @@ export class SeoService {
     
     // Additional Best Practices
     this.metaService.updateTag({ name: 'robots', content: 'index, follow' });
+
+    // Custom Tags
+    if (data.additionalMetaTags) {
+      data.additionalMetaTags.forEach(tag => {
+        this.metaService.updateTag(tag);
+      });
+    }
   }
 }

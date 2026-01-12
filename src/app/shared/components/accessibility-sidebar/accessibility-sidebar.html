@@ -131,7 +131,7 @@
 <!-- Toggle Sidebar Button -->
 <button
   (click)="preferencesService.toggleSidebar()"
-  class="fixed right-0 top-32 z-2000 p-3 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-l-lg transition-all shadow-lg"
+  class="fixed right-0 top-32 z-2000 p-3 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-l-lg transition-all shadow-lg cursor-pointer"
   [class.hidden]="(preferencesService.sidebarOpen$ | async)"
   [attr.aria-label]="(preferencesService.language$ | async) === 'es' ? 'Abrir panel de accesibilidad' : 'Open accessibility panel'"
   title="Accessibility"

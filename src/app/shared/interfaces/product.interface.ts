@@ -33,4 +33,6 @@ export interface ProductsParams extends Partial<Product> {
   _sort?: string;
   _order?: 'asc' | 'desc';
   category_ids?: string[];
+  min_price?: number;
+  max_price?: number;
 }

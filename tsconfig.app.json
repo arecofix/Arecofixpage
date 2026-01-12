@@ -4,10 +4,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-     "baseUrl": "./src",
+     "baseUrl": "./",
     "paths": {
-      "@app/*": ["app/*"],
-      "@env/*": ["environments/*"]
+      "@app/*": ["src/app/*"],
+      "@env/*": ["src/environments/*"]
     },
     "types": []
   },

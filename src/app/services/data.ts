@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Producto {
   id?: string;
@@ -19,7 +20,7 @@ export interface Categoria {
   providedIn: 'root'
 })
 export class DataService {
-  private BASE = 'https://arecofix-20698-default-rtdb.firebaseio.com';
+  private BASE = environment.firebase.databaseURL;
 
   constructor(private http: HttpClient) {}
 

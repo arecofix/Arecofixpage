@@ -206,8 +206,11 @@
             }
           </div>
 
-          <!-- Certifications -->
-          <div class="mt-12">
+            <div class="mt-12">
+              <app-certificate-gallery [title]="'Algunas de mis certificaciones'"></app-certificate-gallery>
+            </div>
+            
+            <div class="mt-12">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
               <span class="text-indigo-600 dark:text-indigo-400">📜</span>
               {{ currentLanguage === 'es' ? 'Certificaciones' : 'Certifications' }}

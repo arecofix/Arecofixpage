@@ -33,6 +33,8 @@ export class ProductService {
       name,
       price,
       slug,
+      min_price,
+      max_price,
     } = params;
 
     const start = (_page - 1) * _per_page;
@@ -57,6 +59,8 @@ export class ProductService {
     if (name) query = query.ilike('name', `%${name}%`);
     if (price) query = query.eq('price', price);
     if (slug) query = query.eq('slug', slug);
+    if (min_price !== undefined) query = query.gte('price', min_price);
+    if (max_price !== undefined) query = query.lte('price', max_price);
 
     // Apply sorting
     if (params._sort) {

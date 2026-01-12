@@ -5,11 +5,12 @@ import {
   input,
   linkedSignal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'pagination',
-  imports: [RouterLink],
+  standalone: true,
+  imports: [RouterModule],
   templateUrl: './pagination.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,

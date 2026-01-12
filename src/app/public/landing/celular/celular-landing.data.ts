@@ -76,18 +76,24 @@ export const COURSES_LIST = [
     },
     {
       img: 'assets/img/cursos/alumno3.jpg',
-      title: 'Certificación Oficial',
-      subtitle: 'Mejora tus capacidades',
+      title: 'Curso Inicial',
+      subtitle: 'Nivel Principiante',
+      duration: '3 Meses',
+      days: 'Sábados 10hs'
     },
     {
       img: 'assets/img/cursos/alumno2.jpg',
-      title: 'Aulas Equipadas',
-      subtitle: 'Tecnología de última generación',
+      title: 'Curso Avanzado',
+      subtitle: 'Microelectrónica',
+      duration: '4 Meses',
+      days: 'Miércoles 18hs'
     },
     {
       img: 'assets/img/cursos/aprendizaje-practico.jpg',
       title: 'Aprendizaje Práctico',
       subtitle: '85% práctica - 15% teoría',
+      duration: '',
+      days: ''
     },
   ];
 
@@ -112,10 +118,10 @@ export const FAQS = [
 
 export const REVIEWS = [
         {
-            name: 'Marcela Pita',
+            name: 'Juan Perez',
             date: 'hace 2 días',
             stars: 5,
-            initial: 'M',
+            initial: 'J',
             bgColor: 'bg-orange-500',
             text: 'La verdad exelente trabajo ,responsable muy educado y sobre todo muy honesto Gracias Ezequiel !!!!!'
         },
@@ -186,13 +192,13 @@ export const GALLERY_ITEMS = [
 
 export const PARTNERS = [
         { name: 'MobiDoc', icon: 'fas fa-user-md', color: 'text-cyan-500', url: 'https://mobidoc.com.ar' },
-        { name: 'Mercado Pago', icon: 'fas fa-hand-holding-usd', color: 'text-blue-400' },
-        { name: 'Reviews', icon: 'fab fa-google', color: 'text-blue-600' }
+        { name: 'La Clinica de tu celular', icon: 'fas fa-hand-holding-usd', color: 'text-blue-400' },
+        { name: 'Doctor de tu celular', icon: 'fas fa-hand-holding-usd', color: 'text-blue-400' }
     ];
 
 export const MENTIONS = [
         { name: 'La Electrónica Online', url: 'https://laelectronicaonline.com.ar/casa-electronica/arecofix-servicio-tecnico-de-celulares-venta-de-repuestos/' },
-        { name: 'Municipio Marcos Paz', url: 'https://www.marcospaz.gob.ar/noticias/item/8551-j%C3%B3venes-del-programa-envi%C3%B3n-finalizaron-el-curso-de-reparaci%C3%B3n-de-celulares.html' },
+        { name: 'Municipio Marcos Paz', url: 'https://www.marcospaz.gov.ar/noticias/item/8551-j%C3%B3venes-del-programa-envi%C3%B3n-finalizaron-el-curso-de-reparaci%C3%B3n-de-celulares.html' },
         { name: 'A1 Noticias', url: 'https://a1noticias.com.ar/nota/9798/marcos-paz-jovenes-del-programa-envion-finalizaron-el-curso-de-reparacion-de-celulares' },
         { name: 'Mobidoc', url: 'https://mobidoc.com.ar/servicio-tecnico/arecofix-soluciones-digitales/' },
         { name: 'Red Argentina', url: 'https://www.redargentina.com.ar/arecofix-servicio-tecnico-de-celulares-en-marcos-paz-F120EC10E1AD945' },

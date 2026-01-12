@@ -8,9 +8,10 @@ import {
 import { CommonModule, DOCUMENT, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title, Meta } from '@angular/platform-browser';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '@app/core/services/auth.service';
+import { SeoService } from '@app/shared/services/seo.service'; // Added import
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
 import { ProductCarouselComponent } from '@app/shared/components/product-carousel/product-carousel.component';
 import { BreadcrumbsComponent } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
@@ -42,18 +43,17 @@ interface GalleryItem {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
+    RouterModule,
     FormsModule,
     ReservationCalendar,
     ProductCarouselComponent,
     BreadcrumbsComponent,
-    NgOptimizedImage,
+    NgOptimizedImage
   ],
   templateUrl: './celular-landing.component.html',
 })
 export class CelularLandingComponent implements OnInit {
-  private titleService = inject(Title);
-  private metaService = inject(Meta);
+  private seoService = inject(SeoService); // Injected SeoService
   private document = inject(DOCUMENT);
   private platformId = inject(PLATFORM_ID);
   private auth = inject(AuthService);
@@ -92,40 +92,19 @@ export class CelularLandingComponent implements OnInit {
   }
 
   setSEO() {
-    const title =
-      'Servicio Técnico de Celulares en Marcos Paz | Reparación iPhone, Samsung, Motorola | Arecofix';
-    const description =
-      'Arreglo de celulares en Marcos Paz. Presupuesto sin cargo y garantía escrita. Cambio de pantalla y batería en el acto. Servicio técnico oficial para iPhone, Samsung y Motorola.';
-    const url = 'https://arecofix.com/#/celular';
-    const image = 'https://arecofix.com/assets/img/branding/og-celulares.jpg';
-
-    this.titleService.setTitle(title);
-
-    this.metaService.updateTag({ name: 'description', content: description });
-    this.metaService.updateTag({
-      name: 'keywords',
-      content:
-        'Reparación de celulares en Marcos Paz, accesorios para celulares, local especializado en reparación de celulares, servicio técnico oficial iPhone Samsung Motorola, cambio de pantalla, arreglo de bateria, Arecofix',
+    this.seoService.setSeoData({
+      title: 'Servicio Técnico de Celulares en Marcos Paz | Reparación iPhone, Samsung, Motorola | Arecofix',
+      description: 'Arreglo de celulares en Marcos Paz. Presupuesto sin cargo y garantía escrita. Cambio de pantalla y batería en el acto. Servicio técnico oficial para iPhone, Samsung y Motorola.',
+      keywords: 'Reparación de celulares en Marcos Paz, accesorios para celulares, local especializado en reparación de celulares, servicio técnico oficial iPhone Samsung Motorola, cambio de pantalla, arreglo de bateria, Arecofix',
+      ogImage: 'https://arecofix.com/assets/img/branding/og-celulares.jpg',
+      ogUrl: 'https://arecofix.com/#/celular',
+      ogTitle: 'Servicio Técnico de Celulares en Marcos Paz | Arecofix',
+      ogDescription: 'Reparación profesional de celulares. Confía en los expertos. Presupuesto sin cargo.',
+      additionalMetaTags: [
+        { name: 'geo.region', content: 'AR-B' },
+        { name: 'geo.placename', content: 'Marcos Paz' }
+      ]
     });
-    this.metaService.updateTag({ name: 'geo.region', content: 'AR-B' });
-    this.metaService.updateTag({
-      name: 'geo.placename',
-      content: 'Marcos Paz',
-    });
-
-    this.metaService.updateTag({ property: 'og:type', content: 'website' });
-    this.metaService.updateTag({ property: 'og:title', content: title });
-    this.metaService.updateTag({
-      property: 'og:description',
-      content: description,
-    });
-    this.metaService.updateTag({ property: 'og:image', content: image });
-    this.metaService.updateTag({ property: 'og:url', content: url });
-    this.metaService.updateTag({
-      property: 'og:site_name',
-      content: 'Arecofix',
-    });
-    this.metaService.updateTag({ property: 'og:locale', content: 'es_AR' });
   }
 
   setStructuredData() {

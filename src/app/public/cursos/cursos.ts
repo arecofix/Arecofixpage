@@ -1,4 +1,5 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, signal, inject } from '@angular/core';
+import { SeoService } from '@app/shared/services/seo.service';
 // Trigger rebuild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,10 +42,25 @@ export class CursosComponent implements OnInit {
         { icon: 'fa-briefcase', title: 'Salida Laboral', description: 'Bolsa de trabajo y prácticas profesionales' }
     ];
 
+    private seoService = inject(SeoService);
+
     constructor(private coursesService: CoursesService, private route: ActivatedRoute, private categoryService: CategoryService, private productService: ProductService, public paginationService: PaginationService) { }
 
     ngOnInit() {
+        this.setSEO();
         this.loadCourses();
+    }
+
+    setSEO() {
+        this.seoService.setSeoData({
+            title: 'Cursos de Reparación y Oficios | Arecofix Academy',
+            description: 'Capacítate con los mejores. Cursos prácticos de reparación de celulares, electrónica y más en Marcos Paz. Salida laboral inmediata.',
+            keywords: 'cursos reparacion celulares, curso oficios, marcos paz, arecofix academy, capacitacion tecnica, salida laboral',
+            ogTitle: 'Arecofix Academy | Cursos Profesionales',
+            ogDescription: 'Tu futuro técnico empieza acá. Inscríbete en nuestros cursos presenciales.',
+            ogImage: 'assets/img/branding/og-courses.jpg',
+            ogUrl: 'https://arecofix.com/#/cursos'
+        });
     }
 
     loadCourses() {
@@ -73,6 +89,8 @@ export class CursosComponent implements OnInit {
                             ...c,
                             rating: c.rating || 4.8,
                             students: c.students || 0,
+                            duration: c.duration || '4 Meses',
+                            schedule: c.schedule || 'Sábados 10 a 13hs',
                             image_url: (c.image_url && c.image_url.includes('curso-reparacion-de-celulares.jpg'))
                                 ? 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg' 
                                 : c.image_url
@@ -94,18 +112,30 @@ export class CursosComponent implements OnInit {
         return [
             {
                 id: '1',
-                title: 'Reparación de Celulares - Nivel Básico',
-                slug: 'reparacion-celulares-basico',
+                title: 'Curso Inicial - Nivel Principiante',
+                slug: 'curso-inicial-reparacion',
                 description: 'Aprende los fundamentos de la reparación de smartphones. Incluye diagnóstico, cambio de pantallas y baterías.',
-                duration: '3 meses',
-                schedule: 'Lunes y Miércoles 18:00-21:00',
+                duration: '3 Meses',
+                schedule: 'Sábados 10hs',
                 price: 45000,
-                image_url: 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg',
-                level: 'Básico',
+                image_url: 'assets/img/cursos/alumno3.jpg',
+                level: 'Principiante',
                 students: 120,
                 rating: 4.8
             },
-            // ... (rest of the mock data can be kept here as fallback)
+            {
+                id: '2',
+                title: 'Curso Avanzado - Microelectrónica',
+                slug: 'curso-avanzado-microelectronica',
+                description: 'Especialización en diagnóstico de placas, soldadura de precisión y esquemáticos.',
+                duration: '4 Meses',
+                schedule: 'Miércoles 18hs',
+                price: 65000,
+                image_url: 'assets/img/cursos/alumno2.jpg',
+                level: 'Avanzado',
+                students: 85,
+                rating: 4.9
+            }
         ];
     }
 

@@ -3,7 +3,7 @@
   <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-gray-50 dark:bg-gray-900">
     <!-- Background Image/Gradient -->
     <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0 bg-gradient-to-b from-white/80 to-white/90 dark:from-transparent dark:to-black/80 z-10"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-white/80 to-white/90 dark:from-transparent dark:to-black/80 z-10"></div>
         <!-- Decorative circles -->
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500/10 dark:bg-blue-500/20 blur-3xl"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-3xl"></div>
@@ -70,7 +70,7 @@
     <div class="container mx-auto px-4">
       <div class="grid md:grid-cols-2 gap-8">
         <!-- Mission Card -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">
+        <div class="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">
           <div class="w-12 h-12 bg-blue-100 dark:bg-blue-600/80 text-blue-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
             🎯
           </div>
@@ -81,7 +81,7 @@
         </div>
         
         <!-- Vision Card -->
-        <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
+        <div class="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
           <div class="w-12 h-12 bg-purple-100 dark:bg-purple-600/80 text-purple-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
             🔭
           </div>
@@ -126,7 +126,7 @@
 
       <div class="flex justify-center flex-wrap gap-8">
         <div *ngFor="let member of content.teamMembers" class="max-w-md w-full bg-white dark:bg-white/5 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-white/10 transform hover:-translate-y-1 transition-transform duration-300 backdrop-blur-md">
-          <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-80"></div>
+          <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 opacity-80"></div>
           <div class="px-8 pb-8">
             <div class="relative -mt-16 mb-6">
               <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl">
@@ -155,6 +155,9 @@
     </div>
   </section>
 
+  <!-- Certificate Gallery Section -->
+  <app-certificate-gallery [title]="'Nuestros Certificados'"></app-certificate-gallery>
+
   <!-- FAQ Section -->
   <section class="py-20 bg-gray-50 dark:bg-transparent">
     <div class="container mx-auto px-4 max-w-4xl">
@@ -173,7 +176,7 @@
               </svg>
             </span>
           </button>
-          <div *ngIf="expandedFAQ === i" class="px-6 pb-4 pt-0 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">
+          <div *ngIf="expandedFAQ === i" class="px-6 pb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">
             {{ faq.answer }}
           </div>
         </div>
@@ -182,7 +185,7 @@
   </section>
 
   <!-- CTA Section -->
-  <section class="py-20 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 dark:from-blue-900/80 dark:to-indigo-900/80 text-white text-center backdrop-blur-md border-t border-white/10">
+  <section class="py-20 bg-linear-to-r from-blue-600/90 to-indigo-600/90 dark:from-blue-900/80 dark:to-indigo-900/80 text-white text-center backdrop-blur-md border-t border-white/10">
     <div class="container mx-auto px-4">
       <h2 class="text-3xl md:text-4xl font-bold mb-6">{{ content.ctaTitle }}</h2>
       <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">

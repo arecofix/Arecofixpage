@@ -11,6 +11,7 @@ export const environment = {
   production: false,
   appName: 'Arecofix',
   apiUrl: 'https://arecofix.com.ar',
+  baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
   // TODO: Move to .env and use build-time replacement
@@ -43,6 +44,7 @@ export const environment = {
     projectId: "arecofix-ca60b",
     storageBucket: "arecofix-ca60b.appspot.com",
     messagingSenderId: "301262429786",
-    appId: "1:301262429786:web:0aca5a5c777b7ab1d08263"
+    appId: "1:301262429786:web:0aca5a5c777b7ab1d08263",
+    databaseURL: "https://arecofix-20698-default-rtdb.firebaseio.com"
   }
 };

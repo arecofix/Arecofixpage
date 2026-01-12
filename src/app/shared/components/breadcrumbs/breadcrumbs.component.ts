@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 export interface BreadcrumbItem {
   label: string;
@@ -10,7 +10,7 @@ export interface BreadcrumbItem {
 @Component({
   selector: 'app-breadcrumbs',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterModule],
   template: `
     <nav aria-label="Breadcrumb" class="container mx-auto px-4 py-4">
       <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">

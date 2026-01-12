@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PreferencesService } from '../../shared/services/preferences.service';
+import { SeoService } from '../../shared/services/seo.service';
+import { CertificateGalleryComponent } from '../../shared/components/certificate-gallery/certificate-gallery.component';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -59,11 +61,24 @@ interface NosotrosContent {
 @Component({
   selector: 'app-nosotros',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CertificateGalleryComponent],
   templateUrl: './nosotros.html',
   styleUrls: ['./nosotros.css']
 })
-export class NosotrosComponent {
+export class NosotrosComponent implements OnInit {
+  private seoService = inject(SeoService);
+  
+  ngOnInit() {
+    this.seoService.setSeoData({
+      title: 'Sobre Nosotros | Arecofix Software Factory',
+      description: 'Más que una empresa de software. Somos un equipo apasionado por transformar negocios a través de la tecnología en Marcos Paz y el mundo.',
+      keywords: 'sobre nosotros, arecofix, software factory, marcos paz, equipo de desarrollo, historia, mision, vision, valores',
+      ogTitle: 'Conoce Arecofix | Innovación Tecnológica en Marcos Paz',
+      ogDescription: 'Descubre nuestra historia, nuestra misión y el equipo detrás de las soluciones tecnológicas que impulsan el futuro.',
+      ogImage: 'assets/img/branding/og-nosotros.jpg',
+      ogUrl: 'https://arecofix.com/#/nosotros'
+    });
+  }
 
   expandedFAQ: number | null = null;
 

@@ -7,6 +7,7 @@ import { Post } from '@app/features/posts/domain/entities/post.entity';
 import { PostService } from '@app/features/posts/application/post.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-post-page',
@@ -97,8 +98,8 @@ export class PostPage implements OnInit, OnDestroy {
             // Open Graph (Social)
             this.metaService.updateTag({ property: 'og:title', content: 'Reparación de Celulares en Marcos Paz | Arecofix' });
             this.metaService.updateTag({ property: 'og:description', content: 'Servicio técnico especializado. Reparamos iPhone, Samsung, Motorola y más en el acto. ¡Tu celular en las mejores manos!' });
-            this.metaService.updateTag({ property: 'og:image', content: 'https://arecofix.com.ar/assets/img/repair/1.jpg' });
-            this.metaService.updateTag({ property: 'og:url', content: 'https://arecofix.com.ar/posts/servicio-tecnico-de-celulares-en-marcos-paz' });
+            this.metaService.updateTag({ property: 'og:image', content: `${environment.baseUrl}/assets/img/repair/1.jpg` });
+            this.metaService.updateTag({ property: 'og:url', content: `${environment.baseUrl}/posts/servicio-tecnico-de-celulares-en-marcos-paz` });
             this.metaService.updateTag({ property: 'og:type', content: 'website' });
 
             this.injectJsonLd();
@@ -121,7 +122,7 @@ export class PostPage implements OnInit, OnDestroy {
             "@context": "https://schema.org",
             "@type": "MobilePhoneStore",
             "name": "Arecofix - Servicio Técnico de Celulares",
-            "image": "https://arecofix.com/assets/img/cursos/local.webp",
+            "image": `${environment.baseUrl}/assets/img/cursos/local.webp`,
             "description": "Servicio técnico especializado en reparación de celulares en Marcos Paz. Cambio de pantallas, baterías y micro-soldadura.",
             "address": {
                 "@type": "PostalAddress",
@@ -136,7 +137,7 @@ export class PostPage implements OnInit, OnDestroy {
                 "latitude": "-34.77", // Placeholder
                 "longitude": "-58.83" // Placeholder
             },
-            "url": "https://arecofix.com",
+            "url": environment.baseUrl,
             "telephone": "+5491125960900",
             "priceRange": "$$",
             "openingHoursSpecification": [

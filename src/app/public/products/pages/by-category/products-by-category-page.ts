@@ -5,23 +5,22 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of, tap } from 'rxjs';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 
-/*  */
 import {
   IsErrorComponent,
   IsLoadingComponent,
 } from '@app/shared/components/resource-status';
-/*  */
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
 import {
   iCategoriesResponse,
   iCategory,
-  iRequestParams,
 } from '@app/public/categories/interfaces';
+import { CartService } from '@app/shared/services/cart.service';
 import {
   Pagination,
   PaginationService,
@@ -29,34 +28,45 @@ import {
 } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
 
-/*  */
 @Component({
   selector: 'products-by-category-page',
   imports: [
     IsErrorComponent,
     IsLoadingComponent,
     ProductCard,
-    Pagination
-],
+    Pagination,
+    RouterModule,
+    FormsModule
+  ],
   templateUrl: './products-by-category-page.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsByCategoryPage {
   private route: ActivatedRoute = inject(ActivatedRoute);
+  private router: Router = inject(Router);
   private categoryService: CategoryService = inject(CategoryService);
   private productService: ProductService = inject(ProductService);
   public paginationService: PaginationService = inject(PaginationService);
+  public cartService: CartService = inject(CartService);
 
   public currentCategory = signal<iCategory | null>(null);
+
+  // Filter signals to bind to UI inputs
+  minPriceInput = signal<number | null>(null);
+  maxPriceInput = signal<number | null>(null);
+
+  categoriesListRs = rxResource({
+    stream: () => this.categoryService.getFeaturedData()
+  });
 
   productsRs = rxResource({
     stream: () =>
       combineLatest([
         this.route.params.pipe(map(({ categorySlug }) => categorySlug)),
-        this.route.queryParams.pipe(map((params) => +params['_page'] || 1)),
+        this.route.queryParams,
       ]).pipe(
-        switchMap(([slug, currentPage]) =>
+        switchMap(([slug, params]) =>
           this.categoryService.getDataBySlug(slug).pipe(
             tap((category: iCategoriesResponse) => {
               this.currentCategory.set(category.data?.[0] || null);
@@ -70,9 +80,23 @@ export class ProductsByCategoryPage {
                 });
               }
 
+              const currentPage = +params['_page'] || 1;
+              const _sort = params['_sort'];
+              const _order = params['_order'] as 'asc' | 'desc';
+              const min_price = params['min_price'] ? +params['min_price'] : undefined;
+              const max_price = params['max_price'] ? +params['max_price'] : undefined;
+
+              // Update inputs if they are empty (initial load)
+              if (this.minPriceInput() === null && min_price) this.minPriceInput.set(min_price);
+              if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
+
               return this.productService.getData({
                 category_id: categoryId,
                 _page: currentPage,
+                _sort,
+                _order,
+                min_price,
+                max_price
               });
             })
           )
@@ -89,5 +113,55 @@ export class ProductsByCategoryPage {
     const { data: products, ...pagination } = data;
     return pagination as iPagination;
   });
+
+  // UI States
+  public isMobileFiltersOpen = signal(false);
+  public isQuickViewOpen = signal(false);
+  public quickViewProduct = signal<any>(null);
+
+  // Methods
+  toggleMobileFilters() {
+    this.isMobileFiltersOpen.update(v => !v);
+  }
+
+  openQuickView(product: any) {
+    this.quickViewProduct.set(product);
+    this.isQuickViewOpen.set(true);
+  }
+
+  closeQuickView() {
+    this.isQuickViewOpen.set(false);
+    this.quickViewProduct.set(null);
+  }
+
+  addToCart(product: any) {
+      this.cartService.addToCart(product);
+      this.closeQuickView();
+  }
+
+  applyPriceFilter() {
+     this.router.navigate([], {
+       relativeTo: this.route,
+       queryParams: {
+         min_price: this.minPriceInput(),
+         max_price: this.maxPriceInput(),
+         _page: 1 
+       },
+       queryParamsHandling: 'merge', 
+     });
+     this.isMobileFiltersOpen.set(false);
+  }
+
+  setSort(sort: string, order: string = 'asc') {
+      this.router.navigate([], {
+       relativeTo: this.route,
+       queryParams: {
+         _sort: sort,
+         _order: order,
+         _page: 1
+       },
+       queryParamsHandling: 'merge',
+     });
+  }
 }
 export default ProductsByCategoryPage;

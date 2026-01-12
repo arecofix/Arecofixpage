@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject, output } from '@angular/core';
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 
 @Component({
   selector: 'product-card',
-  imports: [RouterLink, DecimalPipe, NgOptimizedImage],
+  standalone: true,
+  imports: [RouterModule, DecimalPipe, NgOptimizedImage],
   templateUrl: './product-card.html',
   styles: `
     .line-clamp-2 {
@@ -28,6 +29,7 @@ import { CartService } from '@app/shared/services/cart.service';
 export class ProductCard {
   product = input.required<Product>();
   isPriority = input(false);
+  quickView = output<Product>();
   private cartService = inject(CartService);
 
   addToCart(event: Event) {

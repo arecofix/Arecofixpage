@@ -96,7 +96,7 @@ export class CoursesService {
         return from(
             this.supabase
                 .from('courses')
-                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at')
+                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at, duration, schedule')
                 .order('created_at', { ascending: false })
                 .returns<Course[]>()
         );

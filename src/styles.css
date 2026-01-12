@@ -43,6 +43,10 @@
   
   --color-surface-dark: #0f111a;
   --color-card-dark: #1c2131;
+
+  /* Custom Z-Index */
+  --z-index-2000: 2000;
+  --z-index-3000: 3000;
 }
 
 /* 
@@ -171,21 +175,22 @@ html, body {
         margin: 0;
     }
 
+    /* Reset basic layout */
     html, body {
-        width: 210mm;
-        height: 297mm;
-        margin: 0;
-        padding: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
         background-color: white;
-        overflow: hidden;
+        overflow: visible;
     }
 
-    /* Hide everything by default */
-    body > *:not(.print-container) {
-        display: none !important;
+    /* Hide everything primarily */
+    body {
+        visibility: hidden;
     }
 
-    /* Specifically hide UI components if they are direct children or portaled */
+    /* Ensure specific UI elements are fully removed from layout to prevent interference */
     app-sidebar, 
     app-header, 
     nav, 
@@ -194,9 +199,8 @@ html, body {
     .drawer-side,
     .navbar,
     .toast,
-    .file-input, 
-    button, 
-    .btn,
+    button:not(.print-container button),
+    .btn:not(.print-container .btn),
     .no-print {
         display: none !important;
     }
@@ -204,25 +208,27 @@ html, body {
     /* Show Print Container */
     .print-container {
         display: block !important;
-        position: fixed; /* Fixed to ensure it stays at top */
+        visibility: visible !important;
+        position: absolute;
         top: 0;
         left: 0;
-        width: 210mm;
-        height: 100%;
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 5mm;
         background-color: white;
         z-index: 9999;
-        padding: 5mm; /* Reduced padding slightly */
     }
 
-    /* Ensure contents are visible and styled for print */
+    /* Ensure children of print-container are visible */
     .print-container * {
         visibility: visible !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        color: black !important; /* Force black text for contrast */
+        color: black !important;
     }
-    
-    /* Specific overrides for print readability */
+
+    /* Print Specific Styling Overrides */
     .print-container .border {
         border-color: #000 !important;
         border-width: 1px !important;
@@ -231,6 +237,6 @@ html, body {
     .print-container .bg-gray-100, 
     .print-container .bg-gray-50,
     .print-container .bg-base-200 {
-        background-color: #f3f4f6 !important; /* Ensure light grays print */
+        background-color: #f3f4f6 !important;
     }
 }

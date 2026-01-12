@@ -60,6 +60,13 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
   public searchQuery = signal('');
   public products = signal<Product[]>([]);
   public showResults = signal(false);
+  
+  // Cart Drawer Logic
+  public isCartOpen = signal(false);
+
+  public toggleCart() {
+    this.isCartOpen.update(v => !v);
+  }
 
   // Navbar Visibility Logic
   public isVisible = signal(true);
