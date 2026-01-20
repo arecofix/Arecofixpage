@@ -44,7 +44,8 @@ export class PublicHomePage implements OnInit {
     company: '',
     projectType: 'web',
     budget: 'mid',
-    description: ''
+    description: '',
+    cta: ''
   };
   sendingQuote = false;
 
@@ -71,14 +72,19 @@ export class PublicHomePage implements OnInit {
 
   setSEO() {
     this.seoService.setSeoData({
-      title: 'Servicio Técnico de Celulares en Marcos Paz | Arecofix Software Factory',
-      description: 'Líderes en reparacion de celulares en Marcos Paz. Realizamos arreglo de celulares, cambios de pantalla, baterías y software. Servicio técnico especializado con garantía.',
-      keywords: 'servicio tecnico de celulares en marcos paz, reparacion de celulares en marcos paz, arreglo de celulares en marcos paz, cambio de pantalla, cambio de bateria, software factory, desarrollo web',
-      ogTitle: 'Servicio Técnico de Celulares en Marcos Paz | Arecofix',
-      ogDescription: 'Reparación profesional de celulares. Confía en los expertos en Marcos Paz para el arreglo de tu dispositivo. Solicita tu presupuesto online.',
-      ogImage: 'assets/img/services/mobile-repair-og.jpg', // Placeholder, ideally should be a real image
+      title: 'Soluciones de Software & Consultoría IT | Arecofix',
+      description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
+      keywords: 'desarrollo de software, consultoria it, aplicaciones moviles, servicio tecnico, marcos paz, software factory, arecofix, reparacion de celulares',
+      ogTitle: 'Soluciones Informáticas de Calidad | Arecofix',
+      ogDescription: 'Impulsamos tu negocio con tecnología de vanguardia. Desarrollo web, apps y consultoría estratégica.',
+      ogImage: 'assets/img/hero-illustration.svg',
       ogUrl: 'https://arecofix.com.ar/'
     });
+  }
+
+
+  scrollToSection(element: HTMLElement) {
+    element.scrollIntoView({ behavior: 'smooth' });
   }
 
   async sendQuote() {

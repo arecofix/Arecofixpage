@@ -26,6 +26,15 @@
                     <div class="absolute inset-0 bg-linear-to-b from-gray-900/50 to-gray-900"></div>
                 </div>
                 <div class="relative z-10 container mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
+                    <!-- Breadcrumbs -->
+                    <div class="text-sm breadcrumbs text-gray-400 mb-6 -mt-8">
+                        <ul>
+                            <li><a routerLink="/" class="hover:text-white transition-colors">Inicio</a></li>
+                            <li><a routerLink="/blog" class="hover:text-white transition-colors">Blog</a></li>
+                            <li class="font-semibold text-white truncate max-w-[200px]">{{ post.title }}</li>
+                        </ul>
+                    </div>
+
                     <span class="inline-block py-1 px-3 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-sm font-bold tracking-wide uppercase mb-6 animate-fade-in-up">Servicio Técnico en Marcos Paz</span>
                     <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight animate-fade-in-up delay-100">
                         Tu celular tiene <span class="text-indigo-400">solución</span>.

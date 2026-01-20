@@ -7,7 +7,7 @@
   } @else if (error || !course) {
     <div class="container mx-auto px-4 py-20 text-center">
       <is-error [message]="error || 'Curso no encontrado'" />
-      <a routerLink="/cursos" class="btn btn-primary mt-4">Volver a Cursos</a>
+      <a routerLink="/academy" class="btn btn-primary mt-4">Volver a Cursos</a>
     </div>
   } @else {
     <!-- Hero Section -->
@@ -23,7 +23,7 @@
           <div class="text-sm breadcrumbs text-gray-300 mb-6">
             <ul>
               <li><a routerLink="/">Inicio</a></li>
-              <li><a routerLink="/cursos">Cursos</a></li>
+              <li><a routerLink="/academy">Cursos</a></li>
               <li class="font-semibold text-white">{{course.title}}</li>
             </ul>
           </div>
@@ -364,7 +364,7 @@
 
                      <!-- Mini Instructor Bio -->
                      <div class="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700 text-center opacity-70 hover:opacity-100 transition-opacity">
-                        <img src="assets/img/brands/logo/log.png" alt="Arecofix Academy" class="h-8 mx-auto mb-4 grayscale">
+                        <img src="/assets/img/brands/logo/log.png" alt="Arecofix Academy" class="h-8 mx-auto mb-4 grayscale">
                         <p class="text-sm">
                             <strong>Instructor Certificado:</strong> Ezequiel. Especialista en microsoldadura y reparación de dispositivos móviles con más de 10 años de experiencia en el gremio.
                         </p>

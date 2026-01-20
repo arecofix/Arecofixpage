@@ -1,12 +1,18 @@
 # Archivo robots.txt para arecofix.com.ar
 # Permitir acceso general a los rastreadores
-
 User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /dashboard/
 Disallow: /assets/download/
 Disallow: /datab/
+
+# Optimización para AI Bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 # Directivas específicas para Google
 User-agent: Googlebot

@@ -1,24 +1,52 @@
-@if (categoriesRs.isLoading()) {
-  <is-loading />
-} @else if (!categoriesRs.hasValue()) {
-  <is-empty />
-} @else if (categoriesRs.error()) {
-  <is-error />
-} @else if (categoriesRs.hasValue()) {
+<!-- Hero Section -->
+<div class="relative bg-gray-900 text-white py-16 mb-12 overflow-hidden isolate">
+    <div class="absolute inset-0 bg-linear-to-r from-slate-900 via-purple-900 to-slate-900 opacity-90"></div>
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-3xl opacity-20"></div>
+    <div class="absolute bottom-0 right-0 w-64 h-64 bg-teal-500 rounded-full mix-blend-screen filter blur-3xl opacity-20"></div>
 
-  @if (paginationData()) {
-    <pagination
-      [pages]="categoriesRs.value().pages"
-      [currentPage]="paginationService.currentPage()"
-    />
-  }
+    <div class="relative container mx-auto px-4 text-center">
+         <!-- Breadcrumbs -->
+        <div class="text-sm breadcrumbs text-gray-400 justify-center mb-6 flex">
+            <ul>
+                <li><a routerLink="/" class="hover:text-white transition-colors">Inicio</a></li>
+                <li class="font-semibold text-white">Categorías</li>
+            </ul>
+        </div>
 
-  <div class="divider"></div>
+        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight text-white drop-shadow-xl">
+            Explorá Nuestras Categorías
+        </h1>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
+            Encontrá exactamente lo que buscás navegando por nuestras secciones especializadas. Calidad y variedad en un solo lugar.
+        </p>
+    </div>
+</div>
 
-  <!-- Responsive category grid: 1 column on small, 3 on medium, 5 on large screens -->
-  <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6 p-6">
-    @for (category of filteredCategories(); track $index) {
-      <public-category-card [category]="category" />
+<div class="container mx-auto px-4 pb-20">
+  @if (categoriesRs.isLoading()) {
+    <is-loading />
+  } @else if (categoriesRs.error()) {
+    <is-error />
+  } @else if (categoriesRs.hasValue()) {
+    
+    @if (categoriesRs.value().data.length === 0) {
+        <is-empty />
+    } @else {
+        <!-- Responsive category grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            @for (category of filteredCategories(); track category.id) {
+            <public-category-card [category]="category" class="h-full" />
+            }
+        </div>
+
+        @if (paginationData()) {
+            <div class="mt-16 flex justify-center">
+                <pagination
+                [pages]="categoriesRs.value().pages"
+                [currentPage]="paginationService.currentPage()"
+                />
+            </div>
+        }
     }
-  </div>
-}
+  }
+</div>

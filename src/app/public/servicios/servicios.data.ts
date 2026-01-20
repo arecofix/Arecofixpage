@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 export interface Service {
     id: number;
     title: string;
+    slug?: string;
     description: string;
     icon: string;
     features: string[];
@@ -16,7 +17,7 @@ export interface ProcessStep {
     title: string;
     description: string;
     icon: string;
-}
+  }
 
 export interface Guarantee {
     icon: string;
@@ -45,295 +46,235 @@ export interface ServiciosContent {
 
 export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } = {
     es: {
-        heroTitle: 'Servicios Técnicos',
-        heroSubtitle: 'Profesionales',
-        heroDescription: 'Reparación especializada de smartphones, tablets, consolas y desarrollo de software',
-        heroCtaWhatsapp: 'Solicitar Servicio',
-        heroCtaAll: 'Ver Todos los Servicios',
-        processTitle: 'Nuestro Proceso',
+        heroTitle: 'Servicios de Consultoría & Tecnología',
+        heroSubtitle: 'Soluciones Empresariales',
+        heroDescription: 'Desde Inteligencia Artificial hasta Reparación de Hardware Crítico. Un ecosistema completo para tu negocio.',
+        heroCtaWhatsapp: 'Hablar con Especialista',
+        heroCtaAll: 'Explorar Servicios',
+        processTitle: 'Metodología de Servicios',
         process: [
-            { step: 1, title: 'Diagnóstico', description: 'Evaluamos tu dispositivo sin cargo', icon: 'fa-search' },
-            { step: 2, title: 'Presupuesto', description: 'Te enviamos un presupuesto detallado', icon: 'fa-file-invoice-dollar' },
-            { step: 3, title: 'Reparación', description: 'Realizamos el trabajo con garantía', icon: 'fa-wrench' },
-            { step: 4, title: 'Entrega', description: 'Probamos y entregamos tu equipo', icon: 'fa-check-circle' }
+            { step: 1, title: 'Análisis', description: 'Evaluamos tus necesidades y objetivos comerciales', icon: 'fa-chart-pie' },
+            { step: 2, title: 'Estrategia', description: 'Diseñamos la solución técnica más eficiente', icon: 'fa-chess-board' },
+            { step: 3, title: 'Ejecución', description: 'Desarrollo e implementación ágil', icon: 'fa-rocket' },
+            { step: 4, title: 'Soporte', description: 'Mantenimiento y mejora continua', icon: 'fa-headset' }
         ],
-        servicesTitle: 'Nuestros Servicios',
-        servicesDescription: 'Soluciones técnicas profesionales con garantía y atención personalizada',
+        servicesTitle: 'Catálogo de Soluciones',
+        servicesDescription: 'Ingeniería de software de clase mundial y soporte técnico especializado.',
         services: [
             {
-                id: 1,
-                title: 'Reparación de Celulares',
-                description: 'Servicio técnico especializado en todas las marcas: Samsung, iPhone, Motorola, Xiaomi, y más.',
+                id: 101,
+                title: 'Instalación de Cámaras de Seguridad',
+                slug: 'instalacion-camaras-seguridad',
+                description: 'Sistemas de videovigilancia CCTV e IP. Monitoreo remoto 24/7.',
+                icon: 'fa-video',
+                features: ['Cámaras IP/WiFi', 'Configuración DVR/NVR', 'Acceso Móvil', 'Detección de Movimiento', 'Mantenimiento'],
+                price: 'A Medida',
+                image: 'assets/img/services/software-illustration.png',
+                link: '/servicios/instalacion-camaras-seguridad'
+            },
+            {
+                id: 102,
+                title: 'Electricidad y Plomería',
+                slug: 'electricidad-plomeria',
+                description: 'Servicios integrales de mantenimiento y urgencias para hogar y comercio.',
+                icon: 'fa-tools',
+                features: ['Instalaciones Eléctricas', 'Reparación de Fugas', 'Tableros', 'Grifería', 'Urgencias 24hs'],
+                price: 'A Medida',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/electricidad-plomeria'
+            },
+            {
+                id: 103,
+                title: 'Reparación de Drones',
+                slug: 'reparacion-drones',
+                description: 'Servicio técnico especializado para drones DJI y multirrotores.',
+                icon: 'fa-helicopter',
+                features: ['Calibración de Gimbal', 'Reemplazo de Motores', 'Actualización de Firmware', 'Reparación de Carcasas', 'Diagnóstico de Vuelo'],
+                price: 'Consultar',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/reparacion-drones'
+            },
+            {
+                id: 104,
+                title: 'Diagnóstico y Reparación de Ecus Automotriz',
+                slug: 'reparacion-ecus',
+                description: 'Laboratorio electrónico automotriz. Reprogramación y clonación.',
+                icon: 'fa-car-battery',
+                features: ['Diagnóstico por Scanner', 'Reprogramación (Chiptuning)', 'Clonación de ECUs', 'Inmovilizadores', 'Airbag Reset'],
+                price: 'Consultar',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/reparacion-ecus'
+            },
+            {
+                id: 105,
+                title: 'Electricidad de Motos',
+                slug: 'electricidad-motos',
+                description: 'Soluciones eléctricas especializadas para motocicletas de todas las cilindradas.',
+                icon: 'fa-motorcycle',
+                features: ['Bobinados', 'Encendido Electrónico', 'Luces LED', 'Baterías', 'Sistemas de Carga'],
+                price: 'Consultar',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/electricidad-motos'
+            },
+            {
+                id: 4,
+                title: 'Desarrollo de Aplicaciones a Medida',
+                slug: 'desarrollo-de-software',
+                description: 'Desarrollo de aplicaciones web y móviles escalables para startups y corporaciones.',
                 icon: 'fa-mobile-alt',
-                features: ['Cambio de pantallas y displays', 'Reemplazo de baterías', 'Reparación de placas madre', 'Actualización de software', 'Liberación de equipos'],
-                price: 'Desde $5,000',
+                features: ['Apps Móviles (iOS/Android)', 'Plataformas Web (Angular/React)', 'Sistemas de Gestión (ERP/CRM)', 'APIs & Microservicios', 'Modernización de Legacy'],
+                price: 'A Medida',
+                image: 'assets/img/cursos/laboratorio.webp',
+                link: '/servicios/desarrollo-de-software'
+            },
+            {
+                id: 20,
+                title: 'Consultoría en Inteligencia Artificial',
+                slug: 'consultoria-ia',
+                description: 'Implementación de LLMs, Chatbots y Automatización Inteligente para empresas.',
+                icon: 'fa-brain',
+                features: ['Integración OpenAI/DeepSeek', 'Agentes Autónomos', 'Análisis Predictivo', 'Automatización de Procesos', 'RPA'],
+                price: 'Consultar',
+                image: 'assets/img/services/academy-illustration.png',
+                link: '/servicios/consultoria-ia'
+            },
+            {
+                id: 22,
+                title: 'Cloud & DevOps',
+                slug: 'cloud-devops',
+                description: 'Arquitectura en la nube y optimización de infraestructura.',
+                icon: 'fa-cloud',
+                features: ['Migración AWS/Azure', 'Docker & Kubernetes', 'CI/CD Pipelines', 'Optimización de Costos', 'Seguridad Cloud'],
+                price: 'Consultar',
+                image: 'assets/img/services/software-illustration.png',
+                link: '/servicios/cloud-devops'
+            },
+            {
+                id: 1,
+                title: 'Laboratorio de Electronica | Servicio Tecnico de Celulares en Marcos paz',
+                slug: 'servicio-tecnico-de-celulares-en-marcos-paz',
+                description: 'Servicio técnico especializado en microelectrónica para móviles y laptops.',
+                icon: 'fa-microchip',
+                features: ['Reparación de Placas', 'Cambio de Pantallas', 'Recuperación de Datos', 'Reballing', 'Soldadura SMD'],
+                price: 'Desde $15,000',
                 image: 'assets/img/products/sam.webp',
-                link: '/#/posts/servicio-tecnico-de-celulares-en-marcos-paz'
+                link: '/posts/servicio-tecnico-de-celulares-en-marcos-paz'
             },
             {
                 id: 2,
                 title: 'Reparación de Consolas',
-                description: 'Servicio técnico para PlayStation, Xbox, Nintendo Switch y consolas retro.',
+                slug: 'reparacion-de-consolas',
+                description: 'Servicio técnico para PlayStation, Xbox y Nintendo Switch.',
                 icon: 'fa-gamepad',
-                features: ['Limpieza profunda y mantenimiento', 'Cambio de lectores ópticos', 'Reparación de HDMI', 'Actualización de firmware', 'Cambio de pasta térmica'],
-                price: 'Desde $8,000',
-                image: 'assets/img/cursos/pro.webp'
-            },
+                features: ['Mantenimiento Térmico', 'Reparación de HDMI', 'Reballing GPU', 'Fuentes de Poder', 'Joysticks'],
+                price: 'Desde $12,000',
+                image: 'assets/img/cursos/pro.webp',
+                link: '/servicios/reparacion-de-consolas'
+            }
+        ],
+        servicesCta: 'Solicitar Cotización',
+        guarantees: [
+            { icon: 'fa-shield-alt', title: 'Garantía Escrita', description: 'Todos nuestros desarrollos y reparaciones están garantizados.' },
+            { icon: 'fa-code-branch', title: 'Código Propio', description: 'Entregamos el código fuente de tu software.' },
+            { icon: 'fa-lock', title: 'Seguridad', description: 'Implementamos estándares de ciberseguridad industrial.' }
+        ],
+        ctaTitle: '¿Listo para escalar tu negocio?',
+        ctaDescription: 'Agenda una llamada de 15 minutos gratuita con nuestros expertos.',
+        ctaWhatsapp: 'Agendar Llamada',
+        ctaForm: 'Solicitar Presupuesto'
+    },
+    en: {
+        heroTitle: 'Tech Consulting & Services',
+        heroSubtitle: 'Enterprise Solutions',
+        heroDescription: 'From Artificial Intelligence to Critical Hardware Repair. A complete ecosystem for your business.',
+        heroCtaWhatsapp: 'Talk to Expert',
+        heroCtaAll: 'Explore Services',
+        processTitle: 'Service Methodology',
+        process: [
+            { step: 1, title: 'Analysis', description: 'We evaluate your needs and business goals', icon: 'fa-chart-pie' },
+            { step: 2, title: 'Strategy', description: 'We design the most efficient technical solution', icon: 'fa-chess-board' },
+            { step: 3, title: 'Execution', description: 'Agile development and implementation', icon: 'fa-rocket' },
+            { step: 4, title: 'Support', description: 'Maintenance and continuous improvement', icon: 'fa-headset' }
+        ],
+        servicesTitle: 'Solutions Catalog',
+        servicesDescription: 'World-class software engineering and specialized technical support.',
+        services: [
             {
-                id: 3,
-                title: 'Reparación de Tablets',
-                description: 'Reparación especializada en tablets Android, iPad y Windows.',
-                icon: 'fa-tablet-alt',
-                features: ['Cambio de pantallas táctiles', 'Reparación de conectores de carga', 'Reemplazo de baterías', 'Actualización de sistema operativo', 'Recuperación de datos'],
-                price: 'Desde $6,000',
-                image: 'assets/img/cursos/iph2.jpg'
+                id: 20,
+                title: 'AI Consulting',
+                slug: 'consultoria-ia',
+                description: 'Implementation of LLMs, Chatbots, and Intelligent Automation for companies.',
+                icon: 'fa-brain',
+                features: ['OpenAI/DeepSeek Integration', 'Autonomous Agents', 'Predictive Analysis', 'Process Automation', 'RPA'],
+                price: 'Consult',
+                image: 'assets/img/services/academy-illustration.png',
+                link: '/servicios/consultoria-ia'
             },
             {
                 id: 4,
-                title: 'Desarrollo de Software',
-                description: 'Creamos soluciones web y móviles personalizadas para tu negocio.',
+                title: 'Software Factory & Apps',
+                slug: 'desarrollo-de-software',
+                description: 'Development of scalable web and mobile applications for startups and corporations.',
                 icon: 'fa-code',
-                features: ['Desarrollo de aplicaciones web', 'Aplicaciones móviles (Android/iOS)', 'E-commerce y tiendas online', 'Sistemas de gestión empresarial', 'Mantenimiento y soporte'],
-                price: 'Cotización personalizada',
-                image: 'assets/img/cursos/laboratorio.webp'
+                features: ['Mobile Apps (iOS/Android)', 'Web Platforms (Angular/React)', 'Management Systems (ERP/CRM)', 'APIs & Microservices', 'Legacy Modernization'],
+                price: 'Custom',
+                image: 'assets/img/cursos/laboratorio.webp',
+                link: '/servicios/desarrollo-de-software'
             },
             {
-                id: 5,
-                title: 'Micro Soldadura',
-                description: 'Reparaciones a nivel componente con tecnología de punta.',
-                icon: 'fa-microchip',
-                features: ['Reballing de chips', 'Reparación de pistas', 'Cambio de IC de carga', 'Reparación de Face ID', 'Recuperación de datos'],
-                price: 'Desde $10,000',
-                image: 'assets/img/cursos/laboratorio.jpg'
+                id: 21,
+                title: 'IT Staff Augmentation',
+                slug: 'staff-augmentation',
+                description: 'We add senior talent to your team in less than 72 hours.',
+                icon: 'fa-users',
+                features: ['Fullstack Developers', 'DevOps Engineers', 'QA Automation', 'UX/UI Designers', 'Scrum Masters'],
+                price: 'Per Hour/Month',
+                image: 'assets/img/services/software-illustration.png',
+                link: '/servicios/staff-augmentation'
             },
             {
-                id: 6,
-                title: 'Mantenimiento Preventivo',
-                description: 'Servicio de mantenimiento para prolongar la vida útil de tus dispositivos.',
-                icon: 'fa-tools',
-                features: ['Limpieza interna completa', 'Optimización de software', 'Actualización de sistema', 'Backup de datos', 'Diagnóstico completo'],
-                price: 'Desde $3,000',
-                image: 'assets/img/cursos/local.webp'
+                id: 22,
+                title: 'Cloud & DevOps',
+                slug: 'cloud-devops',
+                description: 'Cloud architecture and infrastructure optimization.',
+                icon: 'fa-cloud',
+                features: ['AWS/Azure Migration', 'Docker & Kubernetes', 'CI/CD Pipelines', 'Cost Optimization', 'Cloud Security'],
+                price: 'Consult',
+                image: 'assets/img/services/software-illustration.png',
+                link: '/servicios/cloud-devops'
             },
-            {
-                id: 7,
-                title: 'Instalación de Cámaras de Seguridad',
-                description: 'Sistemas de vigilancia para hogares y comercios.',
-                icon: 'fa-video',
-                features: ['Instalación de cámaras IP y CCTV', 'Configuración de DVR/NVR', 'Monitoreo remoto', 'Mantenimiento de sistemas', 'Asesoramiento de seguridad'],
-                price: 'Consultar',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 8,
-                title: 'Electricidad y Plomería',
-                description: 'Soluciones integrales para el hogar y la industria.',
-                icon: 'fa-bolt',
-                features: ['Instalaciones eléctricas', 'Reparaciones de plomería', 'Mantenimiento general', 'Urgencias 24hs', 'Certificaciones'],
-                price: 'Consultar',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 9,
-                title: 'Trading',
-                description: 'Aprende a operar en los mercados financieros.',
-                icon: 'fa-chart-line',
-                features: ['Cursos introductorios', 'Análisis técnico', 'Gestión de riesgo', 'Psicotrading', 'Mentoria personalizada'],
-                price: 'Consultar',
-                image: 'assets/img/cursos/pro.webp'
-            },
-            {
-                id: 10,
-                title: 'Creación de Sitios Web',
-                description: 'Tu presencia online profesional y efectiva.',
-                icon: 'fa-laptop-code',
-                features: ['Diseño web responsive', 'Tiendas online (E-commerce)', 'Landing pages', 'Optimización SEO', 'Integración con redes sociales'],
-                price: 'Consultar',
-                image: 'assets/img/cursos/laboratorio.webp'
-            },
-            {
-                id: 11,
-                title: 'Reparación de Impresoras',
-                description: 'Servicio técnico especializado para impresoras láser, inkjet y matriciales.',
-                icon: 'fa-print',
-                features: ['Limpieza de cabezales', 'Reparación de sistema continuo', 'Cambio de rodillos', 'Mantenimiento preventivo', 'Configuración de red'],
-                price: 'Desde $12,000',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 13,
-                title: 'Reparación de Drones',
-                description: 'Servicio técnico especializado para drones de todas las marcas (DJI, etc).',
-                icon: 'fa-helicopter',
-                features: ['Calibración de gimbal', 'Reemplazo de hélices y motores', 'Reparación de placa madre', 'Actualización de firmware', 'Diagnóstico de vuelo'],
-                price: 'Consultar',
-                image: 'assets/img/cursos/laboratorio.webp'
-            },
-            {
-                id: 12,
-                title: 'Otros Servicios',
-                description: 'Soluciones especializadas para necesidades específicas.',
-                icon: 'fa-layer-group',
-                features: ['Reparación de Electrónica', 'Diagnóstico de ECUs Automotriz', 'Electricidad de Motos', 'Alquiler de Trajes', 'Desarrollo de Software a Medida'],
-                price: 'Consultar',
-                image: 'assets/img/brands/logo/logo-normal.PNG'
-            }
-        ],
-        servicesCta: 'Solicitar Ahora',
-        guarantees: [
-            { icon: 'fa-shield-alt', title: 'Garantía de 30 Días', description: 'Todas nuestras reparaciones incluyen garantía escrita' },
-            { icon: 'fa-clock', title: 'Servicio Rápido', description: 'La mayoría de reparaciones en 24-48 horas' },
-            { icon: 'fa-certificate', title: 'Técnicos Certificados', description: 'Personal capacitado y con años de experiencia' }
-        ],
-        ctaTitle: '¿Necesitas reparar tu dispositivo?',
-        ctaDescription: 'Contáctanos ahora y obtén un diagnóstico gratuito',
-        ctaWhatsapp: 'Diagnóstico Gratuito',
-        ctaForm: 'Formulario de Contacto'
-    },
-    en: {
-        heroTitle: 'Technical Services',
-        heroSubtitle: 'Professionals',
-        heroDescription: 'Specialized repair of smartphones, tablets, consoles, and software development',
-        heroCtaWhatsapp: 'Request Service',
-        heroCtaAll: 'View All Services',
-        processTitle: 'Our Process',
-        process: [
-            { step: 1, title: 'Diagnosis', description: 'We evaluate your device free of charge', icon: 'fa-search' },
-            { step: 2, title: 'Quote', description: 'We send you a detailed quote', icon: 'fa-file-invoice-dollar' },
-            { step: 3, title: 'Repair', description: 'We perform the work with warranty', icon: 'fa-wrench' },
-            { step: 4, title: 'Delivery', description: 'We test and deliver your equipment', icon: 'fa-check-circle' }
-        ],
-        servicesTitle: 'Our Services',
-        servicesDescription: 'Professional technical solutions with warranty and personalized attention',
-        services: [
             {
                 id: 1,
-                title: 'Cell Phone Repair',
-                description: 'Specialized technical service for all brands: Samsung, iPhone, Motorola, Xiaomi, and more.',
-                icon: 'fa-mobile-alt',
-                features: ['Screen and display replacement', 'Battery replacement', 'Motherboard repair', 'Software update', 'Unlocking'],
-                price: 'From $5,000',
+                title: 'Hardware Lab (Argentina)',
+                slug: 'servicio-tecnico-de-celulares-en-marcos-paz',
+                description: 'Specialized technical service in microelectronics for mobiles and laptops.',
+                icon: 'fa-microchip',
+                features: ['Board Repair', 'Screen Replacement', 'Data Recovery', 'Reballing', 'SMD Soldering'],
+                price: 'From $15,000',
                 image: 'assets/img/products/sam.webp',
-                link: '/#/posts/servicio-tecnico-de-celulares-en-marcos-paz'
+                link: '/celular'
             },
             {
                 id: 2,
                 title: 'Console Repair',
-                description: 'Technical service for PlayStation, Xbox, Nintendo Switch, and retro consoles.',
+                slug: 'reparacion-de-consolas',
+                description: 'Technical service for PlayStation, Xbox, and Nintendo Switch.',
                 icon: 'fa-gamepad',
-                features: ['Deep cleaning and maintenance', 'Optical drive replacement', 'HDMI repair', 'Firmware update', 'Thermal paste replacement'],
-                price: 'From $8,000',
-                image: 'assets/img/cursos/pro.webp'
-            },
-            {
-                id: 3,
-                title: 'Tablet Repair',
-                description: 'Specialized repair for Android tablets, iPad, and Windows.',
-                icon: 'fa-tablet-alt',
-                features: ['Touch screen replacement', 'Charging port repair', 'Battery replacement', 'OS update', 'Data recovery'],
-                price: 'From $6,000',
-                image: 'assets/img/cursos/iph2.jpg'
-            },
-            {
-                id: 4,
-                title: 'Software Development',
-                description: 'We create custom web and mobile solutions for your business.',
-                icon: 'fa-code',
-                features: ['Web application development', 'Mobile apps (Android/iOS)', 'E-commerce and online stores', 'Business management systems', 'Maintenance and support'],
-                price: 'Custom Quote',
-                image: 'assets/img/cursos/laboratorio.webp'
-            },
-            {
-                id: 5,
-                title: 'Micro Soldering',
-                description: 'Component-level repairs with state-of-the-art technology.',
-                icon: 'fa-microchip',
-                features: ['Chip reballing', 'Trace repair', 'Charging IC replacement', 'Face ID repair', 'Data recovery'],
-                price: 'From $10,000',
-                image: 'assets/img/cursos/laboratorio.jpg'
-            },
-            {
-                id: 6,
-                title: 'Preventive Maintenance',
-                description: 'Maintenance service to prolong the lifespan of your devices.',
-                icon: 'fa-tools',
-                features: ['Complete internal cleaning', 'Software optimization', 'System update', 'Data backup', 'Full diagnosis'],
-                price: 'From $3,000',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 7,
-                title: 'Security Camera Installation',
-                description: 'Surveillance systems for homes and businesses.',
-                icon: 'fa-video',
-                features: ['IP and CCTV camera installation', 'DVR/NVR configuration', 'Remote monitoring', 'System maintenance', 'Security advice'],
-                price: 'Consult',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 8,
-                title: 'Electricity and Plumbing',
-                description: 'Comprehensive solutions for home and industry.',
-                icon: 'fa-bolt',
-                features: ['Electrical installations', 'Plumbing repairs', 'General maintenance', '24h emergencies', 'Certifications'],
-                price: 'Consult',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 9,
-                title: 'Trading',
-                description: 'Learn to trade in financial markets.',
-                icon: 'fa-chart-line',
-                features: ['Introductory courses', 'Technical analysis', 'Risk management', 'Psychotrading', 'Personalized mentorship'],
-                price: 'Consult',
-                image: 'assets/img/cursos/pro.webp'
-            },
-            {
-                id: 10,
-                title: 'Website Creation',
-                description: 'Your professional and effective online presence.',
-                icon: 'fa-laptop-code',
-                features: ['Responsive web design', 'Online stores (E-commerce)', 'Landing pages', 'SEO optimization', 'Social media integration'],
-                price: 'Consult',
-                image: 'assets/img/cursos/laboratorio.webp'
-            },
-            {
-                id: 11,
-                title: 'Printer Repair',
-                description: 'Specialized technical service for laser, inkjet, and dot matrix printers.',
-                icon: 'fa-print',
-                features: ['Printhead cleaning', 'CISS repair', 'Roller replacement', 'Preventive maintenance', 'Network configuration'],
+                features: ['Thermal Maintenance', 'HDMI Repair', 'GPU Reballing', 'Power Supplies', 'Controllers'],
                 price: 'From $12,000',
-                image: 'assets/img/cursos/local.webp'
-            },
-            {
-                id: 13,
-                title: 'Reparación de Drones',
-                description: 'Servicio técnico especializado para drones de todas las marcas (DJI, etc).',
-                icon: 'fa-helicopter',
-                features: ['Calibración de gimbal', 'Reemplazo de hélices y motores', 'Reparación de placa madre', 'Actualización de firmware', 'Diagnóstico de vuelo'],
-                price: 'Consultar',
-                image: 'assets/img/cursos/laboratorio.webp'
-            },
-            {
-                id: 12,
-                title: 'Other Services',
-                description: 'Specialized solutions for specific needs.',
-                icon: 'fa-layer-group',
-                features: ['Electronics Repair', 'Automotive ECU Diagnostics', 'Motorcycle Electricity', 'Suit Rental', 'Custom Software Development'],
-                price: 'Consult',
-                image: 'assets/img/brands/logo/logo-normal.PNG'
+                image: 'assets/img/cursos/pro.webp',
+                link: '/servicios/reparacion-de-consolas'
             }
         ],
-        servicesCta: 'Request Now',
+        servicesCta: 'Request Quote',
         guarantees: [
-            { icon: 'fa-shield-alt', title: '30-Day Warranty', description: 'All our repairs include a written warranty' },
-            { icon: 'fa-clock', title: 'Fast Service', description: 'Most repairs in 24-48 hours' },
-            { icon: 'fa-certificate', title: 'Certified Technicians', description: 'Trained staff with years of experience' }
+            { icon: 'fa-shield-alt', title: 'Written Warranty', description: 'All our developments and repairs are guaranteed.' },
+            { icon: 'fa-code-branch', title: 'Source Code', description: 'We deliver the source code of your software.' },
+            { icon: 'fa-lock', title: 'Security', description: 'We implement industrial cybersecurity standards.' }
         ],
-        ctaTitle: 'Need to repair your device?',
-        ctaDescription: 'Contact us now and get a free diagnosis',
-        ctaWhatsapp: 'Free Diagnosis',
-        ctaForm: 'Contact Form'
+        ctaTitle: 'Ready to scale your business?',
+        ctaDescription: 'Schedule a free 15-minute call with our experts.',
+        ctaWhatsapp: 'Schedule Call',
+        ctaForm: 'Request Budget'
     }
 };

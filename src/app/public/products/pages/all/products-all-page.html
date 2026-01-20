@@ -1,0 +1,309 @@
+<!-- Mobile Filter Drawer Wrapper -->
+<div class="drawer lg:drawer-open">
+  <input id="shop-filters-drawer" type="checkbox" class="drawer-toggle" />
+  
+  <div class="drawer-content flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navbar / Mobile Header for Filters -->
+    <div class="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
+      <h2 class="font-bold text-gray-900 dark:text-white">Productos</h2>
+      <label for="shop-filters-drawer" class="btn btn-sm btn-ghost lg:hidden">
+        <i class="fas fa-sliders-h mr-2"></i> Filtros
+      </label>
+    </div>
+
+    <!-- HERO SECTION -->
+    <header class="relative bg-gray-900 text-white overflow-hidden isolate">
+      <!-- Background Effects -->
+      <div class="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-gray-900 bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-100),white)] dark:bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-900),transparent)] opacity-20"></div>
+      <div class="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center opacity-10 dark:opacity-5"></div>
+      
+      <!-- Gradient Overlay -->
+      <div class="absolute inset-0 bg-linear-to-r from-gray-900/90 to-gray-800/90 backdrop-blur-sm z-0"></div>
+
+      <div class="relative container mx-auto px-4 py-16 sm:py-24 text-center">
+        <!-- Breadcrumbs -->
+        <div class="text-sm breadcrumbs text-gray-400 justify-center mb-6 flex relative z-10">
+            <ul>
+                <li><a routerLink="/" class="hover:text-white transition-colors">Inicio</a></li>
+                <li class="font-semibold text-white">Productos</li>
+            </ul>
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">
+          Catálogo Completo
+        </h1>
+        <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+          Encontrá repuestos originales, herramientas de precisión y accesorios premium para llevar tus reparaciones al siguiente nivel.
+        </p>
+
+        <!-- Search Bar (Floating & Glassmorphism) -->
+        <div class="max-w-2xl mx-auto relative group z-20">
+            <div class="absolute -inset-1 bg-linear-to-r from-teal-500 to-indigo-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <div class="relative flex items-center bg-white dark:bg-gray-800 rounded-full shadow-2xl overflow-hidden">
+                <div class="pl-6 text-gray-400">
+                    <i class="fas fa-search text-lg"></i>
+                </div>
+                <input 
+                    type="text" 
+                    placeholder="Buscar por nombre, SKU o modelo..." 
+                    [ngModel]="searchQuery()"
+                    (ngModelChange)="onSearch($event)"
+                    class="w-full bg-transparent border-none text-gray-900 dark:text-white placeholder-gray-500 px-4 py-5 focus:ring-0 text-lg mobile-search-input" 
+                    aria-label="Buscar productos"
+                />
+                <button class="hidden sm:block mr-2 px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-bold hover:bg-indigo-600 dark:hover:bg-gray-200 transition-colors">
+                    Buscar
+                </button>
+            </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 container mx-auto px-4 py-12">
+        <!-- Results Header & Sort Controls (Desktop) -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-800 gap-4">
+            <div class="text-gray-600 dark:text-gray-400 font-medium">
+                @if (productsRs.value()) {
+                  Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> resultados
+                } @else {
+                  Cargando catálogo...
+                }
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-500 hidden sm:inline">Ordenar por:</span>
+                <select class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                        [ngModel]="currentSort" 
+                        (ngModelChange)="setSort($event.split('|')[0], $event.split('|')[1])">
+                    <option value="created_at|desc">Más Recientes</option>
+                    <option value="price|asc">Precio: Menor a Mayor</option>
+                    <option value="price|desc">Precio: Mayor a Menor</option>
+                    <option value="name|asc">Alfabético A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- PRODUCTS GRID -->
+        <main class="min-h-[400px]">
+            @if (productsRs.isLoading()) {
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+                    @for(i of [1,2,3,4,5,6]; track i) {
+                        <div class="animate-pulse bg-gray-200 dark:bg-gray-800 rounded-3xl h-[400px] w-full"></div>
+                    }
+                 </div>
+            }
+            @if (productsRs.error()) { <is-error [message]="productsRs.error()?.message || 'Error al cargar productos'" /> }
+
+            @if (productsRs.value()) {
+                @if (productsRs.value()?.items === 0) {
+                    <div class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+                            <i class="fas fa-search text-4xl text-gray-300 dark:text-gray-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No encontramos lo que buscas</h3>
+                        <p class="text-gray-500 dark:text-gray-400 max-w-md">
+                            Intenta con otros términos, verifica la ortografía o elimina los filtros aplicados.
+                        </p>
+                        <button (click)="onSearch(''); minPriceInput.set(null); maxPriceInput.set(null)" class="btn btn-link text-indigo-600 mt-4">
+                            Limpiar búsqueda
+                        </button>
+                    </div>
+                } @else {
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+                        @for (product of productsRs.value()!.data; track product.id; let i = $index) {
+                            <product-card 
+                                [product]="product" 
+                                [isPriority]="i < 2" 
+                                (quickView)="openQuickView($event)"
+                                class="h-full"
+                            ></product-card>
+                        }
+                    </div>
+
+                    @if (paginationData(); as pagination) {
+                        <div class="mt-16 flex justify-center">
+                            <pagination [pages]="pagination.pages" [currentPage]="paginationService.currentPage()"></pagination>
+                        </div>
+                    }
+                }
+            }
+        </main>
+        
+        <!-- SEO Content Section -->
+        <section class="mt-24 pt-12 border-t border-gray-200 dark:border-gray-800">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">¿Por qué elegir Arecofix para tus repuestos?</h2>
+            <div class="grid md:grid-cols-2 gap-8 text-gray-600 dark:text-gray-300 leading-relaxed">
+                <div>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2 text-lg">Calidad Comprobada</h3>
+                    <p class="mb-4">
+                        Sabemos lo frustrante que es instalar un repuesto y que falle a los días. Por eso, testeamos cada lote de pantallas y baterías. Trabajamos calidades <strong>Original, OLED y Premium</strong> para que elijas según tu presupuesto, pero siempre con garantía.
+                    </p>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2 text-lg">Stock Real</h3>
+                    <p>
+                        Lo que ves publicado es lo que tenemos. Sin vueltas. Nuestro sistema de stock se actualiza en tiempo real para que no pierdas tiempo.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2 text-lg">Envíos y Retiros</h3>
+                    <p class="mb-4">
+                        Hacemos envíos a todo el país. Si estás en la zona, podés retirar por nuestro local en <strong>Marcos Paz</strong>. Despachamos en el día las compras realizadas antes de las 14hs.
+                    </p>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2 text-lg">Atención al Gremio</h3>
+                    <p>
+                        ¿Tenés local? Pedí tu lista de precios mayorista. Queremos ser tus socios estratégicos, ayudándote a crecer con precios competitivos y soporte técnico especializado.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Benefits Strip -->
+    <div class="bg-gray-900 text-white py-12 px-4 mt-auto">
+        <div class="container mx-auto">
+             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="p-4 rounded-xl hover:bg-white/5 transition-colors group">
+                    <i class="fas fa-truck-fast text-4xl mb-3 text-teal-400 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold">Envíos Rápidos</h4>
+                    <p class="text-sm text-gray-400">A todo el país</p>
+                </div>
+                <div class="p-4 rounded-xl hover:bg-white/5 transition-colors group">
+                    <i class="fas fa-shield-alt text-4xl mb-3 text-teal-400 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold">Garantía Escrita</h4>
+                    <p class="text-sm text-gray-400">Compra protegida</p>
+                </div>
+                <div class="p-4 rounded-xl hover:bg-white/5 transition-colors group">
+                    <i class="far fa-credit-card text-4xl mb-3 text-teal-400 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold">Cuotas Fijas</h4>
+                    <p class="text-sm text-gray-400">Tarjetas bancarias</p>
+                </div>
+                <div class="p-4 rounded-xl hover:bg-white/5 transition-colors group">
+                    <i class="fas fa-headset text-4xl mb-3 text-teal-400 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold">Soporte Técnico</h4>
+                    <p class="text-sm text-gray-400">Post-venta real</p>
+                </div>
+             </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- DRAWER SIDEBAR (Filters) -->
+  <div class="drawer-side z-40">
+    <label for="shop-filters-drawer" aria-label="close sidebar" class="drawer-overlay backdrop-blur-sm"></label>
+    <aside class="menu p-6 w-80 min-h-full bg-white dark:bg-gray-800 text-base-content border-r border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Filtros</h3>
+            <label for="shop-filters-drawer" class="btn btn-sm btn-circle btn-ghost">✕</label>
+        </div>
+
+        <!-- Filter Groups -->
+        <div class="space-y-8">
+            <!-- Price Range -->
+            <div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-tag text-indigo-500"></i> Precio
+                </h4>
+                <div class="flex items-center gap-3">
+                    <div class="form-control w-full">
+                        <label class="label text-xs text-gray-500">Mínimo</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-gray-400">$</span>
+                            <input type="number" [ngModel]="minPriceInput()" (ngModelChange)="minPriceInput.set($event)" placeholder="0" class="input input-bordered w-full pl-6 rounded-xl" />
+                        </div>
+                    </div>
+                    <div class="form-control w-full">
+                        <label class="label text-xs text-gray-500">Máximo</label>
+                        <div class="relative">
+                             <span class="absolute left-3 top-2.5 text-gray-400">$</span>
+                            <input type="number" [ngModel]="maxPriceInput()" (ngModelChange)="maxPriceInput.set($event)" placeholder="Max" class="input input-bordered w-full pl-6 rounded-xl" />
+                        </div>
+                    </div>
+                </div>
+                <button (click)="applyPriceFilter()" class="btn btn-primary w-full mt-4 rounded-xl shadow-lg shadow-indigo-500/20">
+                    Aplicar Precio
+                </button>
+            </div>
+
+            <!-- Pre-defined Filters (Simulated for this page) -->
+            <div>
+                 <h4 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-layer-group text-indigo-500"></i> Categorías Rápidas
+                </h4>
+                <ul class="space-y-2">
+                    <li><a routerLink="/products/category/repuestos" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Repuestos</a></li>
+                    <li><a routerLink="/products/category/herramientas" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Herramientas</a></li>
+                    <li><a routerLink="/products/category/accesorios" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Accesorios</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-8">
+            <button (click)="onSearch(''); minPriceInput.set(null); maxPriceInput.set(null); applyPriceFilter()" class="btn btn-outline btn-block rounded-xl">
+                Limpiar Todo
+            </button>
+        </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Quick View Modal -->
+@if (isQuickViewOpen()) {
+<div class="modal modal-open z-50 animate-fade-in">
+  <div class="modal-box relative max-w-4xl bg-white dark:bg-gray-800 rounded-3xl p-0 overflow-hidden shadow-2xl">
+    <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10 bg-white/50 backdrop-blur-md" (click)="closeQuickView()">✕</button>
+    
+    @if (quickViewProduct(); as p) {
+        <div class="flex flex-col md:flex-row h-full">
+            <!-- Image Side -->
+            <div class="w-full md:w-1/2 bg-gray-50 dark:bg-gray-700/30 p-8 flex items-center justify-center relative">
+                <img [src]="p.image_url || 'assets/img/no-image.png'" class="max-h-[300px] object-contain drop-shadow-xl" [alt]="p.name"/>
+                @if(p.stock <= 0) {
+                     <span class="absolute top-8 left-8 badge badge-error text-white font-bold p-3">Sin Stock</span>
+                } @else if (p.sale_price) {
+                     <span class="absolute top-8 left-8 badge badge-secondary text-white font-bold p-3">Oferta</span>
+                }
+            </div>
+            
+            <!-- Content Side -->
+            <div class="w-full md:w-1/2 p-8 flex flex-col">
+                <div class="mb-auto">
+                    <h3 class="font-black text-2xl md:text-3xl mb-2 text-gray-900 dark:text-white leading-tight">{{ p.name }}</h3>
+                    <div class="flex items-center gap-2 mb-4">
+                         <div class="rating rating-sm rating-disabled">
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" />
+                        </div>
+                        <span class="text-xs text-gray-400">(24 reviews)</span>
+                    </div>
+
+                    <div class="flex items-baseline gap-3 mb-6">
+                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.price | currency }}</span>
+                        @if(p.regular_price && p.regular_price > p.price) {
+                            <span class="text-lg text-gray-400 line-through">{{ p.regular_price | currency }}</span>
+                        }
+                    </div>
+                    
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{{ p.description || 'Sin descripción disponible.' }}</p>
+                    
+                    <!-- Features/Badges -->
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span class="badge badge-outline"><i class="fas fa-check mr-1"></i> Original</span>
+                        <span class="badge badge-outline"><i class="fas fa-shield-alt mr-1"></i> Garantía</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-lg w-full rounded-2xl shadow-xl shadow-indigo-600/30 gap-3" (click)="addToCart(p)">
+                   <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                </button>
+            </div>
+        </div>
+    }
+  </div>
+  <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-sm">
+    <button (click)="closeQuickView()">close</button>
+  </form>
+</div>
+}

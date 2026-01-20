@@ -33,6 +33,7 @@
             <tr class="text-base-content font-bold">
                 <th>Número</th>
                 <th>Cliente</th>
+                <th>Productos</th>
                 <th>Total</th>
                 <th>Estado</th>
                 <th>Fecha</th>
@@ -47,15 +48,36 @@
                     <div class="font-medium">{{ order.customer_name }}</div>
                     <div class="text-sm opacity-70">{{ order.customer_email }}</div>
                 </td>
+                <td>
+                    <ul class="text-sm">
+                        @for (item of order.items; track item.id) {
+                            <li>
+                                <span class="font-bold">{{ item.quantity }}x</span> {{ item.product_name }}
+                            </li>
+                        }
+                        @if (!order.items || order.items.length === 0) {
+                            <span class="opacity-50 italic">Sin productos</span>
+                        }
+                    </ul>
+                </td>
                 <td class="font-semibold">${{ order.total.toFixed(2) }}</td>
                 <td>
-                    <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
-                        {{ getStatusText(order.status) }}
+                    <span class="badge" [ngClass]="order.status | statusColor">
+                        {{ order.status | orderStatus }}
                     </span>
                 </td>
                 <td>{{ order.created_at | date:'short' }}</td>
                 <td>
                     <div class="flex gap-2">
+                        @if (order.status === 'pending' || order.status === 'processing') {
+                        <button (click)="toggleOrderStatus(order)" 
+                                class="btn btn-sm text-white"
+                                [class.btn-success]="order.status === 'pending'"
+                                [class.btn-warning]="order.status === 'processing'"
+                                [title]="order.status === 'pending' ? 'Marcar como Abonado' : 'Volver a Pendiente'">
+                            <i class="fas" [class.fa-check-dollar]="order.status === 'pending'" [class.fa-undo]="order.status === 'processing'"></i>
+                        </button>
+                        }
                         <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
                             <i class="fas fa-eye"></i>
                         </a>

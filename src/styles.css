@@ -29,18 +29,18 @@
   --color-accent-content: #ffffff;
   --color-neutral: var(--color-brand-gray-purple);
   --color-neutral-content: #ffffff;
-  
+
   /* Dynamic Base Colors */
   --color-base-100: var(--base-100);
   --color-base-200: var(--base-200);
   --color-base-300: var(--base-300);
   --color-base-content: var(--base-content);
-  
+
   --color-info: #3abff8;
   --color-success: #36d399;
   --color-warning: #fbbd23;
   --color-error: #f87272;
-  
+
   --color-surface-dark: #0f111a;
   --color-card-dark: #1c2131;
 
@@ -54,189 +54,302 @@
    We define these CSS variables so @theme picks them up dynamically.
 */
 :root {
-    --base-100: #ffffff;
-    --base-200: #f3f4f6; /* Gray 100 */
-    --base-300: #d1d5db; /* Gray 300 */
-    --base-content: #1f2937; /* Gray 800 */
+  --base-100: #ffffff;
+  --base-200: #f3f4f6;
+  --base-300: #d1d5db;
+  --base-content: #1f2937;
+
+  /* Font Families */
+  --font-heading: "Exo 2", sans-serif;
+  --font-body: "Inter", sans-serif;
 }
 
 .dark {
-    --base-100: #1f2937; /* Gray 800 */
-    --base-200: #111827; /* Gray 900 - Darker than base-100 */
-    --base-300: #374151; /* Gray 700 - Lighter than base-100 (borders) */
-    --base-content: #f3f4f6; /* Gray 100 */
+  --base-100: #0f111a; /* Deep Space Blue/Black */
+  --base-200: #161b2c; /* Slightly Lighter */
+  --base-300: #252b42; /* Card BG */
+  --base-content: #f3f4f6;
 }
 
 /* Global Styles */
-html, body {
-    overflow-x: hidden;
-    width: 100%;
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
 }
 
 /* 
    Button Overrides 
 */
-
-/* Fix for missing bg-dark class used in home page */
 .bg-dark {
-    background-color: var(--color-brand-dark-blue-fav);
+  background-color: var(--color-brand-dark-blue-fav);
 }
 
-/* Component Visibility Overrides */
-/* Component visibility overrides removed to allow DaisyUI to handle theming natively via data-theme attributes */
+/* Glassmorphism Utilities */
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7); /* Light mode default */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.dark .glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8); /* Light mode default */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  color: #1f2937;
+}
+
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.7); /* Dark slate */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border-color: rgba(78, 160, 54, 0.5); /* Brand Green Border on Hover */
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #4ea036 0%, #327cbe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
 
 .dropdown-content li > a,
 .dropdown-content li > button,
 .dropdown-content li > span {
-    color: var(--base-content);
+  color: var(--base-content);
 }
 
 .dropdown-content li > a:hover,
 .dropdown-content li > button:hover {
-    background-color: var(--color-brand-blue);
-    color: white;
+  background-color: var(--color-brand-blue);
+  color: white;
 }
 
 /* HIGH CONTRAST MODE */
 .high-contrast {
-    background-color: var(--color-hc-bg);
-    color: var(--color-hc-text);
+  background-color: var(--color-hc-bg);
+  color: var(--color-hc-text);
 }
 
 .high-contrast body {
-    background-color: var(--color-hc-bg);
-    color: var(--color-hc-text);
+  background-color: var(--color-hc-bg);
+  color: var(--color-hc-text);
 }
 
-.high-contrast :where(
-    .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500, 
-    .text-gray-400, .text-gray-300, .text-gray-200, .text-gray-100, .text-white, 
-    .text-black, .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, 
-    .text-slate-500, .text-slate-400
-) {
-    color: var(--color-hc-text);
+.high-contrast
+  :where(
+    .text-gray-900,
+    .text-gray-800,
+    .text-gray-700,
+    .text-gray-600,
+    .text-gray-500,
+    .text-gray-400,
+    .text-gray-300,
+    .text-gray-200,
+    .text-gray-100,
+    .text-white,
+    .text-black,
+    .text-slate-900,
+    .text-slate-800,
+    .text-slate-700,
+    .text-slate-600,
+    .text-slate-500,
+    .text-slate-400
+  ) {
+  color: var(--color-hc-text);
 }
 
-.high-contrast :where(
-    .text-indigo-600, .text-indigo-500, .text-indigo-400, .text-indigo-300, 
-    .text-blue-600, .text-purple-600, .text-blue-400, .text-cyan-300
-) {
-    color: var(--color-hc-accent);
+.high-contrast
+  :where(
+    .text-indigo-600,
+    .text-indigo-500,
+    .text-indigo-400,
+    .text-indigo-300,
+    .text-blue-600,
+    .text-purple-600,
+    .text-blue-400,
+    .text-cyan-300
+  ) {
+  color: var(--color-hc-accent);
 }
 
-.high-contrast :where(
-    .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-800, .bg-gray-900, 
-    .bg-slate-900, .bg-slate-800, .bg-black
-) {
-    background-color: black !important;
-    border: 1px solid white !important;
+.high-contrast
+  :where(
+    .bg-white,
+    .bg-gray-50,
+    .bg-gray-100,
+    .bg-gray-800,
+    .bg-gray-900,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-black
+  ) {
+  background-color: black !important;
+  border: 1px solid white !important;
 }
 
 .high-contrast img,
 .high-contrast [style*="background-image"] {
-    filter: grayscale(100%) contrast(120%);
-    opacity: 1 !important;
+  filter: grayscale(100%) contrast(120%);
+  opacity: 1 !important;
 }
 
 .high-contrast :where(button, a.btn, .btn) {
-    background-color: black !important;
-    border: 2px solid var(--color-hc-accent) !important;
-    color: var(--color-hc-accent) !important;
-    font-weight: bold !important;
+  background-color: black !important;
+  border: 2px solid var(--color-hc-accent) !important;
+  color: var(--color-hc-accent) !important;
+  font-weight: bold !important;
 }
 
 .high-contrast :where(button:hover, a.btn:hover) {
-    background-color: var(--color-hc-accent) !important;
-    color: black !important;
+  background-color: var(--color-hc-accent) !important;
+  color: black !important;
 }
 
-.high-contrast :where(
-    .blur-3xl, .bg-gradient-to-br, .bg-gradient-to-t, 
-    .bg-gradient-to-r, .bg-gradient-to-b, .bg-clip-text
-) {
-    background: none !important;
-    -webkit-text-fill-color: var(--color-hc-text) !important;
+.high-contrast
+  :where(
+    .blur-3xl,
+    .bg-gradient-to-br,
+    .bg-gradient-to-t,
+    .bg-gradient-to-r,
+    .bg-gradient-to-b,
+    .bg-clip-text
+  ) {
+  background: none !important;
+  -webkit-text-fill-color: var(--color-hc-text) !important;
 }
 
 .high-contrast :where(input, textarea, select) {
-    background-color: black !important;
-    color: white !important;
-    border: 1px solid white !important;
+  background-color: black !important;
+  color: white !important;
+  border: 1px solid white !important;
 }
 
 /* PRINT STYLES */
-.print-container {
-    display: none;
-}
+/* .print-container removed display:none to allow on-screen visibility */
 
 @media print {
-    @page {
-        size: A4 portrait;
-        margin: 0;
-    }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
 
-    /* Reset basic layout */
-    html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0 !important;
-        padding: 0 !important;
-        background-color: white;
-        overflow: visible;
-    }
+  /* Reset basic layout */
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: white;
+    overflow: visible;
+  }
 
-    /* Hide everything primarily */
-    body {
-        visibility: hidden;
-    }
+  /* Hide everything primarily */
+  body {
+    visibility: hidden;
+  }
 
-    /* Ensure specific UI elements are fully removed from layout to prevent interference */
-    app-sidebar, 
-    app-header, 
-    nav, 
-    header, 
-    footer, 
-    .drawer-side,
-    .navbar,
-    .toast,
-    button:not(.print-container button),
-    .btn:not(.print-container .btn),
-    .no-print {
-        display: none !important;
-    }
+  /* Ensure specific UI elements are fully removed from layout to prevent interference */
+  app-sidebar,
+  app-header,
+  nav,
+  header,
+  footer,
+  .drawer-side,
+  .navbar,
+  .toast,
+  button:not(.print-container button),
+  .btn:not(.print-container .btn),
+  .no-print {
+    display: none !important;
+  }
 
-    /* Show Print Container */
-    .print-container {
-        display: block !important;
-        visibility: visible !important;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        min-height: 100vh;
-        margin: 0;
-        padding: 5mm;
-        background-color: white;
-        z-index: 9999;
-    }
+  /* Show Print Container */
+  .print-container {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 5mm;
+    background-color: white;
+    z-index: 9999;
+  }
 
-    /* Ensure children of print-container are visible */
-    .print-container * {
-        visibility: visible !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        color: black !important;
-    }
+  /* Ensure children of print-container are visible */
+  .print-container * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: black !important;
+  }
 
-    /* Print Specific Styling Overrides */
-    .print-container .border {
-        border-color: #000 !important;
-        border-width: 1px !important;
-    }
-    
-    .print-container .bg-gray-100, 
-    .print-container .bg-gray-50,
-    .print-container .bg-base-200 {
-        background-color: #f3f4f6 !important;
-    }
+  /* Print Specific Styling Overrides */
+  .print-container .border {
+    border-color: #000 !important;
+    border-width: 1px !important;
+  }
+
+  .print-container .bg-gray-100,
+  .print-container .bg-gray-50,
+  .print-container .bg-base-200 {
+    background-color: #f3f4f6 !important;
+  }
 }

@@ -1,7 +1,26 @@
 <div class="min-h-screen bg-base-100 py-10 px-4">
     <div class="max-w-7xl mx-auto">
 
-        <h1 class="text-4xl font-bold text-center mb-12">Nuestros Productos</h1>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-4">
+             <h1 class="text-4xl font-bold text-center">Nuestros Productos</h1>
+             <a routerLink="/productos" class="btn btn-primary btn-outline btn-sm">
+                Ver Catálogo Completo <i class="fas fa-list ml-1"></i>
+             </a>
+        </div>
+        
+        <div class="flex justify-center mb-12">
+            <div class="relative w-full max-w-md">
+                <input 
+                    type="text" 
+                    placeholder="Buscar producto..." 
+                    [(ngModel)]="searchQuery"
+                    (keyup.enter)="onSearch()"
+                    class="input input-bordered w-full pl-10 shadow-lg" />
+                <button (click)="onSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-sm btn-circle">
+                    <i class="fas fa-search text-base-content/50"></i>
+                </button>
+            </div>
+        </div>
 
         @if (loading()) {
         <div class="flex justify-center p-10">
@@ -13,14 +32,14 @@
         <section class="mb-16">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold border-l-4 border-primary pl-4">Celulares</h2>
-                <a routerLink="/products/category/celulares" class="btn btn-sm btn-ghost">Ver todos <i
+                <a routerLink="/productos/categoria/celulares" class="btn btn-sm btn-ghost">Ver todos <i
                         class="fas fa-arrow-right ml-1"></i></a>
             </div>
 
             @if (celulares().length > 0) {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @for (product of celulares(); track product.id) {
-                <product-card [product]="product"></product-card>
+                <product-card [product]="product" (quickView)="openQuickView($event)"></product-card>
                 }
             </div>
             } @else {
@@ -35,14 +54,14 @@
         <section>
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold border-l-4 border-secondary pl-4">Repuestos</h2>
-                <a routerLink="/products/category/repuestos" class="btn btn-sm btn-ghost">Ver todos <i
+                <a routerLink="/productos/categoria/repuestos" class="btn btn-sm btn-ghost">Ver todos <i
                         class="fas fa-arrow-right ml-1"></i></a>
             </div>
 
             @if (repuestos().length > 0) {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @for (product of repuestos(); track product.id) {
-                <product-card [product]="product"></product-card>
+                <product-card [product]="product" (quickView)="openQuickView($event)"></product-card>
                 }
             </div>
             } @else {
@@ -55,4 +74,63 @@
 
         }
     </div>
+
+    <!-- Quick View Modal -->
+    @if (isQuickViewOpen() && quickViewProduct()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" (click)="closeQuickView()">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in-up" (click)="$event.stopPropagation()">
+            
+            <button (click)="closeQuickView()" class="absolute top-4 right-4 btn btn-circle btn-sm btn-ghost z-10">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- Image -->
+                <div class="bg-gray-50 dark:bg-gray-700 p-8 flex items-center justify-center">
+                    <img [src]="quickViewProduct().image_url || 'assets/img/no-image.png'" [alt]="quickViewProduct().name" class="max-h-96 object-contain">
+                </div>
+
+                <!-- Info -->
+                <div class="p-8 flex flex-col h-full">
+                    <span class="text-sm text-indigo-600 font-bold uppercase tracking-wider mb-2">
+                        {{ quickViewProduct().category?.name || 'Producto' }}
+                    </span>
+                    
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                        {{ quickViewProduct().name }}
+                    </h2>
+
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="text-3xl font-bold text-gray-900 dark:text-white">
+                            ${{ quickViewProduct().price | number:'1.0-0' }}
+                        </span>
+                        @if (quickViewProduct().stock > 0) {
+                            <span class="badge badge-success gap-2">
+                                <i class="fas fa-check"></i> En Stock
+                            </span>
+                        } @else {
+                            <span class="badge badge-error gap-2">
+                                <i class="fas fa-times"></i> Agotado
+                            </span>
+                        }
+                    </div>
+
+                    <p class="text-gray-600 dark:text-gray-300 text-lg mb-8 leading-relaxed">
+                        {{ quickViewProduct().description }}
+                    </p>
+
+                    <div class="mt-auto flex gap-4">
+                        <button class="btn btn-primary flex-1">
+                            <i class="fas fa-shopping-cart mr-2"></i> Agregar al Carrito
+                        </button>
+                        <a [routerLink]="['/productos/detalle', quickViewProduct().slug]" (click)="closeQuickView()" class="btn btn-outline flex-1">
+                            Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
 </div>

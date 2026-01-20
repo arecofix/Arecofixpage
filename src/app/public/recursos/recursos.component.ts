@@ -29,7 +29,7 @@ import { RouterLink } from '@angular/router';
               <p class="text-gray-600 dark:text-gray-300 mb-6">
                 Accede a nuestra base de datos de drivers, esquemáticos y software de servicio técnico. Exclusivo para gremio.
               </p>
-              <a routerLink="/fixtecnicos" class="block w-full py-3 px-6 text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors">
+              <a routerLink="/gsm" class="block w-full py-3 px-6 text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors">
                 Ir a Descargas
               </a>
             </div>
@@ -75,7 +75,7 @@ import { RouterLink } from '@angular/router';
             <p class="text-gray-600 dark:text-gray-300 mb-8">
                 Capacítate con los mejores en Arecofix Academy.
             </p>
-            <a routerLink="/cursos" class="inline-flex items-center px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-full hover:opacity-90 transition-opacity">
+            <a routerLink="/academy" class="inline-flex items-center px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-full hover:opacity-90 transition-opacity">
                 <i class="fas fa-graduation-cap mr-2"></i> Ver Cursos
             </a>
         </div>

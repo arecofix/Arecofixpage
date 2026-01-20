@@ -1,0 +1,117 @@
+@if (service(); as s) {
+    <div class="min-h-screen bg-base-100 font-sans">
+      
+      <!-- HERO SECTION -->
+      <section class="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 z-0">
+          <img 
+            [ngSrc]="s.image" 
+            [alt]="s.title"
+            fill
+            priority
+            class="object-cover blur-sm scale-105"
+          >
+          <div class="absolute inset-0 bg-black/60"></div>
+        </div>
+  
+        <div class="relative z-10 container mx-auto px-4 text-center">
+          <span class="inline-block py-1 px-3 rounded-full bg-primary/20 border border-primary/50 text-primary-content text-sm font-bold tracking-wide uppercase mb-4 backdrop-blur-md">
+            Servicio Profesional
+          </span>
+          <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-2xl">
+            {{ s.title }}
+          </h1>
+          <p class="text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+            {{ s.description }}
+          </p>
+        </div>
+      </section>
+  
+      <!-- CONTENT SECTION -->
+      <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col lg:flex-row gap-12">
+            
+            <!-- Left Column: Details & Features -->
+            <div class="lg:w-2/3">
+              <div class="prose prose-lg max-w-none">
+                <h2 class="text-3xl font-bold mb-8 text-base-content">¿Qué incluye este servicio?</h2>
+                <p class="text-base-content/70 text-lg mb-8">
+                  En Arecofix nos especializamos en brindar soluciones completas. Para el servicio de 
+                  <strong>{{ s.title }}</strong>, contamos con herramientas de última generación y
+                   personal capacitado para garantizar el mejor resultado.
+                </p>
+  
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 not-prose mb-12">
+                  @for (feature of s.features; track feature) {
+                    <div class="flex items-start gap-3 p-4 bg-base-200/50 rounded-xl hover:bg-base-200 transition-colors">
+                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                        <i class="fas fa-check text-primary text-sm"></i>
+                      </div>
+                      <span class="font-medium text-base-content">{{ feature }}</span>
+                    </div>
+                  }
+                </div>
+  
+                <h3 class="text-2xl font-bold mb-4">Garantía de Confianza</h3>
+                <p class="text-base-content/70 mb-8">
+                  Todos nuestros trabajos cuentan con garantía escrita. Utilizamos repuestos de
+                  calidad original o premium certificados. Tu satisfacción y la seguridad de
+                  tu equipo son nuestra prioridad.
+                </p>
+              </div>
+            </div>
+  
+            <!-- Right Column: Sticky Sidebar -->
+            <div class="lg:w-1/3">
+              <div class="sticky top-24 space-y-6">
+                
+                <!-- CTA Card -->
+                <div class="card bg-base-100 shadow-xl border border-base-200 overflow-hidden">
+                  <div class="bg-primary p-4 text-primary-content text-center">
+                    <p class="font-bold text-lg">Solicitar Presupuesto</p>
+                  </div>
+                  <div class="card-body items-center text-center p-8">
+                    <div class="w-20 h-20 bg-base-200 rounded-full flex items-center justify-center text-4xl mb-4 text-primary">
+                        <i [class]="'fas ' + s.icon"></i>
+                    </div>
+                    <h3 class="card-title text-2xl mb-2">{{ s.price }}</h3>
+                    <p class="text-sm text-base-content/60 mb-8">El precio puede variar según el modelo y la complejidad.</p>
+                    
+                    <a [href]="getWhatsAppLink(s)" target="_blank" class="btn btn-primary btn-lg w-full shadow-lg hover:scale-105 transition-transform mb-3">
+                      <i class="fab fa-whatsapp mr-2"></i> Consultar Ahora
+                    </a>
+                    <p class="text-xs text-base-content/40">Respuesta inmediata</p>
+                  </div>
+                </div>
+  
+                <!-- Locations Info -->
+                <div class="bg-base-200 rounded-xl p-6">
+                  <h4 class="font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-error"></i> Dónde Estamos
+                  </h4>
+                  <p class="text-sm text-base-content/70 mb-2">Jorge Newbery 69, Marcos Paz.</p>
+                  <p class="text-xs text-base-content/40">A 3 cuadras de ruta 40</p>
+                </div>
+  
+              </div>
+            </div>
+  
+          </div>
+        </div>
+      </section>
+  
+      <!-- CTA BOTTOM -->
+      <section class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">¿Tenés alguna duda específca?</h2>
+            <p class="text-gray-400 mb-8 max-w-2xl mx-auto">No dudes en escribirnos. Te asesoramos sin compromiso para que tomes la mejor decisión.</p>
+            <a [href]="getWhatsAppLink(s)" target="_blank" class="btn btn-outline btn-white btn-lg">
+                Hablar con un Técnico
+            </a>
+        </div>
+      </section>
+  
+    </div>
+  }

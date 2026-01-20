@@ -29,7 +29,9 @@ export interface Repair {
     readonly status: RepairStatus;
     readonly estimated_cost?: number;
     readonly final_cost?: number;
+    readonly deposit_amount?: number;
     readonly notes?: string;
+    readonly technician_notes?: string;
     readonly technician_id?: string;
     readonly received_at?: string;
     readonly created_at: string;

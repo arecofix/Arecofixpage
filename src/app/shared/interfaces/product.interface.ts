@@ -22,6 +22,9 @@ export interface Product {
   image_url?: string;
   gallery_urls?: string[];
   sku?: string;
+  stock?: number;
+  regular_price?: number;
+  sale_price?: number;
 }
 
 export type PageNumber = number;
@@ -35,4 +38,5 @@ export interface ProductsParams extends Partial<Product> {
   category_ids?: string[];
   min_price?: number;
   max_price?: number;
+  q?: string;
 }

@@ -1,31 +1,58 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { CategoryService } from '@app/public/categories/services';
-import { ProductService } from '@app/public/products/services';
+import { RouterLink, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ProductCard } from '@app/public/products/components';
-import { firstValueFrom } from 'rxjs';
+import { GetProductsByCategorySlugUseCase } from '@app/core/usecases/products/get-products-by-category-slug.usecase';
+import { SeoService } from '@app/core/services/seo.service';
+import { firstValueFrom, forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-products-index-page',
     standalone: true,
-    imports: [CommonModule, RouterLink, ProductCard],
+    imports: [CommonModule, RouterLink, ProductCard, FormsModule],
     templateUrl: './products-index-page.html',
 })
 export class ProductsIndexPage implements OnInit {
-    private categoryService = inject(CategoryService);
-    private productService = inject(ProductService);
+    private getProductsUseCase = inject(GetProductsByCategorySlugUseCase);
+    private seoService = inject(SeoService);
+    private router = inject(Router);
 
     celulares = signal<any[]>([]);
     repuestos = signal<any[]>([]);
     loading = signal(true);
+    searchQuery = '';
+    
+    // Quick View State
+    quickViewProduct = signal<any>(null);
+    isQuickViewOpen = signal(false);
 
-    async ngOnInit() {
+    ngOnInit() {
+        this.setSeoData();
+        this.loadData();
+    }
+
+    private setSeoData() {
+        this.seoService.setPageData(
+            'Productos - Celulares y Repuestos',
+            'Explora nuestra selección de celulares nuevos y usados, y encuentra los repuestos que necesitas en Arecofix.',
+            'https://arecofix.com.ar/assets/img/brands/logo/logo-normal1.PNG' // Default or specific image
+        );
+    }
+
+    private async loadData() {
         try {
-            await Promise.all([
-                this.loadCategoryProducts('celulares', this.celulares),
-                this.loadCategoryProducts('repuestos', this.repuestos)
-            ]);
+            // Parallel execution using forkJoin
+            const [celularesData, repuestosData] = await firstValueFrom(
+                forkJoin([
+                    this.getProductsUseCase.execute('celulares'),
+                    this.getProductsUseCase.execute('repuestos')
+                ])
+            );
+            
+            this.celulares.set(celularesData);
+            this.repuestos.set(repuestosData);
+
         } catch (error) {
             console.error('Error loading products', error);
         } finally {
@@ -33,19 +60,19 @@ export class ProductsIndexPage implements OnInit {
         }
     }
 
-    async loadCategoryProducts(slug: string, signalSetter: any) {
-        try {
-            // 1. Get Category
-            const catRes = await firstValueFrom(this.categoryService.getDataBySlug(slug));
-            const category = catRes.data?.[0]; // Assuming response structure
-
-            if (category?.id) {
-                // 2. Get Products
-                const prodRes = await firstValueFrom(this.productService.getData({ category_id: category.id }));
-                signalSetter.set(prodRes.data?.slice(0, 4) || []);
-            }
-        } catch (e) {
-            console.log(`Category ${slug} not found or error`, e);
+    onSearch() {
+        if (this.searchQuery.trim()) {
+            this.router.navigate(['/products/all'], { queryParams: { q: this.searchQuery } });
         }
+    }
+
+    openQuickView(product: any) {
+        this.quickViewProduct.set(product);
+        this.isQuickViewOpen.set(true);
+    }
+
+    closeQuickView() {
+        this.isQuickViewOpen.set(false);
+        this.quickViewProduct.set(null);
     }
 }

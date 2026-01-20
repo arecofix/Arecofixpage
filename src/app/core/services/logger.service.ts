@@ -53,7 +53,8 @@ export class LoggerService {
      * Send errors to monitoring service (PostHog, Sentry, etc.)
      */
     private sendToMonitoring(message: string, error: any): void {
-        // TODO: Implement error monitoring integration
+        // TODO: Implement error monitoring integration (e.g., Sentry, Bugsnag)
+        // For now, errors are only logged to the console.
         // Example: Sentry.captureException(error);
     }
 

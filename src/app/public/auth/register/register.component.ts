@@ -26,6 +26,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     hasNumeric: false,
     hasSpecialChar: false,
   };
+  socialLoading: { [key: string]: boolean } = {
+    google: false,
+    github: false,
+    facebook: false,
+  };
 
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
@@ -168,18 +173,49 @@ export class RegisterComponent implements OnInit, OnDestroy {
   
   async handleGoogleLogin() {
     this.error = '';
-    this.loading = true;
+    this.socialLoading['google'] = true;
     try {
       const res = await this.authService.signInWithGoogle();
+      this.socialLoading['google'] = false;
       if (res.error) {
-        this.error = res.error;
-        this.loading = false;
+        this.error = this.parseAuthError(res.error);
       }
-      // Redirect happens automatically by Supabase OAuth
     } catch (err) {
-      this.loading = false;
+      this.socialLoading['google'] = false;
       this.error = 'Error al iniciar sesión con Google.';
       console.error('Google login error:', err);
+    }
+  }
+
+  async loginWithFacebook() {
+    this.error = '';
+    this.socialLoading['facebook'] = true;
+    try {
+      const res = await this.authService.signInWithFacebook();
+      this.socialLoading['facebook'] = false;
+      if (res.error) {
+        this.error = this.parseAuthError(res.error);
+      }
+    } catch (err) {
+      this.socialLoading['facebook'] = false;
+      this.error = 'Error al iniciar sesión con Facebook.';
+      console.error('Facebook login error:', err);
+    }
+  }
+
+  async loginWithGithub() {
+    this.error = '';
+    this.socialLoading['github'] = true;
+    try {
+      const res = await this.authService.signInWithGithub();
+      this.socialLoading['github'] = false;
+      if (res.error) {
+        this.error = this.parseAuthError(res.error);
+      }
+    } catch (err) {
+      this.socialLoading['github'] = false;
+      this.error = 'Error al iniciar sesión con GitHub.';
+      console.error('GitHub login error:', err);
     }
   }
 

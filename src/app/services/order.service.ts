@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AuthService } from '../core/services/auth.service';
 import { SupabaseClient, PostgrestError } from '@supabase/supabase-js';
+import { LoggerService } from '../core/services/logger.service';
 import { Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
@@ -10,24 +11,52 @@ import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.i
 })
 export class OrderService {
     private supabase: SupabaseClient;
+    private logger = inject(LoggerService);
 
     constructor(private authService: AuthService) {
         this.supabase = this.authService.getSupabaseClient();
     }
 
-    getOrders(): Observable<Order[]> {
+    getOrders(): Observable<OrderWithItems[]> {
         return from(
             this.supabase
-                .from('orders')
-                .select('*')
+                .from('orders' as any)
+                .select('*, order_items(*)')
                 .order('created_at', { ascending: false })
         ).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return data || [];
+                // Explicit mapping to ensure clean data flowing into the app
+                return (data || []).map((o: any) => ({
+                    id: o.id,
+                    created_at: o.created_at,
+                    updated_at: o.updated_at || undefined,
+                    order_number: o.order_number,
+                    customer_name: o.customer_name,
+                    customer_email: o.customer_email,
+                    customer_phone: o.customer_phone || undefined,
+                    customer_address: o.customer_address || undefined,
+                    customer_id: o.customer_id || undefined,
+                    status: o.status,
+                    subtotal: o.subtotal,
+                    tax: o.tax,
+                    discount: o.discount,
+                    total: o.total_amount, // Map total_amount form DB to total in Interface
+                    notes: o.notes || undefined,
+                    items: (o.order_items || []).map((i: any) => ({
+                        id: i.id,
+                        order_id: i.order_id,
+                        product_id: i.product_id,
+                        product_name: i.product_name,
+                        quantity: i.quantity,
+                        unit_price: i.unit_price,
+                        subtotal: i.subtotal,
+                        created_at: i.created_at
+                    }))
+                })) as OrderWithItems[];
             }),
             catchError((err) => {
-                console.error('Error fetching orders:', err);
+                this.logger.error('Error fetching orders:', err);
                 throw err;
             })
         );
@@ -36,21 +65,48 @@ export class OrderService {
     getOrderById(id: string): Observable<OrderWithItems> {
         return from(
             Promise.all([
-                this.supabase.from('orders').select('*').eq('id', id).single(),
-                this.supabase.from('order_items').select('*').eq('order_id', id)
+                this.supabase.from('orders' as any).select('*').eq('id', id).single(),
+                this.supabase.from('order_items' as any).select('*').eq('order_id', id)
             ])
         ).pipe(
             map(([orderResult, itemsResult]) => {
                 if (orderResult.error) throw orderResult.error;
                 if (itemsResult.error) throw itemsResult.error;
 
-                return {
-                    ...orderResult.data,
-                    items: itemsResult.data || []
-                } as OrderWithItems;
+                const o: any = orderResult.data;
+                const items: any[] = itemsResult.data || [];
+
+                const order: OrderWithItems = {
+                    id: o.id,
+                    created_at: o.created_at,
+                    updated_at: o.updated_at || undefined,
+                    order_number: o.order_number,
+                    customer_name: o.customer_name,
+                    customer_email: o.customer_email,
+                    customer_phone: o.customer_phone || undefined,
+                    customer_address: o.customer_address || undefined,
+                    customer_id: o.customer_id || undefined,
+                    status: o.status,
+                    subtotal: o.subtotal,
+                    tax: o.tax,
+                    discount: o.discount,
+                    total: o.total_amount,
+                    notes: o.notes || undefined,
+                    items: items.map(i => ({
+                        id: i.id,
+                        order_id: i.order_id,
+                        product_id: i.product_id || undefined,
+                        product_name: i.product_name,
+                        quantity: i.quantity,
+                        unit_price: i.unit_price,
+                        subtotal: i.subtotal,
+                        created_at: i.created_at
+                    }))
+                };
+                return order;
             }),
             catchError((err) => {
-                console.error('Error fetching order:', err);
+                this.logger.error('Error fetching order:', err);
                 throw err;
             })
         );
@@ -58,58 +114,62 @@ export class OrderService {
 
     async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | null }> {
         try {
-            // Generate order ID client-side to avoid needing SELECT permissions
             const orderId = crypto.randomUUID();
-            // Generate order number
             const orderNumber = `ORD-${Date.now()}`;
 
-            // Insert order
             const insertPayload = {
                 id: orderId,
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone,
                 customer_address: order.customer_address,
-                status: order.status,
+                status: order.status || 'pending',
                 subtotal: order.subtotal,
                 tax: order.tax,
                 discount: order.discount,
-                total_amount: order.total, // Map total to total_amount
+                total_amount: order.total,
                 notes: order.notes,
-                order_number: orderNumber
+                order_number: orderNumber,
+                customer_id: order.customer_id
             };
 
             const { error: orderError } = await this.supabase
-                .from('orders')
+                .from('orders' as any)
                 .insert(insertPayload);
-                // .select() .single() removed to avoid RLS 42501 error
 
             if (orderError) throw orderError;
 
-            // Insert order items
             const itemsWithOrderId = items.map(item => ({
-                ...item,
-                order_id: orderId
+                order_id: orderId,
+                product_id: item.product_id,
+                product_name: item.product_name,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                subtotal: item.subtotal
             }));
 
             const { error: itemsError } = await this.supabase
-                .from('order_items')
+                .from('order_items' as any)
                 .insert(itemsWithOrderId);
 
             if (itemsError) throw itemsError;
 
-            // Construct the return object since we can't select it back
-            const orderData = { ...insertPayload, created_at: new Date().toISOString() };
-            return { data: orderData as any, error: null };
+            const orderData: Order = { 
+                ...order, 
+                id: orderId, 
+                order_number: orderNumber,
+                created_at: new Date().toISOString() 
+            };
+            return { data: orderData, error: null };
         } catch (error) {
-            console.error('Error creating order:', error);
-            return { data: null, error: error as any };
+            this.logger.error('Error creating order:', error);
+            return { data: null, error: error as PostgrestError };
         }
     }
 
     async updateOrderStatus(id: string, status: Order['status']): Promise<{ error: PostgrestError | null }> {
         const { error } = await this.supabase
-            .from('orders')
+            .from('orders' as any)
             .update({ status, updated_at: new Date().toISOString() })
             .eq('id', id);
 
@@ -117,18 +177,16 @@ export class OrderService {
     }
 
     async deleteOrder(id: string): Promise<{ error: PostgrestError | null }> {
-        // Order items will be deleted automatically due to CASCADE
         const { error } = await this.supabase
-            .from('orders')
+            .from('orders' as any)
             .delete()
             .eq('id', id);
 
         return { error };
     }
+    
     async updateOrder(id: string, order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | Error | null }> {
         try {
-            // Update order details
-            // Update order details
             const updatePayload = {
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
@@ -144,7 +202,7 @@ export class OrderService {
             };
 
             const { data: orderData, error: orderError } = await this.supabase
-                .from('orders')
+                .from('orders' as any)
                 .update(updatePayload)
                 .eq('id', id)
                 .select()
@@ -153,47 +211,62 @@ export class OrderService {
             if (orderError) throw orderError;
             if (!orderData) throw new Error('Order not found or permission denied');
 
-            // Handle items
-            // 1. Get existing item IDs
             const { data: existingItems, error: fetchError } = await this.supabase
-                .from('order_items')
+                .from('order_items' as any)
                 .select('id')
                 .eq('order_id', id);
 
             if (fetchError) throw fetchError;
 
-            const existingIds = existingItems.map(i => i.id);
+            const existingIds = (existingItems || []).map((i: any) => i.id);
             const currentIds = items.filter(i => i.id).map(i => i.id);
 
-            // 2. Delete removed items
-            const idsToDelete = existingIds.filter(id => !currentIds.includes(id));
+            const idsToDelete = existingIds.filter(eid => !currentIds.includes(eid));
             if (idsToDelete.length > 0) {
                 const { error: deleteError } = await this.supabase
-                    .from('order_items')
+                    .from('order_items' as any)
                     .delete()
                     .in('id', idsToDelete);
                 if (deleteError) throw deleteError;
             }
 
-            // 3. Upsert items (update existing, insert new)
             const itemsToUpsert = items.map(item => ({
-                ...item,
+                ...(item.id ? { id: item.id } : {}),
                 order_id: id,
-                // Ensure we don't send undefined/null IDs for new items if not needed, 
-                // but upsert needs ID to match. New items shouldn't have ID or should have it undefined.
-                // Supabase upsert: if ID is present and matches, update. If not, insert.
+                product_name: item.product_name,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                subtotal: item.subtotal,
+                product_id: item.product_id
             }));
 
             const { error: upsertError } = await this.supabase
-                .from('order_items')
+                .from('order_items' as any)
                 .upsert(itemsToUpsert);
 
             if (upsertError) throw upsertError;
 
-            return { data: orderData, error: null };
+            const mappedOrder: Order = {
+                id: orderData.id,
+                order_number: orderData.order_number,
+                customer_name: orderData.customer_name,
+                customer_email: orderData.customer_email,
+                customer_phone: orderData.customer_phone || undefined,
+                customer_address: orderData.customer_address || undefined,
+                status: orderData.status,
+                subtotal: orderData.subtotal,
+                tax: orderData.tax,
+                discount: orderData.discount,
+                total: orderData.total_amount,
+                notes: orderData.notes || undefined,
+                created_at: orderData.created_at,
+                updated_at: orderData.updated_at || undefined
+            };
+
+            return { data: mappedOrder, error: null };
         } catch (error) {
-            console.error('Error updating order:', error);
-            return { data: null, error: error as any };
+            this.logger.error('Error updating order:', error);
+            return { data: null, error: error as PostgrestError };
         }
     }
 }

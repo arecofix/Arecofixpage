@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { SeoService } from '../../shared/services/seo.service';
 import { environment } from '../../../environments/environment';
+import { RouterModule } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { CommonModule } from '@angular/common';
 import { map } from 'rxjs/operators';
@@ -11,7 +12,7 @@ import { Service, SERVICIOS_CONTENT, ServiciosContent } from './servicios.data';
 @Component({
     selector: 'app-servicios',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterModule],
     templateUrl: './servicios.html',
     styleUrl: './servicios.scss'
 })

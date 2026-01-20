@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button';
 import { AnalyticsService } from './services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
+import { SeoService } from './core/services/seo.service';
 import posthog from 'posthog-js';
 
 @Component({
@@ -17,6 +18,7 @@ import posthog from 'posthog-js';
 export class App implements OnInit {
   private analytics = inject(AnalyticsService);
   private logger = inject(LoggerService);
+  private seoService = inject(SeoService);
 
   ngOnInit() {
     // Send a test event to verify PostHog is working

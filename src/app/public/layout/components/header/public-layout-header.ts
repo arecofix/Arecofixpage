@@ -165,7 +165,7 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
   public selectProduct(product: Product) {
     this.searchQuery.set('');
     this.showResults.set(false);
-    this.router.navigate(['/products/details', product.slug || product.id]);
+    this.router.navigate(['/productos/detalle', product.slug || product.id]);
   }
 
   public categoryRs = rxResource<iCategoriesResponse, unknown>({
@@ -194,7 +194,7 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
       return {
         id: String(category.id), // Keep track of ID for nesting
         title: category.name,
-        path: '/products/category/' + slug.toLowerCase(),
+        path: '/productos/categoria/' + slug.toLowerCase(),
         icon: icon || 'fas fa-box',
         parentId: category.parent_id ? String(category.parent_id) : undefined,
         children: []

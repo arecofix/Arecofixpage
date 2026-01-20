@@ -1,22 +1,170 @@
-@if (productsRs.isLoading()) {
-<is-loading />
-} @else if (!productsRs.hasValue()) {
-<is-empty />
-} @else if (productsRs.error()) {
-<is-error />
-} @else if (productsRs.hasValue()) { @if (paginationData()) {
-<pagination
-  [pages]="productsRs.value().pages "
-  [currentPage]="paginationService.currentPage()"
-/>
-}
+<!-- Unique Hero for Featured -->
+<header class="relative bg-gray-900 text-white overflow-hidden isolate">
+    <div class="absolute inset-0 bg-linear-to-r from-purple-900 via-indigo-900 to-blue-900 opacity-90"></div>
+    <div class="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-gray-50 dark:from-gray-900 to-transparent"></div>
+    
+    <!-- Orbs -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
 
-<div class="divider"></div>
-<!-- Responsive product grid: 1 column on small, 3 on medium, 5 on large screens -->
-<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4 p-4">
-  @for (product of productsRs.value().data; track product.id; let i = $index) {
-  <product-card [product]="product" [isPriority]="i < 8" />
-  <!--  -->}
+    <div class="relative container mx-auto px-4 py-20 text-center">
+        <!-- Breadcrumbs -->
+        <div class="text-sm breadcrumbs text-purple-200 justify-center mb-6 flex">
+            <ul>
+                <li><a routerLink="/" class="hover:text-white transition-colors">Inicio</a></li>
+                <li><a routerLink="/products" class="hover:text-white transition-colors">Productos</a></li>
+                <li class="font-semibold text-white">Destacados</li>
+            </ul>
+        </div>
+
+        <span class="inline-block py-1 px-3 rounded-full bg-yellow-500/20 text-yellow-300 text-sm font-bold mb-4 border border-yellow-500/30 backdrop-blur-sm">
+            <i class="fas fa-star mr-2"></i> Selección Premium
+        </span>
+        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight text-white drop-shadow-lg">
+            Productos Destacados
+        </h1>
+        <p class="text-xl text-purple-100 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
+            Las mejores ofertas, los más vendidos y las novedades que no te podés perder. Calidad certificada por nuestros expertos.
+        </p>
+
+        <!-- Search with unique style -->
+        <div class="max-w-xl mx-auto relative group">
+            <div class="absolute -inset-0.5 bg-linear-to-r from-pink-500 to-purple-600 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-200"></div>
+            <div class="relative flex items-center bg-white dark:bg-gray-800 rounded-full shadow-2xl">
+                 <input 
+                    type="text" 
+                    placeholder="Buscar en destacados..." 
+                    [ngModel]="searchQuery()"
+                    (ngModelChange)="onSearch($event)"
+                    class="w-full bg-transparent border-none text-gray-900 dark:text-white placeholder-gray-400 px-6 py-4 focus:ring-0 text-lg rounded-full"
+                 />
+                 <button class="mr-2 p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors">
+                     <i class="fas fa-arrow-right"></i>
+                 </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="container mx-auto px-4">
+        
+        <!-- Toolbar -->
+         <div class="flex justify-between items-center mb-8 px-2">
+            <div>
+                 @if (productsRs.value()) {
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Encontramos <span class="font-bold text-gray-900 dark:text-white">{{ productsRs.value()?.items }}</span> joyas para vos
+                    </p>
+                 }
+            </div>
+            <!-- Could add sort here if implemented in TS -->
+         </div>
+
+         <!-- Grid -->
+        @if (productsRs.isLoading()) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                @for(i of [1,2,3,4,5,6,7,8]; track i) {
+                    <div class="aspect-square bg-gray-200 dark:bg-gray-800 rounded-3xl animate-pulse"></div>
+                }
+            </div>
+        } @else if (productsRs.error()) {
+             <is-error [message]="productsRs.error()?.message || 'Error cargando destacados'" />
+        } @else if (productsRs.value()) {
+            @if (productsRs.value()?.items === 0) {
+                 <div class="text-center py-20">
+                    <h3 class="text-2xl font-bold text-gray-400">No hay destacados por ahora</h3>
+                 </div>
+            } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                @for (product of productsRs.value()!.data; track product.id; let i = $index) {
+                    <!-- Featured Card: Add a visual indicator for ranking -->
+                    <div class="relative group">
+                        @if (i < 3) {
+                            <div class="absolute -top-4 -left-4 z-10 w-12 h-12 bg-yellow-400 splat shadow-lg flex items-center justify-center text-yellow-900 font-black text-xl rotate-12 group-hover:rotate-0 transition-transform">
+                                #{{i+1}}
+                            </div>
+                        }
+                        <product-card [product]="product" [isPriority]="i < 4" (quickView)="openQuickView($event)"></product-card>
+                    </div>
+                }
+                </div>
+
+                @if (paginationData(); as pagination) {
+                    <div class="mt-16 flex justify-center">
+                        <pagination [pages]="pagination.pages" [currentPage]="paginationService.currentPage()"></pagination>
+                    </div>
+                }
+            }
+        }
+    </div>
 </div>
 
-<!--  -->}
+<!-- Benefits Banner -->
+<section class="py-16 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-gray-700 dark:text-gray-300">
+      <div class="p-6 rounded-2xl bg-gray-50 dark:bg-gray-700/50">
+        <i class="fas fa-star text-4xl mb-4 text-yellow-500"></i>
+        <h4 class="font-bold text-lg mb-1">Calidad Premium</h4>
+        <p class="text-sm opacity-70">Solo lo mejor</p>
+      </div>
+      <div class="p-6 rounded-2xl bg-gray-50 dark:bg-gray-700/50">
+        <i class="fas fa-box-open text-4xl mb-4 text-blue-500"></i>
+        <h4 class="font-bold text-lg mb-1">Stock Permanente</h4>
+        <p class="text-sm opacity-70">Entrega inmediata</p>
+      </div>
+      <div class="p-6 rounded-2xl bg-gray-50 dark:bg-gray-700/50">
+        <i class="fas fa-dollar-sign text-4xl mb-4 text-green-500"></i>
+        <h4 class="font-bold text-lg mb-1">Mejor Precio</h4>
+        <p class="text-sm opacity-70">Garantizado</p>
+      </div>
+      <div class="p-6 rounded-2xl bg-gray-50 dark:bg-gray-700/50">
+        <i class="fas fa-lock text-4xl mb-4 text-purple-500"></i>
+        <h4 class="font-bold text-lg mb-1">Compra Segura</h4>
+        <p class="text-sm opacity-70">Protección total</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick View Modal -->
+@if (isQuickViewOpen()) {
+<div class="modal modal-open z-50 animate-fade-in">
+  <div class="modal-box relative max-w-4xl bg-white dark:bg-gray-800 rounded-3xl p-0 overflow-hidden shadow-2xl">
+    <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10 bg-white/50 backdrop-blur-md" (click)="closeQuickView()">✕</button>
+    
+    @if (quickViewProduct(); as p) {
+        <div class="flex flex-col md:flex-row h-full">
+            <div class="w-full md:w-1/2 bg-gray-50 dark:bg-gray-700/30 p-8 flex items-center justify-center relative">
+                <img [src]="p.image_url || 'assets/img/no-image.png'" class="max-h-[300px] object-contain drop-shadow-xl" [alt]="p.name"/>
+                @if(p.stock !== undefined && p.stock <= 0) {
+                     <span class="absolute top-8 left-8 badge badge-error text-white font-bold p-3">Sin Stock</span>
+                }
+            </div>
+            
+            <div class="w-full md:w-1/2 p-8 flex flex-col">
+                <div class="mb-auto">
+                    <h3 class="font-black text-2xl md:text-3xl mb-2 text-gray-900 dark:text-white leading-tight">{{ p.name }}</h3>
+                    <div class="flex items-baseline gap-3 mb-6">
+                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.price | currency }}</span>
+                        @if(p.regular_price && p.regular_price > p.price) {
+                            <span class="text-lg text-gray-400 line-through">{{ p.regular_price | currency }}</span>
+                        }
+                    </div>
+                    
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{{ p.description || 'Sin descripción disponible.' }}</p>
+                </div>
+                
+                <button class="btn btn-primary btn-lg w-full rounded-2xl shadow-xl shadow-indigo-600/30 gap-3" (click)="addToCart(p)">
+                   <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                </button>
+            </div>
+        </div>
+    }
+  </div>
+  <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-sm">
+    <button (click)="closeQuickView()">close</button>
+  </form>
+</div>
+}

@@ -2,54 +2,68 @@
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
       <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Mapa del Sitio</h2>
-      <p class="mt-2 text-lg leading-8 text-gray-600">Estructura completa de nuestro sitio web.</p>
+      <p class="mt-2 text-lg leading-8 text-gray-600">Navega por toda la estructura de Arecofix para encontrar lo que buscas.</p>
     </div>
     
     <div class="mx-auto mt-16 max-w-2xl lg:max-w-none">
-      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
         
         <!-- Sección Principal -->
-        <div class="bg-gray-50 rounded-2xl p-8">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Principal</h3>
-          <ul class="space-y-3 text-gray-600">
-            <li><a routerLink="/" class="hover:text-indigo-600 transition">Inicio</a></li>
-            <li><a routerLink="/nosotros" class="hover:text-indigo-600 transition">Nosotros</a></li>
-            <li><a routerLink="/contacto" class="hover:text-indigo-600 transition">Contacto</a></li>
-            <li><a routerLink="/recursos" class="hover:text-indigo-600 transition">Recursos</a></li>
-          </ul>
+        <div class="group relative">
+           <div class="absolute -inset-2 rounded-lg bg-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+           <div class="relative">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 pl-2 border-l-4 border-indigo-500">Principal</h3>
+              <ul class="space-y-3 text-gray-600 pl-2">
+                <li><a routerLink="/" class="hover:text-indigo-600 transition flex items-center"><i class="fas fa-home w-5 text-gray-400"></i> Inicio</a></li>
+                <li><a routerLink="/nosotros" class="hover:text-indigo-600 transition flex items-center"><i class="fas fa-users w-5 text-gray-400"></i> Nosotros</a></li>
+                <li><a routerLink="/contacto" class="hover:text-indigo-600 transition flex items-center"><i class="fas fa-envelope w-5 text-gray-400"></i> Contacto</a></li>
+                <li><a routerLink="/recursos" class="hover:text-indigo-600 transition flex items-center"><i class="fas fa-box-open w-5 text-gray-400"></i> Recursos</a></li>
+              </ul>
+           </div>
         </div>
 
-        <!-- Productos y Servicios -->
-        <div class="bg-gray-50 rounded-2xl p-8">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Oferta</h3>
-          <ul class="space-y-3 text-gray-600">
-            <li><a routerLink="/products/featured" class="hover:text-indigo-600 transition">Productos Destacados</a></li>
-            <li><a routerLink="/categories" class="hover:text-indigo-600 transition">Categorías</a></li>
-            <li><a routerLink="/servicios" class="hover:text-indigo-600 transition">Servicios</a></li>
-            <li><a routerLink="/cursos" class="hover:text-indigo-600 transition">Cursos</a></li>
-          </ul>
+        <!-- Productos y Soluciones -->
+        <div class="group relative">
+            <div class="absolute -inset-2 rounded-lg bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 pl-2 border-l-4 border-blue-500">Tienda & Servicios</h3>
+              <ul class="space-y-3 text-gray-600 pl-2">
+                <li><a routerLink="/productos" class="hover:text-blue-600 transition flex items-center"><i class="fas fa-shopping-bag w-5 text-gray-400"></i> Productos <span class="badge badge-xs badge-neutral ml-2">Nuevo</span></a></li>
+                <li><a routerLink="/products/featured" class="hover:text-blue-600 transition flex items-center"><i class="fas fa-star w-5 text-gray-400"></i> Destacados</a></li>
+                <li><a routerLink="/categories" class="hover:text-blue-600 transition flex items-center"><i class="fas fa-th w-5 text-gray-400"></i> Categorías</a></li>
+                <li><a routerLink="/servicios" class="hover:text-blue-600 transition flex items-center"><i class="fas fa-wrench w-5 text-gray-400"></i> Servicios Técnicos</a></li>
+                <li><a routerLink="/gsm" class="hover:text-blue-600 transition flex items-center"><i class="fas fa-mobile-alt w-5 text-gray-400"></i> Zona GSM</a></li>
+              </ul>
+            </div>
         </div>
 
-        <!-- Legal y Soporte -->
-        <div class="bg-gray-50 rounded-2xl p-8">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Legal y Soporte</h3>
-          <ul class="space-y-3 text-gray-600">
-            <li><a routerLink="/privacy" class="hover:text-indigo-600 transition">Política de Privacidad</a></li>
-            <li><a routerLink="/terms" class="hover:text-indigo-600 transition">Términos y Condiciones</a></li>
-            <li><a routerLink="/blog" class="hover:text-indigo-600 transition">Blog</a></li>
-            <li><a routerLink="/sitemap" class="hover:text-indigo-600 transition font-semibold">Mapa del Sitio</a></li>
-          </ul>
+        <!-- Comunidad & Educación -->
+        <div class="group relative">
+            <div class="absolute -inset-2 rounded-lg bg-green-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 pl-2 border-l-4 border-green-500">Comunidad</h3>
+              <ul class="space-y-3 text-gray-600 pl-2">
+                <li><a routerLink="/academy" class="hover:text-green-600 transition flex items-center"><i class="fas fa-graduation-cap w-5 text-gray-400"></i> Arecofix Academy</a></li>
+                <li><a routerLink="/fixtecnicos" class="hover:text-green-600 transition flex items-center"><i class="fas fa-network-wired w-5 text-gray-400"></i> FixTécnicos <span class="badge badge-xs badge-primary ml-2">PRO</span></a></li>
+                <li><a routerLink="/blog" class="hover:text-green-600 transition flex items-center"><i class="fas fa-newspaper w-5 text-gray-400"></i> Blog</a></li>
+                <li><a routerLink="/portfolio" class="hover:text-green-600 transition flex items-center"><i class="fas fa-images w-5 text-gray-400"></i> Portfolio</a></li>
+              </ul>
+            </div>
         </div>
 
-        <!-- Usuario -->
-        <div class="bg-gray-50 rounded-2xl p-8">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Usuario</h3>
-          <ul class="space-y-3 text-gray-600">
-            <li><a routerLink="/login" class="hover:text-indigo-600 transition">Iniciar Sesión</a></li>
-            <li><a routerLink="/register" class="hover:text-indigo-600 transition">Registrarse</a></li>
-            <li><a routerLink="/perfil" class="hover:text-indigo-600 transition">Mi Perfil</a></li>
-            <li><a routerLink="/tracking/search" class="hover:text-indigo-600 transition">Seguimiento de Reparación</a></li>
-          </ul>
+        <!-- Usuario & Legal -->
+        <div class="group relative">
+            <div class="absolute -inset-2 rounded-lg bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 pl-2 border-l-4 border-gray-500">Soporte</h3>
+              <ul class="space-y-3 text-gray-600 pl-2">
+                <li><a routerLink="/login" class="hover:text-gray-900 transition flex items-center"><i class="fas fa-sign-in-alt w-5 text-gray-400"></i> Iniciar Sesión</a></li>
+                <li><a routerLink="/register" class="hover:text-gray-900 transition flex items-center"><i class="fas fa-user-plus w-5 text-gray-400"></i> Registrarse</a></li>
+                <li><a routerLink="/privacy" class="hover:text-gray-900 transition flex items-center"><i class="fas fa-shield-alt w-5 text-gray-400"></i> Política de Privacidad</a></li>
+                <li><a routerLink="/terms" class="hover:text-gray-900 transition flex items-center"><i class="fas fa-file-contract w-5 text-gray-400"></i> Términos</a></li>
+                <li><a routerLink="/sitemap" class="hover:text-gray-900 transition flex items-center font-bold text-indigo-600"><i class="fas fa-sitemap w-5 text-indigo-600"></i> Mapa del Sitio</a></li>
+              </ul>
+            </div>
         </div>
 
       </div>

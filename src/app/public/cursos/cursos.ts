@@ -59,7 +59,7 @@ export class CursosComponent implements OnInit {
             ogTitle: 'Arecofix Academy | Cursos Profesionales',
             ogDescription: 'Tu futuro técnico empieza acá. Inscríbete en nuestros cursos presenciales.',
             ogImage: 'assets/img/branding/og-courses.jpg',
-            ogUrl: 'https://arecofix.com/#/cursos'
+            ogUrl: 'https://arecofix.com/#/academy'
         });
     }
 
@@ -135,6 +135,19 @@ export class CursosComponent implements OnInit {
                 level: 'Avanzado',
                 students: 85,
                 rating: 4.9
+            },
+            {
+                id: '3',
+                title: 'Curso de Electricidad Domiciliaria',
+                slug: 'curso-electricidad',
+                description: 'Aprende a realizar instalaciones, reparaciones y mantenimiento eléctrico en hogares y comercios desde cero.',
+                duration: '5 Meses',
+                schedule: 'Martes y Jueves 19hs',
+                price: 40000,
+                image_url: 'assets/img/cursos/electricity.jpg',
+                level: 'Principiante',
+                students: 40,
+                rating: 4.7
             }
         ];
     }

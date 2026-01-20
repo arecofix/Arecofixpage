@@ -18,41 +18,54 @@ export class AdminInvoiceDetailPage implements OnInit {
     company = signal<any>(null);
     loading = signal(true);
 
+    error = signal('');
+    
     async ngOnInit() {
         const id = this.route.snapshot.paramMap.get('id');
         const supabase = this.auth.getSupabaseClient();
+        
+        try {
+            // Fetch company settings
+            const { data: companyData } = await supabase.from('company_settings').select('*').maybeSingle();
+            if (companyData) {
+                this.company.set(companyData);
+            }
 
-        // Fetch company settings
-        const { data: companyData } = await supabase.from('company_settings').select('*').maybeSingle();
-        if (companyData) {
-            this.company.set(companyData);
-        }
+            if (id) {
+                // Fetch invoice
+                const { data: invoice, error: invoiceError } = await supabase
+                    .from('invoices')
+                    .select('*, sales(*)')
+                    .eq('id', id)
+                    .single();
 
-        if (id) {
-            // Fetch invoice
-            const { data: invoice } = await supabase
-                .from('invoices')
-                .select('*, sales(*)')
-                .eq('id', id)
-                .single();
+                if (invoiceError) throw invoiceError;
 
-            if (invoice) {
-                this.invoice.set(invoice);
+                if (invoice) {
+                    this.invoice.set(invoice);
 
-                // Fetch items
-                if (invoice.sales?.id) {
-                    const { data: items } = await supabase
-                        .from('sale_items')
-                        .select('*, products(name)')
-                        .eq('sale_id', invoice.sales.id);
-
-                    if (items) {
-                        this.items.set(items);
+                    // Fetch items
+                    if (invoice.sales?.id) {
+                        const { data: items, error: itemsError } = await supabase
+                            .from('sale_items')
+                            .select('*, products(name)')
+                            .eq('sale_id', invoice.sales.id);
+                        
+                        if (itemsError) {
+                            console.error('Error fetching items:', itemsError);
+                            // Don't block page render on items error
+                        } else if (items) {
+                            this.items.set(items);
+                        }
                     }
                 }
             }
+        } catch (e: any) {
+            console.error('Error loading invoice:', e);
+            this.error.set(e.message || 'Error al cargar la factura');
+        } finally {
+            this.loading.set(false);
         }
-        this.loading.set(false);
     }
 
     print() {

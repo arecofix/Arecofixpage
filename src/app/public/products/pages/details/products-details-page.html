@@ -8,11 +8,34 @@
 
     <!-- Product Details Page (Redesigned) -->
     <div class="bg-white dark:bg-gray-900 pt-6">
+
+     <div class="container mx-auto px-4 lg:px-8 mt-4 mb-4 flex justify-end">
+          <div class="relative w-full max-w-xs">
+              <input 
+                  type="text" 
+                  placeholder="Buscar producto..." 
+                  [(ngModel)]="searchQuery"
+                  (keyup.enter)="onSearch()"
+                  class="input input-bordered w-full pl-10 h-10" />
+              <button (click)="onSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle">
+                  <i class="fas fa-search text-gray-400"></i>
+              </button>
+          </div>
+      </div>
+
       <nav aria-label="Breadcrumb">
         <ol role="list" class="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
           <li>
             <div class="flex items-center">
-              <a routerLink="/products" class="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">Productos</a>
+              <a routerLink="/" class="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">Inicio</a>
+              <svg viewBox="0 0 16 20" width="16" height="20" fill="currentColor" aria-hidden="true" class="h-5 w-4 text-gray-300">
+                <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
+              </svg>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <a routerLink="/productos" class="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">Productos</a>
               <svg viewBox="0 0 16 20" width="16" height="20" fill="currentColor" aria-hidden="true" class="h-5 w-4 text-gray-300">
                 <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
               </svg>
@@ -22,7 +45,13 @@
             <div class="flex items-center">
               <span class="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                  @if (!categoryRs.isLoading()) {
-                    {{ categoryRs.value()?.name || 'General' }}
+                    @if(categoryRs.value()) {
+                        <a [routerLink]="['/productos/categoria', categoryRs.value()!.slug]" class="hover:underline">
+                            {{ categoryRs.value()!.name }}
+                        </a>
+                    } @else {
+                        General
+                    }
                  } @else {
                     ...
                  }
@@ -43,16 +72,16 @@
         
         <!-- Image Gallery (Left Column) -->
         <div class="lg:max-w-lg lg:self-end">
-             <div class="w-full max-h-[500px] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
-                <img [ngSrc]="product()!.image_url || 'assets/img/no-image.png'" [alt]="product()!.name" class="w-full h-auto max-h-[500px] object-contain object-center" width="500" height="500" [priority]="true"/>
+             <div class="w-full h-[500px] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
+                <img [ngSrc]="product()!.image_url || 'assets/img/no-image.png'" [alt]="product()!.name" class="object-contain object-center" fill [priority]="true"/>
              </div>
              
              <!-- Thumbnails / Gallery Grid -->
              @if (product()!.gallery_urls && product()!.gallery_urls!.length > 0) {
               <div class="mt-4 grid grid-cols-4 gap-4">
                   @for(img of product()!.gallery_urls; track img) {
-                   <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
-                      <img [src]="img" [alt]="product()!.name" class="h-full w-full object-cover object-center" />
+                   <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
+                      <img [ngSrc]="img" [alt]="product()!.name" class="object-cover object-center" fill />
                    </div>
                   }
               </div>
@@ -111,6 +140,23 @@
                  Agregar a Favoritos
               </button>
            </form>
+
+           <!-- Shipping & Contact Info -->
+           <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <div class="flex">
+                  <div class="shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-blue-700 dark:text-blue-200">
+                      <span class="font-bold">Armado y despacho de pedidos 24hs/48hs.</span> Avisar antes de pasar por el local. 
+                      <a href="https://wa.me/5491125960900" target="_blank" class="font-bold underline hover:text-blue-600">AGENDA EL Whatsapp: 5491125960900</a> Y MANDANOS UN MSJ PARA QUE PUEDAS VER PROMOCIONES DEL DIA, DESCUENTO, SORTEOS Y MAS!!!
+                    </p>
+                  </div>
+                </div>
+           </div>
         </div>
 
       </div>

@@ -3,6 +3,7 @@ import { Observable, from, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
+import { LoggerService } from '@app/core/services/logger.service';
 
 import {
   iCategoriesResponse,
@@ -15,6 +16,7 @@ import {
 })
 export class CategoryService {
   private supabase: SupabaseClient;
+  private logger = inject(LoggerService);
 
   constructor(private authService: AuthService) {
     this.supabase = this.authService.getSupabaseClient();
@@ -53,7 +55,7 @@ export class CategoryService {
         return this.processResponse(data || [], count, { _page, _per_page });
       }),
       catchError((err) => {
-        console.error('Supabase Error:', err);
+        this.logger.error('Supabase Error:', err);
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
       })
     );
@@ -78,7 +80,7 @@ export class CategoryService {
         return this.processResponse(data || [], count, { _page, _per_page });
       }),
       catchError((err) => {
-        console.error('Supabase Error:', err);
+        this.logger.error('Supabase Error:', err);
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
       })
     );
@@ -98,7 +100,7 @@ export class CategoryService {
         return this.processResponse(data || [], data?.length || 0, { _page: 1, _per_page: 1 });
       }),
       catchError((err) => {
-        console.error('Supabase Error:', err);
+        this.logger.error('Supabase Error:', err);
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
       })
     );
@@ -118,7 +120,7 @@ export class CategoryService {
         return data as iCategory;
       }),
       catchError((err) => {
-        console.error('Supabase Error:', err);
+        this.logger.error('Supabase Error:', err);
         return of(null);
       })
     );

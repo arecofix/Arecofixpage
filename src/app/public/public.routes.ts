@@ -25,9 +25,15 @@ export const publicRoutes: Routes = [
         loadChildren: () => import('@app/public/categories/categories.routes'),
       },
       {
-        title: 'Products',
-        path: 'products',
+        title: 'Productos',
+        path: 'productos',
         loadChildren: () => import('@app/public/products/products.routes'),
+      },
+      {
+        title: 'Repuestos Redirect',
+        path: 'repuestos',
+        redirectTo: 'productos/categoria/repuestos',
+        pathMatch: 'full'
       },
       {
         title: 'Login',
@@ -91,8 +97,16 @@ export const publicRoutes: Routes = [
           ),
       },
       {
-        title: 'Cursos',
-        path: 'cursos',
+        title: 'Detalle de Servicio',
+        path: 'servicios/:slug',
+        loadComponent: () =>
+          import('@app/public/servicios/pages/detail/service-detail.component').then(
+            (m) => m.ServiceDetailComponent
+          ),
+      },
+      {
+        title: 'Academy',
+        path: 'academy',
         loadComponent: () =>
           import('@app/public/cursos/cursos').then(
             (m) => m.CursosComponent
@@ -100,7 +114,7 @@ export const publicRoutes: Routes = [
       },
       {
         title: 'Detalle del Curso',
-        path: 'cursos/:slug',
+        path: 'academy/:slug',
         loadComponent: () =>
           import('@app/public/cursos/course-detail/course-detail.component').then(
             (m) => m.CourseDetailComponent

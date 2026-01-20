@@ -3,7 +3,7 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  z-index: 10000;
+  z-index: 99999;
 
   /* Hardware acceleration to prevent ghosting */
   backface-visibility: hidden;
@@ -30,7 +30,6 @@
 }
 
 /* New Pulse Animation via Pseudo-element to prevent ghosting */
-
 
 /* Estilo del ícono SVG */
 .whatsapp-btn svg {

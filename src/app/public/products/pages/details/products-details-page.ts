@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   Injector,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of } from 'rxjs';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { Location, NgOptimizedImage } from '@angular/common';
@@ -21,6 +23,7 @@ import { ProductService } from '@app/public/products/services';
 import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
+import { SeoService } from '@app/core/services/seo.service';
 /*  */
 
 @Component({
@@ -29,7 +32,9 @@ import { FallbackService } from '@app/core/services/fallback.service';
     IsEmptyComponent,
     IsErrorComponent,
     IsLoadingComponent,
-    NgOptimizedImage
+    NgOptimizedImage,
+    FormsModule,
+    RouterModule
   ],
   templateUrl: './products-details-page.html',
   styles: ``,
@@ -42,6 +47,20 @@ export class ProductsDetailsPage {
   private location: Location = inject(Location);
 
   private fallbackService = inject(FallbackService);
+  private seoService = inject(SeoService);
+
+  constructor() {
+      effect(() => {
+          const product = this.product();
+          if (product) {
+              this.seoService.setPageData(
+                  product.name,
+                  product.description || `Compra ${product.name} en Arecofix`,
+                  product.image_url
+              );
+          }
+      });
+  }
 
   productRs = rxResource({
     stream: () =>
@@ -108,23 +127,33 @@ export class ProductsDetailsPage {
   }
 
   shareProduct() {
-    const product = this.product();
-    if (!product) return;
+      // ... same share logic ...
+      const product = this.product();
+      if (!product) return;
+  
+      const shareData = {
+        title: product.name,
+        text: `Mira este producto: ${product.name}`,
+        url: window.location.href
+      };
+  
+      if (navigator.share) {
+        navigator.share(shareData)
+          .catch((err) => console.error('Error sharing:', err));
+      } else {
+        // Fallback to clipboard
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => alert('Enlace copiado al portapapeles!'))
+          .catch(err => console.error('Error copying to clipboard:', err));
+      }
+  }
 
-    const shareData = {
-      title: product.name,
-      text: `Mira este producto: ${product.name}`,
-      url: window.location.href
-    };
+  searchQuery = '';
+  private router = inject(Router);
 
-    if (navigator.share) {
-      navigator.share(shareData)
-        .catch((err) => console.error('Error sharing:', err));
-    } else {
-      // Fallback to clipboard
-      navigator.clipboard.writeText(window.location.href)
-        .then(() => alert('Enlace copiado al portapapeles!'))
-        .catch(err => console.error('Error copying to clipboard:', err));
+  onSearch() {
+    if (this.searchQuery.trim()) {
+        this.router.navigate(['/products/all'], { queryParams: { q: this.searchQuery } });
     }
   }
 }

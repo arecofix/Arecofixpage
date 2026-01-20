@@ -3,6 +3,8 @@ import { AuthService } from '../core/services/auth.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { User } from '@supabase/supabase-js';
+import { UserProfile } from '../shared/interfaces/user.interface';
 
 /**
  * Auth Helper Service
@@ -22,7 +24,7 @@ import { map } from 'rxjs/operators';
 interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
-  user: any | null;
+  user: User | null;
   error: string | null;
 }
 
@@ -75,7 +77,7 @@ export class AuthHelperService {
   /**
    * Observable: usuario actual
    */
-  getCurrentUser$(): Observable<any | null> {
+  getCurrentUser$(): Observable<User | null> {
     return this.getAuthState$().pipe(
       map(state => state.user)
     );
@@ -171,7 +173,7 @@ export class AuthHelperService {
   /**
    * Actualizar perfil del usuario
    */
-  async updateUserProfile(profileData: any): Promise<{
+  async updateUserProfile(profileData: Partial<UserProfile>): Promise<{
     success: boolean;
     error?: string;
   }> {

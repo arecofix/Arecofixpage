@@ -5,7 +5,8 @@ import {
   input,
   linkedSignal,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'pagination',
@@ -66,11 +67,28 @@ export class Pagination {
     this.activePage.set(page);
   }
 
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   next() {
-    this.onPageChange(this.activePage() + 1);
+    const nextP = this.activePage() + 1;
+    if (nextP <= this.pages()) {
+        this.navigateTo(nextP);
+    }
   }
 
   prev() {
-    this.onPageChange(this.activePage() - 1);
+    const prevP = this.activePage() - 1;
+    if (prevP >= 1) {
+        this.navigateTo(prevP);
+    }
+  }
+
+  navigateTo(page: number) {
+      this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { _page: page },
+          queryParamsHandling: 'merge'
+      });
   }
 }

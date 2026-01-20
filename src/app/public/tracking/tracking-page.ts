@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { TrackingService } from './services/tracking.service';
+import { Repair } from '../../features/repairs/domain/entities/repair.entity';
+import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
     selector: 'app-tracking-page',
@@ -13,6 +15,7 @@ import { TrackingService } from './services/tracking.service';
 export class TrackingPage implements OnInit {
     private route = inject(ActivatedRoute);
     private trackingService = inject(TrackingService);
+    private logger = inject(LoggerService);
     whatsappNumber = environment.contact.whatsappNumber;
 
     code: string | null = null;
@@ -31,13 +34,14 @@ export class TrackingPage implements OnInit {
     }
 
     async loadRepair() {
-        if (!this.code) return;
+        const code = this.code;
+        if (!code) return;
 
         try {
-            const { data, error } = await this.trackingService.getRepairByCode(this.code);
+            const { data, error } = await this.trackingService.getRepairByCode(code);
 
             if (error) {
-                console.error('Error fetching repair:', error);
+                this.logger.error('Error fetching repair:', error);
                 this.error.set(`Error: ${error.message || JSON.stringify(error)}`);
             } else if (data && data.length > 0) {
                 this.repair.set(data[0]);
@@ -45,7 +49,7 @@ export class TrackingPage implements OnInit {
                 this.error.set('No se encontró ninguna reparación con este código.');
             }
         } catch (e: any) {
-            console.error('TrackingPage: Unexpected error:', e);
+            this.logger.error('TrackingPage: Unexpected error:', e);
             this.error.set(`Error inesperado: ${e.message || e}`);
         } finally {
             this.loading.set(false);

@@ -5,14 +5,15 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, switchMap, of, tap } from 'rxjs';
+import { combineLatest, map, switchMap, of, tap, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { rxResource } from '@angular/core/rxjs-interop';
 
 import {
   IsErrorComponent,
-  IsLoadingComponent,
 } from '@app/shared/components/resource-status';
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
@@ -31,8 +32,8 @@ import { ProductCard } from '@app/public/products/components';
 @Component({
   selector: 'products-by-category-page',
   imports: [
+    CommonModule,
     IsErrorComponent,
-    IsLoadingComponent,
     ProductCard,
     Pagination,
     RouterModule,
@@ -60,6 +61,34 @@ export class ProductsByCategoryPage {
     stream: () => this.categoryService.getFeaturedData()
   });
 
+  // Search Signal and Subject
+  searchQuery = signal('');
+  private searchSubject = new Subject<string>();
+
+  constructor() {
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(q => {
+      this.updateQueryParams({ q: q || null, _page: 1 });
+    });
+  }
+
+  // Helper for updating query params (DRY)
+  updateQueryParams(newParams: any) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: newParams,
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  // Method called from template
+  onSearch(value: string) {
+    this.searchQuery.set(value);
+    this.searchSubject.next(value);
+  }
+
   productsRs = rxResource({
     stream: () =>
       combineLatest([
@@ -85,8 +114,10 @@ export class ProductsByCategoryPage {
               const _order = params['_order'] as 'asc' | 'desc';
               const min_price = params['min_price'] ? +params['min_price'] : undefined;
               const max_price = params['max_price'] ? +params['max_price'] : undefined;
+              const q = params['q'] || undefined; // Grab 'q'
 
-              // Update inputs if they are empty (initial load)
+              // Sync local signals
+              if (this.searchQuery() !== (q || '')) this.searchQuery.set(q || '');
               if (this.minPriceInput() === null && min_price) this.minPriceInput.set(min_price);
               if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
 
@@ -96,7 +127,8 @@ export class ProductsByCategoryPage {
                 _sort,
                 _order,
                 min_price,
-                max_price
+                max_price,
+                q // Pass 'q'
               });
             })
           )

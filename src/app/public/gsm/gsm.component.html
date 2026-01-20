@@ -27,6 +27,15 @@
     }
 
     <div class="container mx-auto px-4 py-12 lg:py-20 relative z-10">
+      <div class="text-sm breadcrumbs mb-6"
+           [class.text-blue-100]="theme !== 'high-contrast'"
+           [class.text-white]="theme === 'high-contrast'">
+          <ul>
+              <li><a routerLink="/" class="hover:underline">Inicio</a></li>
+              <li class="font-semibold">{{ translations[lang].badge }}</li>
+          </ul>
+      </div>
+
       <div class="flex flex-col lg:flex-row items-center gap-12">
         
         <!-- Hero Content (Left) -->

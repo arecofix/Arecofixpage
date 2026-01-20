@@ -61,6 +61,11 @@ export class ProductService {
     if (slug) query = query.eq('slug', slug);
     if (min_price !== undefined) query = query.gte('price', min_price);
     if (max_price !== undefined) query = query.lte('price', max_price);
+    
+    // Search query
+    if (params.q) {
+      query = query.or(`name.ilike.%${params.q}%,description.ilike.%${params.q}%`);
+    }
 
     // Apply sorting
     if (params._sort) {

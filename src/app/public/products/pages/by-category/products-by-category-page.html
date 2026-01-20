@@ -1,249 +1,227 @@
-<!-- Hero Section -->
-<div class="relative bg-gray-900 text-white py-12 mb-8 overflow-hidden">
-  <div class="absolute inset-0 opacity-20 bg-linear-to-r from-blue-900 to-indigo-900"></div>
-  <!-- Decorative circles -->
-  <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
-  <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
+<!-- Mobile Filter Drawer Wrapper -->
+<div class="drawer lg:drawer-open">
+  <input id="cat-filters-drawer" type="checkbox" class="drawer-toggle" />
   
-  <div class="relative container mx-auto px-4">
-    <div class="max-w-3xl">
-      <!-- Breadcrumbs -->
-      <div class="text-sm breadcrumbs text-gray-300 mb-4">
-        <ul>
-          <li><a routerLink="/">Inicio</a></li>
-          <li><a routerLink="/products">Productos</a></li>
-          @if (currentCategory()) {
-            <li class="font-semibold text-white">{{ currentCategory()?.name }}</li>
-          }
-        </ul>
-      </div>
-
-      @if (currentCategory()) {
-        <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-          {{ currentCategory()?.name }}
-        </h1>
-        <p class="text-lg text-gray-300 max-w-2xl leading-relaxed">
-          {{ currentCategory()?.description || 'Explora nuestra selección de productos de alta calidad.' }}
-        </p>
-      } @else {
-        <div class="h-10 w-64 bg-gray-700 rounded animate-pulse mb-4"></div>
-        <div class="h-6 w-96 bg-gray-700 rounded animate-pulse"></div>
-      }
+  <div class="drawer-content flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Mobile Header -->
+    <div class="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
+      <h2 class="font-bold text-gray-900 dark:text-white truncate">
+          {{ currentCategory()?.name || 'Categoría' }}
+      </h2>
+      <label for="cat-filters-drawer" class="btn btn-sm btn-ghost lg:hidden">
+        <i class="fas fa-sliders-h mr-2"></i> Filtros
+      </label>
     </div>
-  </div>
-</div>
 
-<div class="bg-white">
-  <!-- Mobile filter dialog -->
-  @if (isMobileFiltersOpen()) {
-  <div class="relative z-40 lg:hidden" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-black/25 transition-opacity" (click)="toggleMobileFilters()"></div>
+    <!-- DYNAMIC HERO -->
+    <header class="relative bg-gray-900 text-white overflow-hidden isolate">
+       <div class="absolute inset-0 bg-linear-to-br from-indigo-900 via-blue-950 to-slate-900 opacity-90"></div>
+       <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+       <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500 rounded-full mix-blend-overlay filter blur-3xl opacity-10"></div>
 
-    <div class="fixed inset-0 z-40 flex">
-      <div class="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition-all">
-        <div class="flex items-center justify-between px-4">
-          <h2 class="text-lg font-medium text-gray-900">Filtros</h2>
-          <button type="button" (click)="toggleMobileFilters()" class="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400">
-            <span class="sr-only">Cerrar menú</span>
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+       <div class="relative container mx-auto px-4 py-16 lg:py-24 text-center">
+           <div class="text-sm breadcrumbs text-indigo-200 justify-center mb-6 hidden md:flex">
+                <ul>
+                <li><a routerLink="/">Inicio</a></li>
+                <li><a routerLink="/productos">Productos</a></li>
+                <li class="font-semibold text-white">{{ currentCategory()?.name || 'Cargando...' }}</li>
+                </ul>
+            </div>
 
-        <!-- Filters (Mobile) -->
-        <form class="mt-4 border-t border-gray-200">
-          <h3 class="sr-only">Categorías</h3>
-          <ul role="list" class="px-2 py-3 font-medium text-gray-900">
-             @for (category of categoriesListRs.value()?.data; track category.id) {
-                <li><a [routerLink]="['/products/category', category.slug]" (click)="toggleMobileFilters()" routerLinkActive="text-indigo-600 bg-gray-50" class="block px-2 py-3 text-gray-500 hover:text-gray-900">{{ category.name }}</a></li>
-             }
-          </ul>
+            <h1 class="text-4xl md:text-5xl font-black mb-6 tracking-tight animate-fade-in-up">
+                {{ currentCategory()?.name || 'Explorando Categoría' }}
+            </h1>
+            
+            <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8 font-light">
+                 {{ currentCategory()?.description || 'Encontrá los mejores productos de esta sección con calidad garantizada.' }}
+            </p>
+       </div>
+    </header>
 
-          <div class="border-t border-gray-200 px-4 py-6">
-             <h3 class="-mx-2 -my-3 flow-root">
-                <span class="font-medium text-gray-900 px-2">Precio</span>
-             </h3>
-             <div class="pt-6 space-y-4">
-                <div class="flex items-center gap-2">
-                  <input type="number" placeholder="Min" [ngModel]="minPriceInput()" (ngModelChange)="minPriceInput.set($event)" name="minPriceMobile" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900">
-                  <span class="text-gray-400">-</span>
-                  <input type="number" placeholder="Max" [ngModel]="maxPriceInput()" (ngModelChange)="maxPriceInput.set($event)" name="maxPriceMobile" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900">
-                </div>
-                <button type="button" (click)="applyPriceFilter()" class="w-full btn btn-primary btn-sm">Aplicar</button>
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 container mx-auto px-4 py-12">
+         <!-- Toolbar -->
+         <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-800 gap-4">
+            <div class="text-gray-600 dark:text-gray-400 font-medium text-sm">
+                 @if (productsRs.value()) {
+                    Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> resultados
+                  } @else {
+                    Cargando catálogo...
+                  }
+            </div>
+            
+             <div class="flex items-center gap-3">
+                 <!-- Search in Category -->
+                 <div class="relative hidden md:block">
+                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                     <input 
+                         [ngModel]="searchQuery()" 
+                         (ngModelChange)="onSearch($event)" 
+                         type="text" 
+                         [placeholder]="'Buscar en ' + (currentCategory()?.name || 'esta sección') + '...'" 
+                         class="input input-bordered input-sm rounded-full pl-9 w-64 focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800"
+                     />
+                 </div>
+
+                <select (change)="setSort($any($event.target).value.split('|')[0], $any($event.target).value.split('|')[1])"
+                    class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 min-w-[150px]">
+                    <option value="created_at|desc">Más Recientes</option>
+                    <option value="price|asc">Precio: Menor a Mayor</option>
+                    <option value="price|desc">Precio: Mayor a Menor</option>
+                </select>
+            </div>
+         </div>
+         
+         <!-- Mobile Search Block (Visible only on mobile) -->
+         <div class="md:hidden mb-6">
+             <div class="relative">
+                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                 <input 
+                     [ngModel]="searchQuery()" 
+                     (ngModelChange)="onSearch($event)" 
+                     type="text" 
+                     placeholder="Buscar en esta categoría..." 
+                     class="input input-bordered w-full rounded-2xl pl-10"
+                 />
              </div>
-          </div>
-        </form>
-      </div>
+         </div>
+
+         <!-- GRID -->
+         <main class="min-h-[400px]">
+            @if (productsRs.isLoading()) {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                    @for(i of [1,2,3,4,5,6]; track i) {
+                        <div class="animate-pulse bg-gray-200 dark:bg-gray-800 rounded-3xl h-[400px] w-full"></div>
+                    }
+                 </div>
+            } @else if (productsRs.error()) {
+                 <is-error [message]="productsRs.error()?.message || 'Error al cargar categoría'" />
+            } @else if (productsRs.value()) {
+                 @if (productsRs.value()?.items === 0) {
+                     <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                         <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                         <h3 class="font-bold text-lg text-gray-900 dark:text-white">Sin resultados en esta categoría</h3>
+                         <button (click)="onSearch(''); minPriceInput.set(null); maxPriceInput.set(null); applyPriceFilter()" class="btn btn-link text-indigo-600">
+                             Ver todos los productos
+                         </button>
+                     </div>
+                 } @else {
+                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                        @for (product of productsRs.value()!.data; track product.id; let i = $index) {
+                            <product-card [product]="product" [isPriority]="i < 2" (quickView)="openQuickView($event)"></product-card>
+                        }
+                     </div>
+
+                     @if (paginationData()) {
+                        <div class="mt-12 flex justify-center">
+                            <pagination [pages]="paginationData()!.pages" [currentPage]="paginationService.currentPage()"></pagination>
+                        </div>
+                     }
+                 }
+            }
+         </main>
     </div>
   </div>
-  }
 
-  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex items-baseline justify-between border-b border-gray-200 pt-12 pb-6">
-      
-      @if (currentCategory()) {
-         <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">{{ currentCategory()?.name }}</h1>
-      } @else {
-         <div class="h-10 w-64 bg-gray-200 rounded animate-pulse"></div>
-      }
-
-      <div class="flex items-center">
-        <!-- Sort Dropdown (Simplified) -->
-        <div class="relative inline-block text-left group">
-          <button type="button" class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-            Ordenar
-            <svg class="-mr-1 ml-1 h-5 w-5 shrink-0 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-            </svg>
-          </button>
-          
-          <!-- Dropdown menu -->
-          <div class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black/5 focus:outline-none hidden group-hover:block transition-opacity">
-            <div class="py-1">
-              <button (click)="setSort('view_count', 'desc')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Más Populares</button>
-              <button (click)="setSort('rating', 'desc')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mejor Calificados</button>
-              <button (click)="setSort('created_at', 'desc')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Más Recientes</button>
-              <button (click)="setSort('price', 'asc')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Precio: Menor a Mayor</button>
-              <button (click)="setSort('price', 'desc')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Precio: Mayor a Menor</button>
-            </div>
-          </div>
+  <!-- SIDEBAR (Filters) -->
+  <div class="drawer-side z-40">
+    <label for="cat-filters-drawer" aria-label="close sidebar" class="drawer-overlay backdrop-blur-sm"></label>
+    <aside class="menu p-6 w-80 min-h-full bg-white dark:bg-gray-800 text-base-content border-r border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Filtros</h3>
+            <label for="cat-filters-drawer" class="btn btn-sm btn-circle btn-ghost">✕</label>
         </div>
 
-        <button type="button" class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
-          <span class="sr-only">Ver cuadrícula</span>
-          <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4.25 2A2.25 2.25 0 002 4.25v2.5A2.25 2.25 0 004.25 9h2.5A2.25 2.25 0 009 6.75v-2.5A2.25 2.25 0 006.75 2h-2.5zm0 9A2.25 2.25 0 002 13.25v2.5A2.25 2.25 0 004.25 18h2.5A2.25 2.25 0 009 15.75v-2.5A2.25 2.25 0 006.75 11h-2.5zm9-9A2.25 2.25 0 0011 4.25v2.5A2.25 2.25 0 0013.25 9h2.5A2.25 2.25 0 0018 6.75v-2.5A2.25 2.25 0 0015.75 2h-2.5zm0 9A2.25 2.25 0 0011 13.25v2.5A2.25 2.25 0 0013.25 18h2.5A2.25 2.25 0 0018 15.75v-2.5A2.25 2.25 0 0015.75 11h-2.5z" clip-rule="evenodd" />
-          </svg>
-        </button>
-        <button type="button" (click)="toggleMobileFilters()" class="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden">
-          <span class="sr-only">Filtros</span>
-          <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clip-rule="evenodd" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <section aria-labelledby="products-heading" class="pt-6 pb-24">
-      <h2 id="products-heading" class="sr-only">Products</h2>
-
-      <div class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-        <!-- Filters (Desktop) -->
-        <form class="hidden lg:block">
-          <h3 class="sr-only">Categorías</h3>
-          <ul role="list" class="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
-             @for (category of categoriesListRs.value()?.data; track category.id) {
-                <li><a [routerLink]="['/products/category', category.slug]" routerLinkActive="text-indigo-600" class="text-gray-600 hover:text-indigo-600 block">{{ category.name }}</a></li>
-             }
-          </ul>
-
-          <div class="border-b border-gray-200 py-6">
-            <h3 class="-my-3 flow-root">
-               <span class="font-medium text-gray-900">Precio</span>
-            </h3>
-            <div class="pt-6 space-y-4">
-                 <div class="flex items-center gap-2">
-                  <input type="number" placeholder="Min" [ngModel]="minPriceInput()" (ngModelChange)="minPriceInput.set($event)" name="minPriceDesktop" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900">
-                  <span class="text-gray-400">-</span>
-                  <input type="number" placeholder="Max" [ngModel]="maxPriceInput()" (ngModelChange)="maxPriceInput.set($event)" name="maxPriceDesktop" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900">
+        <div class="space-y-8">
+            <!-- Price -->
+            <div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-tag text-indigo-500"></i> Precio
+                </h4>
+                <div class="flex flex-col gap-3">
+                    <div class="form-control w-full">
+                        <label class="label text-xs text-gray-500">Mínimo</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400">$</span>
+                            <input type="number" [ngModel]="minPriceInput()" (ngModelChange)="minPriceInput.set($event)" placeholder="0" class="input input-bordered w-full pl-8 rounded-xl" />
+                        </div>
+                    </div>
+                    <div class="form-control w-full">
+                        <label class="label text-xs text-gray-500">Máximo</label>
+                        <div class="relative">
+                             <span class="absolute left-3 top-3 text-gray-400">$</span>
+                            <input type="number" [ngModel]="maxPriceInput()" (ngModelChange)="maxPriceInput.set($event)" placeholder="Max" class="input input-bordered w-full pl-8 rounded-xl" />
+                        </div>
+                    </div>
+                   <button (click)="applyPriceFilter()" class="btn btn-primary w-full mt-2 rounded-xl">
+                        Aplicar
+                    </button>
                 </div>
-                <button type="button" (click)="applyPriceFilter()" class="w-full btn btn-primary btn-sm btn-outline">Aplicar</button>
-            </div>
-          </div>
-        </form>
-
-        <!-- Product grid -->
-        <div class="lg:col-span-3">
-          @if (productsRs.isLoading()) {
-            <is-loading />
-          } @else if (!productsRs.hasValue() || productsRs.value().data.length === 0) {
-            <div class="text-center py-16 bg-white rounded-xl border border-gray-100">
-               <p class="text-gray-500">No se encontraron productos.</p>
-            </div>
-          } @else if (productsRs.error()) {
-            <is-error />
-          } @else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-               @for (product of productsRs.value().data; track product.id; let i = $index) {
-                 <product-card [product]="product" [isPriority]="i < 8" (quickView)="openQuickView($event)" />
-               }
             </div>
 
-            <!-- Pagination -->
-            @if (paginationData()) {
-              <div class="mt-12 flex justify-center">
-                <pagination
-                  [pages]="productsRs.value().pages"
-                  [currentPage]="paginationService.currentPage()"
-                />
-              </div>
-            }
-          }
+            <!-- Other Categories -->
+             <div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-layer-group text-indigo-500"></i> Otras Secciones
+                </h4>
+                <div class="max-h-60 overflow-y-auto custom-scrollbar">
+                    <ul class="space-y-1">
+                        @if (categoriesListRs.value()) {
+                            @for (cat of categoriesListRs.value()!.data; track cat.id) {
+                                <li>
+                                    <a [routerLink]="['/productos/categoria', cat.slug]" 
+                                       [class.active]="currentCategory()?.id === cat.id"
+                                       class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm">
+                                        {{ cat.name }}
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+             </div>
         </div>
-      </div>
-    </section>
-  </main>
+    </aside>
+  </div>
 </div>
 
 <!-- Quick View Modal -->
-@if (isQuickViewOpen() && quickViewProduct()) {
-<div class="relative z-3000" role="dialog" aria-modal="true">
-  <div class="fixed inset-0 hidden md:block bg-gray-500/75 transition-opacity" (click)="closeQuickView()"></div>
-
-  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-stretch justify-center text-center md:items-center md:px-2 lg:px-4">
-      <div class="flex w-full transform text-left text-base transition md:my-8 md:max-w-2xl md:px-4 lg:max-w-4xl">
-        <div class="relative flex w-full items-center overflow-hidden bg-white px-4 pt-14 pb-8 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8 rounded-2xl">
-          <button type="button" (click)="closeQuickView()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 sm:top-8 sm:right-6 md:top-6 md:right-6 lg:top-8 lg:right-8 z-20">
-            <span class="sr-only">Close</span>
-            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <div class="grid w-full grid-cols-1 items-start gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
-            <div class="aspect-2/3 w-full rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5 relative overflow-hidden">
-                <img [src]="quickViewProduct().image_url || 'assets/img/no-image.png'" [alt]="quickViewProduct().name" class="absolute inset-0 size-full object-cover object-center" />
+@if (isQuickViewOpen()) {
+<div class="modal modal-open z-50 animate-fade-in">
+  <div class="modal-box relative max-w-4xl bg-white dark:bg-gray-800 rounded-3xl p-0 overflow-hidden shadow-2xl">
+    <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10 bg-white/50 backdrop-blur-md" (click)="closeQuickView()">✕</button>
+    
+    @if (quickViewProduct(); as p) {
+        <div class="flex flex-col md:flex-row h-full">
+            <div class="w-full md:w-1/2 bg-gray-50 dark:bg-gray-700/30 p-8 flex items-center justify-center relative">
+                <img [src]="p.image_url || 'assets/img/no-image.png'" class="max-h-[300px] object-contain drop-shadow-xl" [alt]="p.name"/>
+                @if((p.stock ?? 0) <= 0) {
+                     <span class="absolute top-8 left-8 badge badge-error text-white font-bold p-3">Sin Stock</span>
+                }
             </div>
             
-            <div class="sm:col-span-8 lg:col-span-7">
-              <h2 class="text-2xl font-bold text-gray-900 sm:pr-12">{{ quickViewProduct().name }}</h2>
-
-              <section aria-labelledby="information-heading" class="mt-2">
-                <h3 id="information-heading" class="sr-only">Product information</h3>
-                <p class="text-2xl text-gray-900">${{ quickViewProduct().price }}</p>
-
-                <!-- Reviews (Static) -->
-                <div class="mt-6">
-                  <h4 class="sr-only">Reviews</h4>
-                  <div class="flex items-center">
-                    <div class="flex items-center">
-                        @for (i of [1,2,3,4,5]; track i) {
-                            <svg class="size-5 shrink-0 text-gray-900" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" fill-rule="evenodd" />
-                            </svg>
+            <div class="w-full md:w-1/2 p-8 flex flex-col">
+                <div class="mb-auto">
+                    <h3 class="font-black text-2xl md:text-3xl mb-2 text-gray-900 dark:text-white leading-tight">{{ p.name }}</h3>
+                    <div class="flex items-baseline gap-3 mb-6">
+                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.price | currency }}</span>
+                        @if(p.regular_price && p.regular_price > p.price) {
+                            <span class="text-lg text-gray-400 line-through">{{ p.regular_price | currency }}</span>
                         }
                     </div>
-                    <p class="sr-only">5 out of 5 stars</p>
-                    <a href="#" class="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500">Reviews &rarr;</a>
-                  </div>
+                
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{{ p.description || 'Sin descripción disponible.' }}</p>
                 </div>
-              </section>
-
-              <section aria-labelledby="options-heading" class="mt-10">
-                 <p class="text-base text-gray-600 mb-6">{{ quickViewProduct().description }}</p>
-
-                  <button type="submit" (click)="addToCart(quickViewProduct())" class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden">Agregar al Carrito</button>
-                  <p class="mt-6 text-center text-sm">
-                      <a [routerLink]="['/products/details', quickViewProduct().slug]" (click)="closeQuickView()" class="font-medium text-indigo-600 hover:text-indigo-500">Ver detalles completos</a>
-                  </p>
-              </section>
+                
+                <button class="btn btn-primary btn-lg w-full rounded-2xl shadow-xl shadow-indigo-600/30 gap-3" (click)="addToCart(p)">
+                   <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                </button>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
+    }
   </div>
+  <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-sm">
+    <button (click)="closeQuickView()">close</button>
+  </form>
 </div>
 }

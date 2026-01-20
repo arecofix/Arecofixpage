@@ -5,7 +5,7 @@ export const SPECIAL_OFFERS = [
       description: 'Lo ultimo de Samsung | $320 | Celulares',
       price: '$320',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
     },
     {
       image: 'assets/img/products/arreglo-consolas.webp',
@@ -13,7 +13,7 @@ export const SPECIAL_OFFERS = [
       description: 'Auriculares Nuevo en Caja | $19000 | Celulares',
       price: '$19000',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
     },
     {
       image: 'assets/img/products/servicio-tecnico-consolas.webp',
@@ -21,7 +21,7 @@ export const SPECIAL_OFFERS = [
       description: 'Parlante Nuevo en Caja | $27000 | Celulares',
       price: '$27000',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
     },
     {
       image: 'assets/img/products/reparacion-consolas.webp',
@@ -29,26 +29,26 @@ export const SPECIAL_OFFERS = [
       description: 'Joystick Nuevo en Caja | $47800 | Consolas',
       price: '$47800',
       category: 'Consoles',
-      link: '/#/products',
+      link: '/productos',
     },
   ];
 
 export const TECH_BEST = [
     {
       image: 'assets/img/products/sam.webp',
-      name: 'Samsung Galaxy J8',
-      description: 'En venta Samsung Galaxy J8 Color Azul | $79000 | Celulares',
+      name: 'Samsung Galaxy A31',
+      description: 'En venta Samsung Galaxy A31 Color Azul | $79000 | Celulares',
       price: '$79000',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
     },
     {
       image: 'assets/img/products/iphx.webp',
-      name: 'Motorola Moto E32',
-      description: 'Motorola Moto E32 | $56000 | Celulares',
-      price: '$56000',
+      name: 'iPhone X',
+      description: 'iPhone X Impecable | Consultar Precio | Celulares',
+      price: 'Consultar',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
     },
     {
       image: 'assets/img/products/iph8plus.webp',
@@ -56,15 +56,23 @@ export const TECH_BEST = [
       description: 'Apple Nuevo en Caja | $290 USD | Celulares',
       price: '$290 USD',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
+    },
+    {
+      image: 'assets/img/products/motorola.webp',
+      name: 'Motorola Moto E32',
+      description: 'Motorola Moto E32 | $69800 | Celulares',
+      price: '$69800',
+      category: 'Celulares',
+      link: '/productos',
     },
     {
       image: 'assets/img/products/j2.webp',
-      name: 'TCL 7 SE',
-      description: 'TCL 7 SE Vidrio Astillado | $29000 | Celulares',
-      price: '$29000',
+      name: 'Samsung Galaxy J2 Prime',
+      description: 'Samsung Galaxy J2 Prime | Consultar Precio | Celulares',
+      price: 'Consultar',
       category: 'Celulares',
-      link: '/#/products',
+      link: '/productos',
     },
   ];
 
@@ -210,19 +218,19 @@ export const BLOG_FEATURES = [
              title: 'Servicio Técnico en Marcos Paz',
              desc: 'Conocé en detalle cómo trabajamos y por qué somos los elegidos en la zona.',
              img: 'assets/img/repair/10.jpg',
-             link: '/posts/servicio-tecnico-de-celulares-en-marcos-paz'
+             link: '/gsm'
         },
         {
              title: 'Cursos de Reparación',
              desc: 'Capacitate con nosotros. Salida laboral inmediata y certificación.',
              img: 'assets/img/cursos/egresado-2025.jpg',
-             link: '/cursos'
+             link: '/academy'
         },
         {
              title: 'Venta de Repuestos',
              desc: 'Catálogo completo de módulos, baterías y herramientas para el técnico.',
              img: 'assets/img/repuestos/1.webp',
-             link: '/products/category/repuestos'
+             link: '/productos/categoria/repuestos'
         }
     ];
 
