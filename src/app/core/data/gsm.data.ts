@@ -1,33 +1,35 @@
 import { GsmTool, BrandService, DownloadItem } from '@app/public/gsm/services/gsm.service';
 
+import { environment } from 'src/environments/environment';
+
 export const GSM_TOOLS: GsmTool[] = [
   {
     name: 'UnlockTool',
     description: 'Herramienta profesional para desbloqueo de FRP, Mi Account y Flasheo.',
     price: 'Consultar',
     icon: 'fas fa-unlock-alt',
-    loginUrl: 'https://unlocktool.net'
+    loginUrl: environment.externalUrls.gsm.unlocktool
   },
   {
     name: 'Chimera Tool',
     description: 'Soporte multimarca para reparación de IMEI, desbloqueo y más.',
     price: 'Consultar',
     icon: 'fas fa-dragon',
-    loginUrl: 'https://chimeratool.com'
+    loginUrl: environment.externalUrls.gsm.chimeratool
   },
   {
     name: 'Z3X Box',
     description: 'Especializada en Samsung y LG. Reparación de IMEI y Flasheo.',
     price: 'Consultar',
     icon: 'fas fa-box-open',
-    loginUrl: 'https://z3x-team.com'
+    loginUrl: environment.externalUrls.gsm.z3x_team
   },
   {
     name: 'SigmaKey',
     description: 'Solución para Huawei, Motorola y otras marcas MTK/Qualcomm.',
     price: 'Consultar',
     icon: 'fas fa-key',
-    loginUrl: 'https://sigmakey.com'
+    loginUrl: environment.externalUrls.gsm.sigmakey
   }
 ];
 

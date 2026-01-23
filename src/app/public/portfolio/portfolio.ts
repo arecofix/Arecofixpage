@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { CertificateGalleryComponent } from '../../shared/components/certificate-gallery/certificate-gallery.component';
 import { interval, Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 interface BackendHighlight {
   title: string;
@@ -69,7 +70,7 @@ interface Project {
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, RouterLink, CertificateGalleryComponent],
+  imports: [CommonModule, RouterLink, CertificateGalleryComponent, NgOptimizedImage],
   templateUrl: './portfolio.html',
   styleUrls: ['./portfolio.css']
 })
@@ -93,9 +94,9 @@ export class PortfolioComponent implements OnInit, OnDestroy {
       tagline: 'Arquitecto de Soluciones Escalables | Experto en Node.js & Cloud',
       location: 'Buenos Aires, Argentina',
       email: 'ezequielenrico15@gmail.com',
-      linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
-      github: 'https://github.com/arecofix',
-      cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
+      linkedin: environment.contact.socialMedia.linkedin,
+      github: environment.contact.socialMedia.github,
+      cvUrl: environment.externalUrls.portfolio.cv,
       about: 'Ingeniero de Software con profunda especialización en arquitectura de backend, diseño de APIs RESTful de alto rendimiento y optimización de bases de datos. Mi enfoque combina la robustez de la ingeniería de sistemas con metodologías modernas como Clean Architecture y TDD. Comprometido con la excelencia técnica, la seguridad y la escalabilidad.',
       backendHighlights: [
         {
@@ -192,7 +193,7 @@ USING (
           image: 'assets/img/projects/panel.png',
           techStack: ['Node.js', 'Angular', 'Supabase', 'Redis', 'Docker'],
           features: ['Gestión de Inventario', 'CRM & Ventas', 'Reportes Financieros', 'Trazabilidad de Servicio'],
-          link: 'https://arecofix.com.ar'
+          link: environment.baseUrl
         },
         {
           title: 'Enterprise ERP System with Java Spring',
@@ -239,9 +240,9 @@ USING (
       tagline: 'Scalable Solutions Architect | Node.js & Cloud Expert',
       location: 'Buenos Aires, Argentina',
       email: 'ezequielenrico15@gmail.com',
-      linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
-      github: 'https://github.com/arecofix',
-      cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
+      linkedin: environment.contact.socialMedia.linkedin,
+      github: environment.contact.socialMedia.github,
+      cvUrl: environment.externalUrls.portfolio.cv,
       about: 'Software Engineer with deep specialization in backend architecture, high-performance RESTful API design, and database optimization. My approach combines systems engineering robustness with modern methodologies like Clean Architecture and TDD. Committed to technical excellence, security, and scalability.',
       backendHighlights: [
         {
@@ -338,7 +339,7 @@ USING (
           image: 'assets/img/projects/panel.png',
           techStack: ['Node.js', 'Angular', 'Supabase', 'Redis', 'Docker'],
           features: ['Inventory Management', 'CRM & Sales', 'Financial Reports', 'Service Traceability'],
-          link: 'https://arecofix.com.ar'
+          link: environment.baseUrl
         },
         {
           title: 'Enterprise ERP System with Java Spring',

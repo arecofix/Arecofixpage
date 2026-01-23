@@ -130,10 +130,10 @@
           <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 opacity-80"></div>
           <div class="px-8 pb-8">
             <div class="relative -mt-16 mb-6">
-              <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl">
+              <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl relative">
                 <!-- Placeholder for image if not present -->
                 <ng-container *ngIf="member.image; else noImage">
-                  <img [src]="member.image" [alt]="member.name" class="w-full h-full object-cover">
+                  <img [ngSrc]="member.image" [alt]="member.name" class="object-cover" fill>
                 </ng-container>
                 <ng-template #noImage>
                   👨‍💻

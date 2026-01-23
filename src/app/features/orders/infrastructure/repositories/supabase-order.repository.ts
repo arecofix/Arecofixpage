@@ -66,7 +66,7 @@ export class SupabaseOrderRepository extends OrderRepository {
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
-        return (data || []).map(this._mapToEntity);
+        return ((data as unknown) as OrderDbRecord[] || []).map(record => this._mapToEntity(record));
       })
     );
   }
@@ -81,7 +81,7 @@ export class SupabaseOrderRepository extends OrderRepository {
     );
   }
 
-  private _mapToEntity(dbRecord: any): Order {
+  private _mapToEntity(dbRecord: OrderDbRecord): Order {
     return new Order({
       id: dbRecord.id,
       customer_info: {
@@ -92,7 +92,7 @@ export class SupabaseOrderRepository extends OrderRepository {
       },
       status: dbRecord.status,
       total: dbRecord.total_amount,
-      cart_items: dbRecord.order_items?.map((i: any) => ({
+      cart_items: dbRecord.order_items?.map((i) => ({
         product_id: i.product_id,
         product_name: i.product_name,
         quantity: i.quantity,
@@ -102,4 +102,24 @@ export class SupabaseOrderRepository extends OrderRepository {
       created_at: new Date(dbRecord.created_at)
     });
   }
+}
+
+interface OrderItemDbRecord {
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+}
+
+interface OrderDbRecord {
+  id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  customer_address: string;
+  status: OrderStatus;
+  total_amount: number;
+  created_at: string;
+  order_items: OrderItemDbRecord[];
 }

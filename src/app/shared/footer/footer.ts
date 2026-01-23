@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { PreferencesService } from '../services/preferences.service';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, CommonModule, NgOptimizedImage],
   templateUrl: './footer.html',
   styleUrl: './footer.css'
 })
@@ -50,7 +51,7 @@ export class Footer {
     }, 1500);
   }
 
-  shareOn(platform: string) {
+  shareOn(platform: 'facebook' | 'twitter' | 'whatsapp' | 'linkedin') {
     const url = encodeURIComponent(window.location.href);
     const text = encodeURIComponent('¡Mira esta página de Arecofix!');
     let shareUrl = '';

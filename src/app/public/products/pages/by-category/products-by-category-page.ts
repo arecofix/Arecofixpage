@@ -29,6 +29,7 @@ import {
   iPagination,
 } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
+import { Product } from '@app/public/products/interfaces';
 
 @Component({
   selector: 'products-by-category-page',
@@ -92,7 +93,7 @@ export class ProductsByCategoryPage {
   }
 
   // Helper for updating query params (DRY)
-  updateQueryParams(newParams: any) {
+  updateQueryParams(newParams: Record<string, string | number | null>) {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: newParams,
@@ -166,14 +167,14 @@ export class ProductsByCategoryPage {
   // UI States
   public isMobileFiltersOpen = signal(false);
   public isQuickViewOpen = signal(false);
-  public quickViewProduct = signal<any>(null);
+  public quickViewProduct = signal<Product | null>(null);
 
   // Methods
   toggleMobileFilters() {
     this.isMobileFiltersOpen.update(v => !v);
   }
 
-  openQuickView(product: any) {
+  openQuickView(product: Product) {
     this.quickViewProduct.set(product);
     this.isQuickViewOpen.set(true);
   }
@@ -183,7 +184,7 @@ export class ProductsByCategoryPage {
     this.quickViewProduct.set(null);
   }
 
-  addToCart(product: any) {
+  addToCart(product: Product) {
       this.cartService.addToCart(product);
       this.closeQuickView();
   }

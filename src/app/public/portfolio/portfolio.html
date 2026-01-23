@@ -270,7 +270,7 @@
           <div *ngFor="let project of currentContent.projects" class="group relative bg-[#131620] rounded-xl overflow-hidden border border-gray-800 hover:border-cyan-500/50 transition-all duration-300">
             <div class="aspect-video bg-gray-900 relative overflow-hidden">
                <div class="absolute inset-0 bg-linear-to-b from-transparent to-[#131620] z-10 opacity-90 transition-opacity group-hover:opacity-40"></div>
-               <img [src]="project.image" class="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700 opacity-50 group-hover:opacity-100" />
+               <img [ngSrc]="project.image" class="object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700 opacity-50 group-hover:opacity-100" fill />
             </div>
             
             <div class="p-8 relative z-20 -mt-10">

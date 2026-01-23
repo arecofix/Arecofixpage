@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, 
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
+import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { AdminProductService } from './services/admin-product.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
@@ -21,7 +22,7 @@ export class AdminProductsPage implements OnInit {
   
   // Signals
   public products = signal<Product[]>([]);
-  public brands = signal<any[]>([]); // For bulk edit
+  public brands = signal<Brand[]>([]); // For bulk edit
   public searchQuery = signal<string>('');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
   
@@ -161,9 +162,10 @@ export class AdminProductsPage implements OnInit {
     }
   }
 
-  async importProducts(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
+  async importProducts(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
 
     try {
       this.loading.set(true);
@@ -177,13 +179,13 @@ export class AdminProductsPage implements OnInit {
     } finally {
       this.loading.set(false);
       // Reset file input
-      event.target.value = '';
+      input.value = '';
     }
   }
 
   // Helpers for Template
   updateSort(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
-    this.sortOrder.set(value as any);
+    this.sortOrder.set(value as 'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc');
   }
 }

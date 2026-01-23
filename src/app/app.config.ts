@@ -18,6 +18,8 @@ import { CategoryRepository } from './features/products/domain/repositories/cate
 import { SupabaseCategoryRepository } from './features/products/infrastructure/repositories/supabase-category.repository';
 import { BrandRepository } from './features/products/domain/repositories/brand.repository';
 import { SupabaseBrandRepository } from './features/products/infrastructure/repositories/supabase-brand.repository';
+import { RepairRepository } from './features/repairs/domain/repositories/repair.repository';
+import { SupabaseRepairRepository } from './features/repairs/infrastructure/repositories/supabase-repair.repository';
 
 // const firebaseConfig = environment.firebase; // Unused
 
@@ -45,5 +47,6 @@ export const appConfig: ApplicationConfig = {
     { provide: ProductRepository, useClass: SupabaseProductRepository },
     { provide: CategoryRepository, useClass: SupabaseCategoryRepository },
     { provide: BrandRepository, useClass: SupabaseBrandRepository },
+    { provide: RepairRepository, useClass: SupabaseRepairRepository },
   ]
 };

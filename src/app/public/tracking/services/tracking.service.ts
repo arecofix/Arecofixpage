@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
+import { Repair } from '@app/features/repairs/domain/entities/repair.entity';
 
 @Injectable({
     providedIn: 'root'

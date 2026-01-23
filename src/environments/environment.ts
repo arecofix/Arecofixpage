@@ -7,7 +7,9 @@
  * 
  * TODO: Implement proper environment variable injection at build time
  */
-export const environment = {
+import { Environment } from './environment.model';
+
+export const environment: Environment = {
   production: false,
   appName: 'Arecofix',
   apiUrl: 'https://arecofix.com.ar',
@@ -38,4 +40,32 @@ export const environment = {
       googleMaps: 'https://g.page/r/CQeBPqhRjbRzEAE/review'
     }
   },
+
+  externalUrls: {
+    gsm: {
+      samsung_usb: 'https://developer.samsung.com/android-usb-driver',
+      odin: 'https://odindownload.com/',
+      xiaomi_adb: 'https://github.com/Szaki/XiaomiADBFastbootTools',
+      platform_tools: 'https://developer.android.com/studio/releases/platform-tools',
+      flexihub: 'https://www.flexihub.com/download/',
+      radmin_vpn: 'https://www.radmin-vpn.com/',
+      usb_redirector: 'https://www.incentivespro.com/downloads.html',
+      rustdesk: 'https://rustdesk.com/',
+      teamviewer: 'https://www.teamviewer.com/download/',
+      ultraviewer: 'https://www.ultraviewer.net/en/download.html',
+      psiphon: 'https://psiphon.ca/en/download.html',
+      anydesk: 'https://anydesk.com/en/downloads',
+      virtualhere: 'https://www.virtualhere.com/usb_client_software',
+      samfw: 'https://samfw.com/blog/samfw-tool',
+      samfirm: 'https://samfirmtool.com/',
+      tres_u_tools: 'http://www.3u.com/',
+      unlocktool: 'https://unlocktool.net',
+      chimeratool: 'https://chimeratool.com',
+      z3x_team: 'https://z3x-team.com',
+      sigmakey: 'https://sigmakey.com'
+    },
+    portfolio: {
+      cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
+    }
+  }
 };

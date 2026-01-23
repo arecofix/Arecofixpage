@@ -10,7 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of } from 'rxjs';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
-import { Location, NgOptimizedImage, CommonModule, DecimalPipe } from '@angular/common';
+import { Location, NgOptimizedImage, CommonModule, DecimalPipe, DOCUMENT } from '@angular/common';
 /*  */
 import {
   IsEmptyComponent,
@@ -21,7 +21,7 @@ import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/bre
 /*  */
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
-import { Product } from '../../interfaces';
+import { Product, ProductsResponse } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
 import { SeoService } from '@app/core/services/seo.service';
@@ -52,6 +52,7 @@ export class ProductsDetailsPage {
 
   private fallbackService = inject(FallbackService);
   private seoService = inject(SeoService);
+  private document = inject(DOCUMENT);
 
   constructor() {
       effect(() => {
@@ -63,6 +64,34 @@ export class ProductsDetailsPage {
                   product.image_url,
                   'product'
               );
+
+              // JSON-LD Structured Data
+              const script = this.document.createElement('script');
+              script.type = 'application/ld+json';
+              script.text = JSON.stringify({
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": product.name,
+                "image": product.image_url ? [`https://arecofix.com.ar${product.image_url}`] : [],
+                "description": product.description || `Compra ${product.name} en Arecofix`,
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Arecofix"
+                },
+                "sku": product.sku || product.id,
+                "offers": {
+                  "@type": "Offer",
+                  "url": window.location.href,
+                  "priceCurrency": "ARS",
+                  "price": product.price,
+                  "availability": "https://schema.org/InStock",
+                  "seller": {
+                    "@type": "Organization",
+                    "name": "Arecofix"
+                  }
+                }
+              });
+              this.document.head.appendChild(script);
           }
       });
   }
@@ -101,12 +130,16 @@ export class ProductsDetailsPage {
 
               if ((!response.data || response.data.length === 0) && fallbackItem) {
                 // Return fallback item if DB empty and we have a fallback
-                return {
-                  ...response,
+                const fallbackResponse: ProductsResponse = {
                   data: [fallbackItem],
                   items: 1,
-                  pages: 1
-                } as any;
+                  pages: 1,
+                  first: 1,
+                  last: 1,
+                  prev: undefined,
+                  next: undefined
+                };
+                return fallbackResponse;
               }
               return response;
             })

@@ -1,5 +1,5 @@
 <!-- Trigger rebuild -->
-<div class="navbar glass-panel border-b border-gray-200 dark:border-white/5 sticky top-0 z-100 backdrop-blur-md text-gray-900 dark:text-white transition-colors duration-300">
+<div class="navbar glass-panel border-b border-gray-200 dark:border-white/5 sticky top-0 z-100 backdrop-blur-md text-gray-900 dark:text-white transition-colors duration-300 lg:min-h-16 lg:h-16">
   <!-- NAVBAR START -->
   <div class="navbar-start">
     <!-- Menú hamburguesa (Mobile) -->
@@ -111,10 +111,10 @@
     </div>
 
     <!-- Logo + appName -->
-    <a class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group" [routerLink]="['/']">
+    <a class="flex shrink-0 items-center gap-3 px-3 py-1 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group" [routerLink]="['/']">
       <div class="relative group-hover:scale-105 transition-transform">
-         <img src="/assets/img/brands/logo/Logo (2).png" alt="Arecofix Logo" class="h-9 w-auto hidden dark:block drop-shadow-lg" height="36" width="120" />
-         <img src="/assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-9 w-auto dark:hidden drop-shadow-md" height="36" width="120" />
+         <img src="/assets/img/brands/logo/Logo (2).png" alt="Arecofix Logo" class="h-9 w-auto object-contain hidden dark:block drop-shadow-lg" height="36" width="120" />
+         <img src="/assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-9 w-auto object-contain dark:hidden drop-shadow-md" height="36" width="120" />
       </div>
       <span class="font-bold text-xl text-gray-900 dark:text-white font-heading tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ appName }}</span>
     </a>

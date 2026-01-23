@@ -68,7 +68,7 @@ export class AdminProductService {
         const products = await this.getProducts();
         if (!products.length) return;
 
-        const headers = [
+        const headers: (keyof Product | 'category_id' | 'brand_id')[] = [
             'id', 'name', 'slug', 'description', 'price', 
             'stock', 'category_id', 'brand_id', 'image_url', 
             'is_active', 'is_featured', 'sku', 'barcode'
@@ -78,12 +78,14 @@ export class AdminProductService {
             headers.join(','),
             ...products.map(product => {
                 return headers.map(header => {
-                    const value = (product as any)[header] || '';
+                    const value = product[header as keyof Product];
+                    const safeValue = value === undefined || value === null ? '' : value;
+                    
                     // Handle strings with commas or quotes
-                    if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-                        return `"${value.replace(/"/g, '""')}"`;
+                    if (typeof safeValue === 'string' && (safeValue.includes(',') || safeValue.includes('"') || safeValue.includes('\n'))) {
+                        return `"${safeValue.replace(/"/g, '""')}"`;
                     }
-                    return value;
+                    return safeValue;
                 }).join(',');
             })
         ].join('\n');
@@ -104,13 +106,15 @@ export class AdminProductService {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             
-            reader.onload = async (e: any) => {
+            reader.onload = async (e: ProgressEvent<FileReader>) => {
                 try {
-                    const csv = e.target.result;
+                    const csv = e.target?.result as string;
+                    if (!csv) throw new Error('Empty file');
+                    
                     const lines = csv.split(/\r\n|\n/);
                     const headers = lines[0].split(',').map((h: string) => h.trim());
                     
-                    const productsToUpsert = [];
+                    const productsToUpsert: Partial<Product>[] = [];
                     let errorCount = 0;
 
                     for (let i = 1; i < lines.length; i++) {
@@ -140,7 +144,7 @@ export class AdminProductService {
                             continue;
                         }
 
-                        const product: any = {};
+                        const product: Record<string, any> = {};
                         headers.forEach((header: string, index: number) => {
                             let value = values[index]?.trim();
                             // Remove surrounding quotes if present
@@ -160,13 +164,13 @@ export class AdminProductService {
                         });
 
                         // Remove id if it's empty or new placeholder to allow auto-generation
-                        if (!product.id || product.id === 'new') {
-                            delete product.id;
+                        if (!product['id'] || product['id'] === 'new') {
+                            delete product['id'];
                         }
 
                         // Basic validation
-                        if (product.name && product.price >= 0) {
-                            productsToUpsert.push(product);
+                        if (product['name'] && (product['price'] === undefined || product['price'] >= 0)) {
+                            productsToUpsert.push(product as unknown as Partial<Product>);
                         } else {
                             errorCount++;
                         }
@@ -175,7 +179,7 @@ export class AdminProductService {
                     if (productsToUpsert.length > 0) {
                         const { error } = await this.supabase
                             .from('products')
-                            .upsert(productsToUpsert, { onConflict: 'id' }); // or slug/sku if preferred
+                            .upsert(productsToUpsert, { onConflict: 'id' }); 
 
                         if (error) throw error;
                     }

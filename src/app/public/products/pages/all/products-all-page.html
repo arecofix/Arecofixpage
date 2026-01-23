@@ -253,7 +253,7 @@
             <!-- Image Side -->
             <div class="w-full md:w-1/2 bg-gray-50 dark:bg-gray-700/30 p-8 flex items-center justify-center relative">
                 <img [src]="p.image_url || 'assets/img/no-image.png'" class="max-h-[300px] object-contain drop-shadow-xl" [alt]="p.name"/>
-                @if(p.stock <= 0) {
+                @if((p.stock ?? 0) <= 0) {
                      <span class="absolute top-8 left-8 badge badge-error text-white font-bold p-3">Sin Stock</span>
                 } @else if (p.sale_price) {
                      <span class="absolute top-8 left-8 badge badge-secondary text-white font-bold p-3">Oferta</span>

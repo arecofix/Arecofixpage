@@ -26,6 +26,7 @@ import {
   iPagination,
 } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
+import { Product } from '@app/public/products/interfaces';
 
 @Component({
   selector: 'products-featured-page',
@@ -55,7 +56,7 @@ export class ProductsFeaturedPage {
 
   // Quick View
   isQuickViewOpen = signal(false);
-  quickViewProduct = signal<any>(null);
+  quickViewProduct = signal<Product | null>(null);
 
   constructor() {
     this.searchSubject.pipe(
@@ -66,7 +67,7 @@ export class ProductsFeaturedPage {
     });
   }
 
-  updateQueryParams(newParams: any) {
+  updateQueryParams(newParams: Record<string, string | number | null>) {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: newParams,
@@ -79,7 +80,7 @@ export class ProductsFeaturedPage {
     this.searchSubject.next(value);
   }
 
-  openQuickView(product: any) {
+  openQuickView(product: Product) {
     this.quickViewProduct.set(product);
     this.isQuickViewOpen.set(true);
   }
@@ -89,7 +90,7 @@ export class ProductsFeaturedPage {
     this.quickViewProduct.set(null);
   }
 
-  addToCart(product: any) {
+  addToCart(product: Product) {
       this.cartService.addToCart(product);
       this.closeQuickView();
   }

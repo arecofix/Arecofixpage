@@ -6,6 +6,7 @@ import { ProductCard } from '@app/public/products/components';
 import { GetProductsByCategorySlugUseCase } from '@app/core/usecases/products/get-products-by-category-slug.usecase';
 import { SeoService } from '@app/core/services/seo.service';
 import { firstValueFrom, forkJoin } from 'rxjs';
+import { Product } from '@app/shared/interfaces/product.interface';
 
 @Component({
     selector: 'app-products-index-page',
@@ -18,13 +19,13 @@ export class ProductsIndexPage implements OnInit {
     private seoService = inject(SeoService);
     private router = inject(Router);
 
-    celulares = signal<any[]>([]);
-    repuestos = signal<any[]>([]);
+    celulares = signal<Product[]>([]);
+    repuestos = signal<Product[]>([]);
     loading = signal(true);
     searchQuery = '';
     
     // Quick View State
-    quickViewProduct = signal<any>(null);
+    quickViewProduct = signal<Product | null>(null);
     isQuickViewOpen = signal(false);
 
     ngOnInit() {
@@ -50,8 +51,8 @@ export class ProductsIndexPage implements OnInit {
                 ])
             );
             
-            this.celulares.set(celularesData);
-            this.repuestos.set(repuestosData);
+            this.celulares.set(celularesData as Product[]); // Cast needed if usecase returns any[]
+            this.repuestos.set(repuestosData as Product[]);
 
         } catch (error) {
             console.error('Error loading products', error);
@@ -66,7 +67,7 @@ export class ProductsIndexPage implements OnInit {
         }
     }
 
-    openQuickView(product: any) {
+    openQuickView(product: Product) {
         this.quickViewProduct.set(product);
         this.isQuickViewOpen.set(true);
     }

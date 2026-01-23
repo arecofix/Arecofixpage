@@ -76,7 +76,7 @@
     </div>
 
     <!-- Quick View Modal -->
-    @if (isQuickViewOpen() && quickViewProduct()) {
+    @if (isQuickViewOpen() && quickViewProduct(); as p) {
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" (click)="closeQuickView()">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in-up" (click)="$event.stopPropagation()">
             
@@ -87,24 +87,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2">
                 <!-- Image -->
                 <div class="bg-gray-50 dark:bg-gray-700 p-8 flex items-center justify-center">
-                    <img [src]="quickViewProduct().image_url || 'assets/img/no-image.png'" [alt]="quickViewProduct().name" class="max-h-96 object-contain">
+                    <img [src]="p.image_url || 'assets/img/no-image.png'" [alt]="p.name" class="max-h-96 object-contain">
                 </div>
 
                 <!-- Info -->
                 <div class="p-8 flex flex-col h-full">
                     <span class="text-sm text-indigo-600 font-bold uppercase tracking-wider mb-2">
-                        {{ quickViewProduct().category?.name || 'Producto' }}
+                        Producto
                     </span>
                     
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                        {{ quickViewProduct().name }}
+                        {{ p.name }}
                     </h2>
 
                     <div class="flex items-center gap-4 mb-6">
                         <span class="text-3xl font-bold text-gray-900 dark:text-white">
-                            ${{ quickViewProduct().price | number:'1.0-0' }}
+                            ${{ p.price | number:'1.0-0' }}
                         </span>
-                        @if (quickViewProduct().stock > 0) {
+                        @if ((p.stock ?? 0) > 0) {
                             <span class="badge badge-success gap-2">
                                 <i class="fas fa-check"></i> En Stock
                             </span>
@@ -116,14 +116,14 @@
                     </div>
 
                     <p class="text-gray-600 dark:text-gray-300 text-lg mb-8 leading-relaxed">
-                        {{ quickViewProduct().description }}
+                        {{ p.description }}
                     </p>
 
                     <div class="mt-auto flex gap-4">
                         <button class="btn btn-primary flex-1">
                             <i class="fas fa-shopping-cart mr-2"></i> Agregar al Carrito
                         </button>
-                        <a [routerLink]="['/productos/detalle', quickViewProduct().slug]" (click)="closeQuickView()" class="btn btn-outline flex-1">
+                        <a [routerLink]="['/productos/detalle', p.slug]" (click)="closeQuickView()" class="btn btn-outline flex-1">
                             Ver Detalles
                         </a>
                     </div>

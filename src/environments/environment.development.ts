@@ -7,14 +7,16 @@
  * 
  * TODO: Implement proper environment variable injection at build time
  */
-export const environment = {
+import { Environment } from './environment.model';
+
+export const environment: Environment = {
   production: false,
   appName: 'Arecofix',
+  // ... (keep existing properties)
   apiUrl: 'https://arecofix.com.ar',
   baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
-  // TODO: Move to .env and use build-time replacement
   supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
   supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0',
 
@@ -22,7 +24,6 @@ export const environment = {
   enableProfileUpsert: false,
 
   // Analytics Configuration
-  // TODO: Move to .env and use build-time replacement
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
 
@@ -31,7 +32,7 @@ export const environment = {
   whatsappPhoneNumberId: '322928504245092',
   whatsappBusinessAccountId: '368379263021902',
   whatsappAppId: '1209190100450173',
-  whatsappApiUrl: 'https://graph.facebook.com/v22.0', // Base URL, phone ID to be appended in service
+  whatsappApiUrl: 'https://graph.facebook.com/v22.0',
 
   // Contact Information
   contact: {
@@ -43,6 +44,34 @@ export const environment = {
       linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
       youtube: 'https://www.youtube.com/@Arecofix',
       googleMaps: 'https://g.page/r/CQeBPqhRjbRzEAE/review'
+    }
+  },
+
+  externalUrls: {
+    gsm: {
+      samsung_usb: 'https://developer.samsung.com/android-usb-driver',
+      odin: 'https://odindownload.com/',
+      xiaomi_adb: 'https://github.com/Szaki/XiaomiADBFastbootTools',
+      platform_tools: 'https://developer.android.com/studio/releases/platform-tools',
+      flexihub: 'https://www.flexihub.com/download/',
+      radmin_vpn: 'https://www.radmin-vpn.com/',
+      usb_redirector: 'https://www.incentivespro.com/downloads.html',
+      rustdesk: 'https://rustdesk.com/',
+      teamviewer: 'https://www.teamviewer.com/download/',
+      ultraviewer: 'https://www.ultraviewer.net/en/download.html',
+      psiphon: 'https://psiphon.ca/en/download.html',
+      anydesk: 'https://anydesk.com/en/downloads',
+      virtualhere: 'https://www.virtualhere.com/usb_client_software',
+      samfw: 'https://samfw.com/blog/samfw-tool',
+      samfirm: 'https://samfirmtool.com/',
+      tres_u_tools: 'http://www.3u.com/',
+      unlocktool: 'https://unlocktool.net',
+      chimeratool: 'https://chimeratool.com',
+      z3x_team: 'https://z3x-team.com',
+      sigmakey: 'https://sigmakey.com'
+    },
+    portfolio: {
+      cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
     }
   },
 

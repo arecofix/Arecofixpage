@@ -19,6 +19,7 @@ import { CartService } from '@app/shared/services/cart.service';
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
+import { Product } from '@app/public/products/interfaces';
 
 @Component({
   selector: 'app-products-all-page',
@@ -101,7 +102,7 @@ export class ProductsAllPage {
 
   // UI States
   isQuickViewOpen = signal(false);
-  quickViewProduct = signal<any>(null);
+  quickViewProduct = signal<Product | null>(null);
 
   // Methods
   onSearch(value: string) {
@@ -109,7 +110,7 @@ export class ProductsAllPage {
     this.searchSubject.next(value);
   }
 
-  updateQueryParams(newParams: any) {
+  updateQueryParams(newParams: Record<string, string | number | null>) {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: newParams,
@@ -117,7 +118,7 @@ export class ProductsAllPage {
     });
   }
 
-  openQuickView(product: any) {
+  openQuickView(product: Product) {
     this.quickViewProduct.set(product);
     this.isQuickViewOpen.set(true);
   }
@@ -127,7 +128,7 @@ export class ProductsAllPage {
     this.quickViewProduct.set(null);
   }
 
-  addToCart(product: any) {
+  addToCart(product: Product) {
       this.cartService.addToCart(product);
       this.closeQuickView();
   }

@@ -1,8 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { CertificateGalleryComponent } from '../../shared/components/certificate-gallery/certificate-gallery.component';
+import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -61,7 +62,7 @@ interface NosotrosContent {
 @Component({
   selector: 'app-nosotros',
   standalone: true,
-  imports: [CommonModule, CertificateGalleryComponent],
+  imports: [CommonModule, CertificateGalleryComponent, NgOptimizedImage],
   templateUrl: './nosotros.html',
   styleUrls: ['./nosotros.css']
 })
@@ -113,8 +114,8 @@ export class NosotrosComponent implements OnInit {
           name: 'Ezequiel Enrico Areco',
           role: 'Fundador & Director Técnico',
           bio: 'Apasionado por la tecnología desde joven. Fundó Arecofix con la visión de profesionalizar el servicio técnico en la región. Ingeniero de software y experto en microelectrónica, lidera el equipo con un enfoque en calidad y educación continua.',
-          image: '/assets/img/perfil.jpeg',
-          linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/'
+          image: 'assets/img/perfil.jpeg',
+          linkedin: environment.contact.socialMedia.linkedin
         }
       ],
       faqTitle: 'Preguntas Frecuentes',
@@ -165,7 +166,7 @@ export class NosotrosComponent implements OnInit {
           role: 'Founder & Technical Director',
           bio: 'Passionate about technology since young. Founded Arecofix with the vision of professionalizing technical service in the region. Software engineer and microelectronics expert, leads the team with a focus on quality and continuous education.',
           image: '/assets/img/perfil.jpeg',
-          linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/'
+          linkedin: environment.contact.socialMedia.linkedin
         }
       ],
       faqTitle: 'Frequently Asked Questions',

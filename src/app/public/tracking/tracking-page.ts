@@ -19,7 +19,7 @@ export class TrackingPage implements OnInit {
     whatsappNumber = environment.contact.whatsappNumber;
 
     code: string | null = null;
-    repair = signal<any>(null);
+    repair = signal<Repair | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
 
@@ -44,7 +44,7 @@ export class TrackingPage implements OnInit {
                 this.logger.error('Error fetching repair:', error);
                 this.error.set(`Error al buscar la reparación. Por favor intente nuevamente.`);
             } else if (data && data.length > 0) {
-                this.repair.set(data[0]);
+                this.repair.set(data[0] as unknown as Repair);
             } else {
                 this.error.set('No se encontró ninguna reparación con este código.');
             }

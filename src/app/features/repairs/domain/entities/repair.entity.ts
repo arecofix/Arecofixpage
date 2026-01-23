@@ -38,6 +38,18 @@ export interface Repair {
     readonly updated_at: string;
     readonly completed_at?: string;
     readonly images?: string[];
+    // Additional fields from form
+    readonly checklist?: RepairChecklist;
+    readonly security_pin?: string;
+    readonly security_pattern?: string;
+}
+
+export interface RepairChecklist {
+    charger: boolean;
+    battery: boolean;
+    chip: boolean;
+    sd: boolean;
+    case: boolean;
 }
 
 /**
@@ -55,6 +67,9 @@ export interface CreateRepairDto {
     readonly estimated_cost?: number;
     readonly notes?: string;
     readonly images?: string[];
+    readonly checklist?: RepairChecklist;
+    readonly security_pin?: string;
+    readonly security_pattern?: string;
 }
 
 /**

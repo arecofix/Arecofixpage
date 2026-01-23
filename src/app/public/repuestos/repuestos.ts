@@ -49,7 +49,7 @@ export class RepuestosComponent implements OnInit {
 
     // UI Signals
     searchQuery = signal('');
-    routeParams = signal<any>({});
+    routeParams = signal<Record<string, string | number | null>>({});
 
     currentCategory = computed(() => this.routeParams()['category'] || 'all');
     currentBrand = computed(() => this.routeParams()['brand'] || 'all');
@@ -103,7 +103,7 @@ export class RepuestosComponent implements OnInit {
                     const categoryId = params['category']; // Specific selected sub-category
                     const brandId = params['brand'];
                     const maxPrice = params['price'];
-                    const sort = params['sort'];
+                    const sort = params['sort'] as string | undefined;
 
                     const serviceParams: any = {
                         _page: page,
@@ -122,7 +122,7 @@ export class RepuestosComponent implements OnInit {
                     if (categoryId && categoryId !== 'all') {
                         // User selected a specific sub-category
                         // We must include this category AND its children
-                        serviceParams.category_ids = this.getAllChildIds(categoryId, this.categories());
+                        serviceParams.category_ids = this.getAllChildIds(categoryId as string, this.categories());
                     } else {
                         // User is viewing "All Repuestos" -> Use the massive calculated list
                         serviceParams.category_ids = this.repuestosCategoryIds();
@@ -164,8 +164,8 @@ export class RepuestosComponent implements OnInit {
         this.searchSubject.next(term); // Debounce URL update
     }
 
-    applyFilter(type: string, value: any) {
-        const queryParams: any = { _page: 1 }; // Reset page on filter change
+    applyFilter(type: string, value: string | number | null) {
+        const queryParams: Record<string, string | number | null | undefined> = { _page: 1 }; // Reset page on filter change
         queryParams[type] = value === 'all' ? null : value;
         
         this.router.navigate([], {
