@@ -45,14 +45,14 @@
             {{course.description}}
           </p>
           
-          <div class="flex flex-wrap gap-4">
+          <div class="flex flex-col sm:flex-row gap-4 mt-8">
             <button (click)="openRegistration()" 
-              class="btn btn-primary bg-indigo-600 border-none hover:bg-indigo-500 text-white px-8 h-12 text-lg">
-              Inscribirme Ahora
+              class="btn btn-primary bg-indigo-600 border-none hover:bg-indigo-500 text-white px-8 h-12 text-lg shadow-lg shadow-indigo-500/30">
+              <i class="fas fa-pen-nib mr-2"></i> Inscribirme al Curso
             </button>
-            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quisiera%20más%20info%20sobre%20el%20curso%20' + course.title" target="_blank"
-               class="btn btn-outline text-white hover:bg-white hover:text-gray-900 h-12 px-6">
-              <i class="fab fa-whatsapp mr-2"></i> Consultar
+            <a routerLink="/login" 
+               class="btn btn-outline text-white hover:bg-white hover:text-gray-900 border-white/30 h-12 px-8 text-lg">
+              <i class="fas fa-laptop-code mr-2"></i> Acceder al Curso
             </a>
           </div>
         </div>

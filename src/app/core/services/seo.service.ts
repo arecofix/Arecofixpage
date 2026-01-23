@@ -24,7 +24,7 @@ export class SeoService {
     });
   }
 
-  setPageData(title: string, description: string, imageUrl?: string) {
+  setPageData(title: string, description: string, imageUrl?: string, type: 'website' | 'product' | 'article' = 'website') {
     // Set Title
     const finalTitle = `${title} | Arecofix`;
     this.titleService.setTitle(finalTitle);
@@ -35,11 +35,13 @@ export class SeoService {
     // Set Open Graph Tags (Social Sharing)
     this.metaService.updateTag({ property: 'og:title', content: finalTitle });
     this.metaService.updateTag({ property: 'og:description', content: description });
+    this.metaService.updateTag({ property: 'og:type', content: type });
     this.metaService.updateTag({ property: 'og:url', content: `https://arecofix.com.ar${this.router.url}` });
     
     if (imageUrl) {
-      this.metaService.updateTag({ property: 'og:image', content: imageUrl });
-      this.metaService.updateTag({ name: 'twitter:image', content: imageUrl });
+      const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `https://arecofix.com.ar/${imageUrl.replace(/^\//, '')}`;
+      this.metaService.updateTag({ property: 'og:image', content: fullImageUrl });
+      this.metaService.updateTag({ name: 'twitter:image', content: fullImageUrl });
     } else {
         // Default Image
         this.metaService.updateTag({ property: 'og:image', content: 'https://arecofix.com.ar/assets/img/brands/logo/logo-normal1.PNG' });

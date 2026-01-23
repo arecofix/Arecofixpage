@@ -20,6 +20,7 @@ export interface Product {
     min_stock_alert?: number;
     sku?: string;
     barcode?: string;
+    currency?: 'ARS' | 'USD';
     created_at: string;
     updated_at: string;
 }
@@ -43,6 +44,7 @@ export interface CreateProductDto {
     min_stock_alert?: number;
     sku?: string;
     barcode?: string;
+    currency?: 'ARS' | 'USD';
 }
 
 /**

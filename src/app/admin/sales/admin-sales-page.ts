@@ -1,10 +1,11 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { LoggerService } from '@app/core/services/logger.service';
+import { Pagination } from '@app/shared/components/pagination/pagination';
 
 interface CartItem extends Product {
     quantity: number;
@@ -13,7 +14,7 @@ interface CartItem extends Product {
 @Component({
     selector: 'app-admin-sales-page',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, Pagination],
     templateUrl: './admin-sales-page.html',
 })
 export class AdminSalesPage implements OnInit {
@@ -21,14 +22,51 @@ export class AdminSalesPage implements OnInit {
     private router = inject(Router);
     private logger = inject(LoggerService);
 
+    // Data Signals
     products = signal<Product[]>([]);
     cart = signal<CartItem[]>([]);
+    
+    // UI State Signals
     searchQuery = signal('');
     loading = signal(false);
     processing = signal(false);
+    isCartOpenMobile = signal(false); // For mobile responsiveness
 
-    // Computed totals
-    total = computed(() => this.cart().reduce((acc, item) => acc + (item.price * item.quantity), 0));
+    // Pagination Signals
+    currentPage = signal(1);
+    itemsPerPage = signal(12);
+
+    // Computed: Filtered Products
+    filteredProducts = computed(() => {
+        const query = this.searchQuery().toLowerCase();
+        return this.products().filter(p =>
+            p.name.toLowerCase().includes(query) ||
+            p.sku?.toLowerCase().includes(query) ||
+            p.barcode?.toLowerCase().includes(query)
+        );
+    });
+
+    // Computed: Paginated Products
+    paginatedProducts = computed(() => {
+        const all = this.filteredProducts();
+        const start = (this.currentPage() - 1) * this.itemsPerPage();
+        return all.slice(start, start + this.itemsPerPage());
+    });
+
+    // Computed: Total Pages
+    totalPages = computed(() => Math.ceil(this.filteredProducts().length / this.itemsPerPage()));
+
+    // Computed: Cart Totals
+    cartTotal = computed(() => this.cart().reduce((acc, item) => acc + (item.price * item.quantity), 0));
+    cartCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
+
+    constructor() {
+        // Reset pagination on search
+        effect(() => {
+            this.searchQuery();
+            this.currentPage.set(1);
+        }, { allowSignalWrites: true });
+    }
 
     async ngOnInit() {
         await this.loadProducts();
@@ -50,14 +88,21 @@ export class AdminSalesPage implements OnInit {
         this.loading.set(false);
     }
 
-    addToCart(product: any) {
+    addToCart(product: Product) {
         this.cart.update(items => {
             const existing = items.find(i => i.id === product.id);
             if (existing) {
+                // Check stock limit
+                if (existing.quantity >= product.stock) {
+                    // Optional: Show toast "Stock limit reached"
+                    return items;
+                }
                 return items.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
             }
             return [...items, { ...product, quantity: 1 }];
         });
+        
+        // On mobile, maybe hint cart updated?
     }
 
     removeFromCart(productId: string) {
@@ -68,7 +113,11 @@ export class AdminSalesPage implements OnInit {
         this.cart.update(items => {
             return items.map(i => {
                 if (i.id === productId) {
+                    const product = this.products().find(p => p.id === productId);
+                    const stock = product?.stock || 0;
                     const newQty = i.quantity + change;
+
+                    if (newQty > stock) return i; // Prevent exceeding stock
                     return newQty > 0 ? { ...i, quantity: newQty } : i;
                 }
                 return i;
@@ -88,7 +137,7 @@ export class AdminSalesPage implements OnInit {
                 .from('sales')
                 .insert({
                     staff_id: user?.id,
-                    total_amount: this.total(),
+                    total_amount: this.cartTotal(),
                     status: 'completed',
                     payment_method: 'cash'
                 })
@@ -112,15 +161,15 @@ export class AdminSalesPage implements OnInit {
 
             if (itemsError) throw itemsError;
 
-            // 3. Update Stock (This should ideally be a database trigger or RPC to be safe)
+            // 3. Update Stock
             for (const item of this.cart()) {
                 const { error: stockError } = await supabase.rpc('decrement_stock', {
                     row_id: item.id,
                     amount: item.quantity
                 });
-                // Fallback if RPC doesn't exist (though it's safer with RPC)
+                
                 if (stockError) {
-                    // Manual update (race condition risk but okay for MVP)
+                    // Manual Fallback
                     const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.id).single();
                     if (currentProduct) {
                         await supabase.from('products').update({ stock: currentProduct.stock - item.quantity }).eq('id', item.id);
@@ -128,11 +177,11 @@ export class AdminSalesPage implements OnInit {
                 }
             }
 
-            // 4. Create Invoice (Optional auto-generation)
+            // 4. Create Invoice
             await supabase.from('invoices').insert({
                 sale_id: sale.id,
-                total_amount: this.total(),
-                type: 'B', // Default to B for final consumer
+                total_amount: this.cartTotal(),
+                type: 'B', 
                 issued_at: new Date().toISOString()
             });
 
@@ -145,14 +194,5 @@ export class AdminSalesPage implements OnInit {
         } finally {
             this.processing.set(false);
         }
-    }
-
-    filteredProducts() {
-        const query = this.searchQuery().toLowerCase();
-        return this.products().filter(p =>
-            p.name.toLowerCase().includes(query) ||
-            p.sku?.toLowerCase().includes(query) ||
-            p.barcode?.toLowerCase().includes(query)
-        );
     }
 }

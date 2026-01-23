@@ -8,17 +8,20 @@ import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
-import { environment } from '../environments/environment';
+// import { environment } from '../environments/environment'; // environment no longer needed for firebase config here
 
-// Firebase imports
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { getAuth, provideAuth } from '@angular/fire/auth';
+// Firebase imports REMOVED
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { ProductRepository } from './features/products/domain/repositories/product.repository';
+import { SupabaseProductRepository } from './features/products/infrastructure/repositories/supabase-product.repository';
+import { CategoryRepository } from './features/products/domain/repositories/category.repository';
+import { SupabaseCategoryRepository } from './features/products/infrastructure/repositories/supabase-category.repository';
+import { BrandRepository } from './features/products/domain/repositories/brand.repository';
+import { SupabaseBrandRepository } from './features/products/infrastructure/repositories/supabase-brand.repository';
 
-const firebaseConfig = environment.firebase;
+// const firebaseConfig = environment.firebase; // Unused
 
-export const appConfig = {
+export const appConfig: ApplicationConfig = {
   providers: [
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
@@ -28,23 +31,19 @@ export const appConfig = {
     provideZonelessChangeDetection(),
     provideRouter(
       routes,
-            withInMemoryScrolling({
+      withInMemoryScrolling({
         anchorScrolling: 'enabled',
         scrollPositionRestoration: 'enabled'
       })
     ),
     provideHttpClient(withFetch()),
 
-    // Configuración de Firebase
-    provideFirebaseApp(() => initializeApp(firebaseConfig)),
-    provideFirestore(() => getFirestore()),
-    provideAuth(() => getAuth()),
-
     // Charts
     provideCharts(withDefaultRegisterables()),
 
-    // Agrega otros módulos de Firebase según necesites:
-    // provideStorage(() => getStorage()), // Para Firebase Storage
-    // provideFunctions(() => getFunctions()) // Para Cloud Functions
+    // Repositories
+    { provide: ProductRepository, useClass: SupabaseProductRepository },
+    { provide: CategoryRepository, useClass: SupabaseCategoryRepository },
+    { provide: BrandRepository, useClass: SupabaseBrandRepository },
   ]
 };

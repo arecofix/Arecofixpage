@@ -1,0 +1,112 @@
+@if (isOpen()) {
+<div class="modal modal-open z-50">
+  <div class="modal-box w-11/12 max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl relative overflow-hidden">
+    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="close()">✕</button>
+    
+    <h3 class="font-bold text-2xl text-gray-800 dark:text-white mb-2">Edición Masiva</h3>
+    <p class="text-sm text-gray-500 mb-6">Aplicando cambios a <span class="badge badge-primary font-bold">{{ selectedIds().length }}</span> productos seleccionados.</p>
+
+    <!-- Mode Selector -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-8">
+      <button 
+        type="button"
+        (click)="mode.set('price_inflation')" 
+        [class.btn-active]="mode() === 'price_inflation'"
+        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
+        <i class="fas fa-percentage"></i> Inflación
+      </button>
+      <button 
+        type="button"
+        (click)="mode.set('currency_change')" 
+        [class.btn-active]="mode() === 'currency_change'"
+        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
+        <i class="fas fa-dollar-sign"></i> Moneda
+      </button>
+      <button 
+        type="button"
+        (click)="mode.set('brand_change')" 
+        [class.btn-active]="mode() === 'brand_change'" 
+        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
+        <i class="fas fa-tag"></i> Marca
+      </button>
+      <button 
+        type="button"
+        (click)="mode.set('status_change')" 
+        [class.btn-active]="mode() === 'status_change'" 
+        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
+        <i class="fas fa-power-off"></i> Estado
+      </button>
+    </div>
+
+    <!-- Active Form -->
+    <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-6 mb-8 min-h-[150px] flex flex-col justify-center animate-fade-in border border-dashed border-gray-300 dark:border-gray-600">
+      
+      @switch (mode()) {
+        @case ('price_inflation') {
+          <div class="form-control w-full max-w-xs mx-auto">
+            <label class="label">
+              <span class="label-text font-bold text-lg">Porcentaje de Aumento</span>
+            </label>
+            <div class="relative">
+              <input type="number" [(ngModel)]="inflationPercentage" placeholder="ej: 10" class="input input-bordered input-lg w-full pr-12 text-center font-bold text-2xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">%</span>
+            </div>
+            <label class="label">
+              <span class="label-text-alt text-gray-500">Ejemplo: 10% convertirá $100 -> $110</span>
+            </label>
+          </div>
+        }
+        @case ('currency_change') {
+            <div class="form-control w-full max-w-xs mx-auto">
+                <label class="label"><span class="label-text font-bold">Nueva Moneda</span></label>
+                <select [(ngModel)]="targetCurrency" class="select select-bordered select-lg w-full text-center text-xl">
+                    <option value="ARS">🇦🇷 Peso Argentino (ARS)</option>
+                    <option value="USD">🇺🇸 Dólar (USD)</option>
+                </select>
+                <p class="text-xs text-center mt-2 text-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Solo cambia la etiqueta, no convierte valores.
+                </p>
+            </div>
+        }
+        @case ('brand_change') {
+            <div class="form-control w-full max-w-xs mx-auto">
+                <label class="label"><span class="label-text font-bold">Nueva Marca</span></label>
+                <select [(ngModel)]="targetBrandId" class="select select-bordered select-lg w-full">
+                    <option value="">Seleccionar...</option>
+                    @for(b of brands(); track b.id) {
+                        <option [value]="b.id">{{ b.name }}</option>
+                    }
+                </select>
+            </div>
+        }
+        @case ('status_change') {
+            <div class="form-control w-full max-w-xs mx-auto">
+                <label class="label cursor-pointer justify-center gap-4">
+                    <span class="label-text font-bold text-lg">Estado</span> 
+                    <input type="checkbox" [(ngModel)]="targetStatus" class="toggle toggle-success toggle-lg" />
+                    <span class="font-bold" [class.text-success]="targetStatus()" [class.text-gray-400]="!targetStatus()">
+                        {{ targetStatus() ? 'ACTIVO' : 'INACTIVO' }}
+                    </span>
+                </label>
+            </div>
+        }
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="close()" [disabled]="isProcessing()">Cancelar</button>
+      <button class="btn btn-primary px-8" (click)="execute()" [disabled]="isProcessing()">
+        @if(isProcessing()) {
+            <span class="loading loading-spinner"></span> Procesando...
+        } @else {
+            Aplicar Cambios
+        }
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-sm">
+    <button (click)="close()">close</button>
+  </form>
+</div>
+}

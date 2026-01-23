@@ -3,21 +3,25 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AdminProductService } from './services/admin-product.service';
+import { ProductImagesManagerComponent } from './components/product-images-manager/product-images-manager.component';
 
 @Component({
   selector: 'app-admin-product-form-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ProductImagesManagerComponent],
   templateUrl: './admin-product-form-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminProductFormPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  privateproductService = inject(AdminProductService); // Fix typo and logic
   private productService = inject(AdminProductService);
   private cdr = inject(ChangeDetectorRef);
 
   id: string | null = null;
+  
+  // Form State
   form = signal({
     sku: '',
     barcode: '',
@@ -25,6 +29,7 @@ export class AdminProductFormPage implements OnInit {
     slug: '',
     description: '',
     price: 0,
+    currency: 'ARS', // Default to ARS
     stock: 0,
     brand_id: '',
     category_id: '',
@@ -32,13 +37,16 @@ export class AdminProductFormPage implements OnInit {
     images: [] as string[],
   });
 
+  // Resources
   brands = signal<any[]>([]);
   categories = signal<any[]>([]);
 
+  // UI State
   loading = true;
   saving = false;
-  uploading = signal(false);
+  uploading = signal(false); // Can be controlled by child
   error: string | null = null;
+  activeTab = signal<'general' | 'price' | 'media'>('general');
 
   async ngOnInit() {
     try {
@@ -61,6 +69,7 @@ export class AdminProductFormPage implements OnInit {
             slug: data.slug || '',
             description: data.description || '',
             price: data.price || 0,
+            currency: (data as any).currency || 'ARS', // Handle legacy data
             stock: data.stock || 0,
             brand_id: data.brand_id || '',
             category_id: data.category_id || '',
@@ -77,40 +86,31 @@ export class AdminProductFormPage implements OnInit {
     }
   }
 
-  async onFileChange(event: any) {
-    const file: File = event.target.files?.[0];
-    if (!file) return;
-
-    this.uploading.set(true);
-    try {
-      const publicUrl = await this.productService.uploadImage(file);
-      this.form.update((f) => ({ ...f, images: [...f.images, publicUrl] }));
-    } catch (e: any) {
-      this.error = e.message;
-    } finally {
-      this.uploading.set(false);
-      this.cdr.markForCheck();
-    }
-  }
-
-  removeImage(index: number) {
-    this.form.update((f) => ({
-      ...f,
-      images: f.images.filter((_, i) => i !== index)
-    }));
-    this.cdr.markForCheck();
-  }
-
   generateBarcode() {
     const sku = this.form().sku;
     const barcode = sku ? sku : `GEN-${Date.now()}`;
     this.form.update(f => ({ ...f, barcode }));
   }
 
+  generateSlug() {
+    const name = this.form().name;
+    if (name) {
+      const slug = this.productService.slugify(name);
+      this.form.update(f => ({ ...f, slug }));
+    }
+  }
+
   async save() {
     this.saving = true;
     this.error = null;
     const formVal = this.form();
+
+    // Basic Validation
+    if (!formVal.name || formVal.price < 0) {
+        this.error = 'Por favor complete los campos requeridos correctamente.';
+        this.saving = false;
+        return;
+    }
 
     let slug = formVal.slug;
     if (!slug) {
@@ -121,15 +121,16 @@ export class AdminProductFormPage implements OnInit {
       sku: formVal.sku,
       barcode: formVal.barcode,
       name: formVal.name,
-      slug: slug,
+      slug: slug, // Ensure unique? Service handles conflict usually or DB constraint
       description: formVal.description,
       price: formVal.price,
+      currency: formVal.currency, // New Field
       stock: formVal.stock,
       brand_id: formVal.brand_id || null,
       category_id: formVal.category_id || null,
       is_active: formVal.is_active,
-      gallery_urls: Array.isArray(formVal.images) ? formVal.images : [],
-      image_url: formVal.images.length > 0 ? formVal.images[0] : null
+      gallery_urls: Array.isArray(formVal.images) ? formVal.images : [], // List of strings
+      image_url: formVal.images.length > 0 ? formVal.images[0] : null // Main image is first
     };
 
     try {
@@ -145,5 +146,15 @@ export class AdminProductFormPage implements OnInit {
       this.saving = false;
       this.cdr.markForCheck();
     }
+  }
+
+  handleUploadError(msg: string) {
+    this.error = msg;
+    this.cdr.markForCheck();
+    // Auto clear error after 3s
+    setTimeout(() => {
+        this.error = null;
+        this.cdr.markForCheck();
+    }, 3000);
   }
 }

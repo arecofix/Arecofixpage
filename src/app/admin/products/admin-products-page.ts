@@ -5,11 +5,12 @@ import { Product } from '@app/features/products/domain/entities/product.entity';
 import { AdminProductService } from './services/admin-product.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
+import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
 
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, Pagination],
+  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent],
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,8 +21,15 @@ export class AdminProductsPage implements OnInit {
   
   // Signals
   public products = signal<Product[]>([]);
+  public brands = signal<any[]>([]); // For bulk edit
   public searchQuery = signal<string>('');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
+  
+  // Selection Helper
+  public selectedIds = signal<Set<string>>(new Set());
+
+  // Bulk Edit Modal State
+  public isBulkModalOpen = signal(false);
   
   // Pagination Signals
   public currentPage = signal<number>(1);
@@ -73,6 +81,15 @@ export class AdminProductsPage implements OnInit {
      return Math.ceil(this.allFilteredProducts().length / this.itemsPerPage());
   });
 
+  public isAllSelected = computed(() => {
+      const pageItems = this.paginatedProducts();
+      if (pageItems.length === 0) return false;
+      const selected = this.selectedIds();
+      return pageItems.every(p => selected.has(p.id));
+  });
+
+  public selectedIdsList = computed(() => Array.from(this.selectedIds()));
+
   async ngOnInit() {
     // Sync URL params
     this.route.queryParams.subscribe(params => {
@@ -81,13 +98,56 @@ export class AdminProductsPage implements OnInit {
     });
 
     try {
-      const data = await this.productService.getProducts();
-      this.products.set(data);
+      const [products, brands] = await Promise.all([
+          this.productService.getProducts(),
+          this.productService.getBrands()
+      ]);
+      this.products.set(products);
+      this.brands.set(brands);
     } catch (e: any) {
       this.error.set(e.message || 'Error al cargar productos');
     } finally {
       this.loading.set(false);
     }
+  }
+
+  // Selection Logic
+  toggleSelection(id: string) {
+    this.selectedIds.update(set => {
+        const newSet = new Set(set);
+        if (newSet.has(id)) newSet.delete(id);
+        else newSet.add(id);
+        return newSet;
+    });
+  }
+
+  toggleSelectAll() {
+    const pageItems = this.paginatedProducts();
+    const allSelected = this.isAllSelected();
+    
+    this.selectedIds.update(set => {
+        const newSet = new Set(set);
+        if (allSelected) {
+            pageItems.forEach(p => newSet.delete(p.id));
+        } else {
+            pageItems.forEach(p => newSet.add(p.id));
+        }
+        return newSet;
+    });
+  }
+  
+  openBulkEdit() {
+      if (this.selectedIds().size === 0) return;
+      this.isBulkModalOpen.set(true);
+  }
+
+  onBulkEditSuccess() {
+      this.selectedIds.set(new Set()); // Clear selection
+      this.ngOnInit(); // Reload data
+  }
+
+  clearSelection() {
+      this.selectedIds.set(new Set());
   }
 
   async exportProducts() {

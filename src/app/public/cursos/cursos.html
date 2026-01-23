@@ -1,368 +1,262 @@
 <!-- Hero Section -->
-<!-- Promo / Hero Section -->
-<div class="relative overflow-hidden bg-white dark:bg-gray-900 mb-8">
-  <div class="pt-16 pb-80 sm:pt-24 sm:pb-40 lg:pt-40 lg:pb-48">
-    <div class="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
-      <div class="sm:max-w-lg">
-        <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">Tu Futuro en Tecnología Comienza Aquí</h1>
-        <p class="mt-4 text-xl text-gray-500 dark:text-gray-300">Domina la reparación de dispositivos móviles con nuestros cursos prácticos. Aprende haciendo y conviértete en un profesional demandado.</p>
-        <div class="mt-8 flex flex-wrap gap-4">
-             <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20información%20sobre%20los%20cursos'"
-              class="inline-block rounded-md border border-transparent bg-green-600 px-8 py-3 text-center font-medium text-white hover:bg-green-700">
-              <i class="fab fa-whatsapp mr-2"></i> Consultar
-            </a>
-            <a href="#academy" class="inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-center font-medium text-white hover:bg-indigo-700">Ver Cursos</a>
-        </div>
-      </div>
-      <div>
-        <div class="mt-10">
-          <!-- Decorative image grid -->
-          <div aria-hidden="true" class="pointer-events-none lg:absolute lg:inset-y-0 lg:mx-auto lg:w-full lg:max-w-7xl">
-            <div class="absolute transform sm:top-0 sm:left-1/2 sm:translate-x-8 lg:top-1/2 lg:left-1/2 lg:translate-x-8 lg:-translate-y-1/2">
-              <div class="flex items-center space-x-6 lg:space-x-8">
-                <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                  <div class="h-64 w-44 overflow-hidden rounded-lg sm:opacity-0 lg:opacity-100">
-                    <img src="assets/img/cursos/1.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                  <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="assets/img/cursos/2.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                </div>
-                <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                  <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="assets/img/cursos/3.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                  <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="assets/img/cursos/4.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                  <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="assets/img/cursos/5.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                </div>
-                <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                  <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="assets/img/cursos/6.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                  <div class="h-64 w-44 overflow-hidden rounded-lg">
-                    <img src="assets/img/cursos/7.jpg" alt="" class="size-full object-cover" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<section class="relative bg-gray-900 text-white py-20 lg:py-32 overflow-hidden">
+    <!-- Background Gradient & Shapes -->
+    <div class="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 z-0"></div>
+    <div class="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-blue-900/20 to-transparent z-0"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-green-500/10 rounded-full blur-3xl z-0"></div>
 
-<!-- Benefits Section -->
-<section class="py-12 bg-gray-50 dark:bg-gray-800">
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      @for (benefit of benefits; track benefit.icon) {
-      <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600 hover:shadow-md transition text-center">
-        <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="fas {{benefit.icon}} text-2xl text-indigo-600 dark:text-indigo-400"></i>
-        </div>
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{benefit.title}}</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-300">{{benefit.description}}</p>
-      </div>
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Courses Catalog -->
-<section id="academy" class="py-16 bg-white dark:bg-gray-900">
-  <div class="container mx-auto px-4">
-    <div class="mb-10">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Nuestros Cursos</h2>
-      <p class="text-gray-600 dark:text-gray-400">
-        Programas diseñados para llevarte desde principiante hasta profesional
-      </p>
-    </div>
-
-    <!-- Loading State -->
-    @if (loading) {
-    <div class="flex justify-center items-center py-20">
-      <span class="loading loading-spinner loading-lg text-indigo-600"></span>
-    </div>
-    }
-
-    <!-- Error State -->
-    @if (error) {
-    <div class="text-center py-10 text-red-600 dark:text-red-400">
-      <p>{{error}}</p>
-    </div>
-    }
-
-    @if (!loading && !error) {
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      @for (course of courses; track course.id) {
-      <div
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-        <!-- Course Image -->
-        <div class="relative h-48 overflow-hidden">
-          <img [src]="course.image_url" [alt]="course.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg">
-            {{course.level}}
-          </div>
-        </div>
-        <!-- Course Content -->
-        <div class="p-6">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{course.title}}</h3>
-          <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 text-sm">{{course.description}}</p>
-          <!-- Course Info -->
-          <div class="space-y-2 mb-6 border-t border-gray-100 dark:border-gray-700 pt-4">
-            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <i class="fas fa-clock w-6 text-center text-indigo-600 dark:text-indigo-400"></i>
-              <span>{{course.duration}}</span>
-            </div>
-            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <i class="fas fa-calendar-alt w-6 text-center text-indigo-600 dark:text-indigo-400"></i>
-              <span>{{course.schedule}}</span>
-            </div>
-            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <i class="fas fa-users w-6 text-center text-indigo-600 dark:text-indigo-400"></i>
-              <span>{{course.students}} estudiantes</span>
-            </div>
-          </div>
-          
-          <!-- Price and CTA -->
-          <div class="flex items-center justify-between mt-auto">
-            <div>
-              <span class="text-2xl font-bold text-gray-900 dark:text-white">{{course.price | currency}}</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400 block">por mes</span>
-            </div>
-            <button [routerLink]="['/academy', course.slug]"
-              class="px-4 py-2 bg-gray-900 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors shadow-sm">
-              Ver Detalles
-            </button>
-          </div>
-        </div>
-      </div>
-      }
-    </div>
-    }
-  </div>
-</section>
-
-<!-- Product Features Section (Highlight) -->
-<div class="bg-white dark:bg-gray-800 py-24 sm:py-32">
-  <div class="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 px-4 sm:px-6 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
-    <div>
-      <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Dominá la Técnica</h2>
-      <p class="mt-4 text-gray-500 dark:text-gray-400">Nuestros cursos están diseñados con un enfoque 100% práctico. Aprenderás a diagnosticar y reparar fallas reales utilizando herramientas profesionales y métodos probados en la industria.</p>
-
-      <dl class="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-y-16 lg:gap-x-8">
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <dt class="font-medium text-gray-900 dark:text-white">Certificación</dt>
-          <dd class="mt-2 text-sm text-gray-500 dark:text-gray-400">Diploma válido para iniciar tu propio negocio</dd>
-        </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <dt class="font-medium text-gray-900 dark:text-white">Herramientas</dt>
-          <dd class="mt-2 text-sm text-gray-500 dark:text-gray-400">Acceso a laboratorios totalmente equipados</dd>
-        </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <dt class="font-medium text-gray-900 dark:text-white">Soporte Vitalicio</dt>
-          <dd class="mt-2 text-sm text-gray-500 dark:text-gray-400">Consultas post-curso y acceso a comunidad</dd>
-        </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <dt class="font-medium text-gray-900 dark:text-white">Material</dt>
-          <dd class="mt-2 text-sm text-gray-500 dark:text-gray-400">Guías digitales y esquemáticos incluidos</dd>
-        </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <dt class="font-medium text-gray-900 dark:text-white">Metodología</dt>
-          <dd class="mt-2 text-sm text-gray-500 dark:text-gray-400">Clases presenciales con cupos limitados</dd>
-        </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <dt class="font-medium text-gray-900 dark:text-white">Salida Laboral</dt>
-          <dd class="mt-2 text-sm text-gray-500 dark:text-gray-400">Bolsa de trabajo para comercios aliados</dd>
-        </div>
-      </dl>
-    </div>
-    <div class="grid grid-cols-2 grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
-      <img src="assets/img/cursos/laboratorio.jpg" alt="Laboratorio de reparación equipado." class="rounded-lg bg-gray-100 object-cover h-full w-full" />
-      <img src="assets/img/cursos/iph.jpg" alt="Detalle de reparación en microscopio." class="rounded-lg bg-gray-100 object-cover h-full w-full" />
-      <img src="assets/img/cursos/iph2.jpg" alt="Herramientas de precisión." class="rounded-lg bg-gray-100 object-cover h-full w-full" />
-      <img src="assets/img/cursos/pro.webp" alt="Clase práctica." class="rounded-lg bg-gray-100 object-cover h-full w-full" />
-    </div>
-  </div>
-</div>
-
-<!-- Testimonials -->
-<section class="py-16 bg-gray-50 dark:bg-gray-800">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Lo que dicen nuestros egresados</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600">
-        <div class="flex items-center mb-6">
-          <img src="assets/img/cursos/egresado-2025.jpg" alt="Tobias Marchi"
-            class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-indigo-100 dark:ring-indigo-900">
-          <div>
-            <h4 class="font-bold text-gray-900 dark:text-white">Tobias Marchi</h4>
-            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Egresado 2025</p>
-          </div>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 italic">"Gracias al curso pude abrir mi propio taller. Los profesores son excelentes y el equipamiento es de primera."</p>
-      </div>
-      <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600">
-        <div class="flex items-center mb-6">
-          <img src="assets/img/cursos/alumno2.jpg" alt="María González"
-            class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-indigo-100 dark:ring-indigo-900">
-          <div>
-            <h4 class="font-bold text-gray-900 dark:text-white">Pablo Benitez</h4>
-            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Egresada 2024</p>
-          </div>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 italic">"La formación es muy completa y práctica. En 6 meses ya estaba trabajando de forma independiente."</p>
-      </div>
-      <div class="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-600">
-        <div class="flex items-center mb-6">
-          <img src="assets/img/cursos/alumno3.jpg" alt="Juan Pérez" class="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-indigo-100 dark:ring-indigo-900">
-          <div>
-            <h4 class="font-bold text-gray-900 dark:text-white">Maria Marcucci</h4>
-            <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Egresado 2024</p>
-          </div>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 italic">"El mejor curso de reparación que he tomado. Aprendí técnicas que no se enseñan en ningún otro lugar."</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-16 bg-linear-to-r from-indigo-600 to-purple-600 text-white">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h2 class="text-3xl sm:text-4xl font-bold mb-4">¿Listo para comenzar tu carrera?</h2>
-    <p class="text-xl mb-8 text-indigo-100">Inscríbete ahora y obtén un 10% de descuento en tu primer mes</p>
-    <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20inscribirme%20a%20un%20curso'"
-      class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg">
-      <i class="fab fa-whatsapp mr-2 text-2xl"></i>
-      Inscribirme Ahora
-    </a>
-  </div>
-</section>
-
-<!-- Productos de la categoría Cursos -->
-<section class="py-16 bg-white dark:bg-gray-900">
-  <div class="container mx-auto px-4">
-    <div class="mb-10">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Productos para Estudiantes</h2>
-      <p class="text-gray-600 dark:text-gray-400">
-        Herramientas y accesorios recomendados para potenciar tu aprendizaje
-      </p>
-      
-      <!-- Sorting Controls -->
-      <div class="mt-6 flex justify-end gap-4">
-        <select [ngModel]="sort()" (ngModelChange)="sort.set($event)" class="select select-bordered select-sm w-full max-w-xs">
-          <option value="created_at">Más recientes</option>
-          <option value="price">Precio</option>
-          <option value="name">Nombre</option>
-        </select>
-        <select [ngModel]="order()" (ngModelChange)="order.set($event)" class="select select-bordered select-sm w-full max-w-xs">
-          <option value="asc">Ascendente</option>
-          <option value="desc">Descendente</option>
-        </select>
-      </div>
-    </div>
-
-    @if (productsRs.isLoading()) {
-    <is-loading />
-    } @else if (productsRs.error()) {
-    <is-error />
-    } @else if (productsRs.hasValue()) { 
-      @if (productsRs.value().data.length === 0) {
-        <is-empty />
-      } @else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          @for (product of productsRs.value().data; track product.id; let i = $index) {
-          <product-card [product]="product" [isPriority]="i < 8" />
-          }
-        </div>
-        
-        @if (paginationData()) {
-          <div class="mt-12 flex justify-center">
-            <pagination [pages]="productsRs.value().pages" [currentPage]="paginationService.currentPage()" />
-          </div>
-        }
-      }
-    }
-  </div>
-</section>
-
-<!-- Registration Modal (Keep existing logic) -->
-  <!-- Registration Modal (DaisyUI) -->
-  @if (showRegistrationModal) {
-    <dialog class="modal modal-open modal-bottom sm:modal-middle" (click)="closeRegistration()">
-      <div class="modal-box bg-white dark:bg-gray-800 text-left relative" (click)="$event.stopPropagation()">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-500" (click)="closeRegistration()">✕</button>
-        
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">
-          Inscripción al curso
-        </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{selectedCourse?.title}}</p>
-        
-        <div class="mt-2">
-            @if (registrationSuccess) {
-            <div class="bg-green-50 border border-green-200 text-green-700 p-6 rounded-lg text-center" role="alert">
-                <i class="fas fa-check-circle text-5xl mb-4 text-green-500"></i>
-                <h3 class="text-xl font-bold mb-2">¡Pre-inscripción realizada!</h3>
-                <p class="mb-4">Para confirmar tu vacante, por favor realiza el pago:</p>
-                
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-green-100 mb-6 text-left">
-                    <p class="font-bold text-gray-800 mb-1">Datos Bancarios:</p>
-                    <p class="text-gray-600 mb-1">Alias: <span class="font-mono font-bold text-gray-900 select-all">arecofix</span></p>
-                    <p class="text-gray-600">CBU: <span class="font-mono font-bold text-gray-900 select-all">ecocell</span></p>
-                </div>
-
-                <p class="text-sm mb-4">
-                    Una vez realizado el pago, envía el comprobante al: <br>
-                    <strong class="text-lg">+54 9 11 2596-0900</strong>
-                </p>
-
-                <a href="https://wa.me/5491125960900?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20curso%20{{selectedCourse?.title}}" 
-                    target="_blank"
-                    class="btn btn-success w-full text-white no-underline hover:bg-green-600 bg-green-500 border-none inline-flex items-center justify-center">
-                    <i class="fab fa-whatsapp mr-2 text-xl"></i> Enviar Comprobante
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="max-w-3xl mx-auto text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-blue-500/20 text-blue-300 text-sm font-bold tracking-wide uppercase mb-6 border border-blue-500/30">
+                Arecofix Academy
+            </span>
+            <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
+                Dominá la Tecnología<br />
+                <span class="text-transparent bg-clip-text bg-linear-to-r from-green-400 to-blue-500">
+                    Construí tu Futuro
+                </span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-10 leading-relaxed">
+                Formate como técnico profesional en reparación de celulares y tecnología. 
+                Cursos prácticos, certificación oficial y las mejores herramientas del mercado.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a routerLink="." fragment="cursos-list" 
+                   class="btn btn-primary btn-lg rounded-full px-8 shadow-lg shadow-blue-500/30 hover:-translate-y-1 transition-all">
+                    Ver Cursos Disponibles
                 </a>
-                
-                <button (click)="closeRegistration()" class="btn btn-ghost w-full mt-4">Cerrar</button>
+                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20info%20sobre%20cursos'" 
+                   target="_blank"
+                   class="btn btn-outline btn-lg text-white border-white/30 hover:bg-white hover:text-gray-900 rounded-full px-8">
+                    <i class="fa-brands fa-whatsapp mr-2"></i> Consultar Ahora
+                </a>
             </div>
-            } @else {
-            <form class="space-y-4">
-                <div>
-                <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre Completo</label>
-                <input type="text" id="full_name" [(ngModel)]="registrationForm.full_name" name="full_name" placeholder="Ej: Juan Pérez" class="input input-bordered w-full dark:bg-gray-700 dark:text-white">
-                </div>
-                <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                <input type="email" id="email" [(ngModel)]="registrationForm.email" name="email" placeholder="tucorreo@ejemplo.com" class="input input-bordered w-full dark:bg-gray-700 dark:text-white">
-                </div>
-                <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono / WhatsApp</label>
-                <input type="tel" id="phone" [(ngModel)]="registrationForm.phone" name="phone" placeholder="Ej: +54 9 11 1234 5678" class="input input-bordered w-full dark:bg-gray-700 dark:text-white">
-                </div>
-                @if (registrationError) {
-                <p class="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-100">{{registrationError}}</p>
-                }
-            </form>
+        </div>
+    </div>
+</section>
 
-            <div class="modal-action flex flex-col sm:flex-row-reverse gap-2 mt-6">
-                <button type="button" (click)="submitRegistration()" [disabled]="registering" 
-                    class="btn btn-primary w-full sm:w-auto">
-                    {{ registering ? 'Enviando...' : 'Enviar Inscripción' }}
-                </button>
-                <button type="button" (click)="closeRegistration()" class="btn btn-ghost w-full sm:w-auto">
-                    Cerrar
-                </button>
-            </div>
+<!-- Stats / Benefits Section -->
+<section class="py-16 bg-white dark:bg-gray-800 -mt-10 relative z-20 rounded-t-[3rem]">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            @for (benefit of benefits(); track benefit.title) {
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover-lift group">
+                    <div [class]="'w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-2xl mb-3 md:mb-6 transition-transform group-hover:scale-110 ' + benefit.color">
+                        <i [class]="benefit.icon"></i>
+                    </div>
+                    <h3 class="text-sm md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3 leading-tight">{{ benefit.title }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-xs md:text-sm">
+                        {{ benefit.description }}
+                    </p>
+                </div>
             }
         </div>
-      </div>
-      <form method="dialog" class="modal-backdrop">
-        <button (click)="closeRegistration()">close</button>
-      </form>
-    </dialog>
-  }
+    </div>
+</section>
+
+<!-- Courses List Section -->
+<section id="cursos-list" class="py-20 bg-gray-50 dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Nuestros Cursos</h2>
+            <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
+                Elegí la capacitación que impulsará tu carrera profesional.
+            </p>
+        </div>
+
+        @if (isLoadingCourses()) {
+            <div class="flex justify-center py-20">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+            </div>
+        } @else {
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-8">
+                @for (course of courses(); track course.id) {
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 flex flex-col h-full group card-modern hover-lift">
+                        
+                        <!-- Image -->
+                        <div class="relative h-48 overflow-hidden">
+                            <div class="absolute inset-0 bg-gray-900/20 group-hover:bg-transparent transition-colors z-10"></div>
+                            <img [src]="course.image_url" [alt]="course.title" 
+                                 class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                            
+                            <div class="absolute top-2 right-2 z-20">
+                                <span class="badge badge-primary font-bold py-3 px-4 shadow-lg text-xs tracking-wider border-none bg-blue-600 text-white">
+                                    {{ course.level }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-6 flex flex-col grow">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-500 transition-colors leading-tight">
+                                {{ course.title }}
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed grow line-clamp-3">
+                                {{ course.description }}
+                            </p>
+
+                            <!-- Meta Info -->
+                            <div class="flex flex-col gap-3 mb-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                                    <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 shrink-0">
+                                        <i class="fas fa-clock text-xs"></i>
+                                    </div>
+                                    <span>{{ course.duration }}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                                    <div class="w-8 h-8 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-500 shrink-0">
+                                        <i class="fas fa-calendar-alt text-xs"></i>
+                                    </div>
+                                    <span class="whitespace-normal wrap-break-word">{{ course.schedule }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center justify-between mt-auto gap-2">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Inversión Mensual</span>
+                                    <span class="text-2xl font-black text-gray-900 dark:text-white leading-none">
+                                        {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                                    </span>
+                                </div>
+                                <a [routerLink]="['/academy', course.slug]" 
+                                        class="btn btn-primary btn-sm rounded-xl px-6 py-2 shadow-lg hover:shadow-xl transition-all h-auto text-sm font-bold bg-blue-600 border-none text-white hover:bg-blue-700">
+                                    Ver Detalle <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Additional Products / Kits Section -->
+<section class="py-20 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-6 text-center md:text-left">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Kit de Herramientas</h2>
+                <p class="text-gray-600 dark:text-gray-400">Todo lo que necesitás para empezar tu taller profesional.</p>
+            </div>
+            
+            <div class="flex gap-2">
+                <select [ngModel]="sort()" (ngModelChange)="sort.set($event)" 
+                        class="select select-bordered select-sm w-36 dark:bg-gray-700">
+                    <option value="created_at">Nuevos</option>
+                    <option value="price">Precio</option>
+                </select>
+                <select [ngModel]="order()" (ngModelChange)="order.set($event)" 
+                        class="select select-bordered select-sm w-36 dark:bg-gray-700">
+                    <option value="asc">Menor Precio</option>
+                    <option value="desc">Mayor Precio</option>
+                </select>
+            </div>
+        </div>
+
+        @if (productsRs.isLoading()) {
+            <is-loading />
+        } @else if (productsRs.error()) {
+            <is-error />
+        } @else if (productsRs.hasValue()) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @for (product of productsRs.value().data; track product.id) {
+                    <product-card [product]="product" />
+                }
+            </div>
+            
+            @if (paginationData(); as pager) {
+                <div class="mt-12 flex justify-center">
+                    <pagination [pages]="pager.pages" 
+                               [currentPage]="paginationService.currentPage()" />
+                </div>
+            }
+        }
+    </div>
+</section>
+
+
+<!-- Registration Modal -->
+@if (isRegistrationOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+         (click)="closeRegistration()">
+        
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100 border border-gray-100 dark:border-gray-700"
+             (click)="$event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="bg-primary px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Inscripción</h3>
+                <button (click)="closeRegistration()" class="text-white/80 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 md:p-8">
+                @if (selectedCourse()) {
+                    <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+                        <p class="text-xs text-blue-600 dark:text-blue-300 font-bold uppercase tracking-wider mb-1">Estás aplicando a:</p>
+                        <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ selectedCourse()?.title }}</h4>
+                    </div>
+                }
+
+                @if (registrationSuccess()) {
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">¡Solicitud Recibida!</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">
+                            Gracias por tu interés. Un asesor te contactará por WhatsApp para confirmar tu vacante y coordinar el pago.
+                        </p>
+                        <button (click)="closeRegistration()" class="btn btn-outline w-full rounded-xl">
+                            Entendido
+                        </button>
+                    </div>
+                } @else {
+                    <form (ngSubmit)="submitRegistration()" class="space-y-4">
+                        <div class="form-control">
+                            <label class="label"><span class="label-text">Nombre Completo</span></label>
+                            <input type="text" [(ngModel)]="registrationForm.full_name" name="full_name" 
+                                   class="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary" 
+                                   placeholder="Ej: Juan Pérez" required />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label"><span class="label-text">WhatsApp</span></label>
+                            <input type="tel" [(ngModel)]="registrationForm.phone" name="phone" 
+                                   class="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary" 
+                                   placeholder="Ej: 11 1234 5678" required />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label"><span class="label-text">Correo Electrónico</span></label>
+                            <input type="email" [(ngModel)]="registrationForm.email" name="email" 
+                                   class="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary" 
+                                   placeholder="tu@email.com" required />
+                        </div>
+                        
+                        @if (registrationError()) {
+                            <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
+                                {{ registrationError() }}
+                            </div>
+                        }
+
+                        <button type="submit" [disabled]="isRegistering()" 
+                                class="btn btn-primary w-full rounded-xl mt-4 text-lg">
+                            @if (isRegistering()) {
+                                <span class="loading loading-spinner loading-sm"></span> Enviando...
+                            } @else {
+                                Enviar Solicitud
+                            }
+                        </button>
+                    </form>
+                }
+            </div>
+
+        </div>
+    </div>
+}

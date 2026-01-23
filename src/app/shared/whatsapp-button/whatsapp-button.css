@@ -1,8 +1,8 @@
 /* Contenedor principal */
 .whatsapp-btn-container {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 25px;
+  right: 25px;
   z-index: 99999;
 
   /* Hardware acceleration to prevent ghosting */

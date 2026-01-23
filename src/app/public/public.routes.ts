@@ -30,10 +30,9 @@ export const publicRoutes: Routes = [
         loadChildren: () => import('@app/public/products/products.routes'),
       },
       {
-        title: 'Repuestos Redirect',
+        title: 'Repuestos',
         path: 'repuestos',
-        redirectTo: 'productos/categoria/repuestos',
-        pathMatch: 'full'
+        loadComponent: () => import('@app/public/repuestos/repuestos').then((m) => m.RepuestosComponent),
       },
       {
         title: 'Login',
@@ -127,6 +126,11 @@ export const publicRoutes: Routes = [
           import('@app/public/checkout/checkout-page').then(
             (m) => m.CheckoutPage
           ),
+      },
+      {
+        path: 'posts/servicio-tecnico-de-celulares-en-marcos-paz',
+        redirectTo: 'celular',
+        pathMatch: 'full'
       },
       {
         title: 'Blog Post',

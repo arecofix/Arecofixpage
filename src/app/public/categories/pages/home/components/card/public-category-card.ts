@@ -61,4 +61,20 @@ export class PublicCategoryCard {
 
     return this.category().icon || this.iconMap['default'];
   });
+
+  categoryLink = computed(() => {
+    const slug = this.category().slug.toLowerCase();
+    
+    // Custom Redirects
+    if (slug === 'cursos' || slug === 'academy' || slug === 'capacitaciones') {
+        return ['/academy'];
+    }
+
+    if (slug === 'repuestos') {
+        return ['/repuestos'];
+    }
+
+    // Default Behavior
+    return ['/productos', 'categoria', this.category().slug];
+  });
 }

@@ -4,13 +4,13 @@
   <div class="navbar-start">
     <!-- Menú hamburguesa (Mobile) -->
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden text-gray-900 dark:text-white opacity-100" aria-label="Abrir menú">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden text-gray-900 dark:text-white opacity-100 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Abrir menú">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
         </svg>
       </div>
 
-      <ul tabindex="0" class="menu menu-sm dropdown-content bg-white dark:bg-[#1a1a1a] rounded-box z-50 mt-3 w-60 p-2 shadow-xl border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-200">
+      <ul tabindex="0" class="menu menu-sm dropdown-content bg-white dark:bg-[#1a1a1a] rounded-box z-50 mt-3 w-60 p-2 shadow-xl border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-200 animate-fade-in-up">
         <!-- Buscador móvil -->
         <li class="mb-4">
           <div class="relative">
@@ -25,7 +25,7 @@
             <!-- Live Search Results Dropdown (Mobile) -->
             @if (showResults() && filteredProducts().length > 0) {
             <div
-              class="absolute top-full left-0 w-full mt-1 bg-[#222] border border-gray-600 rounded-lg shadow-xl z-50 overflow-hidden">
+              class="absolute top-full left-0 w-full mt-1 bg-[#222] border border-gray-600 rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in-up">
               <ul class="menu menu-sm bg-[#222] text-gray-200 p-0">
                 @for (product of filteredProducts(); track product.id) {
                 <li>
@@ -51,17 +51,17 @@
         <li>
           @if (item.children && item.children.length > 0) {
             <details class="group">
-              <summary class="flex items-center justify-between py-3 pr-2 list-none outline-none cursor-pointer">
+              <summary class="flex items-center justify-between py-3 pr-2 outline-none cursor-pointer list-none [&::-webkit-details-marker]:hidden after:hidden! hover:text-blue-500 transition-colors">
                 <!-- Parent Link -->
-                <a [routerLink]="item.path" (click)="$event.stopPropagation()" class="flex gap-3 flex-1 items-center" routerLinkActive="text-blue-400 font-bold" [routerLinkActiveOptions]="{exact: true}">
+                <a [routerLink]="item.path" (click)="$event.stopPropagation()" class="flex gap-3 flex-1 items-center font-medium" routerLinkActive="text-blue-500 font-bold" [routerLinkActiveOptions]="{exact: true}">
                   <i [class]="item.icon"></i> {{item.title}}
                 </a>
                 <i class="fas fa-chevron-down text-sm transition-transform group-open:rotate-180"></i>
               </summary>
-              <ul class="pl-4 border-l border-white/10 ml-2">
+              <ul class="pl-4 border-l border-gray-200 dark:border-white/10 ml-2 mt-2 space-y-1">
                 @for (child of item.children; track child.path) {
                   <li>
-                    <a class="flex gap-3 py-3 hover:text-blue-400" [routerLink]="child.path" routerLinkActive="text-blue-400 font-bold" [routerLinkActiveOptions]="{exact: true}">
+                    <a class="flex gap-3 py-2 hover:text-blue-500 transition-colors text-sm" [routerLink]="child.path" routerLinkActive="text-blue-500 font-bold" [routerLinkActiveOptions]="{exact: true}">
                       <i [class]="child.icon"></i> {{child.title}}
                     </a>
                   </li>
@@ -69,7 +69,7 @@
               </ul>
             </details>
           } @else {
-            <a class="flex gap-3 py-3 hover:text-blue-400" [routerLink]="item.path" routerLinkActive="text-blue-400 font-bold"
+            <a class="flex gap-3 py-3 hover:text-blue-500 transition-colors font-medium" [routerLink]="item.path" routerLinkActive="text-blue-500 font-bold"
               [routerLinkActiveOptions]="{exact: true}">
               <i [class]="item.icon"></i> {{item.title}}
             </a>
@@ -78,31 +78,31 @@
         }
 
         <li>
-          <a class="flex gap-3 py-3 hover:text-blue-400" routerLink="productos/destacados" routerLinkActive="text-blue-400 font-bold"
+          <a class="flex gap-3 py-3 hover:text-blue-500 transition-colors font-medium" routerLink="productos/destacados" routerLinkActive="text-blue-500 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
-            <i class="fas fa-star"></i> Destacados
+            <i class="fas fa-star text-yellow-500"></i> Destacados
           </a>
         </li>
         <li>
-          <a class="flex gap-3 py-3 hover:text-blue-400" routerLink="categories" routerLinkActive="text-blue-400 font-bold"
+          <a class="flex gap-3 py-3 hover:text-blue-500 transition-colors font-medium" routerLink="categories" routerLinkActive="text-blue-500 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-tag"></i> Categorías
           </a>
         </li>
         <li>
-          <a class="flex gap-3 py-3 hover:text-blue-400" routerLink="/contacto" routerLinkActive="text-blue-400 font-bold"
+          <a class="flex gap-3 py-3 hover:text-blue-500 transition-colors font-medium" routerLink="/contacto" routerLinkActive="text-blue-500 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-envelope"></i> Contacto
           </a>
         </li>
         <li>
-          <a class="flex gap-3 py-3 hover:text-blue-400" routerLink="/nosotros" routerLinkActive="text-blue-400 font-bold"
+          <a class="flex gap-3 py-3 hover:text-blue-500 transition-colors font-medium" routerLink="/nosotros" routerLinkActive="text-blue-500 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-info-circle"></i> Nosotros
           </a>
         </li>
         <li>
-          <a class="flex gap-3 py-3 hover:text-blue-400" routerLink="/servicios" routerLinkActive="text-blue-400 font-bold"
+          <a class="flex gap-3 py-3 hover:text-blue-500 transition-colors font-medium" routerLink="/servicios" routerLinkActive="text-blue-500 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
             <i class="fas fa-concierge-bell"></i> Servicios
           </a>
@@ -111,35 +111,38 @@
     </div>
 
     <!-- Logo + appName -->
-    <a class="flex items-center gap-2 btn btn-ghost hover:bg-white/5" [routerLink]="['/']">
-      <img src="/assets/img/brands/logo/Logo (2).png" alt="Arecofix Logo" class="h-8 w-auto hidden dark:block" height="32" width="108" />
-      <img src="/assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-8 w-auto dark:hidden" height="32" width="108" />
-      <span class="font-bold text-lg text-gray-900 dark:text-white font-heading tracking-wide">{{ appName }}</span>
+    <a class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group" [routerLink]="['/']">
+      <div class="relative group-hover:scale-105 transition-transform">
+         <img src="/assets/img/brands/logo/Logo (2).png" alt="Arecofix Logo" class="h-9 w-auto hidden dark:block drop-shadow-lg" height="36" width="120" />
+         <img src="/assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-9 w-auto dark:hidden drop-shadow-md" height="36" width="120" />
+      </div>
+      <span class="font-bold text-xl text-gray-900 dark:text-white font-heading tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ appName }}</span>
     </a>
   </div>
 
   <!-- NAVBAR CENTER (desktop) -->
   <div class="navbar-center hidden lg:flex">
-    <ul class="menu menu-horizontal px-1 gap-1">
+    <ul class="menu menu-horizontal px-1 gap-2 items-center">
       @for (item of menuItems(); track $index) {
-      <li>
+      <li class="h-full flex items-center">
         @if (item.children && item.children.length > 0) {
-          <div class="dropdown dropdown-hover group">
-            <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg flex items-center gap-1 font-medium" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5" [routerLinkActiveOptions]="{exact: false}">
+          <div class="dropdown dropdown-hover group/dropdown">
+            <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl flex items-center gap-2 font-medium px-4 h-10 hover-lift" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold" [routerLinkActiveOptions]="{exact: false}">
               <i [class]="item.icon"></i> {{item.title}}
+              <i class="fas fa-chevron-down text-[10px] opacity-50 group-hover/dropdown:rotate-180 transition-transform duration-300"></i>
             </a>
-            <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-xl bg-[#1a1a1a] border border-white/10 rounded-xl w-52 mt-4 text-gray-300">
+            <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl w-60 mt-2 text-gray-600 dark:text-gray-300 animate-fade-in-up">
               @for (child of item.children; track child.path) {
                 <li>
-                  <a [routerLink]="child.path" routerLinkActive="text-blue-400 font-bold" [routerLinkActiveOptions]="{exact: true}" class="hover:bg-white/10 hover:text-white">
-                    <i [class]="child.icon"></i> {{child.title}}
+                  <a [routerLink]="child.path" routerLinkActive="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-white/5" [routerLinkActiveOptions]="{exact: true}" class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-3">
+                    <span class="w-6 text-center"><i [class]="child.icon"></i></span> {{child.title}}
                   </a>
                 </li>
               }
             </ul>
           </div>
         } @else {
-          <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg font-medium" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5"
+          <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl font-medium px-4 h-10 hover-lift flex items-center gap-2" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
             <i [class]="item.icon"></i> {{item.title}}
           </a>
@@ -147,47 +150,54 @@
       </li>
       }
 
-      <li>
-        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg font-medium" routerLink="productos/destacados" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5"
+      <li class="h-full flex items-center">
+        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl font-medium px-4 h-10 hover-lift flex items-center gap-2" routerLink="productos/destacados" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold"
           [routerLinkActiveOptions]="{exact: true}">
-          <i class="fas fa-star"></i> Destacados
+          <i class="fas fa-star text-blue-500"></i> Destacado
         </a>
       </li>
-      <li>
-        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg font-medium" routerLink="categories" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fas fa-tag"></i> Categorías
-        </a>
-      </li>
-      <li>
-        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg font-medium" routerLink="/contacto" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fas fa-envelope"></i> Contacto
-        </a>
-      </li>
-      <li>
-        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg font-medium" routerLink="/nosotros" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fas fa-info-circle"></i> Nosotros
-        </a>
-      </li>
-      <li>
-        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors rounded-lg font-medium" routerLink="/servicios" routerLinkActive="text-blue-600 dark:text-blue-400! bg-black/5 dark:bg-white/5"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fas fa-concierge-bell"></i> Servicios
-        </a>
+
+      <!-- More Items Dropdown for remaining links to keep navbar clean -->
+      <li class="h-full flex items-center">
+        <div class="dropdown dropdown-hover group/dropdown">
+           <div tabindex="0" role="button" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl flex items-center gap-2 font-medium px-4 h-10 hover-lift">
+              <i class="fas fa-ellipsis-h"></i> Más
+           </div>
+           <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl w-52 mt-2 text-gray-600 dark:text-gray-300 animate-fade-in-up">
+              <li>
+                <a class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-2" routerLink="categories" routerLinkActive="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-white/5">
+                  <i class="fas fa-tag w-5 text-center"></i> Categorías
+                </a>
+              </li>
+              <li>
+                <a class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-2" routerLink="/servicios" routerLinkActive="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-white/5">
+                   <i class="fas fa-concierge-bell w-5 text-center"></i> Servicios
+                </a>
+              </li>
+              <li>
+                <a class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-2" routerLink="/nosotros" routerLinkActive="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-white/5">
+                   <i class="fas fa-info-circle w-5 text-center"></i> Nosotros
+                </a>
+              </li>
+              <li>
+                <a class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-2" routerLink="/contacto" routerLinkActive="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-white/5">
+                   <i class="fas fa-envelope w-5 text-center"></i> Contacto
+                </a>
+              </li>
+           </ul>
+        </div>
       </li>
     </ul>
   </div>
 
   <!-- NAVBAR END -->
-  <div class="navbar-end flex items-center gap-3">
+  <div class="navbar-end flex items-center gap-2 lg:gap-4">
     <!-- Buscador desktop -->
-    <div class="hidden lg:flex items-center gap-2 relative">
-      <div class="join">
-        <input type="text" placeholder="Buscar productos..." [(ngModel)]="searchQuery" (input)="onSearchInput()"
-          class="input input-sm input-bordered bg-gray-100 dark:bg-black/20 text-gray-900 dark:text-white border-gray-300 dark:border-white/20 join-item w-64 focus:bg-white dark:focus:bg-black/40 focus:border-blue-500 transition-colors" />
-        <button class="btn btn-sm btn-primary join-item border-none text-white" aria-label="Buscar">
+    <div class="hidden lg:flex items-center gap-2 relative group">
+      <div class="join transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500/50 rounded-full">
+        <input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (input)="onSearchInput()"
+          class="input input-sm input-bordered rounded-l-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border-transparent focus:border-transparent w-48 focus:w-64 transition-all duration-300 placeholder-gray-500" />
+        <button class="btn btn-sm btn-primary rounded-r-full border-none text-white px-4" aria-label="Buscar">
           <i class="fas fa-search"></i>
         </button>
       </div>
@@ -195,17 +205,17 @@
       <!-- Live Search Results Dropdown -->
       @if (showResults() && filteredProducts().length > 0) {
       <div
-        class="absolute top-full left-0 w-full mt-1 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden">
-        <ul class="menu menu-sm bg-[#1a1a1a] text-gray-200 p-0">
+        class="absolute top-full right-0 w-80 mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-fade-in-up">
+        <ul class="menu menu-sm bg-transparent text-gray-900 dark:text-gray-200 p-0">
           @for (product of filteredProducts(); track product.id) {
           <li>
             <a (click)="selectProduct(product)"
-              class="flex items-center gap-3 p-2 hover:bg-white/10 rounded-none text-gray-200">
+              class="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-white/10 rounded-none border-b border-gray-100 dark:border-white/5 last:border-none transition-colors">
               <img [src]="product.image_url || '/assets/img/no-image.png'" alt="{{product.name}}"
-                class="w-8 h-8 object-contain rounded bg-white border" />
+                class="w-10 h-10 object-contain rounded-lg bg-white border border-gray-100 shadow-sm" />
               <div class="flex flex-col flex-1 min-w-0">
-                <span class="font-bold text-sm text-gray-200 whitespace-normal leading-tight line-clamp-2">{{ product.name }}</span>
-                <span class="text-xs text-gray-400">${{ product.price }}</span>
+                <span class="font-bold text-sm text-gray-800 dark:text-gray-200 whitespace-normal leading-tight line-clamp-2">{{ product.name }}</span>
+                <span class="text-xs font-bold text-blue-600 dark:text-blue-400 mt-1">${{ product.price }}</span>
               </div>
             </a>
           </li>
@@ -214,6 +224,7 @@
       </div>
       }
     </div>
+
 
     <!-- Carrito (Drawer) -->
     <button (click)="toggleCart()" class="btn btn-circle btn-sm btn-ghost hover:bg-black/10 dark:hover:bg-white/10 text-gray-900 dark:text-white" aria-label="Carrito">

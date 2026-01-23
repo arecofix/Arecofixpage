@@ -1,10 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BrandRepository } from '@app/features/products/data/repositories/brand.repository';
+import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { LoggerService } from '@app/core/services/logger.service';
 import { NotificationService } from '@app/core/services/notification.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-admin-brands-page',
@@ -27,7 +28,7 @@ export class AdminBrandsPage implements OnInit {
     async loadBrands() {
         this.loading.set(true);
         try {
-            const brands = await this.brandRepo.findAll({ column: 'name', ascending: true });
+            const brands = await firstValueFrom(this.brandRepo.getAll({ column: 'name', ascending: true }));
             this.brands.set(brands);
         } catch (error) {
             this.logger.error('Failed to load brands', error);
@@ -39,7 +40,7 @@ export class AdminBrandsPage implements OnInit {
 
     async toggleStatus(brand: Brand) {
         try {
-            await this.brandRepo.toggleStatus(brand.id, brand.is_active);
+            await firstValueFrom(this.brandRepo.update(brand.id, { is_active: !brand.is_active }));
             await this.loadBrands();
             this.notification.showSuccess('Estado actualizado correctamente');
         } catch (error) {

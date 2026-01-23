@@ -1,0 +1,92 @@
+<div class="space-y-4">
+  <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+      <i class="fas fa-images mr-2 text-indigo-500"></i> Galería Multimedia
+    </h3>
+    
+    <div class="flex gap-2 w-full sm:w-auto">
+      <!-- File Upload Button -->
+      <label [class.btn-disabled]="uploading()" class="btn btn-outline btn-primary flex-1 sm:flex-none">
+        <input type="file" multiple accept="image/*" class="hidden" (change)="onFileSelected($event)" [disabled]="uploading()" />
+        @if(uploading()) {
+          <span class="loading loading-spinner loading-xs"></span>
+        } @else {
+          <i class="fas fa-upload mr-2"></i> Subir
+        }
+      </label>
+
+      <!-- Camera Button -->
+      <button type="button" (click)="toggleCamera()" class="btn btn-md" 
+        [class.btn-error]="isCameraOpen()"
+        [class.btn-secondary]="!isCameraOpen()">
+        <i class="fas" [class.fa-times]="isCameraOpen()" [class.fa-camera]="!isCameraOpen()"></i>
+        <span class="hidden sm:inline">{{ isCameraOpen() ? 'Cerrar' : 'Cámara' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Camera Viewport -->
+  @if (isCameraOpen()) {
+    <div class="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video animate-fade-in mb-4">
+      <video autoplay playsinline class="w-full h-full object-cover"></video>
+      <div class="absolute bottom-4 left-0 right-0 flex justify-center pb-4">
+        <button type="button" (click)="capturePhoto()" [disabled]="uploading()" class="btn btn-circle btn-lg btn-white border-4 border-gray-300 hover:border-white shadow-xl transition-all hover:scale-110">
+          <div class="w-12 h-12 rounded-full bg-white"></div>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Drag & Drop Grid -->
+  @if (images().length > 0) {
+    <div 
+      cdkDropList 
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 image-list" 
+      (cdkDropListDropped)="drop($event)">
+      
+      @for (img of images(); track img; let i = $index) {
+        <div class="card bg-base-100 shadow-sm border border-base-200 group image-item relative cursor-move hover:shadow-md transition-shadow" cdkDrag>
+          
+          <!-- Drag Handle / Image -->
+          <figure class="aspect-square relative overflow-hidden bg-gray-100 dark:bg-gray-800">
+             <img [src]="img" class="w-full h-full object-cover pointer-events-none select-none" />
+             
+             <!-- Main Image Badge -->
+             @if (i === 0) {
+               <div class="absolute top-2 left-2 badge badge-primary font-bold shadow-sm z-10">
+                 <i class="fas fa-star mr-1 text-xs"></i> Principal
+               </div>
+             } @else {
+               <div class="absolute top-2 left-2 badge badge-ghost opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 text-white z-10 text-xs">
+                 {{ i + 1 }}°
+               </div>
+             }
+
+             <!-- Actions Overlay -->
+             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button type="button" (click)="removeImage(i)" class="btn btn-circle btn-error btn-sm text-white shadow-lg pointer-events-auto">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+             </div>
+          </figure>
+
+          <!-- Custom Placeholder when dragging -->
+          <div *cdkDragPlaceholder class="bg-gray-200 dark:bg-gray-700 rounded-xl border-2 border-dashed border-gray-400 opacity-50 flex items-center justify-center">
+            <span class="text-gray-500 font-bold">Mover aquí</span>
+          </div>
+        </div>
+      }
+    </div>
+    
+    <p class="text-xs text-gray-500 text-center mt-2">
+      <i class="fas fa-info-circle mr-1"></i> Arrastra las imágenes para reordenarlas. La primera será la portada.
+    </p>
+  } @else {
+    <!-- Empty State -->
+    <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-12 text-center text-gray-400 bg-gray-50 dark:bg-gray-800/50">
+      <i class="fas fa-images text-4xl mb-3 opacity-50"></i>
+      <p>No hay imágenes cargadas.</p>
+      <p class="text-sm">Sube fotos o usa la cámara para empezar.</p>
+    </div>
+  }
+</div>

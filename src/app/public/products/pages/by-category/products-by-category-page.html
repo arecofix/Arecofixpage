@@ -3,29 +3,15 @@
   <input id="cat-filters-drawer" type="checkbox" class="drawer-toggle" />
   
   <div class="drawer-content flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Mobile Header -->
-    <div class="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-      <h2 class="font-bold text-gray-900 dark:text-white truncate">
-          {{ currentCategory()?.name || 'Categoría' }}
-      </h2>
-      <label for="cat-filters-drawer" class="btn btn-sm btn-ghost lg:hidden">
-        <i class="fas fa-sliders-h mr-2"></i> Filtros
-      </label>
-    </div>
-
     <!-- DYNAMIC HERO -->
     <header class="relative bg-gray-900 text-white overflow-hidden isolate">
-       <div class="absolute inset-0 bg-linear-to-br from-indigo-900 via-blue-950 to-slate-900 opacity-90"></div>
-       <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
-       <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500 rounded-full mix-blend-overlay filter blur-3xl opacity-10"></div>
+       <div class="absolute inset-0 bg-linear-to-br from-indigo-900 via-blue-950 to-slate-900 opacity-90 pointer-events-none"></div>
+       <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20 pointer-events-none"></div>
+       <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500 rounded-full mix-blend-overlay filter blur-3xl opacity-10 pointer-events-none"></div>
 
-       <div class="relative container mx-auto px-4 py-16 lg:py-24 text-center">
-           <div class="text-sm breadcrumbs text-indigo-200 justify-center mb-6 hidden md:flex">
-                <ul>
-                <li><a routerLink="/">Inicio</a></li>
-                <li><a routerLink="/productos">Productos</a></li>
-                <li class="font-semibold text-white">{{ currentCategory()?.name || 'Cargando...' }}</li>
-                </ul>
+       <div class="relative container mx-auto px-4 py-8 lg:py-12 text-center">
+           <div class="flex justify-center mb-6">
+                <app-breadcrumbs [items]="breadcrumbItems()" classes="justify-center !text-indigo-200" activeClasses="!text-white"></app-breadcrumbs>
             </div>
 
             <h1 class="text-4xl md:text-5xl font-black mb-6 tracking-tight animate-fade-in-up">
@@ -42,12 +28,18 @@
     <div class="flex-1 container mx-auto px-4 py-12">
          <!-- Toolbar -->
          <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-800 gap-4">
-            <div class="text-gray-600 dark:text-gray-400 font-medium text-sm">
-                 @if (productsRs.value()) {
-                    Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> resultados
-                  } @else {
-                    Cargando catálogo...
-                  }
+            <div class="w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div class="text-gray-600 dark:text-gray-400 font-medium text-sm">
+                     @if (productsRs.value()) {
+                        Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> resultados
+                      } @else {
+                        Cargando catálogo...
+                      }
+                </div>
+                
+                <label for="cat-filters-drawer" class="btn btn-sm btn-outline rounded-full w-full sm:w-auto lg:hidden">
+                    <i class="fas fa-sliders-h mr-2"></i> Filtros
+                </label>
             </div>
             
              <div class="flex items-center gap-3">
@@ -55,8 +47,8 @@
                  <div class="relative hidden md:block">
                      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                      <input 
-                         [ngModel]="searchQuery()" 
-                         (ngModelChange)="onSearch($event)" 
+                         [defaultValue]="searchQuery()" 
+                         (input)="onSearch($any($event.target).value)"
                          type="text" 
                          [placeholder]="'Buscar en ' + (currentCategory()?.name || 'esta sección') + '...'" 
                          class="input input-bordered input-sm rounded-full pl-9 w-64 focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800"
@@ -77,8 +69,8 @@
              <div class="relative">
                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                  <input 
-                     [ngModel]="searchQuery()" 
-                     (ngModelChange)="onSearch($event)" 
+                     [defaultValue]="searchQuery()" 
+                     (input)="onSearch($any($event.target).value)"
                      type="text" 
                      placeholder="Buscar en esta categoría..." 
                      class="input input-bordered w-full rounded-2xl pl-10"
@@ -106,7 +98,7 @@
                          </button>
                      </div>
                  } @else {
-                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-6">
                         @for (product of productsRs.value()!.data; track product.id; let i = $index) {
                             <product-card [product]="product" [isPriority]="i < 2" (quickView)="openQuickView($event)"></product-card>
                         }
@@ -129,7 +121,7 @@
     <aside class="menu p-6 w-80 min-h-full bg-white dark:bg-gray-800 text-base-content border-r border-gray-200 dark:border-gray-700">
         <div class="flex justify-between items-center mb-8">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">Filtros</h3>
-            <label for="cat-filters-drawer" class="btn btn-sm btn-circle btn-ghost">✕</label>
+            <label for="cat-filters-drawer" class="btn btn-sm btn-circle btn-ghost cursor-pointer">✕</label>
         </div>
 
         <div class="space-y-8">

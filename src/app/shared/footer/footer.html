@@ -4,18 +4,18 @@
 
       <!-- Logo + Links + Redes -->
       <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-1/2">
-        <img src="https://arecofix.com.ar/assets/img/brands/logo/log.png" alt="Logo Arecofix" class="h-10 dark:brightness-0 dark:invert" height="40"
+        <img src="https://arecofix.com.ar/assets/img/brands/logo/log.png" alt="Logo Arecofix" class="h-10" height="40"
           width="136" />
 
         <nav aria-label="Footer navigation" class="w-full">
-          <ul class="flex flex-row flex-wrap justify-center lg:justify-start gap-5 text-sm text-gray-600 dark:text-gray-400">
+          <ul class="flex flex-row flex-wrap justify-center lg:justify-start gap-5 text-sm text-gray-700 dark:text-gray-300">
             <li><a routerLink="./" class="hover:text-blue-400 transition-colors font-medium">Inicio</a>
             </li>
             <li><a routerLink="/recursos"
                 class="hover:text-blue-400 transition-colors font-medium">Recursos</a></li>
             <li><a routerLink="/nosotros"
                 class="hover:text-blue-400 transition-colors font-medium">Nosotros</a></li>
-            <li><a routerLink="/products/featured"
+            <li><a routerLink="/productos"
                 class="hover:text-blue-400 transition-colors font-medium">Productos</a></li>
             <li><a routerLink="/contacto"
                 class="hover:text-blue-400 transition-colors font-medium">Contacto</a></li>
@@ -29,27 +29,27 @@
         <!-- Social Media Buttons -->
         <div class="flex gap-4 mt-4 flex-wrap justify-center lg:justify-start">
           <a [href]="socialLinks.facebook" aria-label="Facebook"
-            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all hover:-translate-y-1 border border-blue-200 dark:border-blue-600/30">
+            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-blue-200 dark:border-blue-600/30">
             <i class="fa-brands fa-facebook-f text-lg"></i>
           </a>
           <a [href]="socialLinks.instagram" aria-label="Instagram"
-            class="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-600/20 text-pink-600 dark:text-pink-500 hover:bg-pink-600 hover:text-white flex items-center justify-center transition-all hover:-translate-y-1 border border-pink-200 dark:border-pink-600/30">
+            class="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-600/20 text-pink-600 dark:text-pink-500 hover:bg-pink-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-pink-200 dark:border-pink-600/30">
             <i class="fa-brands fa-instagram text-lg"></i>
           </a>
           <a [href]="socialLinks.github" aria-label="GitHub"
-            class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black flex items-center justify-center transition-all hover:-translate-y-1 border border-gray-300 dark:border-white/20">
+            class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black flex items-center justify-center transition-all hover-lift border border-gray-300 dark:border-white/20">
             <i class="fa-brands fa-github text-lg"></i>
           </a>
           <a [href]="socialLinks.linkedin" aria-label="LinkedIn"
-            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-700/20 text-blue-700 dark:text-blue-400 hover:bg-blue-700 hover:text-white flex items-center justify-center transition-all hover:-translate-y-1 border border-blue-200 dark:border-blue-700/30">
+            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-700/20 text-blue-700 dark:text-blue-400 hover:bg-blue-700 hover:text-white flex items-center justify-center transition-all hover-lift border border-blue-200 dark:border-blue-700/30">
             <i class="fa-brands fa-linkedin-in text-lg"></i>
           </a>
           <a [href]="socialLinks.youtube" aria-label="YouTube"
-            class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-600/20 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover:-translate-y-1 border border-red-200 dark:border-red-600/30">
+            class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-600/20 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-red-200 dark:border-red-600/30">
             <i class="fa-brands fa-youtube text-lg"></i>
           </a>
           <a [href]="socialLinks.googleMaps" aria-label="Google Maps"
-            class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-600/20 text-green-600 dark:text-green-500 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all hover:-translate-y-1 border border-green-200 dark:border-green-600/30">
+            class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-600/20 text-green-600 dark:text-green-500 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-green-200 dark:border-green-600/30">
             <i class="fa-solid fa-map-location-dot text-lg"></i>
           </a>
         </div>
@@ -110,8 +110,8 @@
             </li>
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-envelope text-blue-500"></i>
-              <a href="mailto:contacto@arecofix.com.ar"
-                class="hover:text-blue-400 transition">contacto@arecofix.com.ar</a>
+              <a href="mailto:info@arecofix.com.ar"
+                class="hover:text-blue-400 transition">info@arecofix.com.ar</a>
             </li>
           </ul>
         </div>
@@ -122,12 +122,12 @@
     <!-- Copyright -->
     <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 border-t border-gray-200 dark:border-white/5 mt-2">
       <p>
-        <a routerLink="/portfolio" class="hover:text-blue-400 transition">
-          &copy; {{ currentYear }} Arecofix. Todos los derechos reservados.
+        <a routerLink="/portfolio" class="hover:text-blue-400 transition hover-scale inline-block">
+          &copy; {{ currentYear }} <span class="font-bold text-gradient-premium">Arecofix</span>. Todos los derechos reservados.
         </a>
       </p>
       <div class="flex gap-6">
-        <button (click)="openAccessibilityMenu()" class="hover:text-blue-400 transition flex items-center gap-2">
+        <button (click)="openAccessibilityMenu()" class="hover:text-blue-400 transition flex items-center gap-2" aria-label="Cambiar idioma a Español">
           <i class="fa-solid fa-globe"></i> Español
         </button>
         <a routerLink="/sitemap" class="hover:text-blue-400 transition">Mapa del sitio</a>

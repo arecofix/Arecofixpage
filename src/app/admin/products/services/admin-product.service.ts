@@ -1,67 +1,46 @@
 import { Injectable, inject } from '@angular/core';
-import { AuthService } from '@app/core/services/auth.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
+import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
+import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
+import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
+import { AuthService } from '@app/core/services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AdminProductService {
+    private productRepo = inject(ProductRepository);
+    private brandRepo = inject(BrandRepository);
+    private categoryRepo = inject(CategoryRepository);
+    // Needed for storage and bulk ops not yet in repo
     private auth = inject(AuthService);
     private supabase = this.auth.getSupabaseClient();
 
     async getProducts(): Promise<Product[]> {
-        const { data, error } = await this.supabase
-            .from('products')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        return data || [];
+        return firstValueFrom(this.productRepo.getAll());
     }
 
     async getProduct(id: string): Promise<Product> {
-        const { data, error } = await this.supabase
-            .from('products')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) throw error;
-        return data as Product;
+        return firstValueFrom(this.productRepo.getById(id));
     }
 
     async getBrands(): Promise<Brand[]> {
-        const { data, error } = await this.supabase
-            .from('brands')
-            .select('*')
-            .eq('is_active', true)
-            .order('name');
-
-        if (error) throw error;
-        return (data as Brand[]) || [];
+        return firstValueFrom(this.brandRepo.getAll());
     }
 
     async getCategories(): Promise<Category[]> {
-        const { data, error } = await this.supabase
-            .from('categories')
-            .select('*')
-            .eq('is_active', true)
-            .order('name');
-
-        if (error) throw error;
-        return (data as Category[]) || [];
+        return firstValueFrom(this.categoryRepo.getAll());
     }
 
     async createProduct(payload: Partial<Product>): Promise<void> {
-        const { error } = await this.supabase.from('products').insert(payload);
-        if (error) throw error;
+        await firstValueFrom(this.productRepo.create(payload as Product));
     }
 
     async updateProduct(id: string, payload: Partial<Product>): Promise<void> {
-        const { error } = await this.supabase.from('products').update(payload).eq('id', id);
-        if (error) throw error;
+        await firstValueFrom(this.productRepo.update(id, payload));
     }
 
     async uploadImage(file: File): Promise<string> {
@@ -210,5 +189,53 @@ export class AdminProductService {
             reader.onerror = (error) => reject(error);
             reader.readAsText(file);
         });
+    }
+
+    async bulkUpdate(ids: string[], payload: Partial<Product>): Promise<void> {
+        const { error } = await this.supabase
+            .from('products')
+            .update(payload)
+            .in('id', ids);
+
+        if (error) throw error;
+    }
+
+    async bulkIncreasePrice(ids: string[], percentage: number): Promise<void> {
+        // Strategy: Fetch current prices, calculate new ones, and update.
+        // For distinct values, we unfortunately need individual updates or an Upsert.
+        // Supabase/PostgREST doesn't support "price = price * 1.1" in simple update yet without RPC.
+        
+        // 1. Get current products
+        const { data: products, error } = await this.supabase
+            .from('products')
+            .select('id, price')
+            .in('id', ids);
+
+        if (error) throw error;
+        if (!products || products.length === 0) return;
+
+        // 2. Prepare updates
+        const updates = products.map(p => ({
+            id: p.id,
+            price: Math.round(p.price * (1 + percentage / 100)) // Round to integer for simplicity, or 2 decimals
+        }));
+
+        // 3. Perform Upsert (efficient batch update)
+        // Note: This requires the table to have a primary key on ID (standard)
+        // We only send ID and Price, so we must rely on Supabase not clearing other fields on upsert 
+        // IF we use 'ignoreDuplicates: false' (default).
+        // However, standard upsert replaces the row. 
+        // BETTER APPROACH SAFE: Parallel Updates for now to avoid overwriting other fields 
+        // if upsert behavior isn't strictly PATCh. 
+        // Actually, upsert overwrites. We don't want that.
+        // Let's use Promise.all with a concurrency limit if possible, or just Promise.all for now (Batch size usually < 50).
+        
+        const BATCH_SIZE = 5;
+        for (let i = 0; i < updates.length; i += BATCH_SIZE) {
+             const batch = updates.slice(i, i + BATCH_SIZE);
+             await Promise.all(batch.map(u => 
+                 this.supabase.from('products').update({ price: u.price }).eq('id', u.id)
+             ));
+        }
     }
 }

@@ -1,54 +1,67 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { CertificateGalleryComponent } from '../../shared/components/certificate-gallery/certificate-gallery.component';
+import { interval, Subscription } from 'rxjs';
+
+interface BackendHighlight {
+  title: string;
+  icon: string;
+  description: string;
+  stats: { label: string; value: string }[];
+}
+
+interface CodeSnippet {
+  title: string;
+  language: string;
+  code: string;
+  description: string;
+}
+
+interface SystemStatus {
+  name: string;
+  status: 'operational' | 'degraded' | 'maintenance';
+  latency: number;
+  uptime: string;
+}
 
 interface PortfolioContent {
   name: string;
-  title: string;
+  role: string;
+  tagline: string;
   location: string;
-  phone: string;
   email: string;
-  website: string;
   linkedin: string;
-  summary: string;
-  about: string;
-  workExperience: WorkExperience[];
-  education: Education[];
-  technicalSkills: TechnicalSkill[];
-  certifications: string[];
-  projects: Project[];
+  github: string;
   cvUrl: string;
+  about: string;
+  backendHighlights: BackendHighlight[];
+  codeSnippets: CodeSnippet[];
+  technicalSkills: TechnicalSkill[];
+  projects: Project[];
+  workExperience: WorkExperience[];
 }
 
 interface WorkExperience {
   position: string;
   company: string;
   period: string;
-  description?: string;
-  achievements?: string[];
-}
-
-interface Education {
-  degree: string;
-  institution: string;
-  period: string;
-  details: string[];
+  description: string;
+  techStack: string[];
 }
 
 interface TechnicalSkill {
-  name: string;
-  icon: string; // FontAwesome class or emoji for now
-  description: string;
-  category: 'language' | 'framework' | 'tool' | 'database' | 'os';
+  category: string;
+  skills: { name: string; icon: string; description: string }[];
 }
 
 interface Project {
   title: string;
   description: string;
   image: string;
-  tags: string[];
+  techStack: string[];
+  features: string[];
   link?: string;
   github?: string;
 }
@@ -60,183 +73,316 @@ interface Project {
   templateUrl: './portfolio.html',
   styleUrls: ['./portfolio.css']
 })
-export class PortfolioComponent implements OnInit {
+export class PortfolioComponent implements OnInit, OnDestroy {
   currentLanguage: 'en' | 'es' = 'es';
+  activeSnippetIndex = 0;
+  terminalOutput: string[] = [];
+  systemStatuses: SystemStatus[] = [
+    { name: 'Supabase Auth', status: 'operational', latency: 45, uptime: '99.99%' },
+    { name: 'PostgreSQL DB', status: 'operational', latency: 12, uptime: '99.95%' },
+    { name: 'Node.js API', status: 'operational', latency: 28, uptime: '99.90%' },
+    { name: 'Redis Cache', status: 'operational', latency: 5, uptime: '99.99%' }
+  ];
+  
+  private simulationSubscription?: Subscription;
 
   portfolioContent: { en: PortfolioContent; es: PortfolioContent } = {
-    en: {
+    es: {
       name: 'EZEQUIEL ENRICO ARECO',
-      title: 'Fullstack Developer',
+      role: 'Senior Backend & Fullstack Engineer',
+      tagline: 'Arquitecto de Soluciones Escalables | Experto en Node.js & Cloud',
       location: 'Buenos Aires, Argentina',
-      phone: '+54 11 2596-0900',
       email: 'ezequielenrico15@gmail.com',
-      website: 'www.arecofix.com.ar',
       linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
+      github: 'https://github.com/arecofix',
       cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
-      summary: 'Systems professional, Full-Stack developer. Currently working in the government technical team and experienced as an IT instructor. I enjoy teamwork and value collaboration. Seeking new professional opportunities in IT.',
-      about: 'Welcome to my online portfolio. Here you will see examples of the tools I work with as a fullstack developer. I specialize in web development using modern technologies like HTML, CSS, JavaScript, and frameworks like Django and React.',
-      workExperience: [
+      about: 'Ingeniero de Software con profunda especialización en arquitectura de backend, diseño de APIs RESTful de alto rendimiento y optimización de bases de datos. Mi enfoque combina la robustez de la ingeniería de sistemas con metodologías modernas como Clean Architecture y TDD. Comprometido con la excelencia técnica, la seguridad y la escalabilidad.',
+      backendHighlights: [
         {
-          position: 'Technical Team',
-          company: 'Envión Program, Municipality of Marcos Paz',
-          period: '2022 - Present',
-          description: 'Part of the technical team, managing systems and providing support.'
+          title: 'Arquitectura de Microservicios',
+          icon: 'fas fa-server',
+          description: 'Diseño e implementación de sistemas distribuidos desacoplados utilizando Node.js y comunicación por eventos.',
+          stats: [{ label: 'Escalabilidad', value: 'Alta' }, { label: 'Disponibilidad', value: '99.9%' }]
         },
         {
-          position: 'Contraventional Police',
-          company: 'Security Secretariat',
-          period: '2020 - 2021',
-          description: 'Served in the security secretariat.'
+          title: 'Optimización de Bases de Datos',
+          icon: 'fas fa-database',
+          description: 'Tuning avanzado de consultas SQL, indexación estratégica y modelado de datos eficiente en PostgreSQL y Supabase.',
+          stats: [{ label: 'Query Time', value: '-60%' }, { label: 'Throughput', value: '2x' }]
         },
         {
-          position: 'Instructor',
-          company: 'Eddis Educativa (Morón & Marcos Paz)',
-          period: '2023 - Present',
-          description: 'Teaching IT courses including Cell Phone Repair.'
+          title: 'Seguridad & Auth',
+          icon: 'fas fa-shield-alt',
+          description: 'Implementación de esquemas robustos de autenticación (JWT, OAuth2) y políticas de seguridad Row Level Security (RLS) con enfoque en DevSecOps.',
+          stats: [{ label: 'Compliance', value: 'OWASP' }, { label: 'Seguridad', value: 'A+' }]
         }
       ],
-      education: [
+      codeSnippets: [
         {
-          degree: 'Bachelors in computer science',
-          institution: 'Universidad Nacional del Oeste (UNO)',
-          period: 'Expected 2024',
-          details: [
-            'Currently finishing final subjects.',
-            'Acquired knowledge in C#, HTML, CSS, JS, Python, PHP, ReactJS, SQL.'
-          ]
+          title: 'Node.js Clean Architecture Controller',
+          language: 'typescript',
+          description: 'Implementación de un controlador genérico siguiendo principios SOLID y manejo de errores centralizado.',
+          code: `
+export class BaseController {
+  protected async execute(req: Request, res: Response): Promise<void | any> {
+    try {
+      await this.executeImpl(req, res);
+    } catch (error) {
+      console.error(\`[BaseController]: Uncaught controller error\`);
+      console.error(error);
+      this.fail(res, 'An unexpected error occurred');
+    }
+  }
+
+  public static jsonResponse(res: Response, code: number, message: string) {
+    return res.status(code).json({ message });
+  }
+}`
+        },
+        {
+          title: 'Supabase RLS Policy (SQL)',
+          language: 'sql',
+          description: 'Política de seguridad a nivel de fila para asegurar aislamiento de datos por tenant.',
+          code: `
+-- Enable RLS
+ALTER TABLE "orders" ENABLE ROW LEVEL SECURITY;
+
+-- Create Policy
+CREATE POLICY "Tenant Isolation Policy"
+ON "orders"
+FOR ALL
+USING (
+  tenant_id = auth.jwt() ->> 'tenant_id'
+);`
         }
       ],
       technicalSkills: [
-        { name: 'Python', icon: 'fab fa-python', category: 'language', description: 'Passionate about Python development, focusing on AI and Machine Learning.' },
-        { name: 'JavaScript', icon: 'fab fa-js', category: 'language', description: 'Building interactive and dynamic web applications, DOM manipulation, and API interactions.' },
-        { name: 'C# .NET', icon: 'fab fa-microsoft', category: 'language', description: 'Developed business management applications using Windows Forms and OOP.' },
-        { name: 'Django', icon: 'fas fa-leaf', category: 'framework', description: 'Creating robust dynamic websites with URL routing, templates, and DB management.' },
-        { name: 'Node.js', icon: 'fab fa-node', category: 'framework', description: 'Building REST APIs, CRUD systems, and handling authentication.' },
-        { name: 'PHP', icon: 'fab fa-php', category: 'language', description: 'Developing robust web apps with frameworks like Laravel.' },
-        { name: 'Docker', icon: 'fab fa-docker', category: 'tool', description: 'Containerization for consistent development and deployment environments.' },
-        { name: 'Git', icon: 'fab fa-git-alt', category: 'tool', description: 'Version control and collaboration.' },
-        { name: 'MySQL', icon: 'fas fa-database', category: 'database', description: 'Relational database management.' },
-        { name: 'Linux', icon: 'fab fa-linux', category: 'os', description: 'Server management and command line proficiency.' }
-      ],
-      certifications: [
-        'Codo a Codo Fullstack Python (2022)',
-        'JavaScript, ReactJS, SQL - Coderhouse (2021)',
-        'Database Course - Udemy (2021)',
-        'Full-Stack Web Developer - LinkedIn Learning (2020)',
-        'English B2 (Advanced)'
+        { 
+          category: 'High-Performance Backend', 
+          skills: [
+            { name: 'Java Enterprise', icon: 'fa-brands fa-java', description: 'Desarrollo de sistemas distribuidos robustos, multithreading y gestión de memoria avanzada.' },
+            { name: 'Spring Boot', icon: 'fa-brands fa-envira', description: 'Arquitectura de microservicios, Spring Cloud, Spring Security y DI para aplicaciones empresariales.' },
+            { name: 'Node.js', icon: 'fa-brands fa-node', description: 'Event-driven, Streams API y escalabilidad horizontal para servicios de alta concurrencia.' },
+            { name: 'C# .NET', icon: 'fa-brands fa-microsoft', description: 'Desarrollo de soluciones corporativas, LINQ, Entity Framework y optimización de rendimiento.' },
+            { name: 'Python', icon: 'fa-brands fa-python', description: 'Scripting de automatización, análisis de datos y desarrollo backend con Django/FastAPI.' }
+          ] 
+        },
+        { 
+          category: 'Cloud Infrastructure & DevOps', 
+          skills: [
+            { name: 'Docker & Kubernetes', icon: 'fa-brands fa-docker', description: 'Orquestación de contendores, CI/CD pipelines y gestión de entornos aislados.' },
+            { name: 'Supabase / Postgres', icon: 'fas fa-database', description: 'Diseño de esquemas complejos, Stored Procedures, Triggers y optimización de índices.' },
+            { name: 'Redis', icon: 'fas fa-server', description: 'Estrategias de caching distribuido, Pub/Sub y gestión de sesiones de alta velocidad.' },
+            { name: 'Linux Hardening', icon: 'fa-brands fa-linux', description: 'Administración de servidores, scripting bash y seguridad de nivel kernel.' }
+          ] 
+        },
+        { 
+          category: 'Modern Frontend & Architecture', 
+          skills: [
+            { name: 'Angular', icon: 'fa-brands fa-angular', description: 'Aplicaciones SPA escalables, RxJS avanzado, señales y gestión de estado reactivo.' },
+            { name: 'Clean Architecture', icon: 'fas fa-project-diagram', description: 'Implementación estricta de principios SOLID, DDD y separación de responsabilidades.' },
+            { name: 'System Design', icon: 'fas fa-sitemap', description: 'Diseño de sistemas de alto nivel, patrones de diseño y diagramado de arquitectura.' }
+          ] 
+        }
       ],
       projects: [
         {
-          title: 'Arecofix Page',
-          description: 'Institutional website and e-commerce for Arecofix. Built with Angular and Tailwind CSS.',
-          image: '/assets/img/projects/arecofix.png',
-          tags: ['Angular', 'Tailwind', 'TypeScript'],
+          title: 'Sistema de Gestión para Ecommerce',
+          description: 'Sistema integral de gestión para E-commerce y Servicios Técnicos. Panel de administración robusto con control de inventario en tiempo real, gestión de ventas, seguimiento de órdenes de servicio, clientes, y reportes financieros detallados. Incluye facturación automatizada, integración con pasarelas de pago, y módulos de logística.',
+          image: 'assets/img/projects/panel.png',
+          techStack: ['Node.js', 'Angular', 'Supabase', 'Redis', 'Docker'],
+          features: ['Gestión de Inventario', 'CRM & Ventas', 'Reportes Financieros', 'Trazabilidad de Servicio'],
           link: 'https://arecofix.com.ar'
         },
         {
-          title: 'Management System',
-          description: 'Desktop application for business management developed in C# .NET.',
+          title: 'Enterprise ERP System with Java Spring',
+          description: 'Reingeniería de legacy a microservicios. Sistema distribuido para gestión de recursos empresariales en tiempo real.',
           image: 'assets/img/projects/panel.png',
-          tags: ['C#', '.NET', 'SQL Server']
+          techStack: ['Java 21', 'Spring Boot 3', 'Kafka', 'PostgreSQL'],
+          features: ['Event Sourcing', 'Distributed Tracing', 'CQRS Partner Integration']
+        }
+      ],
+      workExperience: [
+        {
+          position: 'Profesor de Reparación de Artículos Electrónicos',
+          company: 'IAP Marcos Paz',
+          period: '2025 - Presente',
+          description: 'Principalmente Reparación de Celulares. Dictado de cursos especializados en reparación de hardware, microelectrónica y diagnóstico de fallas. Formación técnica práctica y teórica para futuros técnicos.',
+          techStack: ['Microelectrónica', 'Hardware', 'Diagnóstico Avanzado']
         },
         {
-          title: 'Envión Registration',
-          description: 'Web platform for beneficiary registration using Django and Python.',
-          image: 'assets/img/projects/data.png',
-          tags: ['Django', 'Python', 'PostgreSQL']
+          position: 'Líder Técnico & Desarrollador Fullstack',
+          company: 'Arecofix',
+          period: '2020 - 2023',
+          description: 'Lideré la transformación digital del negocio, diseñando la arquitectura completa del sistema de gestión y ventas. Implementé CI/CD pipelines y optimicé el rendimiento del servidor en un 300%.',
+          techStack: ['Node.js', 'Angular', 'Supabase', 'Docker']
+        },
+        {
+          position: 'Instructor de Desarrollo de Software',
+          company: 'Eddis Educativa',
+          period: '2022 - Presente',
+          description: 'Capacitación de más de 50 alumnos en tecnologías web modernas, mentoreando proyectos finales y enseñando mejores prácticas de la industria.',
+          techStack: ['HTML/CSS/JS', 'Programación Lógica']
+        },
+        {
+          position: 'Equipo Técnico de Sistemas',
+          company: 'Municipio de Marcos Paz',
+          period: 'Until 2023', 
+          description: 'Mantenimiento y evolución de sistemas gubernamentales críticos. Gestión de bases de datos y soporte de infraestructura.',
+          techStack: ['Soporte IT', 'Redes', 'Sistemas Legacy']
         }
       ]
     },
-    es: {
+    en: {
       name: 'EZEQUIEL ENRICO ARECO',
-      title: 'Desarrollador Fullstack',
+      role: 'Senior Backend & Fullstack Engineer',
+      tagline: 'Scalable Solutions Architect | Node.js & Cloud Expert',
       location: 'Buenos Aires, Argentina',
-      phone: '+54 11 2596-0900',
       email: 'ezequielenrico15@gmail.com',
-      website: 'www.arecofix.com.ar',
       linkedin: 'https://www.linkedin.com/in/ezequiel-enrico/',
+      github: 'https://github.com/arecofix',
       cvUrl: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf',
-      summary: 'Profesional de sistemas, desarrollador Full-Stack. Actualmente trabajo en el sector gubernamental de equipo técnico y tengo experiencia como profesor de informática y tutor en cursos de Reparación de Celulares. Disfruto trabajando en equipo y valoro la colaboración y el intercambio de ideas. Busco nuevas oportunidades profesionales en el campo de la tecnología de la información.',
-      about: 'Bienvenido a mi portafolio en línea. Recuerda que en la sección acerca de encontrarás mi información personal. Aquí verás ejemplos de las herramientas con las que trabajo como desarrollador fullstack. Estoy especializado en el desarrollo web, utilizando tecnologías modernas como Angular, Tailwind CSS, TypeScript y frameworks como Django y Node.js.',
-      workExperience: [
+      about: 'Software Engineer with deep specialization in backend architecture, high-performance RESTful API design, and database optimization. My approach combines systems engineering robustness with modern methodologies like Clean Architecture and TDD. Committed to technical excellence, security, and scalability.',
+      backendHighlights: [
         {
-          position: 'Equipo Técnico',
-          company: 'Programa Envión, Municipio de Marcos Paz',
-          period: '2022 - Presente',
-          description: 'Formo parte del equipo técnico, gestionando sistemas y brindando soporte.'
+          title: 'Microservices Architecture',
+          icon: 'fas fa-server',
+          description: 'Design and implementation of decoupled distributed systems using Node.js and event-driven communication.',
+          stats: [{ label: 'Scalability', value: 'High' }, { label: 'Availability', value: '99.9%' }]
         },
         {
-          position: 'Policía Contravencional',
-          company: 'Secretaría de Seguridad',
-          period: '2020 - 2021',
-          description: 'Desempeño en la secretaría de seguridad.'
+          title: 'Database Optimization',
+          icon: 'fas fa-database',
+          description: 'Advanced SQL query tuning, strategic indexing, and efficient data modeling in PostgreSQL and Supabase.',
+          stats: [{ label: 'Query Time', value: '-60%' }, { label: 'Throughput', value: '2x' }]
         },
         {
-          position: 'Docente',
-          company: 'Eddis Educativa (Sede Morón y Marcos Paz)',
-          period: '2023 - Presente',
-          description: 'Dictado de cursos de informática y Reparación de Celulares.'
+          title: 'Security & Auth',
+          icon: 'fas fa-shield-alt',
+          description: 'Implementation of robust authentication schemes (JWT, OAuth2) and Row Level Security (RLS) policies with a DevSecOps focus.',
+          stats: [{ label: 'Compliance', value: 'OWASP' }, { label: 'Security', value: 'A+' }]
         }
       ],
-      education: [
+      codeSnippets: [
         {
-          degree: 'Licenciatura en Informática',
-          institution: 'Universidad Nacional del Oeste (UNO)',
-          period: 'Proyección 2024',
-          details: [
-            'Actualmente cursando las últimas materias.',
-            'Conocimientos en C#, HTML, CSS, JS, Python, PHP, ReactJS, SQL.',
-            'Frameworks: Bootstrap, Tailwind, Django.',
-            'Paquete Office (Avanzado).'
-          ]
+          title: 'Node.js Clean Architecture Controller',
+          language: 'typescript',
+          description: 'Implementation of a generic controller following SOLID principles and centralized error handling.',
+          code: `
+export class BaseController {
+  protected async execute(req: Request, res: Response): Promise<void | any> {
+    try {
+      await this.executeImpl(req, res);
+    } catch (error) {
+      console.error(\`[BaseController]: Uncaught controller error\`);
+      console.error(error);
+      this.fail(res, 'An unexpected error occurred');
+    }
+  }
+
+  public static jsonResponse(res: Response, code: number, message: string) {
+    return res.status(code).json({ message });
+  }
+}`
+        },
+        {
+          title: 'Supabase RLS Policy (SQL)',
+          language: 'sql',
+          description: 'Row Level Security policy to ensure data isolation by tenant.',
+          code: `
+-- Enable RLS
+ALTER TABLE "orders" ENABLE ROW LEVEL SECURITY;
+
+-- Create Policy
+CREATE POLICY "Tenant Isolation Policy"
+ON "orders"
+FOR ALL
+USING (
+  tenant_id = auth.jwt() ->> 'tenant_id'
+);`
         }
       ],
       technicalSkills: [
-        { name: 'Python', icon: 'fab fa-python', category: 'language', description: 'Me apasiona el desarrollo de Python, enfocándome en machine learning e inteligencia artificial.' },
-        { name: 'JavaScript', icon: 'fab fa-js', category: 'language', description: 'Creación de aplicaciones web interactivas, manipulación del DOM e interacción con APIs.' },
-        { name: 'C# .NET', icon: 'fab fa-microsoft', category: 'language', description: 'Desarrollo de aplicaciones de gestión empresarial utilizando Windows Forms y POO.' },
-        { name: 'Django', icon: 'fas fa-leaf', category: 'framework', description: 'Sitios web dinámicos y robustos con enrutamiento de URL, plantillas y gestión de BD.' },
-        { name: 'Node.js', icon: 'fab fa-node', category: 'framework', description: 'Construcción de APIs REST y CRUD, autenticación y bases de datos.' },
-        { name: 'PHP', icon: 'fab fa-php', category: 'language', description: 'Desarrollo de aplicaciones web robustas con frameworks como Laravel.' },
-        { name: 'Docker', icon: 'fab fa-docker', category: 'tool', description: 'Contenedorización para entornos de desarrollo y despliegue consistentes.' },
-        { name: 'Git', icon: 'fab fa-git-alt', category: 'tool', description: 'Control de versiones y trabajo colaborativo.' },
-        { name: 'MySQL', icon: 'fas fa-database', category: 'database', description: 'Gestión de bases de datos relacionales.' },
-        { name: 'Linux', icon: 'fab fa-linux', category: 'os', description: 'Manejo de servidores y línea de comandos.' }
-      ],
-      certifications: [
-        'Capacitación Codo a Codo Fullstack Python (2022)',
-        'Cursos JavaScript, ReactJS y SQL - Coderhouse (2021)',
-        'Curso de Base de Datos - Udemy (2021)',
-        'Curso Desarrollador Web Full-Stack - LinkedIn Learning (2020)',
-        'Inglés B2 (Avanzado)'
+        { 
+          category: 'High-Performance Backend', 
+          skills: [
+            { name: 'Java Enterprise', icon: 'fa-brands fa-java', description: 'Robust distributed systems, multithreading, and advanced memory management.' },
+            { name: 'Spring Boot', icon: 'fa-brands fa-envira', description: 'Microservices architecture, Spring Cloud, Spring Security, and Enterprise DI.' },
+            { name: 'Node.js', icon: 'fa-brands fa-node', description: 'Event-driven architecture, Streams API, and horizontal scalability for high-concurrency services.' },
+            { name: 'C# .NET', icon: 'fa-brands fa-microsoft', description: 'Corporate solutions development, LINQ, Entity Framework, and performance optimization.' },
+            { name: 'Python', icon: 'fa-brands fa-python', description: 'Automation scripting, data analysis, and backend development with Django/FastAPI.' }
+          ] 
+        },
+        { 
+          category: 'Cloud Infrastructure & DevOps', 
+          skills: [
+            { name: 'Docker & Kubernetes', icon: 'fa-brands fa-docker', description: 'Container orchestration, CI/CD pipelines, and isolated environment management.' },
+            { name: 'Supabase / Postgres', icon: 'fas fa-database', description: 'Complex schema design, Stored Procedures, Triggers, and index optimization.' },
+            { name: 'Redis', icon: 'fas fa-server', description: 'Distributed caching strategies, Pub/Sub, and high-speed session management.' },
+            { name: 'Linux Hardening', icon: 'fa-brands fa-linux', description: 'Server administration, bash scripting, and kernel-level security.' }
+          ] 
+        },
+        { 
+          category: 'Modern Frontend & Architecture', 
+          skills: [
+            { name: 'Angular', icon: 'fa-brands fa-angular', description: 'Scalable SPA applications, advanced RxJS, signals, and reactive state management.' },
+            { name: 'Clean Architecture', icon: 'fas fa-project-diagram', description: 'Strict implementation of SOLID principles, DDD, and separation of concerns.' },
+            { name: 'System Design', icon: 'fas fa-sitemap', description: 'High-level system design, design patterns, and architectural diagramming.' }
+          ] 
+        }
       ],
       projects: [
         {
-          title: 'Arecofix Page',
-          description: 'Sitio institucional y e-commerce para Arecofix. Construido con Angular y Tailwind CSS.',
-          image: 'assets/img/projects/arecofix.png',
-          tags: ['Angular', 'Tailwind', 'TypeScript'],
+          title: 'System Management for Ecommerce',
+          description: 'Comprehensive management system for E-commerce and Technical Services. Robust admin panel with real-time inventory control, sales management, service order tracking, clients, and detailed financial reports. Includes automated invoicing, payment gateway integration, and logistics modules.',
+          image: 'assets/img/projects/panel.png',
+          techStack: ['Node.js', 'Angular', 'Supabase', 'Redis', 'Docker'],
+          features: ['Inventory Management', 'CRM & Sales', 'Financial Reports', 'Service Traceability'],
           link: 'https://arecofix.com.ar'
         },
         {
-          title: 'Sistema de Gestión',
-          description: 'Aplicación de escritorio para gestión empresarial desarrollada en C# .NET.',
+          title: 'Enterprise ERP System with Java Spring',
+          description: 'Legacy to microservices re-engineering. Distributed system for real-time enterprise resource management.',
           image: 'assets/img/projects/panel.png',
-          tags: ['C#', '.NET', 'SQL Server']
+          techStack: ['Java 21', 'Spring Boot 3', 'Kafka', 'PostgreSQL'],
+          features: ['Event Sourcing', 'Distributed Tracing', 'CQRS Partner Integration']
+        }
+      ],
+      workExperience: [
+        {
+          position: 'Electronics Repair Professor',
+          company: 'IAP Marcos Paz',
+          period: '2025 - Present',
+          description: 'Mainly Cell Phone Repair. Teaching specialized courses in hardware repair, microelectronics, and fault diagnosis. Practical and theoretical technical training for future technicians.',
+          techStack: ['Microelectronics', 'Hardware', 'Advanced Diagnosis']
         },
         {
-          title: 'Registro Envión',
-          description: 'Plataforma web para registro de beneficiarios utilizando Django y Python.',
-          image: 'assets/img/projects/data.png',
-          tags: ['Django', 'Python', 'PostgreSQL']
+          position: 'Technical Lead & Fullstack Developer',
+          company: 'Arecofix',
+          period: '2020 - 2023',
+          description: 'Led the digital transformation of the business, designing the complete architecture of the management and sales system. Implemented CI/CD pipelines and optimized server performance by 300%.',
+          techStack: ['Node.js', 'Angular', 'Supabase', 'Docker']
+        },
+        {
+          position: 'Software Development Instructor',
+          company: 'Eddis Educativa',
+          period: '2022 - Present',
+          description: 'Training over 50 students in modern web technologies, mentoring final projects, and teaching industry best practices.',
+          techStack: ['HTML/CSS/JS', 'Logic Programming']
+        },
+        {
+          position: 'Systems Technical Team',
+          company: 'Municipality of Marcos Paz',
+          period: 'Until 2023',
+          description: 'Maintenance and evolution of critical government systems. Database management and infrastructure support.',
+          techStack: ['IT Support', 'Networking', 'Legacy Systems']
         }
       ]
     }
   };
 
   backgroundOptions = [
-    { id: 'gradient-5', name: 'Dark Gray', class: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black' },
-    { id: 'gradient-1', name: 'Blue Gradient', class: 'bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900' }
+    { id: 'gradient-5', name: 'Dark Gray', class: 'bg-surface-dark' },
   ];
 
   constructor(public preferencesService: PreferencesService) {}
@@ -245,14 +391,47 @@ export class PortfolioComponent implements OnInit {
     return this.portfolioContent[this.currentLanguage];
   }
 
-  get backgroundClass(): string {
-    const selected = this.backgroundOptions.find(bg => bg.id === this.preferencesService.getCurrentTheme());
-    return selected?.class || this.backgroundOptions[0].class;
-  }
-
   ngOnInit(): void {
     this.preferencesService.language$.subscribe(lang => {
       this.currentLanguage = lang;
     });
+
+    // Simulate realtime terminal updates
+    this.simulationSubscription = interval(2000).subscribe(() => {
+      this.simulateSystemActivity();
+    });
+    
+    this.terminalOutput = [
+      '> Initializing system...',
+      '> Connected to Supabase Engine v2.0',
+      '> Loading modules...',
+      '> System ready.'
+    ];
+  }
+
+  ngOnDestroy(): void {
+    if (this.simulationSubscription) {
+      this.simulationSubscription.unsubscribe();
+    }
+  }
+
+  simulateSystemActivity() {
+    // Randomly update latencies
+    this.systemStatuses.forEach(stat => {
+      const variation = Math.floor(Math.random() * 10) - 5;
+      stat.latency = Math.max(1, stat.latency + variation);
+    });
+
+    // Add random log
+    const logs = [
+      '[INFO] GET /api/v1/products 200 OK',
+      '[INFO] Auth Check: Token Valid',
+      '[DEBUG] Cache Hit: user_profile_123',
+      '[INFO] Supabase: Realtime subscription active',
+      '[WARN] High CPU load on Node-Worker-1 (transient)',
+    ];
+    const randomLog = logs[Math.floor(Math.random() * logs.length)];
+    this.terminalOutput.push(`> ${new Date().toLocaleTimeString()} ${randomLog}`);
+    if (this.terminalOutput.length > 8) this.terminalOutput.shift();
   }
 }

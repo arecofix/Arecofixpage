@@ -3,14 +3,6 @@
   <input id="repuestos-filter-drawer" type="checkbox" class="drawer-toggle" />
   
   <div class="drawer-content flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-     <!-- Navbar / Mobile Header for Filters -->
-     <div class="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-        <h2 class="font-bold text-gray-900 dark:text-white">Repuestos</h2>
-        <label for="repuestos-filter-drawer" class="btn btn-sm btn-ghost lg:hidden">
-          <i class="fas fa-sliders-h mr-2"></i> Filtros
-        </label>
-      </div>
-
     <!-- HERO SECTION -->
     <header class="relative bg-gray-900 text-white overflow-hidden isolate">
        <div class="absolute inset-0 bg-linear-to-r from-blue-900 to-indigo-900 opacity-80"></div>
@@ -22,7 +14,7 @@
            <div class="text-sm breadcrumbs text-blue-200 justify-center mb-6 flex">
                 <ul>
                 <li><a routerLink="/">Inicio</a></li>
-                <li><a routerLink="/products">Productos</a></li>
+                <li><a routerLink="/productos">Productos</a></li>
                 <li class="font-semibold text-white">Repuestos</li>
                 </ul>
             </div>
@@ -57,17 +49,23 @@
     </header>
 
     <!-- Main Content -->
-    <div class="flex-1 container mx-auto px-4 py-12">
-        
-        <!-- Toolbar -->
-         <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-800 gap-4">
-            <div class="text-gray-600 dark:text-gray-400 font-medium text-sm">
-                 @if (productsRs.value()) {
-                    Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> repuestos
-                  } @else {
-                    Cargando catálogo...
-                  }
-            </div>
+     <div class="flex-1 container mx-auto px-4 py-12">
+         
+         <!-- Toolbar -->
+          <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-800 gap-4">
+             <div class="w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                 <div class="text-gray-600 dark:text-gray-400 font-medium text-sm">
+                      @if (productsRs.value()) {
+                         Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> repuestos
+                       } @else {
+                         Cargando catálogo...
+                       }
+                 </div>
+                 
+                 <label for="repuestos-filter-drawer" class="btn btn-sm btn-outline rounded-full w-full sm:w-auto lg:hidden">
+                    <i class="fas fa-sliders-h mr-2"></i> Filtros
+                 </label>
+             </div>
             
              <div class="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
                 <!-- Badges Filter Quick Access (Optional) -->
@@ -112,7 +110,7 @@
                          <button (click)="applyFilter('category', 'all'); onSearch('')" class="btn btn-link text-blue-600">Ver todo</button>
                      </div>
                  } @else {
-                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-6">
                         @for (product of productsRs.value()?.data; track product.id; let i = $index) {
                             <product-card [product]="product" [isPriority]="i < 4" (quickView)="openQuickView($event)"/>
                         }

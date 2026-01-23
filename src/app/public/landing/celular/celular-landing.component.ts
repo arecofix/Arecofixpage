@@ -7,11 +7,13 @@ import {
 } from '@angular/core';
 import { CommonModule, DOCUMENT, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Title, Meta } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '@app/core/services/auth.service';
-import { SeoService } from '@app/shared/services/seo.service'; // Added import
+import { SeoService } from '@app/core/services/seo.service';
+import { LoggerService } from '@app/core/services/logger.service';
+import { ContactService, CreateMessageDto } from '@app/core/services/contact.service';
+import { NotificationService } from '@app/core/services/notification.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
 import { ProductCarouselComponent } from '@app/shared/components/product-carousel/product-carousel.component';
 import { BreadcrumbsComponent } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
@@ -28,6 +30,9 @@ import {
   REVIEWS,
   SPECIAL_OFFERS,
   TECH_BEST,
+  SEO_CONTENT,
+  WHY_US,
+  LOCATION_DATA
 } from './celular-landing.data';
 
 interface GalleryItem {
@@ -53,11 +58,14 @@ interface GalleryItem {
   templateUrl: './celular-landing.component.html',
 })
 export class CelularLandingComponent implements OnInit {
-  private seoService = inject(SeoService); // Injected SeoService
+  private seoService = inject(SeoService);
+  private contactService = inject(ContactService);
+  private notificationService = inject(NotificationService);
   private document = inject(DOCUMENT);
   private platformId = inject(PLATFORM_ID);
-  private auth = inject(AuthService);
+  private auth = inject(AuthService); // Kept if needed for other things, but logic moved
   private cdr = inject(ChangeDetectorRef);
+  private logger = inject(LoggerService);
 
   whatsappNumber = environment.contact.whatsappNumber;
 
@@ -79,6 +87,9 @@ export class CelularLandingComponent implements OnInit {
   blogFeatures = BLOG_FEATURES;
   appInfo = APP_INFO;
   relatedServices = RELATED_SERVICES;
+  seoContent = SEO_CONTENT;
+  whyUs = WHY_US;
+  locationData = LOCATION_DATA;
 
   // Contact Form Data
   contactName = '';
@@ -92,19 +103,11 @@ export class CelularLandingComponent implements OnInit {
   }
 
   setSEO() {
-    this.seoService.setSeoData({
-      title: 'Servicio Técnico de Celulares en Marcos Paz | Reparación iPhone, Samsung, Motorola | Arecofix',
-      description: 'Arreglo de celulares en Marcos Paz. Presupuesto sin cargo y garantía escrita. Cambio de pantalla y batería en el acto. Servicio técnico oficial para iPhone, Samsung y Motorola.',
-      keywords: 'Reparación de celulares en Marcos Paz, accesorios para celulares, local especializado en reparación de celulares, servicio técnico oficial iPhone Samsung Motorola, cambio de pantalla, arreglo de bateria, Arecofix',
-      ogImage: 'https://arecofix.com/assets/img/branding/og-celulares.jpg',
-      ogUrl: 'https://arecofix.com/#/celular',
-      ogTitle: 'Servicio Técnico de Celulares en Marcos Paz | Arecofix',
-      ogDescription: 'Reparación profesional de celulares. Confía en los expertos. Presupuesto sin cargo.',
-      additionalMetaTags: [
-        { name: 'geo.region', content: 'AR-B' },
-        { name: 'geo.placename', content: 'Marcos Paz' }
-      ]
-    });
+    this.seoService.setPageData(
+      'Servicio Tecnico Reparacion de Celulares en Marcos paz',
+      'Arreglamos tu celular en el día. Servicio técnico premium en Marcos Paz para iPhone, Samsung y Motorola. ¡Consultanos!',
+      'assets/img/repair/10.jpg'
+    );
   }
 
   setStructuredData() {
@@ -163,39 +166,40 @@ export class CelularLandingComponent implements OnInit {
 
   async sendContactForm() {
     if (!this.contactName || !this.contactPhone || !this.contactMessage) {
-      alert('Por favor completa todos los campos');
+      this.notificationService.showWarning('Por favor completa todos los campos.');
       return;
     }
 
     this.sendingContact = true;
     this.cdr.markForCheck();
 
-    try {
-      const supabase = this.auth.getSupabaseClient();
-
-      await supabase.from('contact_messages').insert({
+    const contactData: CreateMessageDto = {
         name: this.contactName,
         phone: this.contactPhone,
-        email: 'lp-celular@arecofix.com',
+        email: 'lp-celular@arecofix.com', // Explicitly setting destination/source email for this landing
         subject: 'Consulta desde Landing Celulares',
         message: this.contactMessage,
-        is_read: false,
-      });
+    };
 
-      alert('¡Consulta enviada con éxito! Te responderemos a la brevedad.');
-      this.contactName = '';
-      this.contactPhone = '';
-      this.contactMessage = '';
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const text = `Hola Arecofix, soy ${this.contactName}. ${this.contactMessage}`;
-      window.open(
-        `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(text)}`,
-        '_blank'
-      );
-    } finally {
-      this.sendingContact = false;
-      this.cdr.markForCheck();
+    const { error } = await this.contactService.createMessage(contactData);
+
+    if (error) {
+         this.logger.error('Error sending message:', error);
+         this.notificationService.showError('Hubo un problema al enviar el mensaje. Redireccionando a WhatsApp...');
+         
+         const text = `Hola Arecofix, soy ${this.contactName}. ${this.contactMessage}`;
+         window.open(
+            `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(text)}`,
+            '_blank'
+         );
+    } else {
+        this.notificationService.showSuccess('¡Consulta enviada con éxito! Te responderemos a la brevedad.');
+        this.contactName = '';
+        this.contactPhone = '';
+        this.contactMessage = '';
     }
+
+    this.sendingContact = false;
+    this.cdr.markForCheck();
   }
 }

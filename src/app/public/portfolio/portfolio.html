@@ -1,246 +1,317 @@
-<div
-  [ngClass]="[backgroundClass, (preferencesService.highContrast$ | async) ? 'high-contrast' : '']"
-  [style.font-size.px]="(preferencesService.fontSize$ | async)"
-  class="min-h-screen transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans"
->
+<div class="min-h-screen bg-surface-dark text-gray-300 font-mono selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+  
+  <!-- Background Grid Effect -->
+  <div class="fixed inset-0 z-0 pointer-events-none opacity-20" 
+       style="background-image: linear-gradient(#1f2937 1px, transparent 1px), linear-gradient(90deg, #1f2937 1px, transparent 1px); background-size: 40px 40px;">
+  </div>
 
-  <!-- Main Content -->
-  <div class="pt-8 pb-16" [class.pr-80]="(preferencesService.sidebarOpen$ | async)">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Main Content Wrapper -->
+  <div class="relative z-10 pt-20 pb-20 lg:ml-20"> <!-- Margin left for sidebar if exists, adjusted -->
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
 
-      <!-- Hero / Header Section -->
-      <div class="bg-white dark:bg-white/5 backdrop-blur-lg border border-gray-200 dark:border-white/10 rounded-3xl p-8 sm:p-12 mb-12 hover:shadow-xl hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 shadow-2xl relative overflow-hidden group">
-        <!-- Decorative Glow -->
-        <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/30 rounded-full blur-3xl group-hover:bg-indigo-500/20 dark:group-hover:bg-indigo-500/40 transition-all duration-500"></div>
-        
-        <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-          <div class="flex-1 text-center md:text-left">
-            <h1 class="text-4xl sm:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
+      <!-- HERO SECTION -->
+      <section class="grid lg:grid-cols-2 gap-12 items-center">
+        <div class="space-y-8 animate-fade-in-up">
+          <div class="space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              </span>
+              Available for Hire
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-white tracking-tight">
               {{ currentContent.name }}
             </h1>
-            <p class="text-xl sm:text-2xl text-indigo-600 dark:text-indigo-300 font-medium mb-6">{{ currentContent.title }}</p>
-            
-            <div class="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600 dark:text-gray-300 mb-8">
-              <span class="flex items-center gap-2 bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full border border-gray-200 dark:border-white/10">
-                📍 {{ currentContent.location }}
-              </span>
-              <a href="mailto:{{ currentContent.email }}" class="flex items-center gap-2 bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full border border-gray-200 dark:border-white/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all">
-                📧 {{ currentContent.email }}
-              </a>
-              <a href="tel:{{ currentContent.phone }}" class="flex items-center gap-2 bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full border border-gray-200 dark:border-white/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all">
-                📱 {{ currentContent.phone }}
-              </a>
+            <h2 class="text-2xl md:text-3xl text-cyan-500 font-semibold">
+              {{ currentContent.role }}
+            </h2>
+            <div class="flex flex-col gap-2 text-gray-300 font-mono text-sm py-2">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-phone text-cyan-500"></i>
+                <a href="tel:1125960900" class="hover:text-white transition-colors">1125960900</a>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-envelope text-cyan-500"></i>
+                <a href="mailto:EzequielEnrico15@gmail.com" class="hover:text-white transition-colors">EzequielEnrico15@gmail.com</a>
+              </div>
             </div>
-
-            <div class="flex flex-wrap justify-center md:justify-start gap-4">
-              <a [href]="currentContent.cvUrl" download class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-500/25 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                {{ currentLanguage === 'es' ? 'Descargar CV' : 'Download CV' }}
-              </a>
-              <a routerLink="/contacto" class="px-8 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white font-bold rounded-xl transition-all backdrop-blur-sm border border-gray-200 dark:border-white/10">
-                {{ currentLanguage === 'es' ? 'Contactar' : 'Contact Me' }}
-              </a>
-            </div>
+            <p class="text-lg text-gray-400 max-w-xl leading-relaxed border-l-4 border-cyan-700/50 pl-4">
+              {{ currentContent.tagline }}
+            </p>
           </div>
-          
-          <!-- Profile Image Placeholder -->
-          <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-white dark:border-white/10 shadow-2xl overflow-hidden bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0">
-             <img src="/assets/img/perfil.jpeg" alt="Profile" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity">
+
+          <div class="flex flex-wrap gap-4">
+            <a [href]="currentContent.cvUrl" download class="group relative px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-all shadow-[0_0_20px_rgba(8,145,178,0.3)] hover:shadow-[0_0_30px_rgba(8,145,178,0.5)] overflow-hidden">
+              <div class="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <span class="relative flex items-center gap-2">
+                <i class="fas fa-download"></i> Download CV
+              </span>
+            </a>
+            <a [href]="currentContent.linkedin" target="_blank" class="px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all flex items-center gap-2">
+              <i class="fab fa-linkedin"></i> LinkedIn
+            </a>
+            <a [href]="currentContent.github" target="_blank" class="px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all flex items-center gap-2">
+              <i class="fab fa-github"></i> GitHub
+            </a>
           </div>
         </div>
-      </div>
 
-      <!-- About Section -->
-      <div class="grid md:grid-cols-3 gap-8 mb-12">
-        <div class="md:col-span-2 bg-white dark:bg-white/5 backdrop-blur-lg border border-gray-200 dark:border-white/10 rounded-3xl p-8 hover:shadow-lg hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 shadow-lg dark:shadow-none">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <span class="text-indigo-600 dark:text-indigo-400">👋</span>
-            {{ currentLanguage === 'es' ? 'Sobre Mí' : 'About Me' }}
-          </h2>
-          <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-lg mb-4">
-            {{ currentContent.about }}
-          </p>
-          <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
-            {{ currentContent.summary }}
-          </p>
+        <!-- HERO TERMINAL -->
+        <div class="relative group">
+          <div class="absolute -inset-1 bg-linear-to-r from-cyan-600 to-blue-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+          <div class="relative bg-[#0d1017] rounded-lg border border-gray-800 shadow-2xl overflow-hidden font-mono text-sm leading-relaxed">
+            <!-- Terminal Header -->
+            <div class="bg-[#1a1d2d] px-4 py-2 flex items-center gap-2 border-b border-gray-800">
+              <div class="flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div class="text-gray-500 text-xs ml-4">root@server:~</div>
+            </div>
+            <!-- Terminal Body -->
+            <div class="p-6 text-gray-300 h-[300px] overflow-hidden flex flex-col justify-end">
+              <div class="opacity-50 mb-4">
+                <span class="text-green-500">➜</span> <span class="text-cyan-400">~</span> neofetch
+              </div>
+              <div class="grid grid-cols-[120px_1fr] gap-6 mb-4">
+                <div class="text-cyan-500 select-none">
+       _  _
+      (o)(o)
+      /    \
+     (_/__\_)
+    _/      \_
+                </div>
+                <div class="space-y-1 text-xs md:text-sm">
+                  <div><span class="text-cyan-500 font-bold">OS</span>: Arch Linux x86_64</div>
+                  <div><span class="text-cyan-500 font-bold">Kernel</span>: 5.15.0-76-generic</div>
+                  <div><span class="text-cyan-500 font-bold">Uptime</span>: 5 years, 3 months</div>
+                  <div><span class="text-cyan-500 font-bold">Shell</span>: zsh 5.8</div>
+                  <div><span class="text-cyan-500 font-bold">Backend</span>: Node.js, Python, Java</div>
+                  <div><span class="text-cyan-500 font-bold">Database</span>: Supabase (PostgreSQL), Redis</div>
+                </div>
+              </div>
+              <div *ngFor="let line of terminalOutput" class="animate-fade-in-up">
+                <span class="text-gray-500">{{line}}</span>
+              </div>
+              <div class="flex items-center">
+                <span class="text-green-500 mr-2">➜</span>
+                <span class="animate-pulse">_</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SYSTEM STATUS / DASHBOARD -->
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div *ngFor="let status of systemStatuses" class="bg-[#131620] border border-gray-800 p-4 rounded-xl hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-400 text-sm">{{ status.name }}</span>
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+            </div>
+          </div>
+          <div class="flex items-end justify-between">
+            <div>
+              <div class="text-xl font-mono text-white">{{ status.latency }}ms</div>
+              <div class="text-xs text-gray-500">Latency</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-mono text-cyan-500">{{ status.uptime }}</div>
+              <div class="text-xs text-gray-500">Uptime</div>
+            </div>
+          </div>
+          <!-- Tiny chart visualization -->
+          <div class="mt-3 flex items-end gap-1 h-8 opacity-30">
+            <div class="flex-1 bg-cyan-500 h-[40%] rounded-xs"></div>
+            <div class="flex-1 bg-cyan-500 h-[70%] rounded-xs"></div>
+            <div class="flex-1 bg-cyan-500 h-[50%] rounded-xs"></div>
+            <div class="flex-1 bg-cyan-500 h-[90%] rounded-xs"></div>
+            <div class="flex-1 bg-cyan-500 h-[60%] rounded-xs"></div>
+            <div class="flex-1 bg-cyan-500 h-[80%] rounded-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BACKEND HIGHLIGHTS & ARCHITECTURE -->
+      <section>
+        <div class="flex items-center gap-4 mb-12">
+          <h2 class="text-3xl font-bold text-white">Engineering <span class="text-cyan-500">Excellence</span></h2>
+          <div class="h-px flex-1 bg-gray-800"></div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8 mb-16">
+          <div *ngFor="let item of currentContent.backendHighlights" class="bg-[#131620] border border-gray-800 p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group">
+            <div class="w-14 h-14 bg-cyan-500/10 rounded-lg flex items-center justify-center text-2xl text-cyan-500 mb-6 group-hover:bg-cyan-500 group-hover:text-black transition-colors">
+              <i [class]="item.icon"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">{{ item.title }}</h3>
+            <p class="text-gray-400 leading-relaxed mb-6 h-20">{{ item.description }}</p>
+            
+            <div class="grid grid-cols-2 gap-4 pt-6 border-t border-gray-800/50">
+              <div *ngFor="let stat of item.stats">
+                <div class="text-2xl font-mono font-bold text-white">{{ stat.value }}</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider">{{ stat.label }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Snippet Viewer -->
+        <div class="bg-[#0d1017] rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
+            <div class="flex border-b border-gray-800 overflow-x-auto">
+              <button *ngFor="let snippet of currentContent.codeSnippets; let i = index"
+                      (click)="activeSnippetIndex = i"
+                      class="px-6 py-4 text-sm font-medium border-r border-gray-800 hover:bg-[#1a1d2d] transition-colors whitespace-nowrap"
+                      [ngClass]="activeSnippetIndex === i ? 'bg-[#1a1d2d] text-cyan-400 border-b-2 border-b-cyan-500' : 'text-gray-500'">
+                {{ snippet.title }}
+              </button>
+            </div>
+            <div class="p-0 grid md:grid-cols-[1fr_300px]">
+              <div class="bg-[#0d1017] p-6 overflow-x-auto">
+                <pre class="font-mono text-sm leading-relaxed"><code class="language-typescript text-gray-300">{{ currentContent.codeSnippets[activeSnippetIndex].code }}</code></pre>
+              </div>
+              <div class="bg-[#131620] p-6 border-l border-gray-800">
+                <h4 class="text-white font-bold mb-4">Code Analysis</h4>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                  {{ currentContent.codeSnippets[activeSnippetIndex].description }}
+                </p>
+                <div class="mt-8">
+                  <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Tech Stack</div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="px-2 py-1 bg-cyan-900/30 text-cyan-300 text-xs rounded-md border border-cyan-500/20">TypeScript</span>
+                    <span class="px-2 py-1 bg-blue-900/30 text-blue-300 text-xs rounded-md border border-blue-500/20">Clean Arch</span>
+                    <span class="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded-md border border-purple-500/20">Solid</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </section>
+
+      <!-- SKILLS WITH METERS -->
+      <!-- SKILLS MATRIX -->
+      <section>
+        <div class="flex items-center gap-4 mb-12">
+          <h2 class="text-3xl font-bold text-white">Technical <span class="text-cyan-500">Mastery</span></h2>
+          <div class="h-px flex-1 bg-gray-800"></div>
         </div>
         
-        <!-- Quick Stats / Highlights -->
-        <div class="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-600/20 dark:to-purple-600/20 backdrop-blur-lg border border-indigo-200 dark:border-indigo-500/20 rounded-3xl p-8 flex flex-col justify-center shadow-lg dark:shadow-none">
-          <div class="space-y-6">
-            <div>
-              <div class="text-3xl font-bold text-indigo-700 dark:text-white mb-1">5+</div>
-              <div class="text-indigo-600 dark:text-indigo-200 text-sm uppercase tracking-wide">{{ currentLanguage === 'es' ? 'Años de Experiencia' : 'Years Experience' }}</div>
-            </div>
-            <div>
-              <div class="text-3xl font-bold text-indigo-700 dark:text-white mb-1">10+</div>
-              <div class="text-indigo-600 dark:text-indigo-200 text-sm uppercase tracking-wide">{{ currentLanguage === 'es' ? 'Proyectos Completados' : 'Projects Completed' }}</div>
-            </div>
-            <div>
-              <div class="text-3xl font-bold text-indigo-700 dark:text-white mb-1">100%</div>
-              <div class="text-indigo-600 dark:text-indigo-200 text-sm uppercase tracking-wide">{{ currentLanguage === 'es' ? 'Compromiso' : 'Commitment' }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skills Grid -->
-      <div class="mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-          <span class="w-8 h-1 bg-indigo-500 rounded-full"></span>
-          {{ currentLanguage === 'es' ? 'Habilidades Técnicas' : 'Technical Skills' }}
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          @for (skill of currentContent.technicalSkills; track skill.name) {
-            <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6 text-center hover:bg-gray-50 dark:hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 group cursor-default shadow-sm dark:shadow-none">
-              <div class="text-4xl mb-3 text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-800 dark:group-hover:text-white transition-colors">
-                <i [class]="skill.icon"></i>
-              </div>
-              <h3 class="font-bold text-gray-900 dark:text-white mb-1">{{ skill.name }}</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400">{{ skill.category }}</p>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Projects Section -->
-      <div class="mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-          <span class="w-8 h-1 bg-indigo-500 rounded-full"></span>
-          {{ currentLanguage === 'es' ? 'Proyectos Destacados' : 'Featured Projects' }}
-        </h2>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          @for (project of currentContent.projects; track project.title) {
-            <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 group shadow-lg dark:shadow-none">
-              <div class="h-48 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
-                <!-- Placeholder for project image -->
-                <div class="absolute inset-0 bg-linear-to-t from-gray-900 to-transparent opacity-60 z-10"></div>
-                <img [src]="project.image" [alt]="project.title" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-              </div>
-              <div class="p-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ project.title }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
-                <div class="flex flex-wrap gap-2 mb-6">
-                  @for (tag of project.tags; track tag) {
-                    <span class="px-2 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs rounded-md border border-indigo-200 dark:border-indigo-500/20">
-                      {{ tag }}
-                    </span>
-                  }
+        <div class="grid lg:grid-cols-3 gap-8">
+          <div *ngFor="let category of currentContent.technicalSkills" class="bg-surface-dark p-6 rounded-2xl border border-gray-800/50 hover:border-cyan-500/30 transition-all duration-300">
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+              <i class="fas fa-layer-group text-cyan-500"></i>
+              {{ category.category }}
+            </h3>
+            <div class="space-y-6">
+              <div *ngFor="let skill of category.skills" class="group flex gap-4 items-start p-3 rounded-lg hover:bg-gray-800/30 transition-colors">
+                <div class="w-10 h-10 rounded-lg bg-[#1a1d2d] flex items-center justify-center shrink-0 border border-gray-700/50 group-hover:border-cyan-500/50 group-hover:bg-cyan-900/10 transition-all">
+                  <i [class]="skill.icon + ' text-xl text-gray-400 group-hover:text-cyan-400 transition-colors'"></i>
                 </div>
-                <div class="flex gap-3">
-                  @if (project.link) {
-                    <a [href]="project.link" target="_blank" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-lg text-sm font-semibold transition-colors">
-                      Demo
-                    </a>
-                  }
-                  @if (project.github) {
-                    <a [href]="project.github" target="_blank" class="flex-1 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white text-center rounded-lg text-sm font-semibold transition-colors">
-                      Code
-                    </a>
-                  }
+                <div>
+                  <h4 class="text-white font-bold text-sm tracking-wide group-hover:text-cyan-300 transition-colors">{{ skill.name }}</h4>
+                  <p class="text-gray-500 text-xs mt-1 leading-relaxed">{{ skill.description }}</p>
                 </div>
               </div>
             </div>
-          }
-        </div>
-      </div>
-
-      <!-- Experience & Education Timeline -->
-      <div class="grid lg:grid-cols-2 gap-12 mb-12">
-        <!-- Experience -->
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-            <span class="text-indigo-600 dark:text-indigo-400">💼</span>
-            {{ currentLanguage === 'es' ? 'Experiencia Laboral' : 'Work Experience' }}
-          </h2>
-          <div class="space-y-8 border-l-2 border-gray-200 dark:border-white/10 ml-3 pl-8 relative">
-            @for (exp of currentContent.workExperience; track exp.company) {
-              <div class="relative">
-                <span class="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white dark:border-gray-900"></span>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ exp.position }}</h3>
-                <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">{{ exp.company }}</p>
-                <span class="inline-block px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-xs text-gray-600 dark:text-gray-300 mb-3 border border-gray-200 dark:border-white/10">
-                  {{ exp.period }}
-                </span>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-3">{{ exp.description }}</p>
-                @if (exp.achievements) {
-                  <ul class="space-y-1">
-                    @for (achievement of exp.achievements; track achievement) {
-                      <li class="text-gray-500 text-xs flex gap-2">
-                        <span class="text-indigo-500">•</span> {{ achievement }}
-                      </li>
-                    }
-                  </ul>
-                }
-              </div>
-            }
           </div>
         </div>
+      </section>
 
-        <!-- Education -->
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-            <span class="text-indigo-600 dark:text-indigo-400">🎓</span>
-            {{ currentLanguage === 'es' ? 'Educación' : 'Education' }}
-          </h2>
-          <div class="space-y-8 border-l-2 border-gray-200 dark:border-white/10 ml-3 pl-8 relative">
-            @for (edu of currentContent.education; track edu.institution) {
-              <div class="relative">
-                <span class="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-purple-500 border-4 border-white dark:border-gray-900"></span>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ edu.degree }}</h3>
-                <p class="text-purple-600 dark:text-purple-400 font-medium mb-2">{{ edu.institution }}</p>
-                <span class="inline-block px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-xs text-gray-600 dark:text-gray-300 mb-3 border border-gray-200 dark:border-white/10">
-                  {{ edu.period }}
-                </span>
-                <ul class="space-y-2">
-                  @for (detail of edu.details; track detail) {
-                    <li class="text-gray-600 dark:text-gray-400 text-sm flex gap-2">
-                      <span class="text-purple-500 mt-1">▸</span>
-                      <span>{{ detail }}</span>
-                    </li>
-                  }
-                </ul>
+      <!-- EXPERIENCE -->
+      <section>
+        <div class="flex items-center gap-4 mb-12">
+          <h2 class="text-3xl font-bold text-white">Experience <span class="text-cyan-500">Log</span></h2>
+          <div class="h-px flex-1 bg-gray-800"></div>
+        </div>
+
+        <div class="relative border-l border-gray-800 ml-4 md:ml-8 space-y-16">
+          <div *ngFor="let exp of currentContent.workExperience" class="relative pl-8 md:pl-12">
+            <!-- Timeline Dot -->
+            <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-[#0f111a] border-4 border-cyan-600 shadow-[0_0_10px_rgba(8,145,178,0.5)]"></div>
+            
+            <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
+              <div>
+                <h3 class="text-2xl font-bold text-white">{{ exp.position }}</h3>
+                <div class="text-cyan-500 text-lg">{{ exp.company }}</div>
               </div>
-            }
-          </div>
-
-            <div class="mt-12">
-              <app-certificate-gallery [title]="'Algunas de mis certificaciones'"></app-certificate-gallery>
+              <div class="px-4 py-1 bg-gray-800 rounded-full text-xs font-mono text-gray-300 border border-gray-700">
+                {{ exp.period }}
+              </div>
             </div>
             
-            <div class="mt-12">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-              <span class="text-indigo-600 dark:text-indigo-400">📜</span>
-              {{ currentLanguage === 'es' ? 'Certificaciones' : 'Certifications' }}
-            </h2>
-            <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm dark:shadow-none">
-              <ul class="space-y-3">
-                @for (cert of currentContent.certifications; track cert) {
-                  <li class="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-                    <svg class="w-5 h-5 text-green-500 dark:text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    {{ cert }}
-                  </li>
-                }
-              </ul>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6 max-w-4xl">
+              {{ exp.description }}
+            </p>
+            
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let tech of exp.techStack" class="px-3 py-1 bg-[#1a1d2d] hover:bg-gray-800 text-gray-300 hover:text-white text-xs font-mono rounded border border-gray-700 hover:border-cyan-500/50 transition-colors">
+                <span class="text-cyan-500 mr-1">$</span> {{ tech }}
+              </span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Footer -->
-      <div class="border-t border-gray-200 dark:border-white/10 pt-8 pb-8 text-center">
-        <p class="text-gray-500 dark:text-gray-400 text-sm">
-          © 2025 Ezequiel Enrico Areco. {{ currentLanguage === 'es' ? 'Todos los derechos reservados.' : 'All rights reserved.' }}
-        </p>
-        <div class="flex justify-center gap-4 mt-4">
-          <a href="#" class="text-gray-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><i class="fab fa-github text-xl"></i></a>
-          <a [href]="currentContent.linkedin" target="_blank" class="text-gray-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><i class="fab fa-linkedin text-xl"></i></a>
-          <a href="mailto:{{ currentContent.email }}" class="text-gray-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><i class="fas fa-envelope text-xl"></i></a>
+      <!-- PROJECTS SHOWCASE -->
+      <section class="pb-20">
+        <div class="flex items-center gap-4 mb-12">
+          <h2 class="text-3xl font-bold text-white">Deployed <span class="text-cyan-500">Systems</span></h2>
+          <div class="h-px flex-1 bg-gray-800"></div>
         </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div *ngFor="let project of currentContent.projects" class="group relative bg-[#131620] rounded-xl overflow-hidden border border-gray-800 hover:border-cyan-500/50 transition-all duration-300">
+            <div class="aspect-video bg-gray-900 relative overflow-hidden">
+               <div class="absolute inset-0 bg-linear-to-b from-transparent to-[#131620] z-10 opacity-90 transition-opacity group-hover:opacity-40"></div>
+               <img [src]="project.image" class="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700 opacity-50 group-hover:opacity-100" />
+            </div>
+            
+            <div class="p-8 relative z-20 -mt-10">
+              <h3 class="text-2xl font-bold text-white mb-2">{{ project.title }}</h3>
+              <p class="text-gray-400 mb-6 line-clamp-2">{{ project.description }}</p>
+              
+              <div class="flex flex-wrap gap-2 mb-6">
+                <span *ngFor="let tag of project.techStack" class="text-xs text-cyan-400 bg-cyan-900/20 px-2 py-1 rounded border border-cyan-500/20">
+                  {{ tag }}
+                </span>
+              </div>
+
+              <div class="flex gap-4">
+                 <a *ngIf="project.link" [href]="project.link" target="_blank" class="text-sm font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
+                   <i class="fas fa-external-link-alt"></i> Live Demo
+                 </a>
+                 <a *ngIf="project.github" [href]="project.github" target="_blank" class="text-sm font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
+                   <i class="fab fa-github"></i> Source Code
+                 </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer / Contact CTA -->
+      <div class="text-center pt-20 border-t border-gray-800">
+        <h2 class="text-3xl font-bold text-white mb-6">Ready to Scale Your Team?</h2>
+        <div class="flex justify-center gap-4">
+             <a routerLink="/contacto" class="px-8 py-3 bg-cyan-600 text-white rounded-lg font-bold hover:bg-cyan-500 transition-colors shadow-lg shadow-cyan-500/20 cursor-pointer">
+               Initialize Contact Protocol
+             </a>
+        </div>
+        
+        <div class="mt-16 text-left">
+           <app-certificate-gallery [title]="'Verified Credentials'"></app-certificate-gallery>
+        </div>
+
+        <p class="mt-8 text-gray-600 font-mono text-xs text-center">
+          SYSTEM_ID: EZEQUIEL-ENRICO-V2.5.0 // STATUS: ONLINE
+        </p>
       </div>
 
     </div>

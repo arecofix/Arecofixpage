@@ -3,30 +3,20 @@
   <input id="shop-filters-drawer" type="checkbox" class="drawer-toggle" />
   
   <div class="drawer-content flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Navbar / Mobile Header for Filters -->
-    <div class="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-      <h2 class="font-bold text-gray-900 dark:text-white">Productos</h2>
-      <label for="shop-filters-drawer" class="btn btn-sm btn-ghost lg:hidden">
-        <i class="fas fa-sliders-h mr-2"></i> Filtros
-      </label>
-    </div>
-
     <!-- HERO SECTION -->
     <header class="relative bg-gray-900 text-white overflow-hidden isolate">
-      <!-- Background Effects -->
-      <div class="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-gray-900 bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-100),white)] dark:bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-900),transparent)] opacity-20"></div>
-      <div class="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center opacity-10 dark:opacity-5"></div>
-      
-      <!-- Gradient Overlay -->
-      <div class="absolute inset-0 bg-linear-to-r from-gray-900/90 to-gray-800/90 backdrop-blur-sm z-0"></div>
+       <!-- Background Effects -->
+       <!-- Background Effects -->
+       <div class="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-gray-900 bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-100),white)] dark:bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-900),transparent)] opacity-20 pointer-events-none"></div>
+       <div class="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center opacity-10 dark:opacity-5 pointer-events-none"></div>
+       
+       <!-- Gradient Overlay -->
+       <div class="absolute inset-0 bg-linear-to-r from-gray-900/90 to-gray-800/90 backdrop-blur-sm z-0 pointer-events-none"></div>
 
-      <div class="relative container mx-auto px-4 py-16 sm:py-24 text-center">
+       <div class="relative container mx-auto px-4 py-16 sm:py-24 text-center">
         <!-- Breadcrumbs -->
-        <div class="text-sm breadcrumbs text-gray-400 justify-center mb-6 flex relative z-10">
-            <ul>
-                <li><a routerLink="/" class="hover:text-white transition-colors">Inicio</a></li>
-                <li class="font-semibold text-white">Productos</li>
-            </ul>
+        <div class="flex justify-center mb-6 relative z-10">
+            <app-breadcrumbs [items]="breadcrumbItems()" classes="justify-center text-gray-400 !text-gray-400" activeClasses="!text-white"></app-breadcrumbs>
         </div>
 
         <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">
@@ -63,12 +53,18 @@
     <div class="flex-1 container mx-auto px-4 py-12">
         <!-- Results Header & Sort Controls (Desktop) -->
         <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-800 gap-4">
-            <div class="text-gray-600 dark:text-gray-400 font-medium">
-                @if (productsRs.value()) {
-                  Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> resultados
-                } @else {
-                  Cargando catálogo...
-                }
+            <div class="w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div class="text-gray-600 dark:text-gray-400 font-medium">
+                    @if (productsRs.value()) {
+                      Mostrando <span class="text-gray-900 dark:text-white font-bold">{{ productsRs.value()?.items }}</span> resultados
+                    } @else {
+                      Cargando catálogo...
+                    }
+                </div>
+                
+                <label for="shop-filters-drawer" class="btn btn-sm btn-outline rounded-full w-full sm:w-auto lg:hidden">
+                    <i class="fas fa-sliders-h mr-2"></i> Filtros
+                </label>
             </div>
             
             <div class="flex items-center gap-3">
@@ -110,7 +106,7 @@
                         </button>
                     </div>
                 } @else {
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-8">
                         @for (product of productsRs.value()!.data; track product.id; let i = $index) {
                             <product-card 
                                 [product]="product" 
@@ -230,9 +226,9 @@
                     <i class="fas fa-layer-group text-indigo-500"></i> Categorías Rápidas
                 </h4>
                 <ul class="space-y-2">
-                    <li><a routerLink="/products/category/repuestos" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Repuestos</a></li>
-                    <li><a routerLink="/products/category/herramientas" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Herramientas</a></li>
-                    <li><a routerLink="/products/category/accesorios" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Accesorios</a></li>
+                    <li><a routerLink="/productos/categoria/repuestos" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Repuestos</a></li>
+                    <li><a routerLink="/productos/categoria/herramientas" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Herramientas</a></li>
+                    <li><a routerLink="/productos/categoria/accesorios" class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Accesorios</a></li>
                 </ul>
             </div>
         </div>

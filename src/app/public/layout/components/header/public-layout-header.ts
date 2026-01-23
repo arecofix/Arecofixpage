@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef, signal, computed, AfterViewInit, OnDestroy, PLATFORM_ID, ElementRef, Renderer2, HostListener } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef, signal, computed, AfterViewInit, OnDestroy, PLATFORM_ID, ElementRef, Renderer2, HostListener, effect } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { CategoryService } from '@app/public/categories/services/category.service';
@@ -62,15 +62,17 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
   public showResults = signal(false);
   
   // Cart Drawer Logic
-  public isCartOpen = signal(false);
+  // Delegating to CartService for global state
+  public isCartOpen = this.cartService.isCartOpen;
 
   public toggleCart() {
-    this.isCartOpen.update(v => !v);
+    this.cartService.toggleCart();
   }
 
   // Navbar Visibility Logic
   public isVisible = signal(true);
   private destroy$ = new Subject<void>();
+  private lastScrollTop = 0;
 
   public filteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
@@ -85,9 +87,25 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
 
   constructor() {
     this.loadProducts();
+
+    effect(() => {
+        // Track cart items dependency
+        const items = this.cartService.cartItems();
+        if (items.length > 0) {
+             // Run this outside angular reactive context to avoid loops if needed, 
+             // but here we just want to trigger a side effect (showing navbar)
+             // We need to use untracked if we modified a signal that started this cycle, but showNavbar modifies a local signal isVisible.
+             // However, to be safe and purely reactive side-effect:
+             
+             // Wrap in setTimeout to ensure it runs after view updates or simply just call it.
+             // Since signals are synchronous, we just call it.
+             this.showNavbar();
+             this.lastScrollTop = isPlatformBrowser(this.platformId) ? (window.scrollY || document.documentElement.scrollTop) : 0;
+        }
+    });
   }
 
-  private lastScrollTop = 0;
+
 
   ngAfterViewInit() {
     // No-op: Logic moved to HostListener for reliability
@@ -138,6 +156,8 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
       this.cdr.markForCheck();
     }
   }
+
+
 
   ngOnDestroy() {
     this.destroy$.next();

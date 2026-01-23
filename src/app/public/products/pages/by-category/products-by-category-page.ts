@@ -15,6 +15,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import {
   IsErrorComponent,
 } from '@app/shared/components/resource-status';
+import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
 import {
@@ -37,7 +38,8 @@ import { ProductCard } from '@app/public/products/components';
     ProductCard,
     Pagination,
     RouterModule,
-    FormsModule
+    FormsModule,
+    BreadcrumbsComponent
   ],
   templateUrl: './products-by-category-page.html',
   styles: ``,
@@ -59,6 +61,21 @@ export class ProductsByCategoryPage {
 
   categoriesListRs = rxResource({
     stream: () => this.categoryService.getFeaturedData()
+  });
+
+  breadcrumbItems = computed(() => {
+    const category = this.currentCategory();
+    const items: BreadcrumbItem[] = [
+        { label: 'Inicio', url: '/' },
+        { label: 'Productos', url: '/productos' }
+    ];
+
+    if (category) {
+        items.push({ label: category.name });
+    } else {
+        items.push({ label: 'Categoría' });
+    }
+    return items;
   });
 
   // Search Signal and Subject

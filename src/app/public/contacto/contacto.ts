@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { PreferencesService } from '../../shared/services/preferences.service';
-import { SeoService } from '../../shared/services/seo.service';
+import { SeoService } from '@app/core/services/seo.service';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -50,15 +50,11 @@ export class ContactoComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.seoService.setSeoData({
-            title: 'Contacto | Arecofix Software Factory',
-            description: 'Ponte en contacto con nosotros. Estamos listos para escuchar tu idea y convertirla en realidad. Whatsapp, Email y Redes Sociales.',
-            keywords: 'contacto, soporte, ventas, arecofix, marcos paz, desarrollo de software, presupuesto software',
-            ogTitle: 'Contáctanos | Arecofix',
-            ogDescription: '¿Tienes un proyecto en mente? Hablemos. Estamos aquí para ayudarte a escalar tu negocio.',
-            ogImage: 'assets/img/branding/og-contact.jpg',
-            ogUrl: 'https://arecofix.com/#/contacto'
-        });
+        this.seoService.setPageData(
+            'Contacto',
+            'Ponte en contacto con nosotros. Estamos listos para escuchar tu idea y convertirla en realidad. Whatsapp, Email y Redes Sociales.',
+            'assets/img/branding/og-contact.jpg'
+        );
     }
 
     onSubmit() {

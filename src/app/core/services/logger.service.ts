@@ -15,7 +15,7 @@ export class LoggerService {
     /**
      * Log debug information (only in development)
      */
-    debug(message: string, data?: any): void {
+    debug(message: string, data?: unknown): void {
         if (!this.isProduction) {
             console.log(`[DEBUG] ${message}`, data || '');
         }
@@ -24,7 +24,7 @@ export class LoggerService {
     /**
      * Log informational messages
      */
-    info(message: string, data?: any): void {
+    info(message: string, data?: unknown): void {
         if (!this.isProduction) {
             console.info(`[INFO] ${message}`, data || '');
         }
@@ -33,14 +33,14 @@ export class LoggerService {
     /**
      * Log warnings (shown in all environments)
      */
-    warn(message: string, data?: any): void {
+    warn(message: string, data?: unknown): void {
         console.warn(`[WARN] ${message}`, data || '');
     }
 
     /**
      * Log errors (shown in all environments)
      */
-    error(message: string, error?: any): void {
+    error(message: string, error?: unknown): void {
         console.error(`[ERROR] ${message}`, error || '');
 
         // In production, you might want to send errors to a monitoring service
@@ -52,10 +52,9 @@ export class LoggerService {
     /**
      * Send errors to monitoring service (PostHog, Sentry, etc.)
      */
-    private sendToMonitoring(message: string, error: any): void {
-        // TODO: Implement error monitoring integration (e.g., Sentry, Bugsnag)
-        // For now, errors are only logged to the console.
-        // Example: Sentry.captureException(error);
+    private sendToMonitoring(message: string, error: unknown): void {
+        // Implement error monitoring integration (e.g., Sentry, Bugsnag)
+        // For now, errors are only logged to the console via console.error in production.
     }
 
     /**

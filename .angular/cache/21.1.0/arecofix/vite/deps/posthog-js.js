@@ -16,7 +16,7 @@ var u = null != i && i.XMLHttpRequest && "withCredentials" in new i.XMLHttpReque
 var h = null == i ? void 0 : i.AbortController;
 var d = null == n ? void 0 : n.userAgent;
 var v = null != t ? t : {};
-var c = { DEBUG: false, LIB_VERSION: "1.326.0" };
+var c = { DEBUG: false, LIB_VERSION: "1.333.0" };
 function f(t2, i2, e2, r2, s2, n2, o2) {
   try {
     var a2 = t2[n2](o2), l2 = a2.value;
@@ -2441,23 +2441,23 @@ var Cn = (function(t2) {
 })({});
 var Rn = class {
   constructor(t2) {
-    this.oi = false, this.ai = false, this.li = false, this.ui = false, this.hi = false, this.di = false, this.vi = false, this._instance = t2, this.featureFlagEventHandlers = [];
-  }
-  ci() {
-    var t2 = this._instance.config.evaluation_environments;
-    return null != t2 && t2.length ? t2.filter(((t3) => {
-      var i2 = t3 && "string" == typeof t3 && t3.trim().length > 0;
-      return i2 || bn.error("Invalid evaluation environment found:", t3, "Expected non-empty string"), i2;
-    })) : [];
+    this.oi = false, this.ai = false, this.li = false, this.ui = false, this.hi = false, this.di = false, this.vi = false, this.ci = false, this._instance = t2, this.featureFlagEventHandlers = [];
   }
   fi() {
-    return this.ci().length > 0;
+    var t2, i2 = null !== (t2 = this._instance.config.evaluation_contexts) && void 0 !== t2 ? t2 : this._instance.config.evaluation_environments;
+    return !this._instance.config.evaluation_environments || this._instance.config.evaluation_contexts || this.ci || (bn.warn("evaluation_environments is deprecated. Use evaluation_contexts instead. evaluation_environments will be removed in a future version."), this.ci = true), null != i2 && i2.length ? i2.filter(((t3) => {
+      var i3 = t3 && "string" == typeof t3 && t3.trim().length > 0;
+      return i3 || bn.error("Invalid evaluation context found:", t3, "Expected non-empty string"), i3;
+    })) : [];
+  }
+  pi() {
+    return this.fi().length > 0;
   }
   flags() {
     if (this._instance.config.__preview_remote_config) this.di = true;
     else {
-      var t2 = !this.pi && (this._instance.config.advanced_disable_feature_flags || this._instance.config.advanced_disable_feature_flags_on_first_load);
-      this.gi({ disableFlags: t2 });
+      var t2 = !this.gi && (this._instance.config.advanced_disable_feature_flags || this._instance.config.advanced_disable_feature_flags_on_first_load);
+      this.mi({ disableFlags: t2 });
     }
   }
   get hasLoadedFlags() {
@@ -2490,15 +2490,15 @@ var Rn = class {
     return this.oi || (bn.warn(" Overriding feature flag payloads!", { flagPayloads: t2, overriddenPayloads: i2, finalPayloads: e2 }), this.oi = true), e2;
   }
   reloadFeatureFlags() {
-    this.ui || this._instance.config.advanced_disable_feature_flags || this.pi || (this.pi = setTimeout((() => {
-      this.gi();
+    this.ui || this._instance.config.advanced_disable_feature_flags || this.gi || (this.gi = setTimeout((() => {
+      this.mi();
     }), 5));
   }
-  mi() {
-    clearTimeout(this.pi), this.pi = void 0;
+  yi() {
+    clearTimeout(this.gi), this.gi = void 0;
   }
   ensureFlagsLoaded() {
-    this.ai || this.li || this.pi || this.reloadFeatureFlags();
+    this.ai || this.li || this.gi || this.reloadFeatureFlags();
   }
   setAnonymousDistinctId(t2) {
     this.$anon_distinct_id = t2;
@@ -2506,21 +2506,21 @@ var Rn = class {
   setReloadingPaused(t2) {
     this.ui = t2;
   }
-  gi(t2) {
+  mi(t2) {
     var i2;
-    if (this.mi(), !this._instance.O()) if (this.li) this.hi = true;
+    if (this.yi(), !this._instance.O()) if (this.li) this.hi = true;
     else {
       var e2 = this._instance.config.token, r2 = this._instance.get_property("$device_id"), s2 = { token: e2, distinct_id: this._instance.get_distinct_id(), groups: this._instance.getGroups(), $anon_distinct_id: this.$anon_distinct_id, person_properties: g({}, (null == (i2 = this._instance.persistence) ? void 0 : i2.get_initial_props()) || {}, this._instance.get_property(oe) || {}), group_properties: this._instance.get_property(ae) };
-      D(r2) || M(r2) || (s2.$device_id = r2), (null != t2 && t2.disableFlags || this._instance.config.advanced_disable_feature_flags) && (s2.disable_flags = true), this.fi() && (s2.evaluation_environments = this.ci());
+      D(r2) || M(r2) || (s2.$device_id = r2), (null != t2 && t2.disableFlags || this._instance.config.advanced_disable_feature_flags) && (s2.disable_flags = true), this.pi() && (s2.evaluation_contexts = this.fi());
       var n2 = this._instance.config.__preview_remote_config, o2 = n2 ? "/flags/?v=2" : "/flags/?v=2&config=true", a2 = this._instance.config.advanced_only_evaluate_survey_feature_flags ? "&only_evaluate_survey_feature_flags=true" : "", l2 = this._instance.requestRouter.endpointFor("flags", o2 + a2);
       n2 && (s2.timezone = cs()), this.li = true, this._instance._send_request({ method: "POST", url: l2, data: s2, compression: this._instance.config.disable_compression ? void 0 : $s.Base64, timeout: this._instance.config.feature_flag_request_timeout_ms, callback: (t3) => {
         var i3, e3, r3 = true;
-        (200 === t3.statusCode && (this.hi || (this.$anon_distinct_id = void 0), r3 = false), this.li = false, this.di) || (this.di = true, this._instance.yi(null !== (e3 = t3.json) && void 0 !== e3 ? e3 : {}));
+        (200 === t3.statusCode && (this.hi || (this.$anon_distinct_id = void 0), r3 = false), this.li = false, this.di) || (this.di = true, this._instance.bi(null !== (e3 = t3.json) && void 0 !== e3 ? e3 : {}));
         if (!s2.disable_flags || this.hi) if (this.vi = !r3, t3.json && null != (i3 = t3.json.quotaLimited) && i3.includes(Cn.FeatureFlags)) bn.warn("You have hit your feature flags quota limit, and will not be able to load feature flags until the quota is reset.  Please visit https://posthog.com/docs/billing/limits-alerts to learn more.");
         else {
           var n3;
           if (!s2.disable_flags) this.receivedFeatureFlags(null !== (n3 = t3.json) && void 0 !== n3 ? n3 : {}, r3);
-          this.hi && (this.hi = false, this.gi());
+          this.hi && (this.hi = false, this.mi());
         }
       } });
     }
@@ -2549,7 +2549,7 @@ var Rn = class {
   }
   getRemoteConfigPayload(t2, i2) {
     var e2 = this._instance.config.token, r2 = { distinct_id: this._instance.get_distinct_id(), token: e2 };
-    this.fi() && (r2.evaluation_environments = this.ci()), this._instance._send_request({ method: "POST", url: this._instance.requestRouter.endpointFor("flags", "/flags/?v=2&config=true"), data: r2, compression: this._instance.config.disable_compression ? void 0 : $s.Base64, timeout: this._instance.config.feature_flag_request_timeout_ms, callback: (e3) => {
+    this.pi() && (r2.evaluation_contexts = this.fi()), this._instance._send_request({ method: "POST", url: this._instance.requestRouter.endpointFor("flags", "/flags/?v=2&config=true"), data: r2, compression: this._instance.config.disable_compression ? void 0 : $s.Base64, timeout: this._instance.config.feature_flag_request_timeout_ms, callback: (e3) => {
       var r3, s2 = null == (r3 = e3.json) ? void 0 : r3.featureFlagPayloads;
       i2((null == s2 ? void 0 : s2[t2]) || void 0);
     } });
@@ -2586,7 +2586,7 @@ var Rn = class {
             t3.errorsWhileComputingFlags && (c2 = g({}, e3, c2), f2 = g({}, r3, f2), p2 = g({}, s3, p2)), i3 && i3.register(g({ [xn]: Object.keys(Tn(c2)), [re]: c2 || {}, [$n]: f2 || {}, [ne]: p2 || {} }, u2 ? { [kn]: u2 } : {}, h2 ? { [Pn]: h2 } : {}));
           }
         }
-      })(t2, this._instance.persistence, e2, r2, s2), this.bi(i2);
+      })(t2, this._instance.persistence, e2, r2, s2), this.wi(i2);
     }
   }
   override(t2, i2) {
@@ -2594,7 +2594,7 @@ var Rn = class {
   }
   overrideFeatureFlags(t2) {
     if (!this._instance.__loaded || !this._instance.persistence) return bn.uninitializedWarning("posthog.featureFlags.overrideFeatureFlags");
-    if (false === t2) return this._instance.persistence.unregister(En), this._instance.persistence.unregister(Sn), this.bi(), wn.info("All overrides cleared");
+    if (false === t2) return this._instance.persistence.unregister(En), this._instance.persistence.unregister(Sn), this.wi(), wn.info("All overrides cleared");
     if (t2 && "object" == typeof t2 && ("flags" in t2 || "payloads" in t2)) {
       var i2, e2 = t2;
       if (this.oi = Boolean(null !== (i2 = e2.suppressWarning) && void 0 !== i2 && i2), "flags" in e2) {
@@ -2607,13 +2607,13 @@ var Rn = class {
           wn.info("Flag overrides set", { flags: e2.flags });
         }
       }
-      return "payloads" in e2 && (false === e2.payloads ? (this._instance.persistence.unregister(Sn), wn.info("Payload overrides cleared")) : e2.payloads && (this._instance.persistence.register({ [Sn]: e2.payloads }), wn.info("Payload overrides set", { payloads: e2.payloads }))), void this.bi();
+      return "payloads" in e2 && (false === e2.payloads ? (this._instance.persistence.unregister(Sn), wn.info("Payload overrides cleared")) : e2.payloads && (this._instance.persistence.register({ [Sn]: e2.payloads }), wn.info("Payload overrides set", { payloads: e2.payloads }))), void this.wi();
     }
-    this.bi();
+    this.wi();
   }
   onFeatureFlags(t2) {
     if (this.addFeatureFlagsHandler(t2), this.ai) {
-      var { flags: i2, flagVariants: e2 } = this.wi();
+      var { flags: i2, flagVariants: e2 } = this.xi();
       t2(i2, e2);
     }
     return () => this.removeFeatureFlagsHandler(t2);
@@ -2622,7 +2622,7 @@ var Rn = class {
     var r2, s2 = (this._instance.get_property(se) || []).find(((i3) => i3.flagKey === t2)), n2 = { ["$feature_enrollment/" + t2]: i2 }, o2 = { $feature_flag: t2, $feature_enrollment: i2, $set: n2 };
     s2 && (o2.$early_access_feature_name = s2.name), e2 && (o2.$feature_enrollment_stage = e2), this._instance.capture("$feature_enrollment_update", o2), this.setPersonPropertiesForFlags(n2, false);
     var a2 = g({}, this.getFlagVariants(), { [t2]: i2 });
-    null == (r2 = this._instance.persistence) || r2.register({ [xn]: Object.keys(Tn(a2)), [re]: a2 }), this.bi();
+    null == (r2 = this._instance.persistence) || r2.register({ [xn]: Object.keys(Tn(a2)), [re]: a2 }), this.wi();
   }
   getEarlyAccessFeatures(t2, i2, e2) {
     void 0 === i2 && (i2 = false);
@@ -2636,12 +2636,12 @@ var Rn = class {
       }
     } });
   }
-  wi() {
+  xi() {
     var t2 = this.getFlags(), i2 = this.getFlagVariants();
     return { flags: t2.filter(((t3) => i2[t3])), flagVariants: Object.keys(i2).filter(((t3) => i2[t3])).reduce(((t3, e2) => (t3[e2] = i2[e2], t3)), {}) };
   }
-  bi(t2) {
-    var { flags: i2, flagVariants: e2 } = this.wi();
+  wi(t2) {
+    var { flags: i2, flagVariants: e2 } = this.xi();
     this.featureFlagEventHandlers.forEach(((r2) => r2(i2, e2, { errorsLoading: t2 })));
   }
   setPersonPropertiesForFlags(t2, i2) {
@@ -2666,21 +2666,21 @@ var Rn = class {
     } else this._instance.unregister(ae);
   }
   reset() {
-    this.ai = false, this.li = false, this.ui = false, this.hi = false, this.di = false, this.vi = false, this.$anon_distinct_id = void 0, this.mi(), this.oi = false;
+    this.ai = false, this.li = false, this.ui = false, this.hi = false, this.di = false, this.vi = false, this.$anon_distinct_id = void 0, this.yi(), this.oi = false;
   }
 };
 var Fn = ["cookie", "localstorage", "localstorage+cookie", "sessionstorage", "memory"];
 var Mn = class {
   constructor(t2, i2) {
-    this.R = t2, this.props = {}, this.xi = false, this.Ei = ((t3) => {
+    this.R = t2, this.props = {}, this.Ei = false, this.$i = ((t3) => {
       var i3 = "";
       return t3.token && (i3 = t3.token.replace(/\+/g, "PL").replace(/\//g, "SL").replace(/=/g, "EQ")), t3.persistence_name ? "ph_" + t3.persistence_name : "ph_" + i3 + "_posthog";
-    })(t2), this.Y = this.$i(t2), this.load(), t2.debug && $i.info("Persistence loaded", t2.persistence, g({}, this.props)), this.update_config(t2, t2, i2), this.save();
+    })(t2), this.Y = this.Si(t2), this.load(), t2.debug && $i.info("Persistence loaded", t2.persistence, g({}, this.props)), this.update_config(t2, t2, i2), this.save();
   }
   isDisabled() {
-    return !!this.Si;
+    return !!this.ki;
   }
-  $i(i2) {
+  Si(i2) {
     -1 === Fn.indexOf(i2.persistence.toLowerCase()) && ($i.critical("Unknown persistence type " + i2.persistence + "; falling back to localStorage+cookie"), i2.persistence = "localStorage+cookie");
     var e2 = (function(i3) {
       void 0 === i3 && (i3 = []);
@@ -2728,23 +2728,23 @@ var Mn = class {
     })), t2;
   }
   load() {
-    if (!this.Si) {
-      var t2 = this.Y.W(this.Ei);
+    if (!this.ki) {
+      var t2 = this.Y.W(this.$i);
       t2 && (this.props = Ri({}, t2));
     }
   }
   save() {
-    this.Si || this.Y.G(this.Ei, this.props, this.ki, this.Pi, this.Ti, this.R.debug);
+    this.ki || this.Y.G(this.$i, this.props, this.Pi, this.Ti, this.Ii, this.R.debug);
   }
   remove() {
-    this.Y.V(this.Ei, false), this.Y.V(this.Ei, true);
+    this.Y.V(this.$i, false), this.Y.V(this.$i, true);
   }
   clear() {
     this.remove(), this.props = {};
   }
   register_once(t2, i2, e2) {
     if (R(t2)) {
-      M(i2) && (i2 = "None"), this.ki = M(e2) ? this.Ii : e2;
+      M(i2) && (i2 = "None"), this.Pi = M(e2) ? this.Ci : e2;
       var r2 = false;
       if (Ci(t2, ((t3, e3) => {
         this.props.hasOwnProperty(e3) && this.props[e3] !== i2 || (this.props[e3] = t3, r2 = true);
@@ -2754,7 +2754,7 @@ var Mn = class {
   }
   register(t2, i2) {
     if (R(t2)) {
-      this.ki = M(i2) ? this.Ii : i2;
+      this.Pi = M(i2) ? this.Ci : i2;
       var e2 = false;
       if (Ci(t2, ((i3, r2) => {
         t2.hasOwnProperty(r2) && this.props[r2] !== i3 && (this.props[r2] = i3, e2 = true);
@@ -2766,9 +2766,9 @@ var Mn = class {
     t2 in this.props && (delete this.props[t2], this.save());
   }
   update_campaign_params() {
-    if (!this.xi) {
+    if (!this.Ei) {
       var t2 = os(this.R.custom_campaign_params, this.R.mask_personal_data_properties, this.R.custom_personal_data_properties);
-      F(Di(t2)) || this.register(t2), this.xi = true;
+      F(Di(t2)) || this.register(t2), this.Ei = true;
     }
   }
   update_search_keyword() {
@@ -2805,23 +2805,23 @@ var Mn = class {
     })), t2;
   }
   update_config(t2, i2, e2) {
-    if (this.Ii = this.ki = t2.cookie_expiration, this.set_disabled(t2.disable_persistence || !!e2), this.set_cross_subdomain(t2.cross_subdomain_cookie), this.set_secure(t2.secure_cookie), t2.persistence !== i2.persistence || !((t3, i3) => {
+    if (this.Ci = this.Pi = t2.cookie_expiration, this.set_disabled(t2.disable_persistence || !!e2), this.set_cross_subdomain(t2.cross_subdomain_cookie), this.set_secure(t2.secure_cookie), t2.persistence !== i2.persistence || !((t3, i3) => {
       if (t3.length !== i3.length) return false;
       var e3 = [...t3].sort(), r3 = [...i3].sort();
       return e3.every(((t4, i4) => t4 === r3[i4]));
     })(t2.cookie_persisted_properties || [], i2.cookie_persisted_properties || [])) {
-      var r2 = this.$i(t2), s2 = this.props;
+      var r2 = this.Si(t2), s2 = this.props;
       this.clear(), this.Y = r2, this.props = s2, this.save();
     }
   }
   set_disabled(t2) {
-    this.Si = t2, this.Si ? this.remove() : this.save();
+    this.ki = t2, this.ki ? this.remove() : this.save();
   }
   set_cross_subdomain(t2) {
-    t2 !== this.Pi && (this.Pi = t2, this.remove(), this.save());
+    t2 !== this.Ti && (this.Ti = t2, this.remove(), this.save());
   }
   set_secure(t2) {
-    t2 !== this.Ti && (this.Ti = t2, this.remove(), this.save());
+    t2 !== this.Ii && (this.Ii = t2, this.remove(), this.save());
   }
   set_event_timer(t2, i2) {
     var e2 = this.props[qi] || {};
@@ -2842,14 +2842,14 @@ var On = Si("[Product Tours]");
 var An = "ph_product_tours";
 var Dn = class {
   constructor(t2) {
-    this.Ci = null, this.Ri = null, this._instance = t2;
+    this.Ri = null, this.Fi = null, this._instance = t2;
   }
   onRemoteConfig(t2) {
     this._instance.persistence && this._instance.persistence.register({ [Qi]: !(null == t2 || !t2.productTours) }), this.loadIfEnabled();
   }
   loadIfEnabled() {
     var t2, i2;
-    this.Ci || ((t2 = this._instance).config.disable_product_tours || null == (i2 = t2.persistence) || !i2.get_property(Qi)) || this.it((() => this.Fi()));
+    this.Ri || ((t2 = this._instance).config.disable_product_tours || null == (i2 = t2.persistence) || !i2.get_property(Qi)) || this.it((() => this.Mi()));
   }
   it(t2) {
     var i2, e2;
@@ -2857,16 +2857,16 @@ var Dn = class {
       i3 ? On.error("Could not load product tours script", i3) : t2();
     }));
   }
-  Fi() {
+  Mi() {
     var t2;
-    !this.Ci && null != (t2 = v.__PosthogExtensions__) && t2.generateProductTours && (this.Ci = v.__PosthogExtensions__.generateProductTours(this._instance, true));
+    !this.Ri && null != (t2 = v.__PosthogExtensions__) && t2.generateProductTours && (this.Ri = v.__PosthogExtensions__.generateProductTours(this._instance, true));
   }
   getProductTours(t2, i2) {
-    if (void 0 === i2 && (i2 = false), !I(this.Ri) || i2) {
+    if (void 0 === i2 && (i2 = false), !I(this.Fi) || i2) {
       var e2 = this._instance.persistence;
       if (e2) {
         var r2 = e2.props[An];
-        if (I(r2) && !i2) return this.Ri = r2, void t2(r2, { isLoaded: true });
+        if (I(r2) && !i2) return this.Fi = r2, void t2(r2, { isLoaded: true });
       }
       this._instance._send_request({ url: this._instance.requestRouter.endpointFor("api", "/api/product_tours/?token=" + this._instance.config.token), method: "GET", callback: (i3) => {
         var r3 = i3.statusCode;
@@ -2875,50 +2875,50 @@ var Dn = class {
           return On.error(s2), void t2([], { isLoaded: false, error: s2 });
         }
         var n2 = I(i3.json.product_tours) ? i3.json.product_tours : [];
-        this.Ri = n2, e2 && e2.register({ [An]: n2 }), t2(n2, { isLoaded: true });
+        this.Fi = n2, e2 && e2.register({ [An]: n2 }), t2(n2, { isLoaded: true });
       } });
-    } else t2(this.Ri, { isLoaded: true });
+    } else t2(this.Fi, { isLoaded: true });
   }
   getActiveProductTours(t2) {
-    j(this.Ci) ? t2([], { isLoaded: false, error: "Product tours not loaded" }) : this.Ci.getActiveProductTours(t2);
+    j(this.Ri) ? t2([], { isLoaded: false, error: "Product tours not loaded" }) : this.Ri.getActiveProductTours(t2);
   }
   showProductTour(t2) {
     var i2;
-    null == (i2 = this.Ci) || i2.showTourById(t2);
+    null == (i2 = this.Ri) || i2.showTourById(t2);
   }
   previewTour(t2) {
-    this.Ci ? this.Ci.previewTour(t2) : this.it((() => {
+    this.Ri ? this.Ri.previewTour(t2) : this.it((() => {
       var i2;
-      this.Fi(), null == (i2 = this.Ci) || i2.previewTour(t2);
+      this.Mi(), null == (i2 = this.Ri) || i2.previewTour(t2);
     }));
   }
   dismissProductTour() {
     var t2;
-    null == (t2 = this.Ci) || t2.dismissTour("user_clicked_skip");
+    null == (t2 = this.Ri) || t2.dismissTour("user_clicked_skip");
   }
   nextStep() {
     var t2;
-    null == (t2 = this.Ci) || t2.nextStep();
+    null == (t2 = this.Ri) || t2.nextStep();
   }
   previousStep() {
     var t2;
-    null == (t2 = this.Ci) || t2.previousStep();
+    null == (t2 = this.Ri) || t2.previousStep();
   }
   clearCache() {
     var t2;
-    this.Ri = null, null == (t2 = this._instance.persistence) || t2.unregister(An);
+    this.Fi = null, null == (t2 = this._instance.persistence) || t2.unregister(An);
   }
   resetTour(t2) {
     var i2;
-    null == (i2 = this.Ci) || i2.resetTour(t2);
+    null == (i2 = this.Ri) || i2.resetTour(t2);
   }
   resetAllTours() {
     var t2;
-    null == (t2 = this.Ci) || t2.resetAllTours();
+    null == (t2 = this.Ri) || t2.resetAllTours();
   }
   cancelPendingTour(t2) {
     var i2;
-    null == (i2 = this.Ci) || i2.cancelPendingTour(t2);
+    null == (i2 = this.Ri) || i2.cancelPendingTour(t2);
   }
 };
 var jn = (function(t2) {
@@ -2968,16 +2968,16 @@ var Qn = [zn.Popover, zn.Widget, zn.API];
 var Zn = { ignoreConditions: false, ignoreDelay: false, displayType: Vn.Popover };
 var to = class {
   constructor() {
-    this.Mi = {}, this.Mi = {};
+    this.Oi = {}, this.Oi = {};
   }
   on(t2, i2) {
-    return this.Mi[t2] || (this.Mi[t2] = []), this.Mi[t2].push(i2), () => {
-      this.Mi[t2] = this.Mi[t2].filter(((t3) => t3 !== i2));
+    return this.Oi[t2] || (this.Oi[t2] = []), this.Oi[t2].push(i2), () => {
+      this.Oi[t2] = this.Oi[t2].filter(((t3) => t3 !== i2));
     };
   }
   emit(t2, i2) {
-    for (var e2 of this.Mi[t2] || []) e2(i2);
-    for (var r2 of this.Mi["*"] || []) r2(t2, i2);
+    for (var e2 of this.Oi[t2] || []) e2(i2);
+    for (var r2 of this.Oi["*"] || []) r2(t2, i2);
   }
 };
 function io(t2, i2, e2) {
@@ -3000,24 +3000,24 @@ function io(t2, i2, e2) {
 }
 var eo = class {
   constructor(t2) {
-    this.Oi = new to(), this.Ai = (t3, i2) => this.Di(t3, i2) && this.ji(t3, i2) && this.Li(t3, i2) && this.Ni(t3, i2), this.Di = (t3, i2) => null == i2 || !i2.event || (null == t3 ? void 0 : t3.event) === (null == i2 ? void 0 : i2.event), this._instance = t2, this.Ui = /* @__PURE__ */ new Set(), this.zi = /* @__PURE__ */ new Set();
+    this.Ai = new to(), this.Di = (t3, i2) => this.ji(t3, i2) && this.Li(t3, i2) && this.Ni(t3, i2) && this.Ui(t3, i2), this.ji = (t3, i2) => null == i2 || !i2.event || (null == t3 ? void 0 : t3.event) === (null == i2 ? void 0 : i2.event), this._instance = t2, this.zi = /* @__PURE__ */ new Set(), this.Hi = /* @__PURE__ */ new Set();
   }
   init() {
     var t2;
-    if (!M(null == (t2 = this._instance) ? void 0 : t2.Hi)) {
+    if (!M(null == (t2 = this._instance) ? void 0 : t2.Bi)) {
       var i2;
-      null == (i2 = this._instance) || i2.Hi(((t3, i3) => {
+      null == (i2 = this._instance) || i2.Bi(((t3, i3) => {
         this.on(t3, i3);
       }));
     }
   }
   register(t2) {
     var i2, e2;
-    if (!M(null == (i2 = this._instance) ? void 0 : i2.Hi) && (t2.forEach(((t3) => {
+    if (!M(null == (i2 = this._instance) ? void 0 : i2.Bi) && (t2.forEach(((t3) => {
       var i3, e3;
-      null == (i3 = this.zi) || i3.add(t3), null == (e3 = t3.steps) || e3.forEach(((t4) => {
+      null == (i3 = this.Hi) || i3.add(t3), null == (e3 = t3.steps) || e3.forEach(((t4) => {
         var i4;
-        null == (i4 = this.Ui) || i4.add((null == t4 ? void 0 : t4.event) || "");
+        null == (i4 = this.zi) || i4.add((null == t4 ? void 0 : t4.event) || "");
       }));
     })), null != (e2 = this._instance) && e2.autocapture)) {
       var r2, s2 = /* @__PURE__ */ new Set();
@@ -3031,22 +3031,22 @@ var eo = class {
   }
   on(t2, i2) {
     var e2;
-    null != i2 && 0 != t2.length && (this.Ui.has(t2) || this.Ui.has(null == i2 ? void 0 : i2.event)) && this.zi && (null == (e2 = this.zi) ? void 0 : e2.size) > 0 && this.zi.forEach(((t3) => {
-      this.Bi(i2, t3) && this.Oi.emit("actionCaptured", t3.name);
+    null != i2 && 0 != t2.length && (this.zi.has(t2) || this.zi.has(null == i2 ? void 0 : i2.event)) && this.Hi && (null == (e2 = this.Hi) ? void 0 : e2.size) > 0 && this.Hi.forEach(((t3) => {
+      this.qi(i2, t3) && this.Ai.emit("actionCaptured", t3.name);
     }));
   }
-  qi(t2) {
+  Wi(t2) {
     this.onAction("actionCaptured", ((i2) => t2(i2)));
   }
-  Bi(t2, i2) {
+  qi(t2, i2) {
     if (null == (null == i2 ? void 0 : i2.steps)) return false;
-    for (var e2 of i2.steps) if (this.Ai(t2, e2)) return true;
+    for (var e2 of i2.steps) if (this.Di(t2, e2)) return true;
     return false;
   }
   onAction(t2, i2) {
-    return this.Oi.on(t2, i2);
+    return this.Ai.on(t2, i2);
   }
-  ji(t2, i2) {
+  Li(t2, i2) {
     if (null != i2 && i2.url) {
       var e2, r2 = null == t2 || null == (e2 = t2.properties) ? void 0 : e2.$current_url;
       if (!r2 || "string" != typeof r2) return false;
@@ -3054,21 +3054,21 @@ var eo = class {
     }
     return true;
   }
-  Li(t2, i2) {
-    return !!this.Wi(t2, i2) && (!!this.Gi(t2, i2) && !!this.Vi(t2, i2));
+  Ni(t2, i2) {
+    return !!this.Gi(t2, i2) && (!!this.Vi(t2, i2) && !!this.Ji(t2, i2));
   }
-  Wi(t2, i2) {
+  Gi(t2, i2) {
     var e2;
     if (null == i2 || !i2.href) return true;
-    var r2 = this.Ji(t2);
+    var r2 = this.Ki(t2);
     if (r2.length > 0) return r2.some(((t3) => io(t3.href, i2.href, i2.href_matching || "exact")));
     var s2, n2 = (null == t2 || null == (e2 = t2.properties) ? void 0 : e2.$elements_chain) || "";
     return !!n2 && io((s2 = n2.match(/(?::|")href="(.*?)"/)) ? s2[1] : "", i2.href, i2.href_matching || "exact");
   }
-  Gi(t2, i2) {
+  Vi(t2, i2) {
     var e2;
     if (null == i2 || !i2.text) return true;
-    var r2 = this.Ji(t2);
+    var r2 = this.Ki(t2);
     if (r2.length > 0) return r2.some(((t3) => io(t3.text, i2.text, i2.text_matching || "exact") || io(t3.$el_text, i2.text, i2.text_matching || "exact")));
     var s2, n2, o2, a2 = (null == t2 || null == (e2 = t2.properties) ? void 0 : e2.$elements_chain) || "";
     return !!a2 && (s2 = (function(t3) {
@@ -3076,7 +3076,7 @@ var eo = class {
       return e3;
     })(a2), n2 = i2.text, o2 = i2.text_matching || "exact", s2.some(((t3) => io(t3, n2, o2))));
   }
-  Vi(t2, i2) {
+  Ji(t2, i2) {
     var e2, r2;
     if (null == i2 || !i2.selector) return true;
     var s2 = null == t2 || null == (e2 = t2.properties) ? void 0 : e2.$element_selectors;
@@ -3089,11 +3089,11 @@ var eo = class {
     }
     return false;
   }
-  Ji(t2) {
+  Ki(t2) {
     var i2;
     return null == (null == t2 || null == (i2 = t2.properties) ? void 0 : i2.$elements) ? [] : null == t2 ? void 0 : t2.properties.$elements;
   }
-  Ni(t2, i2) {
+  Ui(t2, i2) {
     return null == i2 || !i2.properties || 0 === i2.properties.length || _n(i2.properties.reduce(((t3, i3) => {
       var e2 = I(i3.value) ? i3.value.map(String) : null != i3.value ? [String(i3.value)] : [];
       return t3[i3.key] = { values: e2, operator: i3.operator || "exact" }, t3;
@@ -3102,12 +3102,12 @@ var eo = class {
 };
 var ro = class {
   constructor(t2) {
-    this._instance = t2, this.Ki = /* @__PURE__ */ new Map(), this.Yi = /* @__PURE__ */ new Map(), this.Xi = /* @__PURE__ */ new Map();
-  }
-  Qi(t2, i2) {
-    return !!t2 && _n(t2.propertyFilters, null == i2 ? void 0 : i2.properties);
+    this._instance = t2, this.Yi = /* @__PURE__ */ new Map(), this.Xi = /* @__PURE__ */ new Map(), this.Qi = /* @__PURE__ */ new Map();
   }
   Zi(t2, i2) {
+    return !!t2 && _n(t2.propertyFilters, null == i2 ? void 0 : i2.properties);
+  }
+  te(t2, i2) {
     var e2 = /* @__PURE__ */ new Map();
     return t2.forEach(((t3) => {
       var r2;
@@ -3119,43 +3119,43 @@ var ro = class {
       }));
     })), e2;
   }
-  te(t2, i2, e2) {
-    var r2 = (e2 === jn.Activation ? this.Ki : this.Yi).get(t2), s2 = [];
-    return this.ie(((t3) => {
+  ie(t2, i2, e2) {
+    var r2 = (e2 === jn.Activation ? this.Yi : this.Xi).get(t2), s2 = [];
+    return this.ee(((t3) => {
       s2 = t3.filter(((t4) => null == r2 ? void 0 : r2.includes(t4.id)));
     })), s2.filter(((r3) => {
       var s3, n2 = null == (s3 = r3.conditions) || null == (s3 = s3[e2]) || null == (s3 = s3.values) ? void 0 : s3.find(((i3) => i3.name === t2));
-      return this.Qi(n2, i2);
+      return this.Zi(n2, i2);
     }));
   }
   register(t2) {
     var i2;
-    M(null == (i2 = this._instance) ? void 0 : i2.Hi) || (this.ee(t2), this.re(t2));
+    M(null == (i2 = this._instance) ? void 0 : i2.Bi) || (this.re(t2), this.se(t2));
   }
-  re(t2) {
+  se(t2) {
     var i2 = t2.filter(((t3) => {
       var i3, e2;
       return (null == (i3 = t3.conditions) ? void 0 : i3.actions) && (null == (e2 = t3.conditions) || null == (e2 = e2.actions) || null == (e2 = e2.values) ? void 0 : e2.length) > 0;
     }));
     if (0 !== i2.length) {
-      if (null == this.se) {
-        this.se = new eo(this._instance), this.se.init();
-        this.se.qi(((t3) => {
+      if (null == this.ne) {
+        this.ne = new eo(this._instance), this.ne.init();
+        this.ne.Wi(((t3) => {
           this.onAction(t3);
         }));
       }
       i2.forEach(((t3) => {
         var i3, e2, r2, s2, n2;
-        t3.conditions && null != (i3 = t3.conditions) && i3.actions && null != (e2 = t3.conditions) && null != (e2 = e2.actions) && e2.values && (null == (r2 = t3.conditions) || null == (r2 = r2.actions) || null == (r2 = r2.values) ? void 0 : r2.length) > 0 && (null == (s2 = this.se) || s2.register(t3.conditions.actions.values), null == (n2 = t3.conditions) || null == (n2 = n2.actions) || null == (n2 = n2.values) || n2.forEach(((i4) => {
+        t3.conditions && null != (i3 = t3.conditions) && i3.actions && null != (e2 = t3.conditions) && null != (e2 = e2.actions) && e2.values && (null == (r2 = t3.conditions) || null == (r2 = r2.actions) || null == (r2 = r2.values) ? void 0 : r2.length) > 0 && (null == (s2 = this.ne) || s2.register(t3.conditions.actions.values), null == (n2 = t3.conditions) || null == (n2 = n2.actions) || null == (n2 = n2.values) || n2.forEach(((i4) => {
           if (i4 && i4.name) {
-            var e3 = this.Xi.get(i4.name);
-            e3 && e3.push(t3.id), this.Xi.set(i4.name, e3 || [t3.id]);
+            var e3 = this.Qi.get(i4.name);
+            e3 && e3.push(t3.id), this.Qi.set(i4.name, e3 || [t3.id]);
           }
         })));
       }));
     }
   }
-  ee(t2) {
+  re(t2) {
     var i2, e2 = t2.filter(((t3) => {
       var i3, e3;
       return (null == (i3 = t3.conditions) ? void 0 : i3.events) && (null == (e3 = t3.conditions) || null == (e3 = e3.events) || null == (e3 = e3.values) ? void 0 : e3.length) > 0;
@@ -3164,77 +3164,77 @@ var ro = class {
       return (null == (i3 = t3.conditions) ? void 0 : i3.cancelEvents) && (null == (e3 = t3.conditions) || null == (e3 = e3.cancelEvents) || null == (e3 = e3.values) ? void 0 : e3.length) > 0;
     }));
     if (0 !== e2.length || 0 !== r2.length) {
-      null == (i2 = this._instance) || i2.Hi(((t3, i3) => {
+      null == (i2 = this._instance) || i2.Bi(((t3, i3) => {
         this.onEvent(t3, i3);
-      })), this.Ki = this.Zi(t2, jn.Activation), this.Yi = this.Zi(t2, jn.Cancellation);
+      })), this.Yi = this.te(t2, jn.Activation), this.Xi = this.te(t2, jn.Cancellation);
     }
   }
   onEvent(t2, i2) {
-    var e2, r2 = this.ne(), s2 = this.oe(), n2 = this.ae(), o2 = (null == (e2 = this._instance) || null == (e2 = e2.persistence) ? void 0 : e2.props[s2]) || [];
+    var e2, r2 = this.oe(), s2 = this.ae(), n2 = this.le(), o2 = (null == (e2 = this._instance) || null == (e2 = e2.persistence) ? void 0 : e2.props[s2]) || [];
     if (n2 === t2 && i2 && o2.length > 0) {
       var a2, l2;
       r2.info("event matched, removing item from activated items", { event: t2, eventPayload: i2, existingActivatedItems: o2 });
       var u2 = (null == i2 || null == (a2 = i2.properties) ? void 0 : a2.$survey_id) || (null == i2 || null == (l2 = i2.properties) ? void 0 : l2.$product_tour_id);
       if (u2) {
         var h2 = o2.indexOf(u2);
-        h2 >= 0 && (o2.splice(h2, 1), this.le(o2));
+        h2 >= 0 && (o2.splice(h2, 1), this.ue(o2));
       }
     } else {
-      if (this.Yi.has(t2)) {
-        var d2 = this.te(t2, i2, jn.Cancellation);
+      if (this.Xi.has(t2)) {
+        var d2 = this.ie(t2, i2, jn.Cancellation);
         d2.length > 0 && (r2.info("cancel event matched, cancelling items", { event: t2, itemsToCancel: d2.map(((t3) => t3.id)) }), d2.forEach(((t3) => {
           var i3 = o2.indexOf(t3.id);
-          i3 >= 0 && o2.splice(i3, 1), this.ue(t3.id);
-        })), this.le(o2));
+          i3 >= 0 && o2.splice(i3, 1), this.he(t3.id);
+        })), this.ue(o2));
       }
-      if (this.Ki.has(t2)) {
-        r2.info("event name matched", { event: t2, eventPayload: i2, items: this.Ki.get(t2) });
-        var v2 = this.te(t2, i2, jn.Activation);
-        this.le(o2.concat(v2.map(((t3) => t3.id)) || []));
+      if (this.Yi.has(t2)) {
+        r2.info("event name matched", { event: t2, eventPayload: i2, items: this.Yi.get(t2) });
+        var v2 = this.ie(t2, i2, jn.Activation);
+        this.ue(o2.concat(v2.map(((t3) => t3.id)) || []));
       }
     }
   }
   onAction(t2) {
-    var i2, e2 = this.oe(), r2 = (null == (i2 = this._instance) || null == (i2 = i2.persistence) ? void 0 : i2.props[e2]) || [];
-    this.Xi.has(t2) && this.le(r2.concat(this.Xi.get(t2) || []));
+    var i2, e2 = this.ae(), r2 = (null == (i2 = this._instance) || null == (i2 = i2.persistence) ? void 0 : i2.props[e2]) || [];
+    this.Qi.has(t2) && this.ue(r2.concat(this.Qi.get(t2) || []));
   }
-  le(t2) {
-    var i2, e2 = this.ne(), r2 = this.oe(), s2 = [...new Set(t2)].filter(((t3) => !this.he(t3)));
+  ue(t2) {
+    var i2, e2 = this.oe(), r2 = this.ae(), s2 = [...new Set(t2)].filter(((t3) => !this.de(t3)));
     e2.info("updating activated items", { activatedItems: s2 }), null == (i2 = this._instance) || null == (i2 = i2.persistence) || i2.register({ [r2]: s2 });
   }
   getActivatedIds() {
-    var t2, i2 = this.oe(), e2 = null == (t2 = this._instance) || null == (t2 = t2.persistence) ? void 0 : t2.props[i2];
+    var t2, i2 = this.ae(), e2 = null == (t2 = this._instance) || null == (t2 = t2.persistence) ? void 0 : t2.props[i2];
     return e2 || [];
   }
   getEventToItemsMap() {
-    return this.Ki;
+    return this.Yi;
   }
-  de() {
-    return this.se;
+  ve() {
+    return this.ne;
   }
 };
 var so = class extends ro {
   constructor(t2) {
     super(t2);
   }
-  oe() {
+  ae() {
     return "$surveys_activated";
   }
-  ae() {
+  le() {
     return Wn.SHOWN;
   }
-  ie(t2) {
+  ee(t2) {
     var i2;
     null == (i2 = this._instance) || i2.getSurveys(t2);
   }
-  ue(t2) {
+  he(t2) {
     var i2;
     null == (i2 = this._instance) || i2.cancelPendingSurvey(t2);
   }
-  ne() {
+  oe() {
     return Jn;
   }
-  he() {
+  de() {
     return false;
   }
   getSurveys() {
@@ -3246,14 +3246,14 @@ var so = class extends ro {
 };
 var no = class {
   constructor(t2) {
-    this.ve = void 0, this._surveyManager = null, this.ce = false, this.fe = [], this.pe = null, this._instance = t2, this._surveyEventReceiver = null;
+    this.ce = void 0, this._surveyManager = null, this.fe = false, this.pe = [], this.ge = null, this._instance = t2, this._surveyEventReceiver = null;
   }
   onRemoteConfig(t2) {
     if (!this._instance.config.disable_surveys) {
       var i2 = t2.surveys;
       if (j(i2)) return Jn.warn("Flags not loaded yet. Not loading surveys.");
       var e2 = I(i2);
-      this.ve = e2 ? i2.length > 0 : i2, Jn.info("flags response received, isSurveysEnabled: " + this.ve), this.loadIfEnabled();
+      this.ce = e2 ? i2.length > 0 : i2, Jn.info("flags response received, isSurveysEnabled: " + this.ce), this.loadIfEnabled();
     }
   }
   reset() {
@@ -3265,55 +3265,55 @@ var no = class {
     t2.forEach(((t3) => localStorage.removeItem(t3)));
   }
   loadIfEnabled() {
-    if (!this._surveyManager) if (this.ce) Jn.info("Already initializing surveys, skipping...");
+    if (!this._surveyManager) if (this.fe) Jn.info("Already initializing surveys, skipping...");
     else if (this._instance.config.disable_surveys) Jn.info("Disabled. Not loading surveys.");
     else if (this._instance.config.cookieless_mode && this._instance.consent.isOptedOut()) Jn.info("Not loading surveys in cookieless mode without consent.");
     else {
       var t2 = null == v ? void 0 : v.__PosthogExtensions__;
       if (t2) {
-        if (!M(this.ve) || this._instance.config.advanced_enable_surveys) {
-          var i2 = this.ve || this._instance.config.advanced_enable_surveys;
-          this.ce = true;
+        if (!M(this.ce) || this._instance.config.advanced_enable_surveys) {
+          var i2 = this.ce || this._instance.config.advanced_enable_surveys;
+          this.fe = true;
           try {
             var e2 = t2.generateSurveys;
-            if (e2) return void this.ge(e2, i2);
+            if (e2) return void this._e(e2, i2);
             var r2 = t2.loadExternalDependency;
-            if (!r2) return void this._e("PostHog loadExternalDependency extension not found.");
+            if (!r2) return void this.me("PostHog loadExternalDependency extension not found.");
             r2(this._instance, "surveys", ((e3) => {
-              e3 || !t2.generateSurveys ? this._e("Could not load surveys script", e3) : this.ge(t2.generateSurveys, i2);
+              e3 || !t2.generateSurveys ? this.me("Could not load surveys script", e3) : this._e(t2.generateSurveys, i2);
             }));
           } catch (t3) {
-            throw this._e("Error initializing surveys", t3), t3;
+            throw this.me("Error initializing surveys", t3), t3;
           } finally {
-            this.ce = false;
+            this.fe = false;
           }
         }
       } else Jn.error("PostHog Extensions not found.");
     }
   }
-  ge(t2, i2) {
-    this._surveyManager = t2(this._instance, i2), this._surveyEventReceiver = new so(this._instance), Jn.info("Surveys loaded successfully"), this.me({ isLoaded: true });
-  }
   _e(t2, i2) {
-    Jn.error(t2, i2), this.me({ isLoaded: false, error: t2 });
+    this._surveyManager = t2(this._instance, i2), this._surveyEventReceiver = new so(this._instance), Jn.info("Surveys loaded successfully"), this.ye({ isLoaded: true });
+  }
+  me(t2, i2) {
+    Jn.error(t2, i2), this.ye({ isLoaded: false, error: t2 });
   }
   onSurveysLoaded(t2) {
-    return this.fe.push(t2), this._surveyManager && this.me({ isLoaded: true }), () => {
-      this.fe = this.fe.filter(((i2) => i2 !== t2));
+    return this.pe.push(t2), this._surveyManager && this.ye({ isLoaded: true }), () => {
+      this.pe = this.pe.filter(((i2) => i2 !== t2));
     };
   }
   getSurveys(t2, i2) {
     if (void 0 === i2 && (i2 = false), this._instance.config.disable_surveys) return Jn.info("Disabled. Not loading surveys."), t2([]);
     var e2, r2 = this._instance.get_property(le);
     if (r2 && !i2) return t2(r2, { isLoaded: true });
-    "undefined" != typeof Promise && this.pe ? this.pe.then(((i3) => {
+    "undefined" != typeof Promise && this.ge ? this.ge.then(((i3) => {
       var { surveys: e3, context: r3 } = i3;
       return t2(e3, r3);
-    })) : ("undefined" != typeof Promise && (this.pe = new Promise(((t3) => {
+    })) : ("undefined" != typeof Promise && (this.ge = new Promise(((t3) => {
       e2 = t3;
     }))), this._instance._send_request({ url: this._instance.requestRouter.endpointFor("api", "/api/surveys/?token=" + this._instance.config.token), method: "GET", timeout: this._instance.config.surveys_request_timeout_ms, callback: (i3) => {
       var r3;
-      this.pe = null;
+      this.ge = null;
       var s2 = i3.statusCode;
       if (200 !== s2 || !i3.json) {
         var n2 = "Surveys API could not be loaded, status: " + s2;
@@ -3336,8 +3336,8 @@ var no = class {
       t2(l2, h2), null == e2 || e2({ surveys: l2, context: h2 });
     } }));
   }
-  me(t2) {
-    for (var i2 of this.fe) try {
+  ye(t2) {
+    for (var i2 of this.pe) try {
       if (!t2.isLoaded) return i2([], t2);
       this.getSurveys(i2);
     } catch (t3) {
@@ -3348,21 +3348,21 @@ var no = class {
     if (void 0 === i2 && (i2 = false), !j(this._surveyManager)) return this._surveyManager.getActiveMatchingSurveys(t2, i2);
     Jn.warn("init was not called");
   }
-  ye(t2) {
+  be(t2) {
     var i2 = null;
     return this.getSurveys(((e2) => {
       var r2;
       i2 = null !== (r2 = e2.find(((i3) => i3.id === t2))) && void 0 !== r2 ? r2 : null;
     })), i2;
   }
-  be(t2) {
+  we(t2) {
     if (j(this._surveyManager)) return { eligible: false, reason: "SDK is not enabled or survey functionality is not yet loaded" };
-    var i2 = "string" == typeof t2 ? this.ye(t2) : t2;
+    var i2 = "string" == typeof t2 ? this.be(t2) : t2;
     return i2 ? this._surveyManager.checkSurveyEligibility(i2) : { eligible: false, reason: "Survey not found" };
   }
   canRenderSurvey(t2) {
     if (j(this._surveyManager)) return Jn.warn("init was not called"), { visible: false, disabledReason: "SDK is not enabled or survey functionality is not yet loaded" };
-    var i2 = this.be(t2);
+    var i2 = this.we(t2);
     return { visible: i2.eligible, disabledReason: i2.reason };
   }
   canRenderSurveyAsync(t2, i2) {
@@ -3370,7 +3370,7 @@ var no = class {
       this.getSurveys(((i3) => {
         var r2, s2 = null !== (r2 = i3.find(((i4) => i4.id === t2))) && void 0 !== r2 ? r2 : null;
         if (s2) {
-          var n2 = this.be(s2);
+          var n2 = this.we(s2);
           e2({ visible: n2.eligible, disabledReason: n2.reason });
         } else e2({ visible: false, disabledReason: "Survey not found" });
       }), i2);
@@ -3380,7 +3380,7 @@ var no = class {
     var r2;
     if (j(this._surveyManager)) Jn.warn("init was not called");
     else {
-      var s2 = "string" == typeof t2 ? this.ye(t2) : t2;
+      var s2 = "string" == typeof t2 ? this.be(t2) : t2;
       if (null != s2 && s2.id) if (Qn.includes(s2.type)) {
         var n2 = null == o ? void 0 : o.querySelector(i2);
         if (n2) return null != (r2 = s2.appearance) && r2.surveyPopupDelaySeconds ? (Jn.info("Rendering survey " + s2.id + " with delay of " + s2.appearance.surveyPopupDelaySeconds + " seconds"), void setTimeout((() => {
@@ -3396,14 +3396,14 @@ var no = class {
     var e2;
     if (j(this._surveyManager)) Jn.warn("init was not called");
     else {
-      var r2 = this.ye(t2);
+      var r2 = this.be(t2);
       if (r2) {
         var s2 = r2;
-        if (null != (e2 = r2.appearance) && e2.surveyPopupDelaySeconds && i2.ignoreDelay && (s2 = g({}, r2, { appearance: g({}, r2.appearance, { surveyPopupDelaySeconds: 0 }) })), false === i2.ignoreConditions) {
+        if (null != (e2 = r2.appearance) && e2.surveyPopupDelaySeconds && i2.ignoreDelay && (s2 = g({}, r2, { appearance: g({}, r2.appearance, { surveyPopupDelaySeconds: 0 }) })), i2.displayType !== Vn.Popover && i2.initialResponses && Jn.warn("initialResponses is only supported for popover surveys. prefill will not be applied."), false === i2.ignoreConditions) {
           var n2 = this.canRenderSurvey(r2);
           if (!n2.visible) return void Jn.warn("Survey is not eligible to be displayed: ", n2.disabledReason);
         }
-        i2.displayType !== Vn.Inline ? this._surveyManager.handlePopoverSurvey(s2, i2.properties) : this.renderSurvey(s2, i2.selector, i2.properties);
+        i2.displayType !== Vn.Inline ? this._surveyManager.handlePopoverSurvey(s2, i2) : this.renderSurvey(s2, i2.selector, i2.properties);
       } else Jn.warn("Survey not found");
     }
   }
@@ -3418,47 +3418,47 @@ var no = class {
 var oo = Si("[Conversations]");
 var ao = class {
   constructor(t2) {
-    this.we = void 0, this._conversationsManager = null, this.xe = false, this.Ee = null, this._instance = t2;
+    this.xe = void 0, this._conversationsManager = null, this.Ee = false, this.$e = null, this._instance = t2;
   }
   onRemoteConfig(t2) {
     if (!this._instance.config.disable_conversations) {
       var i2 = t2.conversations;
-      j(i2) || (U(i2) ? this.we = i2 : (this.we = i2.enabled, this.Ee = i2), this.loadIfEnabled());
+      j(i2) || (U(i2) ? this.xe = i2 : (this.xe = i2.enabled, this.$e = i2), this.loadIfEnabled());
     }
   }
   reset() {
     var t2;
-    null == (t2 = this._conversationsManager) || t2.reset(), this._conversationsManager = null, this.we = void 0, this.Ee = null;
+    null == (t2 = this._conversationsManager) || t2.reset(), this._conversationsManager = null, this.xe = void 0, this.$e = null;
   }
   loadIfEnabled() {
-    if (!this._conversationsManager && !this.xe && !(this._instance.config.disable_conversations || this._instance.config.cookieless_mode && this._instance.consent.isOptedOut())) {
+    if (!this._conversationsManager && !this.Ee && !(this._instance.config.disable_conversations || this._instance.config.cookieless_mode && this._instance.consent.isOptedOut())) {
       var t2 = null == v ? void 0 : v.__PosthogExtensions__;
-      if (t2 && !M(this.we) && this.we) if (this.Ee && this.Ee.token) {
-        this.xe = true;
+      if (t2 && !M(this.xe) && this.xe) if (this.$e && this.$e.token) {
+        this.Ee = true;
         try {
           var i2 = t2.initConversations;
-          if (i2) return this.$e(i2), void (this.xe = false);
+          if (i2) return this.Se(i2), void (this.Ee = false);
           var e2 = t2.loadExternalDependency;
-          if (!e2) return void this.Se("PostHog loadExternalDependency extension not found.");
+          if (!e2) return void this.ke("PostHog loadExternalDependency extension not found.");
           e2(this._instance, "conversations", ((i3) => {
-            i3 || !t2.initConversations ? this.Se("Could not load conversations script", i3) : this.$e(t2.initConversations), this.xe = false;
+            i3 || !t2.initConversations ? this.ke("Could not load conversations script", i3) : this.Se(t2.initConversations), this.Ee = false;
           }));
         } catch (t3) {
-          this.Se("Error initializing conversations", t3), this.xe = false;
+          this.ke("Error initializing conversations", t3), this.Ee = false;
         }
       } else oo.error("Conversations enabled but missing token in remote config.");
     }
   }
-  $e(t2) {
-    if (this.Ee) try {
-      this._conversationsManager = t2(this.Ee, this._instance), oo.info("Conversations loaded successfully");
+  Se(t2) {
+    if (this.$e) try {
+      this._conversationsManager = t2(this.$e, this._instance), oo.info("Conversations loaded successfully");
     } catch (t3) {
-      this.Se("Error completing conversations initialization", t3);
+      this.ke("Error completing conversations initialization", t3);
     }
     else oo.error("Cannot complete initialization: remote config is null");
   }
-  Se(t2, i2) {
-    oo.error(t2, i2), this._conversationsManager = null, this.xe = false;
+  ke(t2, i2) {
+    oo.error(t2, i2), this._conversationsManager = null, this.Ee = false;
   }
   show() {
     this._conversationsManager ? this._conversationsManager.show() : oo.warn("Conversations not loaded yet.");
@@ -3467,7 +3467,7 @@ var ao = class {
     this._conversationsManager && this._conversationsManager.hide();
   }
   isAvailable() {
-    return true === this.we && !D(this._conversationsManager);
+    return true === this.xe && !D(this._conversationsManager);
   }
   isVisible() {
     var t2, i2;
@@ -3509,22 +3509,22 @@ var ao = class {
 var lo = class {
   constructor(t2) {
     var i2;
-    this.ke = false, this.Pe = false, this._instance = t2, this._instance && null != (i2 = this._instance.config.logs) && i2.captureConsoleLogs && (this.ke = true);
+    this.Pe = false, this.Te = false, this._instance = t2, this._instance && null != (i2 = this._instance.config.logs) && i2.captureConsoleLogs && (this.Pe = true);
   }
   onRemoteConfig(t2) {
     var i2, e2 = null == (i2 = t2.logs) ? void 0 : i2.captureConsoleLogs;
-    !j(e2) && e2 && (this.ke = true, this.loadIfEnabled());
+    !j(e2) && e2 && (this.Pe = true, this.loadIfEnabled());
   }
   reset() {
   }
   loadIfEnabled() {
-    if (this.ke && !this.Pe) {
+    if (this.Pe && !this.Te) {
       var t2 = Si("[logs]"), i2 = null == v ? void 0 : v.__PosthogExtensions__;
       if (i2) {
         var e2 = i2.loadExternalDependency;
         e2 ? e2(this._instance, "logs", ((e3) => {
           var r2;
-          e3 || null == (r2 = i2.logs) || !r2.initializeLogs ? t2.error("Could not load logs script", e3) : (i2.logs.initializeLogs(this._instance), this.Pe = true);
+          e3 || null == (r2 = i2.logs) || !r2.initializeLogs ? t2.error("Could not load logs script", e3) : (i2.logs.initializeLogs(this._instance), this.Te = true);
         })) : t2.error("PostHog loadExternalDependency extension not found.");
       } else t2.error("PostHog Extensions not found.");
     }
@@ -3533,25 +3533,32 @@ var lo = class {
 var uo = Si("[RateLimiter]");
 var ho = class {
   constructor(t2) {
-    var i2, e2;
     this.serverLimits = {}, this.lastEventRateLimited = false, this.checkForLimiting = (t3) => {
-      var i3 = t3.text;
-      if (i3 && i3.length) try {
-        (JSON.parse(i3).quota_limited || []).forEach(((t4) => {
+      var i2 = t3.text;
+      if (i2 && i2.length) try {
+        (JSON.parse(i2).quota_limited || []).forEach(((t4) => {
           uo.info((t4 || "events") + " is quota limited."), this.serverLimits[t4] = (/* @__PURE__ */ new Date()).getTime() + 6e4;
         }));
       } catch (t4) {
-        return void uo.warn('could not rate limit - continuing. Error: "' + (null == t4 ? void 0 : t4.message) + '"', { text: i3 });
+        return void uo.warn('could not rate limit - continuing. Error: "' + (null == t4 ? void 0 : t4.message) + '"', { text: i2 });
       }
-    }, this.instance = t2, this.captureEventsPerSecond = (null == (i2 = t2.config.rate_limiting) ? void 0 : i2.events_per_second) || 10, this.captureEventsBurstLimit = Math.max((null == (e2 = t2.config.rate_limiting) ? void 0 : e2.events_burst_limit) || 10 * this.captureEventsPerSecond, this.captureEventsPerSecond), this.lastEventRateLimited = this.clientRateLimitContext(true).isRateLimited;
+    }, this.instance = t2, this.lastEventRateLimited = this.clientRateLimitContext(true).isRateLimited;
+  }
+  get captureEventsPerSecond() {
+    var t2;
+    return (null == (t2 = this.instance.config.rate_limiting) ? void 0 : t2.events_per_second) || 10;
+  }
+  get captureEventsBurstLimit() {
+    var t2;
+    return Math.max((null == (t2 = this.instance.config.rate_limiting) ? void 0 : t2.events_burst_limit) || 10 * this.captureEventsPerSecond, this.captureEventsPerSecond);
   }
   clientRateLimitContext(t2) {
     var i2, e2, r2;
     void 0 === t2 && (t2 = false);
-    var s2 = (/* @__PURE__ */ new Date()).getTime(), n2 = null !== (i2 = null == (e2 = this.instance.persistence) ? void 0 : e2.get_property(ve)) && void 0 !== i2 ? i2 : { tokens: this.captureEventsBurstLimit, last: s2 };
-    n2.tokens += (s2 - n2.last) / 1e3 * this.captureEventsPerSecond, n2.last = s2, n2.tokens > this.captureEventsBurstLimit && (n2.tokens = this.captureEventsBurstLimit);
-    var o2 = n2.tokens < 1;
-    return o2 || t2 || (n2.tokens = Math.max(0, n2.tokens - 1)), !o2 || this.lastEventRateLimited || t2 || this.instance.capture("$$client_ingestion_warning", { $$client_ingestion_warning_message: "posthog-js client rate limited. Config is set to " + this.captureEventsPerSecond + " events per second and " + this.captureEventsBurstLimit + " events burst limit." }, { skip_client_rate_limiting: true }), this.lastEventRateLimited = o2, null == (r2 = this.instance.persistence) || r2.set_property(ve, n2), { isRateLimited: o2, remainingTokens: n2.tokens };
+    var { captureEventsBurstLimit: s2, captureEventsPerSecond: n2 } = this, o2 = (/* @__PURE__ */ new Date()).getTime(), a2 = null !== (i2 = null == (e2 = this.instance.persistence) ? void 0 : e2.get_property(ve)) && void 0 !== i2 ? i2 : { tokens: s2, last: o2 };
+    a2.tokens += (o2 - a2.last) / 1e3 * n2, a2.last = o2, a2.tokens > s2 && (a2.tokens = s2);
+    var l2 = a2.tokens < 1;
+    return l2 || t2 || (a2.tokens = Math.max(0, a2.tokens - 1)), !l2 || this.lastEventRateLimited || t2 || this.instance.capture("$$client_ingestion_warning", { $$client_ingestion_warning_message: "posthog-js client rate limited. Config is set to " + n2 + " events per second and " + s2 + " events burst limit." }, { skip_client_rate_limiting: true }), this.lastEventRateLimited = l2, null == (r2 = this.instance.persistence) || r2.set_property(ve, a2), { isRateLimited: l2, remainingTokens: a2.tokens };
   }
   isServerRateLimited(t2) {
     var i2 = this.serverLimits[t2 || "events"] || false;
@@ -3567,142 +3574,142 @@ var co = class {
     var t2;
     return null == (t2 = v._POSTHOG_REMOTE_CONFIG) || null == (t2 = t2[this._instance.config.token]) ? void 0 : t2.config;
   }
-  Te(t2) {
+  Ie(t2) {
     var i2, e2;
     null != (i2 = v.__PosthogExtensions__) && i2.loadExternalDependency ? null == (e2 = v.__PosthogExtensions__) || null == e2.loadExternalDependency || e2.loadExternalDependency(this._instance, "remote-config", (() => t2(this.remoteConfig))) : (vo.error("PostHog Extensions not found. Cannot load remote config."), t2());
   }
-  Ie(t2) {
+  Ce(t2) {
     this._instance._send_request({ method: "GET", url: this._instance.requestRouter.endpointFor("assets", "/array/" + this._instance.config.token + "/config"), callback: (i2) => {
       t2(i2.json);
     } });
   }
   load() {
     try {
-      if (this.remoteConfig) return vo.info("Using preloaded remote config", this.remoteConfig), void this.yi(this.remoteConfig);
+      if (this.remoteConfig) return vo.info("Using preloaded remote config", this.remoteConfig), void this.bi(this.remoteConfig);
       if (this._instance.O()) return void vo.warn("Remote config is disabled. Falling back to local config.");
-      this.Te(((t2) => {
-        if (!t2) return vo.info("No config found after loading remote JS config. Falling back to JSON."), void this.Ie(((t3) => {
-          this.yi(t3);
+      this.Ie(((t2) => {
+        if (!t2) return vo.info("No config found after loading remote JS config. Falling back to JSON."), void this.Ce(((t3) => {
+          this.bi(t3);
         }));
-        this.yi(t2);
+        this.bi(t2);
       }));
     } catch (t2) {
       vo.error("Error loading remote config", t2);
     }
   }
-  yi(t2) {
-    t2 ? this._instance.config.__preview_remote_config ? (this._instance.yi(t2), false !== t2.hasFeatureFlags && this._instance.featureFlags.ensureFlagsLoaded()) : vo.info("__preview_remote_config is disabled. Logging config instead", t2) : vo.error("Failed to fetch remote config from PostHog.");
+  bi(t2) {
+    t2 ? this._instance.config.__preview_remote_config ? (this._instance.bi(t2), false !== t2.hasFeatureFlags && this._instance.featureFlags.ensureFlagsLoaded()) : vo.info("__preview_remote_config is disabled. Logging config instead", t2) : vo.error("Failed to fetch remote config from PostHog.");
   }
 };
 var fo = 3e3;
 var po = class {
   constructor(t2, i2) {
-    this.Ce = true, this.Re = [], this.Fe = K((null == i2 ? void 0 : i2.flush_interval_ms) || fo, 250, 5e3, $i.createLogger("flush interval"), fo), this.Me = t2;
+    this.Re = true, this.Fe = [], this.Me = K((null == i2 ? void 0 : i2.flush_interval_ms) || fo, 250, 5e3, $i.createLogger("flush interval"), fo), this.Oe = t2;
   }
   enqueue(t2) {
-    this.Re.push(t2), this.Oe || this.Ae();
+    this.Fe.push(t2), this.Ae || this.De();
   }
   unload() {
-    this.De();
-    var t2 = this.Re.length > 0 ? this.je() : {}, i2 = Object.values(t2);
+    this.je();
+    var t2 = this.Fe.length > 0 ? this.Le() : {}, i2 = Object.values(t2);
     [...i2.filter(((t3) => 0 === t3.url.indexOf("/e"))), ...i2.filter(((t3) => 0 !== t3.url.indexOf("/e")))].map(((t3) => {
-      this.Me(g({}, t3, { transport: "sendBeacon" }));
+      this.Oe(g({}, t3, { transport: "sendBeacon" }));
     }));
   }
   enable() {
-    this.Ce = false, this.Ae();
+    this.Re = false, this.De();
   }
-  Ae() {
+  De() {
     var t2 = this;
-    this.Ce || (this.Oe = setTimeout((() => {
-      if (this.De(), this.Re.length > 0) {
-        var i2 = this.je(), e2 = function() {
+    this.Re || (this.Ae = setTimeout((() => {
+      if (this.je(), this.Fe.length > 0) {
+        var i2 = this.Le(), e2 = function() {
           var e3 = i2[r2], s2 = (/* @__PURE__ */ new Date()).getTime();
           e3.data && I(e3.data) && Ci(e3.data, ((t3) => {
             t3.offset = Math.abs(t3.timestamp - s2), delete t3.timestamp;
-          })), t2.Me(e3);
+          })), t2.Oe(e3);
         };
         for (var r2 in i2) e2();
       }
-    }), this.Fe));
-  }
-  De() {
-    clearTimeout(this.Oe), this.Oe = void 0;
+    }), this.Me));
   }
   je() {
+    clearTimeout(this.Ae), this.Ae = void 0;
+  }
+  Le() {
     var t2 = {};
-    return Ci(this.Re, ((i2) => {
+    return Ci(this.Fe, ((i2) => {
       var e2, r2 = i2, s2 = (r2 ? r2.batchKey : null) || r2.url;
       M(t2[s2]) && (t2[s2] = g({}, r2, { data: [] })), null == (e2 = t2[s2].data) || e2.push(r2.data);
-    })), this.Re = [], t2;
+    })), this.Fe = [], t2;
   }
 };
 var go = ["retriesPerformedSoFar"];
 var _o = class {
   constructor(i2) {
-    this.Le = false, this.Ne = 3e3, this.Re = [], this._instance = i2, this.Re = [], this.Ue = true, !M(t) && "onLine" in t.navigator && (this.Ue = t.navigator.onLine, this.ze = () => {
-      this.Ue = true, this.Lt();
-    }, this.He = () => {
-      this.Ue = false;
-    }, zi(t, "online", this.ze), zi(t, "offline", this.He));
+    this.Ne = false, this.Ue = 3e3, this.Fe = [], this._instance = i2, this.Fe = [], this.ze = true, !M(t) && "onLine" in t.navigator && (this.ze = t.navigator.onLine, this.He = () => {
+      this.ze = true, this.Lt();
+    }, this.Be = () => {
+      this.ze = false;
+    }, zi(t, "online", this.He), zi(t, "offline", this.Be));
   }
   get length() {
-    return this.Re.length;
+    return this.Fe.length;
   }
   retriableRequest(t2) {
     var { retriesPerformedSoFar: i2 } = t2, e2 = _(t2, go);
     N(i2) && (e2.url = un(e2.url, { retry_count: i2 })), this._instance._send_request(g({}, e2, { callback: (t3) => {
-      200 !== t3.statusCode && (t3.statusCode < 400 || t3.statusCode >= 500) && (null != i2 ? i2 : 0) < 10 ? this.Be(g({ retriesPerformedSoFar: i2 }, e2)) : null == e2.callback || e2.callback(t3);
+      200 !== t3.statusCode && (t3.statusCode < 400 || t3.statusCode >= 500) && (null != i2 ? i2 : 0) < 10 ? this.qe(g({ retriesPerformedSoFar: i2 }, e2)) : null == e2.callback || e2.callback(t3);
     } }));
   }
-  Be(t2) {
+  qe(t2) {
     var i2 = t2.retriesPerformedSoFar || 0;
     t2.retriesPerformedSoFar = i2 + 1;
     var e2 = (function(t3) {
       var i3 = 3e3 * Math.pow(2, t3), e3 = i3 / 2, r3 = Math.min(18e5, i3), s3 = (Math.random() - 0.5) * (r3 - e3);
       return Math.ceil(r3 + s3);
     })(i2), r2 = Date.now() + e2;
-    this.Re.push({ retryAt: r2, requestOptions: t2 });
+    this.Fe.push({ retryAt: r2, requestOptions: t2 });
     var s2 = "Enqueued failed request for retry in " + e2;
-    navigator.onLine || (s2 += " (Browser is offline)"), $i.warn(s2), this.Le || (this.Le = true, this.qe());
+    navigator.onLine || (s2 += " (Browser is offline)"), $i.warn(s2), this.Ne || (this.Ne = true, this.We());
   }
-  qe() {
-    if (this.We && clearTimeout(this.We), 0 === this.Re.length) return this.Le = false, void (this.We = void 0);
-    this.We = setTimeout((() => {
-      this.Ue && this.Re.length > 0 && this.Lt(), this.qe();
-    }), this.Ne);
+  We() {
+    if (this.Ge && clearTimeout(this.Ge), 0 === this.Fe.length) return this.Ne = false, void (this.Ge = void 0);
+    this.Ge = setTimeout((() => {
+      this.ze && this.Fe.length > 0 && this.Lt(), this.We();
+    }), this.Ue);
   }
   Lt() {
-    var t2 = Date.now(), i2 = [], e2 = this.Re.filter(((e3) => e3.retryAt < t2 || (i2.push(e3), false)));
-    if (this.Re = i2, e2.length > 0) for (var { requestOptions: r2 } of e2) this.retriableRequest(r2);
+    var t2 = Date.now(), i2 = [], e2 = this.Fe.filter(((e3) => e3.retryAt < t2 || (i2.push(e3), false)));
+    if (this.Fe = i2, e2.length > 0) for (var { requestOptions: r2 } of e2) this.retriableRequest(r2);
   }
   unload() {
-    for (var { requestOptions: i2 } of (this.We && (clearTimeout(this.We), this.We = void 0), this.Le = false, M(t) || (this.ze && (t.removeEventListener("online", this.ze), this.ze = void 0), this.He && (t.removeEventListener("offline", this.He), this.He = void 0)), this.Re)) try {
+    for (var { requestOptions: i2 } of (this.Ge && (clearTimeout(this.Ge), this.Ge = void 0), this.Ne = false, M(t) || (this.He && (t.removeEventListener("online", this.He), this.He = void 0), this.Be && (t.removeEventListener("offline", this.Be), this.Be = void 0)), this.Fe)) try {
       this._instance._send_request(g({}, i2, { transport: "sendBeacon" }));
     } catch (t2) {
       $i.error(t2);
     }
-    this.Re = [];
+    this.Fe = [];
   }
 };
 var mo = class {
   constructor(t2) {
-    this.Ge = () => {
+    this.Ve = () => {
       var t3, i2, e2, r2;
-      this.Ve || (this.Ve = {});
+      this.Je || (this.Je = {});
       var s2 = this.scrollElement(), n2 = this.scrollY(), o2 = s2 ? Math.max(0, s2.scrollHeight - s2.clientHeight) : 0, a2 = n2 + ((null == s2 ? void 0 : s2.clientHeight) || 0), l2 = (null == s2 ? void 0 : s2.scrollHeight) || 0;
-      this.Ve.lastScrollY = Math.ceil(n2), this.Ve.maxScrollY = Math.max(n2, null !== (t3 = this.Ve.maxScrollY) && void 0 !== t3 ? t3 : 0), this.Ve.maxScrollHeight = Math.max(o2, null !== (i2 = this.Ve.maxScrollHeight) && void 0 !== i2 ? i2 : 0), this.Ve.lastContentY = a2, this.Ve.maxContentY = Math.max(a2, null !== (e2 = this.Ve.maxContentY) && void 0 !== e2 ? e2 : 0), this.Ve.maxContentHeight = Math.max(l2, null !== (r2 = this.Ve.maxContentHeight) && void 0 !== r2 ? r2 : 0);
+      this.Je.lastScrollY = Math.ceil(n2), this.Je.maxScrollY = Math.max(n2, null !== (t3 = this.Je.maxScrollY) && void 0 !== t3 ? t3 : 0), this.Je.maxScrollHeight = Math.max(o2, null !== (i2 = this.Je.maxScrollHeight) && void 0 !== i2 ? i2 : 0), this.Je.lastContentY = a2, this.Je.maxContentY = Math.max(a2, null !== (e2 = this.Je.maxContentY) && void 0 !== e2 ? e2 : 0), this.Je.maxContentHeight = Math.max(l2, null !== (r2 = this.Je.maxContentHeight) && void 0 !== r2 ? r2 : 0);
     }, this._instance = t2;
   }
   getContext() {
-    return this.Ve;
+    return this.Je;
   }
   resetContext() {
-    var t2 = this.Ve;
-    return setTimeout(this.Ge, 0), t2;
+    var t2 = this.Je;
+    return setTimeout(this.Ve, 0), t2;
   }
   startMeasuringScrollPosition() {
-    zi(t, "scroll", this.Ge, { capture: true }), zi(t, "scrollend", this.Ge, { capture: true }), zi(t, "resize", this.Ge);
+    zi(t, "scroll", this.Ve, { capture: true }), zi(t, "scrollend", this.Ve, { capture: true }), zi(t, "resize", this.Ve);
   }
   scrollElement() {
     if (!this._instance.config.scroll_root_selector) return null == t ? void 0 : t.document.documentElement;
@@ -3730,19 +3737,19 @@ var mo = class {
 var yo = (t2) => ds(null == t2 ? void 0 : t2.config.mask_personal_data_properties, null == t2 ? void 0 : t2.config.custom_personal_data_properties);
 var bo = class {
   constructor(t2, i2, e2, r2) {
-    this.Je = (t3) => {
-      var i3 = this.Ke();
+    this.Ke = (t3) => {
+      var i3 = this.Ye();
       if (!i3 || i3.sessionId !== t3) {
-        var e3 = { sessionId: t3, props: this.Ye(this._instance) };
-        this.Xe.register({ [de]: e3 });
+        var e3 = { sessionId: t3, props: this.Xe(this._instance) };
+        this.Qe.register({ [de]: e3 });
       }
-    }, this._instance = t2, this.Qe = i2, this.Xe = e2, this.Ye = r2 || yo, this.Qe.onSessionId(this.Je);
+    }, this._instance = t2, this.Ze = i2, this.Qe = e2, this.Xe = r2 || yo, this.Ze.onSessionId(this.Ke);
   }
-  Ke() {
-    return this.Xe.props[de];
+  Ye() {
+    return this.Qe.props[de];
   }
   getSetOnceProps() {
-    var t2, i2 = null == (t2 = this.Ke()) ? void 0 : t2.props;
+    var t2, i2 = null == (t2 = this.Ye()) ? void 0 : t2.props;
     return i2 ? "r" in i2 ? vs(i2) : { $referring_domain: i2.referringDomain, $pathname: i2.initialPathName, utm_source: i2.utm_source, utm_campaign: i2.utm_campaign, utm_medium: i2.utm_medium, utm_content: i2.utm_content, utm_term: i2.utm_term } : {};
   }
   getSessionProps() {
@@ -3755,17 +3762,17 @@ var bo = class {
 var wo = Si("[SessionId]");
 var xo = class {
   on(t2, i2) {
-    return this.Ze.on(t2, i2);
+    return this.tr.on(t2, i2);
   }
   constructor(t2, i2, e2) {
     var r2;
-    if (this.tr = [], this.ir = void 0, this.Ze = new to(), this.er = (t3, i3) => !(!N(t3) || !N(i3)) && Math.abs(t3 - i3) > this.sessionTimeoutMs, !t2.persistence) throw new Error("SessionIdManager requires a PostHogPersistence instance");
+    if (this.ir = [], this.er = void 0, this.tr = new to(), this.rr = (t3, i3) => !(!N(t3) || !N(i3)) && Math.abs(t3 - i3) > this.sessionTimeoutMs, !t2.persistence) throw new Error("SessionIdManager requires a PostHogPersistence instance");
     if ("always" === t2.config.cookieless_mode) throw new Error('SessionIdManager cannot be used with cookieless_mode="always"');
-    this.R = t2.config, this.Xe = t2.persistence, this.rr = void 0, this.sr = void 0, this._sessionStartTimestamp = null, this._sessionActivityTimestamp = null, this.nr = i2 || br, this.ar = e2 || br;
+    this.R = t2.config, this.Qe = t2.persistence, this.sr = void 0, this.nr = void 0, this._sessionStartTimestamp = null, this._sessionActivityTimestamp = null, this.ar = i2 || br, this.lr = e2 || br;
     var s2 = this.R.persistence_name || this.R.token, n2 = this.R.session_idle_timeout_seconds || 1800;
-    if (this._sessionTimeoutMs = 1e3 * K(n2, 60, 36e3, wo.createLogger("session_idle_timeout_seconds"), 1800), t2.register({ $configured_session_timeout_ms: this._sessionTimeoutMs }), this.lr(), this.ur = "ph_" + s2 + "_window_id", this.hr = "ph_" + s2 + "_primary_window_exists", this.dr()) {
-      var o2 = Fr.W(this.ur), a2 = Fr.W(this.hr);
-      o2 && !a2 ? this.rr = o2 : Fr.V(this.ur), Fr.G(this.hr, true);
+    if (this._sessionTimeoutMs = 1e3 * K(n2, 60, 36e3, wo.createLogger("session_idle_timeout_seconds"), 1800), t2.register({ $configured_session_timeout_ms: this._sessionTimeoutMs }), this.ur(), this.hr = "ph_" + s2 + "_window_id", this.dr = "ph_" + s2 + "_primary_window_exists", this.vr()) {
+      var o2 = Fr.W(this.hr), a2 = Fr.W(this.dr);
+      o2 && !a2 ? this.sr = o2 : Fr.V(this.hr), Fr.G(this.dr, true);
     }
     if (null != (r2 = this.R.bootstrap) && r2.sessionID) try {
       var l2 = ((t3) => {
@@ -3774,60 +3781,60 @@ var xo = class {
         if ("7" !== i3[12]) throw new Error("Not a UUIDv7");
         return parseInt(i3.substring(0, 12), 16);
       })(this.R.bootstrap.sessionID);
-      this.vr(this.R.bootstrap.sessionID, (/* @__PURE__ */ new Date()).getTime(), l2);
+      this.cr(this.R.bootstrap.sessionID, (/* @__PURE__ */ new Date()).getTime(), l2);
     } catch (t3) {
       wo.error("Invalid sessionID in bootstrap", t3);
     }
-    this.cr();
+    this.pr();
   }
   get sessionTimeoutMs() {
     return this._sessionTimeoutMs;
   }
   onSessionId(t2) {
-    return M(this.tr) && (this.tr = []), this.tr.push(t2), this.sr && t2(this.sr, this.rr), () => {
-      this.tr = this.tr.filter(((i2) => i2 !== t2));
+    return M(this.ir) && (this.ir = []), this.ir.push(t2), this.nr && t2(this.nr, this.sr), () => {
+      this.ir = this.ir.filter(((i2) => i2 !== t2));
     };
   }
-  dr() {
-    return "memory" !== this.R.persistence && !this.Xe.Si && Fr.H();
+  vr() {
+    return "memory" !== this.R.persistence && !this.Qe.ki && Fr.H();
   }
-  pr(t2) {
-    t2 !== this.rr && (this.rr = t2, this.dr() && Fr.G(this.ur, t2));
-  }
-  gr() {
-    return this.rr ? this.rr : this.dr() ? Fr.W(this.ur) : null;
-  }
-  vr(t2, i2, e2) {
-    t2 === this.sr && i2 === this._sessionActivityTimestamp && e2 === this._sessionStartTimestamp || (this._sessionStartTimestamp = e2, this._sessionActivityTimestamp = i2, this.sr = t2, this.Xe.register({ [ie]: [i2, t2, e2] }));
+  gr(t2) {
+    t2 !== this.sr && (this.sr = t2, this.vr() && Fr.G(this.hr, t2));
   }
   _r() {
-    var t2 = this.Xe.props[ie];
+    return this.sr ? this.sr : this.vr() ? Fr.W(this.hr) : null;
+  }
+  cr(t2, i2, e2) {
+    t2 === this.nr && i2 === this._sessionActivityTimestamp && e2 === this._sessionStartTimestamp || (this._sessionStartTimestamp = e2, this._sessionActivityTimestamp = i2, this.nr = t2, this.Qe.register({ [ie]: [i2, t2, e2] }));
+  }
+  mr() {
+    var t2 = this.Qe.props[ie];
     return I(t2) && 2 === t2.length && t2.push(t2[0]), t2 || [0, null, 0];
   }
   resetSessionId() {
-    this.vr(null, null, null);
+    this.cr(null, null, null);
   }
   destroy() {
-    clearTimeout(this.mr), this.mr = void 0, this.ir && t && (t.removeEventListener("beforeunload", this.ir, { capture: false }), this.ir = void 0), this.tr = [];
+    clearTimeout(this.yr), this.yr = void 0, this.er && t && (t.removeEventListener("beforeunload", this.er, { capture: false }), this.er = void 0), this.ir = [];
   }
-  cr() {
-    this.ir = () => {
-      this.dr() && Fr.V(this.hr);
-    }, zi(t, "beforeunload", this.ir, { capture: false });
+  pr() {
+    this.er = () => {
+      this.vr() && Fr.V(this.dr);
+    }, zi(t, "beforeunload", this.er, { capture: false });
   }
   checkAndGetSessionAndWindowId(t2, i2) {
     if (void 0 === t2 && (t2 = false), void 0 === i2 && (i2 = null), "always" === this.R.cookieless_mode) throw new Error('checkAndGetSessionAndWindowId should not be called with cookieless_mode="always"');
-    var e2 = i2 || (/* @__PURE__ */ new Date()).getTime(), [r2, s2, n2] = this._r(), o2 = this.gr(), a2 = N(n2) && Math.abs(e2 - n2) > 864e5, l2 = false, u2 = !s2, h2 = !u2 && !t2 && this.er(e2, r2);
-    u2 || h2 || a2 ? (s2 = this.nr(), o2 = this.ar(), wo.info("new session ID generated", { sessionId: s2, windowId: o2, changeReason: { noSessionId: u2, activityTimeout: h2, sessionPastMaximumLength: a2 } }), n2 = e2, l2 = true) : o2 || (o2 = this.ar(), l2 = true);
+    var e2 = i2 || (/* @__PURE__ */ new Date()).getTime(), [r2, s2, n2] = this.mr(), o2 = this._r(), a2 = N(n2) && Math.abs(e2 - n2) > 864e5, l2 = false, u2 = !s2, h2 = !u2 && !t2 && this.rr(e2, r2);
+    u2 || h2 || a2 ? (s2 = this.ar(), o2 = this.lr(), wo.info("new session ID generated", { sessionId: s2, windowId: o2, changeReason: { noSessionId: u2, activityTimeout: h2, sessionPastMaximumLength: a2 } }), n2 = e2, l2 = true) : o2 || (o2 = this.lr(), l2 = true);
     var d2 = !!N(r2) && t2 && !a2 ? r2 : e2, v2 = !N(n2) ? (/* @__PURE__ */ new Date()).getTime() : n2;
-    return this.pr(o2), this.vr(s2, d2, v2), t2 || this.lr(), l2 && this.tr.forEach(((t3) => t3(s2, o2, l2 ? { noSessionId: u2, activityTimeout: h2, sessionPastMaximumLength: a2 } : void 0))), { sessionId: s2, windowId: o2, sessionStartTimestamp: v2, changeReason: l2 ? { noSessionId: u2, activityTimeout: h2, sessionPastMaximumLength: a2 } : void 0, lastActivityTimestamp: r2 };
+    return this.gr(o2), this.cr(s2, d2, v2), t2 || this.ur(), l2 && this.ir.forEach(((t3) => t3(s2, o2, l2 ? { noSessionId: u2, activityTimeout: h2, sessionPastMaximumLength: a2 } : void 0))), { sessionId: s2, windowId: o2, sessionStartTimestamp: v2, changeReason: l2 ? { noSessionId: u2, activityTimeout: h2, sessionPastMaximumLength: a2 } : void 0, lastActivityTimestamp: r2 };
   }
-  lr() {
-    clearTimeout(this.mr), this.mr = setTimeout((() => {
-      var [t2] = this._r();
-      if (this.er((/* @__PURE__ */ new Date()).getTime(), t2)) {
-        var i2 = this.sr;
-        this.resetSessionId(), this.Ze.emit("forcedIdleReset", { idleSessionId: i2 });
+  ur() {
+    clearTimeout(this.yr), this.yr = setTimeout((() => {
+      var [t2] = this.mr();
+      if (this.rr((/* @__PURE__ */ new Date()).getTime(), t2)) {
+        var i2 = this.nr;
+        this.resetSessionId(), this.tr.emit("forcedIdleReset", { idleSessionId: i2 });
       }
     }), 1.1 * this.sessionTimeoutMs);
   }
@@ -3836,15 +3843,15 @@ var Eo = ["$set_once", "$set"];
 var $o = Si("[SiteApps]");
 var So = class {
   constructor(t2) {
-    this._instance = t2, this.yr = [], this.apps = {};
+    this._instance = t2, this.br = [], this.apps = {};
   }
   get isEnabled() {
     return !!this._instance.config.opt_in_site_apps;
   }
-  br(t2, i2) {
+  wr(t2, i2) {
     if (i2) {
       var e2 = this.globalsForEvent(i2);
-      this.yr.push(e2), this.yr.length > 1e3 && (this.yr = this.yr.slice(10));
+      this.br.push(e2), this.br.length > 1e3 && (this.br = this.br.slice(10));
     }
   }
   get siteAppLoaders() {
@@ -3853,9 +3860,9 @@ var So = class {
   }
   init() {
     if (this.isEnabled) {
-      var t2 = this._instance.Hi(this.br.bind(this));
-      this.wr = () => {
-        t2(), this.yr = [], this.wr = void 0;
+      var t2 = this._instance.Bi(this.wr.bind(this));
+      this.Er = () => {
+        t2(), this.br = [], this.Er = void 0;
       };
     }
   }
@@ -3870,7 +3877,7 @@ var So = class {
   setupSiteApp(t2) {
     var i2 = this.apps[t2.id], e2 = () => {
       var e3;
-      (!i2.errored && this.yr.length && ($o.info("Processing " + this.yr.length + " events for site app with id " + t2.id), this.yr.forEach(((t3) => null == i2.processEvent ? void 0 : i2.processEvent(t3))), i2.processedBuffer = true), Object.values(this.apps).every(((t3) => t3.processedBuffer || t3.errored))) && (null == (e3 = this.wr) || e3.call(this));
+      (!i2.errored && this.br.length && ($o.info("Processing " + this.br.length + " events for site app with id " + t2.id), this.br.forEach(((t3) => null == i2.processEvent ? void 0 : i2.processEvent(t3))), i2.processedBuffer = true), Object.values(this.apps).every(((t3) => t3.processedBuffer || t3.errored))) && (null == (e3 = this.Er) || e3.call(this));
     }, r2 = false, s2 = (s3) => {
       i2.errored = !s3, i2.loaded = true, $o.info("Site app with id " + t2.id + " " + (s3 ? "loaded" : "errored")), r2 && e2();
     };
@@ -3888,12 +3895,12 @@ var So = class {
       $o.error("Error while processing buffered events PostHog app with config id " + t2.id, e3), i2.errored = true;
     }
   }
-  Er() {
+  $r() {
     var t2 = this.siteAppLoaders || [];
     for (var i2 of t2) this.apps[i2.id] = { id: i2.id, loaded: false, errored: false, processedBuffer: false };
     for (var e2 of t2) this.setupSiteApp(e2);
   }
-  $r(t2) {
+  Sr(t2) {
     if (0 !== Object.keys(this.apps).length) {
       var i2 = this.globalsForEvent(t2);
       for (var e2 of Object.values(this.apps)) try {
@@ -3905,8 +3912,8 @@ var So = class {
   }
   onRemoteConfig(t2) {
     var i2, e2, r2, s2 = this;
-    if (null != (i2 = this.siteAppLoaders) && i2.length) return this.isEnabled ? (this.Er(), void this._instance.on("eventCaptured", ((t3) => this.$r(t3)))) : void $o.error('PostHog site apps are disabled. Enable the "opt_in_site_apps" config to proceed.');
-    if (null == (e2 = this.wr) || e2.call(this), null != (r2 = t2.siteApps) && r2.length) if (this.isEnabled) {
+    if (null != (i2 = this.siteAppLoaders) && i2.length) return this.isEnabled ? (this.$r(), void this._instance.on("eventCaptured", ((t3) => this.Sr(t3)))) : void $o.error('PostHog site apps are disabled. Enable the "opt_in_site_apps" config to proceed.');
+    if (null == (e2 = this.Er) || e2.call(this), null != (r2 = t2.siteApps) && r2.length) if (this.isEnabled) {
       var n2 = function(t3) {
         var i3;
         v["__$$ph_site_app_" + t3] = s2._instance, null == (i3 = v.__PosthogExtensions__) || null == i3.loadSiteApp || i3.loadSiteApp(s2._instance, a2, ((i4) => {
@@ -3934,7 +3941,7 @@ var Po = (function(t2) {
 var To = "i.posthog.com";
 var Io = class {
   constructor(t2) {
-    this.Sr = {}, this.instance = t2;
+    this.kr = {}, this.instance = t2;
   }
   get apiHost() {
     var t2 = this.instance.config.api_host.trim().replace(/\/$/, "");
@@ -3949,7 +3956,7 @@ var Io = class {
     return i2 || (i2 = this.apiHost.replace("." + To, ".posthog.com")), "https://app.posthog.com" === i2 ? "https://us.posthog.com" : i2;
   }
   get region() {
-    return this.Sr[this.apiHost] || (/https:\/\/(app|us|us-assets)(\.i)?\.posthog\.com/i.test(this.apiHost) ? this.Sr[this.apiHost] = Po.US : /https:\/\/(eu|eu-assets)(\.i)?\.posthog\.com/i.test(this.apiHost) ? this.Sr[this.apiHost] = Po.EU : this.Sr[this.apiHost] = Po.CUSTOM), this.Sr[this.apiHost];
+    return this.kr[this.apiHost] || (/https:\/\/(app|us|us-assets)(\.i)?\.posthog\.com/i.test(this.apiHost) ? this.kr[this.apiHost] = Po.US : /https:\/\/(eu|eu-assets)(\.i)?\.posthog\.com/i.test(this.apiHost) ? this.kr[this.apiHost] = Po.EU : this.kr[this.apiHost] = Po.CUSTOM), this.kr[this.apiHost];
   }
   endpointFor(t2, i2) {
     if (void 0 === i2 && (i2 = ""), i2 && (i2 = "/" === i2[0] ? i2 : "/" + i2), "ui" === t2) return this.uiHost + i2;
@@ -3970,15 +3977,15 @@ var Ro = class _Ro {
     var i2 = this;
     this.getWebExperimentsAndEvaluateDisplayLogic = function(t3) {
       void 0 === t3 && (t3 = false), i2.getWebExperiments(((t4) => {
-        _Ro.kr("retrieved web experiments from the server"), i2.Pr = /* @__PURE__ */ new Map(), t4.forEach(((t5) => {
+        _Ro.Pr("retrieved web experiments from the server"), i2.Tr = /* @__PURE__ */ new Map(), t4.forEach(((t5) => {
           if (t5.feature_flag_key) {
             var e2;
-            if (i2.Pr) _Ro.kr("setting flag key ", t5.feature_flag_key, " to web experiment ", t5), null == (e2 = i2.Pr) || e2.set(t5.feature_flag_key, t5);
+            if (i2.Tr) _Ro.Pr("setting flag key ", t5.feature_flag_key, " to web experiment ", t5), null == (e2 = i2.Tr) || e2.set(t5.feature_flag_key, t5);
             var r2 = i2._instance.getFeatureFlag(t5.feature_flag_key);
-            O(r2) && t5.variants[r2] && i2.Tr(t5.name, r2, t5.variants[r2].transforms);
+            O(r2) && t5.variants[r2] && i2.Ir(t5.name, r2, t5.variants[r2].transforms);
           } else if (t5.variants) for (var s2 in t5.variants) {
             var n2 = t5.variants[s2];
-            _Ro.Ir(n2) && i2.Tr(t5.name, s2, n2.transforms);
+            _Ro.Cr(n2) && i2.Ir(t5.name, s2, n2.transforms);
           }
         }));
       }), t3);
@@ -3987,14 +3994,14 @@ var Ro = class _Ro {
     }));
   }
   onFeatureFlags(t2) {
-    if (this._is_bot()) _Ro.kr("Refusing to render web experiment since the viewer is a likely bot");
+    if (this._is_bot()) _Ro.Pr("Refusing to render web experiment since the viewer is a likely bot");
     else if (!this._instance.config.disable_web_experiments) {
-      if (j(this.Pr)) return this.Pr = /* @__PURE__ */ new Map(), this.loadIfEnabled(), void this.previewWebExperiment();
-      _Ro.kr("applying feature flags", t2), t2.forEach(((t3) => {
+      if (j(this.Tr)) return this.Tr = /* @__PURE__ */ new Map(), this.loadIfEnabled(), void this.previewWebExperiment();
+      _Ro.Pr("applying feature flags", t2), t2.forEach(((t3) => {
         var i2;
-        if (this.Pr && null != (i2 = this.Pr) && i2.has(t3)) {
-          var e2, r2 = this._instance.getFeatureFlag(t3), s2 = null == (e2 = this.Pr) ? void 0 : e2.get(t3);
-          r2 && null != s2 && s2.variants[r2] && this.Tr(s2.name, r2, s2.variants[r2].transforms);
+        if (this.Tr && null != (i2 = this.Tr) && i2.has(t3)) {
+          var e2, r2 = this._instance.getFeatureFlag(t3), s2 = null == (e2 = this.Tr) ? void 0 : e2.get(t3);
+          r2 && null != s2 && s2.variants[r2] && this.Ir(s2.name, r2, s2.variants[r2].transforms);
         }
       }));
     }
@@ -4003,8 +4010,8 @@ var Ro = class _Ro {
     var t2 = _Ro.getWindowLocation();
     if (null != t2 && t2.search) {
       var i2 = sr(null == t2 ? void 0 : t2.search, "__experiment_id"), e2 = sr(null == t2 ? void 0 : t2.search, "__experiment_variant");
-      i2 && e2 && (_Ro.kr("previewing web experiments " + i2 + " && " + e2), this.getWebExperiments(((t3) => {
-        this.Cr(parseInt(i2), e2, t3);
+      i2 && e2 && (_Ro.Pr("previewing web experiments " + i2 + " && " + e2), this.getWebExperiments(((t3) => {
+        this.Rr(parseInt(i2), e2, t3);
       }), false, true));
     }
   }
@@ -4021,14 +4028,14 @@ var Ro = class _Ro {
       return t2(e3);
     } });
   }
-  Cr(t2, i2, e2) {
+  Rr(t2, i2, e2) {
     var r2 = e2.filter(((i3) => i3.id === t2));
-    r2 && r2.length > 0 && (_Ro.kr("Previewing web experiment [" + r2[0].name + "] with variant [" + i2 + "]"), this.Tr(r2[0].name, i2, r2[0].variants[i2].transforms));
+    r2 && r2.length > 0 && (_Ro.Pr("Previewing web experiment [" + r2[0].name + "] with variant [" + i2 + "]"), this.Ir(r2[0].name, i2, r2[0].variants[i2].transforms));
   }
-  static Ir(t2) {
-    return !j(t2.conditions) && (_Ro.Rr(t2) && _Ro.Fr(t2));
+  static Cr(t2) {
+    return !j(t2.conditions) && (_Ro.Fr(t2) && _Ro.Mr(t2));
   }
-  static Rr(t2) {
+  static Fr(t2) {
     var i2;
     if (j(t2.conditions) || j(null == (i2 = t2.conditions) ? void 0 : i2.url)) return true;
     var e2, r2, s2, n2 = _Ro.getWindowLocation();
@@ -4037,7 +4044,7 @@ var Ro = class _Ro {
   static getWindowLocation() {
     return null == t ? void 0 : t.location;
   }
-  static Fr(t2) {
+  static Mr(t2) {
     var i2;
     if (j(t2.conditions) || j(null == (i2 = t2.conditions) ? void 0 : i2.utm)) return true;
     var e2 = os();
@@ -4047,22 +4054,22 @@ var Ro = class _Ro {
     }
     return false;
   }
-  static kr(t2) {
+  static Pr(t2) {
     for (var i2 = arguments.length, e2 = new Array(i2 > 1 ? i2 - 1 : 0), r2 = 1; r2 < i2; r2++) e2[r2 - 1] = arguments[r2];
     $i.info("[WebExperiments] " + t2, e2);
   }
-  Tr(t2, i2, e2) {
-    this._is_bot() ? _Ro.kr("Refusing to render web experiment since the viewer is a likely bot") : "control" !== i2 ? e2.forEach(((e3) => {
+  Ir(t2, i2, e2) {
+    this._is_bot() ? _Ro.Pr("Refusing to render web experiment since the viewer is a likely bot") : "control" !== i2 ? e2.forEach(((e3) => {
       if (e3.selector) {
         var r2;
-        _Ro.kr("applying transform of variant " + i2 + " for experiment " + t2 + " ", e3);
+        _Ro.Pr("applying transform of variant " + i2 + " for experiment " + t2 + " ", e3);
         var s2 = null == (r2 = document) ? void 0 : r2.querySelectorAll(e3.selector);
         null == s2 || s2.forEach(((t3) => {
           var i3 = t3;
           e3.html && (i3.innerHTML = e3.html), e3.css && i3.setAttribute("style", e3.css);
         }));
       }
-    })) : _Ro.kr("Control variants leave the page unmodified.");
+    })) : _Ro.Pr("Control variants leave the page unmodified.");
   }
   _is_bot() {
     return n && this._instance ? ko(n, this._instance.config.custom_blocked_useragents) : void 0;
@@ -4100,95 +4107,95 @@ var Do = Si(Ao);
 var jo = class {
   get started() {
     var t2;
-    return !(null == (t2 = this.Mr) || !t2.isStarted);
+    return !(null == (t2 = this.Or) || !t2.isStarted);
   }
   get status() {
-    return this.Mr ? this.Mr.status : this.Or && !this.Ar ? "disabled" : "lazy_loading";
+    return this.Or ? this.Or.status : this.Ar && !this.Dr ? "disabled" : "lazy_loading";
   }
   constructor(t2) {
-    if (this._forceAllowLocalhostNetworkCapture = false, this.Or = false, this.Dr = void 0, this._instance = t2, !this._instance.sessionManager) throw Do.error("started without valid sessionManager"), new Error(Ao + " started without valid sessionManager. This is a bug.");
+    if (this._forceAllowLocalhostNetworkCapture = false, this.Ar = false, this.jr = void 0, this._instance = t2, !this._instance.sessionManager) throw Do.error("started without valid sessionManager"), new Error(Ao + " started without valid sessionManager. This is a bug.");
     if ("always" === this._instance.config.cookieless_mode) throw new Error(Ao + ' cannot be used with cookieless_mode="always"');
   }
-  get Ar() {
+  get Dr() {
     var i2, e2 = !(null == (i2 = this._instance.get_property(te)) || !i2.enabled), r2 = !this._instance.config.disable_session_recording, s2 = this._instance.config.disable_session_recording || this._instance.consent.isOptedOut();
     return t && e2 && r2 && !s2;
   }
   startIfEnabledOrStop(t2) {
     var i2;
-    if (!this.Ar || null == (i2 = this.Mr) || !i2.isStarted) {
+    if (!this.Dr || null == (i2 = this.Or) || !i2.isStarted) {
       var e2 = !M(Object.assign) && !M(Array.from);
-      this.Ar && e2 ? (this.jr(t2), Do.info("starting")) : this.stopRecording();
+      this.Dr && e2 ? (this.Lr(t2), Do.info("starting")) : this.stopRecording();
     }
   }
-  jr(t2) {
+  Lr(t2) {
     var i2, e2, r2;
-    this.Ar && (null != v && null != (i2 = v.__PosthogExtensions__) && null != (i2 = i2.rrweb) && i2.record && null != (e2 = v.__PosthogExtensions__) && e2.initSessionRecording ? this.Lr(t2) : null == (r2 = v.__PosthogExtensions__) || null == r2.loadExternalDependency || r2.loadExternalDependency(this._instance, this.Nr, ((i3) => {
+    this.Dr && (null != v && null != (i2 = v.__PosthogExtensions__) && null != (i2 = i2.rrweb) && i2.record && null != (e2 = v.__PosthogExtensions__) && e2.initSessionRecording ? this.Nr(t2) : null == (r2 = v.__PosthogExtensions__) || null == r2.loadExternalDependency || r2.loadExternalDependency(this._instance, this.Ur, ((i3) => {
       if (i3) return Do.error("could not load recorder", i3);
-      this.Lr(t2);
+      this.Nr(t2);
     })));
   }
   stopRecording() {
     var t2, i2;
-    null == (t2 = this.Dr) || t2.call(this), this.Dr = void 0, null == (i2 = this.Mr) || i2.stop();
+    null == (t2 = this.jr) || t2.call(this), this.jr = void 0, null == (i2 = this.Or) || i2.stop();
   }
-  Ur() {
+  zr() {
     var t2;
     null == (t2 = this._instance.persistence) || t2.unregister(ee);
   }
-  zr(t2) {
+  Hr(t2) {
     if (this._instance.persistence) {
       var i2, e2, r2 = this._instance.persistence, s2 = () => {
         var i3 = false === t2.sessionRecording ? void 0 : t2.sessionRecording, e3 = null == i3 ? void 0 : i3.sampleRate, s3 = j(e3) ? null : parseFloat(e3);
-        j(s3) && this.Ur();
+        j(s3) && this.zr();
         var n2 = null == i3 ? void 0 : i3.minimumDurationMilliseconds;
         r2.register({ [te]: g({ enabled: !!i3 }, i3, { networkPayloadCapture: g({ capturePerformance: t2.capturePerformance }, null == i3 ? void 0 : i3.networkPayloadCapture), canvasRecording: { enabled: null == i3 ? void 0 : i3.recordCanvas, fps: null == i3 ? void 0 : i3.canvasFps, quality: null == i3 ? void 0 : i3.canvasQuality }, sampleRate: s3, minimumDurationMilliseconds: M(n2) ? null : n2, endpoint: null == i3 ? void 0 : i3.endpoint, triggerMatchType: null == i3 ? void 0 : i3.triggerMatchType, masking: null == i3 ? void 0 : i3.masking, urlTriggers: null == i3 ? void 0 : i3.urlTriggers }) });
       };
-      s2(), null == (i2 = this.Dr) || i2.call(this), this.Dr = null == (e2 = this._instance.sessionManager) ? void 0 : e2.onSessionId(s2);
+      s2(), null == (i2 = this.jr) || i2.call(this), this.jr = null == (e2 = this._instance.sessionManager) ? void 0 : e2.onSessionId(s2);
     }
   }
   onRemoteConfig(t2) {
-    "sessionRecording" in t2 ? false !== t2.sessionRecording ? (this.zr(t2), this.Or = true, this.startIfEnabledOrStop()) : this.Or = true : Do.info("skipping remote config with no sessionRecording", t2);
+    "sessionRecording" in t2 ? false !== t2.sessionRecording ? (this.Hr(t2), this.Ar = true, this.startIfEnabledOrStop()) : this.Ar = true : Do.info("skipping remote config with no sessionRecording", t2);
   }
   log(t2, i2) {
     var e2;
-    void 0 === i2 && (i2 = "log"), null != (e2 = this.Mr) && e2.log ? this.Mr.log(t2, i2) : Do.warn("log called before recorder was ready");
+    void 0 === i2 && (i2 = "log"), null != (e2 = this.Or) && e2.log ? this.Or.log(t2, i2) : Do.warn("log called before recorder was ready");
   }
-  get Nr() {
+  get Ur() {
     var t2, i2, e2 = null == (t2 = this._instance) || null == (t2 = t2.persistence) ? void 0 : t2.get_property(te);
     return (null == e2 || null == (i2 = e2.scriptConfig) ? void 0 : i2.script) || "lazy-recorder";
   }
-  Lr(t2) {
+  Nr(t2) {
     var i2, e2;
     if (null == (i2 = v.__PosthogExtensions__) || !i2.initSessionRecording) throw Error("Called on script loaded before session recording is available");
-    this.Mr || (this.Mr = null == (e2 = v.__PosthogExtensions__) ? void 0 : e2.initSessionRecording(this._instance), this.Mr._forceAllowLocalhostNetworkCapture = this._forceAllowLocalhostNetworkCapture);
-    this.Mr.start(t2);
+    this.Or || (this.Or = null == (e2 = v.__PosthogExtensions__) ? void 0 : e2.initSessionRecording(this._instance), this.Or._forceAllowLocalhostNetworkCapture = this._forceAllowLocalhostNetworkCapture);
+    this.Or.start(t2);
   }
   onRRwebEmit(t2) {
     var i2;
-    null == (i2 = this.Mr) || null == i2.onRRwebEmit || i2.onRRwebEmit(t2);
+    null == (i2 = this.Or) || null == i2.onRRwebEmit || i2.onRRwebEmit(t2);
   }
   overrideLinkedFlag() {
     var t2, i2;
-    this.Mr || (null == (i2 = this._instance.persistence) || i2.register({ $replay_override_linked_flag: true }));
-    null == (t2 = this.Mr) || t2.overrideLinkedFlag();
+    this.Or || (null == (i2 = this._instance.persistence) || i2.register({ $replay_override_linked_flag: true }));
+    null == (t2 = this.Or) || t2.overrideLinkedFlag();
   }
   overrideSampling() {
     var t2, i2;
-    this.Mr || (null == (i2 = this._instance.persistence) || i2.register({ $replay_override_sampling: true }));
-    null == (t2 = this.Mr) || t2.overrideSampling();
+    this.Or || (null == (i2 = this._instance.persistence) || i2.register({ $replay_override_sampling: true }));
+    null == (t2 = this.Or) || t2.overrideSampling();
   }
   overrideTrigger(t2) {
     var i2, e2;
-    this.Mr || (null == (e2 = this._instance.persistence) || e2.register({ ["url" === t2 ? "$replay_override_url_trigger" : "$replay_override_event_trigger"]: true }));
-    null == (i2 = this.Mr) || i2.overrideTrigger(t2);
+    this.Or || (null == (e2 = this._instance.persistence) || e2.register({ ["url" === t2 ? "$replay_override_url_trigger" : "$replay_override_event_trigger"]: true }));
+    null == (i2 = this.Or) || i2.overrideTrigger(t2);
   }
   get sdkDebugProperties() {
     var t2;
-    return (null == (t2 = this.Mr) ? void 0 : t2.sdkDebugProperties) || { $recording_status: this.status };
+    return (null == (t2 = this.Or) ? void 0 : t2.sdkDebugProperties) || { $recording_status: this.status };
   }
   tryAddCustomEvent(t2, i2) {
     var e2;
-    return !(null == (e2 = this.Mr) || !e2.tryAddCustomEvent(t2, i2));
+    return !(null == (e2 = this.Or) || !e2.tryAddCustomEvent(t2, i2));
   }
 };
 var Lo = {};
@@ -4213,10 +4220,10 @@ var qo = class {
   constructor() {
     this.__forceAllowLocalhost = false;
   }
-  get Hr() {
+  get Br() {
     return this.__forceAllowLocalhost;
   }
-  set Hr(t2) {
+  set Br(t2) {
     $i.error("WebPerformanceObserver is deprecated and has no impact on network capture. Use `_forceAllowLocalhostNetworkCapture` on `posthog.sessionRecording`"), this.__forceAllowLocalhost = t2;
   }
 };
@@ -4230,10 +4237,10 @@ var Wo = class _Wo {
     return null !== (t2 = null == (i2 = this.featureFlags) ? void 0 : i2.hasLoadedFlags) && void 0 !== t2 && t2;
   }
   constructor() {
-    this.webPerformance = new qo(), this.Br = false, this.version = c.LIB_VERSION, this.qr = new to(), this._calculate_event_properties = this.calculateEventProperties.bind(this), this.config = Ho(), this.SentryIntegration = Vr, this.sentryIntegration = (t2) => (function(t3, i2) {
+    this.webPerformance = new qo(), this.qr = false, this.version = c.LIB_VERSION, this.Wr = new to(), this._calculate_event_properties = this.calculateEventProperties.bind(this), this.config = Ho(), this.SentryIntegration = Vr, this.sentryIntegration = (t2) => (function(t3, i2) {
       var e2 = Gr(t3, i2);
       return { name: Wr, processEvent: (t4) => e2(t4) };
-    })(this, t2), this.__request_queue = [], this.__loaded = false, this.analyticsDefaultEndpoint = "/e/", this.Wr = false, this.Gr = null, this.Vr = null, this.Jr = null, this.featureFlags = new Rn(this), this.toolbar = new Qr(this), this.scrollManager = new mo(this), this.pageViewManager = new xs(this), this.surveys = new no(this), this.conversations = new ao(this), this.logs = new lo(this), this.experiments = new Ro(this), this.exceptions = new yn(this), this.rateLimiter = new ho(this), this.requestRouter = new Io(this), this.consent = new Or(this), this.externalIntegrations = new Oo(this), this.people = { set: (t2, i2, e2) => {
+    })(this, t2), this.__request_queue = [], this.__loaded = false, this.analyticsDefaultEndpoint = "/e/", this.Gr = false, this.Vr = null, this.Jr = null, this.Kr = null, this.featureFlags = new Rn(this), this.toolbar = new Qr(this), this.scrollManager = new mo(this), this.pageViewManager = new xs(this), this.surveys = new no(this), this.conversations = new ao(this), this.logs = new lo(this), this.experiments = new Ro(this), this.exceptions = new yn(this), this.rateLimiter = new ho(this), this.requestRouter = new Io(this), this.consent = new Or(this), this.externalIntegrations = new Oo(this), this.people = { set: (t2, i2, e2) => {
       var r2 = O(t2) ? { [t2]: i2 } : t2;
       this.setPersonProperties(r2), null == e2 || e2({});
     }, set_once: (t2, i2, e2) => {
@@ -4252,19 +4259,19 @@ var Wo = class _Wo {
     var s2;
     if (void 0 === e2 && (e2 = {}), M(i2) || A(i2)) return $i.critical("PostHog was initialized without a token. This likely indicates a misconfiguration. Please check the first argument passed to posthog.init()"), this;
     if (this.__loaded) return console.warn("[PostHog.js]", "You have already initialized PostHog! Re-initializing is a no-op"), this;
-    this.__loaded = true, this.config = {}, e2.debug = this.Kr(e2.debug), this.Yr = e2, this.Xr = [], e2.person_profiles && (this.Vr = e2.person_profiles), this.set_config(Ri({}, Ho(e2.defaults), Bo(e2), { name: r2, token: i2 })), this.config.on_xhr_error && $i.error("on_xhr_error is deprecated. Use on_request_error instead"), this.compression = e2.disable_compression ? void 0 : $s.GZipJS;
-    var n2 = this.Qr();
+    this.__loaded = true, this.config = {}, e2.debug = this.Yr(e2.debug), this.Xr = e2, this.Qr = [], e2.person_profiles && (this.Jr = e2.person_profiles), this.set_config(Ri({}, Ho(e2.defaults), Bo(e2), { name: r2, token: i2 })), this.config.on_xhr_error && $i.error("on_xhr_error is deprecated. Use on_request_error instead"), this.compression = e2.disable_compression ? void 0 : $s.GZipJS;
+    var n2 = this.Zr();
     this.persistence = new Mn(this.config, n2), this.sessionPersistence = "sessionStorage" === this.config.persistence || "memory" === this.config.persistence ? this.persistence : new Mn(g({}, this.config, { persistence: "sessionStorage" }), n2);
     var o2 = g({}, this.persistence.props), a2 = g({}, this.sessionPersistence.props);
-    this.register({ $initialization_time: (/* @__PURE__ */ new Date()).toISOString() }), this.Zr = new po(((t2) => this.ts(t2)), this.config.request_queue_config), this.es = new _o(this), this.__request_queue = [];
+    this.register({ $initialization_time: (/* @__PURE__ */ new Date()).toISOString() }), this.ts = new po(((t2) => this.es(t2)), this.config.request_queue_config), this.rs = new _o(this), this.__request_queue = [];
     var l2 = "always" === this.config.cookieless_mode || "on_reject" === this.config.cookieless_mode && this.consent.isExplicitlyOptedOut();
     if (l2 || (this.sessionManager = new xo(this), this.sessionPropsManager = new bo(this, this.sessionManager, this.persistence)), this.config.__preview_deferred_init_extensions ? ($i.info("Deferring extension initialization to improve startup performance"), setTimeout((() => {
-      this.rs(l2);
-    }), 0)) : ($i.info("Initializing extensions synchronously"), this.rs(l2)), c.DEBUG = c.DEBUG || this.config.debug, c.DEBUG && $i.info("Starting in debug mode", { this: this, config: e2, thisC: g({}, this.config), p: o2, s: a2 }), void 0 !== (null == (s2 = e2.bootstrap) ? void 0 : s2.distinctID)) {
+      this.ss(l2);
+    }), 0)) : ($i.info("Initializing extensions synchronously"), this.ss(l2)), c.DEBUG = c.DEBUG || this.config.debug, c.DEBUG && $i.info("Starting in debug mode", { this: this, config: e2, thisC: g({}, this.config), p: o2, s: a2 }), void 0 !== (null == (s2 = e2.bootstrap) ? void 0 : s2.distinctID)) {
       var u2, h2, d2 = this.config.get_device_id(br()), v2 = null != (u2 = e2.bootstrap) && u2.isIdentifiedID ? d2 : e2.bootstrap.distinctID;
       this.persistence.set_property(he, null != (h2 = e2.bootstrap) && h2.isIdentifiedID ? "identified" : "anonymous"), this.register({ distinct_id: e2.bootstrap.distinctID, $device_id: v2 });
     }
-    if (this.ss()) {
+    if (this.ns()) {
       var f2, p2, _2 = Object.keys((null == (f2 = e2.bootstrap) ? void 0 : f2.featureFlags) || {}).filter(((t2) => {
         var i3;
         return !(null == (i3 = e2.bootstrap) || null == (i3 = i3.featureFlags) || !i3[t2]);
@@ -4283,9 +4290,9 @@ var Wo = class _Wo {
       var y2 = this.config.get_device_id(br());
       this.register_once({ distinct_id: y2, $device_id: y2 }, ""), this.persistence.set_property(he, "anonymous");
     }
-    return zi(t, "onpagehide" in self ? "pagehide" : "unload", this._handle_unload.bind(this), { passive: false }), this.toolbar.maybeLoadToolbar(), e2.segment ? qr(this, (() => this.ns())) : this.ns(), C(this.config._onCapture) && this.config._onCapture !== No && ($i.warn("onCapture is deprecated. Please use `before_send` instead"), this.on("eventCaptured", ((t2) => this.config._onCapture(t2.event, t2)))), this.config.ip && $i.warn('The `ip` config option has NO EFFECT AT ALL and has been deprecated. Use a custom transformation or "Discard IP data" project setting instead. See https://posthog.com/tutorials/web-redact-properties#hiding-customer-ip-address for more information.'), this;
+    return zi(t, "onpagehide" in self ? "pagehide" : "unload", this._handle_unload.bind(this), { passive: false }), this.toolbar.maybeLoadToolbar(), e2.segment ? qr(this, (() => this.os())) : this.os(), C(this.config._onCapture) && this.config._onCapture !== No && ($i.warn("onCapture is deprecated. Please use `before_send` instead"), this.on("eventCaptured", ((t2) => this.config._onCapture(t2.event, t2)))), this.config.ip && $i.warn('The `ip` config option has NO EFFECT AT ALL and has been deprecated. Use a custom transformation or "Discard IP data" project setting instead. See https://posthog.com/tutorials/web-redact-properties#hiding-customer-ip-address for more information.'), this;
   }
-  rs(t2) {
+  ss(t2) {
     var i2 = performance.now();
     this.historyAutocapture = new Hr(this), this.historyAutocapture.startIfEnabled();
     var e2 = [];
@@ -4317,17 +4324,17 @@ var Wo = class _Wo {
     })), e2.push((() => {
       this.deadClicksAutocapture = new Lr(this, jr), this.deadClicksAutocapture.startIfEnabled();
     })), e2.push((() => {
-      if (this.os) {
-        var t3 = this.os;
-        this.os = void 0, this.yi(t3);
+      if (this.ls) {
+        var t3 = this.ls;
+        this.ls = void 0, this.bi(t3);
       }
-    })), this.ls(e2, i2);
+    })), this.us(e2, i2);
   }
-  ls(t2, i2) {
+  us(t2, i2) {
     for (; t2.length > 0; ) {
       if (this.config.__preview_deferred_init_extensions) {
         if (performance.now() - i2 >= 30 && t2.length > 0) return void setTimeout((() => {
-          this.ls(t2, i2);
+          this.us(t2, i2);
         }), 0);
       }
       var e2 = t2.shift();
@@ -4340,33 +4347,33 @@ var Wo = class _Wo {
     var r2 = Math.round(performance.now() - i2);
     this.register_for_session({ $sdk_debug_extensions_init_method: this.config.__preview_deferred_init_extensions ? "deferred" : "synchronous", $sdk_debug_extensions_init_time_ms: r2 }), this.config.__preview_deferred_init_extensions && $i.info("PostHog extensions initialized (" + r2 + "ms)");
   }
-  yi(t2) {
+  bi(t2) {
     var i2, e2, r2, s2, n2, a2, l2, u2, h2;
     if (!o || !o.body) return $i.info("document not ready yet, trying again in 500 milliseconds..."), void setTimeout((() => {
-      this.yi(t2);
+      this.bi(t2);
     }), 500);
-    this.config.__preview_deferred_init_extensions && (this.os = t2), this.compression = void 0, t2.supportedCompression && !this.config.disable_compression && (this.compression = w(t2.supportedCompression, $s.GZipJS) ? $s.GZipJS : w(t2.supportedCompression, $s.Base64) ? $s.Base64 : void 0), null != (i2 = t2.analytics) && i2.endpoint && (this.analyticsDefaultEndpoint = t2.analytics.endpoint), this.set_config({ person_profiles: this.Vr ? this.Vr : "identified_only" }), null == (e2 = this.siteApps) || e2.onRemoteConfig(t2), null == (r2 = this.sessionRecording) || r2.onRemoteConfig(t2), null == (s2 = this.autocapture) || s2.onRemoteConfig(t2), null == (n2 = this.heatmaps) || n2.onRemoteConfig(t2), this.surveys.onRemoteConfig(t2), this.logs.onRemoteConfig(t2), this.conversations.onRemoteConfig(t2), null == (a2 = this.productTours) || a2.onRemoteConfig(t2), null == (l2 = this.webVitalsAutocapture) || l2.onRemoteConfig(t2), null == (u2 = this.exceptionObserver) || u2.onRemoteConfig(t2), this.exceptions.onRemoteConfig(t2), null == (h2 = this.deadClicksAutocapture) || h2.onRemoteConfig(t2);
+    this.config.__preview_deferred_init_extensions && (this.ls = t2), this.compression = void 0, t2.supportedCompression && !this.config.disable_compression && (this.compression = w(t2.supportedCompression, $s.GZipJS) ? $s.GZipJS : w(t2.supportedCompression, $s.Base64) ? $s.Base64 : void 0), null != (i2 = t2.analytics) && i2.endpoint && (this.analyticsDefaultEndpoint = t2.analytics.endpoint), this.set_config({ person_profiles: this.Jr ? this.Jr : "identified_only" }), null == (e2 = this.siteApps) || e2.onRemoteConfig(t2), null == (r2 = this.sessionRecording) || r2.onRemoteConfig(t2), null == (s2 = this.autocapture) || s2.onRemoteConfig(t2), null == (n2 = this.heatmaps) || n2.onRemoteConfig(t2), this.surveys.onRemoteConfig(t2), this.logs.onRemoteConfig(t2), this.conversations.onRemoteConfig(t2), null == (a2 = this.productTours) || a2.onRemoteConfig(t2), null == (l2 = this.webVitalsAutocapture) || l2.onRemoteConfig(t2), null == (u2 = this.exceptionObserver) || u2.onRemoteConfig(t2), this.exceptions.onRemoteConfig(t2), null == (h2 = this.deadClicksAutocapture) || h2.onRemoteConfig(t2);
   }
-  ns() {
+  os() {
     try {
       this.config.loaded(this);
     } catch (t2) {
       $i.critical("`loaded` function failed", t2);
     }
-    this.us(), this.config.capture_pageview && setTimeout((() => {
-      (this.consent.isOptedIn() || "always" === this.config.cookieless_mode) && this.hs();
+    this.hs(), this.config.capture_pageview && setTimeout((() => {
+      (this.consent.isOptedIn() || "always" === this.config.cookieless_mode) && this.ds();
     }), 1), new co(this).load(), this.featureFlags.flags();
   }
-  us() {
+  hs() {
     var t2;
-    this.is_capturing() && (this.config.request_batching && (null == (t2 = this.Zr) || t2.enable()));
+    this.is_capturing() && (this.config.request_batching && (null == (t2 = this.ts) || t2.enable()));
   }
   _dom_loaded() {
-    this.is_capturing() && Ii(this.__request_queue, ((t2) => this.ts(t2))), this.__request_queue = [], this.us();
+    this.is_capturing() && Ii(this.__request_queue, ((t2) => this.es(t2))), this.__request_queue = [], this.hs();
   }
   _handle_unload() {
     var t2, i2;
-    this.surveys.handlePageUnload(), this.config.request_batching ? (this.ds() && this.capture("$pageleave"), null == (t2 = this.Zr) || t2.unload(), null == (i2 = this.es) || i2.unload()) : this.ds() && this.capture("$pageleave", null, { transport: "sendBeacon" });
+    this.surveys.handlePageUnload(), this.config.request_batching ? (this.vs() && this.capture("$pageleave"), null == (t2 = this.ts) || t2.unload(), null == (i2 = this.rs) || i2.unload()) : this.vs() && this.capture("$pageleave", null, { transport: "sendBeacon" });
   }
   _send_request(t2) {
     this.__loaded && (zo ? this.__request_queue.push(t2) : this.rateLimiter.isServerRateLimited(t2.batchKey) || (t2.transport = t2.transport || this.config.api_transport, t2.url = un(t2.url, { ip: this.config.ip ? 1 : 0 }), t2.headers = g({}, this.config.request_headers, t2.headers), t2.compression = "best-available" === t2.compression ? this.compression : t2.compression, t2.disableXHRCredentials = this.config.__preview_disable_xhr_credentials, this.config.__preview_disable_beacon && (t2.disableTransport = ["sendBeacon"]), t2.fetchOptions = t2.fetchOptions || this.config.fetch_options, ((t3) => {
@@ -4381,8 +4388,8 @@ var Wo = class _Wo {
       null == t2.callback || t2.callback(i2);
     } }))));
   }
-  ts(t2) {
-    this.es ? this.es.retriableRequest(t2) : this._send_request(t2);
+  es(t2) {
+    this.rs ? this.rs.retriableRequest(t2) : this._send_request(t2);
   }
   _execute_array(t2) {
     var i2, e2 = [], r2 = [], s2 = [];
@@ -4401,7 +4408,7 @@ var Wo = class _Wo {
     };
     n2(e2, this), n2(r2, this), n2(s2, this);
   }
-  ss() {
+  ns() {
     var t2, i2;
     return (null == (t2 = this.config.bootstrap) ? void 0 : t2.featureFlags) && Object.keys(null == (i2 = this.config.bootstrap) ? void 0 : i2.featureFlags).length > 0 || false;
   }
@@ -4410,7 +4417,7 @@ var Wo = class _Wo {
   }
   capture(t2, i2, e2) {
     var r2;
-    if (this.__loaded && this.persistence && this.sessionPersistence && this.Zr) {
+    if (this.__loaded && this.persistence && this.sessionPersistence && this.ts) {
       if (this.is_capturing()) if (!M(t2) && O(t2)) {
         var s2 = !this.config.opt_out_useragent_filter && this._is_bot();
         if (!(s2 && !this.config.__preview_capture_bot_pageviews)) {
@@ -4419,27 +4426,27 @@ var Wo = class _Wo {
             null != i2 && i2.$current_url && !O(null == i2 ? void 0 : i2.$current_url) && ($i.error("Invalid `$current_url` property provided to `posthog.capture`. Input must be a string. Ignoring provided value."), null == i2 || delete i2.$current_url), this.sessionPersistence.update_search_keyword(), this.config.save_campaign_params && this.sessionPersistence.update_campaign_params(), this.config.save_referrer && this.sessionPersistence.update_referrer_info(), (this.config.save_campaign_params || this.config.save_referrer) && this.persistence.set_initial_person_info();
             var o2 = /* @__PURE__ */ new Date(), a2 = (null == e2 ? void 0 : e2.timestamp) || o2, l2 = br(), u2 = { uuid: l2, event: t2, properties: this.calculateEventProperties(t2, i2 || {}, a2, l2) };
             "$pageview" === t2 && this.config.__preview_capture_bot_pageviews && s2 && (u2.event = "$bot_pageview", u2.properties.$browser_type = "bot"), n2 && (u2.properties.$lib_rate_limit_remaining_tokens = n2.remainingTokens), (null == e2 ? void 0 : e2.$set) && (u2.$set = null == e2 ? void 0 : e2.$set);
-            var h2, d2 = "$groupidentify" !== t2, v2 = this.vs(null == e2 ? void 0 : e2.$set_once, d2);
+            var h2, d2 = "$groupidentify" !== t2, v2 = this.cs(null == e2 ? void 0 : e2.$set_once, d2);
             if (v2 && (u2.$set_once = v2), (u2 = ji(u2, null != e2 && e2._noTruncate ? null : this.config.properties_string_max_length)).timestamp = a2, M(null == e2 ? void 0 : e2.timestamp) || (u2.properties.$event_time_override_provided = true, u2.properties.$event_time_override_system_time = o2), t2 === Wn.DISMISSED || t2 === Wn.SENT) {
               var c2 = null == i2 ? void 0 : i2[Gn.SURVEY_ID], f2 = null == i2 ? void 0 : i2[Gn.SURVEY_ITERATION];
               h2 = { id: c2, current_iteration: f2 }, localStorage.getItem(Xn(h2)) || localStorage.setItem(Xn(h2), "true"), u2.$set = g({}, u2.$set, { [Yn({ id: c2, current_iteration: f2 }, t2 === Wn.SENT ? "responded" : "dismissed")]: true });
             } else t2 === Wn.SHOWN && (u2.$set = g({}, u2.$set, { [Gn.SURVEY_LAST_SEEN_DATE]: (/* @__PURE__ */ new Date()).toISOString() }));
             var p2 = g({}, u2.properties.$set, u2.$set);
             if (F(p2) || this.setPersonPropertiesForFlags(p2), !j(this.config.before_send)) {
-              var _2 = this.cs(u2);
+              var _2 = this.fs(u2);
               if (!_2) return;
               u2 = _2;
             }
-            this.qr.emit("eventCaptured", u2);
+            this.Wr.emit("eventCaptured", u2);
             var m2 = { method: "POST", url: null !== (r2 = null == e2 ? void 0 : e2._url) && void 0 !== r2 ? r2 : this.requestRouter.endpointFor("api", this.analyticsDefaultEndpoint), data: u2, compression: "best-available", batchKey: null == e2 ? void 0 : e2._batchKey };
-            return !this.config.request_batching || e2 && (null == e2 || !e2._batchKey) || null != e2 && e2.send_instantly ? this.ts(m2) : this.Zr.enqueue(m2), u2;
+            return !this.config.request_batching || e2 && (null == e2 || !e2._batchKey) || null != e2 && e2.send_instantly ? this.es(m2) : this.ts.enqueue(m2), u2;
           }
           $i.critical("This capture call is ignored due to client rate limiting.");
         }
       } else $i.error("No event name provided to posthog.capture");
     } else $i.uninitializedWarning("posthog.capture");
   }
-  Hi(t2) {
+  Bi(t2) {
     return this.on("eventCaptured", ((i2) => t2(i2.event, i2)));
   }
   calculateEventProperties(t2, i2, e2, r2, s2) {
@@ -4457,7 +4464,7 @@ var Wo = class _Wo {
     this.sessionPropsManager && Ri(a2, this.sessionPropsManager.getSessionProps());
     try {
       var f2;
-      this.sessionRecording && Ri(a2, this.sessionRecording.sdkDebugProperties), a2.$sdk_debug_retry_queue_size = null == (f2 = this.es) ? void 0 : f2.length;
+      this.sessionRecording && Ri(a2, this.sessionRecording.sdkDebugProperties), a2.$sdk_debug_retry_queue_size = null == (f2 = this.rs) ? void 0 : f2.length;
     } catch (t3) {
       a2.$sdk_debug_error_capturing_properties = String(t3);
     }
@@ -4470,15 +4477,15 @@ var Wo = class _Wo {
     })) : $i.error("Invalid value for property_denylist config: " + this.config.property_denylist + " or property_blacklist config: " + this.config.property_blacklist);
     var _2 = this.config.sanitize_properties;
     _2 && ($i.error("sanitize_properties is deprecated. Use before_send instead"), a2 = _2(a2, t2));
-    var m2 = this.fs();
-    return a2.$process_person_profile = m2, m2 && !s2 && this.ps("_calculate_event_properties"), a2;
+    var m2 = this.ps();
+    return a2.$process_person_profile = m2, m2 && !s2 && this.gs("_calculate_event_properties"), a2;
   }
-  vs(t2, i2) {
+  cs(t2, i2) {
     var e2;
-    if (void 0 === i2 && (i2 = true), !this.persistence || !this.fs()) return t2;
-    if (this.Br) return t2;
+    if (void 0 === i2 && (i2 = true), !this.persistence || !this.ps()) return t2;
+    if (this.qr) return t2;
     var r2 = this.persistence.get_initial_props(), s2 = null == (e2 = this.sessionPropsManager) ? void 0 : e2.getSetOnceProps(), n2 = Ri({}, r2, s2 || {}, t2 || {}), o2 = this.config.sanitize_properties;
-    return o2 && ($i.error("sanitize_properties is deprecated. Use before_send instead"), n2 = o2(n2, "$set_once")), i2 && (this.Br = true), F(n2) ? void 0 : n2;
+    return o2 && ($i.error("sanitize_properties is deprecated. Use before_send instead"), n2 = o2(n2, "$set_once")), i2 && (this.qr = true), F(n2) ? void 0 : n2;
   }
   register(t2, i2) {
     var e2;
@@ -4500,7 +4507,7 @@ var Wo = class _Wo {
     var i2;
     null == (i2 = this.sessionPersistence) || i2.unregister(t2);
   }
-  gs(t2, i2) {
+  _s(t2, i2) {
     this.register({ [t2]: i2 });
   }
   getFeatureFlag(t2, i2) {
@@ -4535,7 +4542,7 @@ var Wo = class _Wo {
     return void 0 === i2 && (i2 = false), this.featureFlags.getEarlyAccessFeatures(t2, i2, e2);
   }
   on(t2, i2) {
-    return this.qr.on(t2, i2);
+    return this.Wr.on(t2, i2);
   }
   onFeatureFlags(t2) {
     return this.featureFlags.onFeatureFlags(t2);
@@ -4573,7 +4580,7 @@ var Wo = class _Wo {
     if (!this.__loaded || !this.persistence) return $i.uninitializedWarning("posthog.identify");
     if (L(t2) && (t2 = t2.toString(), $i.warn("The first argument to posthog.identify was a number, but it should be a string. It has been converted to a string.")), t2) if (["distinct_id", "distinctid"].includes(t2.toLowerCase())) $i.critical('The string "' + t2 + '" was set in posthog.identify which indicates an error. This ID should be unique to the user and not a hardcoded string.');
     else if (t2 !== me) {
-      if (this.ps("posthog.identify")) {
+      if (this.gs("posthog.identify")) {
         var r2 = this.get_distinct_id();
         if (this.register({ $user_id: t2 }), !this.get_property("$device_id")) {
           var s2 = r2;
@@ -4581,15 +4588,15 @@ var Wo = class _Wo {
         }
         t2 !== r2 && t2 !== this.get_property(Bi) && (this.unregister(Bi), this.register({ distinct_id: t2 }));
         var n2 = "anonymous" === (this.persistence.get_property(he) || "anonymous");
-        t2 !== r2 && n2 ? (this.persistence.set_property(he, "identified"), this.setPersonPropertiesForFlags(g({}, e2 || {}, i2 || {}), false), this.capture("$identify", { distinct_id: t2, $anon_distinct_id: r2 }, { $set: i2 || {}, $set_once: e2 || {} }), this.Jr = fn(t2, i2, e2), this.featureFlags.setAnonymousDistinctId(r2)) : (i2 || e2) && this.setPersonProperties(i2, e2), t2 !== r2 && (this.reloadFeatureFlags(), this.unregister(ue));
+        t2 !== r2 && n2 ? (this.persistence.set_property(he, "identified"), this.setPersonPropertiesForFlags(g({}, e2 || {}, i2 || {}), false), this.capture("$identify", { distinct_id: t2, $anon_distinct_id: r2 }, { $set: i2 || {}, $set_once: e2 || {} }), this.Kr = fn(t2, i2, e2), this.featureFlags.setAnonymousDistinctId(r2)) : (i2 || e2) && this.setPersonProperties(i2, e2), t2 !== r2 && (this.reloadFeatureFlags(), this.unregister(ue));
       }
     } else $i.critical('The string "' + me + '" was set in posthog.identify which indicates an error. This ID is only used as a sentinel value.');
     else $i.error("Unique user id has not been set in posthog.identify");
   }
   setPersonProperties(t2, i2) {
-    if ((t2 || i2) && this.ps("posthog.setPersonProperties")) {
+    if ((t2 || i2) && this.gs("posthog.setPersonProperties")) {
       var e2 = fn(this.get_distinct_id(), t2, i2);
-      this.Jr !== e2 ? (this.setPersonPropertiesForFlags(g({}, i2 || {}, t2 || {})), this.capture("$set", { $set: t2 || {}, $set_once: i2 || {} }), this.Jr = e2) : $i.info("A duplicate setPersonProperties call was made with the same properties. It has been ignored.");
+      this.Kr !== e2 ? (this.setPersonPropertiesForFlags(g({}, i2 || {}, t2 || {})), this.capture("$set", { $set: t2 || {}, $set_once: i2 || {} }), this.Kr = e2) : $i.info("A duplicate setPersonProperties call was made with the same properties. It has been ignored.");
     }
   }
   group(t2, i2, e2) {
@@ -4608,7 +4615,7 @@ var Wo = class _Wo {
     this.featureFlags.resetPersonPropertiesForFlags();
   }
   setGroupPropertiesForFlags(t2, i2) {
-    void 0 === i2 && (i2 = true), this.ps("posthog.setGroupPropertiesForFlags") && this.featureFlags.setGroupPropertiesForFlags(t2, i2);
+    void 0 === i2 && (i2 = true), this.gs("posthog.setGroupPropertiesForFlags") && this.featureFlags.setGroupPropertiesForFlags(t2, i2);
   }
   resetGroupPropertiesForFlags(t2) {
     this.featureFlags.resetGroupPropertiesForFlags(t2);
@@ -4617,7 +4624,7 @@ var Wo = class _Wo {
     var i2, e2, r2, s2;
     if ($i.info("reset"), !this.__loaded) return $i.uninitializedWarning("posthog.reset");
     var n2 = this.get_property("$device_id");
-    if (this.consent.reset(), null == (i2 = this.persistence) || i2.clear(), null == (e2 = this.sessionPersistence) || e2.clear(), this.surveys.reset(), this.featureFlags.reset(), null == (r2 = this.persistence) || r2.set_property(he, "anonymous"), null == (s2 = this.sessionManager) || s2.resetSessionId(), this.Jr = null, "always" === this.config.cookieless_mode) this.register_once({ distinct_id: me, $device_id: null }, "");
+    if (this.consent.reset(), null == (i2 = this.persistence) || i2.clear(), null == (e2 = this.sessionPersistence) || e2.clear(), this.surveys.reset(), this.featureFlags.reset(), null == (r2 = this.persistence) || r2.set_property(he, "anonymous"), null == (s2 = this.sessionManager) || s2.resetSessionId(), this.Kr = null, "always" === this.config.cookieless_mode) this.register_once({ distinct_id: me, $device_id: null }, "");
     else {
       var o2 = this.config.get_device_id(br());
       this.register_once({ distinct_id: o2, $device_id: t2 ? o2 : n2 }, "");
@@ -4645,17 +4652,17 @@ var Wo = class _Wo {
     return r2;
   }
   alias(t2, i2) {
-    return t2 === this.get_property(Hi) ? ($i.critical("Attempting to create alias for existing People user - aborting."), -2) : this.ps("posthog.alias") ? (M(i2) && (i2 = this.get_distinct_id()), t2 !== i2 ? (this.gs(Bi, t2), this.capture("$create_alias", { alias: t2, distinct_id: i2 })) : ($i.warn("alias matches current distinct_id - skipping api call."), this.identify(t2), -1)) : void 0;
+    return t2 === this.get_property(Hi) ? ($i.critical("Attempting to create alias for existing People user - aborting."), -2) : this.gs("posthog.alias") ? (M(i2) && (i2 = this.get_distinct_id()), t2 !== i2 ? (this._s(Bi, t2), this.capture("$create_alias", { alias: t2, distinct_id: i2 })) : ($i.warn("alias matches current distinct_id - skipping api call."), this.identify(t2), -1)) : void 0;
   }
   set_config(t2) {
     var i2 = g({}, this.config);
     if (R(t2)) {
       var e2, r2, s2, n2, o2, a2, l2;
       Ri(this.config, Bo(t2));
-      var u2 = this.Qr();
+      var u2 = this.Zr();
       null == (e2 = this.persistence) || e2.update_config(this.config, i2, u2), this.sessionPersistence = "sessionStorage" === this.config.persistence || "memory" === this.config.persistence ? this.persistence : new Mn(g({}, this.config, { persistence: "sessionStorage" }), u2);
-      var h2 = this.Kr(this.config.debug);
-      U(h2) && (this.config.debug = h2), U(this.config.debug) && (this.config.debug ? (c.DEBUG = true, Pr.H() && Pr.G("ph_debug", "true"), $i.info("set_config", { config: t2, oldConfig: i2, newConfig: g({}, this.config) })) : (c.DEBUG = false, Pr.H() && Pr.V("ph_debug"))), null == (r2 = this.exceptionObserver) || r2.onConfigChange(), null == (s2 = this.sessionRecording) || s2.startIfEnabledOrStop(), null == (n2 = this.autocapture) || n2.startIfEnabled(), null == (o2 = this.heatmaps) || o2.startIfEnabled(), null == (a2 = this.exceptionObserver) || a2.startIfEnabledOrStop(), this.surveys.loadIfEnabled(), this._s(), null == (l2 = this.externalIntegrations) || l2.startIfEnabledOrStop();
+      var h2 = this.Yr(this.config.debug);
+      U(h2) && (this.config.debug = h2), U(this.config.debug) && (this.config.debug ? (c.DEBUG = true, Pr.H() && Pr.G("ph_debug", "true"), $i.info("set_config", { config: t2, oldConfig: i2, newConfig: g({}, this.config) })) : (c.DEBUG = false, Pr.H() && Pr.V("ph_debug"))), null == (r2 = this.exceptionObserver) || r2.onConfigChange(), null == (s2 = this.sessionRecording) || s2.startIfEnabledOrStop(), null == (n2 = this.autocapture) || n2.startIfEnabled(), null == (o2 = this.heatmaps) || o2.startIfEnabled(), null == (a2 = this.exceptionObserver) || a2.startIfEnabledOrStop(), this.surveys.loadIfEnabled(), this.ys(), null == (l2 = this.externalIntegrations) || l2.startIfEnabledOrStop();
     }
   }
   startSessionRecording(t2) {
@@ -4705,28 +4712,28 @@ var Wo = class _Wo {
     var t2, i2;
     return "identified" === (null == (t2 = this.persistence) ? void 0 : t2.get_property(he)) || "identified" === (null == (i2 = this.sessionPersistence) ? void 0 : i2.get_property(he));
   }
-  fs() {
+  ps() {
     var t2, i2;
     return !("never" === this.config.person_profiles || "identified_only" === this.config.person_profiles && !this._isIdentified() && F(this.getGroups()) && (null == (t2 = this.persistence) || null == (t2 = t2.props) || !t2[Bi]) && (null == (i2 = this.persistence) || null == (i2 = i2.props) || !i2[ge]));
   }
-  ds() {
+  vs() {
     return true === this.config.capture_pageleave || "if_capture_pageview" === this.config.capture_pageleave && (true === this.config.capture_pageview || "history_change" === this.config.capture_pageview);
   }
   createPersonProfile() {
-    this.fs() || this.ps("posthog.createPersonProfile") && this.setPersonProperties({}, {});
+    this.ps() || this.gs("posthog.createPersonProfile") && this.setPersonProperties({}, {});
   }
-  ps(t2) {
-    return "never" === this.config.person_profiles ? ($i.error(t2 + ' was called, but process_person is set to "never". This call will be ignored.'), false) : (this.gs(ge, true), true);
+  gs(t2) {
+    return "never" === this.config.person_profiles ? ($i.error(t2 + ' was called, but process_person is set to "never". This call will be ignored.'), false) : (this._s(ge, true), true);
   }
-  Qr() {
+  Zr() {
     if ("always" === this.config.cookieless_mode) return true;
     var t2 = this.consent.isOptedOut(), i2 = this.config.opt_out_persistence_by_default || "on_reject" === this.config.cookieless_mode;
     return this.config.disable_persistence || t2 && !!i2;
   }
-  _s() {
-    var t2, i2, e2, r2, s2 = this.Qr();
-    (null == (t2 = this.persistence) ? void 0 : t2.Si) !== s2 && (null == (e2 = this.persistence) || e2.set_disabled(s2));
-    (null == (i2 = this.sessionPersistence) ? void 0 : i2.Si) !== s2 && (null == (r2 = this.sessionPersistence) || r2.set_disabled(s2));
+  ys() {
+    var t2, i2, e2, r2, s2 = this.Zr();
+    (null == (t2 = this.persistence) ? void 0 : t2.ki) !== s2 && (null == (e2 = this.persistence) || e2.set_disabled(s2));
+    (null == (i2 = this.sessionPersistence) ? void 0 : i2.ki) !== s2 && (null == (r2 = this.sessionPersistence) || r2.set_disabled(s2));
     return s2;
   }
   opt_in_capturing(t2) {
@@ -4734,13 +4741,13 @@ var Wo = class _Wo {
     if ("always" !== this.config.cookieless_mode) {
       var e2, r2, s2;
       if ("on_reject" === this.config.cookieless_mode && this.consent.isExplicitlyOptedOut()) this.reset(true), null == (e2 = this.sessionManager) || e2.destroy(), null == (r2 = this.pageViewManager) || r2.destroy(), this.sessionManager = new xo(this), this.pageViewManager = new xs(this), this.persistence && (this.sessionPropsManager = new bo(this, this.sessionManager, this.persistence)), this.sessionRecording = new jo(this), this.sessionRecording.startIfEnabledOrStop();
-      if (this.consent.optInOut(true), this._s(), this.us(), null == (i2 = this.sessionRecording) || i2.startIfEnabledOrStop(), "on_reject" == this.config.cookieless_mode && this.surveys.loadIfEnabled(), M(null == t2 ? void 0 : t2.captureEventName) || null != t2 && t2.captureEventName) this.capture(null !== (s2 = null == t2 ? void 0 : t2.captureEventName) && void 0 !== s2 ? s2 : "$opt_in", null == t2 ? void 0 : t2.captureProperties, { send_instantly: true });
-      this.config.capture_pageview && this.hs();
+      if (this.consent.optInOut(true), this.ys(), this.hs(), null == (i2 = this.sessionRecording) || i2.startIfEnabledOrStop(), "on_reject" == this.config.cookieless_mode && this.surveys.loadIfEnabled(), M(null == t2 ? void 0 : t2.captureEventName) || null != t2 && t2.captureEventName) this.capture(null !== (s2 = null == t2 ? void 0 : t2.captureEventName) && void 0 !== s2 ? s2 : "$opt_in", null == t2 ? void 0 : t2.captureProperties, { send_instantly: true });
+      this.config.capture_pageview && this.ds();
     } else $i.warn('Consent opt in/out is not valid with cookieless_mode="always" and will be ignored');
   }
   opt_out_capturing() {
     var t2, i2, e2;
-    "always" !== this.config.cookieless_mode ? ("on_reject" === this.config.cookieless_mode && this.consent.isOptedIn() && this.reset(true), this.consent.optInOut(false), this._s(), "on_reject" === this.config.cookieless_mode && (this.register({ distinct_id: me, $device_id: null }), null == (t2 = this.sessionManager) || t2.destroy(), null == (i2 = this.pageViewManager) || i2.destroy(), this.sessionManager = void 0, this.sessionPropsManager = void 0, null == (e2 = this.sessionRecording) || e2.stopRecording(), this.sessionRecording = void 0, this.hs())) : $i.warn('Consent opt in/out is not valid with cookieless_mode="always" and will be ignored');
+    "always" !== this.config.cookieless_mode ? ("on_reject" === this.config.cookieless_mode && this.consent.isOptedIn() && this.reset(true), this.consent.optInOut(false), this.ys(), "on_reject" === this.config.cookieless_mode && (this.register({ distinct_id: me, $device_id: null }), null == (t2 = this.sessionManager) || t2.destroy(), null == (i2 = this.pageViewManager) || i2.destroy(), this.sessionManager = void 0, this.sessionPropsManager = void 0, null == (e2 = this.sessionRecording) || e2.stopRecording(), this.sessionRecording = void 0, this.ds())) : $i.warn('Consent opt in/out is not valid with cookieless_mode="always" and will be ignored');
   }
   has_opted_in_capturing() {
     return this.consent.isOptedIn();
@@ -4756,22 +4763,22 @@ var Wo = class _Wo {
     return "always" === this.config.cookieless_mode || ("on_reject" === this.config.cookieless_mode ? this.consent.isExplicitlyOptedOut() || this.consent.isOptedIn() : !this.has_opted_out_capturing());
   }
   clear_opt_in_out_capturing() {
-    this.consent.reset(), this._s();
+    this.consent.reset(), this.ys();
   }
   _is_bot() {
     return n ? ko(n, this.config.custom_blocked_useragents) : void 0;
   }
-  hs() {
-    o && ("visible" === o.visibilityState ? this.Wr || (this.Wr = true, this.capture("$pageview", { title: o.title }, { send_instantly: true }), this.Gr && (o.removeEventListener("visibilitychange", this.Gr), this.Gr = null)) : this.Gr || (this.Gr = this.hs.bind(this), zi(o, "visibilitychange", this.Gr)));
+  ds() {
+    o && ("visible" === o.visibilityState ? this.Gr || (this.Gr = true, this.capture("$pageview", { title: o.title }, { send_instantly: true }), this.Vr && (o.removeEventListener("visibilitychange", this.Vr), this.Vr = null)) : this.Vr || (this.Vr = this.ds.bind(this), zi(o, "visibilitychange", this.Vr)));
   }
   debug(i2) {
     false === i2 ? (null == t || t.console.log("You've disabled debug mode."), this.set_config({ debug: false })) : (null == t || t.console.log("You're now in debug mode. All calls to PostHog will be logged in your console.\nYou can disable this with `posthog.debug(false)`."), this.set_config({ debug: true }));
   }
   O() {
-    var t2, i2, e2, r2, s2, n2, o2, a2 = this.Yr || {};
+    var t2, i2, e2, r2, s2, n2, o2, a2 = this.Xr || {};
     return "advanced_disable_flags" in a2 ? !!a2.advanced_disable_flags : false !== this.config.advanced_disable_flags ? !!this.config.advanced_disable_flags : true === this.config.advanced_disable_decide ? ($i.warn("Config field 'advanced_disable_decide' is deprecated. Please use 'advanced_disable_flags' instead. The old field will be removed in a future major version."), true) : (e2 = "advanced_disable_decide", r2 = false, s2 = $i, n2 = (i2 = "advanced_disable_flags") in (t2 = a2) && !M(t2[i2]), o2 = e2 in t2 && !M(t2[e2]), n2 ? t2[i2] : o2 ? (s2 && s2.warn("Config field '" + e2 + "' is deprecated. Please use '" + i2 + "' instead. The old field will be removed in a future major version."), t2[e2]) : r2);
   }
-  cs(t2) {
+  fs(t2) {
     if (j(this.config.before_send)) return t2;
     var i2 = I(this.config.before_send) ? this.config.before_send : [this.config.before_send], e2 = t2;
     for (var r2 of i2) {
@@ -4793,7 +4800,7 @@ var Wo = class _Wo {
   captureTraceMetric(t2, i2, e2) {
     this.capture("$ai_metric", { $ai_trace_id: String(t2), $ai_metric_name: i2, $ai_metric_value: String(e2) });
   }
-  Kr(t2) {
+  Yr(t2) {
     var i2 = U(t2) && !t2, e2 = Pr.H() && "true" === Pr.q("ph_debug");
     return !i2 && (!!e2 || t2);
   }

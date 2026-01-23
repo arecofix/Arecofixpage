@@ -7,11 +7,14 @@ export interface CartItem {
     quantity: number;
 }
 
+import { ToastService } from './toast.service';
+
 @Injectable({
     providedIn: 'root'
 })
 export class CartService {
     private logger = inject(LoggerService);
+    private toastService = inject(ToastService);
     cartItems = signal<CartItem[]>([]);
 
     constructor() {
@@ -40,6 +43,7 @@ export class CartService {
             return [...items, { product, quantity: 1 }];
         });
         this.logger.debug('Product added to cart', { productName: product.name });
+        this.toastService.show('Agregaste un producto al carrito', 'success', () => this.openCart());
     }
 
     removeFromCart(productId: string) {
@@ -66,4 +70,19 @@ export class CartService {
 
     totalItems = computed(() => this.cartItems().reduce((acc, item) => acc + item.quantity, 0));
     totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + (item.product.price * item.quantity), 0));
+
+    // Cart Visibility State
+    isCartOpen = signal(false);
+
+    openCart() {
+        this.isCartOpen.set(true);
+    }
+
+    closeCart() {
+        this.isCartOpen.set(false);
+    }
+
+    toggleCart() {
+        this.isCartOpen.update(v => !v);
+    }
 }

@@ -1522,13 +1522,13 @@ Suggested solution: ${env.workaround}`;
 var websocket_factory_default = WebSocketFactory;
 
 // node_modules/@supabase/realtime-js/dist/module/lib/version.js
-var version = "2.90.1";
+var version = "2.91.0";
 
 // node_modules/@supabase/realtime-js/dist/module/lib/constants.js
 var DEFAULT_VERSION = `realtime-js/${version}`;
 var VSN_1_0_0 = "1.0.0";
 var VSN_2_0_0 = "2.0.0";
-var DEFAULT_VSN = VSN_1_0_0;
+var DEFAULT_VSN = VSN_2_0_0;
 var DEFAULT_TIMEOUT = 1e4;
 var WS_CLOSE_NORMAL = 1e3;
 var MAX_PUSH_BUFFER_SIZE = 100;
@@ -2859,6 +2859,7 @@ var RealtimeClient = class {
    * @param options.reconnectAfterMs he optional function that returns the millsec reconnect interval. Defaults to stepped backoff off.
    * @param options.worker Use Web Worker to set a side flow. Defaults to false.
    * @param options.workerUrl The URL of the worker script. Defaults to https://realtime.supabase.com/worker.js that includes a heartbeat event call to keep the connection alive.
+   * @param options.vsn The protocol version to use when connecting. Supported versions are "1.0.0" and "2.0.0". Defaults to "2.0.0".
    * @example
    * ```ts
    * import RealtimeClient from '@supabase/realtime-js'
@@ -5214,7 +5215,7 @@ var StorageFileApi = class {
     return params.join("&");
   }
 };
-var version2 = "2.90.1";
+var version2 = "2.91.0";
 var DEFAULT_HEADERS$1 = { "X-Client-Info": `storage-js/${version2}` };
 var StorageBucketApi = class {
   constructor(url, headers = {}, fetch$1, opts) {
@@ -6822,7 +6823,7 @@ var StorageClient = class extends StorageBucketApi {
 };
 
 // node_modules/@supabase/auth-js/dist/module/lib/version.js
-var version3 = "2.90.1";
+var version3 = "2.91.0";
 
 // node_modules/@supabase/auth-js/dist/module/lib/constants.js
 var AUTO_REFRESH_TICK_DURATION_MS = 30 * 1e3;
@@ -7735,7 +7736,7 @@ var GoTrueAdminApi = class {
     }
   }
   /**
-   * Updates the user data.
+   * Updates the user data. Changes are applied directly without confirmation flows.
    *
    * @param attributes The data you want to update.
    *
@@ -9528,7 +9529,9 @@ var GoTrueClient = class _GoTrueClient {
       }
       if (data.session) {
         await this._saveSession(data.session);
-        await this._notifyAllSubscribers("SIGNED_IN", data.session);
+        setTimeout(async () => {
+          await this._notifyAllSubscribers("SIGNED_IN", data.session);
+        }, 0);
       }
       return this._returnResult({ data: Object.assign(Object.assign({}, data), { redirectType: redirectType !== null && redirectType !== void 0 ? redirectType : null }), error });
     } catch (error) {
@@ -11372,7 +11375,7 @@ var AuthClient = GoTrueClient_default;
 var AuthClient_default = AuthClient;
 
 // node_modules/@supabase/supabase-js/dist/index.mjs
-var version4 = "2.90.1";
+var version4 = "2.91.0";
 var JS_ENV = "";
 if (typeof Deno !== "undefined") JS_ENV = "deno";
 else if (typeof document !== "undefined") JS_ENV = "web";
@@ -11548,7 +11551,7 @@ var SupabaseClient = class {
       headers: this.headers,
       accessToken: this._getAccessToken.bind(this)
     }, settings.realtime));
-    if (this.accessToken) this.accessToken().then((token) => this.realtime.setAuth(token)).catch((e) => console.warn("Failed to set initial Realtime auth token:", e));
+    if (this.accessToken) Promise.resolve(this.accessToken()).then((token) => this.realtime.setAuth(token)).catch((e) => console.warn("Failed to set initial Realtime auth token:", e));
     this.rest = new PostgrestClient(new URL("rest/v1", baseUrl).href, {
       headers: this.headers,
       schema: settings.db.schema,

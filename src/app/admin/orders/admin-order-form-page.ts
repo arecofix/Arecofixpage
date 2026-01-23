@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { OrderService } from '@app/services/order.service';
-import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
+import { OrderService } from '@app/core/services/order.service';
+import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
 import { AuthService } from '@app/core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RepairStatusService } from '@app/features/orders/services/repair-status'; // Import service
@@ -90,7 +90,7 @@ export class AdminOrderFormPage implements OnInit {
         if (!this.id) return;
 
         this.orderService.getOrderById(this.id).subscribe({
-            next: (order) => {
+            next: (order: OrderWithItems) => {
                 this.form.set({
                     customer_name: order.customer_name,
                     customer_email: order.customer_email,
@@ -102,7 +102,7 @@ export class AdminOrderFormPage implements OnInit {
                     discount: order.discount,
                     total: order.total,
                     notes: order.notes,
-                    imei: order.imei || '' // Load IMEI
+                    imei: (order as any).imei || '' // Load IMEI cast as any if property missing in type or extend type
                 });
                 this.items.set(order.items);
 
@@ -110,8 +110,8 @@ export class AdminOrderFormPage implements OnInit {
                 this.cdr.markForCheck();
 
             },
-            error: (err) => {
-                this.error = err.message;
+            error: (err: any) => {
+                this.error = err.message || 'Error desconocido'; // Default message
                 this.cdr.markForCheck();
             }
         });

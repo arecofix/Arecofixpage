@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button';
-import { AnalyticsService } from './services/analytics.service';
+import { ToastComponent } from './shared/components/toast/toast.component';
+import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
 import posthog from 'posthog-js';
@@ -12,6 +13,7 @@ import posthog from 'posthog-js';
   imports: [
     RouterOutlet,
     WhatsappButton,
+    ToastComponent
   ],
   templateUrl: './app.html'
 })

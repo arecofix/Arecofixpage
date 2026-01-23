@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import { PreferencesService } from '../../shared/services/preferences.service';
-import { SeoService } from '../../shared/services/seo.service';
+import { SeoService } from '@app/core/services/seo.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '@app/core/services/auth.service';
 
@@ -18,7 +18,8 @@ import { HOME_CONTENT, HomeContent, QuoteForm } from './public-home.content';
   imports: [
     CommonModule, 
     RouterModule, 
-    FormsModule
+    FormsModule,
+    NgOptimizedImage
   ],
   templateUrl: './public-home-page.html',
   styles: `
@@ -71,15 +72,11 @@ export class PublicHomePage implements OnInit {
   }
 
   setSEO() {
-    this.seoService.setSeoData({
-      title: 'Soluciones de Software & Consultoría IT | Arecofix',
-      description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
-      keywords: 'desarrollo de software, consultoria it, aplicaciones moviles, servicio tecnico, marcos paz, software factory, arecofix, reparacion de celulares',
-      ogTitle: 'Soluciones Informáticas de Calidad | Arecofix',
-      ogDescription: 'Impulsamos tu negocio con tecnología de vanguardia. Desarrollo web, apps y consultoría estratégica.',
-      ogImage: 'assets/img/hero-illustration.svg',
-      ogUrl: 'https://arecofix.com.ar/'
-    });
+    this.seoService.setPageData(
+      'Soluciones de Software & Consultoría IT',
+      'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
+      'assets/img/hero-illustration.svg'
+    );
   }
 
 

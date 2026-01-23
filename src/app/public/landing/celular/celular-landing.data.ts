@@ -2,7 +2,7 @@ export const SPECIAL_OFFERS = [
     {
       image: 'assets/img/products/a06.webp',
       name: 'Samsung Galaxy A06',
-      description: 'Lo ultimo de Samsung | $320 | Celulares',
+      description: 'Lo último de Samsung | Diseño Elegante | $320',
       price: '$320',
       category: 'Celulares',
       link: '/productos',
@@ -10,15 +10,15 @@ export const SPECIAL_OFFERS = [
     {
       image: 'assets/img/products/arreglo-consolas.webp',
       name: 'Auriculares P9 Pro Max',
-      description: 'Auriculares Nuevo en Caja | $19000 | Celulares',
+      description: 'Sonido Premium | Cancelación de Ruido | $19.000',
       price: '$19000',
       category: 'Celulares',
       link: '/productos',
     },
     {
       image: 'assets/img/products/servicio-tecnico-consolas.webp',
-      name: 'Parlante Cargador Inalambrico',
-      description: 'Parlante Nuevo en Caja | $27000 | Celulares',
+      name: 'Parlante Cargador Inalámbrico',
+      description: '2 en 1: Bluetooth + Carga Qi | Sonido 360° | $27.000',
       price: '$27000',
       category: 'Celulares',
       link: '/productos',
@@ -26,7 +26,7 @@ export const SPECIAL_OFFERS = [
     {
       image: 'assets/img/products/reparacion-consolas.webp',
       name: 'Joystick Play Station 4',
-      description: 'Joystick Nuevo en Caja | $47800 | Consolas',
+      description: 'Original Sony PS4 | Precisión Total | $47.800',
       price: '$47800',
       category: 'Consoles',
       link: '/productos',
@@ -37,7 +37,7 @@ export const TECH_BEST = [
     {
       image: 'assets/img/products/sam.webp',
       name: 'Samsung Galaxy A31',
-      description: 'En venta Samsung Galaxy A31 Color Azul | $79000 | Celulares',
+      description: 'Oportunidad: Pantalla Super AMOLED | Azul | $79.000',
       price: '$79000',
       category: 'Celulares',
       link: '/productos',
@@ -45,7 +45,7 @@ export const TECH_BEST = [
     {
       image: 'assets/img/products/iphx.webp',
       name: 'iPhone X',
-      description: 'iPhone X Impecable | Consultar Precio | Celulares',
+      description: 'Diseño Todo Pantalla | Face ID | ¡Consultar Precio!',
       price: 'Consultar',
       category: 'Celulares',
       link: '/productos',
@@ -53,15 +53,15 @@ export const TECH_BEST = [
     {
       image: 'assets/img/products/iph8plus.webp',
       name: 'iPhone 8 Plus',
-      description: 'Apple Nuevo en Caja | $290 USD | Celulares',
+      description: 'Clásico Potente | Doble Cámara | $290 USD',
       price: '$290 USD',
       category: 'Celulares',
       link: '/productos',
     },
     {
       image: 'assets/img/products/motorola.webp',
-      name: 'Motorola Moto E32',
-      description: 'Motorola Moto E32 | $69800 | Celulares',
+      name: 'Motorola Moto E22',
+      description: 'Parlantes Stereo Dolby Atmos | 90Hz | $69.800',
       price: '$69800',
       category: 'Celulares',
       link: '/productos',
@@ -69,7 +69,7 @@ export const TECH_BEST = [
     {
       image: 'assets/img/products/j2.webp',
       name: 'Samsung Galaxy J2 Prime',
-      description: 'Samsung Galaxy J2 Prime | Consultar Precio | Celulares',
+      description: 'Económico y Funcional | Ideal Primer Celular | Consultar',
       price: 'Consultar',
       category: 'Celulares',
       link: '/productos',
@@ -81,27 +81,31 @@ export const COURSES_LIST = [
       img: 'assets/img/cursos/egresado-2025.jpg',
       title: 'Tobias Marchi',
       subtitle: 'Egresado 2025',
+      slug: '',
     },
     {
       img: 'assets/img/cursos/alumno3.jpg',
       title: 'Curso Inicial',
       subtitle: 'Nivel Principiante',
       duration: '3 Meses',
-      days: 'Sábados 10hs'
+      days: 'Sábados 10hs',
+      slug: 'reparacion-celulares-basico',
     },
     {
       img: 'assets/img/cursos/alumno2.jpg',
       title: 'Curso Avanzado',
       subtitle: 'Microelectrónica',
       duration: '4 Meses',
-      days: 'Miércoles 18hs'
+      days: 'Miércoles 18hs',
+      slug: 'curso-avanzado-microelectronica',
     },
     {
       img: 'assets/img/cursos/aprendizaje-practico.jpg',
       title: 'Aprendizaje Práctico',
       subtitle: '85% práctica - 15% teoría',
       duration: '',
-      days: ''
+      days: '',
+      slug: 'aprendizaje-practico',
     },
   ];
 
@@ -191,11 +195,11 @@ export const PROCESS_STEPS = [
     ];
 
 export const GALLERY_ITEMS = [
-        { type: 'video', src: 'assets/img/repair/4.mp4', poster: 'assets/img/repair/1.jpg', span: 'col-span-2 row-span-2' },
-        { type: 'image', src: 'assets/img/repair/13.jpg', alt: 'Reparación de placa', span: '' },
-        { type: 'image', src: 'assets/img/repair/6.jpg', alt: 'Microscopio digital', span: '' },
-        { type: 'image', src: 'assets/img/repair/3.jpg', alt: 'Cambio de pantalla', span: '' },
-        { type: 'image', src: 'assets/img/repair/iphone.jpg', alt: 'Reparación iPhone', span: '' }
+        { type: 'video', src: 'assets/img/repair/4.mp4', poster: 'assets/img/repair/iphone.jpg', alt: 'Reparación iPhone', span: 'col-span-2 row-span-2' },
+        { type: 'image', src: 'assets/img/repair/13.jpg', alt: 'Diagnóstico avanzado', span: '' },
+        { type: 'image', src: 'assets/img/repair/1.jpg', alt: 'Laboratorio técnico', span: '' },
+        { type: 'image', src: 'assets/img/repair/19.jpg', alt: 'Microsoldadura profesional', span: '' },
+        { type: 'image', src: 'assets/img/repair/3.jpg', alt: 'Cambio de pantalla', span: '' }
     ];
 
 export const PARTNERS = [
@@ -246,18 +250,70 @@ export const RELATED_SERVICES = [
             title: 'Reparación de Tablets',
             desc: 'Reparación especializada en tablets Android, iPad y Windows.',
             icon: 'fa-tablet-alt',
-            link: '/servicios'
+            link: '/servicios/reparacion-tablets'
         },
         {
             title: 'Reparación de Consolas',
             desc: 'Servicio técnico para PlayStation, Xbox y Nintendo Switch.',
             icon: 'fa-gamepad',
-            link: '/servicios'
+            link: '/servicios/reparacion-de-consolas'
         },
         {
             title: 'Micro Soldadura',
             desc: 'Reparaciones a nivel componente (IC, Pistas) con tecnología de punta.',
             icon: 'fa-microchip',
-            link: '/servicios'
+            link: '/servicios/servicio-tecnico-de-celulares-en-marcos-paz'
         }
     ];
+    
+ export const LOCATION_DATA = {
+        address: 'Jorge Newbery 69, Marcos Paz, Bs. As.',
+        hours: 'Lun a Sab: 09:00 - 13:00 / 16:00 - 20:00',
+        phone: '11 2596-0900',
+        mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3277.539502732569!2d-58.81797292339245!3d-34.76719126615129!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceb46770c86eb%3A0x73b48d51a83e8107!2sARECOFIX%20Servicio%20t%C3%A9cnico%20de%20celulares%20%7C%20Venta%20de%20Repuestos.!5e0!3m2!1ses-419!2sar!4v1767203451962!5m2!1ses-419!2sar'
+    };
+    
+ export const WHY_US = [
+        {
+            title: '7+ Años de Experiencia',
+            desc: 'Conocemos cada tornillo de tu equipo. Trayectoria comprobable en Marcos Paz.',
+            icon: 'fas fa-medal',
+            color: 'text-blue-600',
+            bg: 'bg-blue-100'
+        },
+        {
+            title: 'Garantía Real (30-90 días)',
+            desc: 'Te damos un comprobante escrito. Si algo falla, respondemos sin vueltas.',
+            icon: 'fas fa-shield-alt',
+            color: 'text-green-600',
+            bg: 'bg-green-100'
+        },
+        {
+            title: 'Laboratorio Propio',
+            desc: 'Tu equipo no "viaja" a otros lados. Se repara acá, con nuestras herramientas.',
+            icon: 'fas fa-microscope',
+            color: 'text-green-600',
+            bg: 'bg-green-100'
+        }
+    ];
+    
+ export const SEO_CONTENT = {
+        title: 'Servicio Técnico y Arreglo de Celulares en Marcos Paz',
+        intro: '¿Buscas donde arreglar tu celular cerca de Marcos Paz? En Arecofix somos líderes en reparación de celulares en Marcos Paz, ofreciendo un servicio rápido, transparente y garantizado. No importa si tenés un iPhone, Samsung, Motorola o Xiaomi, nuestros técnicos certificados están listos para ayudarte.',
+        sections: [
+            {
+                title: 'Expertos en Reparación de Celulares',
+                content: 'Sabemos lo importante que es tu dispositivo para vos. Por eso, nos especializamos en brindar soluciones efectivas para todo tipo de fallas. Desde un simple cambio de módulo hasta reparaciones complejas de microelectrónica. Si necesitás un arreglo de celulares en Marcos Paz de confianza, somos tu mejor opción. Usamos repuestos originales y premium para asegurar la durabilidad de tu equipo.'
+            },
+            {
+                title: '¿Por qué elegir Arecofix en Marcos Paz?',
+                content: 'Nos destacamos por nuestra honestidad y profesionalismo. Te ofrecemos un diagnóstico sin cargo para que sepas exactamente qué tiene tu equipo antes de invertir. Además, todas nuestras reparaciones cuentan con garantía escrita de hasta 3 meses. No busques más "donde arreglar mi celular", vení a Arecofix en Jorge Newbery 69.'
+            }
+        ],
+        features: [
+            { label: 'Reparaciones en el día:', value: 'La mayoría de los cambios de pantalla y batería se realizan en menos de 2 horas.' },
+            { label: 'Precios Competitivos:', value: 'La mejor relación precio-calidad en servicio técnico de la zona.' },
+            { label: 'Atención Personalizada:', value: 'Te mantenemos informado del estado de tu reparación vía WhatsApp.' },
+            { label: 'Venta de Accesorios:', value: 'Protegé tu inversión con nuestras fundas y vidrios templados de alta calidad.' }
+        ]
+    };

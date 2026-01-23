@@ -1,77 +1,208 @@
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-green-600">Inventario</h1>
-    <a routerLink="/admin/purchases/new" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i> Registrar Compra
-    </a>
-</div>
-
-<div class="bg-base-100 rounded-lg shadow overflow-hidden text-base-content">
-    <div class="overflow-x-auto">
-        <table class="table w-full">
-            <thead>
-                <tr class="text-base-content font-bold">
-                    <th>Producto</th>
-                    <th>SKU / Código</th>
-                    <th>Stock Actual</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (loading()) {
-                <tr>
-                    <td colspan="5" class="text-center py-4 text-base-content/70">Cargando...</td>
-                </tr>
-                } @else if (products().length === 0) {
-                <tr>
-                    <td colspan="5" class="text-center py-4 text-base-content/70">No hay productos registrados.</td>
-                </tr>
-                } @else {
-                @for (product of products(); track product.id) {
-                <tr class="hover:bg-base-200/50">
-                    <td>
-                        <div class="flex items-center gap-3">
-                            <div class="avatar">
-                                <div class="mask mask-squircle w-12 h-12">
-                                    <img [src]="product.image_url || 'assets/img/no-image.png'" alt="Product" />
-                                </div>
-                            </div>
-                            <div>
-                                <div class="font-bold">{{ product.name }}</div>
-                                <div class="text-sm opacity-50">${{ product.price }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-sm">{{ product.sku || 'N/A' }}</div>
-                        <div class="text-xs opacity-50">{{ product.barcode || 'Sin código de barras' }}</div>
-                    </td>
-                    <td>
-                        <div class="font-bold text-lg"
-                            [class.text-error]="product.stock <= (product.min_stock_alert || 5)"
-                            [class.text-success]="product.stock > (product.min_stock_alert || 5)">
-                            {{ product.stock }}
-                        </div>
-                        @if (product.stock <= (product.min_stock_alert || 5)) { <div class="badge badge-error badge-xs">
-                            Stock Bajo
-    </div>
-    }
-    </td>
-    <td>
-        <span class="badge" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
-            {{ product.is_active ? 'Activo' : 'Inactivo' }}
-        </span>
-    </td>
-    <td>
-        <!-- Actions removed as per original file if not needed or add edit button back if standard -->
-        <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
-            <i class="fas fa-edit"></i>
+<div class="max-w-7xl mx-auto pb-20 p-4">
+  
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4 border-b border-gray-200 dark:border-gray-800 mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+            <i class="fas fa-boxes text-primary"></i> Control de Stock
+        </h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Monitorea niveles de stock y valor de inventario.</p>
+      </div>
+  
+      <div class="flex gap-2 w-full md:w-auto">
+        <a routerLink="/admin/purchases/new" class="btn btn-primary w-full md:w-auto shadow-lg shadow-primary/20">
+          <i class="fas fa-cart-plus mr-2"></i> Registrar Compra
         </a>
-    </td>
-    </tr>
+      </div>
+    </div>
+  
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <div class="stat">
+              <div class="stat-figure text-primary">
+                <i class="fas fa-cube text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider">Total Items</div>
+              <div class="stat-value text-primary">{{ stats().total }}</div>
+            </div>
+        </div>
+        
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700" 
+             [class.border-error]="stats().outOfStock > 0">
+            <div class="stat">
+              <div class="stat-figure text-error">
+                <i class="fas fa-exclamation-circle text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider text-error">Agotados</div>
+              <div class="stat-value text-error">{{ stats().outOfStock }}</div>
+            </div>
+        </div>
+  
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
+             [class.border-warning]="stats().lowStock > 0">
+            <div class="stat">
+              <div class="stat-figure text-warning">
+                <i class="fas fa-thermometer-quarter text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider text-warning">Stock Bajo</div>
+              <div class="stat-value text-warning">{{ stats().lowStock }}</div>
+            </div>
+        </div>
+  
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <div class="stat">
+              <div class="stat-figure text-success">
+                <i class="fas fa-dollar-sign text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider">Valor Total</div>
+              <div class="stat-value text-success text-2xl">{{ stats().totalValue | currency:'ARS':'symbol':'1.0-0' }}</div>
+              <div class="stat-desc">Estimado en precio venta</div>
+            </div>
+        </div>
+    </div>
+  
+    <!-- Controls Bar -->
+    <div class="flex flex-col lg:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <!-- Search -->
+        <div class="flex-1">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                   placeholder="Buscar producto..." 
+                   class="input input-bordered w-full pl-10" />
+            </div>
+        </div>
+
+        <!-- Filter Tabs (Segmented Control) -->
+        <div class="join w-full lg:w-auto">
+            <input class="join-item btn" type="radio" name="options" aria-label="Todos" 
+              [checked]="filterStatus() === 'all'" (click)="filterStatus.set('all')" />
+            <input class="join-item btn" type="radio" name="options" aria-label="Stock Bajo" 
+              [checked]="filterStatus() === 'low_stock'" (click)="filterStatus.set('low_stock')" />
+            <input class="join-item btn" type="radio" name="options" aria-label="Agotados" 
+              [checked]="filterStatus() === 'out_of_stock'" (click)="filterStatus.set('out_of_stock')" />
+        </div>
+
+        <!-- Sort -->
+        <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full lg:w-auto">
+            <option value="stock_asc">Menor Stock Primero</option>
+            <option value="stock_desc">Mayor Stock Primero</option>
+            <option value="name_asc">Nombre (A-Z)</option>
+        </select>
+    </div>
+  
+    <!-- Content -->
+    @if (loading()) {
+      <div class="flex justify-center p-12">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    } @else {
+      
+      <!-- Desktop Table -->
+      <div class="hidden md:block bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+        <table class="table w-full">
+          <thead class="bg-gray-50 dark:bg-gray-700/50">
+            <tr class="text-gray-600 dark:text-gray-300 font-bold uppercase text-xs tracking-wider">
+              <th>Producto</th>
+              <th>SKU / Marca</th>
+              <th class="text-center">Stock</th>
+              <th>Estado</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of paginatedProducts(); track product.id) {
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+              <td>
+                <div class="flex items-center gap-4">
+                  <div class="avatar">
+                    <div class="mask mask-squircle w-12 h-12 bg-gray-100 dark:bg-gray-700">
+                      <img [src]="product.image_url || 'assets/img/no-image.png'" class="object-cover" />
+                    </div>
+                  </div>
+                  <div>
+                    <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ product.name }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                  <div class="font-mono text-xs">{{ product.sku || '---' }}</div>
+                  <div class="text-xs text-gray-500">Marca ID: {{ product.brand_id ? (product.brand_id | slice:0:5) : 'Genérica' }}</div>
+              </td>
+              <td class="text-center">
+                  <div class="flex flex-col items-center">
+                      <span class="font-bold text-lg" 
+                        [class.text-error]="product.stock === 0"
+                        [class.text-warning]="product.stock > 0 && product.stock <= (product.min_stock_alert||5)"
+                        [class.text-success]="product.stock > (product.min_stock_alert||5)">
+                          {{ product.stock }}
+                      </span>
+                      @if(product.stock === 0) {
+                          <span class="badge badge-error badge-xs">Agotado</span>
+                      } @else if(product.stock <= (product.min_stock_alert||5)) {
+                          <span class="badge badge-warning badge-xs">Bajo</span>
+                      }
+                  </div>
+              </td>
+              <td>
+                <div class="badge badge-sm" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
+                  {{ product.is_active ? 'Activo' : 'Inactivo' }}
+                </div>
+              </td>
+              <td class="text-right">
+                  <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost text-indigo-500">
+                      <i class="fas fa-edit"></i>
+                  </a>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Mobile Cards -->
+      <div class="md:hidden grid grid-cols-1 gap-4">
+          @for (product of paginatedProducts(); track product.id) {
+          <div class="card bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
+              <div class="card-body p-4 flex-row gap-4">
+                  <div class="avatar">
+                      <div class="w-16 h-16 rounded-xl bg-gray-100">
+                          <img [src]="product.image_url || 'assets/img/no-image.png'" class="object-cover" />
+                      </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                      <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ product.name }}</h3>
+                      <div class="text-xs text-gray-500 font-mono mb-2">{{ product.sku }}</div>
+                      
+                      <div class="flex justify-between items-end">
+                          <div [class.text-error]="product.stock === 0"
+                               [class.text-warning]="product.stock > 0 && product.stock <= 5"
+                               [class.text-success]="!product.stock || product.stock > 5">
+                              <span class="text-xs block text-gray-400">Stock</span>
+                              <span class="text-xl font-bold">{{ product.stock }}</span>
+                          </div>
+                          <a [routerLink]="['/admin/products', product.id]" class="btn btn-circle btn-sm btn-ghost">
+                              <i class="fas fa-edit text-indigo-500"></i>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          }
+      </div>
+  
+      <!-- Pagination -->
+      <div class="mt-8 flex justify-center pb-8" *ngIf="filteredProducts().length > 0">
+         <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
+      </div>
+      
+      <!-- Empty State -->
+      @if (filteredProducts().length === 0) {
+        <div class="text-center py-20 opacity-50">
+            <i class="fas fa-search text-4xl mb-3"></i>
+            <p>No se encontraron productos con estos filtros.</p>
+        </div>
+      }
     }
-    }
-    </tbody>
-    </table>
-</div>
-</div>
+  </div>

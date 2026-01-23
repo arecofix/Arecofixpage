@@ -10,13 +10,14 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of } from 'rxjs';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
-import { Location, NgOptimizedImage } from '@angular/common';
+import { Location, NgOptimizedImage, CommonModule, DecimalPipe } from '@angular/common';
 /*  */
 import {
   IsEmptyComponent,
   IsErrorComponent,
   IsLoadingComponent,
 } from '@app/shared/components/resource-status';
+import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 /*  */
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
@@ -24,6 +25,7 @@ import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
 import { SeoService } from '@app/core/services/seo.service';
+import { FavoritesService } from '@app/shared/services/favorites.service';
 /*  */
 
 @Component({
@@ -34,7 +36,9 @@ import { SeoService } from '@app/core/services/seo.service';
     IsLoadingComponent,
     NgOptimizedImage,
     FormsModule,
-    RouterModule
+    RouterModule,
+    BreadcrumbsComponent,
+    CommonModule
   ],
   templateUrl: './products-details-page.html',
   styles: ``,
@@ -56,11 +60,30 @@ export class ProductsDetailsPage {
               this.seoService.setPageData(
                   product.name,
                   product.description || `Compra ${product.name} en Arecofix`,
-                  product.image_url
+                  product.image_url,
+                  'product'
               );
           }
       });
   }
+
+  breadcrumbItems = computed(() => {
+    const product = this.product();
+    const category = this.categoryRs.value();
+    const items: BreadcrumbItem[] = [
+      { label: 'Inicio', url: '/' },
+      { label: 'Productos', url: '/productos' }
+    ];
+
+    if (category) {
+      items.push({ label: category.name, url: `/productos/categoria/${category.slug}` });
+    }
+
+    if (product) {
+      items.push({ label: product.name });
+    }
+    return items;
+  });
 
   productRs = rxResource({
     stream: () =>
@@ -117,7 +140,21 @@ export class ProductsDetailsPage {
     this.location.back();
   }
 
-  private cartService = inject(CartService);
+  public cartService = inject(CartService);
+  public favoritesService = inject(FavoritesService);
+
+  isFavorite = computed(() => {
+    const product = this.product();
+    if (!product) return false;
+    return this.favoritesService.isFavorite(product.id);
+  });
+
+  toggleFavorite() {
+    const product = this.product();
+    if (product) {
+        this.favoritesService.toggleFavorite(product);
+    }
+  }
 
   addToCart() {
     const product = this.product();

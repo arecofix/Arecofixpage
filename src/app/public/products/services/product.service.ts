@@ -14,12 +14,11 @@ import {
   providedIn: 'root',
 })
 export class ProductService {
-  private supabase: SupabaseClient;
+  private authService = inject(AuthService);
   private logger = inject(LoggerService);
+  private supabase: SupabaseClient = this.authService.getSupabaseClient();
 
-  constructor(private authService: AuthService) {
-    this.supabase = this.authService.getSupabaseClient();
-  }
+  constructor() {}
 
   public getData(params: ProductsParams = {}): Observable<ProductsResponse> {
     const {
@@ -85,11 +84,22 @@ export class ProductService {
         const totalItems = count || 0;
         const pages = Math.max(1, Math.ceil(totalItems / _per_page));
 
-        const productsRaw = (data as any[]) || [];
-        const products = productsRaw.map((p: any) => ({
-          ...p,
+        const productsRaw = (data as unknown as Record<string, unknown>[]) || [];
+        const products: Product[] = productsRaw.map((p) => ({
+          id: p['id'] as string,
+          name: p['name'] as string,
+          slug: p['slug'] as string,
+          description: p['description'] as string,
+          price: Number(p['price']),
+          image_url: p['image_url'] as string,
+          category_id: p['category_id'] as string,
+          brand_id: p['brand_id'] as string,
+          stock: Number(p['stock']),
+          is_active: Boolean(p['is_active']),
           // Normaliza el nombre del campo para coincidir con la interfaz Product
-          featured: p?.featured ?? p?.is_featured ?? false,
+          featured: Boolean(p['featured'] ?? p['is_featured'] ?? false),
+          created_at: p['created_at'] as string,
+          updated_at: p['updated_at'] as string,
         }));
 
         return {
@@ -99,7 +109,7 @@ export class ProductService {
           last: pages,
           pages,
           items: totalItems,
-          data: (products as Product[]) || [],
+          data: products,
         };
       }),
       catchError((err) => {

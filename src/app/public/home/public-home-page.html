@@ -27,10 +27,10 @@
                   </p>
                   
                   <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                      <button (click)="scrollToSection(contactSection)" 
-                          class="px-8 py-4 bg-gray-900 text-white dark:bg-white dark:text-black rounded-lg font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all transform hover:scale-105 shadow-xl shadow-blue-900/10 dark:shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                      <a routerLink="/contacto" 
+                          class="px-8 py-4 bg-gray-900 text-white dark:bg-white dark:text-black rounded-lg font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all transform hover:scale-105 shadow-xl shadow-blue-900/10 dark:shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center cursor-pointer">
                           {{ content.hero.ctaPrimary }}
-                      </button>
+                      </a>
                       <a routerLink="/portfolio"
                           class="px-8 py-4 glass-panel text-gray-900 dark:text-white rounded-lg font-medium text-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all text-center flex items-center justify-center cursor-pointer">
                           {{ content.hero.ctaSecondary }}
@@ -40,8 +40,8 @@
 
               <!-- Visual/Art -->
               <div class="lg:w-1/2 relative hidden lg:block animate-float">
-                  <div class="relative z-10 glass-card p-2 rounded-2xl transform rotate-1 hover:rotate-0 transition-duration-500">
-                    <img src="/assets/img/services/software-illustration.png" alt="Dashboard Preview" class="rounded-xl w-full h-auto shadow-lg opacity-90">
+                  <div class="relative z-10 glass-card p-2 rounded-2xl transform rotate-1 hover:rotate-0 transition-duration-500 w-full aspect-video">
+                    <img ngSrc="assets/img/services/software-illustration.png" alt="Dashboard Preview" class="rounded-xl object-cover shadow-lg opacity-90" fill priority>
                     
                      <!-- Code Snippet Decor -->
                     <div class="absolute -bottom-10 -left-10 bg-[#1e1e1e] p-4 rounded-lg border border-gray-700 shadow-xl hidden md:block">
@@ -65,21 +65,30 @@
   <section class="py-20 bg-white dark:bg-black text-gray-900 dark:text-white relative z-20 transition-colors duration-300">
       <div class="container mx-auto px-4 -mt-20 lg:-mt-32">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h2 class="sr-only">Nuestros Pilares de Negocio</h2>
               @for(pillar of content.businessPillars.items; track pillar.title) {
-                  <div class="group relative overflow-hidden rounded-2xl glass-card p-8 transition-all duration-300 hover:border-blue-500/50">
+                  <div class="group relative overflow-hidden rounded-2xl glass-card transition-all duration-300 hover:border-blue-500/50 flex flex-col h-full">
                       <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                           <i [class]="pillar.icon + ' text-9xl'"></i>
                       </div>
                       
-                      <div class="relative z-10">
+                      <!-- Image Section if available -->
+                      @if (pillar.image) {
+                        <div class="relative h-48 overflow-hidden">
+                            <img [ngSrc]="pillar.image" [alt]="pillar.title" class="object-cover transform group-hover:scale-110 transition-transform duration-700" fill>
+                            <div class="absolute inset-0 bg-linear-to-t from-white dark:from-[#1a1a1a] to-transparent opacity-80"></div>
+                        </div>
+                      }
+
+                      <div class="relative z-10 p-8 pt-4 flex flex-col text-left grow">
                           <div [class]="'w-14 h-14 rounded-xl flex items-center justify-center mb-6 ' + (pillar.colorClass === 'blue' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400')">
                               <i [class]="pillar.icon + ' text-2xl'"></i>
                           </div>
                           
                           <h3 class="text-2xl font-bold mb-3 font-heading text-gray-900 dark:text-white">{{ pillar.title }}</h3>
-                          <p class="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed min-h-[50px] font-body">{{ pillar.description }}</p>
+                          <p class="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed grow font-body">{{ pillar.description }}</p>
                           
-                          <a [routerLink]="pillar.link" class="inline-flex items-center gap-2 font-bold text-sm tracking-wide uppercase hover:text-blue-600 dark:hover:text-white transition-colors text-gray-700 dark:text-gray-300">
+                          <a [routerLink]="pillar.link" class="inline-flex items-center gap-2 font-bold text-sm tracking-wide uppercase hover:text-blue-600 dark:hover:text-white transition-colors text-gray-700 dark:text-gray-300 mt-auto">
                               {{ pillar.cta }} <i class="fas fa-arrow-right"></i>
                           </a>
                       </div>
@@ -97,14 +106,15 @@
               <p class="text-gray-600 dark:text-gray-400 text-lg font-body">{{ content.services.subtitle }}</p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              @for(service of content.services.items; track service.title) {
-                  <div class="glass-card rounded-xl p-8 hover:bg-[#151515] transition-all group">
-                      <div class="mb-6 w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                          <i [class]="service.icon + ' text-xl'"></i>
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+              @for(service of content.services.items; track service.title; let last = $last) {
+                  <div class="glass-card rounded-xl p-4 md:p-8 hover:bg-[#151515] transition-all group h-full flex flex-col items-center text-center"
+                       [class.col-span-2]="last" [class.lg:col-span-1]="last">
+                      <div class="mb-3 md:mb-6 w-10 h-10 md:w-12 md:h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+                          <i [class]="service.icon + ' text-lg md:text-xl'"></i>
                       </div>
-                      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 font-heading">{{ service.title }}</h3>
-                      <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm font-body">{{ service.description }}</p>
+                      <h3 class="text-sm md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3 font-heading leading-tight">{{ service.title }}</h3>
+                      <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-xs md:text-sm font-body grow">{{ service.description }}</p>
                   </div>
               }
           </div>
@@ -118,15 +128,16 @@
               <h2 class="text-3xl font-bold text-gray-900 dark:text-white font-heading">{{ content.techServices.title }}</h2>
               <p class="text-gray-600 dark:text-gray-400 mt-2">{{ content.techServices.subtitle }}</p>
            </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               @for(item of content.techServices.items; track item.title) {
-                <div class="glass-panel p-6 rounded-xl flex flex-col items-center hover:bg-white/5 transition-colors">
-                    <i [class]="item.icon + ' text-4xl mb-4 text-gradient'"></i>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ item.title }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-500 mb-4">{{ item.description }}</p>
-                    <div class="flex flex-wrap justify-center gap-2">
+                <div class="glass-panel p-3 md:p-6 rounded-xl flex flex-col items-center justify-center text-center hover:bg-white/5 transition-colors h-full">
+                    <!-- Icon always at top -->
+                    <i [class]="item.icon + ' text-2xl md:text-4xl mb-2 md:mb-3 text-gradient block mx-auto'"></i>
+                    <h3 class="text-sm md:text-lg font-bold text-gray-900 dark:text-white mb-1 md:mb-2 leading-tight">{{ item.title }}</h3>
+                    <p class="text-xs md:text-sm text-gray-600 dark:text-gray-500 mb-3 md:mb-4 leading-relaxed">{{ item.description }}</p>
+                    <div class="flex flex-wrap justify-center gap-1 md:gap-2 mt-auto">
                          @for(feat of item.features; track feat) {
-                             <span class="text-xs bg-gray-200 dark:bg-white/10 px-2 py-1 rounded text-gray-700 dark:text-gray-300 font-mono">{{ feat }}</span>
+                             <span class="text-[10px] md:text-xs bg-gray-200 dark:bg-white/10 px-1.5 py-0.5 md:px-2 md:py-1 rounded text-gray-700 dark:text-gray-300 font-mono">{{ feat }}</span>
                          }
                     </div>
                 </div>
@@ -148,19 +159,20 @@
                    </a>
               </div>
               
-              <div class="lg:w-2/3 grid gap-6">
-                  @for(step of content.methodology.steps; track step.number) {
-                      <div class="flex gap-6 items-start p-8 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
-                          <div class="hidden sm:flex flex-col items-center gap-2">
-                             <span class="text-3xl font-black text-transparent bg-clip-text bg-linear-to-b from-blue-400 to-blue-600 font-mono">{{ step.number }}</span>
-                             <div class="h-12 w-px bg-blue-500/30"></div>
+              <div class="lg:w-2/3 grid grid-cols-2 lg:grid-cols-1 gap-3 md:gap-6">
+                  @for(step of content.methodology.steps; track step.number; let last = $last) {
+                      <div class="flex flex-col lg:flex-row gap-3 md:gap-6 items-center lg:items-start p-4 md:p-8 rounded-2xl glass-panel hover:bg-white/10 transition-colors text-center lg:text-left h-full"
+                           [class.col-span-2]="last" [class.lg:col-span-1]="last">
+                          <div class="flex flex-col items-center gap-2 shrink-0">
+                             <span class="text-xl md:text-3xl font-black text-transparent bg-clip-text bg-linear-to-b from-blue-400 to-blue-600 font-mono">{{ step.number }}</span>
+                             <div class="hidden lg:block h-12 w-px bg-blue-500/30"></div>
                           </div>
                           <div>
-                              <div class="flex items-center gap-3 mb-2">
-                                <i [class]="step.icon + ' text-blue-400 text-xl sm:hidden'"></i>
-                                <h4 class="text-xl font-bold font-heading text-gray-900 dark:text-white">{{ step.title }}</h4>
+                              <div class="flex flex-col lg:flex-row items-center gap-3 mb-2 justify-center lg:justify-start">
+                                <i [class]="step.icon + ' text-blue-400 text-lg md:text-xl lg:hidden'"></i>
+                                <h3 class="text-sm md:text-xl font-bold font-heading text-gray-900 dark:text-white leading-tight">{{ step.title }}</h3>
                               </div>
-                              <p class="text-gray-600 dark:text-gray-400 font-body">{{ step.description }}</p>
+                              <p class="text-gray-600 dark:text-gray-400 font-body text-xs md:text-base leading-relaxed line-clamp-4 lg:line-clamp-none">{{ step.description }}</p>
                           </div>
                       </div>
                   }
@@ -175,9 +187,9 @@
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
               @for(metric of content.metrics.items; track metric.label) {
                   <div class="p-4">
-                      <h4 class="text-4xl lg:text-5xl font-extrabold text-gradient-blue mb-2 font-heading">
+                      <h2 class="text-4xl lg:text-5xl font-extrabold text-gradient-blue mb-2 font-heading">
                           {{ metric.value }}
-                      </h4>
+                      </h2>
                       <p class="text-gray-500 font-mono text-xs uppercase tracking-widest">{{ metric.label }}</p>
                   </div>
               }
@@ -220,80 +232,12 @@
                }
           </div>
           
-          <button (click)="scrollToSection(contactSection)" class="bg-white text-blue-900 px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-gray-100 transition-colors">
+          <a routerLink="/contacto" class="inline-block bg-white text-blue-900 px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-gray-100 transition-colors cursor-pointer">
               {{ content.remoteWork.cta }}
-          </button>
+          </a>
       </div>
   </section>
 
-  <!-- 9. CONTACT FORM -->
-  <section class="py-24 bg-gray-50 dark:bg-[#050505] transition-colors duration-300" #contactSection>
-      <div class="container mx-auto px-4 pb-20"> <!-- Added pb-20 to ensure space above footer/whatsapp button -->
-          <div class="flex flex-col lg:flex-row gap-0 max-w-6xl mx-auto rounded-3xl overflow-hidden glass-card shadow-2xl">
-              <!-- Info Side -->
-              <div class="lg:w-2/5 p-10 bg-linear-to-b from-blue-600 to-blue-800 text-white flex flex-col justify-between">
-                  <div>
-                      <h3 class="text-3xl font-bold mb-4 font-heading">{{ content.quote.title }}</h3>
-                      <p class="text-blue-100 mb-8">{{ content.quote.subtitle }}</p>
-                      
-                      <div class="space-y-6">
-                          <div class="flex items-center gap-4">
-                              <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><i class="fas fa-envelope"></i></div>
-                              <span>info&#64;arecofix.com</span>
-                          </div>
-                           <div class="flex items-center gap-4">
-                              <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><i class="fas fa-phone"></i></div>
-                              <span>+54 9 11 1234 5678</span>
-                          </div>
-                      </div>
-                  </div>
-                  
-                  <div class="mt-12">
-                      <p class="text-sm opacity-60">Follow us</p>
-                      <div class="flex gap-4 mt-2 text-xl">
-                          <a href="#" class="hover:text-white/80"><i class="fab fa-linkedin"></i></a>
-                          <a href="#" class="hover:text-white/80"><i class="fab fa-github"></i></a>
-                          <a href="#" class="hover:text-white/80"><i class="fab fa-instagram"></i></a>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Form Side -->
-              <div class="lg:w-3/5 p-10 bg-gray-100 dark:bg-[#151515] text-gray-900 dark:text-white">
-                  <form (ngSubmit)="sendQuote()" class="space-y-6">
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                              <label class="block text-gray-600 dark:text-gray-400 text-sm mb-2">{{ content.quote.form.name }}</label>
-                              <input type="text" [(ngModel)]="quoteModel.name" name="name" class="w-full bg-white dark:bg-[#1e1e1e] border-b-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-none px-3 py-2 text-gray-900 dark:text-white outline-none transition-colors">
-                          </div>
-                          <div>
-                              <label class="block text-gray-600 dark:text-gray-400 text-sm mb-2">{{ content.quote.form.email }}</label>
-                              <input type="email" [(ngModel)]="quoteModel.email" name="email" class="w-full bg-white dark:bg-[#1e1e1e] border-b-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-none px-3 py-2 text-gray-900 dark:text-white outline-none transition-colors">
-                          </div>
-                      </div>
-                      
-                      <div>
-                          <label class="block text-gray-600 dark:text-gray-400 text-sm mb-2">{{ content.quote.form.projectType }}</label>
-                          <select [(ngModel)]="quoteModel.projectType" name="projectType" class="w-full bg-white dark:bg-[#1e1e1e] border-b-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-none px-3 py-2 text-gray-900 dark:text-white outline-none transition-colors">
-                              <option>Consultoría AI</option>
-                              <option>Desarrollo Web / App</option>
-                              <option>Staff Augmentation</option>
-                              <option>Servicio Técnico</option>
-                          </select>
-                      </div>
-
-                      <div>
-                          <label class="block text-gray-600 dark:text-gray-400 text-sm mb-2">{{ content.quote.form.description }}</label>
-                          <textarea rows="4" [(ngModel)]="quoteModel.description" name="description" class="w-full bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-gray-700 p-4 text-gray-900 dark:text-white focus:border-blue-500 outline-none"></textarea>
-                      </div>
-
-                      <button type="submit" [disabled]="sendingQuote" class="w-full bg-blue-600 text-white font-bold py-4 rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
-                          {{ content.quote.form.cta }}
-                      </button>
-                  </form>
-              </div>
-          </div>
-      </div>
-  </section>
+  <!-- 9. CONTACT FORM REDUNDANT REMOVED -->
 
 </ng-container>

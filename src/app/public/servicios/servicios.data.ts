@@ -168,8 +168,19 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-gamepad',
                 features: ['Mantenimiento Térmico', 'Reparación de HDMI', 'Reballing GPU', 'Fuentes de Poder', 'Joysticks'],
                 price: 'Desde $12,000',
-                image: 'assets/img/cursos/pro.webp',
+                image: 'assets/img/products/arreglo-consolas.webp',
                 link: '/servicios/reparacion-de-consolas'
+            },
+            {
+                id: 3,
+                title: 'Reparación de Tablets',
+                slug: 'reparacion-tablets',
+                description: 'Reparación especializada en tablets Android, iPad y Windows.',
+                icon: 'fa-tablet-alt',
+                features: ['Cambio de Pantalla', 'Cambio de Batería', 'Pin de Carga', 'Sistema Operativo', 'Recuperación de Datos'],
+                price: 'Desde $10,000',
+                image: 'assets/img/repair/13.jpg',
+                link: '/servicios/reparacion-tablets'
             }
         ],
         servicesCta: 'Solicitar Cotización',

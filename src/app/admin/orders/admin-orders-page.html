@@ -1,95 +1,232 @@
-<div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-green-600">Pedidos</h2>
-    <a routerLink="/admin/orders/new" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i>
-        Nuevo Pedido
-    </a>
-</div>
+<div class="max-w-7xl mx-auto pb-20 p-4">
+    
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4 border-b border-gray-200 dark:border-gray-800 mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                <i class="fas fa-shopping-bag text-green-500"></i> Pedidos
+            </h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Gestiona las órdenes de compra de tus clientes.</p>
+        </div>
+        
+        <a routerLink="/admin/orders/new" class="btn btn-primary shadow-lg shadow-green-500/20">
+            <i class="fas fa-plus mr-2"></i> Nuevo Pedido
+        </a>
+    </div>
 
-@if (loading) {
-<div class="flex justify-center items-center py-12">
-    <span class="loading loading-spinner loading-lg"></span>
-</div>
-}
+    <!-- Stats Dashboard -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <div class="stat">
+              <div class="stat-figure text-primary">
+                <i class="fas fa-list-alt text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider">Total Pedidos</div>
+              <div class="stat-value text-primary">{{ stats().total }}</div>
+            </div>
+        </div>
 
-@if (error) {
-<div class="alert alert-error">
-    <i class="fas fa-exclamation-circle"></i>
-    <span>{{ error }}</span>
-</div>
-}
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700" 
+             [class.border-warning]="stats().pending > 0">
+            <div class="stat">
+              <div class="stat-figure text-warning">
+                <i class="fas fa-clock text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider text-warning">Pendientes</div>
+              <div class="stat-value text-warning">{{ stats().pending }}</div>
+            </div>
+        </div>
 
-@if (!loading && !error) {
-@if (orders.length === 0) {
-<div class="text-center py-12">
-    <i class="fas fa-shopping-cart text-6xl text-base-content/30 mb-4"></i>
-    <p class="text-base-content/70 text-lg">No hay pedidos registrados</p>
-    <a routerLink="/admin/orders/new" class="btn btn-primary mt-4">Crear Primer Pedido</a>
-</div>
-} @else {
-<div class="overflow-x-auto bg-base-100 rounded-lg shadow text-base-content">
-    <table class="table w-full">
-        <thead>
-            <tr class="text-base-content font-bold">
-                <th>Número</th>
-                <th>Cliente</th>
-                <th>Productos</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (order of orders; track order.id) {
-            <tr class="hover:bg-base-200/50">
-                <td class="font-mono">{{ order.order_number }}</td>
-                <td>
-                    <div class="font-medium">{{ order.customer_name }}</div>
-                    <div class="text-sm opacity-70">{{ order.customer_email }}</div>
-                </td>
-                <td>
-                    <ul class="text-sm">
-                        @for (item of order.items; track item.id) {
-                            <li>
-                                <span class="font-bold">{{ item.quantity }}x</span> {{ item.product_name }}
-                            </li>
-                        }
-                        @if (!order.items || order.items.length === 0) {
-                            <span class="opacity-50 italic">Sin productos</span>
-                        }
-                    </ul>
-                </td>
-                <td class="font-semibold">${{ order.total.toFixed(2) }}</td>
-                <td>
-                    <span class="badge" [ngClass]="order.status | statusColor">
-                        {{ order.status | orderStatus }}
-                    </span>
-                </td>
-                <td>{{ order.created_at | date:'short' }}</td>
-                <td>
-                    <div class="flex gap-2">
-                        @if (order.status === 'pending' || order.status === 'processing') {
-                        <button (click)="toggleOrderStatus(order)" 
-                                class="btn btn-sm text-white"
-                                [class.btn-success]="order.status === 'pending'"
-                                [class.btn-warning]="order.status === 'processing'"
-                                [title]="order.status === 'pending' ? 'Marcar como Abonado' : 'Volver a Pendiente'">
-                            <i class="fas" [class.fa-check-dollar]="order.status === 'pending'" [class.fa-undo]="order.status === 'processing'"></i>
-                        </button>
-                        }
-                        <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a [routerLink]="['/admin/orders', order.id, 'edit']" class="btn btn-sm btn-ghost hover:bg-base-300">
-                            <i class="fas fa-edit"></i>
-                        </a>
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <div class="stat">
+              <div class="stat-figure text-success">
+                <i class="fas fa-check-circle text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider text-success">Completados</div>
+              <div class="stat-value text-success">{{ stats().completed }}</div>
+            </div>
+        </div>
+
+        <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+            <div class="stat">
+              <div class="stat-figure text-info">
+                <i class="fas fa-dollar-sign text-3xl opacity-50"></i>
+              </div>
+              <div class="stat-title text-xs uppercase tracking-wider">Ingresos Totales</div>
+              <div class="stat-value text-info text-2xl overflow-hidden text-ellipsis">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="flex flex-col lg:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <!-- Search -->
+        <div class="flex-1">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                   placeholder="Buscar cliente, número de pedido..." 
+                   class="input input-bordered w-full pl-10" />
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="overflow-x-auto pb-2 lg:pb-0">
+             <div class="join">
+                <input class="join-item btn" type="radio" name="status" aria-label="Todos" 
+                  [checked]="filterStatus() === 'all'" (click)="filterStatus.set('all')" />
+                <input class="join-item btn" type="radio" name="status" aria-label="Pendientes" 
+                  [checked]="filterStatus() === 'pending'" (click)="filterStatus.set('pending')" />
+                <input class="join-item btn" type="radio" name="status" aria-label="Procesando" 
+                  [checked]="filterStatus() === 'processing'" (click)="filterStatus.set('processing')" />
+                <input class="join-item btn" type="radio" name="status" aria-label="Completados" 
+                  [checked]="filterStatus() === 'completed'" (click)="filterStatus.set('completed')" />
+            </div>
+        </div>
+
+        <!-- Sort -->
+        <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full lg:w-auto">
+            <option value="date_desc">Más Recientes</option>
+            <option value="date_asc">Más Antiguos</option>
+            <option value="total_desc">Mayor Monto</option>
+        </select>
+    </div>
+
+    <!-- Content -->
+    @if (loading()) {
+        <div class="flex justify-center p-12">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+    } @else if (error()) {
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>{{ error() }}</span>
+        </div>
+    } @else {
+        
+        <!-- Desktop Table -->
+        <div class="hidden md:block bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+            <table class="table w-full">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr class="text-gray-600 dark:text-gray-300 font-bold uppercase text-xs tracking-wider">
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Productos</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th class="text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (order of paginatedOrders(); track order.id) {
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                        <td class="font-mono font-bold text-primary">{{ order.order_number }}</td>
+                        <td>
+                            <div class="font-bold text-gray-900 dark:text-white">{{ order.customer_name }}</div>
+                            <div class="text-xs text-gray-500">{{ order.customer_email }}</div>
+                        </td>
+                        <td>
+                            <div class="text-sm max-w-xs truncate">
+                                @if (order.items && order.items.length > 0) {
+                                    <span class="font-bold">{{ order.items[0].quantity }}x</span> {{ order.items[0].product_name }}
+                                    @if(order.items.length > 1) { <span class="badge badge-xs badge-ghost">+{{ order.items.length - 1 }} más</span> }
+                                } @else {
+                                    <span class="italic text-gray-400">Sin items</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="font-bold text-gray-900 dark:text-white">
+                            {{ order.total | currency }}
+                        </td>
+                        <td>
+                            <span class="badge badge-sm font-semibold border-0" 
+                                  [ngClass]="order.status | statusColor">
+                                {{ order.status | orderStatus }}
+                            </span>
+                        </td>
+                        <td class="text-xs text-gray-500">
+                            {{ order.created_at | date:'dd MMM yyyy, HH:mm' }}
+                        </td>
+                        <td class="text-right">
+                            <div class="flex justify-end gap-2">
+                                @if (order.status === 'pending') {
+                                    <button (click)="toggleOrderStatus(order)" class="btn btn-sm btn-ghost text-green-500 tooltip" data-tip="Marcar Pagado">
+                                        <i class="fas fa-check-dollar"></i>
+                                    </button>
+                                }
+                                <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-ghost text-gray-500 tooltip" data-tip="Ver Detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a [routerLink]="['/admin/orders', order.id, 'edit']" class="btn btn-sm btn-ghost text-indigo-500 tooltip" data-tip="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="md:hidden grid grid-cols-1 gap-4">
+            @for (order of paginatedOrders(); track order.id) {
+            <div class="card bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="card-body p-4">
+                    <div class="flex justify-between items-start mb-2">
+                         <div class="flex flex-col">
+                             <span class="font-mono text-xs font-bold text-primary">{{ order.order_number }}</span>
+                             <span class="text-xs text-gray-400">{{ order.created_at | date:'short' }}</span>
+                         </div>
+                         <div class="badge badge-sm border-0 font-bold" [ngClass]="order.status | statusColor">
+                            {{ order.status | orderStatus }}
+                         </div>
                     </div>
-                </td>
-            </tr>
+                    
+                    <h3 class="font-bold text-gray-900 dark:text-white">{{ order.customer_name }}</h3>
+                    
+                    <div class="py-2 border-y border-dashed border-gray-200 dark:border-gray-700 my-2">
+                        <ul class="text-sm space-y-1">
+                             @for(item of order.items.slice(0, 2); track item.id) {
+                                 <li class="flex justify-between">
+                                     <span class="truncate pr-2"><span class="font-bold">{{ item.quantity }}x</span> {{ item.product_name }}</span>
+                                 </li>
+                             }
+                             @if(order.items && order.items.length > 2) {
+                                 <li class="text-xs text-gray-400 italic">+{{ order.items.length - 2 }} productos más...</li>
+                             }
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">{{ order.total | currency }}</span>
+                        
+                        <div class="flex gap-2">
+                             <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-outline btn-ghost">Ver</a>
+                             @if(order.status === 'pending') {
+                                 <button (click)="toggleOrderStatus(order)" class="btn btn-sm btn-success text-white px-4">
+                                     <i class="fas fa-check"></i>
+                                 </button>
+                             }
+                        </div>
+                    </div>
+                </div>
+            </div>
             }
-        </tbody>
-    </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-8 flex justify-center pb-8" *ngIf="filteredOrders().length > 0">
+            <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
+        </div>
+        
+        <!-- Empty State -->
+        @if (filteredOrders().length === 0) {
+            <div class="text-center py-20 opacity-50">
+                <i class="fas fa-shopping-bag text-4xl mb-3"></i>
+                <p>No se encontraron pedidos.</p>
+            </div>
+        }
+    }
 </div>
-}
-}

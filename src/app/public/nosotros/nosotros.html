@@ -1,34 +1,35 @@
 <ng-container *ngIf="content$ | async as content">
   <!-- Hero Section -->
-  <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-gray-50 dark:bg-gray-900">
+  <!-- Hero Section -->
+  <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-[#0a0a0a]">
     <!-- Background Image/Gradient -->
     <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0 bg-linear-to-b from-white/80 to-white/90 dark:from-transparent dark:to-black/80 z-10"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-gray-900/10 to-[#0a0a0a] z-10"></div>
         <!-- Decorative circles -->
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500/10 dark:bg-blue-500/20 blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-3xl"></div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse-slow"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[100px]"></div>
     </div>
     
     <div class="relative z-10 container mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-gray-900 dark:text-white drop-shadow-lg">
+      <h1 class="text-4xl md:text-7xl font-bold mb-6 tracking-tight text-white drop-shadow-lg text-gradient-premium">
         {{ content.title }}
       </h1>
-      <p class="text-xl md:text-2xl text-blue-600 dark:text-blue-200 mb-8 font-light drop-shadow-md">
+      <p class="text-xl md:text-3xl text-blue-200 mb-8 font-light drop-shadow-md">
         {{ content.subtitle }}
       </p>
-      <p class="text-lg text-gray-600 dark:text-gray-200 max-w-3xl mx-auto leading-relaxed drop-shadow-sm">
+      <p class="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed drop-shadow-sm font-light">
         {{ content.intro }}
       </p>
     </div>
   </div>
 
   <!-- Stats Section -->
-  <section class="py-12 bg-white dark:bg-white/5 backdrop-blur-sm -mt-8 relative z-10 container mx-auto px-4 rounded-xl shadow-lg max-w-6xl border border-gray-200 dark:border-white/10">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-200 dark:divide-white/10">
-      <div *ngFor="let achievement of content.achievements" class="p-4">
-        <div class="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">{{ achievement.number }}</div>
-        <div class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">{{ achievement.label }}</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ achievement.description }}</div>
+  <section class="py-12 glass-panel -mt-10 relative z-10 container mx-auto px-4 rounded-2xl shadow-2xl max-w-6xl border border-white/10 backdrop-blur-xl hover:translate-y-[-5px] transition-transform duration-500">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-200 dark:divide-white/5">
+      <div *ngFor="let achievement of content.achievements" class="p-4 group">
+        <div class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500 mb-2 group-hover:scale-110 transition-transform">{{ achievement.number }}</div>
+        <div class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">{{ achievement.label }}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono">{{ achievement.description }}</div>
       </div>
     </div>
   </section>
@@ -68,25 +69,25 @@
   <!-- Mission & Vision -->
   <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
     <div class="container mx-auto px-4">
-      <div class="grid md:grid-cols-2 gap-8">
+      <div class="grid grid-cols-2 gap-4 md:gap-8">
         <!-- Mission Card -->
-        <div class="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">
+        <div class="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">
           <div class="w-12 h-12 bg-blue-100 dark:bg-blue-600/80 text-blue-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
             🎯
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.mission }}</h3>
-          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.mission }}</h3>
+          <p class="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
             {{ content.missionText }}
           </p>
         </div>
         
         <!-- Vision Card -->
-        <div class="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
+        <div class="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
           <div class="w-12 h-12 bg-purple-100 dark:bg-purple-600/80 text-purple-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
             🔭
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.vision }}</h3>
-          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.vision }}</h3>
+          <p class="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
             {{ content.visionText }}
           </p>
         </div>
@@ -102,11 +103,11 @@
         <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div *ngFor="let value of content.values" class="bg-white dark:bg-white/5 p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
-          <div class="text-4xl mb-6">{{ value.icon }}</div>
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ value.title }}</h3>
-          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+      <div class="grid grid-cols-2 gap-4 md:gap-8">
+        <div *ngFor="let value of content.values" class="bg-white dark:bg-white/5 p-4 md:p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
+          <div class="text-3xl md:text-4xl mb-4 md:mb-6">{{ value.icon }}</div>
+          <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">{{ value.title }}</h3>
+          <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             {{ value.description }}
           </p>
         </div>

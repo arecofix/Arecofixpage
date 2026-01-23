@@ -1,9 +1,9 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { Observable, map, of, Subject, switchMap } from 'rxjs';
+import { Observable, map, of, Subject, switchMap, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 // import { IsEmptyComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
 import { CategoryService } from '@app/public/categories/services';
@@ -12,15 +12,16 @@ import { ProductsResponse, Product } from '@app/public/products/interfaces';
 import { ProductCard } from '@app/public/products/components';
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
 import { iCategory } from '@app/public/categories/interfaces';
-import { BrandRepository } from '@app/features/products/data/repositories/brand.repository';
+import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { environment } from '../../../environments/environment';
 import { CartService } from '@app/shared/services/cart.service';
+import { SeoService } from '@app/core/services/seo.service';
 
 @Component({
     selector: 'app-repuestos',
     standalone: true,
-    imports: [CommonModule, FormsModule, ProductCard, Pagination],
+    imports: [CommonModule, FormsModule, ProductCard, Pagination, RouterLink],
     templateUrl: './repuestos.html',
     styleUrl: './repuestos.scss'
 })
@@ -32,6 +33,7 @@ export class RepuestosComponent implements OnInit {
     private productService = inject(ProductService);
     private brandRepo = inject(BrandRepository);
     private cartService = inject(CartService);
+    private seoService = inject(SeoService);
     public paginationService = inject(PaginationService);
 
     // Initial Data State
@@ -148,6 +150,11 @@ export class RepuestosComponent implements OnInit {
     });
 
     async ngOnInit() {
+        this.seoService.setPageData(
+            'Repuestos para Celulares - Mayorista y Minorista',
+            'Encontrá todos los repuestos para tu celular: Módulos, Pantallas, Baterías, Pines de Carga y Herramientas. Envíos a todo el país.',
+            'assets/img/hero-illustration.svg' // Using an existing image, ideally specific to repuestos
+        );
         await this.loadCategories();
         await this.loadBrands();
     }
@@ -223,7 +230,7 @@ export class RepuestosComponent implements OnInit {
     }
 
     async loadBrands() {
-        const brands = await this.brandRepo.findAll({ column: 'name', ascending: true });
+        const brands = await firstValueFrom(this.brandRepo.getAll({ column: 'name', ascending: true }));
         this.brands.set(brands);
     }
 

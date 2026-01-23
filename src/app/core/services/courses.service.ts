@@ -36,56 +36,97 @@ export interface Module {
 export class CoursesService {
     private supabase: SupabaseClient;
 
-    // Centralized mock data for fallback/demo
-    private readonly mockModules: Module[] = [
-        { 
-            id: 'm1', course_id: '1', title: 'Módulo 1: Fundamentos de Electrónica Aplicada', 
-            description: 'Conceptos de voltaje, corriente y resistencia. Uso profesional del multímetro y sus escalas de medición. Interpretación de magnitudes eléctricas en placas móviles.', order: 1 
+    // Centralized mock courses to be Single Source of Truth until DB is fully populated
+    private readonly mockCourses: Course[] = [
+        {
+            id: '1',
+            title: 'Reparación de Celulares - Nivel Básico',
+            slug: 'reparacion-celulares-basico',
+            description: 'Aprende los fundamentos de la reparación de smartphones. Incluye diagnóstico, cambio de pantallas y baterías. Ideal para quienes quieren iniciarse en el mundo de la tecnología móvil.',
+            duration: '3 meses',
+            schedule: 'Sábados 10:00-13:00',
+            price: 45000,
+            image_url: 'assets/img/cursos/alumno3.jpg',
+            level: 'Básico',
+            students: 120,
+            rating: 4.8
         },
-        { 
-            id: 'm2', course_id: '1', title: 'Módulo 2: Instrumentación y Seguridad en Laboratorio', 
-            description: 'Dominio de la estación de soldado, fuentes de alimentación regulables y microscopía. Normas ESD (Descarga Electrostática) y manejo seguro de componentes energizados.', order: 2 
+        {
+            id: '2',
+            title: 'Microelectrónica Avanzada',
+            slug: 'curso-avanzado-microelectronica',
+            description: 'Domina la reparación de placas de iPhone y Android. Aprende reballing, esquema eléctrico, solución de fallas de encendido, carga e imagen.',
+            duration: '4 meses',
+            schedule: 'Miércoles 18:00-21:00',
+            price: 65000,
+            image_url: 'assets/img/cursos/alumno2.jpg',
+            level: 'Avanzado',
+            students: 85,
+            rating: 4.9
         },
-        { 
-            id: 'm3', course_id: '1', title: 'Módulo 3: Arquitectura de Dispositivos Móviles', 
-            description: 'Procedimientos técnicos de desensamble. Identificación de periféricos y buses de datos. Protocolos de desconexión segura de baterías y flexores.', order: 3 
+        {
+            id: '3',
+            title: 'Electricidad Domiciliaria e Industrial',
+            slug: 'curso-electricidad',
+            description: 'Formación completa en instalaciones eléctricas. Aprende desde cero a realizar cableados, montaje de tableros, protecciones, iluminación y detección de fallas.',
+            duration: '5 meses',
+            schedule: 'Martes y Jueves 19:00-21:00',
+            price: 40000,
+            image_url: 'assets/img/cursos/electricity.jpg',
+            level: 'Principiante',
+            students: 40,
+            rating: 4.7
         },
-        { 
-            id: 'm4', course_id: '1', title: 'Módulo 4: Componentes SMD Pasivos', 
-            description: 'Identificación y medición de resistores, capacitores y bobinas en placa. Detección de fugas, circuitos abiertos y componentes en corto.', order: 4 
-        },
-        { 
-            id: 'm5', course_id: '1', title: 'Módulo 5: Semiconductores y Estructura Lógica', 
-            description: 'Funcionamiento de diodos y transistores. Análisis de etapas de rectificación y conmutación en circuitos de potencia. Lógica de control.', order: 5 
-        },
-        { 
-            id: 'm6', course_id: '1', title: 'Módulo 6: Protocolo de Encendido y Distribución de Energía', 
-            description: 'Análisis del PMIC (Power Management IC). Secuencia de arranque del equipo (Power Sequence). Identificación de fallas en la etapa de potencia y distribución.', order: 6 
-        },
-        { 
-            id: 'm7', course_id: '1', title: 'Módulo 7: Tecnologías de Display y Pantallas', 
-            description: 'Diferencias técnicas entre LCD, OLED y AMOLED. Protocolo de cambio de módulos. Introducción a la remanufactura de pantallas (cambio de glass).', order: 7 
-        },
-        { 
-            id: 'm8', course_id: '1', title: 'Módulo 8: Protocolo de Carga y Administración de Batería', 
-            description: 'Diagnóstico de fallas en la línea VBUS y VHBAT. Análisis de circuitos de carga (IFPMIC/Tigris). Ciclos de carga y salud de baterías de Litio.', order: 8 
-        },
-        { 
-            id: 'm9', course_id: '1', title: 'Módulo 9: Técnicas Profesionales de Soldadura', 
-            description: 'Aleaciones de estaño y tipos de flux. Perfiles de temperatura para retrabajo (Rework). Técnicas de Reballing para circuitos integrados y componentes BGA.', order: 9 
-        },
-        { 
-            id: 'm10', course_id: '1', title: 'Módulo 10: Gestión de Software y Firmware', 
-            description: 'Estructura de particiones de Android. Procedimientos de Flasheo y reinstalación de sistema operativo. Modos de servicio (Recovery, DFU, EDL).', order: 10 
-        },
-        { 
-            id: 'm11', course_id: '1', title: 'Módulo 11: Interpretación de Planos Esquemáticos', 
-            description: 'Lectura profesional de esquemas electrónicos (Schematics) y Boardviews. Seguimiento de líneas críticas y protocolos de diagnóstico avanzado.', order: 11 
-        },
-        { 
-            id: 'm12', course_id: '1', title: 'Módulo 12: Gestión Comercial de Servicio Técnico', 
-            description: 'Recepción técnica, checklist de ingreso y egreso de equipos. Elaboración de presupuestos profesionales, manejo de garantías y atención al cliente.', order: 12 
+        {
+            id: '4',
+            title: 'Aprendizaje 100% Práctico',
+            slug: 'aprendizaje-practico',
+            description: 'Modalidad intensiva de práctica en taller. Sin teoría, directo a la mesa de trabajo. Ideal para quienes ya tienen conocimientos teóricos y necesitan horas de vuelo.',
+            duration: 'A medida',
+            schedule: 'Consultar horarios',
+            price: 35000,
+            image_url: 'assets/img/cursos/aprendizaje-practico.jpg', 
+            level: 'Práctico',
+            students: 50,
+            rating: 5.0
         }
+    ];
+
+    private readonly mockModules: Module[] = [
+        // Curso 1: Basico
+        { 
+            id: 'm1-1', course_id: '1', title: 'Módulo 1: Fundamentos y Herramientas', 
+            description: 'Introducción a la electrónica, multímetro, estación de calor.', order: 1 
+        },
+        { 
+            id: 'm1-2', course_id: '1', title: 'Módulo 2: Desarme y Reconocimiento', 
+            description: 'Técnicas de apertura, identificación de partes y buses.', order: 2 
+        },
+        { 
+            id: 'm1-3', course_id: '1', title: 'Módulo 3: Pantallas y Táctiles', 
+            description: 'Diferencias OLED/LCD, cambio de glass vs módulo completo.', order: 3 
+        },
+        { 
+            id: 'm1-4', course_id: '1', title: 'Módulo 4: Baterías y Carga', 
+            description: 'Diagnóstico de baterías, pines de carga y consumo.', order: 4 
+        },
+        { 
+            id: 'm1-5', course_id: '1', title: 'Módulo 5: Software Básico', 
+            description: 'Hard reset, flasheo y cuentas Google.', order: 5 
+        },
+
+        // Curso 2: Microelectronica
+        { id: 'm2-1', course_id: '2', title: 'Módulo 1: Lectura de Planos', description: 'Schematics, boardview y seguimiento de líneas.', order: 1 },
+        { id: 'm2-2', course_id: '2', title: 'Módulo 2: Soldadura SMD', description: 'Manejo de componentes 0201, conectores FPC y blindajes.', order: 2 },
+        { id: 'm2-3', course_id: '2', title: 'Módulo 3: Reballing', description: 'Técnica de reballing para ICs de power, CPU y memoria.', order: 3 },
+        { id: 'm2-4', course_id: '2', title: 'Módulo 4: Fallas de Encendido', description: 'Consumos iniciales, secundarios y diagnóstico con fuente.', order: 4 },
+
+        // Curso 3: Electricidad
+        { id: 'm3-1', course_id: '3', title: 'Módulo 1: Conceptos Básicos', description: 'Ley de Ohm, corriente AC/DC, potencia y seguridad.', order: 1 },
+        { id: 'm3-2', course_id: '3', title: 'Módulo 2: Herramientas y Empalmes', description: 'Uso de pinzas, pelacables y tipos de uniones seguras.', order: 2 },
+        { id: 'm3-3', course_id: '3', title: 'Módulo 3: Tableros y Protecciones', description: 'Disyuntores, térmicas y puesta a tierra.', order: 3 },
+        { id: 'm3-4', course_id: '3', title: 'Módulo 4: Circuitos de Iluminación', description: 'Llaves combinadas, fotocélulas y sensores de movimiento.', order: 4 },
+        { id: 'm3-5', course_id: '3', title: 'Módulo 5: Tomacorrientes y Fuerza', description: 'Cálculo de secciones de cables y distribución de cargas.', order: 5 }
     ];
 
     constructor(private authService: AuthService) {
@@ -109,7 +150,20 @@ export class CoursesService {
                 .select('*')
                 .eq('slug', slug)
                 .single()
-        ) as Observable<PostgrestSingleResponse<Course | null>>;
+        ).pipe(
+            map(({ data, error }) => {
+                if (error || !data) {
+                    // Fallback to mock data (Single Source of Truth)
+                    const mock = this.mockCourses.find(c => c.slug === slug);
+                    return { data: mock || null, error: null, count: null, status: 200, statusText: 'OK' } as PostgrestSingleResponse<Course | null>;
+                }
+                return { data, error, count: null, status: 200, statusText: 'OK' } as PostgrestSingleResponse<Course | null>;
+            }),
+            catchError(() => {
+                 const mock = this.mockCourses.find(c => c.slug === slug);
+                 return of({ data: mock || null, error: null, count: null, status: 200, statusText: 'OK' } as PostgrestSingleResponse<Course | null>);
+            })
+        );
     }
 
     getCourseById(id: string): Observable<PostgrestSingleResponse<Course | null>> {

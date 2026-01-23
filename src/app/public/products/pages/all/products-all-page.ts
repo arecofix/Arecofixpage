@@ -18,6 +18,7 @@ import { ProductService } from '@app/public/products/services';
 import { CartService } from '@app/shared/services/cart.service';
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
+import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-products-all-page',
@@ -28,7 +29,8 @@ import { ProductCard } from '@app/public/products/components';
     Pagination,
     RouterModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    BreadcrumbsComponent
   ],
   templateUrl: './products-all-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +45,11 @@ export class ProductsAllPage {
   // Search Signal and Subject for debounce
   searchQuery = signal('');
   private searchSubject = new Subject<string>();
+
+  breadcrumbItems = signal<BreadcrumbItem[]>([
+    { label: 'Inicio', url: '/' },
+    { label: 'Productos' }
+  ]);
 
   // Filter signals
   minPriceInput = signal<number | null>(null);

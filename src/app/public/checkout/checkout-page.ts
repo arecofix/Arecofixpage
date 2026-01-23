@@ -8,11 +8,11 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '@app/shared/services/cart.service';
-import { OrderService } from '@app/services/order.service';
+import { OrderService } from '@app/core/services/order.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { NotificationService } from '@app/core/services/notification.service';
-import { ContactService } from '@app/services/contact.service';
+import { ContactService } from '@app/core/services/contact.service';
 
 @Component({
   selector: 'app-checkout-page',

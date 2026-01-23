@@ -202,7 +202,13 @@ export class AdminRepairFormPage implements OnInit {
         // Fix for HashLocationStrategy: Add /#/ to the URL
         const url = `${window.location.origin}/#/tracking/${this.form().tracking_code}`;
 
-        const message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
+        let message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
+
+        if (this.form().status === 'completed') {
+            const reviewLink = "https://www.google.com/maps/place/ARECOFIX+Servicio+t%C3%A9cnico+de+celulares+%7C+Venta+de+Repuestos./@-34.7671957,-58.815398,17z/data=!3m1!4b1!4m6!3m5!1s0x95bceb46770c86eb:0x73b48d51a83e8107!8m2!3d-34.7671957!4d-58.815398!16s%2Fg%2F11pvb9nwqp?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoASAFQAw%3D%3D";
+            message = `Hola ${customerName}, su reparación del ${device} ya está lista. Agradecemos su reseña en el siguiente enlace: ${reviewLink}`;
+        }
+
         const whatsappUrl = `https://wa.me/${this.form().customer_phone}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, '_blank');

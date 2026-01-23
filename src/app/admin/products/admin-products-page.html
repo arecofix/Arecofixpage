@@ -1,167 +1,257 @@
-<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 md:gap-0">
-  <h1 class="text-2xl font-bold text-gray-800 dark:text-green-400 self-start md:self-auto">Productos</h1>
-  <div class="grid grid-cols-2 gap-2 w-full md:w-auto md:flex">
-    <button (click)="exportProducts()" class="btn btn-outline btn-primary w-full md:w-auto">
-      <i class="fas fa-file-export mr-2"></i> Exportar CSV
-    </button>
-    <button (click)="fileInput.click()" class="btn btn-outline btn-secondary w-full md:w-auto">
-      <i class="fas fa-file-import mr-2"></i> Importar CSV
-    </button>
-    <input #fileInput type="file" accept=".csv" class="hidden" (change)="importProducts($event)" />
-    <a routerLink="/admin/products/new" class="btn btn-primary col-span-2 w-full md:w-auto">
-      <i class="fas fa-plus mr-2"></i> Nuevo Producto
-    </a>
-  </div>
-</div>
+<div class="max-w-7xl mx-auto pb-20 relative min-h-screen">
+  
+  <!-- Header & Actions -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4 sticky top-0 z-30 bg-gray-50/95 dark:bg-[#0f172a]/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 px-4">
+    <div>
+      <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-500 to-teal-400">
+        Inventario
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 hidden md:block">Gestiona tu catálogo completo desde aquí.</p>
+    </div>
 
-<!-- Filters Bar -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-  <div class="form-control">
-      <div class="input-group">
-          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-              placeholder="Buscar por nombre, SKU o código de barras..."
-              class="input input-bordered w-full bg-base-100 text-base-content" />
-          <button class="btn btn-square">
-              <i class="fas fa-search"></i>
-          </button>
-      </div>
+    <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+      <button (click)="exportProducts()" class="btn btn-outline btn-sm md:btn-md">
+        <i class="fas fa-file-export mr-2"></i> CSV
+      </button>
+      <button (click)="fileInput.click()" class="btn btn-outline btn-sm md:btn-md">
+        <i class="fas fa-file-import mr-2"></i> Importar
+      </button>
+      <input #fileInput type="file" accept=".csv" class="hidden" (change)="importProducts($event)" />
+      
+      <a routerLink="/admin/products/new" class="btn btn-primary btn-sm md:btn-md shadow-lg shadow-green-500/20 whitespace-nowrap">
+        <i class="fas fa-plus mr-2"></i> Nuevo
+      </a>
+    </div>
   </div>
-  <div class="flex justify-end">
-      <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered bg-base-100 text-base-content max-w-xs">
-          <option value="name_asc">Nombre (A-Z)</option>
-          <option value="price_asc">Precio: Menor a Mayor</option>
-          <option value="price_desc">Precio: Mayor a Menor</option>
-          <option value="stock_asc">Stock: Menor a Mayor</option>
-          <option value="stock_desc">Stock: Mayor a Menor</option>
-      </select>
-  </div>
-</div>
 
-@if (loading()) {
-<div class="flex justify-center py-12">
-  <span class="loading loading-spinner loading-lg"></span>
-</div>
-} @else if (error()) {
-<div class="alert alert-error">
-  <i class="fas fa-exclamation-circle"></i>
-  <span>{{ error() }}</span>
-</div>
-} @else {
-<div class="bg-white rounded-lg shadow overflow-hidden text-gray-800 dark:text-white dark:bg-gray-800">
-      <!-- Mobile View (Cards) -->
-      <div class="md:hidden">
-        <div *ngFor="let product of paginatedProducts()" class="p-4 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-          <div class="flex items-start gap-3">
-            <div class="h-12 w-12 shrink-0">
-              <img [src]="product.image_url || 'assets/placeholder.png'" 
-                   [alt]="product.name" 
-                   class="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex justify-between items-start">
-                <div>
-                  <div class="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">{{ product.name }}</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">SKU: {{ product.sku || 'N/A' }}</div>
-                </div>
-                <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400 ml-2">{{ product.price | currency }}</div>
-              </div>
-              
-              <div class="mt-2 flex flex-wrap gap-2 items-center text-xs">
-                <span class="px-2 py-0.5 rounded-full"
-                      [ngClass]="{
-                        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': product.stock > 10,
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': product.stock <= 10 && product.stock > 0,
-                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': product.stock === 0
-                      }">
-                  {{ product.stock }} un.
-                </span>
-                <span class="px-2 py-0.5 rounded-full"
-                      [ngClass]="product.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'">
-                  {{ product.is_active ? 'Activo' : 'Inactivo' }}
-                </span>
-              </div>
-
-              <div class="mt-3 flex justify-end">
-                <a [routerLink]="['/admin/products', product.id]" 
-                   class="btn btn-xs btn-ghost text-indigo-600 dark:text-indigo-400">
-                  <i class="fas fa-edit mr-1"></i> Editar
-                </a>
-              </div>
-            </div>
-          </div>
+  <!-- Filters & Search -->
+  <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <div class="form-control w-full lg:col-span-2">
+        <div class="relative group">
+           <div class="absolute -inset-0.5 bg-linear-to-r from-green-400 to-blue-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+           <div class="relative flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <i class="fas fa-search px-4 text-gray-400"></i>
+              <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                 placeholder="Buscar por nombre, SKU, marca..." 
+                 class="input input-ghost w-full focus:bg-transparent text-lg h-12" />
+           </div>
         </div>
       </div>
+      
+      <div class="flex items-center gap-2">
+         <span class="text-sm font-bold text-gray-500 hidden md:block">Ordenar:</span>
+         <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full bg-white dark:bg-gray-800">
+             <option value="name_asc">A-Z Nombre</option>
+             <option value="price_asc">Precio: Bajo a Alto</option>
+             <option value="price_desc">Precio: Alto a Bajo</option>
+             <option value="stock_asc">Stock: Bajo a Alto</option>
+             <option value="stock_desc">Stock: Alto a Bajo</option>
+         </select>
+      </div>
+  </div>
 
-      <!-- Desktop View (Table) -->
-      <div class="hidden md:block overflow-x-auto">
-        <table class="table w-full">
-          <thead>
-            <tr class="text-gray-800 dark:text-white">
-              <th>Producto</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-           <tr *ngFor="let product of paginatedProducts()" class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800">
-            <td class="px-6 py-4">
-              <div class="flex items-center">
-                <div class="h-10 w-10 shrink-0">
-                  <img [src]="product.image_url || 'assets/placeholder.png'" 
-                       [alt]="product.name" 
-                       class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-700">
+  <!-- Selection Bar (Floating) -->
+  @if (selectedIds().size > 0) {
+    <div class="fixed bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto z-40 animate-fade-in-up">
+      <div class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-full shadow-2xl px-6 py-3 flex items-center justify-between gap-6 border border-gray-700 dark:border-gray-200">
+        <div class="font-bold whitespace-nowrap">
+          <span class="badge badge-primary mr-2">{{ selectedIds().size }}</span> seleccionados
+        </div>
+        <div class="flex items-center gap-2">
+           <button (click)="openBulkEdit()" class="btn btn-sm btn-ghost hover:bg-white/20 dark:hover:bg-black/10 text-white dark:text-gray-900">
+             <i class="fas fa-edit mr-2"></i> Editar Masivo
+           </button>
+           <button (click)="clearSelection()" class="btn btn-circle btn-xs btn-ghost text-white dark:text-gray-900 opacity-70 hover:opacity-100">
+             <i class="fas fa-times"></i>
+           </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- PRODUCTS LIST -->
+  @if (loading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
+      @for(i of [1,2,3,4,5,6,7,8]; track i) {
+         <div class="skeleton h-64 rounded-xl"></div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="p-4">
+      <div class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
+      </div>
+    </div>
+  } @else {
+    
+    <!-- DESKTOP TABLE -->
+    <div class="hidden lg:block bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden mx-4">
+      <table class="table w-full">
+        <thead class="bg-gray-50 dark:bg-gray-700/50">
+          <tr class="text-gray-600 dark:text-gray-300 font-bold uppercase text-xs tracking-wider">
+            <th class="w-12">
+               <label>
+                 <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" 
+                   [checked]="isAllSelected()" 
+                   (change)="toggleSelectAll()" />
+               </label>
+            </th>
+            <th>Producto</th>
+            <th>SKU / Marca</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of paginatedProducts(); track product.id) {
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group cursor-pointer" (click)="toggleSelection(product.id)">
+            <td (click)="$event.stopPropagation()">
+               <label>
+                 <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" 
+                   [checked]="selectedIds().has(product.id)" 
+                   (change)="toggleSelection(product.id)" />
+               </label>
+            </td>
+            <td>
+              <div class="flex items-center gap-4">
+                <div class="avatar">
+                  <div class="mask mask-squircle w-12 h-12 bg-gray-100 dark:bg-gray-700">
+                    <img [src]="product.image_url || 'assets/img/no-image.png'" [alt]="product.name" class="object-cover" />
+                  </div>
                 </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">SKU: {{ product.sku || 'N/A' }}</div>
+                <div>
+                  <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ product.name }}</div>
+                  <div class="text-xs text-gray-400 font-mono">{{ product.slug }}</div>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900 dark:text-white font-medium">{{ product.price | currency }}</div>
+            <td>
+               <div class="flex flex-col">
+                 <span class="font-mono text-xs font-bold">{{ product.sku || '---' }}</span>
+                 <span class="text-xs text-gray-500">
+                    @if(product.brand_id) { 
+                      <!-- Ideally fetch brand name map, keeping simple for now -->
+                      Marca ID: {{ product.brand_id | slice:0:5 }}...
+                    } @else { Generic }
+                 </span>
+               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    [ngClass]="{
-                      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': product.stock > 10,
-                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': product.stock <= 10 && product.stock > 0,
-                      'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': product.stock === 0
-                    }">
-                {{ product.stock }} unidades
-              </span>
+            <td class="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+               {{ product.price | currency: product.currency || 'ARS' }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    [ngClass]="product.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'">
-                {{ product.is_active ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <a [routerLink]="['/admin/products', product.id]" 
-                 class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-4 transition-colors">
-                <i class="fas fa-edit"></i>
-              </a>
-            </td>
-          </tr>
-          
-          <!-- Empty State -->
-          <tr *ngIf="paginatedProducts().length === 0">
-            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-              <div class="flex flex-col items-center justify-center">
-                <i class="fas fa-search text-4xl mb-4 text-gray-300 dark:text-gray-600"></i>
-                <p class="text-lg">No se encontraron productos</p>
+            <td>
+              <div class="flex items-center gap-2">
+                 <div class="radial-progress text-xs" 
+                    [class.text-success]="!product.stock || product.stock > 10"
+                    [class.text-warning]="product.stock && product.stock <= 10 && product.stock > 0"
+                    [class.text-error]="product.stock === 0"
+                    [style.--value]="product.stock ? (product.stock > 100 ? 100 : product.stock) : 0" 
+                    style="--size:2rem;">
+                    {{ product.stock || 0 }}
+                 </div>
+                 @if(product.stock === 0) { <span class="badge badge-error badge-xs">Agotado</span> }
               </div>
             </td>
+            <td>
+              <div class="badge badge-sm gap-2" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
+                 <div class="w-2 h-2 rounded-full" [class.bg-white]="product.is_active" [class.bg-gray-500]="!product.is_active"></div>
+                 {{ product.is_active ? 'Activo' : 'Borrador' }}
+              </div>
+            </td>
+            <td class="text-right" (click)="$event.stopPropagation()">
+               <a [routerLink]="['/admin/products', product.id]" class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left" data-tip="Editar">
+                 <i class="fas fa-pen text-gray-500 hover:text-indigo-500"></i>
+               </a>
+            </td>
           </tr>
+          }
         </tbody>
       </table>
     </div>
 
-  <!-- Pagination -->
-  <div class="p-4 border-t border-gray-200 dark:border-gray-800 flex justify-center" *ngIf="products().length > 0">
-    <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
-  </div>
+    <!-- MOBILE CARDS -->
+    <div class="lg:hidden grid grid-cols-1 gap-4 px-4">
+       <!-- Select All Mobile Control -->
+       <div class="flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
+           <label class="label cursor-pointer gap-3">
+             <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" 
+               [checked]="isAllSelected()" 
+               (change)="toggleSelectAll()" />
+             <span class="label-text font-bold">Seleccionar Todo en página</span>
+           </label>
+       </div>
+
+       @for (product of paginatedProducts(); track product.id) {
+        <div class="card bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700" 
+             [class.ring-2]="selectedIds().has(product.id)" 
+             [class.ring-indigo-500]="selectedIds().has(product.id)">
+           <div class="card-body p-4 flex-row items-start gap-4">
+              <!-- Checkbox -->
+              <input type="checkbox" class="checkbox checkbox-primary mt-1" 
+                  [checked]="selectedIds().has(product.id)" 
+                  (change)="toggleSelection(product.id)" />
+              
+              <!-- Image -->
+              <div class="avatar rounded-xl w-20 h-20 bg-gray-100 shrink-0">
+                  <img [src]="product.image_url || 'assets/img/no-image.png'" class="object-cover rounded-xl" />
+              </div>
+
+              <!-- Content -->
+              <div class="flex-1 min-w-0">
+                 <div class="flex justify-between items-start">
+                    <h3 class="font-bold text-gray-900 dark:text-white truncate pr-2">{{ product.name }}</h3>
+                    <div class="badge badge-xs" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
+                        {{ product.is_active ? 'ON' : 'OFF' }}
+                    </div>
+                 </div>
+                 
+                 <p class="text-xs text-gray-500 font-mono mb-2">{{ product.sku }}</p>
+                 
+                 <div class="flex justify-between items-end mt-2">
+                    <div>
+                       <span class="block text-xs text-gray-400">Precio</span>
+                       <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">{{ product.price | currency: product.currency || 'ARS' }}</span>
+                    </div>
+                    <div class="text-right">
+                       <span class="block text-xs text-gray-400">Stock</span>
+                       <span class="font-mono font-bold" [class.text-error]="product.stock === 0">{{ product.stock || 0 }}</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
+           <!-- Card Actions -->
+           <div class="card-actions border-t border-gray-100 dark:border-gray-700 p-2 flex justify-end bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
+              <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost w-full">
+                 Editar Detalle <i class="fas fa-arrow-right ml-2 opacity-50"></i>
+              </a>
+           </div>
+        </div>
+       }
+    </div>
+
+    <!-- Empty State -->
+    @if (paginatedProducts().length === 0) {
+       <div class="flex flex-col items-center justify-center py-20 text-center opacity-50">
+          <i class="fas fa-box-open text-6xl mb-4 text-gray-300"></i>
+          <p class="text-xl">No se encontraron productos.</p>
+       </div>
+    }
+
+    <!-- Pagination -->
+    <div class="mt-8 flex justify-center pb-8" *ngIf="paginatedProducts().length > 0">
+       <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
+    </div>
+
+  }
 </div>
-}
+
+<!-- MODAL INTEGRATION -->
+<app-bulk-edit-modal 
+   [(isOpen)]="isBulkModalOpen" 
+   [selectedIds]="selectedIdsList()"
+   [brands]="brands()"
+   (onSuccess)="onBulkEditSuccess()">
+</app-bulk-edit-modal>

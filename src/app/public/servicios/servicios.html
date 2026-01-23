@@ -1,175 +1,216 @@
-<ng-container *ngIf="content$ | async as content">
-    <!-- Hero Section -->
-    <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
-        <!-- Background Image -->
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2000" 
-                 class="w-full h-full object-cover opacity-10 dark:opacity-20" alt="Background">
-            <!-- Gradient Overlay -->
-            <div class="absolute inset-0 bg-linear-to-b from-white/80 to-white/90 dark:from-transparent dark:to-black/80"></div>
-        </div>
-    
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 dark:text-white drop-shadow-lg">
-                {{ content.heroTitle }}
-                <span class="block text-transparent bg-clip-text bg-linear-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400">
-                    {{ content.heroSubtitle }}
-                </span>
-            </h1>
-            <p class="text-xl sm:text-2xl text-gray-600 dark:text-gray-200 max-w-3xl mx-auto mb-8 drop-shadow-md">
-                {{ content.heroDescription }}
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20servicio%20técnico'"
-                    class="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition shadow-lg transform hover:scale-105">
-                    <i class="fab fa-whatsapp mr-2 text-xl"></i>
-                    {{ content.heroCtaWhatsapp }}
-                </a>
-                <a routerLink="." fragment="servicios"
-                    class="inline-flex items-center justify-center px-8 py-4 bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white font-semibold rounded-lg transition border border-gray-200 dark:border-white/30 transform hover:scale-105 shadow-sm cursor-pointer">
-                    {{ content.heroCtaAll }}
-                </a>
-            </div>
+<!-- Hero Section -->
+<section class="relative bg-gray-900 text-white py-20 lg:py-32 overflow-hidden">
+    <!-- Background Gradient & Shapes -->
+    <div class="absolute inset-0 bg-linear-to-br from-gray-900 via-[#0f172a] to-gray-900 z-0"></div>
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 z-0 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4 z-0 pointer-events-none"></div>
+
+    <div class="container mx-auto px-4 relative z-10 text-center">
+        <span class="inline-block py-1 px-3 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-bold tracking-wide uppercase mb-6 border border-indigo-500/30">
+            {{ content().heroSubtitle }}
+        </span>
+        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight max-w-4xl mx-auto">
+            {{ content().heroTitle }}
+        </h1>
+        <p class="text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl mx-auto">
+            {{ content().heroDescription }}
+        </p>
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a routerLink="." fragment="services-catalog" 
+               class="btn btn-primary btn-lg rounded-full px-8 shadow-lg shadow-indigo-500/30 hover:-translate-y-1 transition-all border-none bg-linear-to-r from-blue-600 to-indigo-600 text-white">
+                {{ content().heroCtaAll }}
+            </a>
+            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quisiera%20asesoramiento%20sobre%20servicios'" 
+               target="_blank"
+               class="btn btn-outline btn-lg text-white border-white/20 hover:bg-white hover:text-gray-900 rounded-full px-8 hover:border-white">
+                <i class="fa-brands fa-whatsapp mr-2"></i> {{ content().heroCtaWhatsapp }}
+            </a>
         </div>
     </div>
-    
-    <!-- Process Section -->
-    <section class="py-16 bg-white dark:bg-white/5 backdrop-blur-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">{{ content.processTitle }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div *ngFor="let item of content.process" class="text-center">
-                    <div class="relative">
-                        <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
-                            <i class="fas {{item.icon}} text-3xl text-white"></i>
-                        </div>
-                        <div
-                            class="absolute -top-2 -right-2 w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold shadow-sm">
-                            {{item.step}}
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{item.title}}</h3>
-                    <p class="text-gray-600 dark:text-gray-300">{{item.description}}</p>
-                </div>
-            </div>
+</section>
+
+<!-- Process Section -->
+<section class="py-20 bg-white dark:bg-gray-800 -mt-10 relative z-20 rounded-t-[3rem] border-t border-white/10">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ content().processTitle }}</h2>
         </div>
-    </section>
-    
-    <!-- Services Grid -->
-    <section id="servicios" class="py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ content.servicesTitle }}</h2>
-                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                    {{ content.servicesDescription }}
-                </p>
-            </div>
-    
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div *ngFor="let service of content.services" class="bg-white dark:bg-white/5 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm group hover:-translate-y-1">
-                    <!-- Service Image -->
-                    <div class="relative h-48 overflow-hidden bg-linear-to-br from-indigo-500 to-purple-600">
-                        <img [src]="service.image" [alt]="service.title" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
-                            <i class="fas {{service.icon}} text-6xl text-white drop-shadow-lg"></i>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 relative">
+            <!-- Connecting Line (Desktop) -->
+            <div class="hidden lg:block absolute top-10 left-[10%] right-[10%] h-0.5 bg-gray-200 dark:bg-gray-700 z-0"></div>
+
+            @for (step of content().process; track step.step) {
+                <div class="relative z-10 flex flex-col items-center text-center group hover-lift">
+                    <div class="w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700 flex items-center justify-center text-2xl md:text-3xl text-indigo-600 dark:text-indigo-400 mb-4 md:mb-8 transition-all duration-300 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-indigo-500/5 dark:bg-indigo-500/10 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-2xl"></div>
+                        <i class="fa-solid relative z-10" [class]="step.icon"></i>
+                    </div>
+                    <div class="bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300 mb-3 border border-indigo-100 dark:border-indigo-500/20">
+                        PASO 0{{ step.step }}
+                    </div>
+                    <h3 class="text-base md:text-xl font-bold text-gray-900 dark:text-white mb-2">{{ step.title }}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-[220px]">
+                        {{ step.description }}
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Services Catalog -->
+<section id="services-catalog" class="py-20 bg-gray-50 dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{{ content().servicesTitle }}</h2>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">
+                {{ content().servicesDescription }}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+            @for (service of content().services; track service.id) {
+                <!-- Service Card -->
+                <div class="group bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col h-full hover:-translate-y-1">
+                    
+                    <!-- Image -->
+                    <div class="h-32 md:h-52 overflow-hidden relative">
+                        <div class="absolute inset-0 bg-linear-to-t from-gray-900/80 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity"></div>
+                        <img [src]="service.image" [alt]="service.title" 
+                             class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                        
+                        <!-- Icon Badge -->
+                        <div class="absolute bottom-2 left-2 md:bottom-4 md:left-4 z-20 w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-sm md:text-xl">
+                            <i class="fa-solid" [class]="service.icon"></i>
                         </div>
                     </div>
-    
-                    <!-- Service Content -->
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">{{service.title}}</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4">{{service.description}}</p>
-    
-                        <!-- Features List -->
-                        <ul class="space-y-2 mb-6">
-                            <li *ngFor="let feature of service.features" class="flex items-start text-sm text-gray-600 dark:text-gray-300">
-                                <i class="fas fa-check-circle text-green-500 dark:text-green-400 mr-2 mt-1 shrink-0"></i>
-                                <span>{{feature}}</span>
-                            </li>
+
+                    <!-- Content -->
+                    <div class="p-4 md:p-8 flex flex-col grow">
+                        <h3 class="text-sm md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 md:line-clamp-none leading-tight">
+                            {{ service.title }}
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-xs md:text-sm mb-3 md:mb-6 leading-relaxed grow line-clamp-3">
+                            {{ service.description }}
+                        </p>
+
+                        <!-- Features Preview -->
+                        <ul class="space-y-1 md:space-y-2 mb-3 md:mb-6 hidden md:block">
+                            @for (feature of service.features.slice(0, 3); track feature) {
+                                <li class="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-check text-green-500 mt-0.5"></i>
+                                    <span>{{ feature }}</span>
+                                </li>
+                            }
                         </ul>
-    
-                        <!-- Price and CTA -->
-                        <div class="pt-4 border-t border-gray-200 dark:border-white/10">
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{service.price}}</span>
-                            </div>
-                            <!-- Updated Button with Click Handler -->
-                            <a [href]="service.link ? service.link : 'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20el%20servicio%20de%20' + service.title"
-                               (click)="openService(service, $event)"
-                                class="block w-full text-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition shadow-md cursor-pointer">
-                                {{ content.servicesCta }}
+
+                        <div class="mt-auto pt-3 md:pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between gap-2">
+                            <span class="text-xs md:text-sm font-semibold text-indigo-600 dark:text-indigo-400 truncate">
+                                {{ service.price }}
+                            </span>
+                            
+                            <a [routerLink]="service.link" (click)="openService(service, $event)"
+                               class="btn btn-xs md:btn-sm btn-circle btn-ghost text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 dark:hover:text-blue-400 transition-colors shrink-0">
+                                <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Other Services Modal -->
-    <div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" (click)="closeModal()">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100" (click)="$event.stopPropagation()">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Otros Servicios</h3>
-                <button (click)="closeModal()" class="btn btn-circle btn-sm btn-ghost text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <i class="fas fa-times"></i>
+<!-- Guarantees Grid -->
+<section class="py-20 bg-gray-50 dark:bg-[#0a0a0a]">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @for (item of content().guarantees; track item.title) {
+                <div class="flex gap-5 items-start p-8 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:border-blue-500/30 transition-all duration-300 hover:shadow-xl group hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid" [class]="item.icon"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ item.title }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ item.description }}</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final -->
+<section class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-linear-to-r from-blue-900 to-indigo-900 z-0"></div>
+    <!-- Removed pattern svg to avoid build error -->
+    
+    <div class="container mx-auto px-4 relative z-10 text-center">
+        <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">{{ content().ctaTitle }}</h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">{{ content().ctaDescription }}</p>
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a [href]="'https://wa.me/' + whatsappNumber" target="_blank"
+               class="btn btn-lg bg-green-500 border-none hover:bg-green-600 text-white rounded-full px-8 shadow-xl shadow-green-900/20">
+                <i class="fa-brands fa-whatsapp mr-2 text-xl"></i> {{ content().ctaWhatsapp }}
+            </a>
+            <a href="mailto:contacto@arecofix.com"
+               class="btn btn-lg btn-ghost text-white border-white/20 hover:bg-white/10 rounded-full px-8">
+                {{ content().ctaForm }}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+@if (showModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+         (click)="closeModal()">
+        
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100 border border-gray-100 dark:border-gray-700"
+             (click)="$event.stopPropagation()">
+             
+            <div class="bg-linear-to-r from-indigo-600 to-blue-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="text-lg font-bold">Servicios Especializados</h3>
+                <button (click)="closeModal()" class="hover:text-white/80 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             
-            <div class="p-6 max-h-[70vh] overflow-y-auto">
-                <ul class="space-y-3">
-                    <li *ngFor="let item of otherServicesList" class="p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500 transition-colors">
-                        <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20me%20interesa%20el%20servicio%20de%20' + item" 
-                           class="flex items-center gap-3 w-full" target="_blank">
-                            <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                                <i class="fas fa-chevron-right text-xs"></i>
-                            </div>
-                            <span class="text-gray-700 dark:text-gray-200 font-medium">{{ item }}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <div class="p-8">
+                @if (selectedService()) {
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid" [class]="selectedService()?.icon || 'fa-star'"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedService()?.title }}</h4>
+                            <p class="text-sm text-gray-500">{{ selectedService()?.price }}</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+                        {{ selectedService()?.description }}
+                    </p>
+                } @else {
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 font-medium">Otros servicios disponibles bajo demanda:</p>
+                    <ul class="space-y-3 mb-8">
+                        @for (item of otherServicesList(); track item) {
+                            <li class="flex items-center gap-3 text-gray-700 dark:text-gray-300 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                <i class="fas fa-circle-check text-green-500"></i>
+                                <span>{{ item }}</span>
+                            </li>
+                        }
+                    </ul>
+                }
 
-            <div class="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 text-center">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">¿No encuentras lo que buscas?</p>
-                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20tengo%20una%20consulta%20general'" 
-                   class="btn btn-primary w-full shadow-lg">
-                    <i class="fab fa-whatsapp mr-2 text-xl"></i>
-                    Consulta General
+                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Consulta%20sobre%20' + (selectedService()?.title || 'Otros Servicios')" 
+                   target="_blank"
+                   class="btn btn-primary w-full rounded-xl gap-2">
+                    <i class="fa-brands fa-whatsapp"></i> Consultar Disponibilidad
                 </a>
             </div>
         </div>
     </div>
-    
-    <!-- Guarantees Section -->
-    <section class="py-16 bg-indigo-600 dark:bg-indigo-900/50 backdrop-blur-md text-white border-y border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div *ngFor="let guarantee of content.guarantees">
-                    <i class="fas {{guarantee.icon}} text-5xl mb-4 text-indigo-200 dark:text-indigo-300"></i>
-                    <h3 class="text-2xl font-bold mb-2">{{guarantee.title}}</h3>
-                    <p class="text-indigo-100 dark:text-indigo-200">{{guarantee.description}}</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- CTA Section -->
-    <section class="py-16 bg-linear-to-r from-blue-600/80 to-indigo-600/80 text-white backdrop-blur-sm">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-4">{{ content.ctaTitle }}</h2>
-            <p class="text-xl mb-8">{{ content.ctaDescription }}</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20necesito%20un%20diagnóstico%20gratuito'"
-                    class="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg text-lg transform hover:scale-105">
-                    <i class="fab fa-whatsapp mr-2 text-2xl"></i>
-                    {{ content.ctaWhatsapp }}
-                </a>
-                <a href="#/contacto"
-                    class="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition text-lg transform hover:scale-105">
-                    {{ content.ctaForm }}
-                </a>
-            </div>
-        </div>
-    </section>
-</ng-container>
+}

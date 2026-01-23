@@ -1,11 +1,11 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DatabaseError } from '../errors/application.error';
 import { LoggerService } from '../services/logger.service';
+import { Observable, from, map } from 'rxjs';
 
 /**
  * Base Repository
- * Provides common CRUD operations for all entities
- * Eliminates code duplication across admin pages
+ * Provides common CRUD operations for all entities using Observables
  */
 export abstract class BaseRepository<T> {
     protected abstract tableName: string;
@@ -18,165 +18,152 @@ export abstract class BaseRepository<T> {
     /**
      * Find all records
      */
-    async findAll(orderBy?: { column: string; ascending?: boolean }): Promise<T[]> {
-        try {
-            let query = this.supabase.from(this.tableName).select('*');
+    getAll(orderBy?: { column: string; ascending?: boolean }): Observable<T[]> {
+        let query = this.supabase.from(this.tableName).select('*');
 
-            if (orderBy) {
-                query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
-            }
-
-            const { data, error } = await query;
-
-            if (error) throw new DatabaseError(error.message, error);
-            return (data as T[]) || [];
-        } catch (error) {
-            this.logger.error(`Error fetching all ${this.tableName}`, error);
-            throw error;
+        if (orderBy) {
+            query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
         }
+
+        return from(query).pipe(
+            map(({ data, error }) => {
+                if (error) {
+                    this.logger.error(`Error fetching all ${this.tableName}`, error);
+                    throw new DatabaseError(error.message, error);
+                }
+                return (data as T[]) || [];
+            })
+        );
     }
 
     /**
      * Find record by ID
      */
-    async findById(id: string): Promise<T | null> {
-        try {
-            const { data, error } = await this.supabase
+    getById(id: string): Observable<T> {
+        return from(
+            this.supabase
                 .from(this.tableName)
                 .select('*')
                 .eq('id', id)
-                .single();
-
-            if (error) {
-                if (error.code === 'PGRST116') return null; // Not found
-                throw new DatabaseError(error.message, error);
-            }
-
-            return data as T;
-        } catch (error) {
-            this.logger.error(`Error fetching ${this.tableName} by ID`, error);
-            throw error;
-        }
+                .single()
+        ).pipe(
+            map(({ data, error }) => {
+                if (error) {
+                    if (error.code === 'PGRST116') throw new Error('Not found'); // Simplified error for now
+                    this.logger.error(`Error fetching ${this.tableName} by ID`, error);
+                    throw new DatabaseError(error.message, error);
+                }
+                return data as T;
+            })
+        );
     }
 
     /**
      * Create new record
      */
-    async create(item: Partial<T>): Promise<T> {
-        try {
-            const { data, error } = await this.supabase
+    create(item: Partial<T>): Observable<T> {
+        return from(
+            this.supabase
                 .from(this.tableName)
                 .insert(item)
                 .select()
-                .single();
-
-            if (error) throw new DatabaseError(error.message, error);
-            return data as T;
-        } catch (error) {
-            this.logger.error(`Error creating ${this.tableName}`, error);
-            throw error;
-        }
+                .single()
+        ).pipe(
+            map(({ data, error }) => {
+                if (error) {
+                    this.logger.error(`Error creating ${this.tableName}`, error);
+                    throw new DatabaseError(error.message, error);
+                }
+                return data as T;
+            })
+        );
     }
 
     /**
      * Update existing record
      */
-    async update(id: string, item: Partial<T>): Promise<T> {
-        try {
-            const { data, error } = await this.supabase
+    update(id: string, item: Partial<T>): Observable<T> {
+        return from(
+            this.supabase
                 .from(this.tableName)
                 .update(item)
                 .eq('id', id)
                 .select()
-                .single();
-
-            if (error) throw new DatabaseError(error.message, error);
-            return data as T;
-        } catch (error) {
-            this.logger.error(`Error updating ${this.tableName}`, error);
-            throw error;
-        }
+                .single()
+        ).pipe(
+            map(({ data, error }) => {
+                if (error) {
+                     this.logger.error(`Error updating ${this.tableName}`, error);
+                     throw new DatabaseError(error.message, error);
+                }
+                return data as T;
+            })
+        );
     }
 
     /**
      * Delete record
      */
-    async delete(id: string): Promise<void> {
-        try {
-            const { error } = await this.supabase
+    delete(id: string): Observable<void> {
+        return from(
+            this.supabase
                 .from(this.tableName)
                 .delete()
-                .eq('id', id);
-
-            if (error) throw new DatabaseError(error.message, error);
-        } catch (error) {
-            this.logger.error(`Error deleting ${this.tableName}`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Toggle active status
-     */
-    async toggleStatus(id: string, currentStatus: boolean): Promise<T> {
-        try {
-            const { data, error } = await this.supabase
-                .from(this.tableName)
-                .update({ is_active: !currentStatus })
                 .eq('id', id)
-                .select()
-                .single();
-
-            if (error) throw new DatabaseError(error.message, error);
-            return data as T;
-        } catch (error) {
-            this.logger.error(`Error toggling ${this.tableName} status`, error);
-            throw error;
-        }
+        ).pipe(
+            map(({ error }) => {
+                if (error) {
+                    this.logger.error(`Error deleting ${this.tableName}`, error);
+                    throw new DatabaseError(error.message, error);
+                }
+            })
+        );
     }
 
     /**
      * Find records with filter
      */
-    async findWhere(
+    getWhere(
         column: string,
         value: any,
         orderBy?: { column: string; ascending?: boolean }
-    ): Promise<T[]> {
-        try {
-            let query = this.supabase
-                .from(this.tableName)
-                .select('*')
-                .eq(column, value);
+    ): Observable<T[]> {
+        let query = this.supabase
+            .from(this.tableName)
+            .select('*')
+            .eq(column, value);
 
-            if (orderBy) {
-                query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
-            }
-
-            const { data, error } = await query;
-
-            if (error) throw new DatabaseError(error.message, error);
-            return (data as T[]) || [];
-        } catch (error) {
-            this.logger.error(`Error fetching ${this.tableName} with filter`, error);
-            throw error;
+        if (orderBy) {
+            query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
         }
+
+        return from(query).pipe(
+            map(({ data, error }) => {
+                if (error) {
+                    this.logger.error(`Error fetching ${this.tableName} with filter`, error);
+                    throw new DatabaseError(error.message, error);
+                }
+                return (data as T[]) || [];
+            })
+        );
     }
 
     /**
      * Count records
      */
-    async count(): Promise<number> {
-        try {
-            const { count, error } = await this.supabase
+    count(): Observable<number> {
+        return from(
+             this.supabase
                 .from(this.tableName)
-                .select('*', { count: 'exact', head: true });
-
-            if (error) throw new DatabaseError(error.message, error);
-            return count || 0;
-        } catch (error) {
-            this.logger.error(`Error counting ${this.tableName}`, error);
-            throw error;
-        }
+                .select('*', { count: 'exact', head: true })
+        ).pipe(
+            map(({ count, error }) => {
+                if (error) {
+                    this.logger.error(`Error counting ${this.tableName}`, error);
+                    throw new DatabaseError(error.message, error);
+                }
+                return count || 0;
+            })
+        );
     }
 }

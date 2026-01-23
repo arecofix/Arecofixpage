@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
           <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           <div *ngFor="let image of images" class="group relative aspect-4/3 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
             <img [src]="image.src" 
                  [alt]="'Certificate ' + image.id" 
