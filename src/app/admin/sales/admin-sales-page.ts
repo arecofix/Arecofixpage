@@ -65,7 +65,7 @@ export class AdminSalesPage implements OnInit {
         effect(() => {
             this.searchQuery();
             this.currentPage.set(1);
-        }, { allowSignalWrites: true });
+        });
     }
 
     async ngOnInit() {
