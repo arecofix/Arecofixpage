@@ -37,7 +37,7 @@ export class SupabaseProductRepository extends ProductRepository {
 
     let query = this.supabase
       .from('products')
-      .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at', { count: 'exact' })
+      .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at', { count: 'exact' })
       .eq('is_active', true);
 
     // Apply filters
@@ -111,7 +111,7 @@ export class SupabaseProductRepository extends ProductRepository {
   findLowStock(threshold: number = 5): Observable<Product[]> {
     return from(
       this.supabase.from('products')
-        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
+        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
         .lt('stock', threshold)
     ).pipe(map(({ data, error }) => {
       if (error) throw error;
@@ -122,7 +122,7 @@ export class SupabaseProductRepository extends ProductRepository {
   findAvailable(): Observable<Product[]> {
     return from(
       this.supabase.from('products')
-        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
+        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
         .gt('stock', 0)
         .eq('is_active', true)
     ).pipe(map(({ data, error }) => {
@@ -134,7 +134,7 @@ export class SupabaseProductRepository extends ProductRepository {
   getAll(): Observable<Product[]> {
      return from(
       this.supabase.from('products')
-        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
+        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
         .order('created_at', { ascending: false })
     ).pipe(map(({ data, error }) => {
       if (error) throw error;
@@ -145,7 +145,7 @@ export class SupabaseProductRepository extends ProductRepository {
   getById(id: string): Observable<Product> {
     return from(
       this.supabase.from('products')
-        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
+        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
         .eq('id', id)
         .single()
     ).pipe(map(({ data, error }) => {
@@ -165,7 +165,7 @@ export class SupabaseProductRepository extends ProductRepository {
       this.supabase
         .from('products')
         .insert(productData)
-        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
+        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
         .single()
     ).pipe(
       map(({ data, error }) => {
@@ -193,7 +193,7 @@ export class SupabaseProductRepository extends ProductRepository {
         .from('products')
         .update(updateData)
         .eq('id', id)
-        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
+        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
         .single()
     ).pipe(
       map(({ data, error }) => {
@@ -249,7 +249,7 @@ export class SupabaseProductRepository extends ProductRepository {
           featured: isFeatured,
           sku: p['sku'] as string || '',
           barcode: p['barcode'] as string || '',
-          // currency removed as it causes errors and is implicitly ARS
+          currency: p['currency'] as 'ARS' | 'USD' || 'ARS',
           condition: p['condition'] as string,
           warranty: p['warranty'] as string,
           min_stock_alert: p['min_stock_alert'] ? Number(p['min_stock_alert']) : undefined,

@@ -132,15 +132,21 @@
             <h3 class="card-title text-gray-500 mb-6 uppercase text-sm tracking-wider border-b pb-2">Configuración de Venta</h3>
             
             <div class="form-control mb-6">
-              <label class="label font-semibold">Precio de Venta (ARS)</label>
-              <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">
-                  $
-                </span>
-                <input type="number" [(ngModel)]="form().price" name="price" 
-                  class="input input-bordered w-full pl-12 text-xl font-bold text-success" placeholder="0.00" min="0" />
+              <label class="label font-semibold">Precio de Venta</label>
+              <div class="flex gap-4">
+                <select [(ngModel)]="form().currency" name="currency" class="select select-bordered w-32 font-bold text-center">
+                   <option value="ARS">ARS</option>
+                   <option value="USD">USD</option>
+                </select>
+                <div class="relative w-full">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">
+                    {{ form().currency === 'USD' ? 'US$' : '$' }}
+                  </span>
+                  <input type="number" [(ngModel)]="form().price" name="price" 
+                    class="input input-bordered w-full pl-16 text-xl font-bold text-success" placeholder="0.00" min="0" />
+                </div>
               </div>
-              <p class="text-xs text-gray-500 mt-2">Precio en pesos argentinos (ARS)</p>
+              <p class="text-xs text-gray-500 mt-2">Seleccione la moneda (Pesos o Dólares) e ingrese el monto.</p>
             </div>
 
             <div class="divider"></div>
