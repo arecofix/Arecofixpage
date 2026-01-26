@@ -131,25 +131,16 @@
           <div class="card-body">
             <h3 class="card-title text-gray-500 mb-6 uppercase text-sm tracking-wider border-b pb-2">Configuración de Venta</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-               <div class="form-control">
-                 <label class="label font-semibold">Moneda</label>
-                 <select [(ngModel)]="form().currency" name="currency" class="select select-bordered w-full text-lg">
-                   <option value="ARS">🇦🇷 Peso Argentino (ARS)</option>
-                   <option value="USD">🇺🇸 Dólar (USD)</option>
-                 </select>
-               </div>
-
-               <div class="form-control">
-                 <label class="label font-semibold">Precio de Venta</label>
-                 <div class="relative">
-                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
-                     {{ form().currency === 'USD' ? 'US$' : '$' }}
-                   </span>
-                   <input type="number" [(ngModel)]="form().price" name="price" 
-                     class="input input-bordered w-full pl-12 text-xl font-bold text-success" placeholder="0.00" min="0" />
-                 </div>
-               </div>
+            <div class="form-control mb-6">
+              <label class="label font-semibold">Precio de Venta (ARS)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">
+                  $
+                </span>
+                <input type="number" [(ngModel)]="form().price" name="price" 
+                  class="input input-bordered w-full pl-12 text-xl font-bold text-success" placeholder="0.00" min="0" />
+              </div>
+              <p class="text-xs text-gray-500 mt-2">Precio en pesos argentinos (ARS)</p>
             </div>
 
             <div class="divider"></div>

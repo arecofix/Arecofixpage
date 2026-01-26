@@ -37,7 +37,7 @@ export class SupabaseProductRepository extends ProductRepository {
 
     let query = this.supabase
       .from('products')
-      .select('*', { count: 'exact' })
+      .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at', { count: 'exact' })
       .eq('is_active', true);
 
     // Apply filters
@@ -110,7 +110,9 @@ export class SupabaseProductRepository extends ProductRepository {
 
   findLowStock(threshold: number = 5): Observable<Product[]> {
     return from(
-      this.supabase.from('products').select('*').lt('stock', threshold)
+      this.supabase.from('products')
+        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at')
+        .lt('stock', threshold)
     ).pipe(map(({ data, error }) => {
       if (error) throw error;
       return (data || []).map((p: any) => this._mapToEntity(p));
@@ -119,7 +121,10 @@ export class SupabaseProductRepository extends ProductRepository {
 
   findAvailable(): Observable<Product[]> {
     return from(
-      this.supabase.from('products').select('*').gt('stock', 0).eq('is_active', true)
+      this.supabase.from('products')
+        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at')
+        .gt('stock', 0)
+        .eq('is_active', true)
     ).pipe(map(({ data, error }) => {
       if (error) throw error;
       return (data || []).map((p: any) => this._mapToEntity(p));
@@ -128,7 +133,9 @@ export class SupabaseProductRepository extends ProductRepository {
 
   getAll(): Observable<Product[]> {
      return from(
-      this.supabase.from('products').select('*').order('created_at', { ascending: false })
+      this.supabase.from('products')
+        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at')
+        .order('created_at', { ascending: false })
     ).pipe(map(({ data, error }) => {
       if (error) throw error;
       return (data || []).map((p: any) => this._mapToEntity(p));
@@ -137,7 +144,10 @@ export class SupabaseProductRepository extends ProductRepository {
 
   getById(id: string): Observable<Product> {
     return from(
-      this.supabase.from('products').select('*').eq('id', id).single()
+      this.supabase.from('products')
+        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at')
+        .eq('id', id)
+        .single()
     ).pipe(map(({ data, error }) => {
       if (error) throw error;
       return this._mapToEntity(data);
@@ -145,15 +155,80 @@ export class SupabaseProductRepository extends ProductRepository {
   }
 
   create(product: Product): Observable<Product> {
-     return of(product);
+    const productData = {
+      ...product,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    return from(
+      this.supabase
+        .from('products')
+        .insert(productData)
+        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at')
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) {
+          this.logger.error('Error creating product', error);
+          throw error;
+        }
+        return this._mapToEntity(data);
+      }),
+      catchError((err) => {
+        this.logger.error('Failed to create product', err);
+        throw err;
+      })
+    );
   }
 
   update(id: string, product: Partial<Product>): Observable<Product> {
-    return of({ ...product, id } as Product); 
+    const updateData = {
+      ...product,
+      updated_at: new Date().toISOString()
+    };
+
+    return from(
+      this.supabase
+        .from('products')
+        .update(updateData)
+        .eq('id', id)
+        .select('id, name, slug, description, price, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, condition, warranty, min_stock_alert, created_at, updated_at')
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) {
+          this.logger.error('Error updating product', error);
+          throw error;
+        }
+        return this._mapToEntity(data);
+      }),
+      catchError((err) => {
+        this.logger.error('Failed to update product', err);
+        throw err;
+      })
+    );
   }
 
   delete(id: string): Observable<void> {
-    return of(void 0);
+    return from(
+      this.supabase
+        .from('products')
+        .delete()
+        .eq('id', id)
+    ).pipe(
+      map(({ error }) => {
+        if (error) {
+          this.logger.error('Error deleting product', error);
+          throw error;
+        }
+        return void 0;
+      }),
+      catchError((err) => {
+        this.logger.error('Failed to delete product', err);
+        throw err;
+      })
+    );
   }
 
   private _mapToEntity(p: any): any {
@@ -165,12 +240,19 @@ export class SupabaseProductRepository extends ProductRepository {
           description: p['description'] as string,
           price: Number(p['price']),
           image_url: p['image_url'] as string,
+          gallery_urls: p['gallery_urls'] || (p['image_url'] ? [p['image_url']] : []),
           category_id: p['category_id'] as string,
           brand_id: p['brand_id'] as string,
           stock: Number(p['stock']),
           is_active: Boolean(p['is_active']),
           is_featured: isFeatured,
-          featured: isFeatured, 
+          featured: isFeatured,
+          sku: p['sku'] as string || '',
+          barcode: p['barcode'] as string || '',
+          // currency removed as it causes errors and is implicitly ARS
+          condition: p['condition'] as string,
+          warranty: p['warranty'] as string,
+          min_stock_alert: p['min_stock_alert'] ? Number(p['min_stock_alert']) : undefined,
           created_at: p['created_at'] as string,
           updated_at: p['updated_at'] as string,
     };

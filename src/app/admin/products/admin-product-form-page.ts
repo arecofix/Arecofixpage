@@ -15,7 +15,6 @@ import { ProductImagesManagerComponent } from './components/product-images-manag
 export class AdminProductFormPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  privateproductService = inject(AdminProductService); // Fix typo and logic
   private productService = inject(AdminProductService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -29,7 +28,6 @@ export class AdminProductFormPage implements OnInit {
     slug: '',
     description: '',
     price: 0,
-    currency: 'ARS', // Default to ARS
     stock: 0,
     brand_id: '',
     category_id: '',
@@ -69,7 +67,6 @@ export class AdminProductFormPage implements OnInit {
             slug: data.slug || '',
             description: data.description || '',
             price: data.price || 0,
-            currency: (data as any).currency || 'ARS', // Handle legacy data
             stock: data.stock || 0,
             brand_id: data.brand_id || '',
             category_id: data.category_id || '',
@@ -109,6 +106,7 @@ export class AdminProductFormPage implements OnInit {
     if (!formVal.name || formVal.price < 0) {
         this.error = 'Por favor complete los campos requeridos correctamente.';
         this.saving = false;
+        this.cdr.markForCheck();
         return;
     }
 
@@ -117,21 +115,27 @@ export class AdminProductFormPage implements OnInit {
       slug = this.productService.slugify(formVal.name);
     }
 
+    // Only include fields that exist in the database schema
     const payload: any = {
-      sku: formVal.sku,
-      barcode: formVal.barcode,
       name: formVal.name,
-      slug: slug, // Ensure unique? Service handles conflict usually or DB constraint
+      slug: slug,
       description: formVal.description,
       price: formVal.price,
-      currency: formVal.currency, // New Field
       stock: formVal.stock,
       brand_id: formVal.brand_id || null,
       category_id: formVal.category_id || null,
       is_active: formVal.is_active,
-      gallery_urls: Array.isArray(formVal.images) ? formVal.images : [], // List of strings
-      image_url: formVal.images.length > 0 ? formVal.images[0] : null // Main image is first
+      image_url: formVal.images.length > 0 ? formVal.images[0] : null, // Main image
     };
+
+    // Add optional fields only if they have values
+    if (formVal.sku) payload.sku = formVal.sku;
+    if (formVal.barcode) payload.barcode = formVal.barcode;
+    
+    // Store gallery_urls only if the column exists (check if we're updating and it works)
+    if (Array.isArray(formVal.images) && formVal.images.length > 0) {
+      payload.gallery_urls = formVal.images;
+    }
 
     try {
       if (this.id) {
@@ -142,6 +146,7 @@ export class AdminProductFormPage implements OnInit {
       this.router.navigate(['/admin/products']);
     } catch (e: any) {
       this.error = e.message || 'Error al guardar producto';
+      console.error('Save error:', e);
     } finally {
       this.saving = false;
       this.cdr.markForCheck();

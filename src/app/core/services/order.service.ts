@@ -31,7 +31,7 @@ export class OrderService {
                 if (error) throw error;
                 return (data || []).map(this.mapDbOrderToDomain);
             }),
-            catchError((err: any) => {
+            catchError((err: unknown) => {
                 this.handleError('Error fetching orders', err);
                 throw err;
             })
@@ -54,7 +54,7 @@ export class OrderService {
 
                 return this.mapDbOrderToDomain(dbOrder);
             }),
-            catchError((err: any) => {
+            catchError((err: unknown) => {
                 this.handleError('Error fetching order', err);
                 throw err;
             })
@@ -110,7 +110,7 @@ export class OrderService {
                 created_at: new Date().toISOString() 
             };
             return { data: orderData, error: null };
-        } catch (error: any) {
+        } catch (error: unknown) {
             this.handleError('Error creating order', error);
             return { data: null, error: error as PostgrestError };
         }
@@ -172,7 +172,7 @@ export class OrderService {
             updatedDbOrder.order_items = freshItems as DbOrderItem[];
             
             return { data: this.mapDbOrderToDomain(updatedDbOrder), error: null };
-        } catch (error: any) {
+        } catch (error: unknown) {
             this.handleError('Error updating order', error);
             return { data: null, error: error as PostgrestError };
         }
@@ -188,7 +188,7 @@ export class OrderService {
 
         if (fetchError) throw fetchError;
 
-        const existingIds = (existingItems || []).map((i: any) => i.id);
+        const existingIds: string[] = (existingItems || []).map((i: { id: string }) => i.id);
         const currentIds = items.filter(i => i.id).map(i => i.id);
         const idsToDelete = existingIds.filter((eid: string) => !currentIds.includes(eid));
 
@@ -247,7 +247,7 @@ export class OrderService {
         };
     }
 
-    private handleError(msg: string, error: any) {
+    private handleError(msg: string, error: unknown) {
         this.logger.error(`${msg}:`, error);
     }
 }

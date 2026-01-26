@@ -11,11 +11,11 @@ export class AnalyticsService {
         // This service just provides helper methods to interact with PostHog
     }
 
-    identify(userId: string, properties: any = {}) {
+    identify(userId: string, properties: Record<string, unknown> = {}) {
         posthog.identify(userId, properties);
     }
 
-    capture(eventName: string, properties: any = {}) {
+    capture(eventName: string, properties: Record<string, unknown> = {}) {
         posthog.capture(eventName, properties);
     }
 

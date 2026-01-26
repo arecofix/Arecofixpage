@@ -43,10 +43,12 @@ export class ContactService {
             }
 
             return { error };
-        } catch (e: any) {
+        } catch (e: unknown) {
             this.logger.error('ContactService Exception:', e);
+            const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+            
             const pgError: PostgrestError = {
-                message: e?.message || 'Unknown error',
+                message: errorMessage,
                 details: '',
                 hint: '',
                 code: 'UNKNOWN',
