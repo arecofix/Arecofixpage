@@ -72,11 +72,7 @@ export class PublicHomePage implements OnInit {
   }
 
   setSEO() {
-    this.seoService.setPageData(
-      'Soluciones de Software & Consultoría IT',
-      'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
-      'assets/img/hero-illustration.svg'
-    );
+    // Handled by Router Data
   }
 
 

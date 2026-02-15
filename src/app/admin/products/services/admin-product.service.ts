@@ -6,6 +6,8 @@ import { ProductRepository } from '@app/features/products/domain/repositories/pr
 import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
 import { AuthService } from '@app/core/services/auth.service';
+import { CsvService } from '@app/shared/services/csv.service';
+import { StringUtils } from '@app/shared/utils/string.utils';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable({
@@ -15,6 +17,7 @@ export class AdminProductService {
     private productRepo = inject(ProductRepository);
     private brandRepo = inject(BrandRepository);
     private categoryRepo = inject(CategoryRepository);
+    private csvService = inject(CsvService);
     // Needed for storage and bulk ops not yet in repo
     private auth = inject(AuthService);
     private supabase = this.auth.getSupabaseClient();
@@ -54,52 +57,20 @@ export class AdminProductService {
     }
 
     slugify(text: string): string {
-        return text
-            .toString()
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/&/g, '-and-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/-+/g, '-');
+        return StringUtils.slugify(text);
     }
 
     async exportProductsToCSV(): Promise<void> {
         const products = await this.getProducts();
         if (!products.length) return;
 
-        const headers: (keyof Product | 'category_id' | 'brand_id')[] = [
+        const headers = [
             'id', 'name', 'slug', 'description', 'price', 
             'stock', 'category_id', 'brand_id', 'image_url', 
             'is_active', 'is_featured', 'sku', 'barcode'
         ];
 
-        const csvContent = [
-            headers.join(','),
-            ...products.map(product => {
-                return headers.map(header => {
-                    const value = product[header as keyof Product];
-                    const safeValue = value === undefined || value === null ? '' : value;
-                    
-                    // Handle strings with commas or quotes
-                    if (typeof safeValue === 'string' && (safeValue.includes(',') || safeValue.includes('"') || safeValue.includes('\n'))) {
-                        return `"${safeValue.replace(/"/g, '""')}"`;
-                    }
-                    return safeValue;
-                }).join(',');
-            })
-        ].join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        
-        link.setAttribute('href', url);
-        link.setAttribute('download', `products_export_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        this.csvService.exportToCsv(products, 'products_export', headers);
     }
 
     async importProductsFromCSV(file: File): Promise<{ success: number; errors: number }> {
@@ -111,48 +82,22 @@ export class AdminProductService {
                     const csv = e.target?.result as string;
                     if (!csv) throw new Error('Empty file');
                     
-                    const lines = csv.split(/\r\n|\n/);
-                    const headers = lines[0].split(',').map((h: string) => h.trim());
+                    // Use CsvService logic if we want, but since we have specific mapping logic here that relies on indices...
+                    // Actually, CsvService parses lines. We can reuse parseLine logic if public, or just refactor whole thing.
+                    // Let's rely on standard CsvService.
+                    // Wait, CsvService returns parsed objects based on a callback.
                     
-                    const productsToUpsert: Partial<Product>[] = [];
-                    let errorCount = 0;
-
-                    for (let i = 1; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (!line) continue;
-
-                        // Simple CSV parser that handles quotes
-                        const values: string[] = [];
-                        let inQuotes = false;
-                        let currentValue = '';
-                        
-                        for (let char of line) {
-                            if (char === '"') {
-                                inQuotes = !inQuotes;
-                            } else if (char === ',' && !inQuotes) {
-                                values.push(currentValue);
-                                currentValue = '';
-                            } else {
-                                currentValue += char;
-                            }
-                        }
-                        values.push(currentValue);
-
-                        if (values.length !== headers.length) {
-                            console.warn(`Skipping line ${i + 1}: Column count mismatch`);
-                            errorCount++;
-                            continue;
-                        }
-
+                    const result = await this.csvService.parse<Product>(file, (values, headers) => {
                         const product: Record<string, any> = {};
+                        
                         headers.forEach((header: string, index: number) => {
                             let value = values[index]?.trim();
-                            // Remove surrounding quotes if present
-                            if (value?.startsWith('"') && value?.endsWith('"')) {
-                                value = value.substring(1, value.length - 1).replace(/""/g, '"');
-                            }
+                             // Remove surrounding quotes if present (CsvService handles this if parseLine does, but CsvService.parseLine handles quotes internally)
+                             // wait, CsvService.parse calls parseLine which returns clean values?
+                             // Yes, parseLine in CsvService handles quotes and returns clean values.
+                             // So we just take the value.
                             
-                            if (value === '') {
+                            if (value === '' || value === undefined) {
                                 product[header] = null;
                             } else if (header === 'price' || header === 'stock' || header === 'min_stock_alert') {
                                 product[header] = Number(value);
@@ -165,17 +110,18 @@ export class AdminProductService {
 
                         // Remove id if it's empty or new placeholder to allow auto-generation
                         if (!product['id'] || product['id'] === 'new') {
-                            delete product['id'];
+                             delete product['id'];
                         }
 
                         // Basic validation
                         if (product['name'] && (product['price'] === undefined || product['price'] >= 0)) {
-                            productsToUpsert.push(product as unknown as Partial<Product>);
-                        } else {
-                            errorCount++;
+                             return product as Product;
                         }
-                    }
-
+                        return null;
+                    });
+                    
+                    const productsToUpsert = result.data;
+                    
                     if (productsToUpsert.length > 0) {
                         const { error } = await this.supabase
                             .from('products')
@@ -184,7 +130,7 @@ export class AdminProductService {
                         if (error) throw error;
                     }
 
-                    resolve({ success: productsToUpsert.length, errors: errorCount });
+                    resolve({ success: productsToUpsert.length, errors: result.errors });
                 } catch (error) {
                     reject(error);
                 }

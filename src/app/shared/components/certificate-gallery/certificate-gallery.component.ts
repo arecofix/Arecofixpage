@@ -35,6 +35,7 @@ export class CertificateGalleryComponent {
     { id: 1, src: 'assets/img/cursos/certiicate/1.jpg' },
     { id: 2, src: 'assets/img/cursos/certiicate/2.jpg' },
     { id: 3, src: 'assets/img/cursos/certiicate/3.jpg' },
-    { id: 4, src: 'assets/img/cursos/certiicate/4.jpg' }
+    { id: 4, src: 'assets/img/cursos/certiicate/4.jpg' },
+    { id: 5, src: 'assets/img/cursos/certiicate/python.jpg' }
   ];
 }

@@ -125,7 +125,7 @@ export abstract class BaseRepository<T> {
      */
     getWhere(
         column: string,
-        value: any,
+        value: string | number | boolean | null,
         orderBy?: { column: string; ascending?: boolean }
     ): Observable<T[]> {
         let query = this.supabase

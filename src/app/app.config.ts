@@ -4,6 +4,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
+import { provideClientHydration } from '@angular/platform-browser';
 import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
     // Configuración existente
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
+    // provideClientHydration(),
     provideRouter(
       routes,
       withInMemoryScrolling({
@@ -42,7 +44,7 @@ export const appConfig: ApplicationConfig = {
 
     // Charts
     provideCharts(withDefaultRegisterables()),
-
+    
     // Repositories
     { provide: ProductRepository, useClass: SupabaseProductRepository },
     { provide: CategoryRepository, useClass: SupabaseCategoryRepository },

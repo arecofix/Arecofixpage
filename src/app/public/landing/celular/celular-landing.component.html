@@ -19,7 +19,7 @@
 
     <!-- Breadcrumbs (Absolute Top Left) -->
     <div class="absolute top-0 left-0 w-full z-20 pt-20 md:pt-28 px-4 md:px-8">
-         <app-breadcrumbs [items]="breadcrumbItems"></app-breadcrumbs>
+      <app-breadcrumbs [items]="breadcrumbItems"></app-breadcrumbs>
     </div>
 
     <div
@@ -34,7 +34,7 @@
         <h1
           class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl"
         >
-          Servicio Técnico de <br />
+          Servicio Técnico de
           <span
             class="text-transparent bg-clip-text bg-linear-to-r from-[#352F85] to-[#5CE638]"
             >Celulares</span
@@ -122,14 +122,29 @@
       <div
         class="flex flex-row flex-nowrap justify-center items-center opacity-60 grayscale text-2xl md:text-4xl overflow-x-auto no-scrollbar py-4 px-2"
       >
-        <div class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300">
-          <span class="font-bold hover:text-blue-500 hover:opacity-100 transition-colors cursor-default tracking-tighter">SAMSUNG</span>
+        <div
+          class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300"
+        >
+          <span
+            class="font-bold hover:text-blue-500 hover:opacity-100 transition-colors cursor-default tracking-tighter"
+            >SAMSUNG</span
+          >
         </div>
-        <div class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300">
-          <span class="font-bold hover:text-orange-500 hover:opacity-100 transition-colors cursor-default tracking-tighter">XIAOMI</span>
+        <div
+          class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300"
+        >
+          <span
+            class="font-bold hover:text-orange-500 hover:opacity-100 transition-colors cursor-default tracking-tighter"
+            >XIAOMI</span
+          >
         </div>
-        <div class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300">
-          <span class="font-bold hover:text-blue-300 hover:opacity-100 transition-colors cursor-default tracking-tighter">MOTOROLA</span>
+        <div
+          class="shrink-0 mx-4 sm:mx-8 transform hover:scale-105 transition-transform duration-300"
+        >
+          <span
+            class="font-bold hover:text-blue-300 hover:opacity-100 transition-colors cursor-default tracking-tighter"
+            >MOTOROLA</span
+          >
         </div>
       </div>
     </div>
@@ -142,25 +157,25 @@
         <h2 class="text-3xl font-bold text-center mb-8">
           {{ seoContent.title }}
         </h2>
-        
+
         <p class="lead text-center mb-8">
           {{ seoContent.intro }}
         </p>
 
-        @for(section of seoContent.sections; track section.title) {
-            <h3>{{ section.title }}</h3>
-            <p>{{ section.content }}</p>
+        @for (section of seoContent.sections; track section.title) {
+          <h3>{{ section.title }}</h3>
+          <p>{{ section.content }}</p>
         }
 
         <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 list-none pl-0 my-8">
-            @for(feature of seoContent.features; track feature.label) {
-              <li class="flex items-start gap-2">
-                <i class="fas fa-check-circle text-green-500 mt-1"></i>
-                <div class="text-sm">
-                    <strong>{{ feature.label }}</strong> {{ feature.value }}
-                </div>
-              </li>
-            }
+          @for (feature of seoContent.features; track feature.label) {
+            <li class="flex items-start gap-2">
+              <i class="fas fa-check-circle text-green-500 mt-1"></i>
+              <div class="text-sm">
+                <strong>{{ feature.label }}</strong> {{ feature.value }}
+              </div>
+            </li>
+          }
         </ul>
       </div>
     </div>
@@ -236,8 +251,8 @@
       ></app-product-carousel>
 
       <div class="text-center mt-12">
-        <a 
-          routerLink="/productos" 
+        <a
+          routerLink="/productos"
           [queryParams]="{ category: 'all' }"
           class="btn btn-primary btn-wide btn-lg shadow-lg hover:scale-105 transition-transform border-2 border-primary-focus hover:border-white text-white font-bold"
         >
@@ -292,7 +307,10 @@
             Equipos usados seleccionados con garantía.
           </p>
         </div>
-        <a routerLink="/productos" [queryParams]="{ category: 'celulares' }" class="btn btn-link no-underline"
+        <a
+          routerLink="/productos"
+          [queryParams]="{ category: 'celulares' }"
+          class="btn btn-link no-underline"
           >Ver Todo <i class="fas fa-arrow-right ml-2"></i
         ></a>
       </div>
@@ -359,48 +377,99 @@
   <!-- MIGRATED: COURSES SECTION (Redesigned) -->
   <section class="relative isolate bg-gray-900 py-24 sm:py-32 overflow-hidden">
     <!-- Background decoration -->
-    <div aria-hidden="true" class="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl">
-      <div style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)" class="mx-auto aspect-1155/678 w-6xl bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-20"></div>
+    <div
+      aria-hidden="true"
+      class="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
+    >
+      <div
+        style="
+          clip-path: polygon(
+            74.1% 44.1%,
+            100% 61.6%,
+            97.5% 26.9%,
+            85.5% 0.1%,
+            80.7% 2%,
+            72.5% 32.5%,
+            60.2% 62.4%,
+            52.4% 68.1%,
+            47.5% 58.3%,
+            45.2% 34.5%,
+            27.5% 76.7%,
+            0.1% 64.9%,
+            17.9% 100%,
+            27.6% 76.8%,
+            76.1% 97.7%,
+            74.1% 44.1%
+          );
+        "
+        class="mx-auto aspect-1155/678 w-6xl bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-20"
+      ></div>
     </div>
 
     <div class="container mx-auto px-6 lg:px-8">
       <div class="mx-auto max-w-4xl text-center mb-16">
         <h2 class="text-base/7 font-semibold text-indigo-400">Capacitación</h2>
-        <p class="mt-2 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl">Formación Profesional Certificada</p>
-        <p class="mx-auto mt-6 max-w-2xl text-lg font-medium text-pretty text-gray-400">
-          ¿Te apasiona la tecnología? Aprendé a reparar celulares con nosotros. Más de 500 alumnos capacitados con nuestros métodos comprobados.
+        <p
+          class="mt-2 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl"
+        >
+          Formación Profesional Certificada
+        </p>
+        <p
+          class="mx-auto mt-6 max-w-2xl text-lg font-medium text-pretty text-gray-400"
+        >
+          ¿Te apasiona la tecnología? Aprendé a reparar celulares con nosotros.
+          Más de 500 alumnos capacitados con nuestros métodos comprobados.
         </p>
       </div>
 
-      <div class="mx-auto grid grid-cols-2 gap-3 md:gap-8 lg:max-w-none lg:grid-cols-4">
-        @for(course of coursesList; track course.title) {
-        <div [routerLink]="course.slug ? ['/academy', course.slug] : '/academy'" class="flex flex-col rounded-2xl md:rounded-3xl bg-white/5 p-3 md:p-6 ring-1 ring-white/10 hover:bg-white/10 transition-colors hover:-translate-y-1 duration-300 cursor-pointer group">
-          <figure class="aspect-video w-full overflow-hidden rounded-xl md:rounded-2xl mb-3 md:mb-6 shadow-lg">
-            <img [src]="course.img" [alt]="course.title" class="w-full h-full object-cover">
-          </figure>
-          
-          <h3 class="text-lg font-bold text-white mb-2">{{ course.title }}</h3>
-          <p class="text-sm text-gray-300 mb-4 grow">{{ course.subtitle }}</p>
-          
-          <div class="mt-auto space-y-2 pt-4 border-t border-white/10">
-            @if(course.duration) {
-              <div class="flex items-center gap-2 text-sm text-indigo-400 font-medium">
-                <i class="far fa-clock w-5 text-center"></i> {{ course.duration }}
-              </div>
-            }
-            @if(course.days) {
-              <div class="flex items-center gap-2 text-sm text-indigo-300 font-medium">
-                <i class="far fa-calendar-alt w-5 text-center"></i> {{ course.days }}
-              </div>
-            }
+      <div
+        class="mx-auto grid grid-cols-2 gap-3 md:gap-8 lg:max-w-none lg:grid-cols-4"
+      >
+        @for (course of coursesList; track course.title) {
+          <div
+            [routerLink]="course.slug ? ['/academy', course.slug] : '/academy'"
+            class="flex flex-col rounded-2xl md:rounded-3xl bg-white/5 p-3 md:p-6 ring-1 ring-white/10 hover:bg-white/10 transition-colors hover:-translate-y-1 duration-300 cursor-pointer group"
+          >
+            <figure
+              class="aspect-video w-full overflow-hidden rounded-xl md:rounded-2xl mb-3 md:mb-6 shadow-lg"
+            >
+              <img
+                [src]="course.img"
+                [alt]="course.title"
+                class="w-full h-full object-cover"
+              />
+            </figure>
+
+            <h3 class="text-lg font-bold text-white mb-2">
+              {{ course.title }}
+            </h3>
+            <p class="text-sm text-gray-300 mb-4 grow">{{ course.subtitle }}</p>
+
+            <div class="mt-auto space-y-2 pt-4 border-t border-white/10">
+              @if (course.duration) {
+                <div
+                  class="flex items-center gap-2 text-sm text-indigo-400 font-medium"
+                >
+                  <i class="far fa-clock w-5 text-center"></i>
+                  {{ course.duration }}
+                </div>
+              }
+              @if (course.days) {
+                <div
+                  class="flex items-center gap-2 text-sm text-indigo-300 font-medium"
+                >
+                  <i class="far fa-calendar-alt w-5 text-center"></i>
+                  {{ course.days }}
+                </div>
+              }
+            </div>
           </div>
-        </div>
         }
       </div>
 
       <div class="text-center mt-16">
-        <a 
-          routerLink="/academy" 
+        <a
+          routerLink="/academy"
           class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 transition-all hover:scale-105"
         >
           <i class="fas fa-graduation-cap mr-2"></i> Ver Cursos y Capacitaciones
@@ -413,99 +482,182 @@
   <section class="py-20 bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        @for(item of whyUs; track item.title) {
-            <div class="p-6">
-                <div [class]="'w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 ' + item.bg + ' ' + item.color">
-                    <i [class]="item.icon"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-2 dark:text-white">
-                    {{ item.title }}
-                </h3>
-                <p class="text-gray-500 dark:text-gray-400">
-                    {{ item.desc }}
-                </p>
+        @for (item of whyUs; track item.title) {
+          <div class="p-6">
+            <div
+              [class]="
+                'w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 ' +
+                item.bg +
+                ' ' +
+                item.color
+              "
+            >
+              <i [class]="item.icon"></i>
             </div>
+            <h3 class="text-xl font-bold mb-2 dark:text-white">
+              {{ item.title }}
+            </h3>
+            <p class="text-gray-500 dark:text-gray-400">
+              {{ item.desc }}
+            </p>
+          </div>
         }
       </div>
     </div>
   </section>
 
   <div class="bg-gray-900 py-8 sm:py-10">
-  <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-    <h2 class="text-center text-base/7 font-semibold text-indigo-400">Necesitas Reparar tu Celular?</h2>
-    <p class="mx-auto mt-2 max-w-lg text-center text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">Nuestro equipo esta listo para ayudarte</p>
-    <div class="mt-4 grid gap-4 sm:mt-6 lg:grid-cols-3 lg:grid-rows-2">
-      <div class="relative lg:row-span-2">
-        <div class="absolute inset-px rounded-lg bg-gray-800 lg:rounded-l-4xl"></div>
-        <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
-          <div class="px-6 pt-6 pb-2 sm:px-8 sm:pt-8 sm:pb-0">
-            <p class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center">Contamos con profesionales expertos en Reparacion de Celulares</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center">Veni a Arecofix y solucionamos tus problemas.</p>
-          </div>
-          <div class="@container relative min-h-40 w-full grow max-lg:mx-auto max-lg:max-w-sm">
-            <div class="absolute inset-x-8 top-8 bottom-0 overflow-hidden rounded-t-[12cqw] border-x-[3cqw] border-t-[3cqw] border-gray-700 bg-gray-900 outline outline-white/20">
-              
+    <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+      <h2 class="text-center text-base/7 font-semibold text-indigo-400">
+        Necesitas Reparar tu Celular?
+      </h2>
+      <p
+        class="mx-auto mt-2 max-w-lg text-center text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl"
+      >
+        Nuestro equipo esta listo para ayudarte
+      </p>
+      <div class="mt-4 grid gap-4 sm:mt-6 lg:grid-cols-3 lg:grid-rows-2">
+        <div class="relative lg:row-span-2">
+          <div
+            class="absolute inset-px rounded-lg bg-gray-800 lg:rounded-l-4xl"
+          ></div>
+          <div
+            class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]"
+          >
+            <div class="px-6 pt-6 pb-2 sm:px-8 sm:pt-8 sm:pb-0">
+              <p
+                class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center"
+              >
+                Contamos con profesionales expertos en Reparacion de Celulares
+              </p>
+              <p
+                class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center"
+              >
+                Veni a Arecofix y solucionamos tus problemas.
+              </p>
+            </div>
+            <div
+              class="@container relative min-h-40 w-full grow max-lg:mx-auto max-lg:max-w-sm"
+            >
+              <div
+                class="absolute inset-x-8 top-8 bottom-0 overflow-hidden rounded-t-[12cqw] border-x-[3cqw] border-t-[3cqw] border-gray-700 bg-gray-900 outline outline-white/20"
+              ></div>
             </div>
           </div>
+          <div
+            class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15 lg:rounded-l-4xl"
+          ></div>
         </div>
-        <div class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15 lg:rounded-l-4xl"></div>
-      </div>
-      <div class="relative max-lg:row-start-1">
-        <div class="absolute inset-px rounded-lg bg-gray-800 max-lg:rounded-t-4xl"></div>
-        <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
-          <div class="px-6 pt-6 sm:px-8 sm:pt-8">
-            <p class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center">Servicio al cliente Personalizado</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center">Profesionales calificados para resolver tus problemas.</p>
+        <div class="relative max-lg:row-start-1">
+          <div
+            class="absolute inset-px rounded-lg bg-gray-800 max-lg:rounded-t-4xl"
+          ></div>
+          <div
+            class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]"
+          >
+            <div class="px-6 pt-6 sm:px-8 sm:pt-8">
+              <p
+                class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center"
+              >
+                Servicio al cliente Personalizado
+              </p>
+              <p
+                class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center"
+              >
+                Profesionales calificados para resolver tus problemas.
+              </p>
+            </div>
+            <div
+              class="flex flex-1 items-center justify-center px-6 max-lg:pt-6 max-lg:pb-8 sm:px-8 lg:pb-2"
+            >
+              <img
+                src="assets/img/repair/13.jpg"
+                alt="Microsoldadura"
+                class="w-full max-lg:max-w-xs rounded-lg object-cover h-24 sm:h-32"
+              />
+            </div>
           </div>
-          <div class="flex flex-1 items-center justify-center px-6 max-lg:pt-6 max-lg:pb-8 sm:px-8 lg:pb-2">
-            <img src="assets/img/repair/13.jpg" alt="Microsoldadura" class="w-full max-lg:max-w-xs rounded-lg object-cover h-24 sm:h-32" />
-          </div>
+          <div
+            class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15 max-lg:rounded-t-4xl"
+          ></div>
         </div>
-        <div class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15 max-lg:rounded-t-4xl"></div>
-      </div>
-      <div class="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
-        <div class="absolute inset-px rounded-lg bg-gray-800"></div>
-        <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
-          <div class="px-6 pt-6 pb-6 sm:px-8 sm:pt-8 sm:pb-8">
-            <p class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center">Arreglo de Celulares en Marcos Paz</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center">Diagnóstico gratuito y solución efectiva.</p>
+        <div class="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
+          <div class="absolute inset-px rounded-lg bg-gray-800"></div>
+          <div
+            class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]"
+          >
+            <div class="px-6 pt-6 pb-6 sm:px-8 sm:pt-8 sm:pb-8">
+              <p
+                class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center"
+              >
+                Arreglo de Celulares en Marcos Paz
+              </p>
+              <p
+                class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center"
+              >
+                Diagnóstico gratuito y solución efectiva.
+              </p>
+            </div>
           </div>
-
+          <div
+            class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15"
+          ></div>
         </div>
-        <div class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15"></div>
-      </div>
-      <div class="relative lg:row-span-2">
-        <div class="absolute inset-px rounded-lg bg-gray-800 max-lg:rounded-b-4xl lg:rounded-r-4xl"></div>
-        <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
-          <div class="px-6 pt-6 pb-2 sm:px-8 sm:pt-8 sm:pb-0">
-            <p class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center">Reparacion de Celulares</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center">Diagnóstico totalmente Gratis.</p>
-          </div>
-          <div class="relative min-h-40 w-full grow">
-            <div class="absolute top-6 right-0 bottom-0 left-6 overflow-hidden rounded-tl-xl bg-gray-900/60 outline outline-white/10">
-              <div class="flex bg-gray-900 outline outline-white/5">
-                <div class="-mb-px flex text-sm/6 font-medium text-gray-400">
-                  <div class="border-r border-b border-r-white/10 border-b-white/20 bg-white/5 px-4 py-2 text-white">Celulares</div>
-                  <div class="border-r border-gray-600/10 px-4 py-2">Reparacion</div>
+        <div class="relative lg:row-span-2">
+          <div
+            class="absolute inset-px rounded-lg bg-gray-800 max-lg:rounded-b-4xl lg:rounded-r-4xl"
+          ></div>
+          <div
+            class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]"
+          >
+            <div class="px-6 pt-6 pb-2 sm:px-8 sm:pt-8 sm:pb-0">
+              <p
+                class="mt-2 text-lg font-medium tracking-tight text-white max-lg:text-center"
+              >
+                Reparacion de Celulares
+              </p>
+              <p
+                class="mt-2 max-w-lg text-sm/6 text-gray-400 max-lg:text-center"
+              >
+                Diagnóstico totalmente Gratis.
+              </p>
+            </div>
+            <div class="relative min-h-40 w-full grow">
+              <div
+                class="absolute top-6 right-0 bottom-0 left-6 overflow-hidden rounded-tl-xl bg-gray-900/60 outline outline-white/10"
+              >
+                <div class="flex bg-gray-900 outline outline-white/5">
+                  <div class="-mb-px flex text-sm/6 font-medium text-gray-400">
+                    <div
+                      class="border-r border-b border-r-white/10 border-b-white/20 bg-white/5 px-4 py-2 text-white"
+                    >
+                      Celulares
+                    </div>
+                    <div class="border-r border-gray-600/10 px-4 py-2">
+                      Reparacion
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="px-6 pt-4 pb-8 text-xs sm:text-sm leading-tight text-gray-300"
+                >
+                  <p>Venta de Celulares Nuevos y Reacondicionados</p>
+                  <p>Reparacion de Celulares en Marcos Paz</p>
+                  <p>Arreglo de Celulares</p>
+                  <p>Venta de Accesorios</p>
+                  <p>Venta de iPhone</p>
+                  <p>Servicio Tecnico Especializado</p>
                 </div>
               </div>
-              <div class="px-6 pt-4 pb-8 text-xs sm:text-sm leading-tight text-gray-300">
-                <p>Venta de Celulares Nuevos y Reacondicionados</p>
-                <p>Reparacion de Celulares en Marcos Paz</p>
-                <p>Arreglo de Celulares</p>
-                <p>Venta de Accesorios</p>
-                <p>Venta de iPhone</p>
-                <p>Servicio Tecnico Especializado</p>
-              </div>
             </div>
           </div>
+          <div
+            class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15 max-lg:rounded-b-4xl lg:rounded-r-4xl"
+          ></div>
         </div>
-        <div class="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-white/15 max-lg:rounded-b-4xl lg:rounded-r-4xl"></div>
       </div>
     </div>
   </div>
-</div>
-
 
   <!-- MIGRATED: LOCATION SECTION -->
   <section
@@ -518,7 +670,8 @@
       <h2 class="text-3xl font-bold mb-6">A 3 Cuadras de Ruta 40</h2>
       <div class="space-y-4 text-lg">
         <p>
-          <i class="fas fa-map-marker-alt text-error w-8"></i> {{ locationData.address }}
+          <i class="fas fa-map-marker-alt text-error w-8"></i>
+          {{ locationData.address }}
         </p>
         <p>
           <i class="fas fa-clock text-primary w-8"></i> {{ locationData.hours }}
@@ -553,122 +706,243 @@
 
   <!-- PROCESS SECTION "Así Trabajamos" -->
   <section class="py-20 bg-gray-900 text-white relative overflow-hidden">
-    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+    <div
+      class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"
+    ></div>
     <div class="container mx-auto px-4 relative z-10">
       <div class="text-center mb-16">
         <h2 class="text-3xl font-bold">Así Trabajamos</h2>
-        <p class="text-gray-400 mt-2">Simple, transparente y con tecnología a tu favor.</p>
+        <p class="text-gray-400 mt-2">
+          Simple, transparente y con tecnología a tu favor.
+        </p>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-        @for(step of processSteps; track step.title) {
-        <div class="relative items-center flex flex-col group">
-            <div [class]="'w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-lg transition-transform group-hover:scale-110 ' + step.bg + ' ' + step.color">
-                <i [class]="step.icon"></i>
+        @for (step of processSteps; track step.title) {
+          <div class="relative items-center flex flex-col group">
+            <div
+              [class]="
+                'w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-lg transition-transform group-hover:scale-110 ' +
+                step.bg +
+                ' ' +
+                step.color
+              "
+            >
+              <i [class]="step.icon"></i>
             </div>
             <h3 class="text-xl font-bold mb-2">{{ step.title }}</h3>
-            <p class="text-gray-400 text-center text-sm px-4">{{ step.desc }}</p>
-        </div>
+            <p class="text-gray-400 text-center text-sm px-4">
+              {{ step.desc }}
+            </p>
+          </div>
         }
       </div>
     </div>
   </section>
 
   <div class="overflow-hidden bg-gray-900 py-24 sm:py-32">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-      <div class="lg:pt-4 lg:pr-8">
-        <div class="lg:max-w-lg">
-          <h2 class="text-base/7 font-semibold text-indigo-400">Reparacion de Celulares en Marcos Paz</h2>
-          <p class="mt-2 text-4xl font-semibold tracking-tight text-pretty text-white sm:text-5xl">Tu servicio Tecnico de Confianza</p>
-          <p class="mt-6 text-lg/8 text-gray-300">Brindamos Servicio Tecnico de Celulares en Marcos paz, Merlo, Las Heras, Cañuelas, Mariano Acosta, General Rodriguez, Moreno y todo el departamento de Bs As.</p>
-          <dl class="mt-10 max-w-xl space-y-8 text-base/7 text-gray-400 lg:max-w-none">
-            <div class="relative pl-9">
-              <dt class="inline font-semibold text-white">
-                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="absolute top-1 left-1 size-5 text-indigo-400">
-                  <path d="M5.5 17a4.5 4.5 0 0 1-1.44-8.765 4.5 4.5 0 0 1 8.302-3.046 3.5 3.5 0 0 1 4.504 4.272A4 4 0 0 1 15 17H5.5Zm3.75-2.75a.75.75 0 0 0 1.5 0V9.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0l-3.25 3.5a.75.75 0 1 0 1.1 1.02l1.95-2.1v4.59Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                Reparacion de Celulares.
-              </dt>
-              <dd class="inline">Arreglamos Celulares de todas las marcas y modelos todos los problemas de tu celular resueltos en un solo lugar.</dd>
-            </div>
-            <div class="relative pl-9">
-              <dt class="inline font-semibold text-white">
-                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="absolute top-1 left-1 size-5 text-indigo-400">
-                  <path d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                Arreglo de Telefonos Celulares en Marcos Paz.
-              </dt>
-              <dd class="inline">Con nosotros tus datos y privacidad estan totalmente seguros hacemos Reparacion de Celulares en Marcos Paz.</dd>
-            </div>
-            <div class="relative pl-9">
-              <dt class="inline font-semibold text-white">
-                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="absolute top-1 left-1 size-5 text-indigo-400">
-                  <path d="M4.632 3.533A2 2 0 0 1 6.577 2h6.846a2 2 0 0 1 1.945 1.533l1.976 8.234A3.489 3.489 0 0 0 16 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234Z" />
-                  <path d="M4 13a2 2 0 1 0 0 4h12a2 2 0 1 0 0-4H4Zm11.24 2a.75.75 0 0 1 .75-.75H16a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75h-.01a.75.75 0 0 1-.75-.75V15Zm-2.25-.75a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 0 0 .75-.75V15a.75.75 0 0 0-.75-.75h-.01Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                Reparacion de Telefonos Celulares en Marcos Paz.
-              </dt>
-              <dd class="inline">Te ayudamos a recuperar esa informacion tan importante Fotos personales, videos, documentos, y todo lo que necesites.</dd>
-            </div>
-          </dl>
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div
+        class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2"
+      >
+        <div class="lg:pt-4 lg:pr-8">
+          <div class="lg:max-w-lg">
+            <h2 class="text-base/7 font-semibold text-indigo-400">
+              Reparacion de Celulares en Marcos Paz
+            </h2>
+            <p
+              class="mt-2 text-4xl font-semibold tracking-tight text-pretty text-white sm:text-5xl"
+            >
+              Tu servicio Tecnico de Confianza
+            </p>
+            <p class="mt-6 text-lg/8 text-gray-300">
+              Brindamos Servicio Tecnico de Celulares en Marcos paz, Merlo, Las
+              Heras, Cañuelas, Mariano Acosta, General Rodriguez, Moreno y todo
+              el departamento de Bs As.
+            </p>
+            <dl
+              class="mt-10 max-w-xl space-y-8 text-base/7 text-gray-400 lg:max-w-none"
+            >
+              <div class="relative pl-9">
+                <dt class="inline font-semibold text-white">
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    data-slot="icon"
+                    aria-hidden="true"
+                    class="absolute top-1 left-1 size-5 text-indigo-400"
+                  >
+                    <path
+                      d="M5.5 17a4.5 4.5 0 0 1-1.44-8.765 4.5 4.5 0 0 1 8.302-3.046 3.5 3.5 0 0 1 4.504 4.272A4 4 0 0 1 15 17H5.5Zm3.75-2.75a.75.75 0 0 0 1.5 0V9.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0l-3.25 3.5a.75.75 0 1 0 1.1 1.02l1.95-2.1v4.59Z"
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                    />
+                  </svg>
+                  Reparacion de Celulares.
+                </dt>
+                <dd class="inline">
+                  Arreglamos Celulares de todas las marcas y modelos todos los
+                  problemas de tu celular resueltos en un solo lugar.
+                </dd>
+              </div>
+              <div class="relative pl-9">
+                <dt class="inline font-semibold text-white">
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    data-slot="icon"
+                    aria-hidden="true"
+                    class="absolute top-1 left-1 size-5 text-indigo-400"
+                  >
+                    <path
+                      d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z"
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                    />
+                  </svg>
+                  Arreglo de Telefonos Celulares en Marcos Paz.
+                </dt>
+                <dd class="inline">
+                  Con nosotros tus datos y privacidad estan totalmente seguros
+                  hacemos Reparacion de Celulares en Marcos Paz.
+                </dd>
+              </div>
+              <div class="relative pl-9">
+                <dt class="inline font-semibold text-white">
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    data-slot="icon"
+                    aria-hidden="true"
+                    class="absolute top-1 left-1 size-5 text-indigo-400"
+                  >
+                    <path
+                      d="M4.632 3.533A2 2 0 0 1 6.577 2h6.846a2 2 0 0 1 1.945 1.533l1.976 8.234A3.489 3.489 0 0 0 16 11.5H4c-.476 0-.93.095-1.344.267l1.976-8.234Z"
+                    />
+                    <path
+                      d="M4 13a2 2 0 1 0 0 4h12a2 2 0 1 0 0-4H4Zm11.24 2a.75.75 0 0 1 .75-.75H16a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75h-.01a.75.75 0 0 1-.75-.75V15Zm-2.25-.75a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75H13a.75.75 0 0 0 .75-.75V15a.75.75 0 0 0-.75-.75h-.01Z"
+                      clip-rule="evenodd"
+                      fill-rule="evenodd"
+                    />
+                  </svg>
+                  Reparacion de Telefonos Celulares en Marcos Paz.
+                </dt>
+                <dd class="inline">
+                  Te ayudamos a recuperar esa informacion tan importante Fotos
+                  personales, videos, documentos, y todo lo que necesites.
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
+        <img
+          width="2432"
+          height="1442"
+          src="https://tailwindcss.com/plus-assets/img/component-images/dark-project-app-screenshot.png"
+          alt="Product screenshot"
+          class="w-3xl max-w-none rounded-xl shadow-xl ring-1 ring-white/10 sm:w-228 md:-ml-4 lg:ml-0"
+        />
       </div>
-      <img width="2432" height="1442" src="https://tailwindcss.com/plus-assets/img/component-images/dark-project-app-screenshot.png" alt="Product screenshot" class="w-3xl max-w-none rounded-xl shadow-xl ring-1 ring-white/10 sm:w-228 md:-ml-4 lg:ml-0" />
     </div>
   </div>
-</div>
-
 
   <!-- GALLERY SECTION -->
   <section class="py-20 bg-base-100">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-4"> Marcos Paz Cell Mira Nuestros Trabajos</h2>
-        <p class="text-center text-base-content/60 mb-12">Desde microsoldadura hasta cambios de módulo. Así trabajamos.</p>
-      
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @for(item of galleryItems; track item.src) {
-                @if(item.type === 'video') {
-                    <div [class]="'rounded-xl overflow-hidden shadow-md group relative bg-black ' + item.span">
-                        <video [src]="item.src" controls class="w-full h-full object-cover" [poster]="item.poster"></video>
-                    </div>
-                } @else {
-                    <div [class]="'aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:scale-105 cursor-pointer group relative ' + (item.span || '')">
-                        <img [src]="item.src" loading="lazy" [alt]="item.alt" class="w-full h-full object-cover">
-                    </div>
-                }
-            }
-        </div>
+      <h2 class="text-3xl font-bold text-center mb-4">
+        Marcos Paz Cell Mira Nuestros Trabajos
+      </h2>
+      <p class="text-center text-base-content/60 mb-12">
+        Desde microsoldadura hasta cambios de módulo. Así trabajamos.
+      </p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        @for (item of galleryItems; track item.src) {
+          @if (item.type === "video") {
+            <div
+              [class]="
+                'rounded-xl overflow-hidden shadow-md group relative bg-black ' +
+                item.span
+              "
+            >
+              <video
+                [src]="item.src"
+                controls
+                class="w-full h-full object-cover"
+                [poster]="item.poster"
+              ></video>
+            </div>
+          } @else {
+            <div
+              [class]="
+                'aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:scale-105 cursor-pointer group relative ' +
+                (item.span || '')
+              "
+            >
+              <img
+                [src]="item.src"
+                loading="lazy"
+                [alt]="item.alt"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          }
+        }
+      </div>
     </div>
   </section>
 
   <!-- PARTNERS SECTION -->
   <section class="py-12 bg-base-200 border-y border-base-300">
     <div class="container mx-auto px-4 text-center">
-       <p class="text-sm font-bold text-base-content/40 uppercase tracking-widest mb-8">Confían en Nosotros</p>
-       <div class="flex justify-center items-center gap-12 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all">
-           @for(partner of partners; track partner.name) {
-               @if(partner.img) {
-                   <img [src]="partner.img" [alt]="partner.name" class="h-8">
-               } @else {
-                   <div [class]="'flex items-center gap-2 text-xl font-bold ' + partner.color">
-                       @if(partner.icon) { <i [class]="partner.icon"></i> } {{ partner.name }}
-                   </div>
-               }
-           }
-       </div>
+      <p
+        class="text-sm font-bold text-base-content/40 uppercase tracking-widest mb-8"
+      >
+        Confían en Nosotros
+      </p>
+      <div
+        class="flex justify-center items-center gap-12 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all"
+      >
+        @for (partner of partners; track partner.name) {
+          @if (partner.img) {
+            <img [src]="partner.img" [alt]="partner.name" class="h-8" />
+          } @else {
+            <div
+              [class]="
+                'flex items-center gap-2 text-xl font-bold ' + partner.color
+              "
+            >
+              @if (partner.icon) {
+                <i [class]="partner.icon"></i>
+              }
+              {{ partner.name }}
+            </div>
+          }
+        }
+      </div>
 
-       <!-- MENTIONS -->
-       <div class="mt-8 pt-8 border-t border-base-300">
-           <p class="text-xs text-base-content/40 uppercase tracking-widest mb-4">Mencionado en</p>
-           <div class="flex flex-col md:flex-row justify-center items-center gap-4 font-serif text-base-content/60 text-sm flex-wrap">
-               @for(mention of mentions; track mention.name; let isLast = $last) {
-                <a [href]="mention.url" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors border-b border-transparent hover:border-primary">
-                    {{ mention.name }}
-                </a>
-                @if(!isLast) { <span class="hidden md:inline text-base-content/20">•</span> }
-               }
-           </div>
-       </div>
+      <!-- MENTIONS -->
+      <div class="mt-8 pt-8 border-t border-base-300">
+        <p class="text-xs text-base-content/40 uppercase tracking-widest mb-4">
+          Mencionado en
+        </p>
+        <div
+          class="flex flex-col md:flex-row justify-center items-center gap-4 font-serif text-base-content/60 text-sm flex-wrap"
+        >
+          @for (mention of mentions; track mention.name; let isLast = $last) {
+            <a
+              [href]="mention.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-primary transition-colors border-b border-transparent hover:border-primary"
+            >
+              {{ mention.name }}
+            </a>
+            @if (!isLast) {
+              <span class="hidden md:inline text-base-content/20">•</span>
+            }
+          }
+        </div>
+      </div>
     </div>
   </section>
 
@@ -678,58 +952,75 @@
       <div class="text-center mb-12">
         <h2 class="text-3xl font-bold mb-4">Lo que dicen nuestros clientes</h2>
         <div class="flex items-center justify-center gap-2 mb-2">
-            <span class="text-2xl font-bold">4.8</span>
-            <div class="flex text-yellow-500">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star-half-alt"></i>
-            </div>
-            <span class="text-sm text-gray-500">(120 reseñas en Google)</span>
+          <span class="text-2xl font-bold">4.8</span>
+          <div class="flex text-yellow-500">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+          <span class="text-sm text-gray-500">(120 reseñas en Google)</span>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        @for(review of reviews; track review.name) {
-        <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow duration-300 border border-base-200">
+        @for (review of reviews; track review.name) {
+          <div
+            class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow duration-300 border border-base-200"
+          >
             <div class="card-body p-6">
-                <!-- Header: Avatar + Name + Date -->
-                <div class="flex items-start gap-3 mb-3">
-                    <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ' + review.bgColor">
-                        {{ review.initial }}
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-base-content">{{ review.name }}</h4>
-                        <p class="text-xs text-base-content/60">{{ review.date }}</p>
-                    </div>
-                    <!-- Google Icon (optional branding) -->
-                    <i class="fa-brands fa-google text-blue-500 w-5 h-5 ml-auto opacity-70 text-lg"></i>
+              <!-- Header: Avatar + Name + Date -->
+              <div class="flex items-start gap-3 mb-3">
+                <div
+                  [class]="
+                    'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ' +
+                    review.bgColor
+                  "
+                >
+                  {{ review.initial }}
                 </div>
-
-                <!-- Stars -->
-                <div class="flex text-yellow-500 text-xs mb-3">
-                    @for(star of [1,2,3,4,5]; track star) {
-                        @if(star <= review.stars) {
-                            <i class="fas fa-star"></i>
-                        } @else {
-                            <i class="far fa-star"></i>
-                        }
-                    }
+                <div>
+                  <h4 class="font-bold text-sm text-base-content">
+                    {{ review.name }}
+                  </h4>
+                  <p class="text-xs text-base-content/60">{{ review.date }}</p>
                 </div>
+                <!-- Google Icon (optional branding) -->
+                <i
+                  class="fa-brands fa-google text-blue-500 w-5 h-5 ml-auto opacity-70 text-lg"
+                ></i>
+              </div>
 
-                <!-- Review Text -->
-                <p class="text-sm text-base-content/80 line-clamp-4 leading-relaxed">
-                    "{{ review.text }}"
-                </p>
+              <!-- Stars -->
+              <div class="flex text-yellow-500 text-xs mb-3">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  @if (star <= review.stars) {
+                    <i class="fas fa-star"></i>
+                  } @else {
+                    <i class="far fa-star"></i>
+                  }
+                }
+              </div>
+
+              <!-- Review Text -->
+              <p
+                class="text-sm text-base-content/80 line-clamp-4 leading-relaxed"
+              >
+                "{{ review.text }}"
+              </p>
             </div>
-        </div>
+          </div>
         }
       </div>
-      
+
       <div class="text-center mt-10">
-        <a href="https://share.google/Fnume9zIn9XpY4Xiu" target="_blank" class="btn btn-outline btn-primary">
-            <i class="fas fa-pen mr-2"></i> Dejar una Reseña
+        <a
+          href="https://share.google/Fnume9zIn9XpY4Xiu"
+          target="_blank"
+          class="btn btn-outline btn-primary"
+        >
+          <i class="fas fa-pen mr-2"></i> Dejar una Reseña
         </a>
       </div>
     </div>
@@ -743,62 +1034,149 @@
     <div
       class="join join-vertical w-full bg-base-100 rounded-2xl border border-base-200 shadow-sm"
     >
-      @for(faq of faqs; track faq.question; let i = $index) {
-      <div class="collapse collapse-arrow join-item border-b border-base-200">
-        <input type="radio" name="my-accordion-4" [checked]="i === 0" [attr.aria-label]="faq.question" />
-        <div class="collapse-title text-xl font-medium text-base-content">
-          {{ faq.question }}
+      @for (faq of faqs; track faq.question; let i = $index) {
+        <div class="collapse collapse-arrow join-item border-b border-base-200">
+          <input
+            type="radio"
+            name="my-accordion-4"
+            [checked]="i === 0"
+            [attr.aria-label]="faq.question"
+          />
+          <div class="collapse-title text-xl font-medium text-base-content">
+            {{ faq.question }}
+          </div>
+          <div class="collapse-content text-base-content/70">
+            <p>{{ faq.answer }}</p>
+          </div>
         </div>
-        <div class="collapse-content text-base-content/70">
-          <p>{{ faq.answer }}</p>
-        </div>
-      </div>
       }
     </div>
   </section>
 
   <div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
-  <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply" alt="" class="absolute inset-0 -z-10 size-full object-cover object-right md:object-center" />
-  <div aria-hidden="true" class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl">
-    <div style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)" class="aspect-1097/845 w-274.25 bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"></div>
-  </div>
-  <div aria-hidden="true" class="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:-top-112 sm:ml-16 sm:translate-x-0">
-    <div style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)" class="aspect-1097/845 w-274.25 bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"></div>
-  </div>
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl lg:mx-0">
-      <h2 class="text-5xl font-semibold tracking-tight text-white sm:text-7xl">¿Buscas Donde reparar Celulares en Mariano Acosta?</h2>
-      <p class="mt-8 text-lg font-medium text-pretty text-gray-300 sm:text-xl/8">En Arecofix somos los doctores de tu celular encontrás la solución para tus celulares.</p>
+    <img
+      src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply"
+      alt=""
+      class="absolute inset-0 -z-10 size-full object-cover object-right md:object-center"
+    />
+    <div
+      aria-hidden="true"
+      class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
+    >
+      <div
+        style="
+          clip-path: polygon(
+            74.1% 44.1%,
+            100% 61.6%,
+            97.5% 26.9%,
+            85.5% 0.1%,
+            80.7% 2%,
+            72.5% 32.5%,
+            60.2% 62.4%,
+            52.4% 68.1%,
+            47.5% 58.3%,
+            45.2% 34.5%,
+            27.5% 76.7%,
+            0.1% 64.9%,
+            17.9% 100%,
+            27.6% 76.8%,
+            76.1% 97.7%,
+            74.1% 44.1%
+          );
+        "
+        class="aspect-1097/845 w-274.25 bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"
+      ></div>
     </div>
-    <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-      <div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base/7 font-semibold text-white sm:grid-cols-2 md:flex lg:gap-x-10">
-        <a href="#">Reparaciones <span aria-hidden="true">&rarr;</span></a>
-        <a href="#">Servicio al cliente <span aria-hidden="true">&rarr;</span></a>
-        <a href="#">Tecnicos de Celulares Calificados <span aria-hidden="true">&rarr;</span></a>
-        <a href="#">Deja tu celular en manos de profesionales <span aria-hidden="true">&rarr;</span></a>
+    <div
+      aria-hidden="true"
+      class="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:-top-112 sm:ml-16 sm:translate-x-0"
+    >
+      <div
+        style="
+          clip-path: polygon(
+            74.1% 44.1%,
+            100% 61.6%,
+            97.5% 26.9%,
+            85.5% 0.1%,
+            80.7% 2%,
+            72.5% 32.5%,
+            60.2% 62.4%,
+            52.4% 68.1%,
+            47.5% 58.3%,
+            45.2% 34.5%,
+            27.5% 76.7%,
+            0.1% 64.9%,
+            17.9% 100%,
+            27.6% 76.8%,
+            76.1% 97.7%,
+            74.1% 44.1%
+          );
+        "
+        class="aspect-1097/845 w-274.25 bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"
+      ></div>
+    </div>
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl lg:mx-0">
+        <h2
+          class="text-5xl font-semibold tracking-tight text-white sm:text-7xl"
+        >
+          ¿Buscas Donde reparar Celulares en Mariano Acosta?
+        </h2>
+        <p
+          class="mt-8 text-lg font-medium text-pretty text-gray-300 sm:text-xl/8"
+        >
+          En Arecofix somos los doctores de tu celular encontrás la solución
+          para tus celulares.
+        </p>
       </div>
-      <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="flex flex-col-reverse gap-1">
-          <dt class="text-base/7 text-gray-300">Arreglos</dt>
-          <dd class="text-4xl font-semibold tracking-tight text-white">12</dd>
+      <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
+        <div
+          class="grid grid-cols-1 gap-x-8 gap-y-6 text-base/7 font-semibold text-white sm:grid-cols-2 md:flex lg:gap-x-10"
+        >
+          <a href="#">Reparaciones <span aria-hidden="true">&rarr;</span></a>
+          <a href="#"
+            >Servicio al cliente <span aria-hidden="true">&rarr;</span></a
+          >
+          <a href="#"
+            >Tecnicos de Celulares Calificados
+            <span aria-hidden="true">&rarr;</span></a
+          >
+          <a href="#"
+            >Deja tu celular en manos de profesionales
+            <span aria-hidden="true">&rarr;</span></a
+          >
         </div>
-        <div class="flex flex-col-reverse gap-1">
-          <dt class="text-base/7 text-gray-300">Servicio Tecnico</dt>
-          <dd class="text-4xl font-semibold tracking-tight text-white">300+</dd>
-        </div>
-        <div class="flex flex-col-reverse gap-1">
-          <dt class="text-base/7 text-gray-300">Tecnicos Calificados</dt>
-          <dd class="text-4xl font-semibold tracking-tight text-white">40</dd>
-        </div>
-        <div class="flex flex-col-reverse gap-1">
-          <dt class="text-base/7 text-gray-300">Servicio Tecnico de Celulares en Marcos Paz | Reparacion de Celulares iPhone en Marcos Paz | Reparacion de Celulares en Marcos Paz | </dt>
-          <dd class="text-4xl font-semibold tracking-tight text-white">Servicio Tecnico Liderado por Expertos</dd>
-        </div>
-      </dl>
+        <dl
+          class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <div class="flex flex-col-reverse gap-1">
+            <dt class="text-base/7 text-gray-300">Arreglos</dt>
+            <dd class="text-4xl font-semibold tracking-tight text-white">12</dd>
+          </div>
+          <div class="flex flex-col-reverse gap-1">
+            <dt class="text-base/7 text-gray-300">Servicio Tecnico</dt>
+            <dd class="text-4xl font-semibold tracking-tight text-white">
+              300+
+            </dd>
+          </div>
+          <div class="flex flex-col-reverse gap-1">
+            <dt class="text-base/7 text-gray-300">Tecnicos Calificados</dt>
+            <dd class="text-4xl font-semibold tracking-tight text-white">40</dd>
+          </div>
+          <div class="flex flex-col-reverse gap-1">
+            <dt class="text-base/7 text-gray-300">
+              Servicio Tecnico de Celulares en Marcos Paz | Reparacion de
+              Celulares iPhone en Marcos Paz | Reparacion de Celulares en Marcos
+              Paz |
+            </dt>
+            <dd class="text-4xl font-semibold tracking-tight text-white">
+              Servicio Tecnico Liderado por Expertos
+            </dd>
+          </div>
+        </dl>
+      </div>
     </div>
   </div>
-</div>
-
 
   <!-- CONTACT FORM -->
   <section class="py-20 bg-base-200" id="contact">
@@ -855,8 +1233,10 @@
               class="btn btn-primary w-full text-lg"
               [disabled]="sendingContact"
             >
-              @if(sendingContact) {
-              <span class="loading loading-spinner"></span> } Enviar Mensaje
+              @if (sendingContact) {
+                <span class="loading loading-spinner"></span>
+              }
+              Enviar Mensaje
             </button>
           </form>
         </div>
@@ -865,121 +1245,202 @@
   </section>
 
   <!-- WARRANTY BANNER -->
-  <div class="bg-primary text-primary-content py-4 text-center font-bold text-lg md:text-xl shadow-lg relative z-20">
-      <div class="container mx-auto px-4 flex justify-center items-center gap-2">
-          <i class="fas fa-shield-alt text-2xl"></i>
-          <span>Garantía de 30 días en todas nuestras reparaciones</span>
-      </div>
+  <div
+    class="bg-primary text-primary-content py-4 text-center font-bold text-lg md:text-xl shadow-lg relative z-20"
+  >
+    <div class="container mx-auto px-4 flex justify-center items-center gap-2">
+      <i class="fas fa-shield-alt text-2xl"></i>
+      <span>Garantía de 30 días en todas nuestras reparaciones</span>
+    </div>
   </div>
 
   <!-- NOVEDADES Y RECURSOS (App & Blog) -->
   <section class="pt-24 pb-48 bg-gray-50 relative overflow-hidden">
-      <!-- Background Blotches -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-      <div class="absolute bottom-0 left-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-      
-      <div class="container mx-auto px-4 relative z-10">
-          <div class="text-center mb-16">
-              <span class="text-green-600 font-bold tracking-widest uppercase text-sm mb-2 block">Blog & Comunidad</span>
-              <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Novedades y Recursos</h2>
-              <p class="text-xl text-gray-600 max-w-2xl mx-auto">Mantenete al día con lo último en tecnología, guías de reparación y novedades de Arecofix.</p>
+    <!-- Background Blotches -->
+    <div
+      class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
+    ></div>
+    <div
+      class="absolute bottom-0 left-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"
+    ></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="text-center mb-16">
+        <span
+          class="text-green-600 font-bold tracking-widest uppercase text-sm mb-2 block"
+          >Blog & Comunidad</span
+        >
+        <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+          Novedades y Recursos
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Mantenete al día con lo último en tecnología, guías de reparación y
+          novedades de Arecofix.
+        </p>
+      </div>
+
+      <!-- Unified Grid Layout -->
+      <div
+        class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6"
+      >
+        <!-- Blog Posts (Dynamically Rendered) -->
+        @for (post of blogFeatures; track post.title) {
+          <a
+            [routerLink]="post.link"
+            [class]="
+              'group relative flex flex-col bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full ' +
+              ($last ? 'col-span-2 md:col-span-1' : '')
+            "
+          >
+            <!-- Image Container -->
+            <div class="h-48 overflow-hidden relative">
+              <div
+                class="absolute inset-0 bg-gray-900/10 group-hover:bg-transparent transition-colors z-10"
+              ></div>
+              <img
+                [src]="post.img"
+                [alt]="post.title"
+                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 flex flex-col grow">
+              <h3
+                class="text-xl font-bold text-gray-800 mb-3 group-hover:text-green-600 transition-colors"
+              >
+                {{ post.title }}
+              </h3>
+              <p class="text-gray-600 text-sm mb-6 line-clamp-3 grow">
+                {{ post.desc }}
+              </p>
+
+              <div
+                class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-green-600 font-bold text-sm"
+              >
+                <span>Leer Más</span>
+                <i
+                  class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"
+                ></i>
+              </div>
+            </div>
+          </a>
+        }
+
+        <!-- App Download Card (Takes 1 column) -->
+        <div class="col-span-2 md:col-span-1 lg:col-span-1 h-full">
+          <div
+            class="bg-[#1f2937] text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden group border border-gray-700 h-full flex flex-col"
+          >
+            <!-- Decorative Elements -->
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"
+            ></div>
+            <div
+              class="absolute bottom-0 left-0 w-32 h-32 bg-green-500/20 rounded-full blur-2xl"
+            ></div>
+
+            <div
+              class="relative z-10 flex flex-col items-center text-center grow justify-between"
+            >
+              <div
+                class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 border border-white/10 shadow-inner backdrop-blur-sm"
+              >
+                <i
+                  class="fas fa-mobile-screen-button text-4xl text-green-400"
+                ></i>
+              </div>
+
+              <h3 class="text-2xl font-bold mb-3">{{ appInfo.title }}</h3>
+              <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+                {{ appInfo.desc }}
+              </p>
+
+              <ul class="text-left space-y-4 mb-8 w-full px-4">
+                @for (feature of appInfo.features; track feature) {
+                  <li class="flex items-center gap-3 text-sm text-gray-300">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                    <span>{{ feature }}</span>
+                  </li>
+                }
+              </ul>
+
+              <a
+                [href]="appInfo.downloadLink"
+                target="_blank"
+                class="w-full bg-white text-gray-900 rounded-xl p-3 flex items-center justify-center gap-3 hover:bg-gray-100 hover:scale-[1.02] transition-all duration-300 shadow-lg group-hover:shadow-blue-500/20"
+              >
+                <div class="text-left">
+                  <div
+                    class="text-[10px] uppercase font-bold tracking-wider text-gray-500"
+                  >
+                    Disponible en
+                  </div>
+                  <div class="text-lg font-bold leading-none">Google Play</div>
+                </div>
+              </a>
+            </div>
           </div>
-
-          <!-- Unified Grid Layout -->
-          <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
-              
-              <!-- Blog Posts (Dynamically Rendered) -->
-              @for(post of blogFeatures; track post.title) {
-                  <a [routerLink]="post.link" [class]="'group relative flex flex-col bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full ' + ($last ? 'col-span-2 md:col-span-1' : '')">
-                      <!-- Image Container -->
-                      <div class="h-48 overflow-hidden relative">
-                          <div class="absolute inset-0 bg-gray-900/10 group-hover:bg-transparent transition-colors z-10"></div>
-                          <img [src]="post.img" [alt]="post.title" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                      </div>
-                      
-                      <!-- Content -->
-                      <div class="p-6 flex flex-col grow">
-                          <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-green-600 transition-colors">{{ post.title }}</h3>
-                          <p class="text-gray-600 text-sm mb-6 line-clamp-3 grow">{{ post.desc }}</p>
-                          
-                          <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-green-600 font-bold text-sm">
-                              <span>Leer Más</span>
-                              <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                          </div>
-                      </div>
-                  </a>
-              }
-
-              <!-- App Download Card (Takes 1 column) -->
-  <div class="col-span-2 md:col-span-1 lg:col-span-1 h-full">
-    <div class="bg-[#1f2937] text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden group border border-gray-700 h-full flex flex-col">
-      <!-- Decorative Elements -->
-      <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
-      <div class="absolute bottom-0 left-0 w-32 h-32 bg-green-500/20 rounded-full blur-2xl"></div>
-      
-      <div class="relative z-10 flex flex-col items-center text-center grow justify-between">
-        <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 border border-white/10 shadow-inner backdrop-blur-sm">
-             <i class="fas fa-mobile-screen-button text-4xl text-green-400"></i>
         </div>
-        
-        <h3 class="text-2xl font-bold mb-3">{{ appInfo.title }}</h3>
-        <p class="text-gray-400 text-sm mb-8 leading-relaxed">{{ appInfo.desc }}</p>
-        
-        <ul class="text-left space-y-4 mb-8 w-full px-4">
-          @for(feature of appInfo.features; track feature) {
-            <li class="flex items-center gap-3 text-sm text-gray-300">
-              <i class="fas fa-check-circle text-green-400"></i>
-              <span>{{ feature }}</span>
-            </li>
-          }
-        </ul>
-
-        <a [href]="appInfo.downloadLink" target="_blank" class="w-full bg-white text-gray-900 rounded-xl p-3 flex items-center justify-center gap-3 hover:bg-gray-100 hover:scale-[1.02] transition-all duration-300 shadow-lg group-hover:shadow-blue-500/20">
-
-          <div class="text-left">
-            <div class="text-[10px] uppercase font-bold tracking-wider text-gray-500">Disponible en</div>
-            <div class="text-lg font-bold leading-none">Google Play</div>
-          </div>
-        </a>
       </div>
     </div>
-  </div>
-
-</div>
-      </div>
   </section>
 
-<!-- RELATED SERVICES SECTION -->
-<div class="mt-24 mb-12">
+  <!-- RELATED SERVICES SECTION -->
+  <div class="mt-24 mb-12">
     <div class="text-center mb-12">
-        <span class="text-green-600 font-bold tracking-widest uppercase text-xs mb-3 block">Soluciones Integrales</span>
-        <h2 class="text-3xl font-bold text-gray-900 mb-4">Otros Servicios Relacionados</h2>
-        <p class="text-gray-600 max-w-2xl mx-auto">Además de reparar celulares, somos expertos en una amplia gama de dispositivos electrónicos.</p>
+      <span
+        class="text-green-600 font-bold tracking-widest uppercase text-xs mb-3 block"
+        >Soluciones Integrales</span
+      >
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        Otros Servicios Relacionados
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Además de reparar celulares, somos expertos en una amplia gama de
+        dispositivos electrónicos.
+      </p>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mb-12">
-        @for(service of relatedServices; track service.title) {
-            <div [class]="'bg-gray-50 rounded-2xl p-4 md:p-8 hover:bg-white hover:shadow-xl transition-all border border-gray-100 group text-center ' + ($last ? 'col-span-2 md:col-span-1' : '')">
-                <div class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl md:text-2xl mb-3 md:mb-6 group-hover:scale-110 transition-transform">
-                    <i [class]="'fas ' + service.icon"></i>
-                </div>
-                <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{{ service.title }}</h3>
-                <p class="text-gray-600 text-xs md:text-sm mb-4 md:mb-6">{{ service.desc }}</p>
-                <!-- Using RouterLink to navigate to services page -->
-                <a [routerLink]="service.link" class="text-green-600 font-bold text-xs md:text-sm hover:text-green-800 transition-colors inline-flex items-center gap-2">
-                    Ver Detalles <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        }
+      @for (service of relatedServices; track service.title) {
+        <div
+          [class]="
+            'bg-gray-50 rounded-2xl p-4 md:p-8 hover:bg-white hover:shadow-xl transition-all border border-gray-100 group text-center ' +
+            ($last ? 'col-span-2 md:col-span-1' : '')
+          "
+        >
+          <div
+            class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl md:text-2xl mb-3 md:mb-6 group-hover:scale-110 transition-transform"
+          >
+            <i [class]="'fas ' + service.icon"></i>
+          </div>
+          <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
+            {{ service.title }}
+          </h3>
+          <p class="text-gray-600 text-xs md:text-sm mb-4 md:mb-6">
+            {{ service.desc }}
+          </p>
+          <!-- Using RouterLink to navigate to services page -->
+          <a
+            [routerLink]="service.link"
+            class="text-green-600 font-bold text-xs md:text-sm hover:text-green-800 transition-colors inline-flex items-center gap-2"
+          >
+            Ver Detalles <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      }
     </div>
 
     <div class="text-center">
-        <a routerLink="/servicios" class="inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 hover:-translate-y-1 transition-all shadow-lg shadow-gray-900/20">
-            Ver Todos los Servicios <i class="fas fa-layer-group"></i>
-        </a>
+      <a
+        routerLink="/servicios"
+        class="inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 hover:-translate-y-1 transition-all shadow-lg shadow-gray-900/20"
+      >
+        Ver Todos los Servicios <i class="fas fa-layer-group"></i>
+      </a>
     </div>
-</div>
+  </div>
 
   <!-- BRANDS CAROUSEL (Bottom) -->
-
 </div>

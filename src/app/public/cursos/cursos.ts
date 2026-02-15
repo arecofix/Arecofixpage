@@ -118,11 +118,11 @@ export class CursosComponent implements OnInit {
     }
 
     setSEO() {
-        this.seoService.setPageData(
-            'Cursos de Reparación de Celulares | Arecofix Academy',
-            'Convertite en técnico profesional. Cursos presenciales de reparación de celulares y tablets en Marcos Paz. Certificación y salida laboral.',
-            'https://arecofix.com.ar/assets/img/branding/og-academy.jpg'
-        );
+        this.seoService.setPageData({
+            title: 'Cursos de Reparación de Celulares | Arecofix Academy',
+            description: 'Convertite en técnico profesional. Cursos presenciales de reparación de celulares y tablets en Marcos Paz. Certificación y salida laboral.',
+            imageUrl: 'https://arecofix.com.ar/assets/img/branding/og-academy.jpg'
+        });
     }
 
     loadCourses() {

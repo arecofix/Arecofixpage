@@ -16,7 +16,7 @@ export const environment: Environment = {
   production: true,
   appName: 'Arecofix',
   apiUrl: 'https://arecofix.com.ar',
-  baseUrl: 'https://arecofix.com.ar',
+  baseUrl: 'https://www.arecofix.com.ar',
 
   // Supabase Configuration (Anon key is safe for client-side)
   supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',

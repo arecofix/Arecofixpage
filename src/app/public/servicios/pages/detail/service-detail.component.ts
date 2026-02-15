@@ -42,11 +42,11 @@ export class ServiceDetailComponent implements OnInit {
   }
 
   private setSeo(service: Service) {
-    this.seoService.setPageData(
-      service.title,
-      service.description,
-      service.image.startsWith('http') ? service.image : `https://arecofix.com.ar/${service.image}`
-    );
+    this.seoService.setPageData({
+      title: service.title,
+      description: service.description,
+      imageUrl: service.image.startsWith('http') ? service.image : `https://arecofix.com.ar/${service.image}`
+    });
   }
 
   getWhatsAppLink(service: Service) {

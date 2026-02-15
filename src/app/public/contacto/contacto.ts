@@ -50,11 +50,11 @@ export class ContactoComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.seoService.setPageData(
-            'Contacto',
-            'Ponte en contacto con nosotros. Estamos listos para escuchar tu idea y convertirla en realidad. Whatsapp, Email y Redes Sociales.',
-            'assets/img/branding/og-contact.jpg'
-        );
+        this.seoService.setPageData({
+            title: 'Contacto',
+            description: 'Ponte en contacto con nosotros. Estamos listos para escuchar tu idea y convertirla en realidad. Whatsapp, Email y Redes Sociales.',
+            imageUrl: 'assets/img/branding/og-contact.jpg'
+        });
     }
 
     onSubmit() {

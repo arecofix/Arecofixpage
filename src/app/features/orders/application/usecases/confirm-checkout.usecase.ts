@@ -7,6 +7,18 @@ import { CrmMessage } from '../../../messages/domain/entities/crm-message.entity
 import { SupabaseOrderRepository } from '../../infrastructure/repositories/supabase-order.repository';
 import { SupabaseMessageRepository } from '../../../messages/infrastructure/repositories/supabase-message.repository';
 
+// Basic Product Interface needed for Checkout
+interface CheckoutProduct {
+    id: string;
+    name: string;
+    price: number;
+}
+
+interface CartItem {
+    product: CheckoutProduct;
+    quantity: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,7 +33,7 @@ export class ConfirmCheckoutUseCase {
   execute(
       params: { 
           customer: { name: string; email: string; phone: string; address: string; notes?: string }, 
-          items: any[], 
+          items: CartItem[], 
           total: number 
       }
   ): Observable<Order> {

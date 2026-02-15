@@ -49,11 +49,11 @@
                 <i class="fas fa-download"></i> Download CV
               </span>
             </a>
-            <a [href]="currentContent.linkedin" target="_blank" class="px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all flex items-center gap-2">
-              <i class="fab fa-linkedin"></i> LinkedIn
+            <a [href]="currentContent.linkedin" target="_blank" class="group relative px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all">
+              <span class="relative">LinkedIn</span>
             </a>
-            <a [href]="currentContent.github" target="_blank" class="px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all flex items-center gap-2">
-              <i class="fab fa-github"></i> GitHub
+            <a [href]="currentContent.github" target="_blank" class="group relative px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all">
+              <span class="relative">GitHub</span>
             </a>
           </div>
         </div>
@@ -267,31 +267,73 @@
         </div>
 
         <div class="grid md:grid-cols-2 gap-8">
-          <div *ngFor="let project of currentContent.projects" class="group relative bg-[#131620] rounded-xl overflow-hidden border border-gray-800 hover:border-cyan-500/50 transition-all duration-300">
-            <div class="aspect-video bg-gray-900 relative overflow-hidden">
-               <div class="absolute inset-0 bg-linear-to-b from-transparent to-[#131620] z-10 opacity-90 transition-opacity group-hover:opacity-40"></div>
-               <img [ngSrc]="project.image" class="object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700 opacity-50 group-hover:opacity-100" fill />
-            </div>
+          <div *ngFor="let project of currentContent.projects" 
+               [class]="project.featured ? 'group relative bg-[#131620]/80 backdrop-blur-sm rounded-xl overflow-hidden border border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-all duration-300 md:col-span-2 grid md:grid-cols-2' : 'group relative bg-[#131620] rounded-xl overflow-hidden border border-gray-800 hover:border-cyan-500/50 transition-all duration-300'">
             
-            <div class="p-8 relative z-20 -mt-10">
-              <h3 class="text-2xl font-bold text-white mb-2">{{ project.title }}</h3>
-              <p class="text-gray-400 mb-6 line-clamp-2">{{ project.description }}</p>
-              
-              <div class="flex flex-wrap gap-2 mb-6">
-                <span *ngFor="let tag of project.techStack" class="text-xs text-cyan-400 bg-cyan-900/20 px-2 py-1 rounded border border-cyan-500/20">
-                  {{ tag }}
-                </span>
-              </div>
+            <!-- Featured Project Layout -->
+            <ng-container *ngIf="project.featured">
+                <div class="relative overflow-hidden h-64 md:h-auto min-h-[350px]">
+                    <div class="absolute inset-0 bg-cyan-900/20 z-10 mix-blend-overlay"></div>
+                    <img [ngSrc]="project.image" class="object-cover w-full h-full transform scale-100 group-hover:scale-110 transition-transform duration-700" fill />
+                </div>
 
-              <div class="flex gap-4">
-                 <a *ngIf="project.link" [href]="project.link" target="_blank" class="text-sm font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
-                   <i class="fas fa-external-link-alt"></i> Live Demo
-                 </a>
-                 <a *ngIf="project.github" [href]="project.github" target="_blank" class="text-sm font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
-                   <i class="fab fa-github"></i> Source Code
-                 </a>
-              </div>
-            </div>
+                <div class="p-6 md:p-10 flex flex-col justify-center">
+                    <div class="inline-flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 rounded bg-cyan-500 text-black text-xs font-bold uppercase tracking-wider">Featured</span>
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    </div>
+                    
+                    <h3 class="text-3xl font-bold text-white mb-4 leading-tight">{{ project.title }}</h3>
+                    <p class="text-gray-300 mb-6 text-lg leading-relaxed">{{ project.description }}</p>
+                    
+                    <ul *ngIf="project.features" class="mb-8 space-y-3">
+                        <li *ngFor="let feature of project.features" class="flex items-start gap-3 text-sm text-gray-400">
+                            <i class="fas fa-check-circle text-cyan-500 mt-1 shrink-0"></i>
+                            <span>{{ feature }}</span>
+                        </li>
+                    </ul>
+
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <span *ngFor="let tag of project.techStack" class="text-sm font-medium text-cyan-300 bg-cyan-950/50 px-3 py-1.5 rounded border border-cyan-500/20">
+                        {{ tag }}
+                        </span>
+                    </div>
+
+                    <div class="flex gap-4 mt-auto">
+                        <a *ngIf="project.link" [href]="project.link" target="_blank" class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20">
+                            <i class="fas fa-rocket"></i> View Project
+                        </a>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- Standard Project Layout -->
+            <ng-container *ngIf="!project.featured">
+                <div class="aspect-video bg-gray-900 relative overflow-hidden">
+                <div class="absolute inset-0 bg-linear-to-b from-transparent to-[#131620] z-10 opacity-90 transition-opacity group-hover:opacity-40"></div>
+                <img [ngSrc]="project.image" class="object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700 opacity-50 group-hover:opacity-100" fill />
+                </div>
+                
+                <div class="p-8 relative z-20 -mt-10">
+                <h3 class="text-2xl font-bold text-white mb-2">{{ project.title }}</h3>
+                <p class="text-gray-400 mb-6 line-clamp-2 h-12">{{ project.description }}</p>
+                
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <span *ngFor="let tag of project.techStack" class="text-xs text-cyan-400 bg-cyan-900/20 px-2 py-1 rounded border border-cyan-500/20">
+                    {{ tag }}
+                    </span>
+                </div>
+
+                <div class="flex gap-4">
+                    <a *ngIf="project.link" [href]="project.link" target="_blank" class="text-sm font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
+                    <i class="fas fa-external-link-alt"></i> Live Demo
+                    </a>
+                    <a *ngIf="project.github" [href]="project.github" target="_blank" class="text-sm font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
+                    <i class="fab fa-github"></i> Source Code
+                    </a>
+                </div>
+                </div>
+            </ng-container>
           </div>
         </div>
       </section>

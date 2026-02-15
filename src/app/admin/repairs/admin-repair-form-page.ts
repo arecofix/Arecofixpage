@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { CompanyService } from '@app/core/services/company.service';
 import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
 import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/repairs/domain/entities/repair.entity';
+import { environment } from '@env/environment';
 
 @Component({
     selector: 'app-admin-repair-form-page',
@@ -15,7 +17,7 @@ import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/re
 export class AdminRepairFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private auth = inject(AuthService); // Still needed for company settings for now
+    private companyService = inject(CompanyService);
     private repairService = inject(AdminRepairService);
 
     id: string | null = null;
@@ -76,17 +78,21 @@ export class AdminRepairFormPage implements OnInit {
 
         try {
             for (let i = 0; i < files.length; i++) {
-                const url = await this.repairService.uploadImage(files[i]);
-                uploadedUrls.push(url);
+                const file = files.item(i);
+                if (file) {
+                    const url = await this.repairService.uploadImage(file);
+                    uploadedUrls.push(url);
+                }
             }
 
             this.form.update(f => ({
                 ...f,
                 images: [...f.images, ...uploadedUrls]
             }));
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('Error uploading images:', e);
-            this.error.set('Error al subir imágenes: ' + (e.message || e));
+            const message = e instanceof Error ? e.message : 'Unknown error';
+            this.error.set('Error al subir imágenes: ' + message);
         } finally {
             this.uploadingImages.set(false);
             // Clear input
@@ -103,11 +109,13 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     async loadCompanySettings() {
-        // TODO: Move to CompanyService
-        const supabase = this.auth.getSupabaseClient();
-        const { data } = await supabase.from('company_settings').select('*').maybeSingle();
-        if (data) {
-            this.company.set(data);
+        try {
+            const data = await this.companyService.getSettings();
+            if (data) {
+                this.company.set(data);
+            }
+        } catch (error) {
+            console.error('Error loading company settings', error);
         }
     }
 
@@ -137,8 +145,9 @@ export class AdminRepairFormPage implements OnInit {
                     images: data.images || []
                 });
             }
-        } catch (e: any) {
-            this.error.set('Error cargando reparación: ' + e.message);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : 'Unknown error';
+            this.error.set('Error cargando reparación: ' + message);
         }
     }
 
@@ -150,7 +159,8 @@ export class AdminRepairFormPage implements OnInit {
             const formData = this.form();
             
             // Map form data to DTO
-            const dto: any = {
+            // Using logic to extend dto with necessary fields that might not be in CreateRepairDto strict definition but are handled by service/repo logic
+            const baseDto: CreateRepairDto = {
                 customer_name: formData.customer_name,
                 customer_phone: formData.customer_phone,
                 device_model: formData.device_model,
@@ -158,27 +168,34 @@ export class AdminRepairFormPage implements OnInit {
                 device_brand: formData.device_brand,
                 imei: formData.imei,
                 issue_description: formData.issue_description,
-                status: formData.status as RepairStatus,
                 estimated_cost: formData.estimated_cost,
-                final_cost: formData.final_cost,
-                technician_notes: formData.technician_notes,
+                notes: '', // Optional notes field
+                images: formData.images,
                 checklist: formData.checklist,
                 security_pin: formData.security_pin,
                 security_pattern: formData.security_pattern,
+            };
+
+            // We augment the DTO with status and final_cost which are handled by the service/repo
+            const extendedDto = {
+                ...baseDto,
+                status: formData.status as RepairStatus,
+                final_cost: formData.final_cost,
+                technician_notes: formData.technician_notes,
                 deposit_amount: formData.deposit_amount,
-                tracking_code: formData.tracking_code, // Service handles if empty for create
-                images: formData.images,
-                notes: '' // Optional notes field
+                tracking_code: formData.tracking_code,
             };
 
             if (this.id) {
-                await this.repairService.update(this.id, dto as UpdateRepairDto);
+                await this.repairService.update(this.id, extendedDto as UpdateRepairDto);
             } else {
-                await this.repairService.create(dto as CreateRepairDto & { status: RepairStatus, final_cost: number });
+                await this.repairService.create(extendedDto);
             }
             this.router.navigate(['/admin/repairs']);
         } catch (e: any) {
-            this.error.set(e.message);
+            console.error('Error saving repair:', e);
+            const message = e.message || e.error_description || (e instanceof Error ? e.message : 'Unknown error');
+            this.error.set(message);
         } finally {
             this.saving.set(false);
         }
@@ -202,7 +219,8 @@ export class AdminRepairFormPage implements OnInit {
         let message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
 
         if (this.form().status === RepairStatus.COMPLETED) {
-            const reviewLink = "https://www.google.com/maps/place/ARECOFIX+Servicio+t%C3%A9cnico+de+celulares+%7C+Venta+de+Repuestos./@-34.7671957,-58.815398,17z/data=!3m1!4b1!4m6!3m5!1s0x95bceb46770c86eb:0x73b48d51a83e8107!8m2!3d-34.7671957!4d-58.815398!16s%2Fg%2F11pvb9nwqp?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoASAFQAw%3D%3D";
+            // Use configured Google Map Review URL
+            const reviewLink = environment.contact.socialMedia.googleMaps;
             message = `Hola ${customerName}, su reparación del ${device} ya está lista. Agradecemos su reseña en el siguiente enlace: ${reviewLink}`;
         }
 

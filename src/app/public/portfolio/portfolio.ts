@@ -65,6 +65,7 @@ interface Project {
   features: string[];
   link?: string;
   github?: string;
+  featured?: boolean;
 }
 
 @Component({
@@ -188,9 +189,22 @@ USING (
       ],
       projects: [
         {
+          title: 'Zarx – Plataforma Integral de Gestión y Control Geoespacial',
+          description: 'Desarrollo de un ecosistema digital avanzado diseñado para la centralización de datos, seguridad ciudadana y gestión territorial. La aplicación resuelve la fragmentación de información mediante un panel de control unificado que integra herramientas de seguridad, identidad digital y análisis de datos en tiempo real.',
+          image: 'assets/img/cursos/certiicate/zarx.jpeg', 
+          techStack: ['Angular', 'Java', 'Python', 'PostgreSQL', 'Supabase'],
+          features: [
+            'Centralización: Integración de múltiples módulos (Finanzas, Identidad, Seguridad).',
+            'Escalabilidad: Arquitectura Real-time para gran volumen de datos.',
+            'Seguridad: Protocolos de verificación de identidad y prevención de fraudes.'
+          ],
+          link: 'https://zarx.arecofix.com.ar',
+          featured: true
+        },
+        {
           title: 'Sistema de Gestión para Ecommerce',
           description: 'Sistema integral de gestión para E-commerce y Servicios Técnicos. Panel de administración robusto con control de inventario en tiempo real, gestión de ventas, seguimiento de órdenes de servicio, clientes, y reportes financieros detallados. Incluye facturación automatizada, integración con pasarelas de pago, y módulos de logística.',
-          image: 'assets/img/projects/panel.png',
+          image: 'assets/img/cursos/certiicate/arecofix.png',
           techStack: ['Node.js', 'Angular', 'Supabase', 'Redis', 'Docker'],
           features: ['Gestión de Inventario', 'CRM & Ventas', 'Reportes Financieros', 'Trazabilidad de Servicio'],
           link: environment.baseUrl
@@ -334,9 +348,22 @@ USING (
       ],
       projects: [
         {
+          title: 'Zarx – Integral Geospatial Management Platform',
+          description: 'Development of an advanced digital ecosystem designed for data centralization, citizen security, and territorial management. The application solves information fragmentation through a unified control panel integrating security tools, digital identity, and real-time data analysis.',
+          image: 'assets/img/cursos/certiicate/zarx.jpeg',
+          techStack: ['Angular', 'Java', 'Python', 'PostgreSQL', 'Supabase'],
+          features: [
+            'Centralization: Integration of multiple modules (Finance, Identity, Security).',
+            'Scalability: Real-time architecture for high volume data.',
+            'Security: Identity verification protocols and fraud prevention.'
+          ],
+          link: 'https://zarx.arecofix.com.ar',
+          featured: true
+        },
+        {
           title: 'System Management for Ecommerce',
           description: 'Comprehensive management system for E-commerce and Technical Services. Robust admin panel with real-time inventory control, sales management, service order tracking, clients, and detailed financial reports. Includes automated invoicing, payment gateway integration, and logistics modules.',
-          image: 'assets/img/projects/panel.png',
+          image: 'assets/img/cursos/certiicate/arecofix.png',
           techStack: ['Node.js', 'Angular', 'Supabase', 'Redis', 'Docker'],
           features: ['Inventory Management', 'CRM & Sales', 'Financial Reports', 'Service Traceability'],
           link: environment.baseUrl

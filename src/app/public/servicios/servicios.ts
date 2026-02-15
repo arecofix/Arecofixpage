@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -11,7 +11,7 @@ import { Service, SERVICIOS_CONTENT, ServiciosContent } from './servicios.data';
 @Component({
     selector: 'app-servicios',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, NgOptimizedImage],
     templateUrl: './servicios.html',
     styles: [],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -45,11 +45,11 @@ export class ServiciosComponent implements OnInit {
     ]);
 
     ngOnInit() {
-        this.seoService.setPageData(
-            'Soluciones Tecnológicas Integrales | Arecofix Servicios',
-            'Experiencia y tecnología al servicio de tu empresa. Desarrollo de Software, Soporte IT, Ciberseguridad y Reparación de Hardware Especializada.',
-            'assets/img/branding/og-services.jpg'
-        );
+        this.seoService.setPageData({
+            title: 'Soluciones Tecnológicas Integrales | Arecofix Servicios',
+            description: 'Experiencia y tecnología al servicio de tu empresa. Desarrollo de Software, Soporte IT, Ciberseguridad y Reparación de Hardware Especializada.',
+            imageUrl: 'assets/img/branding/og-services.jpg'
+        });
     }
 
     openService(service: Service, event: Event) {

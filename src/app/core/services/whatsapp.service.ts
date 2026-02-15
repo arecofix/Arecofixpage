@@ -3,6 +3,17 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+interface WhatsAppComponent {
+    type: string;
+    parameters: Array<{
+        type: string;
+        text?: string;
+        image?: { link: string };
+        video?: { link: string };
+        document?: { link: string; filename: string };
+    }>;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -19,8 +30,8 @@ export class WhatsappService {
         to: string,
         templateName: string,
         languageCode: string = 'es_AR',
-        components: any[] = []
-    ): Observable<any> {
+        components: WhatsAppComponent[] = []
+    ): Observable<unknown> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.supabaseKey}`,
             'Content-Type': 'application/json'
@@ -44,7 +55,7 @@ export class WhatsappService {
     /**
      * Send a text message (only allowed within 24h window)
      */
-    sendTextMessage(to: string, message: string): Observable<any> {
+    sendTextMessage(to: string, message: string): Observable<unknown> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.supabaseKey}`,
             'Content-Type': 'application/json'

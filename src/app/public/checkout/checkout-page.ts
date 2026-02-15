@@ -13,6 +13,8 @@ import { AuthService } from '@app/core/services/auth.service';
 import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ContactService } from '@app/core/services/contact.service';
+import { ProductService } from '@app/public/products/services/product.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-checkout-page',
@@ -25,6 +27,7 @@ export class CheckoutPage {
   orderService = inject(OrderService);
   authService = inject(AuthService);
   contactService = inject(ContactService);
+  productService = inject(ProductService);
   fb = inject(FormBuilder);
   router = inject(Router);
   notificationService = inject(NotificationService);
@@ -129,9 +132,6 @@ ${formVal.notes || 'Ninguna'}`;
       // 3. Update Profile if logged in
       const currentUser = this.authService.getCurrentUser();
       if (currentUser) {
-         // This assumes Profile logic is simple enough to stay here or needs checking
-         // For strict clean code, this should be in ProfileService.
-         // Keeping it lightweight here as per 'AuthService' access.
          const supabase = this.authService.getSupabaseClient();
          await supabase
           .from('profiles')
@@ -143,6 +143,20 @@ ${formVal.notes || 'Ninguna'}`;
           .eq('id', currentUser.id)
           .maybeSingle(); 
       }
+
+      // 4. Feature purchased products
+      // Logic: Mark purchased items as featured to create a "Trending" effect
+      const uniqueProductIds = [...new Set(cartItems.map(item => item.product.id))];
+      try {
+        const updatePromises = uniqueProductIds.map(id => 
+          firstValueFrom(this.productService.updateProduct(id, { is_featured: true }))
+        );
+        await Promise.all(updatePromises);
+      } catch (featError) {
+        console.warn('Could not update featured status for products (likely permission issue):', featError);
+        // We absorb this error because the order itself was successful
+      }
+
 
       this.orderSuccess.set(true);
       this.cartService.clearCart();

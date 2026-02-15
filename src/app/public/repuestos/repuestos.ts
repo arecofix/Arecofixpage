@@ -150,11 +150,11 @@ export class RepuestosComponent implements OnInit {
     });
 
     async ngOnInit() {
-        this.seoService.setPageData(
-            'Repuestos para Celulares - Mayorista y Minorista',
-            'Encontrá todos los repuestos para tu celular: Módulos, Pantallas, Baterías, Pines de Carga y Herramientas. Envíos a todo el país.',
-            'assets/img/hero-illustration.svg' // Using an existing image, ideally specific to repuestos
-        );
+        this.seoService.setPageData({
+            title: 'Repuestos para Celulares - Mayorista y Minorista',
+            description: 'Encontrá todos los repuestos para tu celular: Módulos, Pantallas, Baterías, Pines de Carga y Herramientas. Envíos a todo el país.',
+            imageUrl: 'assets/img/hero-illustration.svg'
+        });
         await this.loadCategories();
         await this.loadBrands();
     }

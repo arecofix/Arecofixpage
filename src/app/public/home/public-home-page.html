@@ -75,7 +75,7 @@
                       <!-- Image Section if available -->
                       @if (pillar.image) {
                         <div class="relative h-48 overflow-hidden">
-                            <img [ngSrc]="pillar.image" [alt]="pillar.title" class="object-cover transform group-hover:scale-110 transition-transform duration-700" fill>
+                            <img [ngSrc]="pillar.image" [alt]="pillar.title" class="object-cover transform group-hover:scale-110 transition-transform duration-700" fill sizes="(max-width: 768px) 100vw, 50vw">
                             <div class="absolute inset-0 bg-linear-to-t from-white dark:from-[#1a1a1a] to-transparent opacity-80"></div>
                         </div>
                       }
@@ -190,7 +190,7 @@
                       <h2 class="text-4xl lg:text-5xl font-extrabold text-gradient-blue mb-2 font-heading">
                           {{ metric.value }}
                       </h2>
-                      <p class="text-gray-500 font-mono text-xs uppercase tracking-widest">{{ metric.label }}</p>
+                      <p class="text-gray-600 dark:text-gray-400 font-mono text-xs uppercase tracking-widest">{{ metric.label }}</p>
                   </div>
               }
           </div>
@@ -209,7 +209,7 @@
                    <div class="aspect-square rounded-2xl glass-card flex flex-col items-center justify-center p-6 text-center group cursor-default hover:border-green-500/30">
                        <i [class]="industry.icon + ' text-4xl mb-4 text-gray-500 group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors duration-300'"></i>
                        <h3 class="font-bold text-gray-900 dark:text-white mb-2">{{ industry.title }}</h3>
-                       <p class="text-xs text-gray-500 hidden lg:block">{{ industry.description }}</p>
+                       <p class="text-xs text-gray-600 dark:text-gray-400 hidden lg:block">{{ industry.description }}</p>
                    </div>
                }
            </div>

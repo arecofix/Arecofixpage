@@ -23,7 +23,7 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap
-Sitemap: https://arecofix.com.ar/sitemap.xml
+Sitemap: https://www.arecofix.com.ar/sitemap.xml
 
 # Velocidad de rastreo (opcional)
 Crawl-delay: 1

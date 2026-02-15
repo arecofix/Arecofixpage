@@ -34,4 +34,12 @@ export class ProductService {
       })
     );
   }
+  public updateProduct(id: string, data: any): Observable<any> {
+    return this.repository.update(id, data).pipe(
+      catchError((err) => {
+        this.logger.error('ProductService update error', err);
+        throw err;
+      })
+    );
+  }
 }

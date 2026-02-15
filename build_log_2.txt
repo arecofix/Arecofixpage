@@ -1,0 +1,22 @@
+
+> arecofix@0.0.0 build
+> ng build --configuration production
+
+[33m❯[39m Building...
+/*! 🌼 daisyUI 5.5.14 */
+[32m✔[39m Building...
+[35mPrerendered 0 static routes.[39m
+Application bundle generation failed. [15.117 seconds] - 2026-02-14T21:51:27.986Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mFile 'server.ts' not found in TypeScript compilation.[0m [1m[35m[plugin angular-compiler][0m
+
+  The file will be bundled and included in the output but will not be type-checked at build time. To remove this message you can add the file to the TypeScript program via the 'files' or 'include' property.
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "node_modules/@angular/ssr/fesm2022/ssr.mjs" for import "CommonEngine"[0m
+
+    server.ts:2:9:
+[37m      2 │ import { [32mCommonEngine[37m } from '@angular/ssr';
+        ╵          [32m~~~~~~~~~~~~[0m
+
+[39m[22m

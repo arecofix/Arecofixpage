@@ -58,12 +58,12 @@ export class ProductsDetailsPage {
       effect(() => {
           const product = this.product();
           if (product) {
-              this.seoService.setPageData(
-                  product.name,
-                  product.description || `Compra ${product.name} en Arecofix`,
-                  product.image_url,
-                  'product'
-              );
+              this.seoService.setPageData({
+                  title: product.name,
+                  description: product.description || `Compra ${product.name} en Arecofix`,
+                  imageUrl: product.image_url,
+                  type: 'product'
+              });
 
               // JSON-LD Structured Data
               const script = this.document.createElement('script');

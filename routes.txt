@@ -1,0 +1,10 @@
+/
+/celular
+/productos
+/nosotros
+/contacto
+/servicios
+/academy
+/blog
+/recursos
+/sitemap

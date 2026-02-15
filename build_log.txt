@@ -1,0 +1,15 @@
+
+> arecofix@0.0.0 build
+> ng build --configuration production
+
+C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\v1\Arecofixpage\node_modules\rxjs\dist\cjs\internal\util\reportUnhandledError.js:13
+            throw err;
+            ^
+
+Error: The "server" option is required when enabling "ssr", "prerender" or "app-shell".
+    at normalizeOptions (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\v1\Arecofixpage\node_modules\@angular\build\src\builders\application\options.js:244:19)
+    at async buildApplicationInternal (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\v1\Arecofixpage\node_modules\@angular\build\src\builders\application\index.js:86:31)
+    at async buildApplication (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\v1\Arecofixpage\node_modules\@angular\build\src\builders\application\index.js:162:22)
+    at async handleAsyncIterator (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\v1\Arecofixpage\node_modules\@angular-devkit\architect\src\api.js:38:28)
+
+Node.js v22.18.0

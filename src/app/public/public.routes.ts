@@ -12,11 +12,26 @@ export const publicRoutes: Routes = [
         title: 'Inicio - IT Consultoria y Soluciones - Arecofix',
         path: '',
         component: PublicHomePage,
+        data: {
+            seo: {
+                title: 'Soluciones de Software & Consultoría IT',
+                description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
+                imageUrl: 'assets/img/hero-illustration.svg'
+            }
+        }
       },
       {
         title: 'Servicio Técnico de Celulares en Marcos Paz',
         path: 'celular',
         loadComponent: () => import('@app/public/landing/celular/celular-landing.component').then(m => m.CelularLandingComponent),
+        data: {
+          seo: {
+            title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
+            description: 'Arreglo de pantallas, baterías y pines de carga en el acto. Calidad garantizada en Marcos Paz.',
+            imageUrl: 'assets/img/og-celulares.jpg',
+            keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix'
+          }
+        }
       },
       {
         title: 'Categories',

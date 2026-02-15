@@ -8,6 +8,17 @@
         var newPath = window.location.hash.substring(1); // Remove '#'
         window.history.replaceState(null, '', newPath);
       }
+
+      // Monkey-patch document.createElement to add permissions policies to iframes created by third-party scripts (like Facebook Pixel)
+      var originalCreateElement = document.createElement;
+      document.createElement = function(tagName) {
+        var element = originalCreateElement.apply(document, arguments);
+        if (tagName && tagName.toLowerCase() === 'iframe') {
+           // Grant permissions that FB Pixel often checks for
+           element.setAttribute('allow', 'attribution-reporting; browsing-topics; run-ad-auction; join-ad-interest-group; encrypted-media; autoplay');
+        }
+        return element;
+      };
     })();
   </script>
   <!-- Google Tag Manager -->
@@ -46,20 +57,20 @@
   <!-- End Meta Pixel Code -->
 
   <meta charset="utf-8">
-  <title>Inicio - Consultoria IT y Soluciones Digitales - Arecofix</title>
+  <title>Arecofix - Servicio Técnico de Celulares y Soluciones IT</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description"
-    content="Consultoría IT, Desarrollo Web y Inteligencia Artificial. Servicio Técnico especializado en Argentina.">
+    content="Servicio Técnico especializado en Celulares, Consultoría IT, Desarrollo Web y Inteligencia Artificial en Marcos Paz.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="Arecofix">
   <meta name="theme-color" content="#1f2136">
 
   <!-- Open Graph / Facebook -->
-  <meta property="og:title" content="Arecofix - Soluciones Informáticas Integrales">
+  <meta property="og:title" content="Arecofix - Servicio Técnico de Celulares y Soluciones IT">
   <meta property="og:description"
-    content="Consultoría IT, Desarrollo Web y Inteligencia Artificial.">
-  <meta property="og:image" content="https://arecofix.com.ar/assets/img/brands/logo/logo-normal1.PNG">
+    content="Servicio Técnico especializado en Celulares, Consultoría IT y Desarrollo Web.">
+  <meta property="og:image" content="https://arecofix.com.ar/assets/img/branding/og-celulares.jpg">
   <meta property="og:url" content="https://arecofix.com.ar">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Arecofix">
@@ -67,9 +78,9 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Arecofix - Soluciones IT para Empresas">
-  <meta name="twitter:description" content="Consultoría IT, Desarrollo Web y Inteligencia Artificial.">
-  <meta name="twitter:image" content="https://arecofix.com.ar/assets/img/brands/logo/logo-normal1.PNG">
+  <meta name="twitter:title" content="Arecofix - Servicio Técnico de Celulares">
+  <meta name="twitter:description" content="Servicio Técnico especializado en Celulares, Consultoría IT y Desarrollo Web.">
+  <meta name="twitter:image" content="https://arecofix.com.ar/assets/img/branding/og-celulares.jpg">
 
   <link rel="icon" type="image/png" href="/assets/img/brands/logo/Logo (2).png">
   <link rel="apple-touch-icon" sizes="180x180" href="https://arecofix.com.ar/assets/img/apple-touch-icon.png">

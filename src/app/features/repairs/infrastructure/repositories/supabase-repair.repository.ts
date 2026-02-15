@@ -16,7 +16,7 @@ export class SupabaseRepairRepository extends RepairRepository {
         return from(this.supabase.from('repairs').select('*').eq('id', id).single()).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return data as unknown as Repair;
+                return this.mapFromDb(data);
             })
         );
     }
@@ -31,22 +31,24 @@ export class SupabaseRepairRepository extends RepairRepository {
         ).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return (data || []) as unknown as Repair[];
+                return (data || []).map(item => this.mapFromDb(item));
             })
         );
     }
 
     create(repair: CreateRepairDto): Observable<Repair> {
-        return from(this.supabase.from('repairs').insert(repair).select().single()).pipe(
+        const payload = this.mapToDb(repair);
+        return from(this.supabase.from('repairs').insert(payload).select().single()).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return data as unknown as Repair;
+                return this.mapFromDb(data);
             })
         );
     }
 
     update(id: string, repair: UpdateRepairDto): Observable<void> {
-        return from(this.supabase.from('repairs').update(repair).eq('id', id)).pipe(
+        const payload = this.mapToDb(repair);
+        return from(this.supabase.from('repairs').update(payload).eq('id', id)).pipe(
             map(({ error }) => {
                 if (error) throw error;
             })
@@ -62,15 +64,10 @@ export class SupabaseRepairRepository extends RepairRepository {
     }
 
     getByTrackingCode(code: string): Observable<Repair> {
-        // Option A: Use RPC if secure access needed (like public tracking)
-        // Option B: Direct query for admin usage
-        // Since this repository might be used by admin, direct query is fine if logged in.
-        // For public tracking we already have a specialized RPC call in TrackingService (which could be refactored here too, but let's keep separation of concerns: Public vs Admin Repo, or Unified Repo).
-        // Let's implement direct query for now.
         return from(this.supabase.from('repairs').select('*').eq('tracking_code', code).single()).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return data as unknown as Repair;
+                return this.mapFromDb(data);
             })
         );
     }
@@ -80,7 +77,7 @@ export class SupabaseRepairRepository extends RepairRepository {
         const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
         const filePath = `${fileName}`;
 
-        const { error: uploadError, data } = await this.supabase.storage
+        const { error: uploadError } = await this.supabase.storage
             .from('repair-images')
             .upload(filePath, file);
 
@@ -91,5 +88,37 @@ export class SupabaseRepairRepository extends RepairRepository {
             .getPublicUrl(filePath);
 
         return publicUrlData.publicUrl;
+    }
+
+    private mapFromDb(data: any): Repair {
+        return {
+            ...data,
+            // Fallback: if device_brand is missing in DB but brand exists, use brand. 
+            // If device_brand is in DB, use it.
+            device_brand: data.device_brand || data.brand || 'Generic', 
+        } as Repair;
+    }
+
+    private mapToDb(entity: Partial<CreateRepairDto>): any {
+        // Destructure fields that do NOT exist in the 'repairs' table
+        const { device_brand, device_type, notes, ...rest } = entity;
+        
+        const payload: any = { ...rest };
+        
+        // Preserve Brand and Type by prepending to device_model if valid
+        // Schema only has 'device_model'
+        let model = payload.device_model || '';
+        if (device_brand && device_brand !== 'generic') {
+            model = `${device_brand} ${model}`;
+        }
+        if (device_type && device_type !== 'smartphone') {
+            model = `${model} (${device_type})`;
+        }
+        payload.device_model = model.trim();
+
+        // Ensure 'brand' is NOT in payload (in case it was added by previous logic)
+        delete payload.brand; 
+        
+        return payload;
     }
 }

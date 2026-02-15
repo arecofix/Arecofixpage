@@ -78,8 +78,8 @@
                     <!-- Image -->
                     <div class="h-32 md:h-52 overflow-hidden relative">
                         <div class="absolute inset-0 bg-linear-to-t from-gray-900/80 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity"></div>
-                        <img [src]="service.image" [alt]="service.title" 
-                             class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                        <img [ngSrc]="service.image" [alt]="service.title" 
+                             class="object-cover transform group-hover:scale-105 transition-transform duration-700" fill sizes="(max-width: 768px) 50vw, 33vw">
                         
                         <!-- Icon Badge -->
                         <div class="absolute bottom-2 left-2 md:bottom-4 md:left-4 z-20 w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-sm md:text-xl">

@@ -1,0 +1,99 @@
+
+> arecofix@0.0.0 build
+> ng build --configuration production
+
+[33m❯[39m Building...
+/*! 🌼 daisyUI 5.5.14 */
+[32m✔[39m Building...
+[35mBrowser bundles[39m     
+[1mInitial chunk files[22m [2m | [22m[1mNames[22m                    [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-ZXVM333G.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m391.23 kB[39m[2m | [22m              [36m114.30 kB[39m
+[32mstyles-FRECV6JH.css[39m [2m | [22m[2mstyles[22m                   [2m | [22m[36m390.20 kB[39m[2m | [22m               [36m49.85 kB[39m
+[32mchunk-HVVBLFLG.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m177.45 kB[39m[2m | [22m               [36m52.22 kB[39m
+[32mchunk-LX7IVDBP.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m173.51 kB[39m[2m | [22m               [36m38.64 kB[39m
+[32mchunk-HXJBHWUE.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m154.77 kB[39m[2m | [22m               [36m39.82 kB[39m
+[32mmain-EIS2MFVC.js[39m    [2m | [22m[2mmain[22m                     [2m | [22m [36m44.27 kB[39m[2m | [22m               [36m14.50 kB[39m
+[32mchunk-F4YL3ILH.js[39m   [2m | [22m[2m-[22m                        [2m | [22m  [36m2.42 kB[39m[2m | [22m                [36m1.22 kB[39m
+[32mchunk-EUDIZSHU.js[39m   [2m | [22m[2m-[22m                        [2m | [22m  [36m2.33 kB[39m[2m | [22m              [36m764 bytes[39m
+[32mchunk-NPXC4OGH.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m770 bytes[39m[2m | [22m              [36m770 bytes[39m
+[32mchunk-EMIKZBXR.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m709 bytes[39m[2m | [22m              [36m709 bytes[39m
+[32mchunk-7CGTOI24.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m618 bytes[39m[2m | [22m              [36m618 bytes[39m
+[32mchunk-GS7IC3O3.js[39m   [2m | [22m[2m-[22m                        [2m | [22m[36m402 bytes[39m[2m | [22m              [36m402 bytes[39m
+[32mchunk-FBYEXMDY.js[39m   [2m | [22m[2m-[22m                        [2m | [22m [36m30 bytes[39m[2m | [22m               [36m30 bytes[39m
+[32mchunk-AWQLWEOW.js[39m   [2m | [22m[2m-[22m                        [2m | [22m [36m30 bytes[39m[2m | [22m               [36m30 bytes[39m
+[32mchunk-MQUL3GSM.js[39m   [2m | [22m[2m-[22m                        [2m | [22m [36m30 bytes[39m[2m | [22m               [36m30 bytes[39m
+[32mchunk-6KLMDNRR.js[39m   [2m | [22m[2m-[22m                        [2m | [22m [36m25 bytes[39m[2m | [22m               [36m25 bytes[39m
+
+[1m [22m                   [2m | [22m[1mInitial total[22m            [2m | [22m  [1m1.34 MB[22m[2m | [22m              [1m313.92 kB[22m
+
+[1mLazy chunk files[22m    [2m | [22m[1mNames[22m                    [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-QEV7YA3F.js[39m   [2m | [22m[2madmin-product-form-page[22m  [2m | [22m [36m84.12 kB[39m[2m | [22m               [36m20.99 kB[39m
+[32mchunk-CYSYCQZM.js[39m   [2m | [22m[2mpublic-routes[22m            [2m | [22m [36m72.86 kB[39m[2m | [22m               [36m17.44 kB[39m
+[32mchunk-EGU3CJLD.js[39m   [2m | [22m[2mcelular-landing-component[22m[2m | [22m [36m62.18 kB[39m[2m | [22m               [36m16.57 kB[39m
+[32mchunk-CR5KUUIQ.js[39m   [2m | [22m[2m-[22m                        [2m | [22m [36m47.02 kB[39m[2m | [22m                [36m9.46 kB[39m
+[32mchunk-ODNQ3HBP.js[39m   [2m | [22m[2mpost-page[22m                [2m | [22m [36m40.55 kB[39m[2m | [22m               [36m10.54 kB[39m
+[32mchunk-FQ2O6VIL.js[39m   [2m | [22m[2mcourse-detail-component[22m  [2m | [22m [36m40.45 kB[39m[2m | [22m               [36m10.46 kB[39m
+[32mchunk-M6WDY5VB.js[39m   [2m | [22m[2mportfolio[22m                [2m | [22m [36m37.41 kB[39m[2m | [22m                [36m9.64 kB[39m
+[32mchunk-6M76TRTG.js[39m   [2m | [22m[2mgsm-routes[22m               [2m | [22m [36m29.92 kB[39m[2m | [22m                [36m6.89 kB[39m
+[32mchunk-ACDVKGJD.js[39m   [2m | [22m[2mregister-component[22m       [2m | [22m [36m25.12 kB[39m[2m | [22m                [36m6.17 kB[39m
+[32mchunk-QYWBJ23J.js[39m   [2m | [22m[2madmin-repair-form-page[22m   [2m | [22m [36m24.89 kB[39m[2m | [22m                [36m6.40 kB[39m
+[32mchunk-JED5NKBH.js[39m   [2m | [22m[2madmin-products-page[22m      [2m | [22m [36m22.90 kB[39m[2m | [22m                [36m6.38 kB[39m
+[32mchunk-JS47RQOJ.js[39m   [2m | [22m[2mnosotros[22m                 [2m | [22m [36m22.67 kB[39m[2m | [22m                [36m6.82 kB[39m
+[32mchunk-TJUPKEXD.js[39m   [2m | [22m[2mrepuestos[22m                [2m | [22m [36m20.26 kB[39m[2m | [22m                [36m6.52 kB[39m
+[32mchunk-BT6U7PE3.js[39m   [2m | [22m[2mcontacto[22m                 [2m | [22m [36m19.37 kB[39m[2m | [22m                [36m5.70 kB[39m
+[32mchunk-YYW5U3F6.js[39m   [2m | [22m[2mcursos[22m                   [2m | [22m [36m19.27 kB[39m[2m | [22m                [36m5.83 kB[39m
+[2m...and 90 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+
+[35mServer bundles[39m      
+[1mInitial chunk files[22m [2m | [22m[1mNames[22m                    [2m | [22m [1mRaw size[22m
+[32mserver.mjs[39m          [2m | [22m[2mserver[22m                   [2m | [22m[36m806.55 kB[39m[2m | [22m                       
+[32mchunk-BPSXMOJJ.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m455.04 kB[39m[2m | [22m                       
+[32mchunk-JZRXQLTN.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m391.27 kB[39m[2m | [22m                       
+[32mpolyfills.server.mjs[39m[2m | [22m[2mpolyfills.server[22m         [2m | [22m[36m233.25 kB[39m[2m | [22m                       
+[32mchunk-BAGDDTKY.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m196.25 kB[39m[2m | [22m                       
+[32mchunk-BFFH3QLP.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m173.54 kB[39m[2m | [22m                       
+[32mchunk-PRNJTVVW.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m155.09 kB[39m[2m | [22m                       
+[32mchunk-NBZ3MTX5.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m  [36m2.45 kB[39m[2m | [22m                       
+[32mchunk-ADSAOPW5.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m  [36m2.38 kB[39m[2m | [22m                       
+[32mchunk-N7QBYMCK.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m  [36m1.36 kB[39m[2m | [22m                       
+[32mchunk-HBIEB3YV.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m804 bytes[39m[2m | [22m                       
+[32mchunk-5JZFI5SA.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m744 bytes[39m[2m | [22m                       
+[32mmain.server.mjs[39m     [2m | [22m[2mmain.server[22m              [2m | [22m[36m742 bytes[39m[2m | [22m                       
+[32mchunk-KU444SH4.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m[36m436 bytes[39m[2m | [22m                       
+[32mchunk-I7SKRB6J.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m [36m63 bytes[39m[2m | [22m                       
+[32mchunk-QENMRFWU.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m [36m63 bytes[39m[2m | [22m                       
+[32mchunk-WUMV5ZNI.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m [36m63 bytes[39m[2m | [22m                       
+[32mchunk-ACF32YXE.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m [36m58 bytes[39m[2m | [22m                       
+
+[1mLazy chunk files[22m    [2m | [22m[1mNames[22m                    [2m | [22m [1mRaw size[22m
+[32mchunk-QM54ZVNS.mjs[39m  [2m | [22m[2madmin-product-form-page[22m  [2m | [22m [36m84.17 kB[39m[2m | [22m                       
+[32mchunk-K6FZJMCT.mjs[39m  [2m | [22m[2mpublic-routes[22m            [2m | [22m [36m74.41 kB[39m[2m | [22m                       
+[32mchunk-GEVZKJFP.mjs[39m  [2m | [22m[2mcelular-landing-component[22m[2m | [22m [36m62.22 kB[39m[2m | [22m                       
+[32mchunk-4NLTOKUU.mjs[39m  [2m | [22m[2m-[22m                        [2m | [22m [36m47.06 kB[39m[2m | [22m                       
+[32mchunk-SHQHGR5T.mjs[39m  [2m | [22m[2mpost-page[22m                [2m | [22m [36m40.59 kB[39m[2m | [22m                       
+[32mchunk-LUHNSOH4.mjs[39m  [2m | [22m[2mcourse-detail-component[22m  [2m | [22m [36m40.49 kB[39m[2m | [22m                       
+[32mchunk-JPSOTPSJ.mjs[39m  [2m | [22m[2mportfolio[22m                [2m | [22m [36m37.45 kB[39m[2m | [22m                       
+[32mchunk-MPN7NPWO.mjs[39m  [2m | [22m[2mgsm-routes[22m               [2m | [22m [36m29.96 kB[39m[2m | [22m                       
+[32mchunk-K7TVXUFO.mjs[39m  [2m | [22m[2mregister-component[22m       [2m | [22m [36m25.16 kB[39m[2m | [22m                       
+[32mchunk-H3IJHDFU.mjs[39m  [2m | [22m[2madmin-repair-form-page[22m   [2m | [22m [36m24.93 kB[39m[2m | [22m                       
+[32mchunk-FGRUZNBJ.mjs[39m  [2m | [22m[2madmin-products-page[22m      [2m | [22m [36m22.95 kB[39m[2m | [22m                       
+[32mchunk-5ZUNP33U.mjs[39m  [2m | [22m[2mnosotros[22m                 [2m | [22m [36m22.71 kB[39m[2m | [22m                       
+[32mchunk-RJRS3LXD.mjs[39m  [2m | [22m[2mrepuestos[22m                [2m | [22m [36m20.31 kB[39m[2m | [22m                       
+[32mchunk-V54XHHBW.mjs[39m  [2m | [22m[2mcontacto[22m                 [2m | [22m [36m19.41 kB[39m[2m | [22m                       
+[32mchunk-PYATL4S6.mjs[39m  [2m | [22m[2mcursos[22m                   [2m | [22m [36m19.32 kB[39m[2m | [22m                       
+[2m...and 91 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+[35mPrerendered 0 static routes.[39m
+Application bundle generation failed. [13.735 seconds] - 2026-02-14T22:46:35.485Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mFile 'server.ts' not found in TypeScript compilation.[0m [1m[35m[plugin angular-compiler][0m
+
+  The file will be bundled and included in the output but will not be type-checked at build time. To remove this message you can add the file to the TypeScript program via the 'files' or 'include' property.
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mAn error occurred while extracting routes.
+
+NG0401[0m
+
+[39m[22m

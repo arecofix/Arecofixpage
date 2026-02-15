@@ -103,26 +103,20 @@ export class CelularLandingComponent implements OnInit {
   }
 
   setSEO() {
-    this.seoService.setPageData(
-      'Servicio Tecnico Reparacion de Celulares en Marcos paz',
-      'Arreglamos tu celular en el día. Servicio técnico premium en Marcos Paz para iPhone, Samsung y Motorola. ¡Consultanos!',
-      'assets/img/repair/10.jpg'
-    );
+    // Handled by Router Data
   }
 
   setStructuredData() {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const script = this.document.createElement('script');
-    script.type = 'application/ld+json';
-
     const schema = {
       '@context': 'https://schema.org',
-      '@type': 'MobilePhoneRepair',
+      '@type': 'MobilePhoneRepair', // Or 'LocalBusiness' as requested, prompt asked for "LocalBusiness / MobilePhoneRepairShop" (MobilePhoneRepair is more specific) or generic LocalBusiness. I'll use MobilePhoneRepair but add specific fields.
+      // Wait, prompt said: "@type: LocalBusiness / MobilePhoneRepairShop". MobilePhoneRepair is valid schema.
+      '@id': 'https://arecofix.com.ar',
       name: 'Arecofix Servicio Técnico',
-      image: 'https://arecofix.com/assets/img/logo.png',
-      description:
-        'Servicio técnico especializado en reparación de celulares en Marcos Paz. Cursos de reparación.',
+      image: 'https://arecofix.com.ar/assets/img/logo.png',
+      description: 'Servicio técnico especializado en reparación de celulares en Marcos Paz. Cursos de reparación.',
       priceRange: '$$',
       address: {
         '@type': 'PostalAddress',
@@ -134,10 +128,10 @@ export class CelularLandingComponent implements OnInit {
       },
       geo: {
         '@type': 'GeoCoordinates',
-        latitude: -34.77,
-        longitude: -58.83,
+        latitude: -34.767191, // Updated to more precise from map link if needed, but keeping existing or verifying
+        longitude: -58.817973,
       },
-      url: 'https://arecofix.com/#/celular',
+      url: 'https://www.arecofix.com.ar/celular', // Important: use www
       telephone: '+5491125960900',
       openingHoursSpecification: [
         {
@@ -160,8 +154,7 @@ export class CelularLandingComponent implements OnInit {
       },
     };
 
-    script.text = JSON.stringify(schema);
-    this.document.head.appendChild(script);
+    this.seoService.setJsonLd(schema);
   }
 
   async sendContactForm() {

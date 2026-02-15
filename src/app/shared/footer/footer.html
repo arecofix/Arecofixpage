@@ -56,7 +56,7 @@
 
         <!-- Share Buttons -->
         <div class="mt-6 w-full text-center lg:text-left">
-          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Compartir esta página</h4>
+          <h4 class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-3">Compartir esta página</h4>
           <div class="flex gap-3 flex-wrap justify-center lg:justify-start">
             <button (click)="shareOn('facebook')"
               class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all"
@@ -106,7 +106,7 @@
             </li>
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-phone text-blue-500"></i>
-              <a href="tel:+542326403673" class="hover:text-blue-400 transition">+54 11 2596-0900</a>
+              <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="hover:text-blue-400 transition">+{{ whatsappNumber }}</a>
             </li>
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-envelope text-blue-500"></i>
@@ -120,7 +120,7 @@
     </div>
 
     <!-- Copyright -->
-    <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 border-t border-gray-200 dark:border-white/5 mt-2">
+    <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-white/5 mt-2">
       <p>
         <a routerLink="/portfolio" class="hover:text-blue-400 transition hover-scale inline-block">
           &copy; {{ currentYear }} <span class="font-bold text-gradient-premium">Arecofix</span>. Todos los derechos reservados.

@@ -34,11 +34,11 @@ export class ProductsIndexPage implements OnInit {
     }
 
     private setSeoData() {
-        this.seoService.setPageData(
-            'Productos - Celulares y Repuestos',
-            'Explora nuestra selección de celulares nuevos y usados, y encuentra los repuestos que necesitas en Arecofix.',
-            'assets/img/brands/logo/logo-normal1.PNG' // Default or specific image
-        );
+        this.seoService.setPageData({
+            title: 'Productos - Celulares y Repuestos',
+            description: 'Explora nuestra selección de celulares nuevos y usados, y encuentra los repuestos que necesitas en Arecofix.',
+            imageUrl: 'assets/img/brands/logo/logo-normal1.PNG'
+        });
     }
 
     private async loadData() {

@@ -70,11 +70,11 @@ export class NosotrosComponent implements OnInit {
   private seoService = inject(SeoService);
   
   ngOnInit() {
-    this.seoService.setPageData(
-      'Sobre Nosotros',
-      'Más que una empresa de software. Somos un equipo apasionado por transformar negocios a través de la tecnología en Marcos Paz y el mundo.',
-      'assets/img/branding/og-nosotros.jpg'
-    );
+    this.seoService.setPageData({
+      title: 'Sobre Nosotros',
+      description: 'Más que una empresa de software. Somos un equipo apasionado por transformar negocios a través de la tecnología en Marcos Paz y el mundo.',
+      imageUrl: 'assets/img/branding/og-nosotros.jpg'
+    });
   }
 
   expandedFAQ: number | null = null;
