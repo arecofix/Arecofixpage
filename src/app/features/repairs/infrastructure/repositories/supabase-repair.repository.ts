@@ -95,7 +95,7 @@ export class SupabaseRepairRepository extends RepairRepository {
             ...data,
             // Fallback: if device_brand is missing in DB but brand exists, use brand. 
             // If device_brand is in DB, use it.
-            device_brand: data.device_brand || data.brand || 'Generic', 
+            device_brand: data.device_brand || data.brand || 'generic', 
         } as Repair;
     }
 
@@ -108,7 +108,7 @@ export class SupabaseRepairRepository extends RepairRepository {
         // Preserve Brand and Type by prepending to device_model if valid
         // Schema only has 'device_model'
         let model = payload.device_model || '';
-        if (device_brand && device_brand !== 'generic') {
+        if (device_brand && device_brand.toLowerCase() !== 'generic') {
             model = `${device_brand} ${model}`;
         }
         if (device_type && device_type !== 'smartphone') {

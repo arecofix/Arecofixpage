@@ -1,0 +1,29 @@
+# Archivo robots.txt para arecofix.com.ar
+# Permitir acceso general a los rastreadores
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /assets/download/
+Disallow: /datab/
+
+# Optimización para AI Bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Directivas específicas para Google
+User-agent: Googlebot
+Allow: /
+
+# Directivas específicas para Bing
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
+Sitemap: https://www.arecofix.com.ar/sitemap.xml
+
+# Velocidad de rastreo (opcional)
+Crawl-delay: 1

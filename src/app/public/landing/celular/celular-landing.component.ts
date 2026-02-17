@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule, DOCUMENT, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -58,6 +59,8 @@ interface GalleryItem {
   templateUrl: './celular-landing.component.html',
 })
 export class CelularLandingComponent implements OnInit {
+  public sanitizer = inject(DomSanitizer);
+  safeMapUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(LOCATION_DATA.mapEmbedUrl);
   private seoService = inject(SeoService);
   private contactService = inject(ContactService);
   private notificationService = inject(NotificationService);
