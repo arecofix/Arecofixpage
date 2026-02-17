@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/admin/sales/admin-sales.routes.ts"],
-  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_SALES_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Ventas',\r\n    loadComponent: () => import('./admin-sales-page').then(m => m.AdminSalesPage)\r\n  },\r\n  {\r\n    path: 'invoices',\r\n    title: 'Facturación',\r\n    loadComponent: () => import('./admin-invoices-page').then(m => m.AdminInvoicesPage)\r\n  },\r\n  {\r\n    path: 'invoices/:id',\r\n    title: 'Ver Factura',\r\n    loadComponent: () => import('./admin-invoice-detail-page').then(m => m.AdminInvoiceDetailPage)\r\n  }\r\n];\r\n"],
-  "mappings": ";;;AAEO,IAAM,qBAA6B;EACxC;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAoB,EAAE,KAAK,OAAK,EAAE,cAAc;;EAE9E;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAuB,EAAE,KAAK,OAAK,EAAE,iBAAiB;;EAEpF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA6B,EAAE,KAAK,OAAK,EAAE,sBAAsB;;;",
-  "names": []
-}
