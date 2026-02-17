@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/services/admin-services.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_SERVICES_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Servicios',\r\n    loadComponent: () => import('./admin-services-page').then(m => m.AdminServicesPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Servicio',\r\n    loadComponent: () => import('./admin-service-form-page').then(m => m.AdminServiceFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Servicio',\r\n    loadComponent: () => import('./admin-service-form-page').then(m => m.AdminServiceFormPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;AAEO,IAAM,wBAAgC;EAC3C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAuB,EAAE,KAAK,OAAK,EAAE,iBAAiB;;EAEpF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA2B,EAAE,KAAK,OAAK,EAAE,oBAAoB;;EAE3F;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA2B,EAAE,KAAK,OAAK,EAAE,oBAAoB;;;",
+  "names": []
+}

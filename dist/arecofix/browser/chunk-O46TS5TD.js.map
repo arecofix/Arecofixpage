@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/posts/admin-posts.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_POSTS_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Entradas',\r\n    loadComponent: () => import('./admin-posts-page').then(m => m.AdminPostsPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nueva Entrada',\r\n    loadComponent: () => import('./admin-post-form-page').then(m => m.AdminPostFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Entrada',\r\n    loadComponent: () => import('./admin-post-form-page').then(m => m.AdminPostFormPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;AAEO,IAAM,qBAA6B;EACxC;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAoB,EAAE,KAAK,OAAK,EAAE,cAAc;;EAE9E;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAwB,EAAE,KAAK,OAAK,EAAE,iBAAiB;;EAErF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAwB,EAAE,KAAK,OAAK,EAAE,iBAAiB;;;",
+  "names": []
+}

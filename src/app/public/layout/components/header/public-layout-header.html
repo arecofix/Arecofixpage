@@ -4,7 +4,7 @@
   <div class="navbar-start">
     <!-- Menú hamburguesa (Mobile) -->
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden text-gray-900 dark:text-white opacity-100 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Abrir menú">
+      <div tabindex="0" role="button" class="btn btn-ghost xl:hidden text-gray-900 dark:text-white opacity-100 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Abrir menú">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
         </svg>
@@ -116,18 +116,18 @@
          <img src="/assets/img/brands/logo/Logo (2).png" alt="Arecofix Logo" class="h-9 w-auto object-contain hidden dark:block drop-shadow-lg" height="36" width="120" />
          <img src="/assets/img/brands/logo/logo-normal1.PNG" alt="Arecofix Logo" class="h-9 w-auto object-contain dark:hidden drop-shadow-md" height="36" width="120" />
       </div>
-      <span class="font-bold text-xl text-gray-900 dark:text-white font-heading tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ appName }}</span>
+      <span class="font-bold text-lg xl:text-xl text-gray-900 dark:text-white font-heading tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-[140px] xl:max-w-none">{{ appName }}</span>
     </a>
   </div>
 
   <!-- NAVBAR CENTER (desktop) -->
-  <div class="navbar-center hidden lg:flex">
+  <div class="navbar-center hidden xl:flex">
     <ul class="menu menu-horizontal px-1 gap-2 items-center">
-      @for (item of menuItems(); track $index) {
+      @for (item of visibleMenuItems(); track item.id) {
       <li class="h-full flex items-center">
         @if (item.children && item.children.length > 0) {
           <div class="dropdown dropdown-hover group/dropdown">
-            <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl flex items-center gap-2 font-medium px-4 h-10 hover-lift" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold" [routerLinkActiveOptions]="{exact: false}">
+            <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl flex items-center gap-2 font-medium px-3 h-10 hover-lift whitespace-nowrap" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold" [routerLinkActiveOptions]="{exact: false}">
               <i [class]="item.icon"></i> {{item.title}}
               <i class="fas fa-chevron-down text-[10px] opacity-50 group-hover/dropdown:rotate-180 transition-transform duration-300"></i>
             </a>
@@ -142,7 +142,7 @@
             </ul>
           </div>
         } @else {
-          <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl font-medium px-4 h-10 hover-lift flex items-center gap-2" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold"
+          <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl font-medium px-3 h-10 hover-lift flex items-center gap-2 whitespace-nowrap" [routerLink]="item.path" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold"
             [routerLinkActiveOptions]="{exact: true}">
             <i [class]="item.icon"></i> {{item.title}}
           </a>
@@ -151,19 +151,41 @@
       }
 
       <li class="h-full flex items-center">
-        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl font-medium px-4 h-10 hover-lift flex items-center gap-2" routerLink="productos/destacados" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fas fa-star text-blue-500"></i> Destacado
+        <a class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl font-medium px-3 2xl:px-4 h-10 hover-lift flex items-center gap-2" routerLink="productos/destacados" routerLinkActive="text-blue-600 dark:text-blue-400! bg-blue-50 dark:bg-white/5 font-bold"
+          [routerLinkActiveOptions]="{exact: true}" title="Destacados">
+          <i class="fas fa-star text-blue-500"></i> <span class="hidden 2xl:inline">Destacados</span>
         </a>
       </li>
 
       <!-- More Items Dropdown for remaining links to keep navbar clean -->
       <li class="h-full flex items-center">
         <div class="dropdown dropdown-hover group/dropdown">
-           <div tabindex="0" role="button" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl flex items-center gap-2 font-medium px-4 h-10 hover-lift">
+           <div tabindex="0" role="button" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all rounded-xl flex items-center gap-2 font-medium px-3 xl:px-4 h-10 hover-lift">
               <i class="fas fa-ellipsis-h"></i> Más
            </div>
-           <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl w-52 mt-2 text-gray-600 dark:text-gray-300 animate-fade-in-up">
+           <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl w-64 mt-2 text-gray-600 dark:text-gray-300 animate-fade-in-up max-h-[80vh] overflow-y-auto">
+              <!-- Hidden Categories -->
+              @for (item of hiddenMenuItems(); track item.id) {
+                <li>
+                  @if (item.children && item.children.length > 0) {
+                    <details>
+                      <summary class="hover:bg-blue-50 dark:hover:bg-white/10 rounded-lg py-2 font-medium">
+                        <i [class]="item.icon + ' w-5 text-center'"></i> {{item.title}}
+                      </summary>
+                      <ul>
+                        @for (child of item.children; track child.path) {
+                          <li><a [routerLink]="child.path">{{child.title}}</a></li>
+                        }
+                      </ul>
+                    </details>
+                  } @else {
+                    <a class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-2" [routerLink]="item.path">
+                      <i [class]="item.icon + ' w-5 text-center'"></i> {{item.title}}
+                    </a>
+                  }
+                </li>
+              }
+              <div class="divider my-1"></div>
               <li>
                 <a class="hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-white rounded-lg py-2" routerLink="categories" routerLinkActive="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-white/5">
                   <i class="fas fa-tag w-5 text-center"></i> Categorías
@@ -191,13 +213,13 @@
   </div>
 
   <!-- NAVBAR END -->
-  <div class="navbar-end flex items-center gap-2 lg:gap-4">
+  <div class="navbar-end flex items-center gap-2 xl:gap-4">
     <!-- Buscador desktop -->
-    <div class="hidden lg:flex items-center gap-2 relative group">
+    <div class="hidden xl:flex items-center gap-2 relative group">
       <div class="join transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500/50 rounded-full">
         <input type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" (input)="onSearchInput()"
-          class="input input-sm input-bordered rounded-l-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border-transparent focus:border-transparent w-48 focus:w-64 transition-all duration-300 placeholder-gray-500" />
-        <button class="btn btn-sm btn-primary rounded-r-full border-none text-white px-4" aria-label="Buscar">
+          class="input input-sm input-bordered rounded-l-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border-transparent focus:border-transparent w-28 xl:w-40 2xl:w-64 focus:w-48 xl:focus:w-64 transition-all duration-300 placeholder-gray-500 text-xs xl:text-sm" />
+        <button class="btn btn-sm btn-primary rounded-r-full border-none text-white px-3 xl:px-4" aria-label="Buscar">
           <i class="fas fa-search"></i>
         </button>
       </div>

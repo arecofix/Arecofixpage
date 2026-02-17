@@ -21,21 +21,63 @@ export const publicRoutes: Routes = [
         }
       },
       {
-        title: 'Servicio Técnico de Celulares en Marcos Paz',
+        title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
         path: 'celular',
         loadComponent: () => import('@app/public/landing/celular/celular-landing.component').then(m => m.CelularLandingComponent),
         data: {
           seo: {
             title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
             description: 'Arreglo de pantallas, baterías y pines de carga en el acto. Calidad garantizada en Marcos Paz.',
-            imageUrl: 'assets/img/og-celulares.jpg',
-            keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix'
+            imageUrl: 'assets/img/branding/og-celulares.jpg',
+            keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix',
+            schema: {
+              '@context': 'https://schema.org',
+              '@type': 'MobilePhoneRepair',
+              '@id': 'https://arecofix.com.ar',
+              'name': 'Arecofix Servicio Técnico',
+              'image': 'https://arecofix.com.ar/assets/img/branding/logo/logo-normal1.PNG',
+              'description': 'Servicio técnico especializado en reparación de celulares en Marcos Paz. Cursos de reparación.',
+              'priceRange': '$$',
+              'address': {
+                '@type': 'PostalAddress',
+                'streetAddress': 'Jorge Newbery 69',
+                'addressLocality': 'Marcos Paz',
+                'addressRegion': 'Buenos Aires',
+                'postalCode': '1727',
+                'addressCountry': 'AR'
+              },
+              'geo': {
+                '@type': 'GeoCoordinates',
+                'latitude': -34.767191,
+                'longitude': -58.817973
+              },
+              'url': 'https://www.arecofix.com.ar/celular',
+              'telephone': '+5491125960900',
+              'openingHoursSpecification': [
+                {
+                  '@type': 'OpeningHoursSpecification',
+                  'dayOfWeek': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                  'opens': '09:00',
+                  'closes': '19:00'
+                },
+                {
+                  '@type': 'OpeningHoursSpecification',
+                  'dayOfWeek': 'Saturday',
+                  'opens': '09:00',
+                  'closes': '13:00'
+                }
+              ],
+              'aggregateRating': {
+                '@type': 'AggregateRating',
+                'ratingValue': '4.8',
+                'reviewCount': '120'
+              }
+            }
           }
         }
       },
       {
         title: 'Categories',
-
         path: 'categories',
         loadChildren: () => import('@app/public/categories/categories.routes'),
       },
@@ -79,12 +121,38 @@ export const publicRoutes: Routes = [
         loadChildren: () => import('@app/public/gsm/gsm.routes').then(m => m.gsmRoutes),
       },
       {
-        title: 'Portfolio',
+        title: 'Portfolio - Ezequiel Enrico Areco | Fullstack Engineer',
         path: 'portfolio',
         loadComponent: () =>
           import('./portfolio/portfolio').then(
             (m) => m.PortfolioComponent
           ),
+        data: {
+            seo: {
+                title: 'Ezequiel Enrico Areco - Senior Backend & Fullstack Engineer | Portfolio',
+                description: 'Arquitecto de Soluciones Escalables & Ingeniero de Software. Experto en Node.js, Cloud, Clean Architecture y sistemas de alto rendimiento.',
+                imageUrl: 'assets/img/branding/logo/Logo (2).png',
+                keywords: 'software engineer, backend developer, clean architecture, node.js, cloud architect, ezequiel enrico areco, fullstack developer',
+                type: 'profile',
+                schema: {
+                  '@context': 'https://schema.org',
+                  '@type': 'Person',
+                  'name': 'Ezequiel Enrico Areco',
+                  'jobTitle': 'Senior Backend & Fullstack Engineer',
+                  'url': 'https://arecofix.com.ar/portfolio',
+                  'image': 'https://arecofix.com.ar/assets/img/branding/logo/Logo (2).png',
+                  'sameAs': [
+                    'https://www.linkedin.com/in/ezequiel-enrico/',
+                    'https://github.com/arecofix'
+                  ],
+                  'knowsAbout': ['Node.js', 'Angular', 'Cloud Architecture', 'System Design', 'Supabase', 'Docker', 'Clean Architecture'],
+                  'worksFor': {
+                    '@type': 'Organization',
+                    'name': 'Arecofix'
+                  }
+                }
+            }
+        }
       },
       {
         title: 'Nosotros',

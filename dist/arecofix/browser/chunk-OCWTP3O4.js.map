@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/messages/admin-messages.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_MESSAGES_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Mensajes',\r\n    loadComponent: () => import('./admin-messages-page').then(m => m.AdminMessagesPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;AAEO,IAAM,wBAAgC;EAC3C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAuB,EAAE,KAAK,OAAK,EAAE,iBAAiB;;;",
+  "names": []
+}

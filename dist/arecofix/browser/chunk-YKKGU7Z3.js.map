@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/components/pagination/pagination.service.ts"],
+  "sourcesContent": ["import { Injectable, inject } from '@angular/core';\r\nimport { toSignal } from '@angular/core/rxjs-interop';\r\nimport { ActivatedRoute } from '@angular/router';\r\nimport { map } from 'rxjs';\r\n\r\n@Injectable({\r\n  providedIn: 'root',\r\n})\r\nexport class PaginationService {\r\n  private activatedRoute: ActivatedRoute = inject(ActivatedRoute);\r\n\r\n  currentPage = toSignal(\r\n    this.activatedRoute.queryParamMap.pipe(\r\n      map((params)=>(params.get('_page')?+params.get('_page')! : 1)),\r\n      map((page)=>(isNaN(page) ? 1 : page))\r\n    ),{\r\n      initialValue:1\r\n    }\r\n  );\r\n}\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;AAQM,IAAO,oBAAP,MAAO,mBAAiB;EACpB,iBAAiC,OAAO,cAAc;EAE9D,cAAc,SACZ,KAAK,eAAe,cAAc,KAChC,IAAI,CAAC,WAAU,OAAO,IAAI,OAAO,IAAE,CAAC,OAAO,IAAI,OAAO,IAAK,CAAE,GAC7D,IAAI,CAAC,SAAQ,MAAM,IAAI,IAAI,IAAI,IAAK,CAAC,GACrC;IACA,cAAa;GACd;;qCATQ,oBAAiB;EAAA;4EAAjB,oBAAiB,SAAjB,mBAAiB,WAAA,YAFhB,OAAM,CAAA;;;sEAEP,mBAAiB,CAAA;UAH7B;WAAW;MACV,YAAY;KACb;;;",
+  "names": []
+}

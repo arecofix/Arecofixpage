@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/company/admin-company.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_COMPANY_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Empresa',\r\n    loadComponent: () => import('./admin-company-settings-page').then(m => m.AdminCompanySettingsPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;AAEO,IAAM,uBAA+B;EAC1C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA+B,EAAE,KAAK,OAAK,EAAE,wBAAwB;;;",
+  "names": []
+}

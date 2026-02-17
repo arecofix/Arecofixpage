@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/products/domain/repositories/brand.repository.ts"],
+  "sourcesContent": ["\r\nimport { Observable } from 'rxjs';\r\nimport { Brand } from '../entities/brand.entity';\r\n\r\nexport abstract class BrandRepository {\r\n    abstract getAll(orderBy?: { column: string; ascending?: boolean }): Observable<Brand[]>;\r\n    abstract getById(id: string): Observable<Brand>;\r\n    abstract create(brand: Partial<Brand>): Observable<Brand>;\r\n    abstract update(id: string, brand: Partial<Brand>): Observable<Brand>;\r\n    abstract delete(id: string): Observable<void>;\r\n}\r\n"],
+  "mappings": ";AAIM,IAAgB,kBAAhB,MAA+B;;",
+  "names": []
+}

@@ -9,8 +9,9 @@ export interface SeoData {
   title: string;
   description: string;
   imageUrl?: string;
-  type?: 'website' | 'product' | 'article';
+  type?: 'website' | 'product' | 'article' | 'profile';
   keywords?: string;
+  schema?: Record<string, any>;
 }
 
 const SEO_DATA_KEY = makeStateKey<SeoData>('SEO_DATA');
@@ -37,8 +38,6 @@ export class SeoService {
       const serverSeoData = this.transferState.get(SEO_DATA_KEY, null);
       if (serverSeoData) {
         this.setPageData(serverSeoData);
-        // Optional: clear state after use if needed, but keeping it is oftentimes safer
-        // this.transferState.remove(SEO_DATA_KEY);
       }
     }
 
@@ -58,6 +57,12 @@ export class SeoService {
         if (isPlatformServer(this.platformId)) {
           this.transferState.set(SEO_DATA_KEY, seoData);
         }
+      } else {
+        // Reset if no SEO data found for current route (optional, or keep previous?)
+        // Usually better to keep previous or have a default. 
+        // But resetData() is called inside setPageData().
+        // If we want to guarantee clean state for pages without SEO, we might call resetData() here,
+        // but that might wipe the default app title.
       }
     });
   }
@@ -78,6 +83,10 @@ export class SeoService {
     
     // Reset basic Open Graph type to website default
     this.metaService.updateTag({ property: 'og:type', content: 'website' });
+    this.metaService.removeTag('name="keywords"');
+
+    // Clear JSON-LD
+    this.clearJsonLd();
   }
   
   /**
@@ -85,7 +94,7 @@ export class SeoService {
    * This is the entry point for basic SEO configuration per page.
    */
   setPageData(data: SeoData) {
-    const { title, description, imageUrl, type = 'website', keywords } = data;
+    const { title, description, imageUrl, type = 'website', keywords, schema } = data;
     
     // 0. Reset previous specific tags
     this.resetData();
@@ -113,6 +122,11 @@ export class SeoService {
 
     // 5. Set Canonical URL
     this.setCanonicalUrl(this.router.url);
+
+    // 6. Set Structured Data (JSON-LD)
+    if (schema) {
+      this.setJsonLd(schema);
+    }
   }
 
   /**
@@ -165,6 +179,14 @@ export class SeoService {
     }
 
     script.text = JSON.stringify(schema);
+  }
+
+  clearJsonLd() {
+    const scriptId = 'json-ld-schema';
+    const script = this.document.getElementById(scriptId);
+    if (script) {
+      script.remove();
+    }
   }
 }
 

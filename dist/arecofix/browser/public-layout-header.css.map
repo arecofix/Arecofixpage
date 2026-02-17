@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["public-layout-header.ts"],
+  "sourcesContent": ["\n    :host {\n      display: block;\n      position: fixed;\n      top: 0;\n      left: 0;\n      right: 0;\n      z-index: 1000;\n      transition: transform 0.3s ease-in-out;\n      width: 100%;\n      will-change: transform;\n    }\n    :host.hidden-navbar {\n      transform: translateY(-100%) !important;\n    }\n  "],
+  "mappings": ";AACI;AACE,WAAA;AACA,YAAA;AACA,OAAA;AACA,QAAA;AACA,SAAA;AACA,WAAA;AACA,cAAA,UAAA,KAAA;AACA,SAAA;AACA,eAAA;AACF;AACA,KAAA,CAAA;AACE,aAAA,WAAA;AACF;",
+  "names": []
+}

@@ -98,63 +98,7 @@ export class CelularLandingComponent implements OnInit {
   sendingContact = false;
 
   ngOnInit() {
-    this.setSEO();
-    this.setStructuredData();
-  }
-
-  setSEO() {
-    // Handled by Router Data
-  }
-
-  setStructuredData() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const schema = {
-      '@context': 'https://schema.org',
-      '@type': 'MobilePhoneRepair', // Or 'LocalBusiness' as requested, prompt asked for "LocalBusiness / MobilePhoneRepairShop" (MobilePhoneRepair is more specific) or generic LocalBusiness. I'll use MobilePhoneRepair but add specific fields.
-      // Wait, prompt said: "@type: LocalBusiness / MobilePhoneRepairShop". MobilePhoneRepair is valid schema.
-      '@id': 'https://arecofix.com.ar',
-      name: 'Arecofix Servicio Técnico',
-      image: 'https://arecofix.com.ar/assets/img/logo.png',
-      description: 'Servicio técnico especializado en reparación de celulares en Marcos Paz. Cursos de reparación.',
-      priceRange: '$$',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Jorge Newbery 69',
-        addressLocality: 'Marcos Paz',
-        addressRegion: 'Buenos Aires',
-        postalCode: '1727',
-        addressCountry: 'AR',
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: -34.767191, // Updated to more precise from map link if needed, but keeping existing or verifying
-        longitude: -58.817973,
-      },
-      url: 'https://www.arecofix.com.ar/celular', // Important: use www
-      telephone: '+5491125960900',
-      openingHoursSpecification: [
-        {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          opens: '09:00',
-          closes: '19:00',
-        },
-        {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: 'Saturday',
-          opens: '09:00',
-          closes: '13:00',
-        },
-      ],
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.8',
-        reviewCount: '120',
-      },
-    };
-
-    this.seoService.setJsonLd(schema);
+    // SEO and Structured Data are now handled via Route Data and SeoService
   }
 
   async sendContactForm() {

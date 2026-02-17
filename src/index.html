@@ -2,59 +2,68 @@
 <html lang="es">
 
 <head>
+  <!-- Analytics Lazy Loader -->
   <script>
     (function() {
+      // Fix hash routing redirection
       if (window.location.hash && window.location.hash.startsWith('#/')) {
-        var newPath = window.location.hash.substring(1); // Remove '#'
+        var newPath = window.location.hash.substring(1);
         window.history.replaceState(null, '', newPath);
       }
 
-      // Monkey-patch document.createElement to add permissions policies to iframes created by third-party scripts (like Facebook Pixel)
+      // Monkey-patch generic iframe permissions
       var originalCreateElement = document.createElement;
       document.createElement = function(tagName) {
         var element = originalCreateElement.apply(document, arguments);
         if (tagName && tagName.toLowerCase() === 'iframe') {
-           // Grant permissions that FB Pixel often checks for
-           element.setAttribute('allow', 'attribution-reporting; browsing-topics; run-ad-auction; join-ad-interest-group; encrypted-media; autoplay');
+          element.setAttribute('allow', 'attribution-reporting; browsing-topics; run-ad-auction; join-ad-interest-group; encrypted-media; autoplay');
         }
         return element;
       };
+
+      // Lazy Load Analytics
+      var analyticsLoaded = false;
+      function loadAnalytics() {
+        if (analyticsLoaded) return;
+        analyticsLoaded = true;
+
+        // Google Tag Manager
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-NLVCRSJR');
+
+        // GTAG
+        var gtagScript = document.createElement('script');
+        gtagScript.async = true;
+        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
+        document.head.appendChild(gtagScript);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-N7DQDV8MED');
+
+        // Meta Pixel
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1304105440826069', { external_id: 'guest_user' });
+        fbq('track', 'PageView');
+      }
+
+      // Trigger on interaction or timeout
+      var events = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'];
+      events.forEach(function(e) { window.addEventListener(e, loadAnalytics, { once: true, passive: true }); });
+      setTimeout(loadAnalytics, 3500); // Fallback load after 3.5s
     })();
   </script>
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-NLVCRSJR');</script>
-  <!-- End Google Tag Manager -->
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-N7DQDV8MED');
-  </script>
-
-  <!-- Meta Pixel Code -->
-  <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1304105440826069', {
-    external_id: 'guest_user'
-  });
-  fbq('track', 'PageView');
-  </script>
-  <!-- End Meta Pixel Code -->
 
   <meta charset="utf-8">
   <title>Arecofix - Servicio Técnico de Celulares y Soluciones IT</title>

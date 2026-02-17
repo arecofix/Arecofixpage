@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/public/reservation/reservation-calendar.css"],
+  "sourcesContent": ["/* Animaciones */\r\nbutton {\r\n  transition: all 0.2s ease;\r\n}\r\n\r\n/* Efecto hover para días seleccionables */\r\nbutton:not(:disabled):hover {\r\n  transform: scale(1.05);\r\n}\r\n\r\n\r\n.h-10 {\r\n  height: 2.5rem;\r\n}"],
+  "mappings": ";AACA;AACE,cAAA,IAAA,KAAA;AACF;AAGA,MAAA,KAAA,UAAA;AACE,aAAA,MAAA;AACF;AAGA,CAAA;AACE,UAAA;AACF;",
+  "names": []
+}

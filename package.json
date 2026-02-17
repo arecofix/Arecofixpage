@@ -39,6 +39,7 @@
     "@capacitor/core": "^8.0.1",
     "@fortawesome/fontawesome-free": "^7.1.0",
     "@ionic/angular": "8.7.17",
+    "@mlc-ai/web-llm": "^0.2.80",
     "@supabase/supabase-js": "^2.91.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/express": "^5.0.6",

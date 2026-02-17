@@ -250,11 +250,22 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
     });
 
     // Sort root items
-    return rootItems.sort((a, b) => {
+    const sorted = rootItems.sort((a, b) => {
       if (a.title === 'Celulares') return -1;
       if (b.title === 'Celulares') return 1;
       return 0;
     });
+    return sorted;
+  });
+
+  public visibleMenuItems = computed(() => {
+    // Show only first 3 items on standard desktops to avoid overflow
+    return this.menuItems().slice(0, 3);
+  });
+
+  public hiddenMenuItems = computed(() => {
+    // The rest go into the "More" dropdown
+    return this.menuItems().slice(3);
   });
 
   async logout() {
