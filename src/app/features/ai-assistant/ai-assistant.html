@@ -1,7 +1,9 @@
 
 <!-- Toggler Button -->
-<button (click)="toggleChat()" 
-     class="fixed bottom-6 left-6 z-9999 w-14 h-14 md:w-16 md:h-16 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group">
+<button (click)="toggleChat()"
+     class="fixed bottom-6 left-6 z-9999 w-14 h-14 md:w-16 md:h-16 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group"
+     [attr.aria-label]="isOpen() ? 'Cerrar asistente de IA' : 'Abrir asistente de IA'"
+     aria-haspopup="dialog">
     <div class="absolute inset-0 rounded-full border border-white/20 animate-ping opacity-20" *ngIf="!isOpen()"></div>
     <!-- AI Icon -->
     <i class="fas fa-microchip text-2xl group-hover:rotate-12 transition-transform" *ngIf="!isOpen()"></i>

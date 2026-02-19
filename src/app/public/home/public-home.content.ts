@@ -344,7 +344,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             description: 'We collaborate with companies worldwide, offering top-tier talent in your time zone. Fluent English and Agile culture.',
             benefits: ['Fluent English', 'Agile Process', 'Full Commitment', 'International Quality'],
             cta: 'Hire Us',
-            image: 'assets/img/services/software-illustration.png'
+            image: 'assets/img/services/software-illustration.webp'
         },
         github: {
             title: 'Open Source',
@@ -373,7 +373,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
                     title: 'Hardware Lab',
                     description: 'Specialized Lab for mobile & console repairs (Argentina).',
                     icon: 'fas fa-microchip',
-                    image: 'assets/img/services/repair-illustration.png',
+                    image: 'assets/img/services/repair-illustration.webp',
                     cta: 'Go to Lab',
                     link: '/celular',
                     colorClass: 'blue'
@@ -382,7 +382,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
                     title: 'IT Academy',
                     description: 'Training the next generation of developers in LatAm.',
                     icon: 'fas fa-graduation-cap',
-                    image: 'assets/img/services/academy-illustration.png',
+                    image: 'assets/img/services/academy-illustration.webp',
                     cta: 'View Academy',
                     link: '/academy',
                     colorClass: 'green'
@@ -430,7 +430,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             title: 'Laboratorio de Electrónica',
             description: 'Servicio técnico especializado en microelectrónica y recuperación de dispositivos en Marcos Paz (Sede Argentina).',
             icon: 'fas fa-microchip',
-            image: 'assets/img/services/repair-illustration.png',
+            image: 'assets/img/services/repair-illustration.webp',
             cta: 'Ir al Laboratorio',
             link: '/celular',
             colorClass: 'blue'
@@ -439,7 +439,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             title: 'Arecofix Academy',
             description: 'Formación de talento IT de exportación. Cursos de programación y técnica.',
             icon: 'fas fa-graduation-cap',
-            image: 'assets/img/services/academy-illustration.png',
+            image: 'assets/img/services/academy-illustration.webp',
             cta: 'Ver Academia',
             link: '/academy',
             colorClass: 'green'
@@ -619,7 +619,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
         description: 'Somos tu partner tecnológico ideal. Ofrecemos desarrollo de software de calidad internacional, comunicación fluida y alineación horaria. Llevamos la ingeniería argentina al mundo.',
         benefits: ['Soporte Bilingüe', 'Zona Horaria GMT-3', 'Talento Senior', 'Costos Competitivos'],
         cta: 'Agendar Reunión',
-        image: 'assets/img/services/software-illustration.png'
+        image: 'assets/img/services/software-illustration.webp'
       },
       github: {
         title: 'Código Abierto',

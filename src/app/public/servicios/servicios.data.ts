@@ -80,7 +80,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-desktop',
                 features: ['Formateo y Windows', 'Limpieza de Virus', 'Ampliación de Memoria', 'Cambio de Fuente', 'Optimización'],
                 price: 'Desde $15.000',
-                image: 'assets/img/services/software-illustration.png',
+                image: 'assets/img/services/software-illustration.webp',
                 link: '/servicios/reparacion-computadoras'
             },
             {
@@ -91,7 +91,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-laptop',
                 features: ['Desbloqueo', 'Cambio de Pantalla', 'Teclados', 'Cargadores', 'Discos Sólidos'],
                 price: 'Desde $12.000',
-                image: 'assets/img/services/repair-illustration.png',
+                image: 'assets/img/services/repair-illustration.webp',
                 link: '/servicios/arreglo-netbooks'
             },
             {
@@ -124,7 +124,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-print',
                 features: ['Limpieza de Cabezales', 'Reseteo de Chips', 'Sistemas Continuos', 'Atascos de Papel', 'Mantenimiento'],
                 price: 'Consultar',
-                image: 'assets/img/services/repair-illustration.png',
+                image: 'assets/img/services/repair-illustration.webp',
                 link: '/servicios/reparacion-impresoras'
             },
             {
@@ -135,7 +135,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-helicopter',
                 features: ['Calibración de Gimbal', 'Reemplazo de Motores', 'Actualización de Firmware', 'Reparación de Carcasas', 'Diagnóstico de Vuelo'],
                 price: 'Consultar',
-                image: 'assets/img/services/repair-illustration.png',
+                image: 'assets/img/services/repair-illustration.webp',
                 link: '/servicios/reparacion-drones'
             },
             {
@@ -146,7 +146,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-video',
                 features: ['Cámaras IP/WiFi', 'Configuración DVR/NVR', 'Acceso Móvil', 'Detección de Movimiento', 'Mantenimiento'],
                 price: 'A Medida',
-                image: 'assets/img/services/software-illustration.png',
+                image: 'assets/img/services/software-illustration.webp',
                 link: '/servicios/instalacion-camaras-seguridad'
             },
             {
@@ -168,7 +168,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-brain',
                 features: ['Integración OpenAI/DeepSeek', 'Agentes Autónomos', 'Análisis Predictivo', 'Automatización de Procesos', 'RPA'],
                 price: 'Consultar',
-                image: 'assets/img/services/academy-illustration.png',
+                image: 'assets/img/services/academy-illustration.webp',
                 link: '/servicios/consultoria-ia'
             },
             {
@@ -179,7 +179,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-cloud',
                 features: ['Migración AWS/Azure', 'Docker & Kubernetes', 'CI/CD Pipelines', 'Optimización de Costos', 'Seguridad Cloud'],
                 price: 'Consultar',
-                image: 'assets/img/services/software-illustration.png',
+                image: 'assets/img/services/software-illustration.webp',
                 link: '/servicios/cloud-devops'
             },
             {
@@ -190,7 +190,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-car-battery',
                 features: ['Diagnóstico por Scanner', 'Reprogramación (Chiptuning)', 'Clonación de ECUs', 'Inmovilizadores', 'Airbag Reset'],
                 price: 'Consultar',
-                image: 'assets/img/services/repair-illustration.png',
+                image: 'assets/img/services/repair-illustration.webp',
                 link: '/servicios/reparacion-ecus'
             },
             {
@@ -201,7 +201,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-motorcycle',
                 features: ['Bobinados', 'Encendido Electrónico', 'Luces LED', 'Baterías', 'Sistemas de Carga'],
                 price: 'Consultar',
-                image: 'assets/img/services/repair-illustration.png',
+                image: 'assets/img/services/repair-illustration.webp',
                 link: '/servicios/electricidad-motos'
             },
             {
@@ -212,7 +212,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-tools',
                 features: ['Instalaciones Eléctricas', 'Reparación de Fugas', 'Tableros', 'Grifería', 'Urgencias 24hs'],
                 price: 'A Medida',
-                image: 'assets/img/services/repair-illustration.png',
+                image: 'assets/img/services/repair-illustration.webp',
                 link: '/servicios/electricidad-plomeria'
             }
         ],
@@ -251,7 +251,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-brain',
                 features: ['OpenAI/DeepSeek Integration', 'Autonomous Agents', 'Predictive Analysis', 'Process Automation', 'RPA'],
                 price: 'Consult',
-                image: 'assets/img/services/academy-illustration.png',
+                image: 'assets/img/services/academy-illustration.webp',
                 link: '/servicios/consultoria-ia'
             },
             {
@@ -273,7 +273,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-users',
                 features: ['Fullstack Developers', 'DevOps Engineers', 'QA Automation', 'UX/UI Designers', 'Scrum Masters'],
                 price: 'Per Hour/Month',
-                image: 'assets/img/services/software-illustration.png',
+                image: 'assets/img/services/software-illustration.webp',
                 link: '/servicios/staff-augmentation'
             },
             {
@@ -284,7 +284,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 icon: 'fa-cloud',
                 features: ['AWS/Azure Migration', 'Docker & Kubernetes', 'CI/CD Pipelines', 'Cost Optimization', 'Cloud Security'],
                 price: 'Consult',
-                image: 'assets/img/services/software-illustration.png',
+                image: 'assets/img/services/software-illustration.webp',
                 link: '/servicios/cloud-devops'
             },
             {

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/admin/orders/admin-orders.routes.ts"],
-  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_ORDERS_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Pedidos',\r\n    loadComponent: () => import('./admin-orders-page').then(m => m.AdminOrdersPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Pedido',\r\n    loadComponent: () => import('./admin-order-form-page').then(m => m.AdminOrderFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Ver Pedido',\r\n    loadComponent: () => import('./admin-order-form-page').then(m => m.AdminOrderFormPage)\r\n  },\r\n  {\r\n    path: ':id/edit',\r\n    title: 'Editar Pedido',\r\n    loadComponent: () => import('./admin-order-form-page').then(m => m.AdminOrderFormPage)\r\n  }\r\n];\r\n"],
-  "mappings": ";;;;;AAEO,IAAM,sBAA8B;EACzC;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAqB,EAAE,KAAK,OAAK,EAAE,eAAe;;EAEhF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAyB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;EAEvF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAyB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;EAEvF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAyB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;;",
-  "names": []
-}
