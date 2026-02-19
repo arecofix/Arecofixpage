@@ -7,7 +7,8 @@ import { ToastComponent } from './shared/components/toast/toast.component';
 import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
-import posthog from 'posthog-js';
+import { ThemeService } from './core/services/theme.service';
+// import posthog from 'posthog-js';
 
 @Component({
   selector: 'app-root',
@@ -24,10 +25,14 @@ export class App implements OnInit {
   private analytics = inject(AnalyticsService);
   private logger = inject(LoggerService);
   private seoService = inject(SeoService);
+  private themeService = inject(ThemeService); // Ensures theme is applied before first paint
   private platformId = inject(PLATFORM_ID);
   private document = inject(DOCUMENT);
 
   ngOnInit() {
+    // Initialize SEO Service to listen for route changes
+    this.seoService.initialize();
+
     if (isPlatformBrowser(this.platformId)) {
       // SEO Redirection Rule
       if (this.document.location.hostname === 'celulares.arecofix.com.ar') {
@@ -37,7 +42,7 @@ export class App implements OnInit {
 
       // Send a test event to verify PostHog is working
       this.logger.debug('Sending test event to PostHog...');
-      posthog.capture('app_initialized', {
+      this.analytics.capture('app_initialized', {
         timestamp: new Date().toISOString(),
         message: 'Angular app successfully initialized'
       });

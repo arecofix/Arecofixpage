@@ -62,26 +62,70 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
         servicesDescription: 'Ingeniería de software de clase mundial y soporte técnico especializado.',
         services: [
             {
-                id: 101,
-                title: 'Instalación de Cámaras de Seguridad',
-                slug: 'instalacion-camaras-seguridad',
-                description: 'Sistemas de videovigilancia CCTV e IP. Monitoreo remoto 24/7.',
-                icon: 'fa-video',
-                features: ['Cámaras IP/WiFi', 'Configuración DVR/NVR', 'Acceso Móvil', 'Detección de Movimiento', 'Mantenimiento'],
-                price: 'A Medida',
-                image: 'assets/img/services/software-illustration.png',
-                link: '/servicios/instalacion-camaras-seguridad'
+                id: 1,
+                title: 'Laboratorio de Electronica | Servicio Tecnico de Celulares en Marcos paz',
+                slug: 'servicio-tecnico-de-celulares-en-marcos-paz',
+                description: 'Servicio técnico especializado en microelectrónica para móviles y laptops.',
+                icon: 'fa-microchip',
+                features: ['Reparación de Placas', 'Cambio de Pantallas', 'Recuperación de Datos', 'Reballing', 'Soldadura SMD'],
+                price: 'Desde $15,000',
+                image: 'assets/img/products/sam.webp',
+                link: '/posts/servicio-tecnico-de-celulares-en-marcos-paz'
             },
             {
-                id: 102,
-                title: 'Electricidad y Plomería',
-                slug: 'electricidad-plomeria',
-                description: 'Servicios integrales de mantenimiento y urgencias para hogar y comercio.',
-                icon: 'fa-tools',
-                features: ['Instalaciones Eléctricas', 'Reparación de Fugas', 'Tableros', 'Grifería', 'Urgencias 24hs'],
-                price: 'A Medida',
+                id: 107,
+                title: 'Reparación de Computadoras',
+                slug: 'reparacion-computadoras',
+                description: 'Diagnóstico y reparación de PC de escritorio y All-in-One. Optimización y limpieza.',
+                icon: 'fa-desktop',
+                features: ['Formateo y Windows', 'Limpieza de Virus', 'Ampliación de Memoria', 'Cambio de Fuente', 'Optimización'],
+                price: 'Desde $15.000',
+                image: 'assets/img/services/software-illustration.png',
+                link: '/servicios/reparacion-computadoras'
+            },
+            {
+                id: 108,
+                title: 'Arreglo y Mantenimiento de Netbooks',
+                slug: 'arreglo-netbooks',
+                description: 'Especialistas en netbooks escolares (Juana Manso, Conectar Igualdad) y personales.',
+                icon: 'fa-laptop',
+                features: ['Desbloqueo', 'Cambio de Pantalla', 'Teclados', 'Cargadores', 'Discos Sólidos'],
+                price: 'Desde $12.000',
                 image: 'assets/img/services/repair-illustration.png',
-                link: '/servicios/electricidad-plomeria'
+                link: '/servicios/arreglo-netbooks'
+            },
+            {
+                id: 2,
+                title: 'Reparación de Consolas',
+                slug: 'reparacion-de-consolas',
+                description: 'Servicio técnico para PlayStation, Xbox y Nintendo Switch.',
+                icon: 'fa-gamepad',
+                features: ['Mantenimiento Térmico', 'Reparación de HDMI', 'Reballing GPU', 'Fuentes de Poder', 'Joysticks'],
+                price: 'Desde $12,000',
+                image: 'assets/img/products/arreglo-consolas.webp',
+                link: '/servicios/reparacion-de-consolas'
+            },
+            {
+                id: 3,
+                title: 'Reparación de Tablets',
+                slug: 'reparacion-tablets',
+                description: 'Reparación especializada en tablets Android, iPad y Windows.',
+                icon: 'fa-tablet-alt',
+                features: ['Cambio de Pantalla', 'Cambio de Batería', 'Pin de Carga', 'Sistema Operativo', 'Recuperación de Datos'],
+                price: 'Desde $10,000',
+                image: 'assets/img/repair/13.jpg',
+                link: '/servicios/reparacion-tablets'
+            },
+            {
+                id: 106,
+                title: 'Reparación de Impresoras',
+                slug: 'reparacion-impresoras',
+                description: 'Servicio técnico multimarca para impresoras láser, inkjet y matriciales.',
+                icon: 'fa-print',
+                features: ['Limpieza de Cabezales', 'Reseteo de Chips', 'Sistemas Continuos', 'Atascos de Papel', 'Mantenimiento'],
+                price: 'Consultar',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/reparacion-impresoras'
             },
             {
                 id: 103,
@@ -95,26 +139,15 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 link: '/servicios/reparacion-drones'
             },
             {
-                id: 104,
-                title: 'Diagnóstico y Reparación de Ecus Automotriz',
-                slug: 'reparacion-ecus',
-                description: 'Laboratorio electrónico automotriz. Reprogramación y clonación.',
-                icon: 'fa-car-battery',
-                features: ['Diagnóstico por Scanner', 'Reprogramación (Chiptuning)', 'Clonación de ECUs', 'Inmovilizadores', 'Airbag Reset'],
-                price: 'Consultar',
-                image: 'assets/img/services/repair-illustration.png',
-                link: '/servicios/reparacion-ecus'
-            },
-            {
-                id: 105,
-                title: 'Electricidad de Motos',
-                slug: 'electricidad-motos',
-                description: 'Soluciones eléctricas especializadas para motocicletas de todas las cilindradas.',
-                icon: 'fa-motorcycle',
-                features: ['Bobinados', 'Encendido Electrónico', 'Luces LED', 'Baterías', 'Sistemas de Carga'],
-                price: 'Consultar',
-                image: 'assets/img/services/repair-illustration.png',
-                link: '/servicios/electricidad-motos'
+                id: 101,
+                title: 'Instalación de Cámaras de Seguridad',
+                slug: 'instalacion-camaras-seguridad',
+                description: 'Sistemas de videovigilancia CCTV e IP. Monitoreo remoto 24/7.',
+                icon: 'fa-video',
+                features: ['Cámaras IP/WiFi', 'Configuración DVR/NVR', 'Acceso Móvil', 'Detección de Movimiento', 'Mantenimiento'],
+                price: 'A Medida',
+                image: 'assets/img/services/software-illustration.png',
+                link: '/servicios/instalacion-camaras-seguridad'
             },
             {
                 id: 4,
@@ -122,7 +155,7 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 slug: 'desarrollo-de-software',
                 description: 'Desarrollo de aplicaciones web y móviles escalables para startups y corporaciones.',
                 icon: 'fa-mobile-alt',
-                features: ['Apps Móviles (iOS/Android)', 'Plataformas Web (Angular/React)', 'Sistemas de Gestión (ERP/CRM)', 'APIs & Microservicios', 'Modernización de Legacy'],
+                features: ['Apps Móviles (iOS/Android)', 'Plataformas Web (Angular/React)', 'Sistemas de Gestión (ERP/CRM)', 'APIs & Microservices', 'Modernización de Legacy'],
                 price: 'A Medida',
                 image: 'assets/img/cursos/laboratorio.webp',
                 link: '/servicios/desarrollo-de-software'
@@ -150,37 +183,37 @@ export const SERVICIOS_CONTENT: { en: ServiciosContent; es: ServiciosContent } =
                 link: '/servicios/cloud-devops'
             },
             {
-                id: 1,
-                title: 'Laboratorio de Electronica | Servicio Tecnico de Celulares en Marcos paz',
-                slug: 'servicio-tecnico-de-celulares-en-marcos-paz',
-                description: 'Servicio técnico especializado en microelectrónica para móviles y laptops.',
-                icon: 'fa-microchip',
-                features: ['Reparación de Placas', 'Cambio de Pantallas', 'Recuperación de Datos', 'Reballing', 'Soldadura SMD'],
-                price: 'Desde $15,000',
-                image: 'assets/img/products/sam.webp',
-                link: '/posts/servicio-tecnico-de-celulares-en-marcos-paz'
+                id: 104,
+                title: 'Diagnóstico y Reparación de Ecus Automotriz',
+                slug: 'reparacion-ecus',
+                description: 'Laboratorio electrónico automotriz. Reprogramación y clonación.',
+                icon: 'fa-car-battery',
+                features: ['Diagnóstico por Scanner', 'Reprogramación (Chiptuning)', 'Clonación de ECUs', 'Inmovilizadores', 'Airbag Reset'],
+                price: 'Consultar',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/reparacion-ecus'
             },
             {
-                id: 2,
-                title: 'Reparación de Consolas',
-                slug: 'reparacion-de-consolas',
-                description: 'Servicio técnico para PlayStation, Xbox y Nintendo Switch.',
-                icon: 'fa-gamepad',
-                features: ['Mantenimiento Térmico', 'Reparación de HDMI', 'Reballing GPU', 'Fuentes de Poder', 'Joysticks'],
-                price: 'Desde $12,000',
-                image: 'assets/img/products/arreglo-consolas.webp',
-                link: '/servicios/reparacion-de-consolas'
+                id: 105,
+                title: 'Electricidad de Motos',
+                slug: 'electricidad-motos',
+                description: 'Soluciones eléctricas especializadas para motocicletas de todas las cilindradas.',
+                icon: 'fa-motorcycle',
+                features: ['Bobinados', 'Encendido Electrónico', 'Luces LED', 'Baterías', 'Sistemas de Carga'],
+                price: 'Consultar',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/electricidad-motos'
             },
             {
-                id: 3,
-                title: 'Reparación de Tablets',
-                slug: 'reparacion-tablets',
-                description: 'Reparación especializada en tablets Android, iPad y Windows.',
-                icon: 'fa-tablet-alt',
-                features: ['Cambio de Pantalla', 'Cambio de Batería', 'Pin de Carga', 'Sistema Operativo', 'Recuperación de Datos'],
-                price: 'Desde $10,000',
-                image: 'assets/img/repair/13.jpg',
-                link: '/servicios/reparacion-tablets'
+                id: 102,
+                title: 'Electricidad y Plomería',
+                slug: 'electricidad-plomeria',
+                description: 'Servicios integrales de mantenimiento y urgencias para hogar y comercio.',
+                icon: 'fa-tools',
+                features: ['Instalaciones Eléctricas', 'Reparación de Fugas', 'Tableros', 'Grifería', 'Urgencias 24hs'],
+                price: 'A Medida',
+                image: 'assets/img/services/repair-illustration.png',
+                link: '/servicios/electricidad-plomeria'
             }
         ],
         servicesCta: 'Solicitar Cotización',

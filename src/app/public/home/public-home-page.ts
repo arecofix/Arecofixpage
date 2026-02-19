@@ -100,6 +100,7 @@ export class PublicHomePage implements OnInit {
       });
 
       alert('Solicitud enviada. Nos pondremos en contacto pronto.');
+
       // Reset form
       this.quoteModel = { ...this.quoteModel, name: '', email: '', phone: '', company: '', description: '' };
     } catch (error) {

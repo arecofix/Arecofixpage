@@ -1,7 +1,8 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { createClient, SupabaseClient, User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
+import { SupabaseClient, User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
+import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoggerService } from './logger.service';
@@ -17,7 +18,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private supabase: SupabaseClient;
+  private supabase = inject(SUPABASE_CLIENT);
   private router = inject(Router);
   private logger = inject(LoggerService);
   private platformId = inject(PLATFORM_ID);
@@ -30,13 +31,6 @@ export class AuthService {
 
   constructor() {
     const isBrowser = isPlatformBrowser(this.platformId);
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
-        auth: {
-            persistSession: isBrowser,
-            autoRefreshToken: isBrowser,
-            detectSessionInUrl: isBrowser
-        }
-    });
     
     if (isBrowser) {
         this.initializeAuth();

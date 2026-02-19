@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/products/domain/repositories/product.repository.ts"],
+  "sourcesContent": ["\r\nimport { Observable } from 'rxjs';\r\nimport { Product } from '../entities/product.entity';\r\n\r\nimport { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';\r\n\r\nexport abstract class ProductRepository {\r\n    abstract findWithFilters(params: ProductsParams): Observable<ProductsResponse>;\r\n\r\n    abstract findLowStock(threshold?: number): Observable<Product[]>;\r\n    abstract findAvailable(): Observable<Product[]>;\r\n\r\n    abstract getAll(): Observable<Product[]>;\r\n    abstract getById(id: string): Observable<Product>;\r\n    abstract create(product: Product): Observable<Product>;\r\n    abstract update(id: string, product: Partial<Product>): Observable<Product>;\r\n    abstract delete(id: string): Observable<void>;\r\n    \r\n    // Bulk Operations\r\n    abstract upsertMany(products: Partial<Product>[]): Observable<Product[]>;\r\n    abstract updateMany(products: Partial<Product>[]): Observable<void>;\r\n}\r\n"],
+  "mappings": ";;;AAMM,IAAgB,oBAAhB,MAAiC;;",
+  "names": []
+}

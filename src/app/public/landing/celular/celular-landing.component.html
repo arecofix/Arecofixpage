@@ -964,41 +964,40 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         @for (review of reviews; track review.name) {
-          <div
-            class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow duration-300 border border-base-200"
-          >
-            <div class="card-body p-6">
-              <!-- Header: Avatar + Name + Date -->
-              <div class="flex items-start gap-3 mb-3">
+            <!-- Review Card -->
+          <a
+             href="https://share.google/Fnume9zIn9XpY4Xiu"
+             target="_blank"
+             class="relative flex h-full flex-col justify-between rounded-2xl bg-base-100 p-6 shadow-sm ring-1 ring-base-200 transition-all hover:shadow-md hover:-translate-y-1"
+             >
+            <div>
+              <div class="flex items-center gap-x-4 mb-4">
                 <div
                   [class]="
-                    'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ' +
+                    'h-12 w-12 min-w-12 shrink-0 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden ' +
                     review.bgColor
                   "
                 >
-                  {{ review.initial }}
+                  {{ review.initial | slice:0:1 }}
                 </div>
                 <div>
-                  <h4 class="font-bold text-sm text-base-content">
+                  <h3 class="text-lg font-semibold leading-7 text-base-content">
                     {{ review.name }}
-                  </h4>
-                  <p class="text-xs text-base-content/60">{{ review.date }}</p>
+                  </h3>
+                  <div class="flex items-center gap-1 text-sm text-base-content/60">
+                    <p>{{ review.date }}</p>
+                    <span>•</span>
+                    <div class="flex text-yellow-400 text-xs">
+                      @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <i
+                          [class]="
+                            star <= review.stars ? 'fas fa-star' : 'far fa-star'
+                          "
+                        ></i>
+                      }
+                    </div>
+                  </div>
                 </div>
-                <!-- Google Icon (optional branding) -->
-                <i
-                  class="fa-brands fa-google text-blue-500 w-5 h-5 ml-auto opacity-70 text-lg"
-                ></i>
-              </div>
-
-              <!-- Stars -->
-              <div class="flex text-yellow-500 text-xs mb-3">
-                @for (star of [1, 2, 3, 4, 5]; track star) {
-                  @if (star <= review.stars) {
-                    <i class="fas fa-star"></i>
-                  } @else {
-                    <i class="far fa-star"></i>
-                  }
-                }
               </div>
 
               <!-- Review Text -->
@@ -1008,7 +1007,7 @@
                 "{{ review.text }}"
               </p>
             </div>
-          </div>
+          </a>
         }
       </div>
 

@@ -16,7 +16,7 @@ export const publicRoutes: Routes = [
             seo: {
                 title: 'Soluciones de Software & Consultoría IT',
                 description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
-                imageUrl: 'assets/img/hero-illustration.svg'
+                imageUrl: 'assets/img/branding/og-services.jpg'
             }
         }
       },
@@ -161,6 +161,14 @@ export const publicRoutes: Routes = [
           import('@app/public/nosotros/nosotros').then(
             (m) => m.NosotrosComponent
           ),
+        data: {
+          seo: {
+            title: 'Sobre Nosotros | Arecofix - Innovación y Compromiso',
+            description: 'Conocé al equipo detrás de Arecofix. Somos expertos en tecnología comprometidos con brindar soluciones de calidad en Marcos Paz.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            type: 'article'
+          }
+        }
       },
       {
         title: 'Contacto',
@@ -169,6 +177,13 @@ export const publicRoutes: Routes = [
           import('@app/public/contacto/contacto').then(
             (m) => m.ContactoComponent
           ),
+        data: {
+          seo: {
+            title: 'Contacto | Arecofix - Estamos para Ayudarte',
+            description: '¿Tenés alguna consulta o necesitás soporte técnico? Contáctanos por WhatsApp, Email o visitanos en nuestro local.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
       },
       {
         title: 'Servicios',
@@ -177,6 +192,14 @@ export const publicRoutes: Routes = [
           import('@app/public/servicios/servicios').then(
             (m) => m.ServiciosComponent
           ),
+        data: {
+          seo: {
+            title: 'Servicios de Tecnología y Reparación | Arecofix',
+            description: 'Soluciones integrales: Reparación de Celulares, Desarrollo de Software, Cámaras de Seguridad y Soporte IT para empresas.',
+            imageUrl: 'assets/img/branding/og-services.jpg',
+            keywords: 'servicios informaticos, reparacion celulares, desarrollo software, soporte it, camaras seguridad'
+          }
+        }
       },
       {
         title: 'Detalle de Servicio',
@@ -193,6 +216,14 @@ export const publicRoutes: Routes = [
           import('@app/public/cursos/cursos').then(
             (m) => m.CursosComponent
           ),
+        data: {
+          seo: {
+            title: 'Arecofix Academy | Cursos de Tecnología',
+            description: 'Aprendé reparación de celulares, programación y más con nuestros cursos presenciales y online.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            type: 'website'
+          }
+        }
       },
       {
         title: 'Detalle del Curso',
@@ -230,6 +261,13 @@ export const publicRoutes: Routes = [
           import('@app/public/tracking/tracking-page').then(
             (m) => m.TrackingPage
           ),
+        data: {
+          seo: {
+            title: 'Seguimiento de Reparación | Arecofix',
+            description: 'Consultá el estado de tu reparación en tiempo real con tu código de seguimiento.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
       },
       {
         title: 'Política de Privacidad',
@@ -238,6 +276,13 @@ export const publicRoutes: Routes = [
           import('@app/public/privacy/privacy.component').then(
             (m) => m.PrivacyComponent
           ),
+           data: {
+          seo: {
+            title: 'Política de Privacidad | Arecofix',
+            description: 'Conocé cómo protegemos tus datos y tu privacidad en Arecofix.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
       },
       {
         title: 'Términos y Condiciones',
@@ -246,6 +291,13 @@ export const publicRoutes: Routes = [
           import('@app/public/terms/terms.component').then(
             (m) => m.TermsComponent
           ),
+        data: {
+          seo: {
+            title: 'Términos y Condiciones | Arecofix',
+            description: 'Términos y condiciones de uso de nuestros servicios y sitio web.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
       },
       {
         title: 'Blog',
@@ -254,6 +306,14 @@ export const publicRoutes: Routes = [
           import('@app/public/blog/blog.component').then(
             (m) => m.BlogComponent
           ),
+        data: {
+          seo: {
+            title: 'Blog de Tecnología | Arecofix',
+            description: 'Noticias, guías y tutoriales sobre tecnología, reparaciones y desarrollo de software.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            type: 'website'
+          }
+        }
       },
       {
         title: 'Mapa del Sitio',
@@ -270,6 +330,13 @@ export const publicRoutes: Routes = [
           import('@app/public/fixtecnicos/fixtecnicos.component').then(
             (m) => m.FixtecnicosComponent
           ),
+        data: {
+          seo: {
+            title: 'Comunidad FixTécnicos | Arecofix',
+            description: 'Recursos y herramientas exclusivas para técnicos reparadores.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
       },
       {
         title: 'Centro de Recursos',
@@ -278,6 +345,13 @@ export const publicRoutes: Routes = [
           import('@app/public/recursos/recursos.component').then(
             (m) => m.RecursosComponent
           ),
+          data: {
+          seo: {
+            title: 'Centro de Recursos | Arecofix',
+            description: 'Descargas, drivers y manuales para reparaciones y software.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
       },
     ],
   },

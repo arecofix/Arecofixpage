@@ -1,5 +1,6 @@
-import { Injectable, signal, effect, inject, computed } from '@angular/core';
-import { Product } from '@app/shared/interfaces/product.interface'; // Using the entity path seen in previous steps or metadata
+import { Injectable, signal, effect, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Product } from '@app/shared/interfaces/product.interface'; 
 import { LoggerService } from '@app/core/services/logger.service';
 import { ToastService } from './toast.service';
 
@@ -9,25 +10,31 @@ import { ToastService } from './toast.service';
 export class FavoritesService {
     private logger = inject(LoggerService);
     private toastService = inject(ToastService);
+    private platformId = inject(PLATFORM_ID);
     
     // Store array of products
     favorites = signal<Product[]>([]);
 
     constructor() {
-        // Load favorites from local storage
-        const savedFavorites = localStorage.getItem('favorites');
-        if (savedFavorites) {
-            try {
-                this.favorites.set(JSON.parse(savedFavorites));
-            } catch (e) {
-                console.error('Error parsing favorites', e);
-                this.favorites.set([]);
+        if (isPlatformBrowser(this.platformId)) {
+            // Load favorites from local storage
+            const savedFavorites = localStorage.getItem('favorites');
+            if (savedFavorites) {
+                try {
+                    this.favorites.set(JSON.parse(savedFavorites));
+                } catch (e) {
+                    console.error('Error parsing favorites', e);
+                    this.favorites.set([]);
+                }
             }
         }
 
         // Persist to local storage
         effect(() => {
-            localStorage.setItem('favorites', JSON.stringify(this.favorites()));
+            const currentFavorites = this.favorites();
+            if (isPlatformBrowser(this.platformId)) {
+                localStorage.setItem('favorites', JSON.stringify(currentFavorites));
+            }
         });
     }
 

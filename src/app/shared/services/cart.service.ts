@@ -1,4 +1,6 @@
-import { Injectable, signal, computed, effect, inject } from '@angular/core';
+import { Injectable, signal, computed, effect, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
 import { Product } from '@app/public/products/interfaces';
 import { LoggerService } from '@app/core/services/logger.service';
 
@@ -15,18 +17,29 @@ import { ToastService } from './toast.service';
 export class CartService {
     private logger = inject(LoggerService);
     private toastService = inject(ToastService);
+    private platformId = inject(PLATFORM_ID);
+    
     cartItems = signal<CartItem[]>([]);
 
     constructor() {
-        // Load cart from local storage on init
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            this.cartItems.set(JSON.parse(savedCart));
+        if (isPlatformBrowser(this.platformId)) {
+            // Load cart from local storage on init
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                try {
+                    this.cartItems.set(JSON.parse(savedCart));
+                } catch (e) {
+                    this.cartItems.set([]);
+                }
+            }
         }
 
         // Save cart to local storage whenever it changes
         effect(() => {
-            localStorage.setItem('cart', JSON.stringify(this.cartItems()));
+            const currentCart = this.cartItems();
+            if (isPlatformBrowser(this.platformId)) {
+                localStorage.setItem('cart', JSON.stringify(currentCart));
+            }
         });
     }
 

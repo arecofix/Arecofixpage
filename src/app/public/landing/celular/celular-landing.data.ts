@@ -130,10 +130,10 @@ export const FAQS = [
 
 export const REVIEWS = [
         {
-            name: 'Juan Perez',
+            name: 'Marcela Pita',
             date: 'hace 2 días',
             stars: 5,
-            initial: 'J',
+            initial: 'M',
             bgColor: 'bg-orange-500',
             text: 'La verdad exelente trabajo ,responsable muy educado y sobre todo muy honesto Gracias Ezequiel !!!!!'
         },

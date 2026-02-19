@@ -1,0 +1,121 @@
+export default `<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <!-- Analytics Lazy Loader -->
+  <script>
+    (function() {
+      // Fix hash routing redirection
+      if (window.location.hash && window.location.hash.startsWith('#/')) {
+        var newPath = window.location.hash.substring(1);
+        window.history.replaceState(null, '', newPath);
+      }
+
+      // Lazy Load Analytics
+      var analyticsLoaded = false;
+      function loadAnalytics() {
+        if (analyticsLoaded) return;
+        analyticsLoaded = true;
+
+        // Google Tag Manager
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-NLVCRSJR');
+
+        // GTAG
+        var gtagScript = document.createElement('script');
+        gtagScript.async = true;
+        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
+        document.head.appendChild(gtagScript);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-N7DQDV8MED');
+
+        // Meta Pixel
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1304105440826069', { external_id: 'guest_user' });
+        fbq('track', 'PageView');
+      }
+
+      // Trigger on interaction or timeout
+      var events = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'];
+      events.forEach(function(e) { window.addEventListener(e, loadAnalytics, { once: true, passive: true }); });
+      setTimeout(loadAnalytics, 3500); // Fallback load after 3.5s
+    })();
+  </script>
+
+  <meta charset="utf-8">
+  <title>Arecofix - Servicio Técnico de Celulares y Soluciones IT</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Servicio Técnico especializado en Celulares, Consultoría IT, Desarrollo Web y Inteligencia Artificial en Marcos Paz.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Arecofix">
+  <meta name="theme-color" content="#1f2136">
+
+  <!-- Open Graph / Facebook / WhatsApp Placeholders -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Arecofix - Servicio Técnico de Celulares y Soluciones IT">
+  <meta property="og:description" content="Reparación de Celulares en el acto, Desarrollo Web y Consultoría IT en Marcos Paz.">
+  <meta property="og:image" content="assets/img/branding/og-services.jpg">
+  <meta property="og:url" content="https://arecofix.com.ar">
+  <meta property="og:site_name" content="Arecofix">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Arecofix - Servicio Técnico">
+  <meta name="twitter:description" content="Reparación de Celulares y Soluciones IT en Marcos Paz.">
+  <meta name="twitter:image" content="assets/img/branding/og-services.jpg">
+
+  <meta name="theme-color" content="#1f2136">
+  
+  <!-- Dynamic Open Graph & Twitter tags are injected by SeoService (SSR) -->
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/img/brands/logo/logo-img.PNG">
+  <!-- <link rel="manifest" href="/site.webmanifest"> -->
+
+  <!-- Preconexión y carga eficiente de fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co">
+  <link rel="preconnect" href="https://us.i.posthog.com">
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css"></head>
+
+<body ngcm="">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NLVCRSJR"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- Meta Pixel Code (noscript) -->
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1304105440826069&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code (noscript) -->
+  <noscript>
+    <div style="text-align: center; padding: 20px;">
+      <h1>Arecofix - Soluciones Informáticas</h1>
+      <p>Este sitio requiere JavaScript. Servicio Tecnico de Celulares</p>
+      <p>Si tenés problemas, escribinos a: <a href="mailto:info@arecofix.com.ar"
+          style="color: #5bbad5;">info@arecofix.com.ar</a></p>
+    </div>
+  </noscript>
+
+  <app-root></app-root>
+  <!-- Analytics se carga dinámicamente sólo en producción -->
+<link rel="modulepreload" href="chunk-37JUCHEQ.js"><link rel="modulepreload" href="chunk-AYFZ6XFB.js"><link rel="modulepreload" href="chunk-SNLUKXXQ.js"><link rel="modulepreload" href="chunk-XUAOU2YN.js"><link rel="modulepreload" href="chunk-XEMM6DMZ.js"><link rel="modulepreload" href="chunk-6VISID4F.js"><link rel="modulepreload" href="chunk-ZJZBKGOC.js"><link rel="modulepreload" href="chunk-EO3I4DDE.js"><link rel="modulepreload" href="chunk-NJJ5IL4Q.js"><link rel="modulepreload" href="chunk-GR2FBAX3.js"><script src="main.js" type="module"></script></body>
+
+</html>`;

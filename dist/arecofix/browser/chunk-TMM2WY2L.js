@@ -1,1 +1,0 @@
-import"./chunk-7CGTOI24.js";var t=[{path:"",title:"Compras",loadComponent:()=>import("./chunk-2FQAMHB4.js").then(o=>o.AdminPurchasesPage)},{path:"new",title:"Nueva Compra",loadComponent:()=>import("./chunk-VJOOKO4T.js").then(o=>o.AdminPurchaseFormPage)}];export{t as ADMIN_PURCHASES_ROUTES};

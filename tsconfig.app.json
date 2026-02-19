@@ -12,11 +12,10 @@
     "types": []
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "server.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "server.ts",
-    "src/**/*.server.ts"
+    "src/**/*.spec.ts"
   ]
 }

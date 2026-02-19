@@ -1,114 +1,204 @@
-import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef, signal, computed, AfterViewInit, OnDestroy, PLATFORM_ID, ElementRef, Renderer2, HostListener, effect } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  ChangeDetectorRef,
+  signal,
+  computed,
+  OnInit,
+  OnDestroy,
+  PLATFORM_ID,
+  HostListener,
+  effect,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { environment } from '@env/environment';
-import { CategoryService } from '@app/public/categories/services/category.service';
-import { iCategoriesResponse, iCategory } from '@app/public/categories/interfaces';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { AuthService } from '@app/core/services/auth.service';
 import { CartService } from '@app/shared/services/cart.service';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Observable, fromEvent, Subject } from 'rxjs';
-import { map, distinctUntilChanged, filter, pairwise, share, throttleTime, takeUntil } from 'rxjs/operators';
-import { FormsModule } from '@angular/forms';
+import { ThemeService } from '@app/core/services/theme.service';
+import { SearchService } from '@app/shared/services/search.service';
+import { AutoFocusDirective } from '@app/shared/directives/auto-focus.directive';
 import { Product } from '@app/features/products/domain/entities/product.entity';
-
-interface iMenuItem {
-  id?: string;
-  title: string;
-  path: string;
-  icon: string;
-  parentId?: string;
-  children?: iMenuItem[];
-}
+import { NavItem } from '@app/shared/models/navigation.model';
+import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/models/navigation.data';
+import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
+import { ThemeToggleComponent } from '@app/shared/components/theme-toggle/theme-toggle.component';
+import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'public-layout-header',
-  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    CommonModule,
+    FormsModule,
+    NavItemRecursiveComponent,
+    ThemeToggleComponent,
+    AutoFocusDirective,
+  ],
   templateUrl: './public-layout-header.html',
   styles: `
     :host {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      transition: transform 0.3s ease-in-out;
-      width: 100%;
-      will-change: transform;
-    }
-    :host.hidden-navbar {
-      transform: translateY(-100%) !important;
+      display: contents;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
+export class PublicLayoutHeader implements OnInit, OnDestroy {
+  // ── Dependencies ──────────────────────────────────
   public appName: string = environment.appName;
-  public categoryService = inject(CategoryService);
   public authService = inject(AuthService);
   public cartService = inject(CartService);
+  public themeService = inject(ThemeService);
+  public searchService = inject(SearchService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
-  private el = inject(ElementRef);
-  private renderer = inject(Renderer2);
 
-  public user$ = this.authService.authState$.pipe(map(state => state.user));
+  public user$ = this.authService.authState$.pipe(map((state) => state.user));
 
-  // Search Logic
+  /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
+  public searchFocusRequested = signal(false);
+
+  private subscriptions = new Subscription();
+
+  // ── Navigation Data ───────────────────────────────
+  /**
+   * Static navigation items from the centralized data file.
+   * The menu is fully data-driven: add items to navigation.data.ts
+   * and they automatically appear in both desktop and mobile menus.
+   */
+  readonly navItems = signal<NavItem[]>(NAVIGATION_ITEMS);
+
+  /** Top-level items that have children → rendered as mega-menus or dropdowns */
+  readonly megaMenuItems = computed(() =>
+    this.navItems().filter((item) => item.children && item.children.length > 0)
+  );
+
+  /** Top-level items without children → rendered as simple links */
+  readonly directLinks = computed(() =>
+    this.navItems().filter((item) => !item.children || item.children.length === 0)
+  );
+
+  // ── Search Logic ──────────────────────────────────
   public searchQuery = signal('');
   public products = signal<Product[]>([]);
   public showResults = signal(false);
-  
-  // Cart Drawer Logic
-  // Delegating to CartService for global state
-  public isCartOpen = this.cartService.isCartOpen;
-
-  public toggleCart() {
-    this.cartService.toggleCart();
-  }
-
-  // Navbar Visibility Logic
-  public isVisible = signal(true);
-  private destroy$ = new Subject<void>();
-  private lastScrollTop = 0;
 
   public filteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
     if (!query) return [];
-
-    return this.products().filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.sku?.toLowerCase().includes(query) ||
-      p.barcode?.toLowerCase().includes(query)
-    ).slice(0, 10); // Limit to 10 results for UI
+    return this.products()
+      .filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.sku?.toLowerCase().includes(query) ||
+          p.barcode?.toLowerCase().includes(query)
+      )
+      .slice(0, 10);
   });
+
+  // ── Mobile Menu ───────────────────────────────────
+  public isMobileMenuOpen = signal(false);
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.update((v) => !v);
+    if (!this.isMobileMenuOpen()) {
+      this.searchFocusRequested.set(false);
+    }
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen.set(false);
+    this.searchFocusRequested.set(false);
+  }
+
+  /**
+   * Opens the mobile drawer and requests focus on the search input.
+   * Triggered by the navbar lupa icon.
+   */
+  openMobileSearch(): void {
+    this.searchFocusRequested.set(true);
+    this.isMobileMenuOpen.set(true);
+    this.searchService.requestSearchFocus();
+  }
+
+  /** Close mobile drawer when a nav link (not accordion toggle) is clicked */
+  onMobileNavClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const anchor = target.closest('a[routerLink], a[ng-reflect-router-link]');
+    if (anchor) {
+      this.closeMobileMenu();
+    }
+  }
+
+  // ── Desktop Mega Menu ─────────────────────────────
+  public activeMegaMenu = signal<string | null>(null);
+  private megaMenuTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  openMegaMenu(id: string) {
+    if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
+    this.activeMegaMenu.set(id);
+  }
+
+  closeMegaMenuDelayed() {
+    this.megaMenuTimeout = setTimeout(() => {
+      this.activeMegaMenu.set(null);
+    }, 200);
+  }
+
+  keepMegaMenuOpen() {
+    if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
+  }
+
+  // ── Cart ──────────────────────────────────────────
+  public isCartOpen = this.cartService.isCartOpen;
+  public toggleCart() {
+    this.cartService.toggleCart();
+  }
+
+  // ── Navbar Visibility (auto-hide on scroll) ───────
+  public isVisible = signal(true);
+  private lastScrollTop = 0;
 
   constructor() {
     this.loadProducts();
 
+    // Show navbar when item added to cart
     effect(() => {
-        // Track cart items dependency
-        const items = this.cartService.cartItems();
-        if (items.length > 0) {
-             // Run this outside angular reactive context to avoid loops if needed, 
-             // but here we just want to trigger a side effect (showing navbar)
-             // We need to use untracked if we modified a signal that started this cycle, but showNavbar modifies a local signal isVisible.
-             // However, to be safe and purely reactive side-effect:
-             
-             // Wrap in setTimeout to ensure it runs after view updates or simply just call it.
-             // Since signals are synchronous, we just call it.
-             this.showNavbar();
-             this.lastScrollTop = isPlatformBrowser(this.platformId) ? (window.scrollY || document.documentElement.scrollTop) : 0;
-        }
+      const items = this.cartService.cartItems();
+      if (items.length > 0) {
+        this.showNavbar();
+        this.lastScrollTop = isPlatformBrowser(this.platformId)
+          ? window.scrollY || document.documentElement.scrollTop
+          : 0;
+      }
     });
   }
 
+  ngOnInit(): void {
+    // Listen for external search-focus requests (e.g. from other components)
+    this.subscriptions.add(
+      this.searchService.focusRequested$.subscribe(() => {
+        if (!this.isMobileMenuOpen()) {
+          this.searchFocusRequested.set(true);
+          this.isMobileMenuOpen.set(true);
+          this.cdr.markForCheck();
+        }
+      })
+    );
 
-
-  ngAfterViewInit() {
-    // No-op: Logic moved to HostListener for reliability
+    // Debounced search — react to optimized query changes
+    this.subscriptions.add(
+      this.searchService.debouncedQuery$.subscribe((term) => {
+        this.searchQuery.set(term);
+        this.showResults.set(!!term);
+        this.cdr.markForCheck();
+      })
+    );
   }
 
   @HostListener('window:scroll')
@@ -117,7 +207,6 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
 
     const currentScroll = window.scrollY || document.documentElement.scrollTop;
 
-    // Safety check: always show if near top
     if (currentScroll < 50) {
       this.showNavbar();
       this.lastScrollTop = currentScroll;
@@ -125,17 +214,10 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
     }
 
     const scrollDelta = currentScroll - this.lastScrollTop;
-
-    if (scrollDelta > 0) {
-      // Scrolling Down
-      // Only hide if we've scrolled down a significant amount (e.g. > 10px) to avoid jitter
-      if (Math.abs(scrollDelta) > 10) {
-        this.hideNavbar();
-        this.lastScrollTop = currentScroll;
-      }
-    } else {
-      // Scrolling Up
-      // Show immediately on ANY upward scroll
+    if (scrollDelta > 0 && Math.abs(scrollDelta) > 10) {
+      this.hideNavbar();
+      this.lastScrollTop = currentScroll;
+    } else if (scrollDelta < 0) {
       this.showNavbar();
       this.lastScrollTop = currentScroll;
     }
@@ -144,7 +226,6 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
   private showNavbar() {
     if (!this.isVisible()) {
       this.isVisible.set(true);
-      this.renderer.removeClass(this.el.nativeElement, 'hidden-navbar');
       this.cdr.markForCheck();
     }
   }
@@ -152,122 +233,45 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
   private hideNavbar() {
     if (this.isVisible()) {
       this.isVisible.set(false);
-      this.renderer.addClass(this.el.nativeElement, 'hidden-navbar');
       this.cdr.markForCheck();
     }
   }
 
-
-
   ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+    if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
+    this.subscriptions.unsubscribe();
   }
 
+  // ── Search ────────────────────────────────────────
   async loadProducts() {
-    const supabase = this.authService.getSupabaseClient();
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .gt('stock', 0)
-      .order('name');
-
-    if (data) {
-      this.products.set(data);
+    if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      const supabase = this.authService.getSupabaseClient();
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .gt('stock', 0)
+        .order('name');
+      if (data) this.products.set(data);
+    } catch {
+      // Silent fail on SSR or no supabase
     }
   }
 
-  public onSearchInput() {
+  public onSearchInput(): void {
+    this.searchService.updateQuery(this.searchQuery());
     this.showResults.set(!!this.searchQuery());
   }
 
   public selectProduct(product: Product) {
     this.searchQuery.set('');
     this.showResults.set(false);
+    this.closeMobileMenu();
     this.router.navigate(['/productos/detalle', product.slug || product.id]);
   }
 
-  public categoryRs = rxResource<iCategoriesResponse, unknown>({
-    stream: () => this.categoryService.getFeaturedData(),
-  });
-
-  public menuItems = computed(() => {
-    const rawItems = this.categoryRs.value()?.data ?? [];
-    
-    // Filter out unwanted categories
-    const filteredItems = rawItems.filter((category: iCategory) => 
-      category.slug !== 'sports' && category.name !== 'Deportes'
-    );
-
-    // Map to menu items
-    const allMenuItems: iMenuItem[] = filteredItems.map((category: iCategory) => {
-      let icon = category.icon;
-      if (category.name === 'Celulares') icon = 'fas fa-mobile-alt';
-      if (category.name === 'Repuestos') icon = 'fas fa-tools';
-      if (category.name === 'Cursos') icon = 'fas fa-graduation-cap';
-      if (category.name === 'Herramientas') icon = 'fas fa-wrench';
-
-      let slug = category.slug;
-      if (slug === 'electrnicos') slug = 'electronicos';
-
-      return {
-        id: String(category.id), // Keep track of ID for nesting
-        title: category.name,
-        path: '/productos/categoria/' + slug.toLowerCase(),
-        icon: icon || 'fas fa-box',
-        parentId: category.parent_id ? String(category.parent_id) : undefined,
-        children: []
-      };
-    });
-
-    // CUSTOM LOGIC: Nest 'Herramientas' under 'Repuestos'
-    const repuestosItem = allMenuItems.find(i => i.title === 'Repuestos');
-    const herramientasItem = allMenuItems.find(i => i.title === 'Herramientas');
-
-    if (repuestosItem && herramientasItem) {
-      herramientasItem.parentId = repuestosItem.id;
-    }
-
-    // Build tree structure
-    const rootItems: iMenuItem[] = [];
-    const itemMap = new Map<string, iMenuItem>();
-
-    // First pass: map items by ID
-    allMenuItems.forEach(item => {
-      if (item.id) itemMap.set(item.id, item);
-    });
-
-    // Second pass: link children to parents
-    allMenuItems.forEach(item => {
-      if (item.parentId && itemMap.has(item.parentId)) {
-        const parent = itemMap.get(item.parentId)!;
-        parent.children = parent.children || [];
-        parent.children.push(item);
-      } else {
-        rootItems.push(item);
-      }
-    });
-
-    // Sort root items
-    const sorted = rootItems.sort((a, b) => {
-      if (a.title === 'Celulares') return -1;
-      if (b.title === 'Celulares') return 1;
-      return 0;
-    });
-    return sorted;
-  });
-
-  public visibleMenuItems = computed(() => {
-    // Show only first 3 items on standard desktops to avoid overflow
-    return this.menuItems().slice(0, 3);
-  });
-
-  public hiddenMenuItems = computed(() => {
-    // The rest go into the "More" dropdown
-    return this.menuItems().slice(3);
-  });
-
+  // ── Auth ──────────────────────────────────────────
   async logout() {
     try {
       await this.authService.signOut();
@@ -276,5 +280,15 @@ export class PublicLayoutHeader implements AfterViewInit, OnDestroy {
     } catch (err) {
       console.error('Error during logout:', err);
     }
+  }
+
+  // ── Theme Helpers (for template) ──────────────────
+  getThemeStyles(theme: string) {
+    return THEME_STYLES[theme] ?? THEME_STYLES['general'];
+  }
+
+  /** Context-aware label for the mega menu footer link */
+  getMegaFooterLabel(itemId: string): string {
+    return VIEW_ALL_LABELS[itemId] ?? 'Ver más';
   }
 }

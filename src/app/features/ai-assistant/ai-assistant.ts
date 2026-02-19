@@ -39,7 +39,7 @@ export class AiAssistant implements AfterViewChecked {
 
   private scrollToBottom(): void {
     try {
-      if (this.scrollContainer) {
+      if (typeof window !== 'undefined' && this.scrollContainer && this.scrollContainer.nativeElement) {
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
       }
     } catch(err) { }

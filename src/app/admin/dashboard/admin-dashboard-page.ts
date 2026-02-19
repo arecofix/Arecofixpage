@@ -1,12 +1,11 @@
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '@app/core/services/auth.service';
 import { RouterLink } from '@angular/router';
 import posthog from 'posthog-js';
 import { environment } from '@env/environment';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-
+import { AnalyticsRepository, DashboardStats } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
 
 @Component({
@@ -16,7 +15,7 @@ import { CHART_COLORS } from './constants/chart-colors.constant';
   templateUrl: 'admin-dashboard-page.html'
 })
 export class AdminDashboardPage implements OnInit {
-  private auth = inject(AuthService);
+  private analyticsRepo = inject(AnalyticsRepository);
 
   stats = signal({
     users: 0,
@@ -44,10 +43,10 @@ export class AdminDashboardPage implements OnInit {
   };
   public salesChartType: ChartType = 'line';
   public salesChartData: ChartData<'line'> = {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    labels: [],
     datasets: [
       { 
-        data: [65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 110, 120], 
+        data: [], 
         label: 'Ventas ($)', 
         borderColor: CHART_COLORS.primary, 
         backgroundColor: CHART_COLORS.primaryTransparent, 
@@ -67,10 +66,10 @@ export class AdminDashboardPage implements OnInit {
   };
   public productsChartType: ChartType = 'bar';
   public productsChartData: ChartData<'bar'> = {
-    labels: ['iPhone 11', 'Samsung A52', 'Modulo iPhone X', 'Cargador 20W', 'Funda Silicona'],
+    labels: [],
     datasets: [
       { 
-        data: [28, 48, 40, 19, 86], 
+        data: [], 
         label: 'Unidades', 
         backgroundColor: CHART_COLORS.palette
       }
@@ -88,39 +87,34 @@ export class AdminDashboardPage implements OnInit {
   };
   public categoryChartType: ChartType = 'doughnut';
   public categoryChartData: ChartData<'doughnut'> = {
-    labels: ['Repuestos', 'Accesorios', 'Servicios', 'Cursos'],
+    labels: [],
     datasets: [
-      { data: [300, 500, 100, 50], backgroundColor: CHART_COLORS.paletteAlt }
+      { data: [], backgroundColor: CHART_COLORS.paletteAlt }
     ]
   };
 
-  async ngOnInit() {
-    await this.loadStats();
+  ngOnInit() {
+    this.loadStats();
     this.loadAnalyticsInfo();
   }
 
-  async loadStats() {
+  loadStats() {
     this.loading.set(true);
-    const supabase = this.auth.getSupabaseClient();
-
-    try {
-      const { data, error } = await supabase.rpc('get_dashboard_stats');
-
-      if (error) throw error;
-
-      if (data) {
+    
+    this.analyticsRepo.getDashboardStats().subscribe({
+      next: (data) => {
         // Update Summary Stats
         this.stats.set({
-          users: data.users || 0,
-          products: data.products || 0,
-          sales: data.sales || 0,
-          revenue: data.revenue || 0
+          users: data.users,
+          products: data.products,
+          sales: data.sales,
+          revenue: data.revenue
         });
 
         // Update Sales Chart (Line)
         if (data.sales_chart && data.sales_chart.length > 0) {
-            const months = data.sales_chart.map((d: any) => this.formatMonth(d.period));
-            const totals = data.sales_chart.map((d: any) => d.total);
+            const months = data.sales_chart.map(d => this.formatMonth(d.period));
+            const totals = data.sales_chart.map(d => d.total);
             
             this.salesChartData = {
                 labels: months,
@@ -138,8 +132,8 @@ export class AdminDashboardPage implements OnInit {
 
         // Update Products Chart (Bar)
         if (data.products_chart && data.products_chart.length > 0) {
-            const productNames = data.products_chart.map((d: any) => d.name);
-            const quantities = data.products_chart.map((d: any) => d.quantity);
+            const productNames = data.products_chart.map(d => d.name);
+            const quantities = data.products_chart.map(d => d.quantity);
 
             this.productsChartData = {
                 labels: productNames,
@@ -155,8 +149,8 @@ export class AdminDashboardPage implements OnInit {
 
         // Update Category Chart (Doughnut)
         if (data.category_chart && data.category_chart.length > 0) {
-            const catNames = data.category_chart.map((d: any) => d.name);
-            const catCounts = data.category_chart.map((d: any) => d.count);
+            const catNames = data.category_chart.map(d => d.name);
+            const catCounts = data.category_chart.map(d => d.count);
 
             this.categoryChartData = {
                 labels: catNames,
@@ -168,13 +162,14 @@ export class AdminDashboardPage implements OnInit {
                 ]
             };
         }
+        
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading dashboard stats:', error);
+        this.loading.set(false);
       }
-
-    } catch (error) {
-      console.error('Error loading dashboard stats:', error);
-    } finally {
-      this.loading.set(false);
-    }
+    });
   }
 
   private formatMonth(yearMonth: string): string {

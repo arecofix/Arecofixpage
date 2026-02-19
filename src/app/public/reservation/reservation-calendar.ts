@@ -161,7 +161,10 @@ export class ReservationCalendar implements OnInit {
       // Send WhatsApp
       const message = `¡Hola! Soy ${this.customerName}. Quiero confirmar mi reserva para el ${formattedDate} a las ${this.selectedTime} horas.`;
       const encodedMessage = encodeURIComponent(message);
-      window.open(`https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`, '_blank');
+      
+      if (typeof window !== 'undefined') {
+          window.open(`https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`, '_blank');
+      }
 
       // Reset
       this.resetSelection();
@@ -183,7 +186,10 @@ export class ReservationCalendar implements OnInit {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const formattedDate = this.selectedDate.toLocaleDateString('es-ES', options);
     const message = `¡Hola! Quiero reservar una cita para el ${formattedDate} a las ${this.selectedTime} horas.`;
-    window.open(`https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    
+    if (typeof window !== 'undefined') {
+        window.open(`https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    }
   }
 
   get currentMonthYear(): string {

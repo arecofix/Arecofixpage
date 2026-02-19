@@ -41,15 +41,23 @@ export class SupabaseProductRepository extends ProductRepository {
       .eq('is_active', true);
 
     // Apply filters
+    this.logger.debug('ProductRepository findWithFilters params:', params);
+
     if (params.category_ids && params.category_ids.length > 0) {
-      query = query.in('category_id', params.category_ids);
+      if (params.category_ids.length === 1) {
+        query = query.eq('category_id', params.category_ids[0]);
+      } else {
+        query = query.in('category_id', params.category_ids);
+      }
     } else if (category_id !== undefined && category_id !== null) {
       query = query.eq('category_id', category_id);
     }
+    
     if (brand_id) query = query.eq('brand_id', brand_id);
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
     if (id) query = query.eq('id', id);
+    if (params.ids && params.ids.length > 0) query = query.in('id', params.ids);
     if (name) query = query.ilike('name', `%${name}%`);
     if (price) query = query.eq('price', price);
     if (slug) query = query.eq('slug', slug);
@@ -228,6 +236,62 @@ export class SupabaseProductRepository extends ProductRepository {
         this.logger.error('Failed to delete product', err);
         throw err;
       })
+    );
+  }
+
+  upsertMany(products: Partial<Product>[]): Observable<Product[]> {
+    if (!products.length) return of([]);
+
+    const dataToUpsert = products.map(p => ({
+        ...p,
+        updated_at: new Date().toISOString()
+    }));
+
+    return from(
+      this.supabase.from('products')
+        .upsert(dataToUpsert, { onConflict: 'id' as any }) // cast 'id' if TS complains
+        .select()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) {
+           this.logger.error('Error upserting products', error);
+           throw error;
+        }
+        return (data || []).map((p: any) => this._mapToEntity(p));
+      }),
+      catchError((err) => {
+        this.logger.error('Failed to upsert products', err);
+        throw err;
+      })
+    );
+  }
+
+  updateMany(products: Partial<Product>[]): Observable<void> {
+    if (!products.length) return of(void 0);
+
+    // Parallel updates
+    const updates = products.map(p => {
+        if (!p.id) return Promise.resolve({ error: { message: 'Missing ID' } });
+        const { id, ...updateData } = p;
+        return this.supabase.from('products').update({
+            ...updateData,
+            updated_at: new Date().toISOString()
+        }).eq('id', id);
+    });
+
+    return from(Promise.all(updates)).pipe(
+        map((results) => {
+            const errors = results.filter((r: any) => r && r.error);
+            if (errors.length > 0) {
+                 this.logger.error('Some updates failed', errors);
+                 throw new Error(`Failed to update ${errors.length} products`);
+            }
+            return void 0;
+        }),
+        catchError(err => {
+            this.logger.error('Failed to update many products', err);
+            throw err;
+        })
     );
   }
 

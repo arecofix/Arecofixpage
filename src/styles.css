@@ -400,6 +400,42 @@ details > summary::-webkit-details-marker {
   will-change: transform, opacity;
 }
 
+/* Simple Fade In */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Slide In from Left (mobile drawer) */
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Accordion expand animation */
+@keyframes accordionOpen {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+.animate-accordion-open {
+  animation: accordionOpen 0.25s ease-out forwards;
+  overflow: hidden;
+}
+
 .delay-100 {
   animation-delay: 100ms;
 }

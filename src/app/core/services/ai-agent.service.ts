@@ -1,5 +1,6 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { CreateMLCEngine, MLCEngine, InitProgressCallback } from "@mlc-ai/web-llm";
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+// import { CreateMLCEngine, MLCEngine, InitProgressCallback } from "@mlc-ai/web-llm"; // Removed static import
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -10,7 +11,8 @@ export interface ChatMessage {
   providedIn: 'root'
 })
 export class AiAgentService {
-  private engine: MLCEngine | null = null;
+  private platformId = inject(PLATFORM_ID);
+  private engine: any | null = null; // Type 'any' because strict type is not available without static import
   
   // Signals for UI State
   isLoadingModel = signal(false);
@@ -32,22 +34,40 @@ export class AiAgentService {
   constructor() {}
 
   async initModel() {
+    if (!isPlatformBrowser(this.platformId)) {
+        console.warn('AI Model cannot be initialized on server');
+        return;
+    }
+
     if (this.modelLoaded()) return;
 
     this.isLoadingModel.set(true);
     
-    const initProgressCallback: InitProgressCallback = (report) => {
-      this.loadingProgress.set(report.text);
-    };
-
+    // Dynamic import to avoid SSR crashes
     try {
-      this.engine = await CreateMLCEngine(
-        this.selectedModel,
-        { initProgressCallback }
-      );
-      this.modelLoaded.set(true);
+        const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
+        
+        const initProgressCallback = (report: { text: string }) => {
+            this.loadingProgress.set(report.text);
+        };
+
+        this.engine = await CreateMLCEngine(
+            this.selectedModel,
+            { initProgressCallback }
+        );
+        this.modelLoaded.set(true);
+        this.isLoadingModel.set(false);
+        
+        this.initializeSystemPrompt();
+
+    } catch (error) {
+      console.error("Failed to load model", error);
       this.isLoadingModel.set(false);
-      
+      this.loadingProgress.set("Error loading model: " + error);
+    }
+  }
+
+  private initializeSystemPrompt() {
       // System Prompt with MCP capabilities definition
       this.messages.set([
         { role: 'system', content: `You are Arecofix AI Assistant. You help users with IT support, phone repairs, and website quotes.
@@ -62,16 +82,15 @@ export class AiAgentService {
         
         Answer normally if no tool is needed. Keep responses concise and helpful.` }
       ]);
-    } catch (error) {
-      console.error("Failed to load model", error);
-      this.isLoadingModel.set(false);
-      this.loadingProgress.set("Error loading model: " + error);
-    }
   }
 
   async sendMessage(text: string) {
     if (!this.engine) {
         await this.initModel();
+        if (!this.engine) {
+             this.messages.update(msgs => [...msgs, { role: 'assistant', content: "Error crítico: El modelo IA no pudo cargarse. Verifica que tu navegador soporte WebGPU." }]);
+             return;
+        }
     }
 
     this.isGenerating.set(true);
@@ -88,7 +107,8 @@ export class AiAgentService {
 
     } catch (error) {
       console.error("Chat error", error);
-      this.messages.update(msgs => [...msgs, { role: 'assistant', content: "Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo." }]);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.messages.update(msgs => [...msgs, { role: 'assistant', content: `Lo siento, hubo un error técnico: ${errorMsg}. Por favor intenta de nuevo.` }]);
     } finally {
       this.isGenerating.set(false);
     }
@@ -109,6 +129,7 @@ export class AiAgentService {
          try {
              await this.handleToolCall(toolCall);
          } catch (e) {
+             console.error("Tool execution error", e);
              // Fallback if tool execution fails
              this.messages.update(msgs => [...msgs, { role: 'assistant', content: content }]);
          }
@@ -118,21 +139,46 @@ export class AiAgentService {
   }
 
   private extractJson(content: string): any {
-    try {
-      // Try parsing directly
-      if (content.trim().startsWith('{')) {
-          return JSON.parse(content);
-      }
+      // 1. Try stripping markdown code blocks first
+      const cleanContent = content.replace(/```json\s*|```/g, '').trim();
       
-      // Try to extract from markdown code blocks
-      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-          return JSON.parse(jsonMatch[1]);
+      // 2. Scan for the first '{' and try to find a valid JSON object
+      const startIndex = cleanContent.indexOf('{');
+      if (startIndex === -1) return null;
+
+      // Try parsing from the first open brace to the end, then shrinking if needed
+      // Naive approach: try to find the matching closing brace? 
+      // Better approach: Try parsing increasingly longer substrings? 
+      // Or just try to parse the whole thing from startIndex
+      
+      const potentialJson = cleanContent.substring(startIndex);
+      
+      try {
+        return JSON.parse(potentialJson);
+      } catch (e) {
+        // If full parse fails, it might have trailing text.
+        // Attempt to find the closing brace by counting balance
+        let balance = 0;
+        let endIndex = -1;
+        
+        for (let i = 0; i < potentialJson.length; i++) {
+            if (potentialJson[i] === '{') balance++;
+            else if (potentialJson[i] === '}') {
+                balance--;
+                if (balance === 0) {
+                    endIndex = i;
+                    break;
+                }
+            }
+        }
+        
+        if (endIndex !== -1) {
+            try {
+                return JSON.parse(potentialJson.substring(0, endIndex + 1));
+            } catch (err) { }
+        }
       }
       return null;
-    } catch {
-      return null;
-    }
   }
 
   private async handleToolCall(toolCall: any) {
@@ -152,14 +198,14 @@ export class AiAgentService {
                result = `Appointment request received for ${toolCall.args?.serviceType} on ${toolCall.args?.date}. Please confirm via WhatsApp.`;
                break;
           default:
-              result = "Tool not found or not supported.";
+               result = "Tool not found or not supported.";
       }
 
       // Add tool interaction context (hidden from user via visibleMessages)
       this.messages.update(msgs => [
           ...msgs, 
           { role: 'assistant', content: `Checking... (Tool: ${toolCall.tool})` },
-          { role: 'system', content: `[Tool Output]: ${result}` } // System role hides it from UI
+          { role: 'user', content: `[Tool Output]: ${result}` } // Changed to 'user' to be safer for LLM context
       ]);
       
       // Trigger re-generation with tool output

@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 export type Language = 'en' | 'es';
 export type Theme = 'gradient-1' | 'gradient-5'; // Add more as needed
@@ -8,6 +9,8 @@ export type Theme = 'gradient-1' | 'gradient-5'; // Add more as needed
   providedIn: 'root'
 })
 export class PreferencesService {
+  private platformId = inject(PLATFORM_ID);
+  
   private languageSubject = new BehaviorSubject<Language>('es');
   language$ = this.languageSubject.asObservable();
 
@@ -91,10 +94,16 @@ export class PreferencesService {
   }
 
   private savePreference(key: string, value: string): void {
-    localStorage.setItem(key, value);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(key, value);
+    }
   }
 
   private loadPreferences(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     const savedLanguage = localStorage.getItem('portfolio-language') as Language | null;
     const savedBackground = localStorage.getItem('portfolio-background');
     const savedFontSize = localStorage.getItem('portfolio-font-size');
@@ -121,6 +130,10 @@ export class PreferencesService {
   }
 
   private applyTheme(themeId: string): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     const theme = this.backgroundOptions.find(t => t.id === themeId) || this.backgroundOptions[0];
     
     // Toggle .dark class for Tailwind @custom-variant
@@ -131,13 +144,15 @@ export class PreferencesService {
     }
 
     // Set data-theme for DaisyUI (and semantic colors)
-    // We assume themeId maps to a DaisyUI theme name or we use generic 'light'/'dark'
-    // Since backgroundOptions has 'gradient-5' etc which are custom, let's map to light/dark
     const daisyTheme = theme.isDark ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', daisyTheme);
   }
 
   private applyHighContrast(isHighContrast: boolean): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
     if (isHighContrast) {
       document.documentElement.classList.add('high-contrast');
     } else {

@@ -91,7 +91,7 @@ export class CategoryService {
       this.supabase
         .from('categories')
         .select('*')
-        .eq('slug', slug)
+        .ilike('slug', slug) // Use ilike for case-insensitive matching
         .limit(1)
     ).pipe(
       map(({ data, error }) => {
@@ -122,6 +122,24 @@ export class CategoryService {
       catchError((err) => {
         this.logger.error('Supabase Error:', err);
         return of(null);
+      })
+    );
+  }
+  public getAll(): Observable<iCategory[]> {
+    return from(
+      this.supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('name')
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return (data || []) as iCategory[];
+      }),
+      catchError((err) => {
+        this.logger.error('Supabase Error:', err);
+        return of([]);
       })
     );
   }

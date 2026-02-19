@@ -37,8 +37,17 @@
       "architect": {
         "build": {
           "builder": "@angular/build:application",
+          "defaultConfiguration": "production",
           "options": {
             "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "ssr": {
+              "entry": "server.ts"
+            },
+            "prerender": {
+              "discoverRoutes": false,
+              "routesFile": "routes.txt"
+            },
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -98,8 +107,7 @@
                 }
               ]
             }
-          },
-          "defaultConfiguration": "production"
+          }
         },
         "serve": {
           "builder": "@angular/build:dev-server",

@@ -11,7 +11,10 @@ export interface SeoData {
   imageUrl?: string;
   type?: 'website' | 'product' | 'article' | 'profile';
   keywords?: string;
+  url?: string; // Optional override
   schema?: Record<string, any>;
+  author?: string;
+  twitterCard?: 'summary' | 'summary_large_image' | 'app' | 'player';
 }
 
 const SEO_DATA_KEY = makeStateKey<SeoData>('SEO_DATA');
@@ -29,11 +32,18 @@ export class SeoService {
   private transferState = inject(TransferState);
 
   constructor() {
-    this.init();
+    // Service is singleton, initialization logic moved to separate method 
+    // to allow explicit control from AppComponent as requested.
   }
 
-  private init() {
+  /**
+   * Initializes the SEO service.
+   * Subscribes to router events to automatically update tags.
+   * Must be called once from AppComponent.
+   */
+  public initialize() {
     // 1. Check if we have TransferState data (Client Side Hydration)
+    // This prevents flickering on the client side if the server already rendered the tags.
     if (!isPlatformServer(this.platformId)) {
       const serverSeoData = this.transferState.get(SEO_DATA_KEY, null);
       if (serverSeoData) {
@@ -44,61 +54,52 @@ export class SeoService {
     // 2. Subscribe to Route Changes
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
-      map(() => this.rootRoute(this.activatedRoute)),
+      map(() => this.getContentRoute(this.activatedRoute)),
       filter(route => route.outlet === 'primary'),
       mergeMap(route => route.data)
     ).subscribe(data => {
-      // If the route has 'seo' data, use it.
       if (data['seo']) {
         const seoData = data['seo'] as SeoData;
         this.setPageData(seoData);
 
-        // If on Server, save to TransferState
+        // If running on Server, save to TransferState for the Client
         if (isPlatformServer(this.platformId)) {
           this.transferState.set(SEO_DATA_KEY, seoData);
         }
-      } else {
-        // Reset if no SEO data found for current route (optional, or keep previous?)
-        // Usually better to keep previous or have a default. 
-        // But resetData() is called inside setPageData().
-        // If we want to guarantee clean state for pages without SEO, we might call resetData() here,
-        // but that might wipe the default app title.
       }
     });
   }
 
-  private rootRoute(route: ActivatedRoute): ActivatedRoute {
+  /**
+   * Recursively traverses the route tree to find the last child (the actual page component).
+   */
+  private getContentRoute(route: ActivatedRoute): ActivatedRoute {
     while (route.firstChild) {
       route = route.firstChild;
     }
     return route;
   }
 
-  resetData() {
-    // Remove specific product/article tags that might linger
-    this.metaService.removeTag('property="product:price:amount"');
-    this.metaService.removeTag('property="product:price:currency"');
-    this.metaService.removeTag('property="article:published_time"');
-    this.metaService.removeTag('property="article:author"');
-    
-    // Reset basic Open Graph type to website default
-    this.metaService.updateTag({ property: 'og:type', content: 'website' });
-    this.metaService.removeTag('name="keywords"');
-
-    // Clear JSON-LD
-    this.clearJsonLd();
-  }
-  
   /**
-   * Sets the core page metadata including Title, Description, and Canonical URL.
-   * This is the entry point for basic SEO configuration per page.
+   * Sets all SEO metadata for the current page.
    */
-  setPageData(data: SeoData) {
-    const { title, description, imageUrl, type = 'website', keywords, schema } = data;
+  public setPageData(data: SeoData) {
+    const { 
+        title, 
+        description, 
+        imageUrl, 
+        type = 'website', 
+        keywords, 
+        schema,
+        url,
+        author,
+        twitterCard = 'summary_large_image'
+    } = data;
     
-    // 0. Reset previous specific tags
-    this.resetData();
-
+    // 0. Cleanup previous state
+    // Note: Angular's Meta service `updateTag` will replace existing tags with the same name/property,
+    // so explicit removal is only needed for tags that might not be present in the new data.
+    
     // 1. Set Browser Title
     const finalTitle = title.includes('|') || title.includes('Arecofix') ? title : `${title} | Arecofix`;
     this.titleService.setTitle(finalTitle);
@@ -106,68 +107,70 @@ export class SeoService {
     // 2. Set Meta Description
     this.metaService.updateTag({ name: 'description', content: description });
 
-    // 3. Set Keywords (Optional)
+    // 3. Keywords
     if (keywords) {
       this.metaService.updateTag({ name: 'keywords', content: keywords });
     }
 
-    // 4. Set Social Media Tags (Open Graph & Twitter)
-    this.setSocialMediaTags({
-        title: finalTitle,
-        description,
-        image: imageUrl || `${environment.baseUrl}/assets/img/brands/logo/logo-normal1.PNG`,
-        url: this.router.url,
-        type
-    });
+    // 4. Author
+    if (author) {
+        this.metaService.updateTag({ name: 'author', content: author });
+    }
 
-    // 5. Set Canonical URL
-    this.setCanonicalUrl(this.router.url);
+    // 5. Construct Canonical & Image URLs
+    const currentPath = url || this.router.url;
+    const finalUrl = currentPath.startsWith('http') ? currentPath : `${environment.baseUrl}${currentPath}`;
+    
+    // Handle Image URL: if it's relative, append baseUrl. Use default if missing.
+    let finalImageUrl = 'assets/img/branding/og-services.jpg'; // Default valid image
+    if (imageUrl) {
+        finalImageUrl = imageUrl;
+    }
+    if (!finalImageUrl.startsWith('http')) {
+        // Ensure strictly no double slashes if imageUrl starts with /
+        const cleanPath = finalImageUrl.startsWith('/') ? finalImageUrl.substring(1) : finalImageUrl;
+        finalImageUrl = `${environment.baseUrl}/${cleanPath}`;
+    }
 
-    // 6. Set Structured Data (JSON-LD)
+    // 6. Set Social Media Tags (Open Graph)
+    this.metaService.updateTag({ property: 'og:title', content: finalTitle });
+    this.metaService.updateTag({ property: 'og:description', content: description });
+    this.metaService.updateTag({ property: 'og:type', content: type });
+    this.metaService.updateTag({ property: 'og:url', content: finalUrl });
+    this.metaService.updateTag({ property: 'og:image', content: finalImageUrl });
+    if (finalImageUrl.startsWith('https')) {
+        this.metaService.updateTag({ property: 'og:image:secure_url', content: finalImageUrl });
+    }
+    this.metaService.updateTag({ property: 'og:site_name', content: 'Arecofix' });
+
+    // 7. Twitter Cards
+    this.metaService.updateTag({ name: 'twitter:card', content: twitterCard });
+    this.metaService.updateTag({ name: 'twitter:title', content: finalTitle });
+    this.metaService.updateTag({ name: 'twitter:description', content: description });
+    this.metaService.updateTag({ name: 'twitter:image', content: finalImageUrl });
+
+    // 8. Canonical URL
+    this.setCanonicalUrl(finalUrl);
+
+    // 9. Structured Data (JSON-LD)
     if (schema) {
-      this.setJsonLd(schema);
+      this.injectJsonLd(schema);
+    } else {
+        this.removeJsonLd();
     }
   }
 
-  /**
-   * Specifically sets Open Graph and Twitter Card metadata.
-   * Crucial for WhatsApp, Facebook, and Twitter sharing previews.
-   */
-  setSocialMediaTags(config: { title: string; description: string; image: string; url: string; type: string }) {
-    // Open Graph (Facebook, WhatsApp, LinkedIn)
-    this.metaService.updateTag({ property: 'og:title', content: config.title });
-    this.metaService.updateTag({ property: 'og:description', content: config.description });
-    this.metaService.updateTag({ property: 'og:type', content: config.type });
-    this.metaService.updateTag({ property: 'og:url', content: config.url.startsWith('http') ? config.url : `${environment.baseUrl}${config.url}` });
-    
-    const fullImageUrl = config.image.startsWith('http') ? config.image : `${environment.baseUrl}${config.image.startsWith('/') ? '' : '/'}${config.image}`;
-    this.metaService.updateTag({ property: 'og:image', content: fullImageUrl });
-    
-    // Ensure image secure url is set for https
-    if (fullImageUrl.startsWith('https')) {
-        this.metaService.updateTag({ property: 'og:image:secure_url', content: fullImageUrl });
-    }
-
-    // Twitter Card
-    this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-    this.metaService.updateTag({ name: 'twitter:title', content: config.title });
-    this.metaService.updateTag({ name: 'twitter:description', content: config.description });
-    this.metaService.updateTag({ name: 'twitter:image', content: fullImageUrl });
-  }
-
-  setCanonicalUrl(url: string) {
-    // Check if link exists
+  private setCanonicalUrl(url: string) {
     let link: HTMLLinkElement | null = this.document.querySelector('link[rel="canonical"]');
     if (!link) {
         link = this.document.createElement('link');
         link.setAttribute('rel', 'canonical');
         this.document.head.appendChild(link);
     }
-    const finalUrl = url.startsWith('http') ? url : `${environment.baseUrl}${url}`;
-    link.setAttribute('href', finalUrl);
+    link.setAttribute('href', url);
   }
 
-  setJsonLd(schema: Record<string, any>) {
+  private injectJsonLd(schema: Record<string, any>) {
     const scriptId = 'json-ld-schema';
     let script = this.document.getElementById(scriptId) as HTMLScriptElement;
 
@@ -181,9 +184,8 @@ export class SeoService {
     script.text = JSON.stringify(schema);
   }
 
-  clearJsonLd() {
-    const scriptId = 'json-ld-schema';
-    const script = this.document.getElementById(scriptId);
+  private removeJsonLd() {
+    const script = this.document.getElementById('json-ld-schema');
     if (script) {
       script.remove();
     }

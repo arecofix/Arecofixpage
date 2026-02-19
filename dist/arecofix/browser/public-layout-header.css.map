@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["public-layout-header.ts"],
+  "sourcesContent": ["\n    :host {\n      display: contents;\n    }\n  "],
+  "mappings": ";AACI;AACE,WAAA;AACF;",
+  "names": []
+}

@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   Injector,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -54,47 +55,7 @@ export class ProductsDetailsPage {
   private seoService = inject(SeoService);
   private document = inject(DOCUMENT);
 
-  constructor() {
-      effect(() => {
-          const product = this.product();
-          if (product) {
-              this.seoService.setPageData({
-                  title: product.name,
-                  description: product.description || `Compra ${product.name} en Arecofix`,
-                  imageUrl: product.image_url,
-                  type: 'product'
-              });
 
-              // JSON-LD Structured Data
-              const script = this.document.createElement('script');
-              script.type = 'application/ld+json';
-              script.text = JSON.stringify({
-                "@context": "https://schema.org/",
-                "@type": "Product",
-                "name": product.name,
-                "image": product.image_url ? [`https://arecofix.com.ar${product.image_url}`] : [],
-                "description": product.description || `Compra ${product.name} en Arecofix`,
-                "brand": {
-                  "@type": "Brand",
-                  "name": "Arecofix"
-                },
-                "sku": product.sku || product.id,
-                "offers": {
-                  "@type": "Offer",
-                  "url": window.location.href,
-                  "priceCurrency": "ARS",
-                  "price": product.price,
-                  "availability": "https://schema.org/InStock",
-                  "seller": {
-                    "@type": "Organization",
-                    "name": "Arecofix"
-                  }
-                }
-              });
-              this.document.head.appendChild(script);
-          }
-      });
-  }
 
   breadcrumbItems = computed(() => {
     const product = this.product();
@@ -156,6 +117,60 @@ export class ProductsDetailsPage {
     // Retornar el primer producto encontrado (debería ser único por slug)
     return data.data[0];
   });
+
+  // Signal for the currently selected image to display
+  selectedImage = signal<string | null>(null);
+
+  constructor() {
+      effect(() => {
+          const product = this.product();
+          if (product) {
+              // Initialize selected image if not set
+              if (!this.selectedImage()) {
+                  this.selectedImage.set(product.image_url || null);
+              }
+
+              this.seoService.setPageData({
+                  title: product.name,
+                  description: product.description || `Compra ${product.name} en Arecofix`,
+                  imageUrl: product.image_url,
+                  type: 'product'
+              });
+
+              // JSON-LD Structured Data
+              const script = this.document.createElement('script');
+              script.type = 'application/ld+json';
+              script.text = JSON.stringify({
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": product.name,
+                "image": product.image_url ? [`https://arecofix.com.ar${product.image_url}`] : [],
+                "description": product.description || `Compra ${product.name} en Arecofix`,
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Arecofix"
+                },
+                "sku": product.sku || product.id,
+                "offers": {
+                  "@type": "Offer",
+                  "url": window.location.href,
+                  "priceCurrency": "ARS",
+                  "price": product.price,
+                  "availability": "https://schema.org/InStock",
+                  "seller": {
+                    "@type": "Organization",
+                    "name": "Arecofix"
+                  }
+                }
+              });
+              this.document.head.appendChild(script);
+          }
+      });
+  }
+
+  selectImage(image: string) {
+      this.selectedImage.set(image);
+  }
 
   private injector = inject(Injector);
 

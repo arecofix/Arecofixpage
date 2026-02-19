@@ -80,6 +80,8 @@ export class TrackingPage implements OnInit {
     }
 
     openImage(url: string) {
-        window.open(url, '_blank');
+        if (typeof window !== 'undefined') {
+            window.open(url, '_blank');
+        }
     }
 }

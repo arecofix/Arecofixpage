@@ -123,14 +123,16 @@ export class AdminProductService {
                     const productsToUpsert = result.data;
                     
                     if (productsToUpsert.length > 0) {
-                        const { error } = await this.supabase
-                            .from('products')
-                            .upsert(productsToUpsert, { onConflict: 'id' }); 
-
-                        if (error) throw error;
+                        try {
+                            const upserted = await firstValueFrom(this.productRepo.upsertMany(productsToUpsert));
+                            // success count = imported/updated count
+                            resolve({ success: upserted.length, errors: result.errors });
+                        } catch (e) {
+                             reject(e);
+                        }
+                    } else {
+                        resolve({ success: 0, errors: result.errors });
                     }
-
-                    resolve({ success: productsToUpsert.length, errors: result.errors });
                 } catch (error) {
                     reject(error);
                 }
@@ -142,50 +144,25 @@ export class AdminProductService {
     }
 
     async bulkUpdate(ids: string[], payload: Partial<Product>): Promise<void> {
-        const { error } = await this.supabase
-            .from('products')
-            .update(payload)
-            .in('id', ids);
-
-        if (error) throw error;
+        // Prepare updates for each ID
+        const updates = ids.map(id => ({ id, ...payload }));
+        await firstValueFrom(this.productRepo.updateMany(updates));
     }
 
     async bulkIncreasePrice(ids: string[], percentage: number): Promise<void> {
-        // Strategy: Fetch current prices, calculate new ones, and update.
-        // For distinct values, we unfortunately need individual updates or an Upsert.
-        // Supabase/PostgREST doesn't support "price = price * 1.1" in simple update yet without RPC.
-        
         // 1. Get current products
-        const { data: products, error } = await this.supabase
-            .from('products')
-            .select('id, price')
-            .in('id', ids);
+        const response = await firstValueFrom(this.productRepo.findWithFilters({ ids: ids }));
+        const products = response.data; // Access data property from response
 
-        if (error) throw error;
         if (!products || products.length === 0) return;
 
         // 2. Prepare updates
         const updates = products.map(p => ({
             id: p.id,
-            price: Math.round(p.price * (1 + percentage / 100)) // Round to integer for simplicity, or 2 decimals
+            price: Math.round(p.price * (1 + percentage / 100))
         }));
 
-        // 3. Perform Upsert (efficient batch update)
-        // Note: This requires the table to have a primary key on ID (standard)
-        // We only send ID and Price, so we must rely on Supabase not clearing other fields on upsert 
-        // IF we use 'ignoreDuplicates: false' (default).
-        // However, standard upsert replaces the row. 
-        // BETTER APPROACH SAFE: Parallel Updates for now to avoid overwriting other fields 
-        // if upsert behavior isn't strictly PATCh. 
-        // Actually, upsert overwrites. We don't want that.
-        // Let's use Promise.all with a concurrency limit if possible, or just Promise.all for now (Batch size usually < 50).
-        
-        const BATCH_SIZE = 5;
-        for (let i = 0; i < updates.length; i += BATCH_SIZE) {
-             const batch = updates.slice(i, i + BATCH_SIZE);
-             await Promise.all(batch.map(u => 
-                 this.supabase.from('products').update({ price: u.price }).eq('id', u.id)
-             ));
-        }
+        // 3. Perform Update
+        await firstValueFrom(this.productRepo.updateMany(updates));
     }
 }

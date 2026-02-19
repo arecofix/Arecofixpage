@@ -20,6 +20,16 @@ posthog.init(
   }
 );
 
-bootstrapApplication(App, appConfig)
+import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+
+// Browser-specific config (Charts breaks SSR)
+const browserConfig: ApplicationConfig = {
+  providers: [
+    provideCharts(withDefaultRegisterables())
+  ]
+};
+
+bootstrapApplication(App, mergeApplicationConfig(appConfig, browserConfig))
     .catch((err) => console.error(err));
 // Trigger rebuild

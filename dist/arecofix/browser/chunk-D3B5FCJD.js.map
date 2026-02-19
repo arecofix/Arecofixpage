@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/courses/admin-courses.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_COURSES_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Cursos',\r\n    loadComponent: () => import('./admin-courses-page').then(m => m.AdminCoursesPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Curso',\r\n    loadComponent: () => import('./admin-course-form-page').then(m => m.AdminCourseFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Curso',\r\n    loadComponent: () => import('./admin-course-form-page').then(m => m.AdminCourseFormPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;;;AAEO,IAAM,uBAA+B;EAC1C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAsB,EAAE,KAAK,OAAK,EAAE,gBAAgB;;EAElF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA0B,EAAE,KAAK,OAAK,EAAE,mBAAmB;;EAEzF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA0B,EAAE,KAAK,OAAK,EAAE,mBAAmB;;;",
+  "names": []
+}

@@ -15,4 +15,8 @@ export abstract class ProductRepository {
     abstract create(product: Product): Observable<Product>;
     abstract update(id: string, product: Partial<Product>): Observable<Product>;
     abstract delete(id: string): Observable<void>;
+    
+    // Bulk Operations
+    abstract upsertMany(products: Partial<Product>[]): Observable<Product[]>;
+    abstract updateMany(products: Partial<Product>[]): Observable<void>;
 }

@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of, tap, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, catchError } from 'rxjs/operators';
 import { rxResource } from '@angular/core/rxjs-interop';
 
 import {
@@ -107,6 +107,23 @@ export class ProductsByCategoryPage {
     this.searchSubject.next(value);
   }
 
+  // Helper function to get all descendant category IDs recursively
+  private getAllDescendantIds(parentId: string, allCategories: iCategory[]): string[] {
+      // Start with the parent itself
+      let ids = [parentId];
+      
+      // Find direct children
+      const children = allCategories.filter(c => c.parent_id === parentId);
+      
+      for (const child of children) {
+          // Recursively add children and their descendants
+          ids = [...ids, ...this.getAllDescendantIds(child.id, allCategories)];
+      }
+      
+      // Remove duplicates just in case (e.g. if graph has cycles, though unlikely in categories tree)
+      return [...new Set(ids)];
+  }
+
   productsRs = rxResource({
     stream: () =>
       combineLatest([
@@ -114,18 +131,27 @@ export class ProductsByCategoryPage {
         this.route.queryParams,
       ]).pipe(
         switchMap(([slug, params]) =>
-          this.categoryService.getDataBySlug(slug).pipe(
-            tap((category: iCategoriesResponse) => {
-              this.currentCategory.set(category.data?.[0] || null);
+          combineLatest({
+            categoryResponse: this.categoryService.getDataBySlug(slug),
+            allCategories: this.categoryService.getAll().pipe(catchError(() => of([])))
+          }).pipe(
+            tap(({ categoryResponse }) => {
+              this.currentCategory.set(categoryResponse.data?.[0] || null);
             }),
-            switchMap((category: iCategoriesResponse) => {
-              const categoryId = category.data?.[0]?.id;
+            switchMap(({ categoryResponse, allCategories }) => {
+              const currentCat = categoryResponse.data?.[0];
+              const categoryId = currentCat?.id;
               
               if (!categoryId) {
+                console.warn('Category not found for slug:', slug);
                 return of({
                   first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: []
                 });
               }
+
+              // Get all descendant IDs to filter products by category AND subcategories
+              const targetCategoryIds = this.getAllDescendantIds(categoryId, allCategories as iCategory[]);
+              console.log('Fetching products for category:', currentCat.name, 'IDs:', targetCategoryIds);
 
               const currentPage = +params['_page'] || 1;
               const _sort = params['_sort'];
@@ -140,7 +166,7 @@ export class ProductsByCategoryPage {
               if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
 
               return this.productService.getData({
-                category_id: categoryId,
+                category_ids: targetCategoryIds, // Use category_ids instead of category_id
                 _page: currentPage,
                 _sort,
                 _order,
@@ -153,6 +179,7 @@ export class ProductsByCategoryPage {
         ) 
       ),
   });
+
 
   // Computed para extraer datos de paginación de forma reactiva
   paginationData = computed<iPagination | null>(() => {

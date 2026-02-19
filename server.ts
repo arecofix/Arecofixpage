@@ -56,16 +56,31 @@ export function app(): express.Express {
   });
 
   // All regular routes use the Angular engine
-  server.get('*', (req, res, next) => {
-    const { protocol, originalUrl, baseUrl, headers } = req;
+  server.get(/(.*)/, (req, res, next) => {
+    const { originalUrl, baseUrl, headers } = req;
+    
+    // Check X-Forwarded-Proto for correct protocol behind proxies (like Firebase, Cloudflare)
+    const protocol = headers['x-forwarded-proto'] || req.protocol;
+    
+    // Construct the full URL correctly.
+    // 'headers.host' usually includes port if non-standard.
+    // We want the URL that Angular sees to match the request exactly.
+    const fullUrl = `${protocol}://${headers.host}${originalUrl}`;
 
+    console.log(`SSR Rendering: ${fullUrl}`);
+
+    console.log('Rendering request:', originalUrl);
+    console.log('Bootstrap function:', bootstrap);
     commonEngine
       .render({
         bootstrap,
         documentFilePath: indexHtml,
-        url: `${protocol}://${headers.host}${originalUrl}`,
+        url: fullUrl,
         publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+        providers: [
+            { provide: APP_BASE_HREF, useValue: baseUrl },
+            // Pass 'serverUrl' if needed by components, though Angular Router usually handles it via `url`
+        ],
       })
       .then((html) => res.send(html))
       .catch((err) => next(err));
@@ -84,4 +99,9 @@ function run(): void {
   });
 }
 
-run();
+const mainModule = process.argv[1];
+const modulePath = fileURLToPath(import.meta.url);
+
+if (mainModule && (mainModule === modulePath || mainModule + '.mjs' === modulePath)) {
+    run();
+}
