@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/products/admin-products.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_PRODUCTS_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Productos',\r\n    loadComponent: () => import('./admin-products-page').then(m => m.AdminProductsPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Producto',\r\n    loadComponent: () => import('./admin-product-form-page').then(m => m.AdminProductFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Producto',\r\n    loadComponent: () => import('./admin-product-form-page').then(m => m.AdminProductFormPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;;;AAEO,IAAM,wBAAgC;EAC3C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAuB,EAAE,KAAK,OAAK,EAAE,iBAAiB;;EAEpF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA2B,EAAE,KAAK,OAAK,EAAE,oBAAoB;;EAE3F;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA2B,EAAE,KAAK,OAAK,EAAE,oBAAoB;;;",
+  "names": []
+}

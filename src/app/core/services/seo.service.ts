@@ -19,6 +19,42 @@ export interface SeoData {
 
 const SEO_DATA_KEY = makeStateKey<SeoData>('SEO_DATA');
 
+// Dictionary of predefined Meta Tags based on internal routes
+export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
+  '/': {
+    title: 'Soluciones de Software & Consultoría IT',
+    description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
+    imageUrl: 'assets/img/branding/og-services.jpg'
+  },
+  '/celular': {
+    title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
+    description: 'Arreglo de pantallas, baterías y pines de carga en el acto. Calidad garantizada en Marcos Paz.',
+    imageUrl: 'assets/img/branding/og-celulares.jpg',
+    keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix'
+  },
+  '/contacto': {
+    title: 'Contacto | Arecofix - Estamos para Ayudarte',
+    description: '¿Tenés alguna consulta o necesitás soporte técnico? Contáctanos por WhatsApp, Email o visitanos en nuestro local.',
+    imageUrl: 'assets/img/branding/og-contact.jpg'
+  },
+  '/servicios': {
+    title: 'Servicios de Tecnología y Reparación | Arecofix',
+    description: 'Soluciones integrales: Reparación de Celulares, Desarrollo de Software, Cámaras de Seguridad y Soporte IT para empresas.',
+    imageUrl: 'assets/img/branding/og-services.jpg',
+    keywords: 'servicios informaticos, reparacion celulares, desarrollo software, soporte it, camaras seguridad'
+  },
+  '/nosotros': {
+    title: 'Sobre Nosotros | Arecofix - Innovación y Compromiso',
+    description: 'Conocé al equipo detrás de Arecofix. Somos expertos en tecnología comprometidos con brindar soluciones de calidad en Marcos Paz.',
+    imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+  },
+  '/academy': {
+    title: 'Arecofix Academy | Cursos de Tecnología',
+    description: 'Aprendé reparación de celulares, programación y más con nuestros cursos presenciales y online.',
+    imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+  }
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,40 +67,65 @@ export class SeoService {
   private platformId = inject(PLATFORM_ID);
   private transferState = inject(TransferState);
 
-  constructor() {
-    // Service is singleton, initialization logic moved to separate method 
-    // to allow explicit control from AppComponent as requested.
-  }
+  constructor() {}
 
   /**
    * Initializes the SEO service.
    * Subscribes to router events to automatically update tags.
-   * Must be called once from AppComponent.
    */
   public initialize() {
     // 1. Check if we have TransferState data (Client Side Hydration)
-    // This prevents flickering on the client side if the server already rendered the tags.
     if (!isPlatformServer(this.platformId)) {
       const serverSeoData = this.transferState.get(SEO_DATA_KEY, null);
       if (serverSeoData) {
         this.setPageData(serverSeoData);
+      }
+    } else {
+      // Immediate execution for Server to avoid racing with NavigationEnd
+      const initialUrl = this.router.url.split('?')[0];
+      if (STATIC_SEO_CONFIG[initialUrl]) {
+        this.setPageData(STATIC_SEO_CONFIG[initialUrl]);
       }
     }
 
     // 2. Subscribe to Route Changes
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
-      map(() => this.getContentRoute(this.activatedRoute)),
-      filter(route => route.outlet === 'primary'),
-      mergeMap(route => route.data)
-    ).subscribe(data => {
-      if (data['seo']) {
-        const seoData = data['seo'] as SeoData;
+      map((event: any) => event.urlAfterRedirects.split('?')[0]), // Normalize the URL
+    ).subscribe((currentPath: string) => {
+      
+      // Look in the Static Configuration Object first
+      let seoData = STATIC_SEO_CONFIG[currentPath];
+
+      // If not defined statically, attempt to read from ActivatedRoute data
+      if (!seoData) {
+        const routeData = this.getContentRoute(this.activatedRoute).snapshot.data;
+        if (routeData && routeData['seo']) {
+          seoData = routeData['seo'] as SeoData;
+        }
+      }
+
+      // If no static or activated route data exists, enforce absolute defaults
+      if (!seoData) {
+        seoData = {
+          title: 'Arecofix - Servicio Técnico de Celulares y Soluciones IT',
+          description: 'Experto en reparación de celulares en el acto, desarrollo web y transformación digital en Marcos Paz.',
+          imageUrl: 'assets/img/branding/og-services.jpg'
+        };
+      }
+
+      if (seoData) {
+        // Prevent rewriting empty state while hydrating
+        if (!isPlatformServer(this.platformId) && this.transferState.hasKey(SEO_DATA_KEY)) {
+           this.transferState.remove(SEO_DATA_KEY);
+           return;
+        }
+
         this.setPageData(seoData);
 
-        // If running on Server, save to TransferState for the Client
-        if (isPlatformServer(this.platformId)) {
-          this.transferState.set(SEO_DATA_KEY, seoData);
+      } else {
+        if (!isPlatformServer(this.platformId) && this.transferState.hasKey(SEO_DATA_KEY)) {
+           this.transferState.remove(SEO_DATA_KEY);
         }
       }
     });
@@ -84,6 +145,10 @@ export class SeoService {
    * Sets all SEO metadata for the current page.
    */
   public setPageData(data: SeoData) {
+    if (isPlatformServer(this.platformId)) {
+      this.transferState.set(SEO_DATA_KEY, data);
+    }
+
     const { 
         title, 
         description, 
@@ -95,10 +160,6 @@ export class SeoService {
         author,
         twitterCard = 'summary_large_image'
     } = data;
-    
-    // 0. Cleanup previous state
-    // Note: Angular's Meta service `updateTag` will replace existing tags with the same name/property,
-    // so explicit removal is only needed for tags that might not be present in the new data.
     
     // 1. Set Browser Title
     const finalTitle = title.includes('|') || title.includes('Arecofix') ? title : `${title} | Arecofix`;
@@ -117,19 +178,18 @@ export class SeoService {
         this.metaService.updateTag({ name: 'author', content: author });
     }
 
-    // 5. Construct Canonical & Image URLs
-    const currentPath = url || this.router.url;
+    // 5. Construct Canonical & Image URLs absolutely
+    const currentPath = url || this.router.url.split('?')[0]; // discard query params from canonical
     const finalUrl = currentPath.startsWith('http') ? currentPath : `${environment.baseUrl}${currentPath}`;
     
-    // Handle Image URL: if it's relative, append baseUrl. Use default if missing.
-    let finalImageUrl = 'assets/img/branding/og-services.jpg'; // Default valid image
+    let finalImageUrl = `${environment.baseUrl}/assets/img/branding/og-services.jpg`; // Default absolute image
     if (imageUrl) {
-        finalImageUrl = imageUrl;
-    }
-    if (!finalImageUrl.startsWith('http')) {
-        // Ensure strictly no double slashes if imageUrl starts with /
-        const cleanPath = finalImageUrl.startsWith('/') ? finalImageUrl.substring(1) : finalImageUrl;
-        finalImageUrl = `${environment.baseUrl}/${cleanPath}`;
+        if (imageUrl.startsWith('http')) {
+            finalImageUrl = imageUrl;
+        } else {
+            const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+            finalImageUrl = `${environment.baseUrl}/${cleanPath}`;
+        }
     }
 
     // 6. Set Social Media Tags (Open Graph)
@@ -191,4 +251,3 @@ export class SeoService {
     }
   }
 }
-

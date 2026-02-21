@@ -5,7 +5,7 @@
     [ngClass]="[(preferencesService.highContrast$ | async) ? 'high-contrast' : '']"
     [style.font-size.px]="(preferencesService.fontSize$ | async)">
     <!-- Navbar -->
-    <div class="w-full navbar bg-base-100 border-b border-base-300 lg:hidden text-base-content">
+    <div class="w-full navbar bg-base-100 border-b border-base-300 lg:hidden text-base-content sticky top-0 z-40 shadow-sm">
       <div class="flex-none">
         <label for="admin-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost text-base-content">
           <i class="fas fa-bars text-xl"></i>
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Page Content -->
-    <main class="flex-1 p-6 overflow-y-auto">
+    <main class="flex-1 p-6">
       <router-outlet></router-outlet>
     </main>
   </div>

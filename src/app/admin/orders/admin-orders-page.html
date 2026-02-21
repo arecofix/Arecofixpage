@@ -202,13 +202,18 @@
                     <div class="flex justify-between items-center mt-2">
                         <span class="text-xl font-bold text-gray-900 dark:text-white">{{ order.total | currency }}</span>
                         
-                        <div class="flex gap-2">
-                             <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-outline btn-ghost">Ver</a>
+                        <div class="flex justify-end gap-2">
                              @if(order.status === 'pending') {
-                                 <button (click)="toggleOrderStatus(order)" class="btn btn-sm btn-success text-white px-4">
-                                     <i class="fas fa-check"></i>
+                                 <button (click)="toggleOrderStatus(order)" class="btn btn-sm btn-ghost text-green-500 tooltip tooltip-left" data-tip="Marcar Pagado">
+                                     <i class="fas fa-check-dollar"></i>
                                  </button>
                              }
+                             <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-ghost text-gray-500 tooltip tooltip-top" data-tip="Ver Detalle">
+                                 <i class="fas fa-eye"></i>
+                             </a>
+                             <a [routerLink]="['/admin/orders', order.id, 'edit']" class="btn btn-sm btn-ghost text-indigo-500 tooltip tooltip-left" data-tip="Editar">
+                                 <i class="fas fa-pen"></i>
+                             </a>
                         </div>
                     </div>
                 </div>

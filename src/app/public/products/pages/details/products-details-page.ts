@@ -122,50 +122,57 @@ export class ProductsDetailsPage {
   selectedImage = signal<string | null>(null);
 
   constructor() {
-      effect(() => {
-          const product = this.product();
-          if (product) {
-              // Initialize selected image if not set
-              if (!this.selectedImage()) {
-                  this.selectedImage.set(product.image_url || null);
-              }
+    toObservable(this.product, { injector: this.injector }).subscribe(product => {
+      if (product) {
+        // Initialize selected image if not set
+        if (!this.selectedImage()) {
+            this.selectedImage.set(product.image_url || null);
+        }
 
-              this.seoService.setPageData({
-                  title: product.name,
-                  description: product.description || `Compra ${product.name} en Arecofix`,
-                  imageUrl: product.image_url,
-                  type: 'product'
-              });
+        this.seoService.setPageData({
+            title: product.name,
+            description: product.description || `Compra ${product.name} en Arecofix`,
+            imageUrl: product.image_url,
+            type: 'product',
+            url: `/productos/detalle/${product.slug}`
+        });
 
-              // JSON-LD Structured Data
-              const script = this.document.createElement('script');
-              script.type = 'application/ld+json';
-              script.text = JSON.stringify({
-                "@context": "https://schema.org/",
-                "@type": "Product",
-                "name": product.name,
-                "image": product.image_url ? [`https://arecofix.com.ar${product.image_url}`] : [],
-                "description": product.description || `Compra ${product.name} en Arecofix`,
-                "brand": {
-                  "@type": "Brand",
-                  "name": "Arecofix"
-                },
-                "sku": product.sku || product.id,
-                "offers": {
-                  "@type": "Offer",
-                  "url": window.location.href,
-                  "priceCurrency": "ARS",
-                  "price": product.price,
-                  "availability": "https://schema.org/InStock",
-                  "seller": {
-                    "@type": "Organization",
-                    "name": "Arecofix"
-                  }
-                }
-              });
-              this.document.head.appendChild(script);
+        // JSON-LD Structured Data
+        const scriptId = 'product-json-ld';
+        let script = this.document.getElementById(scriptId) as HTMLScriptElement;
+        
+        if (!script) {
+            script = this.document.createElement('script');
+            script.id = scriptId;
+            script.type = 'application/ld+json';
+            this.document.head.appendChild(script);
+        }
+
+        script.text = JSON.stringify({
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "name": product.name,
+          "image": product.image_url ? [`https://arecofix.com.ar${product.image_url}`] : [],
+          "description": product.description || `Compra ${product.name} en Arecofix`,
+          "brand": {
+            "@type": "Brand",
+            "name": "Arecofix"
+          },
+          "sku": product.sku || product.id,
+          "offers": {
+            "@type": "Offer",
+            "url": `https://arecofix.com.ar/productos/detalle/${product.slug}`,
+            "priceCurrency": "ARS",
+            "price": product.price,
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "Arecofix"
+            }
           }
-      });
+        });
+      }
+    });
   }
 
   selectImage(image: string) {

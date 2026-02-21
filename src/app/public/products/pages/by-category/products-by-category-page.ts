@@ -143,7 +143,7 @@ export class ProductsByCategoryPage {
               const categoryId = currentCat?.id;
               
               if (!categoryId) {
-                console.warn('Category not found for slug:', slug);
+                // Silent fail for missing category slugs rather than warning in console
                 return of({
                   first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: []
                 });
@@ -151,7 +151,6 @@ export class ProductsByCategoryPage {
 
               // Get all descendant IDs to filter products by category AND subcategories
               const targetCategoryIds = this.getAllDescendantIds(categoryId, allCategories as iCategory[]);
-              console.log('Fetching products for category:', currentCat.name, 'IDs:', targetCategoryIds);
 
               const currentPage = +params['_page'] || 1;
               const _sort = params['_sort'];

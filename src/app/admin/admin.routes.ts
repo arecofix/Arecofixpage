@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/guards/auth.guard';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const adminRoutes: Routes = [
   {
@@ -7,6 +8,10 @@ export const adminRoutes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('@app/admin/layout/admin-layout').then(m => m.AdminLayout),
+    providers: [
+      // Charts are only needed in admin — keep them out of the public bundle
+      provideCharts(withDefaultRegisterables()),
+    ],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {

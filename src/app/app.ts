@@ -36,17 +36,11 @@ export class App implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       // SEO Redirection Rule
       if (this.document.location.hostname === 'celulares.arecofix.com.ar') {
-        this.document.location.href = 'https://www.arecofix.com.ar/celular';
+        this.document.location.href = 'https://arecofix.com.ar/celular';
         return;
       }
 
-      // Send a test event to verify PostHog is working
-      this.logger.debug('Sending test event to PostHog...');
-      this.analytics.capture('app_initialized', {
-        timestamp: new Date().toISOString(),
-        message: 'Angular app successfully initialized'
-      });
-      this.logger.debug('Test event sent to PostHog');
+      // Removed test event for PostHog
     }
   }
 }

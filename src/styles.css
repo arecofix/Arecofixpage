@@ -130,7 +130,7 @@ h6 {
 }
 
 .glass-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-5px) translateZ(0);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   border-color: rgba(78, 160, 54, 0.5); /* Brand Green Border on Hover */
 }
@@ -164,6 +164,39 @@ h6 {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Slow pulse for background decorations */
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+.animate-pulse-slow {
+  animation: pulseSlow 8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Reduce motion for users who prefer it + improves perf on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-pulse-slow,
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-slide-in-left,
+  .animate-accordion-open {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .glass-card:hover {
+    transform: none;
+  }
+
+  .hover-scale:hover,
+  .hover-lift:hover {
+    transform: none;
+  }
 }
 
 .dropdown-content li > a,

@@ -27,7 +27,12 @@ export class CartService {
             const savedCart = localStorage.getItem('cart');
             if (savedCart) {
                 try {
-                    this.cartItems.set(JSON.parse(savedCart));
+                    const parsed = JSON.parse(savedCart);
+                    if (Array.isArray(parsed)) {
+                        this.cartItems.set(parsed.filter(item => item && item.product && item.product.id));
+                    } else {
+                        this.cartItems.set([]);
+                    }
                 } catch (e) {
                     this.cartItems.set([]);
                 }
@@ -81,8 +86,8 @@ export class CartService {
         this.cartItems.set([]);
     }
 
-    totalItems = computed(() => this.cartItems().reduce((acc, item) => acc + item.quantity, 0));
-    totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + (item.product.price * item.quantity), 0));
+    totalItems = computed(() => this.cartItems().reduce((acc, item) => acc + (item.quantity || 0), 0));
+    totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + ((item.product?.price || 0) * (item.quantity || 0)), 0));
 
     // Cart Visibility State
     isCartOpen = signal(false);

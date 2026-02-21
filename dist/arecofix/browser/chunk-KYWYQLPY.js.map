@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/categories/admin-categories.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_CATEGORIES_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Categorías',\r\n    loadComponent: () => import('./admin-categories-page').then(m => m.AdminCategoriesPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nueva Categoría',\r\n    loadComponent: () => import('./admin-category-form-page').then(m => m.AdminCategoryFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Categoría',\r\n    loadComponent: () => import('./admin-category-form-page').then(m => m.AdminCategoryFormPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;;;AAEO,IAAM,0BAAkC;EAC7C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAyB,EAAE,KAAK,OAAK,EAAE,mBAAmB;;EAExF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA4B,EAAE,KAAK,OAAK,EAAE,qBAAqB;;EAE7F;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA4B,EAAE,KAAK,OAAK,EAAE,qBAAqB;;;",
+  "names": []
+}

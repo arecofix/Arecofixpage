@@ -34,7 +34,7 @@
         <button
           (click)="preferencesService.setLanguage('es')"
           [class.bg-brand-blue]="(preferencesService.language$ | async) === 'es'"
-          class="w-full px-3 py-2 rounded-lg text-white text-sm transition-all hover:bg-brand-blue/80"
+          class="w-full px-3 py-2 rounded-lg text-white text-sm font-medium transition-all hover:bg-brand-blue/80"
           [class.bg-gray-700]="(preferencesService.language$ | async) !== 'es'"
           [attr.aria-pressed]="(preferencesService.language$ | async) === 'es'"
         >
@@ -43,7 +43,7 @@
         <button
           (click)="preferencesService.setLanguage('en')"
           [class.bg-brand-blue]="(preferencesService.language$ | async) === 'en'"
-          class="w-full px-3 py-2 rounded-lg text-white text-sm transition-all hover:bg-brand-blue/80"
+          class="w-full px-3 py-2 rounded-lg text-white text-sm font-medium transition-all hover:bg-brand-blue/80"
           [class.bg-gray-700]="(preferencesService.language$ | async) !== 'en'"
           [attr.aria-pressed]="(preferencesService.language$ | async) === 'en'"
         >
@@ -90,7 +90,7 @@
           </svg>
         </button>
 
-        <span class="text-sm font-semibold text-brand-blue px-3 py-2 bg-gray-800 rounded-lg min-w-12 text-center">
+        <span class="text-sm font-semibold text-blue-300 px-3 py-2 bg-gray-800 rounded-lg min-w-12 text-center">
           {{ (preferencesService.fontSize$ | async) }}px
         </span>
 

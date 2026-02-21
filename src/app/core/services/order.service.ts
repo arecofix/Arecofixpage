@@ -116,13 +116,19 @@ export class OrderService {
         }
     }
 
-    async updateOrderStatus(id: string, status: Order['status']): Promise<{ error: PostgrestError | null }> {
-        const { error } = await this.supabase
+    async updateOrderStatus(id: string, status: Order['status']): Promise<{ error: PostgrestError | Error | null }> {
+        const { error, data } = await this.supabase
             .from('orders')
             .update({ status, updated_at: new Date().toISOString() })
-            .eq('id', id);
+            .eq('id', id)
+            .select();
 
         if (error) this.handleError('Error updating order status', error);
+        
+        if (!error && (!data || data.length === 0)) {
+            return { error: new Error("Supabase RLS Error: No tienes permisos en la Base de Datos para cambiar el Estado de esta Orden. Ejecuta el SQL de ADMIN en Supabase.") };
+        }
+        
         return { error };
     }
 
@@ -152,20 +158,31 @@ export class OrderService {
                 updated_at: new Date().toISOString()
             };
 
-            const { data: orderData, error: orderError } = await this.supabase
+            const { error: orderError, data: updatedOrdersData } = await this.supabase
                 .from('orders')
                 .update(updatePayload)
                 .eq('id', id)
-                .select()
-                .maybeSingle();
+                .select();
 
             if (orderError) throw orderError;
-            if (!orderData) throw new Error('Order not found or permission denied');
+            
+            if (!updatedOrdersData || updatedOrdersData.length === 0) {
+                throw new Error("Supabase RLS Error: El servidor bloqueó la actualización de la Orden. Activa los permisos de edición para 'orders' en Supabase.");
+            }
 
             // Handle items update (delete missing, upsert current)
             await this.handleItemsUpdate(id, items);
 
-            const updatedDbOrder = orderData as DbOrder;
+            // Refetch the updated order to properly construct the updatedDbOrder
+            const { data: fetchUpdatedData, error: fetchUpdatedError } = await this.supabase
+                .from('orders')
+                .select('*')
+                .eq('id', id)
+                .single();
+            
+            if (fetchUpdatedError) throw fetchUpdatedError;
+
+            const updatedDbOrder = fetchUpdatedData as DbOrder;
             // Fetch fresh items to return complete object
             const { data: freshItems } = await this.supabase.from('order_items').select('*').eq('order_id', id);
             

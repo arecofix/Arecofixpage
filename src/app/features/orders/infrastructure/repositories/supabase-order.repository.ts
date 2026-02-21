@@ -26,10 +26,10 @@ export class SupabaseOrderRepository extends OrderRepository {
       .from('orders')
       .insert({
         id: orderId,
-        customer_name: order.customer_info.name,
-        customer_email: order.customer_info.email,
-        customer_phone: order.customer_info.phone,
-        customer_address: order.customer_info.address,
+        customer_name: order.clienteInfo.name,
+        customer_email: order.clienteInfo.email,
+        customer_phone: order.clienteInfo.phone,
+        customer_address: order.clienteInfo.address,
         status: order.status, // 'A_PAGAR'
         total_amount: order.total,
         order_number: orderNumber,
@@ -39,7 +39,7 @@ export class SupabaseOrderRepository extends OrderRepository {
     if (orderError) throw orderError;
 
     // 2. Insert Items
-    const itemsPayload = order.cart_items.map(item => ({
+    const itemsPayload = order.items.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
       product_name: item.product_name,
@@ -84,7 +84,7 @@ export class SupabaseOrderRepository extends OrderRepository {
   private _mapToEntity(dbRecord: OrderDbRecord): Order {
     return new Order({
       id: dbRecord.id,
-      customer_info: {
+      clienteInfo: {
         name: dbRecord.customer_name,
         email: dbRecord.customer_email,
         phone: dbRecord.customer_phone,
@@ -92,14 +92,15 @@ export class SupabaseOrderRepository extends OrderRepository {
       },
       status: dbRecord.status,
       total: dbRecord.total_amount,
-      cart_items: dbRecord.order_items?.map((i) => ({
+      items: dbRecord.order_items?.map((i) => ({
         product_id: i.product_id,
         product_name: i.product_name,
         quantity: i.quantity,
         unit_price: i.unit_price,
         subtotal: i.subtotal
       })) || [],
-      created_at: new Date(dbRecord.created_at)
+      createdAt: new Date(dbRecord.created_at),
+      invoiceUrl: dbRecord.invoiceUrl // Assuming we also fetch invoiceUrl
     });
   }
 }
@@ -122,4 +123,5 @@ interface OrderDbRecord {
   total_amount: number;
   created_at: string;
   order_items: OrderItemDbRecord[];
+  invoiceUrl?: string;
 }

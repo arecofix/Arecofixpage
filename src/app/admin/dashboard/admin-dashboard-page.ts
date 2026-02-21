@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import posthog from 'posthog-js';
 import { environment } from '@env/environment';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
@@ -178,32 +177,12 @@ export class AdminDashboardPage implements OnInit {
       return date.toLocaleDateString('es-ES', { month: 'short' }); // e.g. "ene", "feb"
   }
 
-  loadAnalyticsInfo() {
-    try {
-      // Check if PostHog is initialized
-      const isEnabled = environment.posthogKey && environment.posthogKey !== '';
-
-      if (isEnabled && posthog) {
-        this.analyticsStats.set({
-          enabled: true,
-          sessionId: posthog.get_session_id() || '',
-          distinctId: posthog.get_distinct_id() || 'Anónimo',
-        });
-      } else {
-        this.analyticsStats.set({
-          enabled: false,
-          sessionId: '',
-          distinctId: '',
-        });
-      }
-    } catch (error) {
-      console.error('Error loading analytics info:', error);
-      this.analyticsStats.set({
-        enabled: false,
-        sessionId: '',
-        distinctId: '',
-      });
-    }
+  async loadAnalyticsInfo() {
+    this.analyticsStats.set({
+      enabled: false,
+      sessionId: '',
+      distinctId: '',
+    });
   }
 
   posthogStatus(): string {

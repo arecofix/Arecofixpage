@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, map, switchMap } from 'rxjs';
-import { Order, OrderItem } from '../../domain/entities/order.entity';
+import { Order, ProductoPedido } from '../../domain/entities/order.entity';
 import { OrderRepository } from '../../domain/repositories/order.repository';
 import { MessageRepository } from '../../../messages/domain/repositories/message.repository'; // Cross-boundary import or shared
 import { CrmMessage } from '../../../messages/domain/entities/crm-message.entity';
@@ -39,7 +39,7 @@ export class ConfirmCheckoutUseCase {
   ): Observable<Order> {
     
     // 1. Prepare Order Entity
-    const orderItems: OrderItem[] = params.items.map(i => ({
+    const orderItems: ProductoPedido[] = params.items.map(i => ({
         product_id: i.product.id,
         product_name: i.product.name,
         quantity: i.quantity,
@@ -48,13 +48,13 @@ export class ConfirmCheckoutUseCase {
     }));
 
     const newOrder = new Order({
-        customer_info: {
+        clienteInfo: {
             name: params.customer.name,
             email: params.customer.email,
             phone: params.customer.phone,
             address: params.customer.address
         },
-        cart_items: orderItems,
+        items: orderItems,
         total: params.total,
         status: 'A_PAGAR' // Requirement: Default Status
     });

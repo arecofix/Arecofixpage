@@ -5,7 +5,7 @@ import { OrderService } from '@app/core/services/order.service';
 import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
 import { AuthService } from '@app/core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { RepairStatusService } from '@app/features/orders/services/repair-status'; // Import service
+import { OrderNotificationService } from '@app/features/orders/services/order-notification.service'; // Import Ecommerce Notification service
 
 
 interface ProductOption {
@@ -28,7 +28,7 @@ export class AdminOrderFormPage implements OnInit {
     private router = inject(Router);
     private orderService = inject(OrderService);
     private authService = inject(AuthService);
-    private repairStatusService = inject(RepairStatusService); // Inject service
+    private orderNotificationService = inject(OrderNotificationService); // Inject Ecommerce Service
     private cdr = inject(ChangeDetectorRef);
 
 
@@ -46,7 +46,6 @@ export class AdminOrderFormPage implements OnInit {
         customer_email: '',
         customer_phone: '',
         customer_address: '',
-        imei: '', // Init IMEI
         status: 'pending',
 
         subtotal: 0,
@@ -101,8 +100,7 @@ export class AdminOrderFormPage implements OnInit {
                     tax: order.tax,
                     discount: order.discount,
                     total: order.total,
-                    notes: order.notes,
-                    imei: (order as any).imei || '' // Load IMEI cast as any if property missing in type or extend type
+                    notes: order.notes
                 });
                 this.items.set(order.items);
 
@@ -132,20 +130,37 @@ export class AdminOrderFormPage implements OnInit {
         this.calculateTotals();
     }
 
-    onProductSelect(index: number, productId: string) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-
+    onSearchProduct(index: number, nameQuery: string) {
+        const product = this.products.find(p => p.name === nameQuery);
+        
         this.items.update(items => {
             const newItems = [...items];
-            newItems[index] = {
-                ...newItems[index],
-                product_id: product.id,
-                product_name: product.name,
-                product_sku: product.sku,
-                unit_price: product.price,
-                subtotal: product.price * newItems[index].quantity
-            };
+            if (product) {
+                newItems[index] = {
+                    ...newItems[index],
+                    product_id: product.id,
+                    product_name: product.name,
+                    product_sku: product.sku,
+                    unit_price: product.price,
+                    subtotal: product.price * newItems[index].quantity
+                };
+            } else {
+                newItems[index] = {
+                    ...newItems[index],
+                    product_id: undefined,
+                    product_name: nameQuery,
+                    product_sku: undefined
+                };
+            }
+            return newItems;
+        });
+        this.calculateTotals();
+    }
+
+    onUnitPriceChange(index: number) {
+        this.items.update(items => {
+            const newItems = [...items];
+            newItems[index].subtotal = newItems[index].unit_price * newItems[index].quantity;
             return newItems;
         });
 
@@ -180,6 +195,11 @@ export class AdminOrderFormPage implements OnInit {
         this.cdr.markForCheck();
     }
 
+    updateStatus(newStatus: 'pending' | 'processing' | 'completed' | 'cancelled') {
+        this.form.update(f => ({ ...f, status: newStatus }));
+        this.cdr.markForCheck();
+    }
+
     async save() {
         if (this.items().length === 0) {
             this.error = 'Debes agregar al menos un producto';
@@ -205,23 +225,18 @@ export class AdminOrderFormPage implements OnInit {
             // Check for status change and notify
             if (this.id && this.originalStatus && this.form().status !== this.originalStatus) {
                 const orderData = this.form();
-                // Heuristic to find device name from items if possible, otherwise 'tu equipo'
-                const deviceName = this.items().length > 0 ? this.items()[0].product_name : 'tu equipo';
+                // Compile purchased products list for Ecommerce Notification
+                const productDetails = this.items().map(item => `${item.quantity}x ${item.product_name}`).join(', ');
 
-                // Assuming order number is available in result or we use ID/generic placeholder if not returned immediately
-                // The current interface has order_number optional. We might need to fetch it or just use "Actualización".
-                // Ideally backend returns the updated order. Let's try to assume we can proceed or fetch it.
-                // For now, let's use ID or generic.
-                const link = this.repairStatusService.generateWhatsAppLink(
+                const link = this.orderNotificationService.generateWhatsAppLink(
                     orderData.customer_phone || '',
                     orderData.customer_name,
                     orderData.status,
-                    this.id.substring(0, 8).toUpperCase(), // Use short ID as fallback
-                    deviceName
+                    result.data?.order_number || this.id.substring(0, 8).toUpperCase(), 
+                    productDetails
                 );
 
                 if (link) {
-                    // Open WhatsApp in new tab
                     window.open(link, '_blank');
                 }
             }

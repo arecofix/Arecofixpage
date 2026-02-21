@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/suppliers/admin-suppliers.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_SUPPLIERS_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Proveedores',\r\n    loadComponent: () => import('./admin-suppliers-page').then(m => m.AdminSuppliersPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Proveedor',\r\n    loadComponent: () => import('./admin-supplier-form-page').then(m => m.AdminSupplierFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Proveedor',\r\n    loadComponent: () => import('./admin-supplier-form-page').then(m => m.AdminSupplierFormPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;;;AAEO,IAAM,yBAAiC;EAC5C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAwB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;EAEtF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA4B,EAAE,KAAK,OAAK,EAAE,qBAAqB;;EAE7F;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA4B,EAAE,KAAK,OAAK,EAAE,qBAAqB;;;",
+  "names": []
+}

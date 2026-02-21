@@ -9,7 +9,7 @@
     "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "npm run build && firebase deploy --only hosting",
+    "deploy": "npm run build && npm run generate-sitemap && node scripts/remove-preloads.mjs && firebase deploy --only hosting",
     "generate-sitemap": "node scripts/generate-sitemap.mjs"
   },
   "prettier": {
@@ -51,7 +51,6 @@
     "ng2-charts": "^5.0.0",
     "ngx-mask": "^17.0.0",
     "ngx-skeleton-loader": "^9.0.0",
-    "posthog-js": "^1.100.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

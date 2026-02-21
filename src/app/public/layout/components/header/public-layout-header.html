@@ -7,8 +7,8 @@
      ═══════════════════════════════════════════════════════════════ -->
 
 <nav class="fixed top-0 inset-x-0 z-1000
-            glass-panel border-b border-gray-200 dark:border-white/5
-            backdrop-blur-xl text-gray-900 dark:text-white transition-transform duration-300 ease-in-out
+            bg-white dark:bg-[#1a1c2e] border-b border-gray-200 dark:border-white/5
+            text-gray-900 dark:text-white transition-transform duration-300 ease-in-out
             h-16 flex items-center px-4 lg:px-6 will-change-transform"
      [class.-translate-y-full]="!isVisible()"
      role="navigation"
@@ -38,10 +38,10 @@
     <a class="flex shrink-0 items-center gap-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5
               transition-all duration-200 group py-1 px-1.5"
        [routerLink]="['/']">
-      <img src="/assets/img/brands/logo/logo-dark.webp" alt="Arecofix Logo"
-           class="h-8 w-auto object-contain hidden dark:block drop-shadow-lg" height="32" width="100" />
-      <img src="/assets/img/brands/logo/logo-light.webp" alt="Arecofix Logo"
-           class="h-8 w-auto object-contain dark:hidden drop-shadow-md" height="32" width="100" />
+      <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Arecofix Logo"
+           class="h-8 w-auto object-contain hidden dark:block drop-shadow-lg" height="215" width="200" priority />
+      <img ngSrc="/assets/img/brands/logo/logo-light.webp" alt="Arecofix Logo"
+           class="h-8 w-auto object-contain dark:hidden drop-shadow-md" height="134" width="128" priority />
       <span class="font-bold text-base xl:text-lg text-gray-900 dark:text-white font-heading
                    tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400
                    transition-colors hidden sm:inline truncate max-w-[120px] xl:max-w-none">
@@ -383,10 +383,10 @@
     <!-- Drawer Header -->
     <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5 shrink-0">
       <a class="flex items-center gap-2" [routerLink]="['/']" (click)="closeMobileMenu()">
-        <img src="/assets/img/brands/logo/logo-dark.webp" alt="Logo"
-             class="h-6 w-auto hidden dark:block" height="24" width="80" />
-        <img src="/assets/img/brands/logo/logo-light.webp" alt="Logo"
-             class="h-6 w-auto dark:hidden" height="24" width="80" />
+        <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Logo"
+             class="h-6 w-auto hidden dark:block" height="215" width="200" />
+        <img ngSrc="/assets/img/brands/logo/logo-light.webp" alt="Logo"
+             class="h-6 w-auto dark:hidden" height="134" width="128" />
         <span class="font-bold text-sm text-gray-900 dark:text-white font-heading">{{ appName }}</span>
       </a>
       <button (click)="closeMobileMenu()"
@@ -497,7 +497,7 @@
      CART SIDEBAR
      ═══════════════════════════════════════════════════════════════ -->
 @if (isCartOpen()) {
-  <div class="z-10000" role="dialog" aria-modal="true" aria-label="Carrito de compras">
+  <div class="relative z-10000" role="dialog" aria-modal="true" aria-label="Carrito de compras">
     <div class="fixed inset-0 bg-black/50 transition-opacity" (click)="toggleCart()"></div>
     <div class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">

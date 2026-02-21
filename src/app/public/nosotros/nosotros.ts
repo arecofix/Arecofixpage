@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { CertificateGalleryComponent } from '../../shared/components/certificate-gallery/certificate-gallery.component';
@@ -68,7 +69,13 @@ interface NosotrosContent {
 })
 export class NosotrosComponent implements OnInit {
   private seoService = inject(SeoService);
-  
+  private sanitizer = inject(DomSanitizer);
+
+  /** Pre-sanitized YouTube embed URL so Angular trusts the iframe src binding */
+  youtubeUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+    'https://www.youtube.com/embed/l93eYkGMxsI?start=58&rel=0'
+  );
+
   ngOnInit() {
     this.seoService.setPageData({
       title: 'Sobre Nosotros',

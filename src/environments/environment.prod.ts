@@ -16,7 +16,7 @@ export const environment: Environment = {
   production: true,
   appName: 'Arecofix',
   apiUrl: 'https://arecofix.com.ar',
-  baseUrl: 'https://www.arecofix.com.ar',
+  baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration (Anon key is safe for client-side)
   supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
@@ -25,10 +25,7 @@ export const environment: Environment = {
   authRedirectUrl: 'https://arecofix.com.ar/#/login',
   enableProfileUpsert: false,
 
-  // Analytics Configuration
-  posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
-  posthogHost: 'https://us.i.posthog.com',
-
+  // Analytics Configuration Removed
   // WhatsApp Configuration
   whatsappToken: 'EAARLwIJnO30BQJVYYg23XHI8YlOxew5mmmNrQJT5ZCbKj27RmMxVPslyaTfYKnJA4P5JZCk80JwnzOgZCF0zR5ZC2gDRm6TidoX0jHVE9rp77QHcehimvSmZClobDmSZAGXVv7NyK5RGuSZBbh5Fie1ykDfxeGw7NZCR2DkJabcZB6odycEjRgeBjEMqA9587UPZAPzVoPZAquACqZA0et2Q0pWcZCYDX3gsZC2VY6tlJ86oM5o7AEmaKDbUtveRLRAAAZCaa77S2MOerzRZCP4c394xVYQVH0RVyf9j5plybQZDZD',
   whatsappPhoneNumberId: '322928504245092',

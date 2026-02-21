@@ -12,7 +12,7 @@ import {
   effect,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '@env/environment';
 import { AuthService } from '@app/core/services/auth.service';
@@ -38,6 +38,7 @@ import { Subscription } from 'rxjs';
     NavItemRecursiveComponent,
     ThemeToggleComponent,
     AutoFocusDirective,
+    NgOptimizedImage,
   ],
   templateUrl: './public-layout-header.html',
   styles: `
@@ -165,8 +166,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   private lastScrollTop = 0;
 
   constructor() {
-    this.loadProducts();
-
+    // Defer product loading — not needed until user interacts with search
     // Show navbar when item added to cart
     effect(() => {
       const items = this.cartService.cartItems();
@@ -180,6 +180,15 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Defer product loading to idle time — not needed until search
+    if (isPlatformBrowser(this.platformId)) {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => this.loadProducts(), { timeout: 4000 });
+      } else {
+        setTimeout(() => this.loadProducts(), 2000);
+      }
+    }
+
     // Listen for external search-focus requests (e.g. from other components)
     this.subscriptions.add(
       this.searchService.focusRequested$.subscribe(() => {

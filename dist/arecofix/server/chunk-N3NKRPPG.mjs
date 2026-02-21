@@ -1,2 +1,0 @@
-import './polyfills.server.mjs';
-import{b as c}from"./chunk-KRHCZNNF.mjs";import{K as i}from"./chunk-D7WVJHD7.mjs";import{R as r,W as a,r as o}from"./chunk-IUHZUWYM.mjs";var p=class e{activatedRoute=a(i);currentPage=c(this.activatedRoute.queryParamMap.pipe(o(t=>t.get("_page")?+t.get("_page"):1),o(t=>isNaN(t)?1:t)),{initialValue:1});static \u0275fac=function(m){return new(m||e)};static \u0275prov=r({token:e,factory:e.\u0275fac,providedIn:"root"})};export{p as a};

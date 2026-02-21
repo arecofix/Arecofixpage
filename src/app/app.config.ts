@@ -4,7 +4,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { provideClientHydration } from '@angular/platform-browser';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -22,7 +22,6 @@ const supabase = createClient(environment.supabaseUrl, environment.supabaseKey, 
 });
 
 // Firebase imports REMOVED
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ProductRepository } from './features/products/domain/repositories/product.repository';
 import { SupabaseProductRepository } from './features/products/infrastructure/repositories/supabase-product.repository';
 import { CategoryRepository } from './features/products/domain/repositories/category.repository';
@@ -45,7 +44,7 @@ export const appConfig: ApplicationConfig = {
     // Core Angular providers
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(),
+    provideClientHydration(withEventReplay()),
     provideRouter(
       routes,
       withInMemoryScrolling({

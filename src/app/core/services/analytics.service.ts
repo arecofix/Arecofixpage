@@ -12,26 +12,14 @@ export class AnalyticsService {
     }
 
     identify(userId: string, properties: Record<string, unknown> = {}) {
-        if (isPlatformBrowser(this.platformId)) {
-            import('posthog-js').then(posthog => {
-                posthog.default.identify(userId, properties);
-            });
-        }
+        // Safe stub since analytics was stripped
     }
 
     capture(eventName: string, properties: Record<string, unknown> = {}) {
-        if (isPlatformBrowser(this.platformId)) {
-            import('posthog-js').then(posthog => {
-                posthog.default.capture(eventName, properties);
-            });
-        }
+        // Safe stub since analytics was stripped
     }
 
     reset() {
-        if (isPlatformBrowser(this.platformId)) {
-            import('posthog-js').then(posthog => {
-                posthog.default.reset();
-            });
-        }
+        // Safe stub since analytics was stripped
     }
 }

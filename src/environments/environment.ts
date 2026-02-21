@@ -23,10 +23,7 @@ export const environment: Environment = {
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
 
-  // Analytics Configuration
-  // TODO: Move to .env and use build-time replacement
-  posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
-  posthogHost: 'https://us.i.posthog.com',
+  // Analytics Configuration Removed
 
   // Contact Information
   contact: {

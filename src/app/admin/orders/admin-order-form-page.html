@@ -31,16 +31,12 @@
                         class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
                 </div>
 
-                <div class="col-span-1 md:col-span-2">
-                    <label class="block text-sm font-medium text-base-content mb-1.5">IMEI / S/N del Dispositivo</label>
-                    <input type="text" [(ngModel)]="form().imei" name="imei" placeholder="Ej: 3520190..."
-                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
-                </div>
+
 
 
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-base-content mb-1.5">Estado</label>
-                    <select [(ngModel)]="form().status" name="status" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <select [ngModel]="form().status" (ngModelChange)="updateStatus($event)" name="status" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                         <option value="pending">Pendiente</option>
                         <option value="processing">Procesando</option>
                         <option value="completed">Completado</option>
@@ -81,23 +77,30 @@
                         @for (item of items(); track $index; let idx = $index) {
                         <tr class="border-b border-base-200 hover:bg-base-200/50">
                             <td class="min-w-[200px]">
-                                <select [value]="item.product_id"
-                                    (change)="onProductSelect(idx, $any($event.target).value)"
-                                    class="select select-bordered select-sm w-full bg-base-100 text-base-content border-base-300" required>
-                                    <option value="">Seleccionar producto...</option>
+                                <input type="text"
+                                    [ngModel]="item.product_name"
+                                    (ngModelChange)="onSearchProduct(idx, $event)"
+                                    [name]="'product_' + idx"
+                                    [attr.list]="'products-list-' + idx"
+                                    class="input input-bordered input-sm w-full bg-base-100 text-base-content border-base-300"
+                                    placeholder="Buscar producto o escribir uno..." required autocomplete="off" />
+                                
+                                <datalist [id]="'products-list-' + idx">
                                     @for (product of products; track product.id) {
-                                    <option [value]="product.id">
-                                        {{ product.name }} ({{ product.sku }})
-                                    </option>
+                                      <option [value]="product.name">{{ product.sku }} - ${{ product.price }}</option>
                                     }
-                                </select>
+                                </datalist>
                             </td>
                             <td>
                                 <input type="number" [(ngModel)]="item.quantity" (ngModelChange)="onQuantityChange(idx)"
                                     [name]="'quantity_' + idx" min="1"
                                     class="input input-bordered input-sm w-full bg-base-100 text-base-content border-base-300" />
                             </td>
-                            <td class="font-mono text-right text-base-content/80">${{ item.unit_price.toFixed(2) }}</td>
+                            <td class="font-mono text-right text-base-content/80">
+                                <input type="number" [(ngModel)]="item.unit_price" (ngModelChange)="onUnitPriceChange(idx)"
+                                    [name]="'price_' + idx" min="0" step="0.01"
+                                    class="input input-bordered input-sm w-full bg-base-100 text-base-content border-base-300 text-right" />
+                            </td>
                             <td class="font-mono font-semibold text-right text-base-content">${{ item.subtotal.toFixed(2) }}
                             </td>
                             <td class="text-right">

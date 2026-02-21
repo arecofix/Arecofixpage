@@ -4,6 +4,7 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import bootstrap from './src/main.server';
+import { environment } from './src/environments/environment';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -12,27 +13,10 @@ export function app(): express.Express {
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
 
-  console.log('Server Dist Folder:', serverDistFolder);
-  console.log('Browser Dist Folder:', browserDistFolder);
-  console.log('Index HTML:', indexHtml);
-
   const commonEngine = new CommonEngine();
 
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
-
-  // Middleware to detect bots and strictly ensure SSR functionality
-  server.use((req, res, next) => {
-    const userAgent = req.headers['user-agent']?.toLowerCase() || '';
-    const isBot = /googlebot|facebookexternalhit|whatsapp|twitterbot|linkedinbot|bingbot/i.test(userAgent);
-    
-    if (isBot) {
-        // Force no-cache for bots to ensure latest metadata
-        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        console.log(`Bot detected: ${userAgent} accessing ${req.url}`);
-    }
-    next();
-  });
 
   // Serve static files from /browser
   server.use(express.static(browserDistFolder, {
@@ -40,37 +24,85 @@ export function app(): express.Express {
     index: false
   }));
 
-  // Special caching for SEO critical pages
-  server.get('/celular', (req, res, next) => {
-    const userAgent = req.headers['user-agent']?.toLowerCase() || '';
-    const isBot = /facebookexternalhit|whatsapp|twitterbot/i.test(userAgent);
-    
-    // For social bots, we want fresh content immediately. For users, cache is fine.
-    if (!isBot) {
-         res.set('Cache-Control', 'public, max-age=3600, s-maxage=86400');
+  // Dynamic Sitemap optimized for Google Search Console
+  server.get('/sitemap.xml', async (req, res) => {
+    try {
+      const baseUrl = environment.baseUrl || 'https://arecofix.com.ar';
+      
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+      
+      // Static key routes
+      const staticRoutes = [
+        { path: '/', priority: '1.0', freq: 'daily' },
+        { path: '/productos', priority: '0.9', freq: 'daily' },
+        { path: '/nosotros', priority: '0.8', freq: 'monthly' },
+        { path: '/contacto', priority: '0.8', freq: 'monthly' },
+        { path: '/cursos', priority: '0.8', freq: 'weekly' }
+      ];
+
+      staticRoutes.forEach(route => {
+        xml += `  <url>\n    <loc>${baseUrl}${route.path}</loc>\n    <changefreq>${route.freq}</changefreq>\n    <priority>${route.priority}</priority>\n  </url>\n`;
+      });
+
+      // Fetch dynamic routes from Supabase (Products)
+      if (environment.supabaseUrl && environment.supabaseKey) {
+        try {
+          const fetchOptions = {
+            headers: {
+              'apikey': environment.supabaseKey,
+              'Authorization': `Bearer ${environment.supabaseKey}`
+            }
+          };
+          // Fetch products that are public / active
+          const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?select=slug`, fetchOptions);
+          if (productsRes.ok) {
+            const products = await productsRes.json();
+            products.forEach((p: any) => {
+              if (p.slug) {
+                xml += `  <url>\n    <loc>${baseUrl}/productos/detalle/${p.slug}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+              }
+            });
+          }
+        } catch (e) {
+          console.error('Error fetching products from Supabase for sitemap:', e);
+        }
+      }
+
+      xml += `</urlset>`;
+      
+      res.header('Content-Type', 'application/xml');
+      // Cache sitemap in CDN for 24 hours, but let browsers cache it for 1 hour
+      res.set('Cache-Control', 'public, max-age=3600, s-maxage=86400');
+      res.send(xml);
+    } catch (e) {
+      res.status(500).end();
     }
-    next();
-  }, (req, res, next) => {
-      // Proceed to render
-      next();
   });
 
-  // All regular routes use the Angular engine
+  // All regular routes use the Angular Engine
   server.get(/(.*)/, (req, res, next) => {
     const { originalUrl, baseUrl, headers } = req;
     
-    // Check X-Forwarded-Proto for correct protocol behind proxies (like Firebase, Cloudflare)
+    // Check X-Forwarded-Proto for correct protocol behind proxies like Firebase / Cloud Functions
     const protocol = headers['x-forwarded-proto'] || req.protocol;
+    const host = headers['x-forwarded-host'] || headers.host;
     
-    // Construct the full URL correctly.
-    // 'headers.host' usually includes port if non-standard.
-    // We want the URL that Angular sees to match the request exactly.
-    const fullUrl = `${protocol}://${headers.host}${originalUrl}`;
+    const fullUrl = `${protocol}://${host}${originalUrl}`;
 
-    console.log(`SSR Rendering: ${fullUrl}`);
+    const userAgent = headers['user-agent']?.toLowerCase() || '';
+    const isBot = /googlebot|facebookexternalhit|whatsapp|twitterbot|linkedinbot|bingbot|pinterest/i.test(userAgent);
+    
+    // Setting optimal Cache-Control headers natively for Firebase Hosting to read
+    if (isBot) {
+        // Bots: We want to cache metadata on the CDN for a shorter time or not at all
+        // to ensure link previews update quickly when changed.
+        res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    } else {
+        // Regular Users: CDN cache for optimal performance (e.g., 1 hour)
+        // Adjust these values as needed for your content update frequency
+        res.set('Cache-Control', 'public, max-age=600, s-maxage=3600');
+    }
 
-    console.log('Rendering request:', originalUrl);
-    console.log('Bootstrap function:', bootstrap);
     commonEngine
       .render({
         bootstrap,
@@ -79,7 +111,6 @@ export function app(): express.Express {
         publicPath: browserDistFolder,
         providers: [
             { provide: APP_BASE_HREF, useValue: baseUrl },
-            // Pass 'serverUrl' if needed by components, though Angular Router usually handles it via `url`
         ],
       })
       .then((html) => res.send(html))
@@ -91,8 +122,6 @@ export function app(): express.Express {
 
 function run(): void {
   const port = process.env['PORT'] || 4000;
-
-  // Start up the Node server
   const server = app();
   server.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
