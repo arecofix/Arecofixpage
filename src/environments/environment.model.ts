@@ -7,7 +7,8 @@ export interface Environment {
   supabaseKey: string;
   authRedirectUrl: string;
   enableProfileUpsert: boolean;
-  // Removed PostHog
+  posthogKey?: string;
+  posthogHost?: string;
   // WhatsApp Configuration (Optional as it might not be in all envs or handled differently)
   whatsappToken?: string;
   whatsappPhoneNumberId?: string;

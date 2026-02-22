@@ -2,12 +2,12 @@
  * Repair Status Enum
  */
 export enum RepairStatus {
-    PENDING = 'pending',
-    IN_PROGRESS = 'in_progress',
-    WAITING_PARTS = 'waiting_parts',
-    COMPLETED = 'completed',
-    DELIVERED = 'delivered',
-    CANCELLED = 'cancelled'
+    PENDING = 1,
+    IN_PROGRESS = 2,
+    WAITING_PARTS = 3,
+    COMPLETED = 4,
+    DELIVERED = 5,
+    CANCELLED = 6
 }
 
 /**

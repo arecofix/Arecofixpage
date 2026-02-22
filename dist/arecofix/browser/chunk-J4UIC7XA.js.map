@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/analytics/domain/repositories/analytics.repository.ts"],
-  "sourcesContent": ["import { Observable } from 'rxjs';\r\n\r\nexport interface DashboardStats {\r\n  users: number;\r\n  products: number;\r\n  sales: number;\r\n  revenue: number;\r\n  sales_chart: { period: string; total: number }[];\r\n  products_chart: { name: string; quantity: number }[];\r\n  category_chart: { name: string; count: number }[];\r\n}\r\n\r\nexport abstract class AnalyticsRepository {\r\n  abstract getDashboardStats(): Observable<DashboardStats>;\r\n}\r\n"],
-  "mappings": ";AAYM,IAAgB,sBAAhB,MAAmC;;",
-  "names": []
-}

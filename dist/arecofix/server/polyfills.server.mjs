@@ -10795,7 +10795,7 @@ applyShims();
 
 @angular/platform-server/fesm2022/init.mjs:
   (**
-   * @license Angular v21.1.4
+   * @license Angular v21.1.5
    * (c) 2010-2026 Google LLC. https://angular.dev/
    * License: MIT
    *)

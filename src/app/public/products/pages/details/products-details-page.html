@@ -4,129 +4,132 @@
 <is-empty />
 } @else if (productRs.error()) {
 <is-error />
-} @else if (productRs.hasValue()) {
-
-    <!-- Product Details Page (Redesigned) -->
-    <div class="bg-white dark:bg-gray-900 pt-6">
-
-     <div class="container mx-auto px-4 lg:px-8 mt-4 mb-4 flex justify-end">
-          <div class="relative w-full max-w-xs">
-              <input 
-                  type="text" 
-                  placeholder="Buscar producto..." 
-                  [(ngModel)]="searchQuery"
-                  (keyup.enter)="onSearch()"
-                  class="input input-bordered w-full pl-10 h-10" />
-              <button (click)="onSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle">
-                  <i class="fas fa-search text-gray-400"></i>
-              </button>
-          </div>
-      </div>
-
-      <app-breadcrumbs [items]="breadcrumbItems()"></app-breadcrumbs>
-
-      <!-- Main Layout Grid -->
-      <div class="mx-auto mt-6 max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:gap-x-8">
-        
-        <!-- Image Gallery (Left Column) -->
-        <div class="lg:max-w-lg lg:self-end">
-             <div class="w-full aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
-                @if(selectedImage()) {
-                  <img [ngSrc]="selectedImage()!" [alt]="product()!.name" class="object-contain object-center max-h-full max-w-full" fill [priority]="true"/>
-                } @else {
-                  <img src="assets/img/no-image.png" [alt]="product()!.name" class="object-contain object-center max-h-full max-w-full" />
-                }
-             </div>
-             
-             <!-- Thumbnails / Gallery Grid -->
-             @if (product()!.gallery_urls && product()!.gallery_urls!.length > 0) {
-              <div class="mt-4 grid grid-cols-4 gap-4">
-                  @for(img of product()!.gallery_urls; track img) {
-                   <button 
-                      type="button"
-                      class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative cursor-pointer hover:opacity-75 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full block"
-                      [class.ring-2]="selectedImage() === img"
-                      [class.ring-indigo-500]="selectedImage() === img"
-                      (click)="selectImage(img)">
-                      <img [ngSrc]="img" [alt]="product()!.name" class="object-cover object-center pointer-events-none" fill />
-                   </button>
-                  }
+@} @else if (productRs.hasValue()) {
+    @if (product(); as item) {
+        <!-- Product Details Page (Redesigned) -->
+        <div class="bg-white dark:bg-gray-900 pt-6">
+    
+         <div class="container mx-auto px-4 lg:px-8 mt-4 mb-4 flex justify-end">
+              <div class="relative w-full max-w-xs">
+                  <input 
+                      type="text" 
+                      placeholder="Buscar producto..." 
+                      [(ngModel)]="searchQuery"
+                      (keyup.enter)="onSearch()"
+                      class="input input-bordered w-full pl-10 h-10" />
+                  <button (click)="onSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle">
+                      <i class="fas fa-search text-gray-400"></i>
+                  </button>
               </div>
-             }
-        </div>
-
-        <!-- Product Info (Right Column) -->
-        <div class="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{{ product()!.name }}</h1>
-          
-          <div class="mt-3">
-             <h2 class="sr-only">Product information</h2>
-             <p class="text-3xl tracking-tight text-gray-900 dark:text-white font-bold">${{ product()!.price | number:'1.0-0' }}</p>
           </div>
-
-          <!-- Reviews -->
-          <div class="mt-3">
-             <h3 class="sr-only">Reviews</h3>
-             <div class="flex items-center">
-               <div class="flex items-center">
-                  @for(star of [1,2,3,4,5]; track star) {
-                   <svg class="size-5 shrink-0 text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                     <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
-                   </svg>
-                  }
+    
+          <app-breadcrumbs [items]="breadcrumbItems()"></app-breadcrumbs>
+    
+          <!-- Main Layout Grid -->
+          <div class="mx-auto mt-6 max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:gap-x-8">
+            
+            <!-- Image Gallery (Left Column) -->
+            <div class="lg:max-w-lg lg:self-end">
+                 <div class="w-full aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
+                    @if(selectedImage()) {
+                      <img [ngSrc]="selectedImage()!" [alt]="item.name" class="object-contain object-center max-h-full max-w-full" fill [priority]="true"/>
+                    } @else {
+                      <img src="assets/img/no-image.png" [alt]="item.name" class="object-contain object-center max-h-full max-w-full" />
+                    }
+                 </div>
+                 
+                 <!-- Thumbnails / Gallery Grid -->
+                 @if (item.gallery_urls && item.gallery_urls.length > 0) {
+                  <div class="mt-4 grid grid-cols-4 gap-4">
+                      @for(img of item.gallery_urls; track img) {
+                       <button 
+                          type="button"
+                          class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative cursor-pointer hover:opacity-75 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full block"
+                          [class.ring-2]="selectedImage() === img"
+                          [class.ring-indigo-500]="selectedImage() === img"
+                          (click)="selectImage(img)">
+                          <img [ngSrc]="img" [alt]="item.name" class="object-cover object-center pointer-events-none" fill />
+                       </button>
+                      }
+                  </div>
+                 }
+            </div>
+    
+            <!-- Product Info (Right Column) -->
+            <div class="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
+              <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{{ item.name }}</h1>
+              
+              <div class="mt-3">
+                 <h2 class="sr-only">Product information</h2>
+                 <p class="text-3xl tracking-tight text-gray-900 dark:text-white font-bold">${{ item.price | number:'1.0-0' }}</p>
+              </div>
+    
+              <!-- Reviews -->
+              <div class="mt-3">
+                 <h3 class="sr-only">Reviews</h3>
+                 <div class="flex items-center">
+                   <div class="flex items-center">
+                      @for(star of [1,2,3,4,5]; track star) {
+                       <svg class="size-5 shrink-0 text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                         <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                       </svg>
+                      }
+                   </div>
+                   <p class="sr-only">5 out of 5 stars</p>
+                   <a href="#" class="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">Ver reseñas</a>
+                 </div>
+              </div>
+    
+              <div class="mt-6">
+                <h3 class="sr-only">Description</h3>
+                <p class="text-base text-gray-700 dark:text-gray-300">{{ item.description || 'Sin descripción detallada.' }}</p>
+              </div>
+    
+              <!-- Features -->
+               <div class="mt-10 border-t border-gray-200 dark:border-gray-700 pt-10">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-white">Características</h3>
+                  <div class="mt-4 prose prose-sm text-gray-500 dark:text-gray-400">
+                    <ul role="list">
+                      <li>Garantía: 3 meses</li>
+                      @if(item.sku) { <li>SKU: {{ item.sku }}</li> }
+                      <li>Envío a todo el país</li>
+                      <li>Stock disponible</li>
+                    </ul>
+                  </div>
                </div>
-               <p class="sr-only">5 out of 5 stars</p>
-               <a href="#" class="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">Ver reseñas</a>
-             </div>
+    
+               <!-- Actions -->
+               <form class="mt-10">
+                  <button type="button" (click)="addToCart()" class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200">
+                    <i class="fas fa-shopping-cart mr-2"></i> Agregar al Carrito
+                  </button>
+                  <button type="button" (click)="toggleFavorite()" class="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-transparent px-8 py-3 text-base font-medium text-gray-900 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" [class.border-red-500]="isFavorite()" [class.text-red-600]="isFavorite()" [class.bg-red-50]="isFavorite()">
+                     <i class="mr-2 fa-heart" [class.fas]="isFavorite()" [class.far]="!isFavorite()" [class.text-red-600]="isFavorite()"></i> 
+                     {{ isFavorite() ? 'Quitar de Favoritos' : 'Agregar a Favoritos' }}
+                  </button>
+               </form>
+    
+               <!-- Shipping & Contact Info -->
+               <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <div class="flex">
+                      <div class="shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm text-blue-700 dark:text-blue-200">
+                          <span class="font-bold">Armado y despacho de pedidos 24hs/48hs.</span> Avisar antes de pasar por el local. 
+                          <a href="https://wa.me/5491125960900" target="_blank" class="font-bold underline hover:text-blue-600">AGENDA EL Whatsapp: 5491125960900</a> Y MANDANOS UN MSJ PARA QUE PUEDAS VER PROMOCIONES DEL DIA, DESCUENTO, SORTEOS Y MAS!!!
+                        </p>
+                      </div>
+                    </div>
+               </div>
+            </div>
+    
           </div>
-
-          <div class="mt-6">
-            <h3 class="sr-only">Description</h3>
-            <p class="text-base text-gray-700 dark:text-gray-300">{{ product()!.description || 'Sin descripción detallada.' }}</p>
-          </div>
-
-          <!-- Features -->
-           <div class="mt-10 border-t border-gray-200 dark:border-gray-700 pt-10">
-              <h3 class="text-sm font-medium text-gray-900 dark:text-white">Características</h3>
-              <div class="mt-4 prose prose-sm text-gray-500 dark:text-gray-400">
-                <ul role="list">
-                  <li>Garantía: 3 meses</li>
-                  @if(product()!.sku) { <li>SKU: {{ product()!.sku }}</li> }
-                  <li>Envío a todo el país</li>
-                  <li>Stock disponible</li>
-                </ul>
-              </div>
-           </div>
-
-           <!-- Actions -->
-           <form class="mt-10">
-              <button type="button" (click)="addToCart()" class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200">
-                <i class="fas fa-shopping-cart mr-2"></i> Agregar al Carrito
-              </button>
-              <button type="button" (click)="toggleFavorite()" class="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-transparent px-8 py-3 text-base font-medium text-gray-900 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" [class.border-red-500]="isFavorite()" [class.text-red-600]="isFavorite()" [class.bg-red-50]="isFavorite()">
-                 <i class="mr-2 fa-heart" [class.fas]="isFavorite()" [class.far]="!isFavorite()" [class.text-red-600]="isFavorite()"></i> 
-                 {{ isFavorite() ? 'Quitar de Favoritos' : 'Agregar a Favoritos' }}
-              </button>
-           </form>
-
-           <!-- Shipping & Contact Info -->
-           <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <div class="flex">
-                  <div class="shrink-0">
-                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <div class="ml-3">
-                    <p class="text-sm text-blue-700 dark:text-blue-200">
-                      <span class="font-bold">Armado y despacho de pedidos 24hs/48hs.</span> Avisar antes de pasar por el local. 
-                      <a href="https://wa.me/5491125960900" target="_blank" class="font-bold underline hover:text-blue-600">AGENDA EL Whatsapp: 5491125960900</a> Y MANDANOS UN MSJ PARA QUE PUEDAS VER PROMOCIONES DEL DIA, DESCUENTO, SORTEOS Y MAS!!!
-                    </p>
-                  </div>
-                </div>
-           </div>
         </div>
-
-      </div>
-    </div>
+    } @else {
+        <is-empty />
+    }
 }

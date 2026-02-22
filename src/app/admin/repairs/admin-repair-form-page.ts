@@ -8,10 +8,12 @@ import { AdminRepairService } from '@app/features/repairs/application/services/a
 import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/repairs/domain/entities/repair.entity';
 import { environment } from '@env/environment';
 
+import { QRCodeComponent } from 'angularx-qrcode';
+
 @Component({
     selector: 'app-admin-repair-form-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [CommonModule, FormsModule, RouterLink, QRCodeComponent],
     templateUrl: './admin-repair-form-page.html',
 })
 export class AdminRepairFormPage implements OnInit {
@@ -32,7 +34,7 @@ export class AdminRepairFormPage implements OnInit {
         device_brand: 'generic', // Default
         imei: '',
         issue_description: '',
-        status: RepairStatus.PENDING,
+        current_status_id: RepairStatus.PENDING,
         estimated_cost: 0,
         final_cost: 0,
         technician_notes: '',
@@ -132,7 +134,7 @@ export class AdminRepairFormPage implements OnInit {
                     device_brand: data.device_brand || 'generic',
                     imei: data.imei || '',
                     issue_description: data.issue_description || '',
-                    status: data.status,
+                    current_status_id: data.current_status_id,
                     estimated_cost: data.estimated_cost || 0,
                     final_cost: data.final_cost || 0,
                     technician_notes: data.technician_notes || '',
@@ -179,7 +181,7 @@ export class AdminRepairFormPage implements OnInit {
             // We augment the DTO with status and final_cost which are handled by the service/repo
             const extendedDto = {
                 ...baseDto,
-                status: formData.status as RepairStatus,
+                current_status_id: formData.current_status_id,
                 final_cost: formData.final_cost,
                 technician_notes: formData.technician_notes,
                 deposit_amount: formData.deposit_amount,
@@ -214,11 +216,11 @@ export class AdminRepairFormPage implements OnInit {
 
         const customerName = this.form().customer_name;
         const device = this.form().device_model;
-        const url = `${window.location.origin}/#/tracking/${this.form().tracking_code}`;
+        const url = this.getTrackingUrl();
 
         let message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
 
-        if (this.form().status === RepairStatus.COMPLETED) {
+        if (this.form().current_status_id === RepairStatus.COMPLETED) {
             // Use configured Google Map Review URL
             const reviewLink = environment.contact.socialMedia.googleMaps;
             message = `Hola ${customerName}, su reparación del ${device} ya está lista. Agradecemos su reseña en el siguiente enlace: ${reviewLink}`;
@@ -227,5 +229,10 @@ export class AdminRepairFormPage implements OnInit {
         const whatsappUrl = `https://wa.me/${this.form().customer_phone}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, '_blank');
+    }
+
+    getTrackingUrl(): string {
+        if (!this.form().tracking_code) return '';
+        return `${window.location.origin}/#/tracking/${this.form().tracking_code}`;
     }
 }

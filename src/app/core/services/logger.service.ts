@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { AnalyticsService } from './analytics.service';
 
 /**
  * Logger Service
@@ -49,12 +50,16 @@ export class LoggerService {
         }
     }
 
+    private analytics = inject(AnalyticsService);
+
     /**
      * Send errors to monitoring service (PostHog, Sentry, etc.)
      */
     private sendToMonitoring(message: string, error: unknown): void {
-        // Implement error monitoring integration (e.g., Sentry, Bugsnag)
-        // For now, errors are only logged to the console via console.error in production.
+        this.analytics.capture('production_error', {
+            message,
+            error: error instanceof Error ? error.message : JSON.stringify(error)
+        });
     }
 
     /**

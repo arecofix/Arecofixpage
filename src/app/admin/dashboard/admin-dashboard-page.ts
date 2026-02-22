@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { environment } from '@env/environment';
@@ -6,15 +6,17 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { AnalyticsRepository, DashboardStats } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
+import { AnalyticsService } from '@app/core/services/analytics.service';
 
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
   imports: [CommonModule, RouterLink, BaseChartDirective],
-  templateUrl: 'admin-dashboard-page.html'
+  templateUrl: './admin-dashboard-page.html'
 })
 export class AdminDashboardPage implements OnInit {
   private analyticsRepo = inject(AnalyticsRepository);
+  private analyticsService = inject(AnalyticsService);
 
   stats = signal({
     users: 0,
@@ -179,9 +181,9 @@ export class AdminDashboardPage implements OnInit {
 
   async loadAnalyticsInfo() {
     this.analyticsStats.set({
-      enabled: false,
-      sessionId: '',
-      distinctId: '',
+      enabled: this.analyticsService.isEnabled(),
+      sessionId: this.analyticsService.getSessionId(),
+      distinctId: this.analyticsService.getDistinctId(),
     });
   }
 

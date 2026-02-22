@@ -120,15 +120,36 @@
                         }
                     </div>
 
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text text-base-content">Dirección de Envío</span>
-                        </label>
-                        <textarea formControlName="address" class="textarea textarea-bordered h-24 w-full bg-base-100 text-base-content"
-                            [class.textarea-error]="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched"></textarea>
-                        @if (checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched) {
-                        <span class="text-error text-xs mt-1">La dirección es requerida</span>
-                        }
+                    <div formGroupName="address" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-base-content">Calle</span>
+                                </label>
+                                <input type="text" formControlName="street" class="input input-bordered w-full bg-base-100 text-base-content" />
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-base-content">Número</span>
+                                </label>
+                                <input type="text" formControlName="number" class="input input-bordered w-full bg-base-100 text-base-content" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-base-content">Barrio / Depto</span>
+                                </label>
+                                <input type="text" formControlName="neighborhood" class="input input-bordered w-full bg-base-100 text-base-content" placeholder="Opcional" />
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-base-content">Ciudad</span>
+                                </label>
+                                <input type="text" formControlName="city" class="input input-bordered w-full bg-base-100 text-base-content" />
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-control w-full">

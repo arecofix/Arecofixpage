@@ -2,33 +2,38 @@ import {
   RepairRepository
 } from "./chunk-37JUCHEQ.js";
 import {
-  AnalyticsRepository
-} from "./chunk-J4UIC7XA.js";
+  AnalyticsRepository,
+  AnalyticsService
+} from "./chunk-QC2G4SN3.js";
+import {
+  provideCharts,
+  withDefaultRegisterables
+} from "./chunk-YH56VV6G.js";
 import {
   CategoryRepository
 } from "./chunk-XUAOU2YN.js";
 import {
   ThemeService
-} from "./chunk-JO5X4B25.js";
+} from "./chunk-WEDM36GW.js";
 import {
   NotificationService
-} from "./chunk-BL5IQYYM.js";
+} from "./chunk-B4BUXRTQ.js";
 import {
   BrandRepository
 } from "./chunk-ZJZBKGOC.js";
 import {
   SeoService
-} from "./chunk-UVURSWET.js";
+} from "./chunk-SZ44J5DM.js";
 import {
   AuthService,
   SUPABASE_CLIENT
-} from "./chunk-65AYZUFN.js";
+} from "./chunk-MZTEREIC.js";
 import {
   ProductRepository
 } from "./chunk-GR2FBAX3.js";
 import {
   ToastService
-} from "./chunk-2N73QYS2.js";
+} from "./chunk-6YMWIO4Y.js";
 import {
   DefaultValueAccessor,
   FormsModule,
@@ -37,10 +42,10 @@ import {
   NgForm,
   NgModel,
   ɵNgNoValidate
-} from "./chunk-DEVYQMPB.js";
+} from "./chunk-R5Q6TR54.js";
 import {
   LoggerService
-} from "./chunk-2IPP5M5M.js";
+} from "./chunk-4WZKXYCH.js";
 import {
   environment
 } from "./chunk-TCBIYFRD.js";
@@ -48,7 +53,6 @@ import {
   CommonModule,
   HttpErrorResponse,
   NgClass,
-  NgIf,
   RouterOutlet,
   bootstrapApplication,
   isPlatformBrowser,
@@ -58,7 +62,7 @@ import {
   withEventReplay,
   withFetch,
   withInMemoryScrolling
-} from "./chunk-B7SLUDL7.js";
+} from "./chunk-3EP36GV6.js";
 import {
   Component,
   DOCUMENT,
@@ -113,7 +117,6 @@ import {
   ɵɵresetView,
   ɵɵrestoreView,
   ɵɵsanitizeUrl,
-  ɵɵtemplate,
   ɵɵtext,
   ɵɵtextInterpolate,
   ɵɵtextInterpolate1,
@@ -121,24 +124,24 @@ import {
   ɵɵtwoWayListener,
   ɵɵtwoWayProperty,
   ɵɵviewQuery
-} from "./chunk-4O7IFJFV.js";
+} from "./chunk-TQTEFGZE.js";
 import {
   __objRest,
   __spreadProps,
   __spreadValues
-} from "./chunk-GOMI4DH3.js";
+} from "./chunk-46DXP6YY.js";
 
 // src/app/app.routes.ts
 var routes = [
   __spreadValues({
     title: "Home",
     path: "",
-    loadChildren: () => import("./chunk-7UKZ2UMJ.js")
+    loadChildren: () => import("./chunk-RFTZ2GJN.js")
   }, false ? { \u0275entryName: "src/app/public/public.routes.ts" } : {}),
   __spreadValues({
     title: "Admin",
     path: "admin",
-    loadChildren: () => import("./chunk-J7KWLVYG.js")
+    loadChildren: () => import("./chunk-G5XW2UGG.js")
   }, false ? { \u0275entryName: "src/app/admin/admin.routes.ts" } : {}),
   {
     path: "**",
@@ -508,7 +511,7 @@ var PostgrestBuilder = class {
   * ```
   */
   constructor(builder) {
-    var _builder$shouldThrowO, _builder$isMaybeSingl;
+    var _builder$shouldThrowO, _builder$isMaybeSingl, _builder$urlLengthLim;
     this.shouldThrowOnError = false;
     this.method = builder.method;
     this.url = builder.url;
@@ -518,6 +521,7 @@ var PostgrestBuilder = class {
     this.shouldThrowOnError = (_builder$shouldThrowO = builder.shouldThrowOnError) !== null && _builder$shouldThrowO !== void 0 ? _builder$shouldThrowO : false;
     this.signal = builder.signal;
     this.isMaybeSingle = (_builder$isMaybeSingl = builder.isMaybeSingle) !== null && _builder$isMaybeSingl !== void 0 ? _builder$isMaybeSingl : false;
+    this.urlLengthLimit = (_builder$urlLengthLim = builder.urlLengthLimit) !== null && _builder$urlLengthLim !== void 0 ? _builder$urlLengthLim : 8e3;
     if (builder.fetch) this.fetch = builder.fetch;
     else this.fetch = fetch;
   }
@@ -618,6 +622,8 @@ var PostgrestBuilder = class {
     if (!this.shouldThrowOnError) res = res.catch((fetchError) => {
       var _fetchError$name2;
       let errorDetails = "";
+      let hint = "";
+      let code = "";
       const cause = fetchError === null || fetchError === void 0 ? void 0 : fetchError.cause;
       if (cause) {
         var _cause$message, _cause$code, _fetchError$name, _cause$name;
@@ -634,12 +640,22 @@ ${cause.stack}`;
         var _fetchError$stack;
         errorDetails = (_fetchError$stack = fetchError === null || fetchError === void 0 ? void 0 : fetchError.stack) !== null && _fetchError$stack !== void 0 ? _fetchError$stack : "";
       }
+      const urlLength = this.url.toString().length;
+      if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") {
+        code = "";
+        hint = "Request was aborted (timeout or manual cancellation)";
+        if (urlLength > this.urlLengthLimit) hint += `. Note: Your request URL is ${urlLength} characters, which may exceed server limits. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.`;
+      } else if ((cause === null || cause === void 0 ? void 0 : cause.name) === "HeadersOverflowError" || (cause === null || cause === void 0 ? void 0 : cause.code) === "UND_ERR_HEADERS_OVERFLOW") {
+        code = "";
+        hint = "HTTP headers exceeded server limits (typically 16KB)";
+        if (urlLength > this.urlLengthLimit) hint += `. Your request URL is ${urlLength} characters. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [200+ IDs])), consider using an RPC function instead.`;
+      }
       return {
         error: {
           message: `${(_fetchError$name2 = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name2 !== void 0 ? _fetchError$name2 : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`,
           details: errorDetails,
-          hint: "",
-          code: ""
+          hint,
+          code
         },
         data: null,
         count: null,
@@ -1281,11 +1297,12 @@ var PostgrestQueryBuilder = class {
   * )
   * ```
   */
-  constructor(url, { headers = {}, schema, fetch: fetch$1 }) {
+  constructor(url, { headers = {}, schema, fetch: fetch$1, urlLengthLimit = 8e3 }) {
     this.url = url;
     this.headers = new Headers(headers);
     this.schema = schema;
     this.fetch = fetch$1;
+    this.urlLengthLimit = urlLengthLimit;
   }
   /**
   * Clone URL and headers to prevent shared state between operations.
@@ -1316,6 +1333,10 @@ var PostgrestQueryBuilder = class {
   *
   * `"estimated"`: Uses exact count for low numbers and planned count for high
   * numbers.
+  *
+  * @remarks
+  * When using `count` with `.range()` or `.limit()`, the returned `count` is the total number of rows
+  * that match your filters, not the number of rows in the current page. Use this to build pagination UI.
   */
   select(columns, options) {
     const { head: head2 = false, count } = options !== null && options !== void 0 ? options : {};
@@ -1334,7 +1355,8 @@ var PostgrestQueryBuilder = class {
       url,
       headers,
       schema: this.schema,
-      fetch: this.fetch
+      fetch: this.fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
   /**
@@ -1382,7 +1404,8 @@ var PostgrestQueryBuilder = class {
       headers,
       schema: this.schema,
       body: values,
-      fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch
+      fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
   /**
@@ -1491,7 +1514,8 @@ var PostgrestQueryBuilder = class {
       headers,
       schema: this.schema,
       body: values,
-      fetch: (_this$fetch2 = this.fetch) !== null && _this$fetch2 !== void 0 ? _this$fetch2 : fetch
+      fetch: (_this$fetch2 = this.fetch) !== null && _this$fetch2 !== void 0 ? _this$fetch2 : fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
   /**
@@ -1526,7 +1550,8 @@ var PostgrestQueryBuilder = class {
       headers,
       schema: this.schema,
       body: values,
-      fetch: (_this$fetch3 = this.fetch) !== null && _this$fetch3 !== void 0 ? _this$fetch3 : fetch
+      fetch: (_this$fetch3 = this.fetch) !== null && _this$fetch3 !== void 0 ? _this$fetch3 : fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
   /**
@@ -1558,10 +1583,62 @@ var PostgrestQueryBuilder = class {
       url,
       headers,
       schema: this.schema,
-      fetch: (_this$fetch4 = this.fetch) !== null && _this$fetch4 !== void 0 ? _this$fetch4 : fetch
+      fetch: (_this$fetch4 = this.fetch) !== null && _this$fetch4 !== void 0 ? _this$fetch4 : fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
 };
+function _typeof(o) {
+  "@babel/helpers - typeof";
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
+    return typeof o$1;
+  } : function(o$1) {
+    return o$1 && "function" == typeof Symbol && o$1.constructor === Symbol && o$1 !== Symbol.prototype ? "symbol" : typeof o$1;
+  }, _typeof(o);
+}
+function toPrimitive(t, r) {
+  if ("object" != _typeof(t) || !t) return t;
+  var e = t[Symbol.toPrimitive];
+  if (void 0 !== e) {
+    var i = e.call(t, r || "default");
+    if ("object" != _typeof(i)) return i;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return ("string" === r ? String : Number)(t);
+}
+function toPropertyKey(t) {
+  var i = toPrimitive(t, "string");
+  return "symbol" == _typeof(i) ? i : i + "";
+}
+function _defineProperty(e, r, t) {
+  return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+    value: t,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  }) : e[r] = t, e;
+}
+function ownKeys(e, r) {
+  var t = Object.keys(e);
+  if (Object.getOwnPropertySymbols) {
+    var o = Object.getOwnPropertySymbols(e);
+    r && (o = o.filter(function(r$1) {
+      return Object.getOwnPropertyDescriptor(e, r$1).enumerable;
+    })), t.push.apply(t, o);
+  }
+  return t;
+}
+function _objectSpread2(e) {
+  for (var r = 1; r < arguments.length; r++) {
+    var t = null != arguments[r] ? arguments[r] : {};
+    r % 2 ? ownKeys(Object(t), true).forEach(function(r$1) {
+      _defineProperty(e, r$1, t[r$1]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r$1) {
+      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t, r$1));
+    });
+  }
+  return e;
+}
 var PostgrestClient = class PostgrestClient2 {
   /**
   * Creates a PostgREST client.
@@ -1571,6 +1648,8 @@ var PostgrestClient = class PostgrestClient2 {
   * @param options.headers - Custom headers
   * @param options.schema - Postgres schema to switch to
   * @param options.fetch - Custom fetch
+  * @param options.timeout - Optional timeout in milliseconds for all requests. When set, requests will automatically abort after this duration to prevent indefinite hangs.
+  * @param options.urlLengthLimit - Maximum URL length in characters before warnings/errors are triggered. Defaults to 8000.
   * @example
   * ```ts
   * import PostgrestClient from '@supabase/postgrest-js'
@@ -1578,14 +1657,38 @@ var PostgrestClient = class PostgrestClient2 {
   * const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
   *   headers: { apikey: 'public-anon-key' },
   *   schema: 'public',
+  *   timeout: 30000, // 30 second timeout
   * })
   * ```
   */
-  constructor(url, { headers = {}, schema, fetch: fetch$1 } = {}) {
+  constructor(url, { headers = {}, schema, fetch: fetch$1, timeout, urlLengthLimit = 8e3 } = {}) {
     this.url = url;
     this.headers = new Headers(headers);
     this.schemaName = schema;
-    this.fetch = fetch$1;
+    this.urlLengthLimit = urlLengthLimit;
+    const originalFetch = fetch$1 !== null && fetch$1 !== void 0 ? fetch$1 : globalThis.fetch;
+    if (timeout !== void 0 && timeout > 0) this.fetch = (input, init) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      const existingSignal = init === null || init === void 0 ? void 0 : init.signal;
+      if (existingSignal) {
+        if (existingSignal.aborted) {
+          clearTimeout(timeoutId);
+          return originalFetch(input, init);
+        }
+        const abortHandler = () => {
+          clearTimeout(timeoutId);
+          controller.abort();
+        };
+        existingSignal.addEventListener("abort", abortHandler, { once: true });
+        return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => {
+          clearTimeout(timeoutId);
+          existingSignal.removeEventListener("abort", abortHandler);
+        });
+      }
+      return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => clearTimeout(timeoutId));
+    };
+    else this.fetch = originalFetch;
   }
   /**
   * Perform a query on a table or a view.
@@ -1597,7 +1700,8 @@ var PostgrestClient = class PostgrestClient2 {
     return new PostgrestQueryBuilder(new URL(`${this.url}/${relation}`), {
       headers: new Headers(this.headers),
       schema: this.schemaName,
-      fetch: this.fetch
+      fetch: this.fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
   /**
@@ -1611,7 +1715,8 @@ var PostgrestClient = class PostgrestClient2 {
     return new PostgrestClient2(this.url, {
       headers: this.headers,
       schema,
-      fetch: this.fetch
+      fetch: this.fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
   /**
@@ -1674,7 +1779,8 @@ var PostgrestClient = class PostgrestClient2 {
       headers,
       schema: this.schemaName,
       body,
-      fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch
+      fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch,
+      urlLengthLimit: this.urlLengthLimit
     });
   }
 };
@@ -1796,7 +1902,7 @@ Suggested solution: ${env.workaround}`;
 var websocket_factory_default = WebSocketFactory;
 
 // node_modules/@supabase/realtime-js/dist/module/lib/version.js
-var version = "2.91.0";
+var version = "2.97.0";
 
 // node_modules/@supabase/realtime-js/dist/module/lib/constants.js
 var DEFAULT_VERSION = `realtime-js/${version}`;
@@ -2941,15 +3047,15 @@ var RealtimeChannel = class _RealtimeChannel {
       }).map((bind) => bind.callback(handledPayload, ref));
     } else {
       (_b = this.bindings[typeLower]) === null || _b === void 0 ? void 0 : _b.filter((bind) => {
-        var _a2, _b2, _c, _d, _e, _f, _g, _h;
+        var _a2, _b2, _c, _d, _e, _f;
         if (["broadcast", "presence", "postgres_changes"].includes(typeLower)) {
           if ("id" in bind) {
             const bindId = bind.id;
             const bindEvent = (_a2 = bind.filter) === null || _a2 === void 0 ? void 0 : _a2.event;
-            return bindId && ((_b2 = payload.ids) === null || _b2 === void 0 ? void 0 : _b2.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_c = payload.data) === null || _c === void 0 ? void 0 : _c.type.toLocaleLowerCase())) && (!((_d = bind.filter) === null || _d === void 0 ? void 0 : _d.table) || bind.filter.table === ((_e = payload.data) === null || _e === void 0 ? void 0 : _e.table));
+            return bindId && ((_b2 = payload.ids) === null || _b2 === void 0 ? void 0 : _b2.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_c = payload.data) === null || _c === void 0 ? void 0 : _c.type.toLocaleLowerCase()));
           } else {
-            const bindEvent = (_g = (_f = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _f === void 0 ? void 0 : _f.event) === null || _g === void 0 ? void 0 : _g.toLocaleLowerCase();
-            return bindEvent === "*" || bindEvent === ((_h = payload === null || payload === void 0 ? void 0 : payload.event) === null || _h === void 0 ? void 0 : _h.toLocaleLowerCase());
+            const bindEvent = (_e = (_d = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _d === void 0 ? void 0 : _d.event) === null || _e === void 0 ? void 0 : _e.toLocaleLowerCase();
+            return bindEvent === "*" || bindEvent === ((_f = payload === null || payload === void 0 ? void 0 : payload.event) === null || _f === void 0 ? void 0 : _f.toLocaleLowerCase());
           }
         } else {
           return bind.type.toLocaleLowerCase() === typeLower;
@@ -3673,6 +3779,11 @@ Option 2: Install and provide the "ws" package:
     this.log("transport", `${error}`);
     this._triggerChanError();
     this._triggerStateCallbacks("error", error);
+    try {
+      this.heartbeatCallback("error");
+    } catch (e) {
+      this.log("error", "error in heartbeat callback", e);
+    }
   }
   /** @internal */
   _triggerChanError() {
@@ -4381,19 +4492,22 @@ var IcebergRestCatalog = class {
 
 // node_modules/@supabase/storage-js/dist/index.mjs
 var StorageError = class extends Error {
-  constructor(message) {
+  constructor(message, namespace = "storage", status, statusCode) {
     super(message);
     this.__isStorageError = true;
-    this.name = "StorageError";
+    this.namespace = namespace;
+    this.name = namespace === "vectors" ? "StorageVectorsError" : "StorageError";
+    this.status = status;
+    this.statusCode = statusCode;
   }
 };
 function isStorageError(error) {
   return typeof error === "object" && error !== null && "__isStorageError" in error;
 }
 var StorageApiError = class extends StorageError {
-  constructor(message, status, statusCode) {
-    super(message);
-    this.name = "StorageApiError";
+  constructor(message, status, statusCode, namespace = "storage") {
+    super(message, namespace, status, statusCode);
+    this.name = namespace === "vectors" ? "StorageVectorsApiError" : "StorageApiError";
     this.status = status;
     this.statusCode = statusCode;
   }
@@ -4407,18 +4521,20 @@ var StorageApiError = class extends StorageError {
   }
 };
 var StorageUnknownError = class extends StorageError {
-  constructor(message, originalError) {
-    super(message);
-    this.name = "StorageUnknownError";
+  constructor(message, originalError, namespace = "storage") {
+    super(message, namespace);
+    this.name = namespace === "vectors" ? "StorageVectorsUnknownError" : "StorageUnknownError";
     this.originalError = originalError;
   }
 };
-var resolveFetch$1 = (customFetch) => {
+var resolveFetch2 = (customFetch) => {
   if (customFetch) return (...args) => customFetch(...args);
   return (...args) => fetch(...args);
 };
-var resolveResponse$1 = () => {
-  return Response;
+var isPlainObject = (value) => {
+  if (typeof value !== "object" || value === null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 };
 var recursiveToCamel = (item) => {
   if (Array.isArray(item)) return item.map((el) => recursiveToCamel(el));
@@ -4430,11 +4546,6 @@ var recursiveToCamel = (item) => {
   });
   return result;
 };
-var isPlainObject$1 = (value) => {
-  if (typeof value !== "object" || value === null) return false;
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
-};
 var isValidBucketName = (bucketName) => {
   if (!bucketName || typeof bucketName !== "string") return false;
   if (bucketName.length === 0 || bucketName.length > 100) return false;
@@ -4442,37 +4553,37 @@ var isValidBucketName = (bucketName) => {
   if (bucketName.includes("/") || bucketName.includes("\\")) return false;
   return /^[\w!.\*'() &$@=;:+,?-]+$/.test(bucketName);
 };
-function _typeof(o) {
+function _typeof2(o) {
   "@babel/helpers - typeof";
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
+  return _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
     return typeof o$1;
   } : function(o$1) {
     return o$1 && "function" == typeof Symbol && o$1.constructor === Symbol && o$1 !== Symbol.prototype ? "symbol" : typeof o$1;
-  }, _typeof(o);
+  }, _typeof2(o);
 }
-function toPrimitive(t, r) {
-  if ("object" != _typeof(t) || !t) return t;
+function toPrimitive2(t, r) {
+  if ("object" != _typeof2(t) || !t) return t;
   var e = t[Symbol.toPrimitive];
   if (void 0 !== e) {
     var i = e.call(t, r || "default");
-    if ("object" != _typeof(i)) return i;
+    if ("object" != _typeof2(i)) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
   return ("string" === r ? String : Number)(t);
 }
-function toPropertyKey(t) {
-  var i = toPrimitive(t, "string");
-  return "symbol" == _typeof(i) ? i : i + "";
+function toPropertyKey2(t) {
+  var i = toPrimitive2(t, "string");
+  return "symbol" == _typeof2(i) ? i : i + "";
 }
-function _defineProperty(e, r, t) {
-  return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+function _defineProperty2(e, r, t) {
+  return (r = toPropertyKey2(r)) in e ? Object.defineProperty(e, r, {
     value: t,
     enumerable: true,
     configurable: true,
     writable: true
   }) : e[r] = t, e;
 }
-function ownKeys(e, r) {
+function ownKeys2(e, r) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -4482,68 +4593,171 @@ function ownKeys(e, r) {
   }
   return t;
 }
-function _objectSpread2(e) {
+function _objectSpread22(e) {
   for (var r = 1; r < arguments.length; r++) {
     var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys(Object(t), true).forEach(function(r$1) {
-      _defineProperty(e, r$1, t[r$1]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r$1) {
+    r % 2 ? ownKeys2(Object(t), true).forEach(function(r$1) {
+      _defineProperty2(e, r$1, t[r$1]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys2(Object(t)).forEach(function(r$1) {
       Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t, r$1));
     });
   }
   return e;
 }
-var _getErrorMessage$1 = (err) => {
+var _getErrorMessage = (err) => {
   var _err$error;
   return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_err$error = err.error) === null || _err$error === void 0 ? void 0 : _err$error.message) || JSON.stringify(err);
 };
-var handleError$1 = async (error, reject, options) => {
-  if (error instanceof await resolveResponse$1() && !(options === null || options === void 0 ? void 0 : options.noResolveJson)) error.json().then((err) => {
-    const status = error.status || 500;
-    const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || status + "";
-    reject(new StorageApiError(_getErrorMessage$1(err), status, statusCode));
-  }).catch((err) => {
-    reject(new StorageUnknownError(_getErrorMessage$1(err), err));
-  });
-  else reject(new StorageUnknownError(_getErrorMessage$1(error), error));
+var handleError = async (error, reject, options, namespace) => {
+  if (error && typeof error === "object" && "status" in error && "ok" in error && typeof error.status === "number" && !(options === null || options === void 0 ? void 0 : options.noResolveJson)) {
+    const responseError = error;
+    const status = responseError.status || 500;
+    if (typeof responseError.json === "function") responseError.json().then((err) => {
+      const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
+      reject(new StorageApiError(_getErrorMessage(err), status, statusCode, namespace));
+    }).catch(() => {
+      if (namespace === "vectors") {
+        const statusCode = status + "";
+        reject(new StorageApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode, namespace));
+      } else {
+        const statusCode = status + "";
+        reject(new StorageApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode, namespace));
+      }
+    });
+    else {
+      const statusCode = status + "";
+      reject(new StorageApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode, namespace));
+    }
+  } else reject(new StorageUnknownError(_getErrorMessage(error), error, namespace));
 };
-var _getRequestParams$1 = (method, options, parameters, body) => {
+var _getRequestParams = (method, options, parameters, body) => {
   const params = {
     method,
     headers: (options === null || options === void 0 ? void 0 : options.headers) || {}
   };
-  if (method === "GET" || !body) return params;
-  if (isPlainObject$1(body)) {
-    params.headers = _objectSpread2({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers);
+  if (method === "GET" || method === "HEAD" || !body) return _objectSpread22(_objectSpread22({}, params), parameters);
+  if (isPlainObject(body)) {
+    params.headers = _objectSpread22({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers);
     params.body = JSON.stringify(body);
   } else params.body = body;
   if (options === null || options === void 0 ? void 0 : options.duplex) params.duplex = options.duplex;
-  return _objectSpread2(_objectSpread2({}, params), parameters);
+  return _objectSpread22(_objectSpread22({}, params), parameters);
 };
-async function _handleRequest$1(fetcher, method, url, options, parameters, body) {
+async function _handleRequest(fetcher, method, url, options, parameters, body, namespace) {
   return new Promise((resolve, reject) => {
-    fetcher(url, _getRequestParams$1(method, options, parameters, body)).then((result) => {
+    fetcher(url, _getRequestParams(method, options, parameters, body)).then((result) => {
       if (!result.ok) throw result;
       if (options === null || options === void 0 ? void 0 : options.noResolveJson) return result;
+      if (namespace === "vectors") {
+        const contentType = result.headers.get("content-type");
+        if (result.headers.get("content-length") === "0" || result.status === 204) return {};
+        if (!contentType || !contentType.includes("application/json")) return {};
+      }
       return result.json();
-    }).then((data) => resolve(data)).catch((error) => handleError$1(error, reject, options));
+    }).then((data) => resolve(data)).catch((error) => handleError(error, reject, options, namespace));
   });
 }
-async function get(fetcher, url, options, parameters) {
-  return _handleRequest$1(fetcher, "GET", url, options, parameters);
+function createFetchApi(namespace = "storage") {
+  return {
+    get: async (fetcher, url, options, parameters) => {
+      return _handleRequest(fetcher, "GET", url, options, parameters, void 0, namespace);
+    },
+    post: async (fetcher, url, body, options, parameters) => {
+      return _handleRequest(fetcher, "POST", url, options, parameters, body, namespace);
+    },
+    put: async (fetcher, url, body, options, parameters) => {
+      return _handleRequest(fetcher, "PUT", url, options, parameters, body, namespace);
+    },
+    head: async (fetcher, url, options, parameters) => {
+      return _handleRequest(fetcher, "HEAD", url, _objectSpread22(_objectSpread22({}, options), {}, { noResolveJson: true }), parameters, void 0, namespace);
+    },
+    remove: async (fetcher, url, body, options, parameters) => {
+      return _handleRequest(fetcher, "DELETE", url, options, parameters, body, namespace);
+    }
+  };
 }
-async function post$1(fetcher, url, body, options, parameters) {
-  return _handleRequest$1(fetcher, "POST", url, options, parameters, body);
-}
-async function put(fetcher, url, body, options, parameters) {
-  return _handleRequest$1(fetcher, "PUT", url, options, parameters, body);
-}
-async function head(fetcher, url, options, parameters) {
-  return _handleRequest$1(fetcher, "HEAD", url, _objectSpread2(_objectSpread2({}, options), {}, { noResolveJson: true }), parameters);
-}
-async function remove(fetcher, url, body, options, parameters) {
-  return _handleRequest$1(fetcher, "DELETE", url, options, parameters, body);
-}
+var defaultApi = createFetchApi("storage");
+var { get, post, put, head, remove } = defaultApi;
+var vectorsApi = createFetchApi("vectors");
+var BaseApiClient = class {
+  /**
+  * Creates a new BaseApiClient instance
+  * @param url - Base URL for API requests
+  * @param headers - Default headers for API requests
+  * @param fetch - Optional custom fetch implementation
+  * @param namespace - Error namespace ('storage' or 'vectors')
+  */
+  constructor(url, headers = {}, fetch$1, namespace = "storage") {
+    this.shouldThrowOnError = false;
+    this.url = url;
+    this.headers = headers;
+    this.fetch = resolveFetch2(fetch$1);
+    this.namespace = namespace;
+  }
+  /**
+  * Enable throwing errors instead of returning them.
+  * When enabled, errors are thrown instead of returned in { data, error } format.
+  *
+  * @returns this - For method chaining
+  */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /**
+  * Set an HTTP header for the request.
+  * Creates a shallow copy of headers to avoid mutating shared state.
+  *
+  * @param name - Header name
+  * @param value - Header value
+  * @returns this - For method chaining
+  */
+  setHeader(name, value) {
+    this.headers = _objectSpread22(_objectSpread22({}, this.headers), {}, { [name]: value });
+    return this;
+  }
+  /**
+  * Handles API operation with standardized error handling
+  * Eliminates repetitive try-catch blocks across all API methods
+  *
+  * This wrapper:
+  * 1. Executes the operation
+  * 2. Returns { data, error: null } on success
+  * 3. Returns { data: null, error } on failure (if shouldThrowOnError is false)
+  * 4. Throws error on failure (if shouldThrowOnError is true)
+  *
+  * @typeParam T - The expected data type from the operation
+  * @param operation - Async function that performs the API call
+  * @returns Promise with { data, error } tuple
+  *
+  * @example
+  * ```typescript
+  * async listBuckets() {
+  *   return this.handleOperation(async () => {
+  *     return await get(this.fetch, `${this.url}/bucket`, {
+  *       headers: this.headers,
+  *     })
+  *   })
+  * }
+  * ```
+  */
+  async handleOperation(operation) {
+    var _this = this;
+    try {
+      return {
+        data: await operation(),
+        error: null
+      };
+    } catch (error) {
+      if (_this.shouldThrowOnError) throw error;
+      if (isStorageError(error)) return {
+        data: null,
+        error
+      };
+      throw error;
+    }
+  }
+};
 var StreamDownloadBuilder = class {
   constructor(downloadFn, shouldThrowOnError) {
     this.downloadFn = downloadFn;
@@ -4624,22 +4838,10 @@ var DEFAULT_FILE_OPTIONS = {
   contentType: "text/plain;charset=UTF-8",
   upsert: false
 };
-var StorageFileApi = class {
+var StorageFileApi = class extends BaseApiClient {
   constructor(url, headers = {}, bucketId, fetch$1) {
-    this.shouldThrowOnError = false;
-    this.url = url;
-    this.headers = headers;
+    super(url, headers, fetch$1, "storage");
     this.bucketId = bucketId;
-    this.fetch = resolveFetch$1(fetch$1);
-  }
-  /**
-  * Enable throwing errors instead of returning them.
-  *
-  * @category File Buckets
-  */
-  throwOnError() {
-    this.shouldThrowOnError = true;
-    return this;
   }
   /**
   * Uploads a file to an existing bucket or replaces an existing file at the specified path with a new one.
@@ -4650,10 +4852,10 @@ var StorageFileApi = class {
   */
   async uploadOrUpdate(method, path, fileBody, fileOptions) {
     var _this = this;
-    try {
+    return _this.handleOperation(async () => {
       let body;
-      const options = _objectSpread2(_objectSpread2({}, DEFAULT_FILE_OPTIONS), fileOptions);
-      let headers = _objectSpread2(_objectSpread2({}, _this.headers), method === "POST" && { "x-upsert": String(options.upsert) });
+      const options = _objectSpread22(_objectSpread22({}, DEFAULT_FILE_OPTIONS), fileOptions);
+      let headers = _objectSpread22(_objectSpread22({}, _this.headers), method === "POST" && { "x-upsert": String(options.upsert) });
       const metadata = options.metadata;
       if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
         body = new FormData();
@@ -4671,26 +4873,16 @@ var StorageFileApi = class {
         if (metadata) headers["x-metadata"] = _this.toBase64(_this.encodeMetadata(metadata));
         if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
       }
-      if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) headers = _objectSpread2(_objectSpread2({}, headers), fileOptions.headers);
+      if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) headers = _objectSpread22(_objectSpread22({}, headers), fileOptions.headers);
       const cleanPath = _this._removeEmptyFolders(path);
       const _path = _this._getFinalPath(cleanPath);
-      const data = await (method == "PUT" ? put : post$1)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread2({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
+      const data = await (method == "PUT" ? put : post)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
       return {
-        data: {
-          path: cleanPath,
-          id: data.Id,
-          fullPath: data.Key
-        },
-        error: null
+        path: cleanPath,
+        id: data.Id,
+        fullPath: data.Key
       };
-    } catch (error) {
-      if (_this.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    });
   }
   /**
   * Uploads a file to an existing bucket.
@@ -4776,10 +4968,10 @@ var StorageFileApi = class {
     const _path = _this3._getFinalPath(cleanPath);
     const url = new URL(_this3.url + `/object/upload/sign/${_path}`);
     url.searchParams.set("token", token);
-    try {
+    return _this3.handleOperation(async () => {
       let body;
-      const options = _objectSpread2({ upsert: DEFAULT_FILE_OPTIONS.upsert }, fileOptions);
-      const headers = _objectSpread2(_objectSpread2({}, _this3.headers), { "x-upsert": String(options.upsert) });
+      const options = _objectSpread22({ upsert: DEFAULT_FILE_OPTIONS.upsert }, fileOptions);
+      const headers = _objectSpread22(_objectSpread22({}, _this3.headers), { "x-upsert": String(options.upsert) });
       if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
         body = new FormData();
         body.append("cacheControl", options.cacheControl);
@@ -4793,20 +4985,10 @@ var StorageFileApi = class {
         headers["content-type"] = options.contentType;
       }
       return {
-        data: {
-          path: cleanPath,
-          fullPath: (await put(_this3.fetch, url.toString(), body, { headers })).Key
-        },
-        error: null
+        path: cleanPath,
+        fullPath: (await put(_this3.fetch, url.toString(), body, { headers })).Key
       };
-    } catch (error) {
-      if (_this3.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    });
   }
   /**
   * Creates a signed upload URL.
@@ -4840,30 +5022,20 @@ var StorageFileApi = class {
   */
   async createSignedUploadUrl(path, options) {
     var _this4 = this;
-    try {
+    return _this4.handleOperation(async () => {
       let _path = _this4._getFinalPath(path);
-      const headers = _objectSpread2({}, _this4.headers);
+      const headers = _objectSpread22({}, _this4.headers);
       if (options === null || options === void 0 ? void 0 : options.upsert) headers["x-upsert"] = "true";
-      const data = await post$1(_this4.fetch, `${_this4.url}/object/upload/sign/${_path}`, {}, { headers });
+      const data = await post(_this4.fetch, `${_this4.url}/object/upload/sign/${_path}`, {}, { headers });
       const url = new URL(_this4.url + data.url);
       const token = url.searchParams.get("token");
       if (!token) throw new StorageError("No token returned by API");
       return {
-        data: {
-          signedUrl: url.toString(),
-          path,
-          token
-        },
-        error: null
+        signedUrl: url.toString(),
+        path,
+        token
       };
-    } catch (error) {
-      if (_this4.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    });
   }
   /**
   * Replaces an existing file at the specified path with a new one.
@@ -4941,24 +5113,14 @@ var StorageFileApi = class {
   */
   async move(fromPath, toPath, options) {
     var _this6 = this;
-    try {
-      return {
-        data: await post$1(_this6.fetch, `${_this6.url}/object/move`, {
-          bucketId: _this6.bucketId,
-          sourceKey: fromPath,
-          destinationKey: toPath,
-          destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
-        }, { headers: _this6.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this6.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this6.handleOperation(async () => {
+      return await post(_this6.fetch, `${_this6.url}/object/move`, {
+        bucketId: _this6.bucketId,
+        sourceKey: fromPath,
+        destinationKey: toPath,
+        destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
+      }, { headers: _this6.headers });
+    });
   }
   /**
   * Copies an existing file to a new path in the same bucket.
@@ -4989,24 +5151,14 @@ var StorageFileApi = class {
   */
   async copy(fromPath, toPath, options) {
     var _this7 = this;
-    try {
-      return {
-        data: { path: (await post$1(_this7.fetch, `${_this7.url}/object/copy`, {
-          bucketId: _this7.bucketId,
-          sourceKey: fromPath,
-          destinationKey: toPath,
-          destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
-        }, { headers: _this7.headers })).Key },
-        error: null
-      };
-    } catch (error) {
-      if (_this7.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this7.handleOperation(async () => {
+      return { path: (await post(_this7.fetch, `${_this7.url}/object/copy`, {
+        bucketId: _this7.bucketId,
+        sourceKey: fromPath,
+        destinationKey: toPath,
+        destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
+      }, { headers: _this7.headers })).Key };
+    });
   }
   /**
   * Creates a signed URL. Use a signed URL to share a file for a fixed amount of time.
@@ -5061,23 +5213,12 @@ var StorageFileApi = class {
   */
   async createSignedUrl(path, expiresIn, options) {
     var _this8 = this;
-    try {
+    return _this8.handleOperation(async () => {
       let _path = _this8._getFinalPath(path);
-      let data = await post$1(_this8.fetch, `${_this8.url}/object/sign/${_path}`, _objectSpread2({ expiresIn }, (options === null || options === void 0 ? void 0 : options.transform) ? { transform: options.transform } : {}), { headers: _this8.headers });
+      let data = await post(_this8.fetch, `${_this8.url}/object/sign/${_path}`, _objectSpread22({ expiresIn }, (options === null || options === void 0 ? void 0 : options.transform) ? { transform: options.transform } : {}), { headers: _this8.headers });
       const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `&download=${options.download === true ? "" : options.download}` : "";
-      data = { signedUrl: encodeURI(`${_this8.url}${data.signedURL}${downloadQueryParam}`) };
-      return {
-        data,
-        error: null
-      };
-    } catch (error) {
-      if (_this8.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+      return { signedUrl: encodeURI(`${_this8.url}${data.signedURL}${downloadQueryParam}`) };
+    });
   }
   /**
   * Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
@@ -5119,24 +5260,14 @@ var StorageFileApi = class {
   */
   async createSignedUrls(paths, expiresIn, options) {
     var _this9 = this;
-    try {
-      const data = await post$1(_this9.fetch, `${_this9.url}/object/sign/${_this9.bucketId}`, {
+    return _this9.handleOperation(async () => {
+      const data = await post(_this9.fetch, `${_this9.url}/object/sign/${_this9.bucketId}`, {
         expiresIn,
         paths
       }, { headers: _this9.headers });
       const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `&download=${options.download === true ? "" : options.download}` : "";
-      return {
-        data: data.map((datum) => _objectSpread2(_objectSpread2({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${downloadQueryParam}`) : null })),
-        error: null
-      };
-    } catch (error) {
-      if (_this9.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+      return data.map((datum) => _objectSpread22(_objectSpread22({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${downloadQueryParam}`) : null }));
+    });
   }
   /**
   * Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `getPublicUrl` instead.
@@ -5144,6 +5275,7 @@ var StorageFileApi = class {
   * @category File Buckets
   * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
   * @param options.transform Transform the asset before serving it to the client.
+  * @param parameters Additional fetch parameters like signal for cancellation. Supports standard fetch options including cache control.
   * @returns BlobDownloadBuilder instance for downloading the file
   *
   * @example Download file
@@ -5175,8 +5307,27 @@ var StorageFileApi = class {
   *     }
   *   })
   * ```
+  *
+  * @example Download with cache control (useful in Edge Functions)
+  * ```js
+  * const { data, error } = await supabase
+  *   .storage
+  *   .from('avatars')
+  *   .download('folder/avatar1.png', {}, { cache: 'no-store' })
+  * ```
+  *
+  * @example Download with abort signal
+  * ```js
+  * const controller = new AbortController()
+  * setTimeout(() => controller.abort(), 5000)
+  *
+  * const { data, error } = await supabase
+  *   .storage
+  *   .from('avatars')
+  *   .download('folder/avatar1.png', {}, { signal: controller.signal })
+  * ```
   */
-  download(path, options) {
+  download(path, options, parameters) {
     const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined" ? "render/image/authenticated" : "object";
     const transformationQuery = this.transformOptsToQueryString((options === null || options === void 0 ? void 0 : options.transform) || {});
     const queryString = transformationQuery ? `?${transformationQuery}` : "";
@@ -5184,7 +5335,7 @@ var StorageFileApi = class {
     const downloadFn = () => get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString}`, {
       headers: this.headers,
       noResolveJson: true
-    });
+    }, parameters);
     return new BlobDownloadBuilder(downloadFn, this.shouldThrowOnError);
   }
   /**
@@ -5205,19 +5356,9 @@ var StorageFileApi = class {
   async info(path) {
     var _this10 = this;
     const _path = _this10._getFinalPath(path);
-    try {
-      return {
-        data: recursiveToCamel(await get(_this10.fetch, `${_this10.url}/object/info/${_path}`, { headers: _this10.headers })),
-        error: null
-      };
-    } catch (error) {
-      if (_this10.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this10.handleOperation(async () => {
+      return recursiveToCamel(await get(_this10.fetch, `${_this10.url}/object/info/${_path}`, { headers: _this10.headers }));
+    });
   }
   /**
   * Checks the existence of a file.
@@ -5342,19 +5483,9 @@ var StorageFileApi = class {
   */
   async remove(paths) {
     var _this12 = this;
-    try {
-      return {
-        data: await remove(_this12.fetch, `${_this12.url}/object/${_this12.bucketId}`, { prefixes: paths }, { headers: _this12.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this12.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this12.handleOperation(async () => {
+      return await remove(_this12.fetch, `${_this12.url}/object/${_this12.bucketId}`, { prefixes: paths }, { headers: _this12.headers });
+    });
   }
   /**
   * Get file metadata
@@ -5426,20 +5557,10 @@ var StorageFileApi = class {
   */
   async list(path, options, parameters) {
     var _this13 = this;
-    try {
-      const body = _objectSpread2(_objectSpread2(_objectSpread2({}, DEFAULT_SEARCH_OPTIONS), options), {}, { prefix: path || "" });
-      return {
-        data: await post$1(_this13.fetch, `${_this13.url}/object/list/${_this13.bucketId}`, body, { headers: _this13.headers }, parameters),
-        error: null
-      };
-    } catch (error) {
-      if (_this13.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this13.handleOperation(async () => {
+      const body = _objectSpread22(_objectSpread22(_objectSpread22({}, DEFAULT_SEARCH_OPTIONS), options), {}, { prefix: path || "" });
+      return await post(_this13.fetch, `${_this13.url}/object/list/${_this13.bucketId}`, body, { headers: _this13.headers }, parameters);
+    });
   }
   /**
   * @experimental this method signature might change in the future
@@ -5450,20 +5571,10 @@ var StorageFileApi = class {
   */
   async listV2(options, parameters) {
     var _this14 = this;
-    try {
-      const body = _objectSpread2({}, options);
-      return {
-        data: await post$1(_this14.fetch, `${_this14.url}/object/list-v2/${_this14.bucketId}`, body, { headers: _this14.headers }, parameters),
-        error: null
-      };
-    } catch (error) {
-      if (_this14.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this14.handleOperation(async () => {
+      const body = _objectSpread22({}, options);
+      return await post(_this14.fetch, `${_this14.url}/object/list-v2/${_this14.bucketId}`, body, { headers: _this14.headers }, parameters);
+    });
   }
   encodeMetadata(metadata) {
     return JSON.stringify(metadata);
@@ -5488,27 +5599,17 @@ var StorageFileApi = class {
     return params.join("&");
   }
 };
-var version2 = "2.91.0";
-var DEFAULT_HEADERS$1 = { "X-Client-Info": `storage-js/${version2}` };
-var StorageBucketApi = class {
+var version2 = "2.97.0";
+var DEFAULT_HEADERS = { "X-Client-Info": `storage-js/${version2}` };
+var StorageBucketApi = class extends BaseApiClient {
   constructor(url, headers = {}, fetch$1, opts) {
-    this.shouldThrowOnError = false;
     const baseUrl = new URL(url);
     if (opts === null || opts === void 0 ? void 0 : opts.useNewHostname) {
       if (/supabase\.(co|in|red)$/.test(baseUrl.hostname) && !baseUrl.hostname.includes("storage.supabase.")) baseUrl.hostname = baseUrl.hostname.replace("supabase.", "storage.supabase.");
     }
-    this.url = baseUrl.href.replace(/\/$/, "");
-    this.headers = _objectSpread2(_objectSpread2({}, DEFAULT_HEADERS$1), headers);
-    this.fetch = resolveFetch$1(fetch$1);
-  }
-  /**
-  * Enable throwing errors instead of returning them.
-  *
-  * @category File Buckets
-  */
-  throwOnError() {
-    this.shouldThrowOnError = true;
-    return this;
+    const finalUrl = baseUrl.href.replace(/\/$/, "");
+    const finalHeaders = _objectSpread22(_objectSpread22({}, DEFAULT_HEADERS), headers);
+    super(finalUrl, finalHeaders, fetch$1, "storage");
   }
   /**
   * Retrieves the details of all Storage buckets within an existing project.
@@ -5544,20 +5645,10 @@ var StorageBucketApi = class {
   */
   async listBuckets(options) {
     var _this = this;
-    try {
+    return _this.handleOperation(async () => {
       const queryString = _this.listBucketOptionsToQueryString(options);
-      return {
-        data: await get(_this.fetch, `${_this.url}/bucket${queryString}`, { headers: _this.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+      return await get(_this.fetch, `${_this.url}/bucket${queryString}`, { headers: _this.headers });
+    });
   }
   /**
   * Retrieves the details of an existing Storage bucket.
@@ -5594,19 +5685,9 @@ var StorageBucketApi = class {
   */
   async getBucket(id) {
     var _this2 = this;
-    try {
-      return {
-        data: await get(_this2.fetch, `${_this2.url}/bucket/${id}`, { headers: _this2.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this2.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this2.handleOperation(async () => {
+      return await get(_this2.fetch, `${_this2.url}/bucket/${id}`, { headers: _this2.headers });
+    });
   }
   /**
   * Creates a new Storage bucket
@@ -5647,26 +5728,16 @@ var StorageBucketApi = class {
   */
   async createBucket(id, options = { public: false }) {
     var _this3 = this;
-    try {
-      return {
-        data: await post$1(_this3.fetch, `${_this3.url}/bucket`, {
-          id,
-          name: id,
-          type: options.type,
-          public: options.public,
-          file_size_limit: options.fileSizeLimit,
-          allowed_mime_types: options.allowedMimeTypes
-        }, { headers: _this3.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this3.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this3.handleOperation(async () => {
+      return await post(_this3.fetch, `${_this3.url}/bucket`, {
+        id,
+        name: id,
+        type: options.type,
+        public: options.public,
+        file_size_limit: options.fileSizeLimit,
+        allowed_mime_types: options.allowedMimeTypes
+      }, { headers: _this3.headers });
+    });
   }
   /**
   * Updates a Storage bucket
@@ -5705,25 +5776,15 @@ var StorageBucketApi = class {
   */
   async updateBucket(id, options) {
     var _this4 = this;
-    try {
-      return {
-        data: await put(_this4.fetch, `${_this4.url}/bucket/${id}`, {
-          id,
-          name: id,
-          public: options.public,
-          file_size_limit: options.fileSizeLimit,
-          allowed_mime_types: options.allowedMimeTypes
-        }, { headers: _this4.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this4.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this4.handleOperation(async () => {
+      return await put(_this4.fetch, `${_this4.url}/bucket/${id}`, {
+        id,
+        name: id,
+        public: options.public,
+        file_size_limit: options.fileSizeLimit,
+        allowed_mime_types: options.allowedMimeTypes
+      }, { headers: _this4.headers });
+    });
   }
   /**
   * Removes all objects inside a single bucket.
@@ -5751,19 +5812,9 @@ var StorageBucketApi = class {
   */
   async emptyBucket(id) {
     var _this5 = this;
-    try {
-      return {
-        data: await post$1(_this5.fetch, `${_this5.url}/bucket/${id}/empty`, {}, { headers: _this5.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this5.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this5.handleOperation(async () => {
+      return await post(_this5.fetch, `${_this5.url}/bucket/${id}/empty`, {}, { headers: _this5.headers });
+    });
   }
   /**
   * Deletes an existing bucket. A bucket can't be deleted with existing objects inside it.
@@ -5792,19 +5843,9 @@ var StorageBucketApi = class {
   */
   async deleteBucket(id) {
     var _this6 = this;
-    try {
-      return {
-        data: await remove(_this6.fetch, `${_this6.url}/bucket/${id}`, {}, { headers: _this6.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this6.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this6.handleOperation(async () => {
+      return await remove(_this6.fetch, `${_this6.url}/bucket/${id}`, {}, { headers: _this6.headers });
+    });
   }
   listBucketOptionsToQueryString(options) {
     const params = {};
@@ -5818,7 +5859,7 @@ var StorageBucketApi = class {
     return Object.keys(params).length > 0 ? "?" + new URLSearchParams(params).toString() : "";
   }
 };
-var StorageAnalyticsClient = class {
+var StorageAnalyticsClient = class extends BaseApiClient {
   /**
   * @alpha
   *
@@ -5837,25 +5878,9 @@ var StorageAnalyticsClient = class {
   * ```
   */
   constructor(url, headers = {}, fetch$1) {
-    this.shouldThrowOnError = false;
-    this.url = url.replace(/\/$/, "");
-    this.headers = _objectSpread2(_objectSpread2({}, DEFAULT_HEADERS$1), headers);
-    this.fetch = resolveFetch$1(fetch$1);
-  }
-  /**
-  * @alpha
-  *
-  * Enable throwing errors instead of returning them in the response
-  * When enabled, failed operations will throw instead of returning { data: null, error }
-  *
-  * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
-  *
-  * @category Analytics Buckets
-  * @returns This instance for method chaining
-  */
-  throwOnError() {
-    this.shouldThrowOnError = true;
-    return this;
+    const finalUrl = url.replace(/\/$/, "");
+    const finalHeaders = _objectSpread22(_objectSpread22({}, DEFAULT_HEADERS), headers);
+    super(finalUrl, finalHeaders, fetch$1, "storage");
   }
   /**
   * @alpha
@@ -5893,19 +5918,9 @@ var StorageAnalyticsClient = class {
   */
   async createBucket(name) {
     var _this = this;
-    try {
-      return {
-        data: await post$1(_this.fetch, `${_this.url}/bucket`, { name }, { headers: _this.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this.handleOperation(async () => {
+      return await post(_this.fetch, `${_this.url}/bucket`, { name }, { headers: _this.headers });
+    });
   }
   /**
   * @alpha
@@ -5955,7 +5970,7 @@ var StorageAnalyticsClient = class {
   */
   async listBuckets(options) {
     var _this2 = this;
-    try {
+    return _this2.handleOperation(async () => {
       const queryParams = new URLSearchParams();
       if ((options === null || options === void 0 ? void 0 : options.limit) !== void 0) queryParams.set("limit", options.limit.toString());
       if ((options === null || options === void 0 ? void 0 : options.offset) !== void 0) queryParams.set("offset", options.offset.toString());
@@ -5964,18 +5979,8 @@ var StorageAnalyticsClient = class {
       if (options === null || options === void 0 ? void 0 : options.search) queryParams.set("search", options.search);
       const queryString = queryParams.toString();
       const url = queryString ? `${_this2.url}/bucket?${queryString}` : `${_this2.url}/bucket`;
-      return {
-        data: await get(_this2.fetch, url, { headers: _this2.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this2.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+      return await get(_this2.fetch, url, { headers: _this2.headers });
+    });
   }
   /**
   * @alpha
@@ -6010,19 +6015,9 @@ var StorageAnalyticsClient = class {
   */
   async deleteBucket(bucketName) {
     var _this3 = this;
-    try {
-      return {
-        data: await remove(_this3.fetch, `${_this3.url}/bucket/${bucketName}`, {}, { headers: _this3.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this3.shouldThrowOnError) throw error;
-      if (isStorageError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this3.handleOperation(async () => {
+      return await remove(_this3.fetch, `${_this3.url}/bucket/${bucketName}`, {}, { headers: _this3.headers });
+    });
   }
   /**
   * @alpha
@@ -6180,371 +6175,133 @@ var StorageAnalyticsClient = class {
     } });
   }
 };
-var DEFAULT_HEADERS = {
-  "X-Client-Info": `storage-js/${version2}`,
-  "Content-Type": "application/json"
-};
-var StorageVectorsError = class extends Error {
-  constructor(message) {
-    super(message);
-    this.__isStorageVectorsError = true;
-    this.name = "StorageVectorsError";
-  }
-};
-function isStorageVectorsError(error) {
-  return typeof error === "object" && error !== null && "__isStorageVectorsError" in error;
-}
-var StorageVectorsApiError = class extends StorageVectorsError {
-  constructor(message, status, statusCode) {
-    super(message);
-    this.name = "StorageVectorsApiError";
-    this.status = status;
-    this.statusCode = statusCode;
-  }
-  toJSON() {
-    return {
-      name: this.name,
-      message: this.message,
-      status: this.status,
-      statusCode: this.statusCode
-    };
-  }
-};
-var StorageVectorsUnknownError = class extends StorageVectorsError {
-  constructor(message, originalError) {
-    super(message);
-    this.name = "StorageVectorsUnknownError";
-    this.originalError = originalError;
-  }
-};
-var resolveFetch2 = (customFetch) => {
-  if (customFetch) return (...args) => customFetch(...args);
-  return (...args) => fetch(...args);
-};
-var isPlainObject = (value) => {
-  if (typeof value !== "object" || value === null) return false;
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
-};
-var _getErrorMessage = (err) => err.msg || err.message || err.error_description || err.error || JSON.stringify(err);
-var handleError = async (error, reject, options) => {
-  if (error && typeof error === "object" && "status" in error && "ok" in error && typeof error.status === "number" && !(options === null || options === void 0 ? void 0 : options.noResolveJson)) {
-    const status = error.status || 500;
-    const responseError = error;
-    if (typeof responseError.json === "function") responseError.json().then((err) => {
-      const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
-      reject(new StorageVectorsApiError(_getErrorMessage(err), status, statusCode));
-    }).catch(() => {
-      const statusCode = status + "";
-      reject(new StorageVectorsApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode));
-    });
-    else {
-      const statusCode = status + "";
-      reject(new StorageVectorsApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode));
-    }
-  } else reject(new StorageVectorsUnknownError(_getErrorMessage(error), error));
-};
-var _getRequestParams = (method, options, parameters, body) => {
-  const params = {
-    method,
-    headers: (options === null || options === void 0 ? void 0 : options.headers) || {}
-  };
-  if (method === "GET" || !body) return params;
-  if (isPlainObject(body)) {
-    params.headers = _objectSpread2({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers);
-    params.body = JSON.stringify(body);
-  } else params.body = body;
-  return _objectSpread2(_objectSpread2({}, params), parameters);
-};
-async function _handleRequest(fetcher, method, url, options, parameters, body) {
-  return new Promise((resolve, reject) => {
-    fetcher(url, _getRequestParams(method, options, parameters, body)).then((result) => {
-      if (!result.ok) throw result;
-      if (options === null || options === void 0 ? void 0 : options.noResolveJson) return result;
-      const contentType = result.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) return {};
-      return result.json();
-    }).then((data) => resolve(data)).catch((error) => handleError(error, reject, options));
-  });
-}
-async function post(fetcher, url, body, options, parameters) {
-  return _handleRequest(fetcher, "POST", url, options, parameters, body);
-}
-var VectorIndexApi = class {
+var VectorIndexApi = class extends BaseApiClient {
   /** Creates a new VectorIndexApi instance */
   constructor(url, headers = {}, fetch$1) {
-    this.shouldThrowOnError = false;
-    this.url = url.replace(/\/$/, "");
-    this.headers = _objectSpread2(_objectSpread2({}, DEFAULT_HEADERS), headers);
-    this.fetch = resolveFetch2(fetch$1);
-  }
-  /** Enable throwing errors instead of returning them in the response */
-  throwOnError() {
-    this.shouldThrowOnError = true;
-    return this;
+    const finalUrl = url.replace(/\/$/, "");
+    const finalHeaders = _objectSpread22(_objectSpread22({}, DEFAULT_HEADERS), {}, { "Content-Type": "application/json" }, headers);
+    super(finalUrl, finalHeaders, fetch$1, "vectors");
   }
   /** Creates a new vector index within a bucket */
   async createIndex(options) {
     var _this = this;
-    try {
-      return {
-        data: await post(_this.fetch, `${_this.url}/CreateIndex`, options, { headers: _this.headers }) || {},
-        error: null
-      };
-    } catch (error) {
-      if (_this.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this.handleOperation(async () => {
+      return await vectorsApi.post(_this.fetch, `${_this.url}/CreateIndex`, options, { headers: _this.headers }) || {};
+    });
   }
   /** Retrieves metadata for a specific vector index */
   async getIndex(vectorBucketName, indexName) {
     var _this2 = this;
-    try {
-      return {
-        data: await post(_this2.fetch, `${_this2.url}/GetIndex`, {
-          vectorBucketName,
-          indexName
-        }, { headers: _this2.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this2.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this2.handleOperation(async () => {
+      return await vectorsApi.post(_this2.fetch, `${_this2.url}/GetIndex`, {
+        vectorBucketName,
+        indexName
+      }, { headers: _this2.headers });
+    });
   }
   /** Lists vector indexes within a bucket with optional filtering and pagination */
   async listIndexes(options) {
     var _this3 = this;
-    try {
-      return {
-        data: await post(_this3.fetch, `${_this3.url}/ListIndexes`, options, { headers: _this3.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this3.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this3.handleOperation(async () => {
+      return await vectorsApi.post(_this3.fetch, `${_this3.url}/ListIndexes`, options, { headers: _this3.headers });
+    });
   }
   /** Deletes a vector index and all its data */
   async deleteIndex(vectorBucketName, indexName) {
     var _this4 = this;
-    try {
-      return {
-        data: await post(_this4.fetch, `${_this4.url}/DeleteIndex`, {
-          vectorBucketName,
-          indexName
-        }, { headers: _this4.headers }) || {},
-        error: null
-      };
-    } catch (error) {
-      if (_this4.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this4.handleOperation(async () => {
+      return await vectorsApi.post(_this4.fetch, `${_this4.url}/DeleteIndex`, {
+        vectorBucketName,
+        indexName
+      }, { headers: _this4.headers }) || {};
+    });
   }
 };
-var VectorDataApi = class {
+var VectorDataApi = class extends BaseApiClient {
   /** Creates a new VectorDataApi instance */
   constructor(url, headers = {}, fetch$1) {
-    this.shouldThrowOnError = false;
-    this.url = url.replace(/\/$/, "");
-    this.headers = _objectSpread2(_objectSpread2({}, DEFAULT_HEADERS), headers);
-    this.fetch = resolveFetch2(fetch$1);
-  }
-  /** Enable throwing errors instead of returning them in the response */
-  throwOnError() {
-    this.shouldThrowOnError = true;
-    return this;
+    const finalUrl = url.replace(/\/$/, "");
+    const finalHeaders = _objectSpread22(_objectSpread22({}, DEFAULT_HEADERS), {}, { "Content-Type": "application/json" }, headers);
+    super(finalUrl, finalHeaders, fetch$1, "vectors");
   }
   /** Inserts or updates vectors in batch (1-500 per request) */
   async putVectors(options) {
     var _this = this;
-    try {
-      if (options.vectors.length < 1 || options.vectors.length > 500) throw new Error("Vector batch size must be between 1 and 500 items");
-      return {
-        data: await post(_this.fetch, `${_this.url}/PutVectors`, options, { headers: _this.headers }) || {},
-        error: null
-      };
-    } catch (error) {
-      if (_this.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    if (options.vectors.length < 1 || options.vectors.length > 500) throw new Error("Vector batch size must be between 1 and 500 items");
+    return _this.handleOperation(async () => {
+      return await vectorsApi.post(_this.fetch, `${_this.url}/PutVectors`, options, { headers: _this.headers }) || {};
+    });
   }
   /** Retrieves vectors by their keys in batch */
   async getVectors(options) {
     var _this2 = this;
-    try {
-      return {
-        data: await post(_this2.fetch, `${_this2.url}/GetVectors`, options, { headers: _this2.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this2.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this2.handleOperation(async () => {
+      return await vectorsApi.post(_this2.fetch, `${_this2.url}/GetVectors`, options, { headers: _this2.headers });
+    });
   }
   /** Lists vectors in an index with pagination */
   async listVectors(options) {
     var _this3 = this;
-    try {
-      if (options.segmentCount !== void 0) {
-        if (options.segmentCount < 1 || options.segmentCount > 16) throw new Error("segmentCount must be between 1 and 16");
-        if (options.segmentIndex !== void 0) {
-          if (options.segmentIndex < 0 || options.segmentIndex >= options.segmentCount) throw new Error(`segmentIndex must be between 0 and ${options.segmentCount - 1}`);
-        }
+    if (options.segmentCount !== void 0) {
+      if (options.segmentCount < 1 || options.segmentCount > 16) throw new Error("segmentCount must be between 1 and 16");
+      if (options.segmentIndex !== void 0) {
+        if (options.segmentIndex < 0 || options.segmentIndex >= options.segmentCount) throw new Error(`segmentIndex must be between 0 and ${options.segmentCount - 1}`);
       }
-      return {
-        data: await post(_this3.fetch, `${_this3.url}/ListVectors`, options, { headers: _this3.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this3.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
     }
+    return _this3.handleOperation(async () => {
+      return await vectorsApi.post(_this3.fetch, `${_this3.url}/ListVectors`, options, { headers: _this3.headers });
+    });
   }
   /** Queries for similar vectors using approximate nearest neighbor search */
   async queryVectors(options) {
     var _this4 = this;
-    try {
-      return {
-        data: await post(_this4.fetch, `${_this4.url}/QueryVectors`, options, { headers: _this4.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this4.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this4.handleOperation(async () => {
+      return await vectorsApi.post(_this4.fetch, `${_this4.url}/QueryVectors`, options, { headers: _this4.headers });
+    });
   }
   /** Deletes vectors by their keys in batch (1-500 per request) */
   async deleteVectors(options) {
     var _this5 = this;
-    try {
-      if (options.keys.length < 1 || options.keys.length > 500) throw new Error("Keys batch size must be between 1 and 500 items");
-      return {
-        data: await post(_this5.fetch, `${_this5.url}/DeleteVectors`, options, { headers: _this5.headers }) || {},
-        error: null
-      };
-    } catch (error) {
-      if (_this5.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    if (options.keys.length < 1 || options.keys.length > 500) throw new Error("Keys batch size must be between 1 and 500 items");
+    return _this5.handleOperation(async () => {
+      return await vectorsApi.post(_this5.fetch, `${_this5.url}/DeleteVectors`, options, { headers: _this5.headers }) || {};
+    });
   }
 };
-var VectorBucketApi = class {
+var VectorBucketApi = class extends BaseApiClient {
   /** Creates a new VectorBucketApi instance */
   constructor(url, headers = {}, fetch$1) {
-    this.shouldThrowOnError = false;
-    this.url = url.replace(/\/$/, "");
-    this.headers = _objectSpread2(_objectSpread2({}, DEFAULT_HEADERS), headers);
-    this.fetch = resolveFetch2(fetch$1);
-  }
-  /** Enable throwing errors instead of returning them in the response */
-  throwOnError() {
-    this.shouldThrowOnError = true;
-    return this;
+    const finalUrl = url.replace(/\/$/, "");
+    const finalHeaders = _objectSpread22(_objectSpread22({}, DEFAULT_HEADERS), {}, { "Content-Type": "application/json" }, headers);
+    super(finalUrl, finalHeaders, fetch$1, "vectors");
   }
   /** Creates a new vector bucket */
   async createBucket(vectorBucketName) {
     var _this = this;
-    try {
-      return {
-        data: await post(_this.fetch, `${_this.url}/CreateVectorBucket`, { vectorBucketName }, { headers: _this.headers }) || {},
-        error: null
-      };
-    } catch (error) {
-      if (_this.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this.handleOperation(async () => {
+      return await vectorsApi.post(_this.fetch, `${_this.url}/CreateVectorBucket`, { vectorBucketName }, { headers: _this.headers }) || {};
+    });
   }
   /** Retrieves metadata for a specific vector bucket */
   async getBucket(vectorBucketName) {
     var _this2 = this;
-    try {
-      return {
-        data: await post(_this2.fetch, `${_this2.url}/GetVectorBucket`, { vectorBucketName }, { headers: _this2.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this2.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this2.handleOperation(async () => {
+      return await vectorsApi.post(_this2.fetch, `${_this2.url}/GetVectorBucket`, { vectorBucketName }, { headers: _this2.headers });
+    });
   }
   /** Lists vector buckets with optional filtering and pagination */
   async listBuckets(options = {}) {
     var _this3 = this;
-    try {
-      return {
-        data: await post(_this3.fetch, `${_this3.url}/ListVectorBuckets`, options, { headers: _this3.headers }),
-        error: null
-      };
-    } catch (error) {
-      if (_this3.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this3.handleOperation(async () => {
+      return await vectorsApi.post(_this3.fetch, `${_this3.url}/ListVectorBuckets`, options, { headers: _this3.headers });
+    });
   }
   /** Deletes a vector bucket (must be empty first) */
   async deleteBucket(vectorBucketName) {
     var _this4 = this;
-    try {
-      return {
-        data: await post(_this4.fetch, `${_this4.url}/DeleteVectorBucket`, { vectorBucketName }, { headers: _this4.headers }) || {},
-        error: null
-      };
-    } catch (error) {
-      if (_this4.shouldThrowOnError) throw error;
-      if (isStorageVectorsError(error)) return {
-        data: null,
-        error
-      };
-      throw error;
-    }
+    return _this4.handleOperation(async () => {
+      return await vectorsApi.post(_this4.fetch, `${_this4.url}/DeleteVectorBucket`, { vectorBucketName }, { headers: _this4.headers }) || {};
+    });
   }
 };
 var StorageVectorsClient = class extends VectorBucketApi {
@@ -6741,7 +6498,7 @@ var VectorBucketScope = class extends VectorIndexApi {
   */
   async createIndex(options) {
     var _superprop_getCreateIndex = () => super.createIndex, _this5 = this;
-    return _superprop_getCreateIndex().call(_this5, _objectSpread2(_objectSpread2({}, options), {}, { vectorBucketName: _this5.vectorBucketName }));
+    return _superprop_getCreateIndex().call(_this5, _objectSpread22(_objectSpread22({}, options), {}, { vectorBucketName: _this5.vectorBucketName }));
   }
   /**
   *
@@ -6764,7 +6521,7 @@ var VectorBucketScope = class extends VectorIndexApi {
   */
   async listIndexes(options = {}) {
     var _superprop_getListIndexes = () => super.listIndexes, _this6 = this;
-    return _superprop_getListIndexes().call(_this6, _objectSpread2(_objectSpread2({}, options), {}, { vectorBucketName: _this6.vectorBucketName }));
+    return _superprop_getListIndexes().call(_this6, _objectSpread22(_objectSpread22({}, options), {}, { vectorBucketName: _this6.vectorBucketName }));
   }
   /**
   *
@@ -6897,7 +6654,7 @@ var VectorIndexScope = class extends VectorDataApi {
   */
   async putVectors(options) {
     var _superprop_getPutVectors = () => super.putVectors, _this9 = this;
-    return _superprop_getPutVectors().call(_this9, _objectSpread2(_objectSpread2({}, options), {}, {
+    return _superprop_getPutVectors().call(_this9, _objectSpread22(_objectSpread22({}, options), {}, {
       vectorBucketName: _this9.vectorBucketName,
       indexName: _this9.indexName
     }));
@@ -6926,7 +6683,7 @@ var VectorIndexScope = class extends VectorDataApi {
   */
   async getVectors(options) {
     var _superprop_getGetVectors = () => super.getVectors, _this10 = this;
-    return _superprop_getGetVectors().call(_this10, _objectSpread2(_objectSpread2({}, options), {}, {
+    return _superprop_getGetVectors().call(_this10, _objectSpread22(_objectSpread22({}, options), {}, {
       vectorBucketName: _this10.vectorBucketName,
       indexName: _this10.indexName
     }));
@@ -6955,7 +6712,7 @@ var VectorIndexScope = class extends VectorDataApi {
   */
   async listVectors(options = {}) {
     var _superprop_getListVectors = () => super.listVectors, _this11 = this;
-    return _superprop_getListVectors().call(_this11, _objectSpread2(_objectSpread2({}, options), {}, {
+    return _superprop_getListVectors().call(_this11, _objectSpread22(_objectSpread22({}, options), {}, {
       vectorBucketName: _this11.vectorBucketName,
       indexName: _this11.indexName
     }));
@@ -6987,7 +6744,7 @@ var VectorIndexScope = class extends VectorDataApi {
   */
   async queryVectors(options) {
     var _superprop_getQueryVectors = () => super.queryVectors, _this12 = this;
-    return _superprop_getQueryVectors().call(_this12, _objectSpread2(_objectSpread2({}, options), {}, {
+    return _superprop_getQueryVectors().call(_this12, _objectSpread22(_objectSpread22({}, options), {}, {
       vectorBucketName: _this12.vectorBucketName,
       indexName: _this12.indexName
     }));
@@ -7015,7 +6772,7 @@ var VectorIndexScope = class extends VectorDataApi {
   */
   async deleteVectors(options) {
     var _superprop_getDeleteVectors = () => super.deleteVectors, _this13 = this;
-    return _superprop_getDeleteVectors().call(_this13, _objectSpread2(_objectSpread2({}, options), {}, {
+    return _superprop_getDeleteVectors().call(_this13, _objectSpread22(_objectSpread22({}, options), {}, {
       vectorBucketName: _this13.vectorBucketName,
       indexName: _this13.indexName
     }));
@@ -7087,7 +6844,7 @@ var StorageClient = class extends StorageBucketApi {
 };
 
 // node_modules/@supabase/auth-js/dist/module/lib/version.js
-var version3 = "2.91.0";
+var version3 = "2.97.0";
 
 // node_modules/@supabase/auth-js/dist/module/lib/constants.js
 var AUTO_REFRESH_TICK_DURATION_MS = 30 * 1e3;
@@ -7996,9 +7753,34 @@ var GoTrueAdminApi = class {
   /**
    * Updates the user data. Changes are applied directly without confirmation flows.
    *
+   * @param uid The user's unique identifier
    * @param attributes The data you want to update.
    *
    * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   *
+   * @remarks
+   * **Important:** This is a server-side operation and does **not** trigger client-side
+   * `onAuthStateChange` listeners. The admin API has no connection to client state.
+   *
+   * To sync changes to the client after calling this method:
+   * 1. On the client, call `supabase.auth.refreshSession()` to fetch the updated user data
+   * 2. This will trigger the `TOKEN_REFRESHED` event and notify all listeners
+   *
+   * @example
+   * ```typescript
+   * // Server-side (Edge Function)
+   * const { data, error } = await supabase.auth.admin.updateUserById(
+   *   userId,
+   *   { user_metadata: { preferences: { theme: 'dark' } } }
+   * )
+   *
+   * // Client-side (to sync the changes)
+   * const { data, error } = await supabase.auth.refreshSession()
+   * // onAuthStateChange listeners will now be notified with updated user
+   * ```
+   *
+   * @see {@link GoTrueClient.refreshSession} for syncing admin changes to the client
+   * @see {@link GoTrueClient.updateUser} for client-side user updates (triggers listeners automatically)
    */
   async updateUserById(uid, attributes) {
     validateUUID(uid);
@@ -8264,44 +8046,52 @@ async function navigatorLock(name, acquireTimeout, fn) {
       }
     }, acquireTimeout);
   }
-  return await Promise.resolve().then(() => globalThis.navigator.locks.request(name, acquireTimeout === 0 ? {
-    mode: "exclusive",
-    ifAvailable: true
-  } : {
-    mode: "exclusive",
-    signal: abortController.signal
-  }, async (lock) => {
-    if (lock) {
-      if (internals.debug) {
-        console.log("@supabase/gotrue-js: navigatorLock: acquired", name, lock.name);
-      }
-      try {
-        return await fn();
-      } finally {
+  await Promise.resolve();
+  try {
+    return await globalThis.navigator.locks.request(name, acquireTimeout === 0 ? {
+      mode: "exclusive",
+      ifAvailable: true
+    } : {
+      mode: "exclusive",
+      signal: abortController.signal
+    }, async (lock) => {
+      if (lock) {
         if (internals.debug) {
-          console.log("@supabase/gotrue-js: navigatorLock: released", name, lock.name);
+          console.log("@supabase/gotrue-js: navigatorLock: acquired", name, lock.name);
         }
-      }
-    } else {
-      if (acquireTimeout === 0) {
-        if (internals.debug) {
-          console.log("@supabase/gotrue-js: navigatorLock: not immediately available", name);
-        }
-        throw new NavigatorLockAcquireTimeoutError(`Acquiring an exclusive Navigator LockManager lock "${name}" immediately failed`);
-      } else {
-        if (internals.debug) {
-          try {
-            const result = await globalThis.navigator.locks.query();
-            console.log("@supabase/gotrue-js: Navigator LockManager state", JSON.stringify(result, null, "  "));
-          } catch (e) {
-            console.warn("@supabase/gotrue-js: Error when querying Navigator LockManager state", e);
+        try {
+          return await fn();
+        } finally {
+          if (internals.debug) {
+            console.log("@supabase/gotrue-js: navigatorLock: released", name, lock.name);
           }
         }
-        console.warn("@supabase/gotrue-js: Navigator LockManager returned a null lock when using #request without ifAvailable set to true, it appears this browser is not following the LockManager spec https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request");
-        return await fn();
+      } else {
+        if (acquireTimeout === 0) {
+          if (internals.debug) {
+            console.log("@supabase/gotrue-js: navigatorLock: not immediately available", name);
+          }
+          throw new NavigatorLockAcquireTimeoutError(`Acquiring an exclusive Navigator LockManager lock "${name}" immediately failed`);
+        } else {
+          if (internals.debug) {
+            try {
+              const result = await globalThis.navigator.locks.query();
+              console.log("@supabase/gotrue-js: Navigator LockManager state", JSON.stringify(result, null, "  "));
+            } catch (e) {
+              console.warn("@supabase/gotrue-js: Error when querying Navigator LockManager state", e);
+            }
+          }
+          console.warn("@supabase/gotrue-js: Navigator LockManager returned a null lock when using #request without ifAvailable set to true, it appears this browser is not following the LockManager spec https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request");
+          return await fn();
+        }
       }
+    });
+  } catch (e) {
+    if ((e === null || e === void 0 ? void 0 : e.name) === "AbortError") {
+      throw new NavigatorLockAcquireTimeoutError(`Acquiring an exclusive Navigator LockManager lock "${name}" timed out waiting ${acquireTimeout}ms`);
     }
-  }));
+    throw e;
+  }
 }
 
 // node_modules/@supabase/auth-js/dist/module/lib/polyfills.js
@@ -8855,6 +8645,7 @@ var WebAuthnApi = class {
    * @see {@link https://w3c.github.io/webauthn/#sctn-verifying-assertion W3C WebAuthn Spec - Verifying Assertion}
    */
   async _challenge({ factorId, webauthn, friendlyName, signal: signal2 }, overrides) {
+    var _a;
     try {
       const { data: challengeResponse, error: challengeError } = await this.client.mfa.challenge({
         factorId,
@@ -8867,7 +8658,15 @@ var WebAuthnApi = class {
       if (challengeResponse.webauthn.type === "create") {
         const { user } = challengeResponse.webauthn.credential_options.publicKey;
         if (!user.name) {
-          user.name = `${user.id}:${friendlyName}`;
+          const nameToUse = friendlyName;
+          if (!nameToUse) {
+            const currentUser = await this.client.getUser();
+            const userData = currentUser.data.user;
+            const fallbackName = ((_a = userData === null || userData === void 0 ? void 0 : userData.user_metadata) === null || _a === void 0 ? void 0 : _a.name) || (userData === null || userData === void 0 ? void 0 : userData.email) || (userData === null || userData === void 0 ? void 0 : userData.id) || "User";
+            user.name = `${user.id}:${fallbackName}`;
+          } else {
+            user.name = `${user.id}:${nameToUse}`;
+          }
         }
         if (!user.displayName) {
           user.displayName = user.name;
@@ -9087,8 +8886,9 @@ var DEFAULT_OPTIONS = {
   debug: false,
   hasCustomAuthorizationHeader: false,
   throwOnError: false,
-  lockAcquireTimeout: 1e4
+  lockAcquireTimeout: 1e4,
   // 10 seconds
+  skipAutoInitialize: false
 };
 async function lockNoOp(name, acquireTimeout, fn) {
   return await fn();
@@ -9228,10 +9028,18 @@ var GoTrueClient = class _GoTrueClient {
       }
       (_c = this.broadcastChannel) === null || _c === void 0 ? void 0 : _c.addEventListener("message", async (event) => {
         this._debug("received broadcast notification from other tab or client", event);
-        await this._notifyAllSubscribers(event.data.event, event.data.session, false);
+        try {
+          await this._notifyAllSubscribers(event.data.event, event.data.session, false);
+        } catch (error) {
+          this._debug("#broadcastChannel", "error", error);
+        }
       });
     }
-    this.initialize();
+    if (!settings.skipAutoInitialize) {
+      this.initialize().catch((error) => {
+        this._debug("#initialize()", "error", error);
+      });
+    }
   }
   /**
    * Returns whether error throwing mode is enabled for this client.
@@ -9754,9 +9562,7 @@ var GoTrueClient = class _GoTrueClient {
       }
       if (data.session) {
         await this._saveSession(data.session);
-        setTimeout(async () => {
-          await this._notifyAllSubscribers("SIGNED_IN", data.session);
-        }, 0);
+        await this._notifyAllSubscribers("SIGNED_IN", data.session);
       }
       return this._returnResult({ data: Object.assign(Object.assign({}, data), { redirectType: redirectType !== null && redirectType !== void 0 ? redirectType : null }), error });
     } catch (error) {
@@ -10303,7 +10109,7 @@ var GoTrueClient = class _GoTrueClient {
       } else {
         const { data, error } = await this._getUser(currentSession.access_token);
         if (error) {
-          throw error;
+          return this._returnResult({ data: { user: null, session: null }, error });
         }
         session = {
           access_token: currentSession.access_token,
@@ -10485,14 +10291,14 @@ var GoTrueClient = class _GoTrueClient {
     return await this._useSession(async (result) => {
       var _a;
       const { data, error: sessionError } = result;
-      if (sessionError) {
+      if (sessionError && !isAuthSessionMissingError(sessionError)) {
         return this._returnResult({ error: sessionError });
       }
       const accessToken = (_a = data.session) === null || _a === void 0 ? void 0 : _a.access_token;
       if (accessToken) {
         const { error } = await this.admin.signOut(accessToken, scope);
         if (error) {
-          if (!(isAuthApiError(error) && (error.status === 404 || error.status === 401 || error.status === 403))) {
+          if (!(isAuthApiError(error) && (error.status === 404 || error.status === 401 || error.status === 403) || isAuthSessionMissingError(error))) {
             return this._returnResult({ error });
           }
         }
@@ -11079,7 +10885,13 @@ var GoTrueClient = class _GoTrueClient {
       return false;
     }
     try {
-      this.visibilityChangedCallback = async () => await this._onVisibilityChanged(false);
+      this.visibilityChangedCallback = async () => {
+        try {
+          await this._onVisibilityChanged(false);
+        } catch (error) {
+          this._debug("#visibilityChangedCallback", "error", error);
+        }
+      };
       window === null || window === void 0 ? void 0 : window.addEventListener("visibilitychange", this.visibilityChangedCallback);
       await this._onVisibilityChanged(true);
     } catch (error) {
@@ -11312,8 +11124,33 @@ var GoTrueClient = class _GoTrueClient {
   /**
    * {@see GoTrueMFAApi#getAuthenticatorAssuranceLevel}
    */
-  async _getAuthenticatorAssuranceLevel() {
-    var _a, _b;
+  async _getAuthenticatorAssuranceLevel(jwt) {
+    var _a, _b, _c, _d;
+    if (jwt) {
+      try {
+        const { payload: payload2 } = decodeJWT(jwt);
+        let currentLevel2 = null;
+        if (payload2.aal) {
+          currentLevel2 = payload2.aal;
+        }
+        let nextLevel2 = currentLevel2;
+        const { data: { user }, error: userError } = await this.getUser(jwt);
+        if (userError) {
+          return this._returnResult({ data: null, error: userError });
+        }
+        const verifiedFactors2 = (_b = (_a = user === null || user === void 0 ? void 0 : user.factors) === null || _a === void 0 ? void 0 : _a.filter((factor) => factor.status === "verified")) !== null && _b !== void 0 ? _b : [];
+        if (verifiedFactors2.length > 0) {
+          nextLevel2 = "aal2";
+        }
+        const currentAuthenticationMethods2 = payload2.amr || [];
+        return { data: { currentLevel: currentLevel2, nextLevel: nextLevel2, currentAuthenticationMethods: currentAuthenticationMethods2 }, error: null };
+      } catch (error) {
+        if (isAuthError(error)) {
+          return this._returnResult({ data: null, error });
+        }
+        throw error;
+      }
+    }
     const { data: { session }, error: sessionError } = await this.getSession();
     if (sessionError) {
       return this._returnResult({ data: null, error: sessionError });
@@ -11330,7 +11167,7 @@ var GoTrueClient = class _GoTrueClient {
       currentLevel = payload.aal;
     }
     let nextLevel = currentLevel;
-    const verifiedFactors = (_b = (_a = session.user.factors) === null || _a === void 0 ? void 0 : _a.filter((factor) => factor.status === "verified")) !== null && _b !== void 0 ? _b : [];
+    const verifiedFactors = (_d = (_c = session.user.factors) === null || _c === void 0 ? void 0 : _c.filter((factor) => factor.status === "verified")) !== null && _d !== void 0 ? _d : [];
     if (verifiedFactors.length > 0) {
       nextLevel = "aal2";
     }
@@ -11342,7 +11179,7 @@ var GoTrueClient = class _GoTrueClient {
    * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
    *
    * Returns authorization details including client info, scopes, and user information.
-   * If the API returns a redirect_uri, it means consent was already given - the caller
+   * If the response includes only a redirect_url field, it means consent was already given - the caller
    * should handle the redirect manually if needed.
    */
   async _getAuthorizationDetails(authorizationId) {
@@ -11596,7 +11433,7 @@ var AuthClient = GoTrueClient_default;
 var AuthClient_default = AuthClient;
 
 // node_modules/@supabase/supabase-js/dist/index.mjs
-var version4 = "2.91.0";
+var version4 = "2.97.0";
 var JS_ENV = "";
 if (typeof Deno !== "undefined") JS_ENV = "deno";
 else if (typeof document !== "undefined") JS_ENV = "web";
@@ -11612,37 +11449,37 @@ var DEFAULT_AUTH_OPTIONS = {
   flowType: "implicit"
 };
 var DEFAULT_REALTIME_OPTIONS = {};
-function _typeof2(o) {
+function _typeof3(o) {
   "@babel/helpers - typeof";
-  return _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
+  return _typeof3 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
     return typeof o$1;
   } : function(o$1) {
     return o$1 && "function" == typeof Symbol && o$1.constructor === Symbol && o$1 !== Symbol.prototype ? "symbol" : typeof o$1;
-  }, _typeof2(o);
+  }, _typeof3(o);
 }
-function toPrimitive2(t, r) {
-  if ("object" != _typeof2(t) || !t) return t;
+function toPrimitive3(t, r) {
+  if ("object" != _typeof3(t) || !t) return t;
   var e = t[Symbol.toPrimitive];
   if (void 0 !== e) {
     var i = e.call(t, r || "default");
-    if ("object" != _typeof2(i)) return i;
+    if ("object" != _typeof3(i)) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
   return ("string" === r ? String : Number)(t);
 }
-function toPropertyKey2(t) {
-  var i = toPrimitive2(t, "string");
-  return "symbol" == _typeof2(i) ? i : i + "";
+function toPropertyKey3(t) {
+  var i = toPrimitive3(t, "string");
+  return "symbol" == _typeof3(i) ? i : i + "";
 }
-function _defineProperty2(e, r, t) {
-  return (r = toPropertyKey2(r)) in e ? Object.defineProperty(e, r, {
+function _defineProperty3(e, r, t) {
+  return (r = toPropertyKey3(r)) in e ? Object.defineProperty(e, r, {
     value: t,
     enumerable: true,
     configurable: true,
     writable: true
   }) : e[r] = t, e;
 }
-function ownKeys2(e, r) {
+function ownKeys3(e, r) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -11652,12 +11489,12 @@ function ownKeys2(e, r) {
   }
   return t;
 }
-function _objectSpread22(e) {
+function _objectSpread23(e) {
   for (var r = 1; r < arguments.length; r++) {
     var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys2(Object(t), true).forEach(function(r$1) {
-      _defineProperty2(e, r$1, t[r$1]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys2(Object(t)).forEach(function(r$1) {
+    r % 2 ? ownKeys3(Object(t), true).forEach(function(r$1) {
+      _defineProperty3(e, r$1, t[r$1]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys3(Object(t)).forEach(function(r$1) {
       Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t, r$1));
     });
   }
@@ -11679,7 +11516,7 @@ var fetchWithAuth = (supabaseKey, getAccessToken, customFetch) => {
     let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
     if (!headers.has("apikey")) headers.set("apikey", supabaseKey);
     if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${accessToken}`);
-    return fetch$1(input, _objectSpread22(_objectSpread22({}, init), {}, { headers }));
+    return fetch$1(input, _objectSpread23(_objectSpread23({}, init), {}, { headers }));
   };
 };
 function ensureTrailingSlash(url) {
@@ -11690,11 +11527,11 @@ function applySettingDefaults(options, defaults) {
   const { db: dbOptions, auth: authOptions, realtime: realtimeOptions, global: globalOptions } = options;
   const { db: DEFAULT_DB_OPTIONS$1, auth: DEFAULT_AUTH_OPTIONS$1, realtime: DEFAULT_REALTIME_OPTIONS$1, global: DEFAULT_GLOBAL_OPTIONS$1 } = defaults;
   const result = {
-    db: _objectSpread22(_objectSpread22({}, DEFAULT_DB_OPTIONS$1), dbOptions),
-    auth: _objectSpread22(_objectSpread22({}, DEFAULT_AUTH_OPTIONS$1), authOptions),
-    realtime: _objectSpread22(_objectSpread22({}, DEFAULT_REALTIME_OPTIONS$1), realtimeOptions),
+    db: _objectSpread23(_objectSpread23({}, DEFAULT_DB_OPTIONS$1), dbOptions),
+    auth: _objectSpread23(_objectSpread23({}, DEFAULT_AUTH_OPTIONS$1), authOptions),
+    realtime: _objectSpread23(_objectSpread23({}, DEFAULT_REALTIME_OPTIONS$1), realtimeOptions),
     storage: {},
-    global: _objectSpread22(_objectSpread22(_objectSpread22({}, DEFAULT_GLOBAL_OPTIONS$1), globalOptions), {}, { headers: _objectSpread22(_objectSpread22({}, (_DEFAULT_GLOBAL_OPTIO = DEFAULT_GLOBAL_OPTIONS$1 === null || DEFAULT_GLOBAL_OPTIONS$1 === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS$1.headers) !== null && _DEFAULT_GLOBAL_OPTIO !== void 0 ? _DEFAULT_GLOBAL_OPTIO : {}), (_globalOptions$header = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _globalOptions$header !== void 0 ? _globalOptions$header : {}) }),
+    global: _objectSpread23(_objectSpread23(_objectSpread23({}, DEFAULT_GLOBAL_OPTIONS$1), globalOptions), {}, { headers: _objectSpread23(_objectSpread23({}, (_DEFAULT_GLOBAL_OPTIO = DEFAULT_GLOBAL_OPTIONS$1 === null || DEFAULT_GLOBAL_OPTIONS$1 === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS$1.headers) !== null && _DEFAULT_GLOBAL_OPTIO !== void 0 ? _DEFAULT_GLOBAL_OPTIO : {}), (_globalOptions$header = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _globalOptions$header !== void 0 ? _globalOptions$header : {}) }),
     accessToken: async () => ""
   };
   if (options.accessToken) result.accessToken = options.accessToken;
@@ -11752,7 +11589,7 @@ var SupabaseClient = class {
     const DEFAULTS = {
       db: DEFAULT_DB_OPTIONS,
       realtime: DEFAULT_REALTIME_OPTIONS,
-      auth: _objectSpread22(_objectSpread22({}, DEFAULT_AUTH_OPTIONS), {}, { storageKey: defaultStorageKey }),
+      auth: _objectSpread23(_objectSpread23({}, DEFAULT_AUTH_OPTIONS), {}, { storageKey: defaultStorageKey }),
       global: DEFAULT_GLOBAL_OPTIONS
     };
     const settings = applySettingDefaults(options !== null && options !== void 0 ? options : {}, DEFAULTS);
@@ -11768,7 +11605,7 @@ var SupabaseClient = class {
       } });
     }
     this.fetch = fetchWithAuth(supabaseKey, this._getAccessToken.bind(this), settings.global.fetch);
-    this.realtime = this._initRealtimeClient(_objectSpread22({
+    this.realtime = this._initRealtimeClient(_objectSpread23({
       headers: this.headers,
       accessToken: this._getAccessToken.bind(this)
     }, settings.realtime));
@@ -11776,7 +11613,9 @@ var SupabaseClient = class {
     this.rest = new PostgrestClient(new URL("rest/v1", baseUrl).href, {
       headers: this.headers,
       schema: settings.db.schema,
-      fetch: this.fetch
+      fetch: this.fetch,
+      timeout: settings.db.timeout,
+      urlLengthLimit: settings.db.urlLengthLimit
     });
     this.storage = new StorageClient(this.storageUrl.href, this.headers, this.fetch, options === null || options === void 0 ? void 0 : options.storage);
     if (!settings.accessToken) this._listenForAuthEvents();
@@ -11883,7 +11722,7 @@ var SupabaseClient = class {
     };
     return new SupabaseAuthClient({
       url: this.authUrl.href,
-      headers: _objectSpread22(_objectSpread22({}, authHeaders), headers),
+      headers: _objectSpread23(_objectSpread23({}, authHeaders), headers),
       storageKey,
       autoRefreshToken,
       persistSession,
@@ -11899,7 +11738,7 @@ var SupabaseClient = class {
     });
   }
   _initRealtimeClient(options) {
-    return new RealtimeClient(this.realtimeUrl.href, _objectSpread22(_objectSpread22({}, options), {}, { params: _objectSpread22(_objectSpread22({}, { apikey: this.supabaseKey }), options === null || options === void 0 ? void 0 : options.params) }));
+    return new RealtimeClient(this.realtimeUrl.href, _objectSpread23(_objectSpread23({}, options), {}, { params: _objectSpread23(_objectSpread23({}, { apikey: this.supabaseKey }), options === null || options === void 0 ? void 0 : options.params) }));
   }
   _listenForAuthEvents() {
     return this.auth.onAuthStateChange((event, session) => {
@@ -12488,8 +12327,8 @@ var appConfig = {
       scrollPositionRestoration: "enabled"
     })),
     provideHttpClient(withFetch()),
-    // Charts provider moved to main.ts for SSR compatibility
-    // provideCharts(withDefaultRegisterables()),
+    // Global Charts Registration
+    provideCharts(withDefaultRegisterables()),
     // Repositories
     { provide: ProductRepository, useClass: SupabaseProductRepository },
     { provide: CategoryRepository, useClass: SupabaseCategoryRepository },
@@ -12527,7 +12366,7 @@ var AiAgentService = class _AiAgentService {
       return;
     this.isLoadingModel.set(true);
     try {
-      const { CreateMLCEngine } = await import("./chunk-Z5BRZOMZ.js");
+      const { CreateMLCEngine } = await import("./chunk-EZP7SFDH.js");
       const initProgressCallback = (report) => {
         this.loadingProgress.set(report.text);
       };
@@ -12681,37 +12520,37 @@ var AiAgentService = class _AiAgentService {
 // src/app/features/ai-assistant/ai-assistant.ts
 var _c0 = ["scrollContainer"];
 var _c1 = (a0) => ({ "flex-row-reverse": a0 });
-function AiAssistant_div_1_Template(rf, ctx) {
+function AiAssistant_Conditional_1_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275element(0, "div", 6);
+    \u0275\u0275element(0, "div", 2);
   }
 }
-function AiAssistant_i_2_Template(rf, ctx) {
+function AiAssistant_Conditional_2_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275element(0, "i", 7);
+    \u0275\u0275element(0, "i", 3);
   }
 }
-function AiAssistant_i_3_Template(rf, ctx) {
+function AiAssistant_Conditional_3_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275element(0, "i", 8);
+    \u0275\u0275element(0, "i", 4);
   }
 }
-function AiAssistant_div_4_span_6_Template(rf, ctx) {
+function AiAssistant_Conditional_4_Conditional_6_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "span", 32);
+    \u0275\u0275elementStart(0, "span", 10);
     \u0275\u0275text(1, "Iniciando Motor...");
     \u0275\u0275elementEnd();
   }
 }
-function AiAssistant_div_4_div_12_Template(rf, ctx) {
+function AiAssistant_Conditional_4_Conditional_12_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "div", 33)(1, "p", 34);
+    \u0275\u0275elementStart(0, "div", 14)(1, "p", 27);
     \u0275\u0275text(2);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(3, "div", 35);
-    \u0275\u0275element(4, "div", 36);
+    \u0275\u0275elementStart(3, "div", 28);
+    \u0275\u0275element(4, "div", 29);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(5, "p", 37);
+    \u0275\u0275elementStart(5, "p", 30);
     \u0275\u0275text(6, "Descargando modelo IA (solo la primera vez)...");
     \u0275\u0275elementEnd()();
   }
@@ -12721,12 +12560,12 @@ function AiAssistant_div_4_div_12_Template(rf, ctx) {
     \u0275\u0275textInterpolate(ctx_r1.aiService.loadingProgress());
   }
 }
-function AiAssistant_div_4_For_21_Template(rf, ctx) {
+function AiAssistant_Conditional_4_For_21_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "div", 24)(1, "div", 38);
-    \u0275\u0275element(2, "i", 39);
+    \u0275\u0275elementStart(0, "div", 20)(1, "div", 31);
+    \u0275\u0275element(2, "i", 32);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(3, "div", 40);
+    \u0275\u0275elementStart(3, "div", 33);
     \u0275\u0275text(4);
     \u0275\u0275elementEnd()();
   }
@@ -12743,21 +12582,21 @@ function AiAssistant_div_4_For_21_Template(rf, ctx) {
     \u0275\u0275textInterpolate1(" ", msg_r3.content, " ");
   }
 }
-function AiAssistant_div_4_div_22_Template(rf, ctx) {
+function AiAssistant_Conditional_4_Conditional_22_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "div", 20)(1, "div", 21);
-    \u0275\u0275element(2, "i", 22);
+    \u0275\u0275elementStart(0, "div", 16)(1, "div", 17);
+    \u0275\u0275element(2, "i", 18);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(3, "div", 41);
-    \u0275\u0275element(4, "span", 42)(5, "span", 43)(6, "span", 44);
+    \u0275\u0275elementStart(3, "div", 34);
+    \u0275\u0275element(4, "span", 35)(5, "span", 36)(6, "span", 37);
     \u0275\u0275elementEnd()();
   }
 }
-function AiAssistant_div_4_div_23_Template(rf, ctx) {
+function AiAssistant_Conditional_4_Conditional_23_Template(rf, ctx) {
   if (rf & 1) {
     const _r4 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "div", 45)(1, "button", 46);
-    \u0275\u0275listener("click", function AiAssistant_div_4_div_23_Template_button_click_1_listener() {
+    \u0275\u0275elementStart(0, "div", 21)(1, "button", 38);
+    \u0275\u0275listener("click", function AiAssistant_Conditional_4_Conditional_23_Template_button_click_1_listener() {
       \u0275\u0275restoreView(_r4);
       const ctx_r1 = \u0275\u0275nextContext(2);
       ctx_r1.userInput.set("Estado de mi reparaci\xF3n");
@@ -12765,8 +12604,8 @@ function AiAssistant_div_4_div_23_Template(rf, ctx) {
     });
     \u0275\u0275text(2, " \u{1F527} Estado Reparaci\xF3n ");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(3, "button", 47);
-    \u0275\u0275listener("click", function AiAssistant_div_4_div_23_Template_button_click_3_listener() {
+    \u0275\u0275elementStart(3, "button", 39);
+    \u0275\u0275listener("click", function AiAssistant_Conditional_4_Conditional_23_Template_button_click_3_listener() {
       \u0275\u0275restoreView(_r4);
       const ctx_r1 = \u0275\u0275nextContext(2);
       ctx_r1.userInput.set("Quiero un presupuesto web");
@@ -12774,8 +12613,8 @@ function AiAssistant_div_4_div_23_Template(rf, ctx) {
     });
     \u0275\u0275text(4, " \u{1F4BB} Presupuesto Web ");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(5, "button", 48);
-    \u0275\u0275listener("click", function AiAssistant_div_4_div_23_Template_button_click_5_listener() {
+    \u0275\u0275elementStart(5, "button", 40);
+    \u0275\u0275listener("click", function AiAssistant_Conditional_4_Conditional_23_Template_button_click_5_listener() {
       \u0275\u0275restoreView(_r4);
       const ctx_r1 = \u0275\u0275nextContext(2);
       ctx_r1.userInput.set("Cambio de pantalla iPhone");
@@ -12785,53 +12624,53 @@ function AiAssistant_div_4_div_23_Template(rf, ctx) {
     \u0275\u0275elementEnd()();
   }
 }
-function AiAssistant_div_4_Template(rf, ctx) {
+function AiAssistant_Conditional_4_Template(rf, ctx) {
   if (rf & 1) {
     const _r1 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "div", 9)(1, "div", 10)(2, "div", 11);
-    \u0275\u0275element(3, "div", 12);
-    \u0275\u0275elementStart(4, "h3", 13);
+    \u0275\u0275elementStart(0, "div", 5)(1, "div", 6)(2, "div", 7);
+    \u0275\u0275element(3, "div", 8);
+    \u0275\u0275elementStart(4, "h3", 9);
     \u0275\u0275text(5, "Arecofix AI ");
-    \u0275\u0275template(6, AiAssistant_div_4_span_6_Template, 2, 0, "span", 14);
+    \u0275\u0275conditionalCreate(6, AiAssistant_Conditional_4_Conditional_6_Template, 2, 0, "span", 10);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(7, "div", 11)(8, "div", 15);
+    \u0275\u0275elementStart(7, "div", 7)(8, "div", 11);
     \u0275\u0275text(9, "WebLLM / MCP");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(10, "button", 16);
-    \u0275\u0275listener("click", function AiAssistant_div_4_Template_button_click_10_listener() {
+    \u0275\u0275elementStart(10, "button", 12);
+    \u0275\u0275listener("click", function AiAssistant_Conditional_4_Template_button_click_10_listener() {
       \u0275\u0275restoreView(_r1);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.toggleChat());
     });
-    \u0275\u0275element(11, "i", 17);
+    \u0275\u0275element(11, "i", 13);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275template(12, AiAssistant_div_4_div_12_Template, 7, 1, "div", 18);
-    \u0275\u0275elementStart(13, "div", 19, 0)(15, "div", 20)(16, "div", 21);
-    \u0275\u0275element(17, "i", 22);
+    \u0275\u0275conditionalCreate(12, AiAssistant_Conditional_4_Conditional_12_Template, 7, 1, "div", 14);
+    \u0275\u0275elementStart(13, "div", 15, 0)(15, "div", 16)(16, "div", 17);
+    \u0275\u0275element(17, "i", 18);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(18, "div", 23);
+    \u0275\u0275elementStart(18, "div", 19);
     \u0275\u0275text(19, " Hola! Soy tu asistente de Arecofix potenciado con IA local (WebLLM). Puedo ayudarte a consultar reparaciones, servicios o agendar citas. \xBFEn qu\xE9 te ayudo? ");
     \u0275\u0275elementEnd()();
-    \u0275\u0275repeaterCreate(20, AiAssistant_div_4_For_21_Template, 5, 8, "div", 24, \u0275\u0275repeaterTrackByIndex);
-    \u0275\u0275template(22, AiAssistant_div_4_div_22_Template, 7, 0, "div", 25);
+    \u0275\u0275repeaterCreate(20, AiAssistant_Conditional_4_For_21_Template, 5, 8, "div", 20, \u0275\u0275repeaterTrackByIndex);
+    \u0275\u0275conditionalCreate(22, AiAssistant_Conditional_4_Conditional_22_Template, 7, 0, "div", 16);
     \u0275\u0275elementEnd();
-    \u0275\u0275template(23, AiAssistant_div_4_div_23_Template, 7, 0, "div", 26);
-    \u0275\u0275elementStart(24, "div", 27)(25, "form", 28);
-    \u0275\u0275listener("submit", function AiAssistant_div_4_Template_form_submit_25_listener() {
+    \u0275\u0275conditionalCreate(23, AiAssistant_Conditional_4_Conditional_23_Template, 7, 0, "div", 21);
+    \u0275\u0275elementStart(24, "div", 22)(25, "form", 23);
+    \u0275\u0275listener("submit", function AiAssistant_Conditional_4_Template_form_submit_25_listener() {
       \u0275\u0275restoreView(_r1);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.sendMessage());
     });
-    \u0275\u0275elementStart(26, "input", 29);
-    \u0275\u0275twoWayListener("ngModelChange", function AiAssistant_div_4_Template_input_ngModelChange_26_listener($event) {
+    \u0275\u0275elementStart(26, "input", 24);
+    \u0275\u0275twoWayListener("ngModelChange", function AiAssistant_Conditional_4_Template_input_ngModelChange_26_listener($event) {
       \u0275\u0275restoreView(_r1);
       const ctx_r1 = \u0275\u0275nextContext();
       \u0275\u0275twoWayBindingSet(ctx_r1.userInput, $event) || (ctx_r1.userInput = $event);
       return \u0275\u0275resetView($event);
     });
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(27, "button", 30);
-    \u0275\u0275element(28, "i", 31);
+    \u0275\u0275elementStart(27, "button", 25);
+    \u0275\u0275element(28, "i", 26);
     \u0275\u0275elementEnd()()()();
   }
   if (rf & 2) {
@@ -12839,15 +12678,15 @@ function AiAssistant_div_4_Template(rf, ctx) {
     \u0275\u0275advance(3);
     \u0275\u0275property("ngClass", ctx_r1.aiService.modelLoaded() ? "bg-green-500 animate-pulse" : "bg-yellow-500");
     \u0275\u0275advance(3);
-    \u0275\u0275property("ngIf", ctx_r1.aiService.isLoadingModel());
+    \u0275\u0275conditional(ctx_r1.aiService.isLoadingModel() ? 6 : -1);
     \u0275\u0275advance(6);
-    \u0275\u0275property("ngIf", ctx_r1.aiService.isLoadingModel());
+    \u0275\u0275conditional(ctx_r1.aiService.isLoadingModel() ? 12 : -1);
     \u0275\u0275advance(8);
     \u0275\u0275repeater(ctx_r1.aiService.visibleMessages());
     \u0275\u0275advance(2);
-    \u0275\u0275property("ngIf", ctx_r1.aiService.isGenerating());
+    \u0275\u0275conditional(ctx_r1.aiService.isGenerating() ? 22 : -1);
     \u0275\u0275advance();
-    \u0275\u0275property("ngIf", ctx_r1.aiService.messages().length < 2);
+    \u0275\u0275conditional(ctx_r1.aiService.messages().length < 2 ? 23 : -1);
     \u0275\u0275advance(3);
     \u0275\u0275property("disabled", ctx_r1.aiService.isLoadingModel() || ctx_r1.aiService.isGenerating());
     \u0275\u0275twoWayProperty("ngModel", ctx_r1.userInput);
@@ -12895,142 +12734,153 @@ var AiAssistant = class _AiAssistant {
       let _t;
       \u0275\u0275queryRefresh(_t = \u0275\u0275loadQuery()) && (ctx.scrollContainer = _t.first);
     }
-  }, decls: 5, vars: 5, consts: [["scrollContainer", ""], ["aria-haspopup", "dialog", 1, "fixed", "bottom-6", "left-6", "z-9999", "w-14", "h-14", "md:w-16", "md:h-16", "rounded-full", "bg-linear-to-r", "from-blue-600", "to-purple-600", "text-white", "shadow-lg", "shadow-purple-500/30", "flex", "items-center", "justify-center", "hover:scale-110", "transition-transform", "active:scale-95", "group", 3, "click"], ["class", "absolute inset-0 rounded-full border border-white/20 animate-ping opacity-20", 4, "ngIf"], ["class", "fas fa-microchip text-2xl group-hover:rotate-12 transition-transform", 4, "ngIf"], ["class", "fas fa-times text-xl", 4, "ngIf"], ["class", "fixed bottom-0 right-0 md:bottom-24 md:right-6 w-full md:w-[400px] h-dvh md:h-[600px] md:max-h-[80vh] z-9999 md:rounded-2xl glass-panel border-t md:border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-slide-up bg-surface-dark/95 backdrop-blur-xl", 4, "ngIf"], [1, "absolute", "inset-0", "rounded-full", "border", "border-white/20", "animate-ping", "opacity-20"], [1, "fas", "fa-microchip", "text-2xl", "group-hover:rotate-12", "transition-transform"], [1, "fas", "fa-times", "text-xl"], [1, "fixed", "bottom-0", "right-0", "md:bottom-24", "md:right-6", "w-full", "md:w-[400px]", "h-dvh", "md:h-[600px]", "md:max-h-[80vh]", "z-9999", "md:rounded-2xl", "glass-panel", "border-t", "md:border", "border-white/10", "shadow-2xl", "flex", "flex-col", "overflow-hidden", "animate-slide-up", "bg-surface-dark/95", "backdrop-blur-xl"], [1, "p-4", "border-b", "border-white/10", "flex", "items-center", "justify-between", "bg-white/5", "shrink-0"], [1, "flex", "items-center", "gap-3"], [1, "w-2", "h-2", "rounded-full", 3, "ngClass"], [1, "font-bold", "text-white", "text-sm"], ["class", "text-xs font-normal text-gray-400 block", 4, "ngIf"], [1, "text-[10px]", "text-gray-500", "font-mono", "hidden", "sm:block"], [1, "md:hidden", "w-8", "h-8", "flex", "items-center", "justify-center", "bg-white/10", "rounded-full", "text-white", 3, "click"], [1, "fas", "fa-times"], ["class", "p-4 bg-blue-900/20 text-center shrink-0", 4, "ngIf"], [1, "grow", "overflow-y-auto", "p-4", "space-y-4", "scrollbar-thin", "scrollbar-thumb-gray-700", "scrollbar-track-transparent"], [1, "flex", "gap-3"], [1, "w-8", "h-8", "rounded-full", "bg-linear-to-br", "from-blue-500", "to-purple-600", "flex", "items-center", "justify-center", "shrink-0"], [1, "fas", "fa-robot", "text-xs", "text-white"], [1, "bg-white/10", "p-3", "rounded-2xl", "rounded-tl-sm", "text-sm", "text-gray-200", "shadow-md"], [1, "flex", "gap-3", 3, "ngClass"], ["class", "flex gap-3", 4, "ngIf"], ["class", "px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar shrink-0", 4, "ngIf"], [1, "p-3", "bg-white/5", "border-t", "border-white/10", "shrink-0", "pb-6", "md:pb-3"], [1, "relative", 3, "submit"], ["type", "text", "name", "userInput", "placeholder", "Escribe tu mensaje...", 1, "w-full", "bg-black/30", "border", "border-white/10", "rounded-xl", "py-3", "pl-4", "pr-12", "text-white", "placeholder-gray-500", "focus:outline-hidden", "focus:border-blue-500/50", "transition-colors", "disabled:opacity-50", "text-sm", 3, "ngModelChange", "disabled", "ngModel"], ["type", "submit", 1, "absolute", "right-2", "top-1/2", "-translate-y-1/2", "w-8", "h-8", "bg-blue-600", "hover:bg-blue-500", "rounded-lg", "flex", "items-center", "justify-center", "text-white", "transition-colors", "disabled:opacity-50", "disabled:cursor-not-allowed", 3, "disabled"], [1, "fas", "fa-paper-plane", "text-xs"], [1, "text-xs", "font-normal", "text-gray-400", "block"], [1, "p-4", "bg-blue-900/20", "text-center", "shrink-0"], [1, "text-xs", "text-blue-300", "mb-2"], [1, "w-full", "h-1", "bg-gray-700", "rounded-full", "overflow-hidden"], [1, "h-full", "bg-blue-500", "animate-pulse-width"], [1, "text-[10px]", "text-gray-400", "mt-2"], [1, "w-8", "h-8", "rounded-full", "flex", "items-center", "justify-center", "shrink-0", 3, "ngClass"], [1, "text-xs", "text-white"], [1, "p-3", "rounded-2xl", "text-sm", "max-w-[80%]", "shadow-md", "whitespace-pre-wrap", 3, "ngClass"], [1, "bg-white/5", "p-3", "rounded-2xl", "rounded-tl-sm", "flex", "gap-1", "items-center", "h-10"], [1, "w-2", "h-2", "bg-gray-400", "rounded-full", "animate-bounce"], [1, "w-2", "h-2", "bg-gray-400", "rounded-full", "animate-bounce", "delay-100"], [1, "w-2", "h-2", "bg-gray-400", "rounded-full", "animate-bounce", "delay-200"], [1, "px-4", "py-2", "flex", "gap-2", "overflow-x-auto", "no-scrollbar", "shrink-0"], [1, "whitespace-nowrap", "px-3", "py-1", "rounded-full", "bg-white/5", "border", "border-white/10", "text-xs", "text-blue-300", "hover:bg-white/10", "transition-colors", 3, "click"], [1, "whitespace-nowrap", "px-3", "py-1", "rounded-full", "bg-white/5", "border", "border-white/10", "text-xs", "text-purple-300", "hover:bg-white/10", "transition-colors", 3, "click"], [1, "whitespace-nowrap", "px-3", "py-1", "rounded-full", "bg-white/5", "border", "border-white/10", "text-xs", "text-green-300", "hover:bg-white/10", "transition-colors", 3, "click"]], template: function AiAssistant_Template(rf, ctx) {
+  }, decls: 5, vars: 5, consts: [["scrollContainer", ""], ["aria-haspopup", "dialog", 1, "fixed", "bottom-6", "left-6", "z-9999", "w-14", "h-14", "md:w-16", "md:h-16", "rounded-full", "bg-linear-to-r", "from-blue-600", "to-purple-600", "text-white", "shadow-lg", "shadow-purple-500/30", "flex", "items-center", "justify-center", "hover:scale-110", "transition-transform", "active:scale-95", "group", 3, "click"], [1, "absolute", "inset-0", "rounded-full", "border", "border-white/20", "animate-ping", "opacity-20"], [1, "fas", "fa-microchip", "text-2xl", "group-hover:rotate-12", "transition-transform"], [1, "fas", "fa-times", "text-xl"], [1, "fixed", "bottom-0", "right-0", "md:bottom-24", "md:right-6", "w-full", "md:w-[400px]", "h-dvh", "md:h-[600px]", "md:max-h-[80vh]", "z-9999", "md:rounded-2xl", "glass-panel", "border-t", "md:border", "border-white/10", "shadow-2xl", "flex", "flex-col", "overflow-hidden", "animate-slide-up", "bg-surface-dark/95", "backdrop-blur-xl"], [1, "p-4", "border-b", "border-white/10", "flex", "items-center", "justify-between", "bg-white/5", "shrink-0"], [1, "flex", "items-center", "gap-3"], [1, "w-2", "h-2", "rounded-full", 3, "ngClass"], [1, "font-bold", "text-white", "text-sm"], [1, "text-xs", "font-normal", "text-gray-400", "block"], [1, "text-[10px]", "text-gray-500", "font-mono", "hidden", "sm:block"], [1, "md:hidden", "w-8", "h-8", "flex", "items-center", "justify-center", "bg-white/10", "rounded-full", "text-white", 3, "click"], [1, "fas", "fa-times"], [1, "p-4", "bg-blue-900/20", "text-center", "shrink-0"], [1, "grow", "overflow-y-auto", "p-4", "space-y-4", "scrollbar-thin", "scrollbar-thumb-gray-700", "scrollbar-track-transparent"], [1, "flex", "gap-3"], [1, "w-8", "h-8", "rounded-full", "bg-linear-to-br", "from-blue-500", "to-purple-600", "flex", "items-center", "justify-center", "shrink-0"], [1, "fas", "fa-robot", "text-xs", "text-white"], [1, "bg-white/10", "p-3", "rounded-2xl", "rounded-tl-sm", "text-sm", "text-gray-200", "shadow-md"], [1, "flex", "gap-3", 3, "ngClass"], [1, "px-4", "py-2", "flex", "gap-2", "overflow-x-auto", "no-scrollbar", "shrink-0"], [1, "p-3", "bg-white/5", "border-t", "border-white/10", "shrink-0", "pb-6", "md:pb-3"], [1, "relative", 3, "submit"], ["type", "text", "name", "userInput", "placeholder", "Escribe tu mensaje...", 1, "w-full", "bg-black/30", "border", "border-white/10", "rounded-xl", "py-3", "pl-4", "pr-12", "text-white", "placeholder-gray-500", "focus:outline-hidden", "focus:border-blue-500/50", "transition-colors", "disabled:opacity-50", "text-sm", 3, "ngModelChange", "disabled", "ngModel"], ["type", "submit", 1, "absolute", "right-2", "top-1/2", "-translate-y-1/2", "w-8", "h-8", "bg-blue-600", "hover:bg-blue-500", "rounded-lg", "flex", "items-center", "justify-center", "text-white", "transition-colors", "disabled:opacity-50", "disabled:cursor-not-allowed", 3, "disabled"], [1, "fas", "fa-paper-plane", "text-xs"], [1, "text-xs", "text-blue-300", "mb-2"], [1, "w-full", "h-1", "bg-gray-700", "rounded-full", "overflow-hidden"], [1, "h-full", "bg-blue-500", "animate-pulse-width"], [1, "text-[10px]", "text-gray-400", "mt-2"], [1, "w-8", "h-8", "rounded-full", "flex", "items-center", "justify-center", "shrink-0", 3, "ngClass"], [1, "text-xs", "text-white"], [1, "p-3", "rounded-2xl", "text-sm", "max-w-[80%]", "shadow-md", "whitespace-pre-wrap", 3, "ngClass"], [1, "bg-white/5", "p-3", "rounded-2xl", "rounded-tl-sm", "flex", "gap-1", "items-center", "h-10"], [1, "w-2", "h-2", "bg-gray-400", "rounded-full", "animate-bounce"], [1, "w-2", "h-2", "bg-gray-400", "rounded-full", "animate-bounce", "delay-100"], [1, "w-2", "h-2", "bg-gray-400", "rounded-full", "animate-bounce", "delay-200"], [1, "whitespace-nowrap", "px-3", "py-1", "rounded-full", "bg-white/5", "border", "border-white/10", "text-xs", "text-blue-300", "hover:bg-white/10", "transition-colors", 3, "click"], [1, "whitespace-nowrap", "px-3", "py-1", "rounded-full", "bg-white/5", "border", "border-white/10", "text-xs", "text-purple-300", "hover:bg-white/10", "transition-colors", 3, "click"], [1, "whitespace-nowrap", "px-3", "py-1", "rounded-full", "bg-white/5", "border", "border-white/10", "text-xs", "text-green-300", "hover:bg-white/10", "transition-colors", 3, "click"]], template: function AiAssistant_Template(rf, ctx) {
     if (rf & 1) {
       \u0275\u0275elementStart(0, "button", 1);
       \u0275\u0275listener("click", function AiAssistant_Template_button_click_0_listener() {
         return ctx.toggleChat();
       });
-      \u0275\u0275template(1, AiAssistant_div_1_Template, 1, 0, "div", 2)(2, AiAssistant_i_2_Template, 1, 0, "i", 3)(3, AiAssistant_i_3_Template, 1, 0, "i", 4);
+      \u0275\u0275conditionalCreate(1, AiAssistant_Conditional_1_Template, 1, 0, "div", 2);
+      \u0275\u0275conditionalCreate(2, AiAssistant_Conditional_2_Template, 1, 0, "i", 3);
+      \u0275\u0275conditionalCreate(3, AiAssistant_Conditional_3_Template, 1, 0, "i", 4);
       \u0275\u0275elementEnd();
-      \u0275\u0275template(4, AiAssistant_div_4_Template, 29, 8, "div", 5);
+      \u0275\u0275conditionalCreate(4, AiAssistant_Conditional_4_Template, 29, 8, "div", 5);
     }
     if (rf & 2) {
       \u0275\u0275attribute("aria-label", ctx.isOpen() ? "Cerrar asistente de IA" : "Abrir asistente de IA");
       \u0275\u0275advance();
-      \u0275\u0275property("ngIf", !ctx.isOpen());
+      \u0275\u0275conditional(!ctx.isOpen() ? 1 : -1);
       \u0275\u0275advance();
-      \u0275\u0275property("ngIf", !ctx.isOpen());
+      \u0275\u0275conditional(!ctx.isOpen() ? 2 : -1);
       \u0275\u0275advance();
-      \u0275\u0275property("ngIf", ctx.isOpen());
+      \u0275\u0275conditional(ctx.isOpen() ? 3 : -1);
       \u0275\u0275advance();
-      \u0275\u0275property("ngIf", ctx.isOpen());
+      \u0275\u0275conditional(ctx.isOpen() ? 4 : -1);
     }
-  }, dependencies: [CommonModule, NgClass, NgIf, FormsModule, \u0275NgNoValidate, DefaultValueAccessor, NgControlStatus, NgControlStatusGroup, NgModel, NgForm], styles: ["\n\n@keyframes _ngcontent-%COMP%_slide-up {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n.animate-slide-up[_ngcontent-%COMP%] {\n  animation: _ngcontent-%COMP%_slide-up 0.3s ease-out forwards;\n}\n@keyframes _ngcontent-%COMP%_pulse-width {\n  0% {\n    width: 0%;\n  }\n  50% {\n    width: 60%;\n  }\n  100% {\n    width: 100%;\n  }\n}\n.animate-pulse-width[_ngcontent-%COMP%] {\n  animation: _ngcontent-%COMP%_pulse-width 2s infinite ease-in-out;\n}\n.glass-panel[_ngcontent-%COMP%] {\n  background: rgba(255, 255, 255, 0.05);\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n}\n.scrollbar-thin[_ngcontent-%COMP%]::-webkit-scrollbar {\n  width: 6px;\n}\n.scrollbar-thin[_ngcontent-%COMP%]::-webkit-scrollbar-track {\n  background: transparent;\n}\n.scrollbar-thin[_ngcontent-%COMP%]::-webkit-scrollbar-thumb {\n  background-color: rgba(156, 163, 175, 0.5);\n  border-radius: 20px;\n}\n/*# sourceMappingURL=ai-assistant.css.map */"] });
+  }, dependencies: [CommonModule, NgClass, FormsModule, \u0275NgNoValidate, DefaultValueAccessor, NgControlStatus, NgControlStatusGroup, NgModel, NgForm], styles: ["\n\n@keyframes _ngcontent-%COMP%_slide-up {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n.animate-slide-up[_ngcontent-%COMP%] {\n  animation: _ngcontent-%COMP%_slide-up 0.3s ease-out forwards;\n}\n@keyframes _ngcontent-%COMP%_pulse-width {\n  0% {\n    width: 0%;\n  }\n  50% {\n    width: 60%;\n  }\n  100% {\n    width: 100%;\n  }\n}\n.animate-pulse-width[_ngcontent-%COMP%] {\n  animation: _ngcontent-%COMP%_pulse-width 2s infinite ease-in-out;\n}\n.glass-panel[_ngcontent-%COMP%] {\n  background: rgba(255, 255, 255, 0.05);\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n}\n.scrollbar-thin[_ngcontent-%COMP%]::-webkit-scrollbar {\n  width: 6px;\n}\n.scrollbar-thin[_ngcontent-%COMP%]::-webkit-scrollbar-track {\n  background: transparent;\n}\n.scrollbar-thin[_ngcontent-%COMP%]::-webkit-scrollbar-thumb {\n  background-color: rgba(156, 163, 175, 0.5);\n  border-radius: 20px;\n}\n/*# sourceMappingURL=ai-assistant.css.map */"] });
 };
 (() => {
   (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(AiAssistant, [{
     type: Component,
-    args: [{ selector: "app-ai-assistant", standalone: true, imports: [CommonModule, FormsModule], template: `\r
-<!-- Toggler Button -->\r
-<button (click)="toggleChat()"\r
-     class="fixed bottom-6 left-6 z-9999 w-14 h-14 md:w-16 md:h-16 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group"\r
-     [attr.aria-label]="isOpen() ? 'Cerrar asistente de IA' : 'Abrir asistente de IA'"\r
-     aria-haspopup="dialog">\r
-    <div class="absolute inset-0 rounded-full border border-white/20 animate-ping opacity-20" *ngIf="!isOpen()"></div>\r
-    <!-- AI Icon -->\r
-    <i class="fas fa-microchip text-2xl group-hover:rotate-12 transition-transform" *ngIf="!isOpen()"></i>\r
-    <i class="fas fa-times text-xl" *ngIf="isOpen()"></i>\r
-</button>\r
-\r
-<!-- Chat Window -->\r
-<div *ngIf="isOpen()" \r
-     class="fixed bottom-0 right-0 md:bottom-24 md:right-6 w-full md:w-[400px] h-dvh md:h-[600px] md:max-h-[80vh] z-9999 md:rounded-2xl glass-panel border-t md:border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-slide-up bg-surface-dark/95 backdrop-blur-xl">\r
-    \r
-    <!-- Header -->\r
-    <div class="p-4 border-b border-white/10 flex items-center justify-between bg-white/5 shrink-0">\r
-        <div class="flex items-center gap-3">\r
-            <div class="w-2 h-2 rounded-full" [ngClass]="aiService.modelLoaded() ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'"></div>\r
-            <h3 class="font-bold text-white text-sm">Arecofix AI <span class="text-xs font-normal text-gray-400 block" *ngIf="aiService.isLoadingModel()">Iniciando Motor...</span></h3>\r
-        </div>\r
-        <div class="flex items-center gap-3">\r
-             <div class="text-[10px] text-gray-500 font-mono hidden sm:block">WebLLM / MCP</div>\r
-             <!-- Mobile Close Button -->\r
-             <button (click)="toggleChat()" class="md:hidden w-8 h-8 flex items-center justify-center bg-white/10 rounded-full text-white">\r
-                <i class="fas fa-times"></i>\r
-             </button>\r
-        </div>\r
-    </div>\r
-\r
-    <!-- Progress Bar (Model Loading) -->\r
-    <div *ngIf="aiService.isLoadingModel()" class="p-4 bg-blue-900/20 text-center shrink-0">\r
-        <p class="text-xs text-blue-300 mb-2">{{ aiService.loadingProgress() }}</p>\r
-        <div class="w-full h-1 bg-gray-700 rounded-full overflow-hidden">\r
-            <div class="h-full bg-blue-500 animate-pulse-width"></div>\r
-        </div>\r
-        <p class="text-[10px] text-gray-400 mt-2">Descargando modelo IA (solo la primera vez)...</p>\r
-    </div>\r
-\r
-    <!-- Messages Area -->\r
-    <div class="grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent" #scrollContainer>\r
-        <!-- Welcome Message -->\r
-         <div class="flex gap-3">\r
-            <div class="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">\r
-                <i class="fas fa-robot text-xs text-white"></i>\r
-            </div>\r
-            <div class="bg-white/10 p-3 rounded-2xl rounded-tl-sm text-sm text-gray-200 shadow-md">\r
-                Hola! Soy tu asistente de Arecofix potenciado con IA local (WebLLM). Puedo ayudarte a consultar reparaciones, servicios o agendar citas. \xBFEn qu\xE9 te ayudo?\r
-            </div>\r
-        </div>\r
-\r
-        @for (msg of aiService.visibleMessages(); track $index) {\r
-             <div class="flex gap-3" [ngClass]="{'flex-row-reverse': msg.role === 'user'}">\r
-                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" \r
-                     [ngClass]="msg.role === 'user' ? 'bg-gray-700' : 'bg-linear-to-br from-blue-500 to-purple-600'">\r
-                    <i [class]="msg.role === 'user' ? 'fas fa-user' : 'fas fa-robot'" class="text-xs text-white"></i>\r
-                </div>\r
-                <div class="p-3 rounded-2xl text-sm max-w-[80%] shadow-md whitespace-pre-wrap"\r
-                     [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white/10 text-gray-200 rounded-tl-sm'">\r
-                    {{ msg.content }}\r
-                </div>\r
-            </div>\r
-        }\r
-        \r
-        <!-- Typing Indicator -->\r
-        <div *ngIf="aiService.isGenerating()" class="flex gap-3">\r
-             <div class="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">\r
-                <i class="fas fa-robot text-xs text-white"></i>\r
-            </div>\r
-            <div class="bg-white/5 p-3 rounded-2xl rounded-tl-sm flex gap-1 items-center h-10">\r
-                <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>\r
-                <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></span>\r
-                <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>\r
-            </div>\r
-        </div>\r
-    </div>\r
-\r
-    <!-- Suggestions Chips -->\r
-    <div class="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar shrink-0" *ngIf="aiService.messages().length < 2">\r
-        <button (click)="userInput.set('Estado de mi reparaci\xF3n'); sendMessage()" class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-blue-300 hover:bg-white/10 transition-colors">\r
-            \u{1F527} Estado Reparaci\xF3n\r
-        </button>\r
-        <button (click)="userInput.set('Quiero un presupuesto web'); sendMessage()" class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-purple-300 hover:bg-white/10 transition-colors">\r
-            \u{1F4BB} Presupuesto Web\r
-        </button>\r
-        <button (click)="userInput.set('Cambio de pantalla iPhone'); sendMessage()" class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-green-300 hover:bg-white/10 transition-colors">\r
-            \u{1F4F1} Reparar Celular\r
-        </button>\r
-    </div>\r
-\r
-    <!-- Input Area -->\r
-    <div class="p-3 bg-white/5 border-t border-white/10 shrink-0 pb-6 md:pb-3">\r
-        <form (submit)="sendMessage()" class="relative">\r
-            <input \r
-                type="text" \r
-                [disabled]="aiService.isLoadingModel() || aiService.isGenerating()"\r
-                [(ngModel)]="userInput" \r
-                name="userInput"\r
-                placeholder="Escribe tu mensaje..." \r
-                class="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-white placeholder-gray-500 focus:outline-hidden focus:border-blue-500/50 transition-colors disabled:opacity-50 text-sm">\r
-            <button \r
-                type="submit"\r
-                [disabled]="!userInput() || aiService.isLoadingModel()"\r
-                class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">\r
-                <i class="fas fa-paper-plane text-xs"></i>\r
-            </button>\r
-        </form>\r
-    </div>\r
-</div>\r
+    args: [{ selector: "app-ai-assistant", standalone: true, imports: [CommonModule, FormsModule], template: `
+<!-- Toggler Button -->
+<button (click)="toggleChat()"
+  class="fixed bottom-6 left-6 z-9999 w-14 h-14 md:w-16 md:h-16 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group"
+  [attr.aria-label]="isOpen() ? 'Cerrar asistente de IA' : 'Abrir asistente de IA'"
+  aria-haspopup="dialog">
+  @if (!isOpen()) {
+    <div class="absolute inset-0 rounded-full border border-white/20 animate-ping opacity-20"></div>
+  }
+  <!-- AI Icon -->
+  @if (!isOpen()) {
+    <i class="fas fa-microchip text-2xl group-hover:rotate-12 transition-transform"></i>
+  }
+  @if (isOpen()) {
+    <i class="fas fa-times text-xl"></i>
+  }
+</button>
+
+<!-- Chat Window -->
+@if (isOpen()) {
+  <div
+    class="fixed bottom-0 right-0 md:bottom-24 md:right-6 w-full md:w-[400px] h-dvh md:h-[600px] md:max-h-[80vh] z-9999 md:rounded-2xl glass-panel border-t md:border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-slide-up bg-surface-dark/95 backdrop-blur-xl">
+    <!-- Header -->
+    <div class="p-4 border-b border-white/10 flex items-center justify-between bg-white/5 shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full" [ngClass]="aiService.modelLoaded() ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'"></div>
+        <h3 class="font-bold text-white text-sm">Arecofix AI @if (aiService.isLoadingModel()) {
+          <span class="text-xs font-normal text-gray-400 block">Iniciando Motor...</span>
+        }</h3>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-[10px] text-gray-500 font-mono hidden sm:block">WebLLM / MCP</div>
+        <!-- Mobile Close Button -->
+        <button (click)="toggleChat()" class="md:hidden w-8 h-8 flex items-center justify-center bg-white/10 rounded-full text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Progress Bar (Model Loading) -->
+    @if (aiService.isLoadingModel()) {
+      <div class="p-4 bg-blue-900/20 text-center shrink-0">
+        <p class="text-xs text-blue-300 mb-2">{{ aiService.loadingProgress() }}</p>
+        <div class="w-full h-1 bg-gray-700 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 animate-pulse-width"></div>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-2">Descargando modelo IA (solo la primera vez)...</p>
+      </div>
+    }
+    <!-- Messages Area -->
+    <div class="grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent" #scrollContainer>
+      <!-- Welcome Message -->
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">
+          <i class="fas fa-robot text-xs text-white"></i>
+        </div>
+        <div class="bg-white/10 p-3 rounded-2xl rounded-tl-sm text-sm text-gray-200 shadow-md">
+          Hola! Soy tu asistente de Arecofix potenciado con IA local (WebLLM). Puedo ayudarte a consultar reparaciones, servicios o agendar citas. \xBFEn qu\xE9 te ayudo?
+        </div>
+      </div>
+      @for (msg of aiService.visibleMessages(); track $index) {
+        <div class="flex gap-3" [ngClass]="{'flex-row-reverse': msg.role === 'user'}">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+            [ngClass]="msg.role === 'user' ? 'bg-gray-700' : 'bg-linear-to-br from-blue-500 to-purple-600'">
+            <i [class]="msg.role === 'user' ? 'fas fa-user' : 'fas fa-robot'" class="text-xs text-white"></i>
+          </div>
+          <div class="p-3 rounded-2xl text-sm max-w-[80%] shadow-md whitespace-pre-wrap"
+            [ngClass]="msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-white/10 text-gray-200 rounded-tl-sm'">
+            {{ msg.content }}
+          </div>
+        </div>
+      }
+      <!-- Typing Indicator -->
+      @if (aiService.isGenerating()) {
+        <div class="flex gap-3">
+          <div class="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">
+            <i class="fas fa-robot text-xs text-white"></i>
+          </div>
+          <div class="bg-white/5 p-3 rounded-2xl rounded-tl-sm flex gap-1 items-center h-10">
+            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>
+          </div>
+        </div>
+      }
+    </div>
+    <!-- Suggestions Chips -->
+    @if (aiService.messages().length < 2) {
+      <div class="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar shrink-0">
+        <button (click)="userInput.set('Estado de mi reparaci\xF3n'); sendMessage()" class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-blue-300 hover:bg-white/10 transition-colors">
+          \u{1F527} Estado Reparaci\xF3n
+        </button>
+        <button (click)="userInput.set('Quiero un presupuesto web'); sendMessage()" class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-purple-300 hover:bg-white/10 transition-colors">
+          \u{1F4BB} Presupuesto Web
+        </button>
+        <button (click)="userInput.set('Cambio de pantalla iPhone'); sendMessage()" class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-green-300 hover:bg-white/10 transition-colors">
+          \u{1F4F1} Reparar Celular
+        </button>
+      </div>
+    }
+    <!-- Input Area -->
+    <div class="p-3 bg-white/5 border-t border-white/10 shrink-0 pb-6 md:pb-3">
+      <form (submit)="sendMessage()" class="relative">
+        <input
+          type="text"
+          [disabled]="aiService.isLoadingModel() || aiService.isGenerating()"
+          [(ngModel)]="userInput"
+          name="userInput"
+          placeholder="Escribe tu mensaje..."
+          class="w-full bg-black/30 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-white placeholder-gray-500 focus:outline-hidden focus:border-blue-500/50 transition-colors disabled:opacity-50 text-sm">
+          <button
+            type="submit"
+            [disabled]="!userInput() || aiService.isLoadingModel()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-600 hover:bg-blue-500 rounded-lg flex items-center justify-center text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fas fa-paper-plane text-xs"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  }
 `, styles: ["/* src/app/features/ai-assistant/ai-assistant.css */\n@keyframes slide-up {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n.animate-slide-up {\n  animation: slide-up 0.3s ease-out forwards;\n}\n@keyframes pulse-width {\n  0% {\n    width: 0%;\n  }\n  50% {\n    width: 60%;\n  }\n  100% {\n    width: 100%;\n  }\n}\n.animate-pulse-width {\n  animation: pulse-width 2s infinite ease-in-out;\n}\n.glass-panel {\n  background: rgba(255, 255, 255, 0.05);\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n}\n.scrollbar-thin::-webkit-scrollbar {\n  width: 6px;\n}\n.scrollbar-thin::-webkit-scrollbar-track {\n  background: transparent;\n}\n.scrollbar-thin::-webkit-scrollbar-thumb {\n  background-color: rgba(156, 163, 175, 0.5);\n  border-radius: 20px;\n}\n/*# sourceMappingURL=ai-assistant.css.map */\n"] }]
   }], null, { scrollContainer: [{
     type: ViewChild,
@@ -13251,31 +13101,6 @@ var ToastComponent = class _ToastComponent {
 })();
 (() => {
   (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(ToastComponent, { className: "ToastComponent", filePath: "src/app/shared/components/toast/toast.component.ts", lineNumber: 72 });
-})();
-
-// src/app/core/services/analytics.service.ts
-var AnalyticsService = class _AnalyticsService {
-  platformId = inject(PLATFORM_ID);
-  constructor() {
-  }
-  identify(userId, properties = {}) {
-  }
-  capture(eventName, properties = {}) {
-  }
-  reset() {
-  }
-  static \u0275fac = function AnalyticsService_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _AnalyticsService)();
-  };
-  static \u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({ token: _AnalyticsService, factory: _AnalyticsService.\u0275fac, providedIn: "root" });
-};
-(() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(AnalyticsService, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
 })();
 
 // src/app/app.ts

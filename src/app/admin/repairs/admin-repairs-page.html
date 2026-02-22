@@ -37,8 +37,8 @@
                     </td>
                     <td>{{ repair.device_model }}</td>
                     <td>
-                        <div class="badge" [ngClass]="getStatusColor(repair.status)">
-                            {{ getStatusLabel(repair.status) }}
+                        <div class="badge" [ngClass]="getStatusColor(repair.current_status_id)">
+                            {{ getStatusLabel(repair.current_status_id) }}
                         </div>
                     </td>
                     <td>{{ repair.estimated_cost | currency }}</td>

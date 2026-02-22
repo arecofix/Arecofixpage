@@ -22,8 +22,8 @@ export const environment: Environment = {
 
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
-
-  // Analytics Configuration Removed
+  posthogKey: 'phc_PLACEHOLDER_DEV',
+  posthogHost: 'https://us.i.posthog.com',
 
   // Contact Information
   contact: {

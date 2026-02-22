@@ -8,10 +8,12 @@ if (environment.production) {
   enableProdMode();
 }
 
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+
 // Browser-specific config (Charts breaks SSR)
 const browserConfig: ApplicationConfig = {
   providers: [
-    // Charts loaded lazily only when admin dashboard needs them
+    provideCharts(withDefaultRegisterables()),
   ]
 };
 

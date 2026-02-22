@@ -14,7 +14,7 @@ export interface BreadcrumbItem {
   template: `
     <nav aria-label="Breadcrumb" class="container mx-auto px-4 py-4">
       <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-        @for (item of items; track item; let last = $last) {
+        @for (item of items; track trackByBreadcrumb($index, item); let last = $last) {
           <li class="flex items-center">
             @if (!last) {
               <a [routerLink]="item.url" class="hover:text-primary transition-colors hover:underline">
@@ -35,4 +35,8 @@ export interface BreadcrumbItem {
 })
 export class BreadcrumbsComponent {
   @Input() items: BreadcrumbItem[] = [];
+
+  trackByBreadcrumb(index: number, item: BreadcrumbItem): string {
+    return `${item.label}-${item.url || ''}`;
+  }
 }

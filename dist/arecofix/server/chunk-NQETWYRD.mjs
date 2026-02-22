@@ -1,0 +1,792 @@
+import './polyfills.server.mjs';
+import {
+  PreferencesService
+} from "./chunk-5KBL4BBC.mjs";
+import {
+  SeoService
+} from "./chunk-FY47LHP4.mjs";
+import {
+  CheckboxControlValueAccessor,
+  DefaultValueAccessor,
+  FormBuilder,
+  FormControlName,
+  FormGroupDirective,
+  NgControlStatus,
+  NgControlStatusGroup,
+  NgSelectOption,
+  ReactiveFormsModule,
+  SelectControlValueAccessor,
+  Validators,
+  ɵNgNoValidate,
+  ɵNgSelectMultipleOption
+} from "./chunk-VVLZNBXY.mjs";
+import "./chunk-R72SLW3B.mjs";
+import {
+  AsyncPipe,
+  HttpClient
+} from "./chunk-JEV3MPEL.mjs";
+import {
+  Component,
+  inject,
+  map,
+  setClassMetadata,
+  ɵsetClassDebugInfo,
+  ɵɵadvance,
+  ɵɵconditional,
+  ɵɵconditionalCreate,
+  ɵɵdefineComponent,
+  ɵɵelement,
+  ɵɵelementEnd,
+  ɵɵelementStart,
+  ɵɵgetCurrentView,
+  ɵɵlistener,
+  ɵɵnamespaceHTML,
+  ɵɵnamespaceSVG,
+  ɵɵnextContext,
+  ɵɵpipe,
+  ɵɵpipeBind1,
+  ɵɵproperty,
+  ɵɵrepeater,
+  ɵɵrepeaterCreate,
+  ɵɵresetView,
+  ɵɵrestoreView,
+  ɵɵtext,
+  ɵɵtextInterpolate,
+  ɵɵtextInterpolate1,
+  ɵɵtrustConstantResourceUrl
+} from "./chunk-DXH6IVIR.mjs";
+import "./chunk-ML5XS5HX.mjs";
+
+// src/app/public/contacto/contacto.content.ts
+var CONTACTO_CONTENT = {
+  es: {
+    title: "Contacto",
+    subtitle: "Cont\xE1ctanos",
+    intro: "Si tienes alguna pregunta o necesitas ayuda, no dudes en ponerte en contacto con nosotros. Estamos aqu\xED para ayudarte y responderemos lo antes posible.",
+    formTitle: "Env\xEDa un mensaje",
+    nameLabel: "Nombre *",
+    namePlaceholder: "Tu nombre completo",
+    nameError: "Por favor ingresa tu nombre",
+    emailLabel: "Correo electr\xF3nico *",
+    emailPlaceholder: "tu@email.com",
+    emailError: "Por favor ingresa un email v\xE1lido",
+    phoneLabel: "Tel\xE9fono",
+    phonePlaceholder: "+54 11 1234-5678",
+    subjectLabel: "Asunto *",
+    subjectPlaceholder: "Selecciona un asunto",
+    subjectOptions: [
+      { value: "Consulta general", label: "Consulta general" },
+      { value: "Soporte t\xE9cnico", label: "Soporte t\xE9cnico" },
+      { value: "Informaci\xF3n de ventas", label: "Informaci\xF3n de ventas" },
+      { value: "Oportunidades de trabajo", label: "Oportunidades de trabajo" },
+      { value: "Otro", label: "Otro" }
+    ],
+    messageLabel: "Mensaje *",
+    messagePlaceholder: "Escribe tu mensaje aqu\xED...",
+    messageError: "Por favor escribe tu mensaje",
+    termsText: "Acepto los",
+    termsLink: "t\xE9rminos y condiciones",
+    privacyLink: "pol\xEDtica de privacidad",
+    submitButton: "Enviar mensaje",
+    sendingMessage: "Enviando mensaje...",
+    successMessage: "\xA1Mensaje enviado con \xE9xito! Nos pondremos en contacto contigo pronto.",
+    errorMessage: "Hubo un error al enviar el mensaje. Por favor, int\xE9ntalo de nuevo m\xE1s tarde.",
+    contactInfoTitle: "Informaci\xF3n de contacto",
+    addressLabel: "Direcci\xF3n",
+    addressValue: "Jorge Newbery 69, Marcos paz, Buenos Aires, Argentina",
+    phoneInfoLabel: "Tel\xE9fono",
+    phoneInfoValue: "+54 11 2596-0900",
+    phoneInfoHours: "Lunes a Viernes de 9:00 a 18:00",
+    emailInfoLabel: "Correo electr\xF3nico",
+    emailInfoValue: "Respuesta en menos de 24 horas",
+    supportLabel: "Soporte",
+    supportValue: "Asistencia t\xE9cnica especializada",
+    socialTitle: "S\xEDguenos en redes"
+  },
+  en: {
+    title: "Contact",
+    subtitle: "Contact Us",
+    intro: "If you have any questions or need help, do not hesitate to contact us. We are here to help and will respond as soon as possible.",
+    formTitle: "Send a message",
+    nameLabel: "Name *",
+    namePlaceholder: "Your full name",
+    nameError: "Please enter your name",
+    emailLabel: "Email *",
+    emailPlaceholder: "you@email.com",
+    emailError: "Please enter a valid email",
+    phoneLabel: "Phone",
+    phonePlaceholder: "+54 11 1234-5678",
+    subjectLabel: "Subject *",
+    subjectPlaceholder: "Select a subject",
+    subjectOptions: [
+      { value: "General Inquiry", label: "General Inquiry" },
+      { value: "Technical Support", label: "Technical Support" },
+      { value: "Sales Information", label: "Sales Information" },
+      { value: "Job Opportunities", label: "Job Opportunities" },
+      { value: "Other", label: "Other" }
+    ],
+    messageLabel: "Message *",
+    messagePlaceholder: "Write your message here...",
+    messageError: "Please write your message",
+    termsText: "I accept the",
+    termsLink: "terms and conditions",
+    privacyLink: "privacy policy",
+    submitButton: "Send message",
+    sendingMessage: "Sending message...",
+    successMessage: "Message sent successfully! We will contact you soon.",
+    errorMessage: "There was an error sending the message. Please try again later.",
+    contactInfoTitle: "Contact Information",
+    addressLabel: "Address",
+    addressValue: "Jorge Newbery 69, Marcos Paz, Buenos Aires, Argentina",
+    phoneInfoLabel: "Phone",
+    phoneInfoValue: "+54 11 2596-0900",
+    phoneInfoHours: "Monday to Friday from 9:00 to 18:00",
+    emailInfoLabel: "Email",
+    emailInfoValue: "Response in less than 24 hours",
+    supportLabel: "Support",
+    supportValue: "Specialized technical assistance",
+    socialTitle: "Follow us on social media"
+  }
+};
+
+// src/app/public/contacto/contacto.ts
+var _forTrack0 = ($index, $item) => $item.value;
+function ContactoComponent_Conditional_0_Conditional_26_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "p", 20);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const content_r3 = \u0275\u0275nextContext();
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate(content_r3.nameError);
+  }
+}
+function ContactoComponent_Conditional_0_Conditional_31_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "p", 20);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const content_r3 = \u0275\u0275nextContext();
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate(content_r3.emailError);
+  }
+}
+function ContactoComponent_Conditional_0_For_43_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "option", 28);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const option_r4 = ctx.$implicit;
+    \u0275\u0275property("value", option_r4.value);
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate(option_r4.label);
+  }
+}
+function ContactoComponent_Conditional_0_Conditional_48_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "p", 20);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const content_r3 = \u0275\u0275nextContext();
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate(content_r3.messageError);
+  }
+}
+function ContactoComponent_Conditional_0_Conditional_64_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 39);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(1, "svg", 66);
+    \u0275\u0275element(2, "circle", 67)(3, "path", 68);
+    \u0275\u0275elementEnd();
+    \u0275\u0275text(4);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const content_r3 = \u0275\u0275nextContext();
+    \u0275\u0275advance(4);
+    \u0275\u0275textInterpolate1(" ", content_r3.sendingMessage, " ");
+  }
+}
+function ContactoComponent_Conditional_0_Conditional_65_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 40);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const content_r3 = \u0275\u0275nextContext();
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate1(" ", content_r3.successMessage, " ");
+  }
+}
+function ContactoComponent_Conditional_0_Conditional_66_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 41);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const content_r3 = \u0275\u0275nextContext();
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate1(" ", content_r3.errorMessage, " ");
+  }
+}
+function ContactoComponent_Conditional_0_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r1 = \u0275\u0275getCurrentView();
+    \u0275\u0275elementStart(0, "div", 0)(1, "header", 1)(2, "div", 2)(3, "a", 3);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(4, "svg", 4);
+    \u0275\u0275element(5, "path", 5);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(6, "h1", 6);
+    \u0275\u0275text(7);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(8, "div", 7);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(9, "main", 8)(10, "div", 9)(11, "section", 10)(12, "h2", 11);
+    \u0275\u0275text(13);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(14, "p", 12);
+    \u0275\u0275text(15);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(16, "div", 13)(17, "section", 14)(18, "h3", 15);
+    \u0275\u0275text(19);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(20, "form", 16);
+    \u0275\u0275listener("ngSubmit", function ContactoComponent_Conditional_0_Template_form_ngSubmit_20_listener() {
+      \u0275\u0275restoreView(_r1);
+      const ctx_r1 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r1.onSubmit());
+    });
+    \u0275\u0275elementStart(21, "div", 17)(22, "div")(23, "label", 18);
+    \u0275\u0275text(24);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(25, "input", 19);
+    \u0275\u0275conditionalCreate(26, ContactoComponent_Conditional_0_Conditional_26_Template, 2, 1, "p", 20);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(27, "div")(28, "label", 21);
+    \u0275\u0275text(29);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(30, "input", 22);
+    \u0275\u0275conditionalCreate(31, ContactoComponent_Conditional_0_Conditional_31_Template, 2, 1, "p", 20);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(32, "div")(33, "label", 23);
+    \u0275\u0275text(34);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(35, "input", 24);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(36, "div")(37, "label", 25);
+    \u0275\u0275text(38);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(39, "select", 26)(40, "option", 27);
+    \u0275\u0275text(41);
+    \u0275\u0275elementEnd();
+    \u0275\u0275repeaterCreate(42, ContactoComponent_Conditional_0_For_43_Template, 2, 2, "option", 28, _forTrack0);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(44, "div")(45, "label", 29);
+    \u0275\u0275text(46);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(47, "textarea", 30);
+    \u0275\u0275conditionalCreate(48, ContactoComponent_Conditional_0_Conditional_48_Template, 2, 1, "p", 20);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(49, "div", 31)(50, "div", 32);
+    \u0275\u0275element(51, "input", 33);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(52, "div", 34)(53, "label", 35);
+    \u0275\u0275text(54);
+    \u0275\u0275elementStart(55, "a", 36);
+    \u0275\u0275text(56);
+    \u0275\u0275elementEnd();
+    \u0275\u0275text(57, " y la ");
+    \u0275\u0275elementStart(58, "a", 36);
+    \u0275\u0275text(59);
+    \u0275\u0275elementEnd();
+    \u0275\u0275text(60, ". ");
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(61, "div", 37)(62, "button", 38);
+    \u0275\u0275text(63);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275conditionalCreate(64, ContactoComponent_Conditional_0_Conditional_64_Template, 5, 1, "div", 39);
+    \u0275\u0275conditionalCreate(65, ContactoComponent_Conditional_0_Conditional_65_Template, 2, 1, "div", 40);
+    \u0275\u0275conditionalCreate(66, ContactoComponent_Conditional_0_Conditional_66_Template, 2, 1, "div", 41);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(67, "section", 42)(68, "h3", 43);
+    \u0275\u0275text(69);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(70, "div", 44);
+    \u0275\u0275element(71, "iframe", 45);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(72, "div", 46)(73, "div", 47)(74, "div", 48);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(75, "svg", 49);
+    \u0275\u0275element(76, "path", 50);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(77, "div")(78, "h4", 51);
+    \u0275\u0275text(79);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(80, "p", 52);
+    \u0275\u0275text(81);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(82, "div", 47)(83, "div", 48);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(84, "svg", 49);
+    \u0275\u0275element(85, "path", 53);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(86, "div")(87, "h4", 51);
+    \u0275\u0275text(88);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(89, "p", 52);
+    \u0275\u0275text(90);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(91, "p", 54);
+    \u0275\u0275text(92);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(93, "div", 47)(94, "div", 48);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(95, "svg", 49);
+    \u0275\u0275element(96, "path", 55);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(97, "div")(98, "h4", 51);
+    \u0275\u0275text(99);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(100, "p", 54);
+    \u0275\u0275text(101);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(102, "div", 47)(103, "div", 48);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(104, "svg", 49);
+    \u0275\u0275element(105, "path", 56);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(106, "div")(107, "h4", 51);
+    \u0275\u0275text(108);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(109, "p", 54);
+    \u0275\u0275text(110);
+    \u0275\u0275elementEnd()()()();
+    \u0275\u0275elementStart(111, "div", 57)(112, "h4", 58);
+    \u0275\u0275text(113);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(114, "div", 59)(115, "a", 60);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(116, "svg", 4);
+    \u0275\u0275element(117, "path", 61);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(118, "a", 62);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(119, "svg", 4);
+    \u0275\u0275element(120, "path", 63);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275namespaceHTML();
+    \u0275\u0275elementStart(121, "a", 64);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(122, "svg", 4);
+    \u0275\u0275element(123, "path", 65);
+    \u0275\u0275elementEnd()()()()()()()()();
+  }
+  if (rf & 2) {
+    let tmp_9_0;
+    let tmp_12_0;
+    let tmp_20_0;
+    const content_r3 = ctx;
+    const ctx_r1 = \u0275\u0275nextContext();
+    \u0275\u0275advance(7);
+    \u0275\u0275textInterpolate(content_r3.title);
+    \u0275\u0275advance(6);
+    \u0275\u0275textInterpolate(content_r3.subtitle);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r3.intro, " ");
+    \u0275\u0275advance(4);
+    \u0275\u0275textInterpolate(content_r3.formTitle);
+    \u0275\u0275advance();
+    \u0275\u0275property("formGroup", ctx_r1.contactForm);
+    \u0275\u0275advance(4);
+    \u0275\u0275textInterpolate(content_r3.nameLabel);
+    \u0275\u0275advance();
+    \u0275\u0275property("placeholder", content_r3.namePlaceholder);
+    \u0275\u0275advance();
+    \u0275\u0275conditional(((tmp_9_0 = ctx_r1.contactForm.get("name")) == null ? null : tmp_9_0.invalid) && ((tmp_9_0 = ctx_r1.contactForm.get("name")) == null ? null : tmp_9_0.touched) ? 26 : -1);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.emailLabel);
+    \u0275\u0275advance();
+    \u0275\u0275property("placeholder", content_r3.emailPlaceholder);
+    \u0275\u0275advance();
+    \u0275\u0275conditional(((tmp_12_0 = ctx_r1.contactForm.get("email")) == null ? null : tmp_12_0.invalid) && ((tmp_12_0 = ctx_r1.contactForm.get("email")) == null ? null : tmp_12_0.touched) ? 31 : -1);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.phoneLabel);
+    \u0275\u0275advance();
+    \u0275\u0275property("placeholder", content_r3.phonePlaceholder);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.subjectLabel);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.subjectPlaceholder);
+    \u0275\u0275advance();
+    \u0275\u0275repeater(content_r3.subjectOptions);
+    \u0275\u0275advance(4);
+    \u0275\u0275textInterpolate(content_r3.messageLabel);
+    \u0275\u0275advance();
+    \u0275\u0275property("placeholder", content_r3.messagePlaceholder);
+    \u0275\u0275advance();
+    \u0275\u0275conditional(((tmp_20_0 = ctx_r1.contactForm.get("message")) == null ? null : tmp_20_0.invalid) && ((tmp_20_0 = ctx_r1.contactForm.get("message")) == null ? null : tmp_20_0.touched) ? 48 : -1);
+    \u0275\u0275advance(6);
+    \u0275\u0275textInterpolate1(" ", content_r3.termsText, " ");
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(content_r3.termsLink);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.privacyLink);
+    \u0275\u0275advance(3);
+    \u0275\u0275property("disabled", ctx_r1.isLoading);
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate1(" ", content_r3.submitButton, " ");
+    \u0275\u0275advance();
+    \u0275\u0275conditional(ctx_r1.isLoading ? 64 : -1);
+    \u0275\u0275advance();
+    \u0275\u0275conditional(ctx_r1.showSuccess ? 65 : -1);
+    \u0275\u0275advance();
+    \u0275\u0275conditional(ctx_r1.showError ? 66 : -1);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.contactInfoTitle);
+    \u0275\u0275advance(10);
+    \u0275\u0275textInterpolate(content_r3.addressLabel);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(content_r3.addressValue);
+    \u0275\u0275advance(7);
+    \u0275\u0275textInterpolate(content_r3.phoneInfoLabel);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(content_r3.phoneInfoValue);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(content_r3.phoneInfoHours);
+    \u0275\u0275advance(7);
+    \u0275\u0275textInterpolate(content_r3.emailInfoLabel);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(content_r3.emailInfoValue);
+    \u0275\u0275advance(7);
+    \u0275\u0275textInterpolate(content_r3.supportLabel);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(content_r3.supportValue);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r3.socialTitle);
+  }
+}
+var ContactoComponent = class _ContactoComponent {
+  fb = inject(FormBuilder);
+  http = inject(HttpClient);
+  preferencesService = inject(PreferencesService);
+  seoService = inject(SeoService);
+  contactForm = this.fb.group({
+    name: ["", Validators.required],
+    email: ["", [Validators.required, Validators.email]],
+    phone: [""],
+    subject: ["", Validators.required],
+    message: ["", Validators.required],
+    terms: [false, Validators.requiredTrue]
+  });
+  isLoading = false;
+  showSuccess = false;
+  showError = false;
+  contactoContent = CONTACTO_CONTENT;
+  content$;
+  constructor() {
+    this.content$ = this.preferencesService.language$.pipe(map((lang) => this.contactoContent[lang]));
+  }
+  ngOnInit() {
+    this.seoService.setPageData({
+      title: "Contacto",
+      description: "Ponte en contacto con nosotros. Estamos listos para escuchar tu idea y convertirla en realidad. Whatsapp, Email y Redes Sociales.",
+      imageUrl: "assets/img/branding/og-contact.jpg"
+    });
+  }
+  onSubmit() {
+    if (this.contactForm.invalid) {
+      this.contactForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
+    this.showSuccess = false;
+    this.showError = false;
+    const formData = this.contactForm.value;
+    this.http.post("https://formspree.io/f/mpwrwebv", formData).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.showSuccess = true;
+        this.contactForm.reset();
+      },
+      error: (err) => {
+        console.error("Error sending form:", err);
+        this.isLoading = false;
+        this.showError = true;
+      }
+    });
+  }
+  static \u0275fac = function ContactoComponent_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _ContactoComponent)();
+  };
+  static \u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _ContactoComponent, selectors: [["app-contacto"]], decls: 2, vars: 3, consts: [[1, "min-h-screen", "flex", "flex-col"], [1, "bg-white", "dark:bg-white/5", "backdrop-blur-sm", "shadow-sm", "sticky", "top-0", "z-10", "border-b", "border-gray-200", "dark:border-white/10"], [1, "container", "mx-auto", "px-4", "py-3", "flex", "items-center", "justify-between"], ["href", "./", "aria-label", "Volver", 1, "text-gray-900", "dark:text-white", "flex", "items-center", "hover:text-blue-600", "dark:hover:text-blue-400", "transition-colors"], ["xmlns", "http://www.w3.org/2000/svg", "width", "24", "height", "24", "fill", "currentColor", "viewBox", "0 0 256 256"], ["d", "M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"], [1, "text-gray-900", "dark:text-white", "text-lg", "font-bold", "leading-tight", "tracking-tight", "flex-1", "text-center", "px-4"], [1, "w-6"], [1, "grow", "container", "mx-auto", "px-4", "py-6"], [1, "max-w-4xl", "mx-auto"], [1, "mb-8", "text-center"], [1, "text-2xl", "md:text-3xl", "font-bold", "leading-tight", "mb-2", "text-gray-900", "dark:text-white"], [1, "text-base", "md:text-lg", "leading-normal", "text-gray-600", "dark:text-gray-300", "max-w-2xl", "mx-auto"], [1, "flex", "flex-col", "lg:flex-row", "gap-8"], [1, "flex-1", "bg-white", "dark:bg-white/5", "backdrop-blur-md", "rounded-2xl", "shadow-xl", "p-8", "border", "border-gray-100", "dark:border-white/10", "card-modern"], [1, "text-2xl", "font-bold", "mb-6", "text-transparent", "bg-clip-text", "bg-linear-to-r", "from-blue-600", "to-purple-600", "dark:from-blue-400", "dark:to-purple-400"], [1, "space-y-4", 3, "ngSubmit", "formGroup"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "gap-4"], ["for", "name", 1, "block", "text-sm", "font-medium", "text-gray-700", "dark:text-gray-300", "mb-1"], ["type", "text", "id", "name", "formControlName", "name", 1, "w-full", "px-4", "py-3", "rounded-lg", "border", "border-gray-300", "dark:border-white/20", "bg-gray-50", "dark:bg-white/5", "text-gray-900", "dark:text-white", "focus:outline-none", "focus:border-blue-500", "focus:ring-1", "focus:ring-blue-500", "transition-all", "placeholder-gray-500", 3, "placeholder"], [1, "mt-1", "text-sm", "text-red-500", "dark:text-red-400"], ["for", "email", 1, "block", "text-sm", "font-medium", "text-gray-700", "dark:text-gray-300", "mb-1"], ["type", "email", "id", "email", "formControlName", "email", 1, "w-full", "px-4", "py-3", "rounded-lg", "border", "border-gray-300", "dark:border-white/20", "bg-gray-50", "dark:bg-white/5", "text-gray-900", "dark:text-white", "focus:outline-none", "focus:border-blue-500", "focus:ring-1", "focus:ring-blue-500", "transition-all", "placeholder-gray-500", 3, "placeholder"], ["for", "phone", 1, "block", "text-sm", "font-medium", "text-gray-700", "dark:text-gray-300", "mb-1"], ["type", "tel", "id", "phone", "formControlName", "phone", 1, "w-full", "px-4", "py-3", "rounded-lg", "border", "border-gray-300", "dark:border-white/20", "bg-gray-50", "dark:bg-white/5", "text-gray-900", "dark:text-white", "focus:outline-none", "focus:border-blue-500", "focus:ring-1", "focus:ring-blue-500", "transition-all", "placeholder-gray-500", 3, "placeholder"], ["for", "subject", 1, "block", "text-sm", "font-medium", "text-gray-700", "dark:text-gray-300", "mb-1"], ["id", "subject", "formControlName", "subject", 1, "w-full", "px-4", "py-3", "rounded-lg", "border", "border-gray-300", "dark:border-white/20", "bg-gray-50", "dark:bg-gray-800", "text-gray-900", "dark:text-white", "focus:outline-none", "focus:border-blue-500", "focus:ring-1", "focus:ring-blue-500", "transition-all"], ["value", "", "disabled", "", "selected", ""], [3, "value"], ["for", "message", 1, "block", "text-sm", "font-medium", "text-gray-700", "dark:text-gray-300", "mb-1"], ["id", "message", "formControlName", "message", "rows", "5", 1, "w-full", "px-4", "py-3", "rounded-lg", "border", "border-gray-300", "dark:border-white/20", "bg-gray-50", "dark:bg-white/5", "text-gray-900", "dark:text-white", "focus:outline-none", "focus:border-blue-500", "focus:ring-1", "focus:ring-blue-500", "transition-all", "placeholder-gray-500", 3, "placeholder"], [1, "flex", "items-start"], [1, "flex", "items-center", "h-5"], ["id", "terms", "formControlName", "terms", "type", "checkbox", 1, "focus:ring-blue-500", "h-4", "w-4", "text-blue-600", "border-gray-300", "rounded", "bg-gray-50", "dark:bg-white/5"], [1, "ml-3", "text-sm"], ["for", "terms", 1, "font-medium", "text-gray-700", "dark:text-gray-300"], ["href", "#", 1, "text-blue-600", "dark:text-blue-400", "hover:text-blue-500", "dark:hover:text-blue-300"], [1, "pt-4"], ["type", "submit", 1, "w-full", "md:w-auto", "px-8", "py-3", "btn-premium", "rounded-xl", "shadow-lg", "disabled:opacity-50", "disabled:cursor-not-allowed", 3, "disabled"], [1, "mt-4", "p-4", "rounded-lg", "bg-blue-50", "dark:bg-blue-900/30", "text-blue-800", "dark:text-blue-200", "flex", "items-center", "border", "border-blue-200", "dark:border-blue-500/30"], [1, "mt-4", "p-4", "rounded-lg", "bg-green-50", "dark:bg-green-900/30", "text-green-800", "dark:text-green-200", "border", "border-green-200", "dark:border-green-500/30"], [1, "mt-4", "p-4", "rounded-lg", "bg-red-50", "dark:bg-red-900/30", "text-red-800", "dark:text-red-200", "border", "border-red-200", "dark:border-red-500/30"], [1, "flex-1", "bg-white", "dark:bg-white/5", "backdrop-blur-md", "rounded-2xl", "shadow-xl", "p-8", "border", "border-gray-100", "dark:border-white/10", "card-modern", "h-fit"], [1, "text-2xl", "font-bold", "mb-6", "text-gray-900", "dark:text-white"], [1, "map-container", "mb-6", "rounded-lg", "overflow-hidden", "shadow-lg", "border", "border-gray-200", "dark:border-white/10"], ["src", \u0275\u0275trustConstantResourceUrl`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3277.539502732569!2d-58.81797292339245!3d-34.76719126615129!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceb46770c86eb%3A0x73b48d51a83e8107!2sARECOFIX%20Servicio%20t%C3%A9cnico%20de%20celulares%20%7C%20Venta%20de%20Repuestos.!5e0!3m2!1ses-419!2sar!4v1771631396545!5m2!1ses-419!2sar`, "allowfullscreen", "", "loading", "lazy", "referrerpolicy", "no-referrer-when-downgrade", "title", "Ubicaci\xF3n de Arecofix en el mapa", 1, "w-full", "h-64"], [1, "space-y-4"], [1, "flex", "items-start", "gap-4"], [1, "flex", "items-center", "justify-center", "rounded-lg", "bg-indigo-100", "dark:bg-white/10", "shrink-0", "size-10", "mt-1", "text-indigo-600", "dark:text-white"], ["xmlns", "http://www.w3.org/2000/svg", "width", "20", "height", "20", "fill", "currentColor", "viewBox", "0 0 256 256"], ["d", "M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"], [1, "text-gray-900", "dark:text-white", "font-medium"], [1, "text-gray-600", "dark:text-gray-300"], ["d", "M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"], [1, "text-gray-500", "dark:text-gray-400", "text-sm", "mt-1"], ["d", "M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z"], ["d", "M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"], [1, "mt-8"], [1, "text-gray-900", "dark:text-white", "font-medium", "mb-3"], [1, "flex", "gap-4"], ["href", "https://facebook.com/arecofix", "aria-label", "Facebook", 1, "text-gray-400", "hover:text-blue-600", "dark:hover:text-blue-500", "transition-all"], ["d", "M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"], ["href", "https://linkedin.com/in/ezequiel-enrico-areco", "aria-label", "LinkedIn", 1, "text-gray-400", "hover:text-blue-700", "dark:hover:text-blue-600", "transition-all"], ["d", "M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z"], ["href", "https://instagram.com/arecofix", "aria-label", "Instagram", 1, "text-gray-400", "hover:text-pink-600", "dark:hover:text-pink-500", "transition-all"], ["d", "M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", 1, "animate-spin", "-ml-1", "mr-3", "h-5", "w-5", "text-blue-600", "dark:text-blue-400"], ["cx", "12", "cy", "12", "r", "10", "stroke", "currentColor", "stroke-width", "4", 1, "opacity-25"], ["fill", "currentColor", "d", "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z", 1, "opacity-75"]], template: function ContactoComponent_Template(rf, ctx) {
+    if (rf & 1) {
+      \u0275\u0275conditionalCreate(0, ContactoComponent_Conditional_0_Template, 124, 37, "div", 0);
+      \u0275\u0275pipe(1, "async");
+    }
+    if (rf & 2) {
+      let tmp_0_0;
+      \u0275\u0275conditional((tmp_0_0 = \u0275\u0275pipeBind1(1, 1, ctx.content$)) ? 0 : -1, tmp_0_0);
+    }
+  }, dependencies: [ReactiveFormsModule, \u0275NgNoValidate, NgSelectOption, \u0275NgSelectMultipleOption, DefaultValueAccessor, CheckboxControlValueAccessor, SelectControlValueAccessor, NgControlStatus, NgControlStatusGroup, FormGroupDirective, FormControlName, AsyncPipe], styles: ["\n\n.map-container[_ngcontent-%COMP%] {\n  position: relative;\n  width: 100%;\n  padding-bottom: 56.25%;\n  height: 0;\n  overflow: hidden;\n}\n.responsive-map[_ngcontent-%COMP%] {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: none;\n}\n.input-focus[_ngcontent-%COMP%]:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n.btn-hover[_ngcontent-%COMP%]:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n}\n.btn-active[_ngcontent-%COMP%]:active {\n  transform: translateY(0);\n}\n/*# sourceMappingURL=contacto.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ContactoComponent, [{
+    type: Component,
+    args: [{ selector: "app-contacto", standalone: true, imports: [
+      ReactiveFormsModule,
+      AsyncPipe
+    ], template: `@if (content$ | async; as content) {
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white dark:bg-white/5 backdrop-blur-sm shadow-sm sticky top-0 z-10 border-b border-gray-200 dark:border-white/10">
+      <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="./" class="text-gray-900 dark:text-white flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Volver">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+            <path
+              d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z">
+            </path>
+          </svg>
+        </a>
+        <h1 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center px-4">{{ content.title }}</h1>
+        <div class="w-6"></div> <!-- Spacer para balancear el dise\xF1o -->
+      </div>
+    </header>
+    <!-- Main Content -->
+    <main class="grow container mx-auto px-4 py-6">
+      <div class="max-w-4xl mx-auto">
+        <!-- Hero Section -->
+        <section class="mb-8 text-center">
+          <h2 class="text-2xl md:text-3xl font-bold leading-tight mb-2 text-gray-900 dark:text-white">{{ content.subtitle }}</h2>
+          <p class="text-base md:text-lg leading-normal text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            {{ content.intro }}
+          </p>
+        </section>
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Form Section -->
+          <section class="flex-1 bg-white dark:bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-white/10 card-modern">
+            <h3 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">{{ content.formTitle }}</h3>
+            <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Nombre -->
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.nameLabel }}</label>
+                  <input type="text" id="name" formControlName="name" [placeholder]="content.namePlaceholder"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+                    @if (contactForm.get('name')?.invalid && contactForm.get('name')?.touched) {
+                      <p class="mt-1 text-sm text-red-500 dark:text-red-400">{{ content.nameError }}</p>
+                    }
+                  </div>
+                  <!-- Email -->
+                  <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.emailLabel }}</label>
+                    <input type="email" id="email" formControlName="email" [placeholder]="content.emailPlaceholder"
+                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+                      @if (contactForm.get('email')?.invalid && contactForm.get('email')?.touched) {
+                        <p class="mt-1 text-sm text-red-500 dark:text-red-400">{{ content.emailError }}</p>
+                      }
+                    </div>
+                  </div>
+                  <!-- Tel\xE9fono -->
+                  <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.phoneLabel }}</label>
+                    <input type="tel" id="phone" formControlName="phone" [placeholder]="content.phonePlaceholder"
+                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+                    </div>
+                    <!-- Asunto -->
+                    <div>
+                      <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.subjectLabel }}</label>
+                      <select id="subject" formControlName="subject"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                        <option value="" disabled selected>{{ content.subjectPlaceholder }}</option>
+                        @for (option of content.subjectOptions; track option.value) {
+                          <option [value]="option.value">{{ option.label }}</option>
+                        }
+                      </select>
+                    </div>
+                    <!-- Mensaje -->
+                    <div>
+                      <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ content.messageLabel }}</label>
+                      <textarea id="message" formControlName="message" rows="5" [placeholder]="content.messagePlaceholder"
+                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500"></textarea>
+                      @if (contactForm.get('message')?.invalid && contactForm.get('message')?.touched) {
+                        <p class="mt-1 text-sm text-red-500 dark:text-red-400">{{ content.messageError }}</p>
+                      }
+                    </div>
+                    <!-- T\xE9rminos y condiciones -->
+                    <div class="flex items-start">
+                      <div class="flex items-center h-5">
+                        <input id="terms" formControlName="terms" type="checkbox"
+                          class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded bg-gray-50 dark:bg-white/5">
+                        </div>
+                        <div class="ml-3 text-sm">
+                          <label for="terms" class="font-medium text-gray-700 dark:text-gray-300">
+                            {{ content.termsText }} <a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">{{ content.termsLink }}</a> y la
+                            <a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">{{ content.privacyLink }}</a>.
+                          </label>
+                        </div>
+                      </div>
+                      <!-- Submit Button -->
+                      <div class="pt-4">
+                        <button type="submit" [disabled]="isLoading"
+                          class="w-full md:w-auto px-8 py-3 btn-premium rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                          {{ content.submitButton }}
+                        </button>
+                      </div>
+                      <!-- Loading and Success/Error Messages -->
+                      @if (isLoading) {
+                        <div class="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 flex items-center border border-blue-200 dark:border-blue-500/30">
+                          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          {{ content.sendingMessage }}
+                        </div>
+                      }
+                      @if (showSuccess) {
+                        <div class="mt-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-500/30">
+                          {{ content.successMessage }}
+                        </div>
+                      }
+                      @if (showError) {
+                        <div class="mt-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-500/30">
+                          {{ content.errorMessage }}
+                        </div>
+                      }
+                    </form>
+                  </section>
+                  <!-- Contact Info Section -->
+                  <section class="flex-1 bg-white dark:bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-white/10 card-modern h-fit">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ content.contactInfoTitle }}</h3>
+                    <!-- Mapa Responsive -->
+                    <div class="map-container mb-6 rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-white/10">
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3277.539502732569!2d-58.81797292339245!3d-34.76719126615129!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bceb46770c86eb%3A0x73b48d51a83e8107!2sARECOFIX%20Servicio%20t%C3%A9cnico%20de%20celulares%20%7C%20Venta%20de%20Repuestos.!5e0!3m2!1ses-419!2sar!4v1771631396545!5m2!1ses-419!2sar"
+                        class="w-full h-64" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                      title="Ubicaci\xF3n de Arecofix en el mapa"></iframe>
+                    </div>
+                    <!-- Contact Details -->
+                    <div class="space-y-4">
+                      <div class="flex items-start gap-4">
+                        <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z">
+                            </path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 class="text-gray-900 dark:text-white font-medium">{{ content.addressLabel }}</h4>
+                          <p class="text-gray-600 dark:text-gray-300">{{ content.addressValue }}</p>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-4">
+                        <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z">
+                            </path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 class="text-gray-900 dark:text-white font-medium">{{ content.phoneInfoLabel }}</h4>
+                          <p class="text-gray-600 dark:text-gray-300">{{ content.phoneInfoValue }}</p>
+                          <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{ content.phoneInfoHours }}</p>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-4">
+                        <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z">
+                            </path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 class="text-gray-900 dark:text-white font-medium">{{ content.emailInfoLabel }}</h4>
+                          <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{ content.emailInfoValue }}</p>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-4">
+                        <div class="flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-white/10 shrink-0 size-10 mt-1 text-indigo-600 dark:text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z">
+                            </path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 class="text-gray-900 dark:text-white font-medium">{{ content.supportLabel }}</h4>
+                          <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{ content.supportValue }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Social Media -->
+                    <div class="mt-8">
+                      <h4 class="text-gray-900 dark:text-white font-medium mb-3">{{ content.socialTitle }}</h4>
+                      <div class="flex gap-4">
+                        <a href="https://facebook.com/arecofix" aria-label="Facebook"
+                          class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-all">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z">
+                            </path>
+                          </svg>
+                        </a>
+                        <a href="https://linkedin.com/in/ezequiel-enrico-areco" aria-label="LinkedIn"
+                          class="text-gray-400 hover:text-blue-700 dark:hover:text-blue-600 transition-all">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z">
+                            </path>
+                          </svg>
+                        </a>
+                        <a href="https://instagram.com/arecofix" aria-label="Instagram"
+                          class="text-gray-400 hover:text-pink-600 dark:hover:text-pink-500 transition-all">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                              d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z">
+                            </path>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </main>
+          </div>
+        }`, styles: ["/* src/app/public/contacto/contacto.scss */\n.map-container {\n  position: relative;\n  width: 100%;\n  padding-bottom: 56.25%;\n  height: 0;\n  overflow: hidden;\n}\n.responsive-map {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: none;\n}\n.input-focus:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n.btn-hover:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n}\n.btn-active:active {\n  transform: translateY(0);\n}\n/*# sourceMappingURL=contacto.css.map */\n"] }]
+  }], () => [], null);
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(ContactoComponent, { className: "ContactoComponent", filePath: "src/app/public/contacto/contacto.ts", lineNumber: 23 });
+})();
+export {
+  ContactoComponent
+};
+//# sourceMappingURL=chunk-NQETWYRD.mjs.map

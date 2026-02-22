@@ -17,7 +17,7 @@ export interface Order {
     customer_name: string;
     customer_email: string;
     customer_phone?: string;
-    customer_address?: Address;
+    customer_address?: Address | string;
     status: 'pending' | 'processing' | 'completed' | 'cancelled';
 
     subtotal: number;

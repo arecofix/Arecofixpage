@@ -201,12 +201,13 @@
                         <label class="label">
                             <span class="label-text font-medium">Estado</span>
                         </label>
-                        <select [(ngModel)]="form().status" name="status" class="select select-bordered w-full">
-                            <option value="pending">Pendiente</option>
-                            <option value="in_progress">En Progreso</option>
-                            <option value="completed">Completado</option>
-                            <option value="delivered">Entregado</option>
-                            <option value="cancelled">Cancelado</option>
+                        <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full">
+                            <option [value]="1">Pendiente</option>
+                            <option [value]="2">En Progreso</option>
+                            <option [value]="3">Esperando Repuestos</option>
+                            <option [value]="4">Completado</option>
+                            <option [value]="5">Entregado</option>
+                            <option [value]="6">Cancelado</option>
                         </select>
                     </div>
                     <div class="form-control">
@@ -302,11 +303,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-right">
-                    <h2 class="font-bold text-base text-green-700 uppercase">{{ company()?.name || 'ARECOFIX' }}</h2>
-                    <div class="text-[9px] text-gray-600 leading-tight">
-                        <p>{{ company()?.address }}</p>
-                        <p>{{ company()?.phone }}</p>
+                <!-- QR Code for tracking -->
+                <div class="text-right flex items-center gap-2">
+                    <div class="flex flex-col items-center">
+                         @if (form().tracking_code) {
+                            <qrcode [qrdata]="getTrackingUrl()" [width]="60" [margin]="0" [errorCorrectionLevel]="'M'"></qrcode>
+                         }
+                    </div>
+                    <div class="text-right">
+                        <h2 class="font-bold text-base text-green-700 uppercase">{{ company()?.name || 'ARECOFIX' }}</h2>
+                        <div class="text-[9px] text-gray-600 leading-tight">
+                            <p>{{ company()?.address }}</p>
+                            <p>{{ company()?.phone }}</p>
+                        </div>
                     </div>
                 </div>
             </div>

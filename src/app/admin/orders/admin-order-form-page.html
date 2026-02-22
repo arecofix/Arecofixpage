@@ -25,10 +25,22 @@
                         class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Dirección</label>
-                    <input type="text" [(ngModel)]="form().customer_address" name="customer_address"
-                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-base-content mb-1.5">Calle</label>
+                        <input type="text" [(ngModel)]="$any(form().customer_address).street" name="address_street"
+                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-base-content mb-1.5">Nro</label>
+                        <input type="text" [(ngModel)]="$any(form().customer_address).number" name="address_number"
+                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-base-content mb-1.5">Ciudad</label>
+                        <input type="text" [(ngModel)]="$any(form().customer_address).city" name="address_city"
+                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" />
+                    </div>
                 </div>
 
 

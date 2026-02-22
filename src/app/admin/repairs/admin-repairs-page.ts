@@ -46,25 +46,27 @@ export class AdminRepairsPage implements OnInit {
     }
   }
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'pending': return 'badge-warning';
-      case 'in_progress': return 'badge-info';
-      case 'completed': return 'badge-success';
-      case 'delivered': return 'badge-primary';
-      case 'cancelled': return 'badge-error';
+  getStatusColor(statusId: number): string {
+    switch (statusId) {
+      case 1: return 'badge-warning';
+      case 2: return 'badge-info';
+      case 3: return 'badge-secondary';
+      case 4: return 'badge-success';
+      case 5: return 'badge-success';
+      case 6: return 'badge-error';
       default: return 'badge-ghost';
     }
   }
 
-  getStatusLabel(status: string): string {
-    switch (status) {
-      case 'pending': return 'Pendiente';
-      case 'in_progress': return 'En Progreso';
-      case 'completed': return 'Completado';
-      case 'delivered': return 'Entregado';
-      case 'cancelled': return 'Cancelado';
-      default: return status;
+  getStatusLabel(statusId: number): string {
+    switch (statusId) {
+      case 1: return 'Pendiente';
+      case 2: return 'En Progreso';
+      case 3: return 'Esperando Repuestos';
+      case 4: return 'Completado';
+      case 5: return 'Entregado';
+      case 6: return 'Cancelado';
+      default: return 'Pendiente';
     }
   }
 }

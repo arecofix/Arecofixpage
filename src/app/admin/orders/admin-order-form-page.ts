@@ -45,7 +45,12 @@ export class AdminOrderFormPage implements OnInit {
         customer_name: '',
         customer_email: '',
         customer_phone: '',
-        customer_address: '',
+        customer_address: {
+            street: '',
+            number: '',
+            city: 'Marcos Paz',
+            neighborhood: ''
+        },
         status: 'pending',
 
         subtotal: 0,
@@ -90,11 +95,21 @@ export class AdminOrderFormPage implements OnInit {
 
         this.orderService.getOrderById(this.id).subscribe({
             next: (order: OrderWithItems) => {
+                let address = order.customer_address;
+                if (typeof address === 'string') {
+                    address = {
+                        street: address,
+                        number: '',
+                        city: 'Marcos Paz',
+                        neighborhood: ''
+                    };
+                }
+
                 this.form.set({
                     customer_name: order.customer_name,
                     customer_email: order.customer_email,
                     customer_phone: order.customer_phone,
-                    customer_address: order.customer_address,
+                    customer_address: address || { street: '', number: '', city: '', neighborhood: '' },
                     status: order.status,
                     subtotal: order.subtotal,
                     tax: order.tax,

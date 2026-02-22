@@ -36,7 +36,12 @@ export class CheckoutPage {
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required]],
-    address: ['', [Validators.required]],
+    address: this.fb.group({
+      street: ['', [Validators.required]],
+      number: ['', [Validators.required]],
+      city: ['Marcos Paz', [Validators.required]],
+      neighborhood: ['']
+    }),
     notes: [''],
   });
 
@@ -58,11 +63,13 @@ export class CheckoutPage {
     const cartItems = this.cartService.cartItems();
     const total = this.cartService.totalPrice();
 
+    const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city}`;
+
     const order: Order = {
       customer_name: formVal.name,
       customer_email: formVal.email,
       customer_phone: formVal.phone,
-      customer_address: formVal.address,
+      customer_address: formVal.address, // Structured object
       status: 'pending',
       subtotal: total,
       tax: 0,
@@ -103,7 +110,7 @@ Detalles del Cliente:
 Nombre: ${formVal.name}
 Email: ${formVal.email}
 Teléfono: ${formVal.phone}
-Dirección: ${formVal.address}
+Dirección: ${addressStr}
 
 Productos:
 ${itemsList}
@@ -124,9 +131,6 @@ ${formVal.notes || 'Ninguna'}`;
       const { error: msgError } = await this.contactService.createMessage(messageDto);
       if (msgError) {
           console.error('Message creation error (non-fatal):', msgError);
-          // We don't throw here to ensure the order completion is still shown to the user, 
-          // but strictly speaking we should probably ensure consistency. 
-          // However for UX, if order is taken, we proceed.
       }
 
       // 3. Update Profile if logged in
@@ -137,7 +141,7 @@ ${formVal.notes || 'Ninguna'}`;
           .from('profiles')
           .update({
             phone: formVal.phone,
-            address: formVal.address,
+            address: formVal.address, // Save JSONB object
             updated_at: new Date().toISOString(),
           })
           .eq('id', currentUser.id)

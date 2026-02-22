@@ -54,9 +54,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withFetch()),
 
-    // Charts provider moved to main.ts for SSR compatibility
-    // provideCharts(withDefaultRegisterables()),
-    
     // Repositories
     { provide: ProductRepository, useClass: SupabaseProductRepository },
     { provide: CategoryRepository, useClass: SupabaseCategoryRepository },
