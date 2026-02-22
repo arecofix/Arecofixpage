@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { Category } from '@app/features/products/domain/entities/category.entity';
@@ -7,7 +7,7 @@ import { Category } from '@app/features/products/domain/entities/category.entity
 @Component({
     selector: 'app-admin-categories-page',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './admin-categories-page.html',
 })
 export class AdminCategoriesPage implements OnInit {

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
@@ -7,7 +7,7 @@ import { UserProfile } from '@app/features/authentication/domain/entities/user.e
 @Component({
     selector: 'app-admin-clients-page',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './admin-clients-page.html',
 })
 export class AdminClientsPage implements OnInit {

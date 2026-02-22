@@ -1,7 +1,7 @@
-import { Injectable, inject, PLATFORM_ID, makeStateKey, TransferState } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, makeStateKey, TransferState, DOCUMENT } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { DOCUMENT, isPlatformServer } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 

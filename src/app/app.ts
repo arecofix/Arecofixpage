@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID, DOCUMENT } from '@angular/core';
 import { AiAssistant } from './features/ai-assistant/ai-assistant';
 import { RouterOutlet } from '@angular/router';
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { AnalyticsService } from './core/services/analytics.service';

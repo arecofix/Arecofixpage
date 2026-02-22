@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, Inject, DOCUMENT } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DatePipe, CommonModule, DOCUMENT } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
 import { Post } from '@app/features/posts/domain/entities/post.entity';

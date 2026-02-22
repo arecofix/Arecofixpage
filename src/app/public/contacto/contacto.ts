@@ -3,7 +3,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { SeoService } from '@app/core/services/seo.service';
-import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,9 +14,9 @@ import { CONTACTO_CONTENT, ContactoContent } from './contacto.content';
     selector: 'app-contacto',
     standalone: true,
     imports: [
-        ReactiveFormsModule, 
-        NgIf, AsyncPipe
-    ],
+    ReactiveFormsModule,
+    AsyncPipe
+],
     templateUrl: './contacto.html',
     styleUrls: ['./contacto.scss']
 })

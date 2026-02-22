@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
   selector: 'app-reservation-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './reservation-calendar.html',
   styleUrl: './reservation-calendar.css'
 })

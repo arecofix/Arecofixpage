@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { OrderService } from '@app/core/services/order.service';
 import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
 import { AuthService } from '@app/core/services/auth.service';
-import { CommonModule } from '@angular/common';
+
 import { OrderNotificationService } from '@app/features/orders/services/order-notification.service'; // Import Ecommerce Notification service
 
 
@@ -19,7 +19,7 @@ interface ProductOption {
 @Component({
     selector: 'app-admin-order-form-page',
     standalone: true,
-    imports: [FormsModule, RouterLink, CommonModule],
+    imports: [FormsModule, RouterLink],
     templateUrl: './admin-order-form-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

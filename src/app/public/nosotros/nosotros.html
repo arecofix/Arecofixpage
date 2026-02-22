@@ -1,15 +1,14 @@
-<ng-container *ngIf="content$ | async as content">
+@if (content$ | async; as content) {
   <!-- Hero Section -->
   <!-- Hero Section -->
   <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-[#0a0a0a]">
     <!-- Background Image/Gradient -->
     <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0 bg-linear-to-b from-gray-900/10 to-[#0a0a0a] z-10"></div>
-        <!-- Decorative circles -->
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse-slow"></div>
-        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[100px]"></div>
+      <div class="absolute inset-0 bg-linear-to-b from-gray-900/10 to-[#0a0a0a] z-10"></div>
+      <!-- Decorative circles -->
+      <div class="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse-slow"></div>
+      <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[100px]"></div>
     </div>
-    
     <div class="relative z-10 container mx-auto px-4 text-center">
       <h1 class="text-4xl md:text-7xl font-bold mb-6 tracking-tight text-white drop-shadow-lg text-gradient-premium">
         {{ content.title }}
@@ -22,18 +21,18 @@
       </p>
     </div>
   </div>
-
   <!-- Stats Section -->
   <section class="py-12 glass-panel -mt-10 relative z-10 container mx-auto px-4 rounded-2xl shadow-2xl max-w-6xl border border-white/10 backdrop-blur-xl hover:translate-y-[-5px] transition-transform duration-500">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-200 dark:divide-white/5">
-      <div *ngFor="let achievement of content.achievements" class="p-4 group">
-        <div class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500 mb-2 group-hover:scale-110 transition-transform">{{ achievement.number }}</div>
-        <div class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">{{ achievement.label }}</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono">{{ achievement.description }}</div>
-      </div>
+      @for (achievement of content.achievements; track achievement) {
+        <div class="p-4 group">
+          <div class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500 mb-2 group-hover:scale-110 transition-transform">{{ achievement.number }}</div>
+          <div class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">{{ achievement.label }}</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono">{{ achievement.description }}</div>
+        </div>
+      }
     </div>
   </section>
-
   <!-- History & Foundation -->
   <section class="py-20 bg-gray-50 dark:bg-transparent">
     <div class="container mx-auto px-4">
@@ -52,9 +51,9 @@
         </div>
         <div class="relative">
           <div class="aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10">
-            <iframe width="100%" height="100%" [src]="youtubeUrl" 
-              title="Arecofix Video" frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            <iframe width="100%" height="100%" [src]="youtubeUrl"
+              title="Arecofix Video" frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen>
             </iframe>
           </div>
@@ -65,7 +64,6 @@
       </div>
     </div>
   </section>
-
   <!-- Mission & Vision -->
   <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
     <div class="container mx-auto px-4">
@@ -80,7 +78,6 @@
             {{ content.missionText }}
           </p>
         </div>
-        
         <!-- Vision Card -->
         <div class="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
           <div class="w-12 h-12 bg-purple-100 dark:bg-purple-600/80 text-purple-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
@@ -94,7 +91,6 @@
       </div>
     </div>
   </section>
-
   <!-- Values Section -->
   <section class="py-20 bg-gray-50 dark:bg-transparent">
     <div class="container mx-auto px-4">
@@ -102,19 +98,19 @@
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.valuesTitle }}</h2>
         <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
       </div>
-      
       <div class="grid grid-cols-2 gap-4 md:gap-8">
-        <div *ngFor="let value of content.values" class="bg-white dark:bg-white/5 p-4 md:p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
-          <div class="text-3xl md:text-4xl mb-4 md:mb-6">{{ value.icon }}</div>
-          <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">{{ value.title }}</h3>
-          <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            {{ value.description }}
-          </p>
-        </div>
+        @for (value of content.values; track value) {
+          <div class="bg-white dark:bg-white/5 p-4 md:p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
+            <div class="text-3xl md:text-4xl mb-4 md:mb-6">{{ value.icon }}</div>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">{{ value.title }}</h3>
+            <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              {{ value.description }}
+            </p>
+          </div>
+        }
       </div>
     </div>
   </section>
-
   <!-- Team Section -->
   <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
     <div class="container mx-auto px-4">
@@ -124,67 +120,69 @@
           {{ content.teamSubtitle }}
         </p>
       </div>
-
       <div class="flex justify-center flex-wrap gap-8">
-        <div *ngFor="let member of content.teamMembers" class="max-w-md w-full bg-white dark:bg-white/5 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-white/10 transform hover:-translate-y-1 transition-transform duration-300 backdrop-blur-md">
-          <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 opacity-80"></div>
-          <div class="px-8 pb-8">
-            <div class="relative -mt-16 mb-6">
-              <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl relative">
-                <!-- Placeholder for image if not present -->
-                <ng-container *ngIf="member.image; else noImage">
-                  <img [ngSrc]="member.image" [alt]="member.name" class="object-cover" fill>
-                </ng-container>
-                <ng-template #noImage>
-                  👨‍💻
-                </ng-template>
+        @for (member of content.teamMembers; track member) {
+          <div class="max-w-md w-full bg-white dark:bg-white/5 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-white/10 transform hover:-translate-y-1 transition-transform duration-300 backdrop-blur-md">
+            <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 opacity-80"></div>
+            <div class="px-8 pb-8">
+              <div class="relative -mt-16 mb-6">
+                <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl relative">
+                  <!-- Placeholder for image if not present -->
+                  @if (member.image) {
+                    <img [ngSrc]="member.image" [alt]="member.name" class="object-cover" fill>
+                  } @else {
+                    👨‍💻
+                  }
+                </div>
+              </div>
+              <div class="text-center">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ member.name }}</h3>
+                <p class="text-blue-600 dark:text-blue-400 font-medium mb-4">{{ member.role }}</p>
+                <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">
+                  {{ member.bio }}
+                </p>
+                @if (member.linkedin) {
+                  <a [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block p-2">
+                    <i class="fab fa-linkedin text-2xl"></i>
+                  </a>
+                }
               </div>
             </div>
-            <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ member.name }}</h3>
-              <p class="text-blue-600 dark:text-blue-400 font-medium mb-4">{{ member.role }}</p>
-              <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">
-                {{ member.bio }}
-              </p>
-              <a *ngIf="member.linkedin" [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block p-2">
-                <i class="fab fa-linkedin text-2xl"></i>
-              </a>
-            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   </section>
-
   <!-- Certificate Gallery Section -->
   <app-certificate-gallery [title]="'Nuestros Certificados'"></app-certificate-gallery>
-
   <!-- FAQ Section -->
   <section class="py-20 bg-gray-50 dark:bg-transparent">
     <div class="container mx-auto px-4 max-w-4xl">
       <div class="text-center mb-16">
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.faqTitle }}</h2>
       </div>
-
       <div class="space-y-4">
-        <div *ngFor="let faq of content.faqs; let i = index" class="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden backdrop-blur-sm">
-          <button (click)="toggleFAQ(i)" 
-            class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
-            <span class="font-semibold text-gray-900 dark:text-white">{{ faq.question }}</span>
-            <span class="transform transition-transform duration-200" [class.rotate-180]="expandedFAQ === i">
-              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </span>
-          </button>
-          <div *ngIf="expandedFAQ === i" class="px-6 pb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">
-            {{ faq.answer }}
+        @for (faq of content.faqs; track faq; let i = $index) {
+          <div class="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden backdrop-blur-sm">
+            <button (click)="toggleFAQ(i)"
+              class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+              <span class="font-semibold text-gray-900 dark:text-white">{{ faq.question }}</span>
+              <span class="transform transition-transform duration-200" [class.rotate-180]="expandedFAQ === i">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </span>
+            </button>
+            @if (expandedFAQ === i) {
+              <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">
+                {{ faq.answer }}
+              </div>
+            }
           </div>
-        </div>
+        }
       </div>
     </div>
   </section>
-
   <!-- CTA Section -->
   <section class="py-20 bg-linear-to-r from-blue-600/90 to-indigo-600/90 dark:from-blue-900/80 dark:to-indigo-900/80 text-white text-center backdrop-blur-md border-t border-white/10">
     <div class="container mx-auto px-4">
@@ -193,16 +191,16 @@
         {{ content.ctaText }}
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="https://wa.me/541125960900" target="_blank" 
+        <a href="https://wa.me/541125960900" target="_blank"
           class="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg">
           <i class="fab fa-whatsapp mr-2 text-xl"></i>
           {{ content.ctaWhatsapp }}
         </a>
-        <a routerLink="/contacto" 
+        <a routerLink="/contacto"
           class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
           {{ content.ctaContact }}
         </a>
       </div>
     </div>
   </section>
-</ng-container>
+}

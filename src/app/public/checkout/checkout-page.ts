@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   FormBuilder,
   FormGroup,
@@ -19,7 +19,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './checkout-page.html',
 })
 export class CheckoutPage {

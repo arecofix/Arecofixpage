@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-recursos',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 pb-12">
       <div class="container mx-auto px-4">

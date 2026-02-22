@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,7 +9,7 @@ import { AuthService } from '@app/core/services/auth.service';
 @Component({
   selector: 'app-admin-course-form-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   template: `
     <div class="max-w-4xl mx-auto">
       <div class="flex justify-between items-center mb-6">

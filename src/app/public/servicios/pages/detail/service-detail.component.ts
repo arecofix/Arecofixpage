@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SeoService } from '@app/core/services/seo.service';
 import { SERVICIOS_CONTENT, Service } from '../../servicios.data';
@@ -8,7 +8,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgOptimizedImage],
+  imports: [RouterModule, NgOptimizedImage],
   templateUrl: './service-detail.component.html',
 })
 export class ServiceDetailComponent implements OnInit {

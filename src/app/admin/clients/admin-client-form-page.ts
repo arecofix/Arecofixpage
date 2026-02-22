@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
@@ -7,7 +7,7 @@ import { AuthService } from '@app/core/services/auth.service';
 @Component({
     selector: 'app-admin-client-form-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [FormsModule, RouterLink],
     templateUrl: './admin-client-form-page.html',
 })
 export class AdminClientFormPage implements OnInit {

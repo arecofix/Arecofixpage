@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
@@ -10,7 +10,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
     selector: 'app-admin-brands-page',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './admin-brands-page.html',
 })
 export class AdminBrandsPage implements OnInit {

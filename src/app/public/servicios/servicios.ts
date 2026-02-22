@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -11,7 +11,7 @@ import { Service, SERVICIOS_CONTENT, ServiciosContent } from './servicios.data';
 @Component({
     selector: 'app-servicios',
     standalone: true,
-    imports: [CommonModule, RouterModule, NgOptimizedImage],
+    imports: [RouterModule, NgOptimizedImage],
     templateUrl: './servicios.html',
     styles: [],
     changeDetection: ChangeDetectionStrategy.OnPush

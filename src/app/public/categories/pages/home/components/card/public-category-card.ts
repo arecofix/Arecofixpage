@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { iCategory } from '@app/public/categories/interfaces/category.interface';
 
 @Component({
   selector: 'public-category-card',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink],
   templateUrl: './public-category-card.html',
   styles: `
     :host { display: block; height: 100%; }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface ReviewItem {
   image: string;
@@ -12,7 +12,7 @@ export interface ReviewItem {
 @Component({
   selector: 'app-review-grid',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './review-grid.component.html'
 })
 export class ReviewGridComponent {

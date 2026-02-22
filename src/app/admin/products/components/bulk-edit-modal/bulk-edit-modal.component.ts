@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy, signal, inject, model, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminProductService } from '../../services/admin-product.service';
 
 @Component({
   selector: 'app-bulk-edit-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './bulk-edit-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy, signal, inject, model, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ProductMediaService } from '../../services/product-media.service';
 
 @Component({
   selector: 'app-product-images-manager',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [DragDropModule],
   templateUrl: './product-images-manager.component.html',
   styles: [`
     .cdk-drag-preview {

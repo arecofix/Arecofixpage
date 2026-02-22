@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 
 export interface ProductCarouselItem {
@@ -12,7 +12,7 @@ export interface ProductCarouselItem {
 @Component({
   selector: 'app-product-carousel',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './product-carousel.component.html'
 })
 export class ProductCarouselComponent {

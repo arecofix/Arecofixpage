@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { AdminProductService } from './services/admin-product.service';
 import { ProductImagesManagerComponent } from './components/product-images-manager/product-images-manager.component';
 
 @Component({
   selector: 'app-admin-product-form-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProductImagesManagerComponent],
+  imports: [FormsModule, RouterLink, ProductImagesManagerComponent],
   templateUrl: './admin-product-form-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { Supplier } from '@app/features/customers/domain/entities/supplier.entity';
@@ -7,7 +7,7 @@ import { Supplier } from '@app/features/customers/domain/entities/supplier.entit
 @Component({
     selector: 'app-admin-suppliers-page',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './admin-suppliers-page.html',
 })
 export class AdminSuppliersPage implements OnInit {

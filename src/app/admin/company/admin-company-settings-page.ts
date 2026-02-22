@@ -1,12 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
     selector: 'app-admin-company-settings-page',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     templateUrl: './admin-company-settings-page.html',
 })
 export class AdminCompanySettingsPage implements OnInit {

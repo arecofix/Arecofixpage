@@ -4,13 +4,9 @@ import {
   inject,
   PLATFORM_ID,
   ChangeDetectorRef,
+  DOCUMENT
 } from '@angular/core';
-import {
-  CommonModule,
-  DOCUMENT,
-  isPlatformBrowser,
-  NgOptimizedImage,
-} from '@angular/common';
+import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import {
   DomSanitizer,
   SafeResourceUrl,

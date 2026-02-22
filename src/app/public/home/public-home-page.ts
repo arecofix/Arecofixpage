@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnInit, DOCUMENT } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { map } from 'rxjs/operators';
