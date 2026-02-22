@@ -5,15 +5,28 @@ import {
   PLATFORM_ID,
   ChangeDetectorRef,
 } from '@angular/core';
-import { CommonModule, DOCUMENT, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  CommonModule,
+  DOCUMENT,
+  isPlatformBrowser,
+  NgOptimizedImage,
+} from '@angular/common';
+import {
+  DomSanitizer,
+  SafeResourceUrl,
+  Title,
+  Meta,
+} from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '@app/core/services/auth.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { LoggerService } from '@app/core/services/logger.service';
-import { ContactService, CreateMessageDto } from '@app/core/services/contact.service';
+import {
+  ContactService,
+  CreateMessageDto,
+} from '@app/core/services/contact.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
 import { ProductCarouselComponent } from '@app/shared/components/product-carousel/product-carousel.component';
@@ -33,7 +46,7 @@ import {
   TECH_BEST,
   SEO_CONTENT,
   WHY_US,
-  LOCATION_DATA
+  LOCATION_DATA,
 } from './celular-landing.data';
 
 interface GalleryItem {
@@ -54,14 +67,18 @@ interface GalleryItem {
     ReservationCalendar,
     ProductCarouselComponent,
     BreadcrumbsComponent,
-    NgOptimizedImage
+    NgOptimizedImage,
   ],
   templateUrl: './celular-landing.component.html',
 })
 export class CelularLandingComponent implements OnInit {
   public sanitizer = inject(DomSanitizer);
-  safeMapUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(LOCATION_DATA.mapEmbedUrl);
+  safeMapUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+    LOCATION_DATA.mapEmbedUrl,
+  );
   private seoService = inject(SeoService);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
   private contactService = inject(ContactService);
   private notificationService = inject(NotificationService);
   private document = inject(DOCUMENT);
@@ -74,7 +91,7 @@ export class CelularLandingComponent implements OnInit {
 
   breadcrumbItems = [
     { label: 'Inicio', url: '/' },
-    { label: 'Servicio Técnico Celulares', url: '/celular' }
+    { label: 'Servicio Técnico Celulares', url: '/celular' },
   ];
 
   // --- MIGRATED DATA ---
@@ -85,7 +102,13 @@ export class CelularLandingComponent implements OnInit {
   reviews = REVIEWS;
   processSteps = PROCESS_STEPS;
   galleryItems: GalleryItem[] = GALLERY_ITEMS;
-  partners: { name: string; icon?: string; color?: string; url?: string; img?: string }[] = PARTNERS;
+  partners: {
+    name: string;
+    icon?: string;
+    color?: string;
+    url?: string;
+    img?: string;
+  }[] = PARTNERS;
   mentions = MENTIONS;
   blogFeatures = BLOG_FEATURES;
   appInfo = APP_INFO;
@@ -101,12 +124,39 @@ export class CelularLandingComponent implements OnInit {
   sendingContact = false;
 
   ngOnInit() {
-    // SEO and Structured Data are now handled via Route Data and SeoService
+    this.updateSeoTags();
+  }
+
+  private updateSeoTags() {
+    const title = 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix';
+    const description = '¡Reparamos tu celular en 2 horas! Cambio de módulos, pines de carga y baterías con repuestos originales. Garantía asegurada en Marcos Paz.';
+    const imageUrl = `${environment.baseUrl}/assets/img/branding/og-celulares.jpg`;
+
+    this.titleService.setTitle(title);
+    
+    // Standard Meta
+    this.metaService.updateTag({ name: 'description', content: description });
+    this.metaService.updateTag({ name: 'keywords', content: 'reparación de celulares, cambio de pantalla, marcos paz, arreglo de celulares, servicio técnico' });
+
+    // Open Graph
+    this.metaService.updateTag({ property: 'og:title', content: title });
+    this.metaService.updateTag({ property: 'og:description', content: description });
+    this.metaService.updateTag({ property: 'og:image', content: imageUrl });
+    this.metaService.updateTag({ property: 'og:url', content: `${environment.baseUrl}/celular` });
+    this.metaService.updateTag({ property: 'og:type', content: 'website' });
+
+    // Twitter
+    this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.metaService.updateTag({ name: 'twitter:title', content: title });
+    this.metaService.updateTag({ name: 'twitter:description', content: description });
+    this.metaService.updateTag({ name: 'twitter:image', content: imageUrl });
   }
 
   async sendContactForm() {
     if (!this.contactName || !this.contactPhone || !this.contactMessage) {
-      this.notificationService.showWarning('Por favor completa todos los campos.');
+      this.notificationService.showWarning(
+        'Por favor completa todos los campos.',
+      );
       return;
     }
 
@@ -114,29 +164,33 @@ export class CelularLandingComponent implements OnInit {
     this.cdr.markForCheck();
 
     const contactData: CreateMessageDto = {
-        name: this.contactName,
-        phone: this.contactPhone,
-        email: 'lp-celular@arecofix.com', // Explicitly setting destination/source email for this landing
-        subject: 'Consulta desde Landing Celulares',
-        message: this.contactMessage,
+      name: this.contactName,
+      phone: this.contactPhone,
+      email: 'lp-celular@arecofix.com', // Explicitly setting destination/source email for this landing
+      subject: 'Consulta desde Landing Celulares',
+      message: this.contactMessage,
     };
 
     const { error } = await this.contactService.createMessage(contactData);
 
     if (error) {
-         this.logger.error('Error sending message:', error);
-         this.notificationService.showError('Hubo un problema al enviar el mensaje. Redireccionando a WhatsApp...');
-         
-         const text = `Hola Arecofix, soy ${this.contactName}. ${this.contactMessage}`;
-         window.open(
-            `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(text)}`,
-            '_blank'
-         );
+      this.logger.error('Error sending message:', error);
+      this.notificationService.showError(
+        'Hubo un problema al enviar el mensaje. Redireccionando a WhatsApp...',
+      );
+
+      const text = `Hola Arecofix, soy ${this.contactName}. ${this.contactMessage}`;
+      window.open(
+        `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(text)}`,
+        '_blank',
+      );
     } else {
-        this.notificationService.showSuccess('¡Consulta enviada con éxito! Te responderemos a la brevedad.');
-        this.contactName = '';
-        this.contactPhone = '';
-        this.contactMessage = '';
+      this.notificationService.showSuccess(
+        '¡Consulta enviada con éxito! Te responderemos a la brevedad.',
+      );
+      this.contactName = '';
+      this.contactPhone = '';
+      this.contactMessage = '';
     }
 
     this.sendingContact = false;

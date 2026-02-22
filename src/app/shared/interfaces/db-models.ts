@@ -17,7 +17,7 @@ export interface DbOrder {
     customer_name: string;
     customer_email: string;
     customer_phone: string | null;
-    customer_address: string | null;
+    customer_address: any | null;
     customer_id: string | null;
     status: 'pending' | 'processing' | 'completed' | 'cancelled';
     subtotal: number;

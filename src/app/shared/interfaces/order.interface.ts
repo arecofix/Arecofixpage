@@ -1,3 +1,15 @@
+export interface Address {
+    street: string;
+    number?: string;
+    city: string;
+    state?: string;
+    zip?: string;
+    neighborhood?: string;
+    floor?: string;
+    appartment?: string;
+    notes?: string;
+}
+
 export interface Order {
     id?: string;
     order_number?: string;
@@ -5,7 +17,7 @@ export interface Order {
     customer_name: string;
     customer_email: string;
     customer_phone?: string;
-    customer_address?: string;
+    customer_address?: Address;
     status: 'pending' | 'processing' | 'completed' | 'cancelled';
 
     subtotal: number;

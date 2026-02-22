@@ -26,7 +26,7 @@ export interface Repair {
     readonly imei?: string;
     readonly repair_number?: number;
     readonly issue_description: string;
-    readonly status: RepairStatus;
+    readonly current_status_id: number;
     readonly estimated_cost?: number;
     readonly final_cost?: number;
     readonly deposit_amount?: number;
@@ -76,7 +76,7 @@ export interface CreateRepairDto {
  * Repair update DTO
  */
 export interface UpdateRepairDto extends Partial<CreateRepairDto> {
-    readonly status?: RepairStatus;
+    readonly current_status_id?: number;
     readonly final_cost?: number;
     readonly technician_id?: string;
     readonly completed_at?: string;

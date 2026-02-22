@@ -61,17 +61,18 @@ export class OrderService {
         );
     }
 
-    async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | null }> {
+    async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: Error | PostgrestError | null }> {
         try {
             const orderId = crypto.randomUUID();
-            const orderNumber = `ORD-${Date.now()}`;
+            const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
+            // Strict Payload construction for Supabase JSONB
             const insertPayload: Partial<DbOrder> = {
                 id: orderId,
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone || null,
-                customer_address: order.customer_address || null,
+                customer_address: order.customer_address || null, // Sent as JSON object
                 status: order.status || 'pending',
                 subtotal: order.subtotal,
                 tax: order.tax,
@@ -110,9 +111,9 @@ export class OrderService {
                 created_at: new Date().toISOString() 
             };
             return { data: orderData, error: null };
-        } catch (error: unknown) {
-            this.handleError('Error creating order', error);
-            return { data: null, error: error as PostgrestError };
+        } catch (error: any) {
+            this.handleError('Critical error creating order', error);
+            return { data: null, error: error };
         }
     }
 

@@ -57,26 +57,28 @@ export class TrackingPage implements OnInit {
         }
     }
 
-    getStatusLabel(status: string): string {
-        const statusMap: Record<string, string> = {
-            'pending': 'Pendiente',
-            'in_progress': 'En Progreso',
-            'completed': 'Completado',
-            'delivered': 'Entregado',
-            'cancelled': 'Cancelado'
+    getStatusLabel(statusId: number): string {
+        const statusMap: Record<number, string> = {
+            1: 'Pendiente',
+            2: 'En Progreso',
+            3: 'Esperando Repuestos',
+            4: 'Completado',
+            5: 'Entregado',
+            6: 'Cancelado'
         };
-        return statusMap[status] || status;
+        return statusMap[statusId] || 'Pendiente';
     }
 
-    getStatusColor(status: string): string {
-        const colorMap: Record<string, string> = {
-            'pending': 'badge-warning',
-            'in_progress': 'badge-info',
-            'completed': 'badge-success',
-            'delivered': 'badge-success',
-            'cancelled': 'badge-error'
+    getStatusColor(statusId: number): string {
+        const colorMap: Record<number, string> = {
+            1: 'badge-warning',
+            2: 'badge-info',
+            3: 'badge-secondary',
+            4: 'badge-success',
+            5: 'badge-success',
+            6: 'badge-error'
         };
-        return colorMap[status] || 'badge-ghost';
+        return colorMap[statusId] || 'badge-ghost';
     }
 
     openImage(url: string) {

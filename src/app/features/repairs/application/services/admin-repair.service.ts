@@ -9,25 +9,23 @@ import { Observable, firstValueFrom } from 'rxjs';
 export class AdminRepairService {
     private repository = inject(RepairRepository);
 
+    // Status IDs Mapping (Standardized)
+    private readonly STATUS_COMPLETED = 4;
+    private readonly STATUS_DELIVERED = 5;
+
     async getById(id: string): Promise<Repair> {
         return firstValueFrom(this.repository.getById(id));
     }
 
-    async create(dto: CreateRepairDto & { status: RepairStatus, final_cost: number, tracking_code?: string }): Promise<Repair> {
+    async create(dto: CreateRepairDto & { current_status_id: number, final_cost: number, tracking_code?: string }): Promise<Repair> {
         const payload = { ...dto };
         
-        // Logic: Auto-generate tracking code if missing
         if (!payload.tracking_code) {
-             // We need to extend CreateRepairDto to allow tracking_code or handle it in repo?
-             // Actually, tracking_code is readonly in entity but required for creation usually. 
-             // Let's assume the DB or logic sets it. Here we explicitly set it.
-             // We need to cast or update DTO definition if we want strict typing about tracking_code.
-             // For now, let's treat it as part of CreateRepairDto extended.
              (payload as any).tracking_code = this.generateTrackingCode();
         }
 
         // Logic: Set completed_at if status is final
-        if (this.isFinalStatus(payload.status)) {
+        if (this.isFinalStatus(payload.current_status_id)) {
             (payload as any).completed_at = new Date().toISOString();
         }
 
@@ -38,7 +36,7 @@ export class AdminRepairService {
         const payload = { ...dto };
 
         // Logic: Set completed_at if status changes to final
-        if (payload.status && this.isFinalStatus(payload.status)) {
+        if (payload.current_status_id && this.isFinalStatus(payload.current_status_id)) {
             payload.completed_at = new Date().toISOString();
         }
 
@@ -50,10 +48,10 @@ export class AdminRepairService {
     }
 
     private generateTrackingCode(): string {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        return Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
     }
 
-    private isFinalStatus(status: RepairStatus): boolean {
-        return status === RepairStatus.COMPLETED || status === RepairStatus.DELIVERED;
+    private isFinalStatus(statusId: number): boolean {
+        return statusId === this.STATUS_COMPLETED || statusId === this.STATUS_DELIVERED;
     }
 }
