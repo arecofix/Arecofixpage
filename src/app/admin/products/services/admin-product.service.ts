@@ -18,11 +18,14 @@ export class AdminProductService {
     private brandRepo = inject(BrandRepository);
     private categoryRepo = inject(CategoryRepository);
     private csvService = inject(CsvService);
-    // Needed for storage and bulk ops not yet in repo
     private auth = inject(AuthService);
-    private supabase = this.auth.getSupabaseClient();
 
     async getProducts(): Promise<Product[]> {
+        const user = this.auth.getCurrentUser();
+        if (user) {
+            const profile = await this.auth.getUserProfile(user.id);
+            return firstValueFrom(this.productRepo.getAll(profile?.branch_id));
+        }
         return firstValueFrom(this.productRepo.getAll());
     }
 
@@ -47,13 +50,7 @@ export class AdminProductService {
     }
 
     async uploadImage(file: File): Promise<string> {
-        const filePath = `products/${Date.now()}-${file.name}`;
-        const { data, error } = await this.supabase.storage.from('public-assets').upload(filePath, file);
-
-        if (error) throw error;
-
-        const { data: publicUrl } = this.supabase.storage.from('public-assets').getPublicUrl(data.path);
-        return publicUrl.publicUrl;
+        return this.productRepo.uploadImage(file);
     }
 
     slugify(text: string): string {
@@ -74,95 +71,63 @@ export class AdminProductService {
     }
 
     async importProductsFromCSV(file: File): Promise<{ success: number; errors: number }> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
+        const result = await this.csvService.parse<Product>(file, (values, headers) => {
+            const product: Record<string, any> = {};
             
-            reader.onload = async (e: ProgressEvent<FileReader>) => {
-                try {
-                    const csv = e.target?.result as string;
-                    if (!csv) throw new Error('Empty file');
-                    
-                    // Use CsvService logic if we want, but since we have specific mapping logic here that relies on indices...
-                    // Actually, CsvService parses lines. We can reuse parseLine logic if public, or just refactor whole thing.
-                    // Let's rely on standard CsvService.
-                    // Wait, CsvService returns parsed objects based on a callback.
-                    
-                    const result = await this.csvService.parse<Product>(file, (values, headers) => {
-                        const product: Record<string, any> = {};
-                        
-                        headers.forEach((header: string, index: number) => {
-                            let value = values[index]?.trim();
-                             // Remove surrounding quotes if present (CsvService handles this if parseLine does, but CsvService.parseLine handles quotes internally)
-                             // wait, CsvService.parse calls parseLine which returns clean values?
-                             // Yes, parseLine in CsvService handles quotes and returns clean values.
-                             // So we just take the value.
-                            
-                            if (value === '' || value === undefined) {
-                                product[header] = null;
-                            } else if (header === 'price' || header === 'stock' || header === 'min_stock_alert') {
-                                product[header] = Number(value);
-                            } else if (header === 'is_active' || header === 'is_featured') {
-                                product[header] = value.toLowerCase() === 'true';
-                            } else {
-                                product[header] = value;
-                            }
-                        });
-
-                        // Remove id if it's empty or new placeholder to allow auto-generation
-                        if (!product['id'] || product['id'] === 'new') {
-                             delete product['id'];
-                        }
-
-                        // Basic validation
-                        if (product['name'] && (product['price'] === undefined || product['price'] >= 0)) {
-                             return product as Product;
-                        }
-                        return null;
-                    });
-                    
-                    const productsToUpsert = result.data;
-                    
-                    if (productsToUpsert.length > 0) {
-                        try {
-                            const upserted = await firstValueFrom(this.productRepo.upsertMany(productsToUpsert));
-                            // success count = imported/updated count
-                            resolve({ success: upserted.length, errors: result.errors });
-                        } catch (e) {
-                             reject(e);
-                        }
-                    } else {
-                        resolve({ success: 0, errors: result.errors });
-                    }
-                } catch (error) {
-                    reject(error);
+            headers.forEach((header: string, index: number) => {
+                let value = values[index]?.trim();
+                
+                if (value === '' || value === undefined) {
+                    product[header] = null;
+                } else if (header === 'price' || header === 'stock' || header === 'min_stock_alert') {
+                    product[header] = Number(value);
+                } else if (header === 'is_active' || header === 'is_featured') {
+                    product[header] = value.toLowerCase() === 'true';
+                } else {
+                    product[header] = value;
                 }
-            };
+            });
 
-            reader.onerror = (error) => reject(error);
-            reader.readAsText(file);
+            if (!product['id'] || product['id'] === 'new') {
+                 delete product['id'];
+            }
+
+            if (product['name'] && (product['price'] === undefined || product['price'] >= 0)) {
+                 return product as Product;
+            }
+            return null;
         });
+        
+        const productsToUpsert = result.data;
+        
+        if (productsToUpsert.length > 0) {
+            const upserted = await firstValueFrom(this.productRepo.upsertMany(productsToUpsert));
+            return { success: upserted.length, errors: result.errors };
+        } else {
+            return { success: 0, errors: result.errors };
+        }
     }
 
     async bulkUpdate(ids: string[], payload: Partial<Product>): Promise<void> {
-        // Prepare updates for each ID
         const updates = ids.map(id => ({ id, ...payload }));
         await firstValueFrom(this.productRepo.updateMany(updates));
     }
 
+    async bulkCustomUpdate(updates: Partial<Product>[]): Promise<void> {
+        await firstValueFrom(this.productRepo.upsertMany(updates));
+    }
+
     async bulkIncreasePrice(ids: string[], percentage: number): Promise<void> {
-        // 1. Get current products
         const response = await firstValueFrom(this.productRepo.findWithFilters({ ids: ids }));
-        const products = response.data; // Access data property from response
+        const products = response.data;
 
         if (!products || products.length === 0) return;
 
-        // 2. Prepare updates
         const updates = products.map(p => ({
             id: p.id,
             price: Math.round(p.price * (1 + percentage / 100))
         }));
 
-        // 3. Perform Update
         await firstValueFrom(this.productRepo.updateMany(updates));
     }
 }

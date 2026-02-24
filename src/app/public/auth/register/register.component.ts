@@ -252,7 +252,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
-  private parseAuthError(error: string): string {
+  private parseAuthError(error: any): string {
+    const errorMsg = error?.message || error || '';
     const errorMap: { [key: string]: string } = {
       'User already registered': 'Este email ya está registrado.',
       'Weak password': 'La contraseña debe tener al menos 8 caracteres con mayúsculas, minúsculas, números y caracteres especiales.',
@@ -262,11 +263,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     };
 
     for (const [key, value] of Object.entries(errorMap)) {
-      if (error.toLowerCase().includes(key.toLowerCase())) {
+      if (typeof errorMsg === 'string' && errorMsg.toLowerCase().includes(key.toLowerCase())) {
         return value;
       }
     }
 
-    return error || 'Error al crear la cuenta.';
+    return typeof errorMsg === 'string' ? errorMsg : 'Error al crear la cuenta.';
   }
 }

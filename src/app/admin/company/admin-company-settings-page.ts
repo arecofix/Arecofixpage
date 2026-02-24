@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-admin-company-settings-page',
@@ -11,6 +12,7 @@ import { AuthService } from '@app/core/services/auth.service';
 })
 export class AdminCompanySettingsPage implements OnInit {
     private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
 
     form = signal({
         id: '',
@@ -39,22 +41,27 @@ export class AdminCompanySettingsPage implements OnInit {
     async loadSettings() {
         this.loading.set(true);
         const supabase = this.auth.getSupabaseClient();
-        const { data, error } = await supabase.from('company_settings').select('*').maybeSingle();
+        const tenantId = this.tenantService.getTenantId();
+        
+        const { data, error } = await supabase.from('tenants')
+            .select('*')
+            .eq('id', tenantId)
+            .single();
 
         if (data) {
             this.form.set({
                 id: data.id,
                 name: data.name,
-                owner_name: data.owner_name || '',
-                ruc: data.ruc || '',
-                address: data.address || '',
+                owner_name: '', // Removed from schema
+                ruc: data.tax_id_name || 'CUIT/CUIL', // Mapped to tax_id_name roughly
+                address: data.location || '',
                 tax_percentage: data.tax_percentage || 21,
                 tax_abbreviation: data.tax_abbreviation || 'IVA',
-                email: data.email || '',
-                phone: data.phone || '',
+                email: data.contact_email || '',
+                phone: data.contact_phone || '',
                 location: data.location || '',
                 currency: data.currency || 'ARS',
-                logo_url: data.logo_url || '',
+                logo_url: data.branding_settings?.logo_url || '',
             });
         } else if (error && error.code !== 'PGRST116') { // PGRST116 is "The result contains 0 rows"
             this.error.set(error.message);
@@ -82,19 +89,33 @@ export class AdminCompanySettingsPage implements OnInit {
         this.success.set(null);
         const supabase = this.auth.getSupabaseClient();
         const payload = { ...this.form() };
-        // Remove id from payload if it's empty (for insert) but we usually upsert based on ID if exists
-        const { id, ...updateData } = payload;
+        const tenantId = this.tenantService.getTenantId();
+
+        const updateData = {
+            name: payload.name,
+            tax_id_name: payload.ruc,
+            location: payload.address || payload.location, // Merging address/location
+            tax_percentage: payload.tax_percentage,
+            tax_abbreviation: payload.tax_abbreviation,
+            contact_email: payload.email,
+            contact_phone: payload.phone,
+            currency: payload.currency,
+            branding_settings: {
+                logo_url: payload.logo_url,
+                primary_color: '#3b82f6'
+            },
+            updated_at: new Date().toISOString()
+        };
 
         try {
-            if (id) {
-                const { error } = await supabase.from('company_settings').update(updateData).eq('id', id);
-                if (error) throw error;
-            } else {
-                const { error } = await supabase.from('company_settings').insert(updateData);
-                if (error) throw error;
-            }
-            this.success.set('Configuración guardada correctamente');
-            await this.loadSettings(); // Reload to get ID if it was an insert
+            const { error } = await supabase.from('tenants')
+                .update(updateData)
+                .eq('id', tenantId);
+
+            if (error) throw error;
+            
+            this.success.set('Configuración de la empresa guardada correctamente');
+            await this.loadSettings(); 
         } catch (e: any) {
             this.error.set(e.message);
         } finally {

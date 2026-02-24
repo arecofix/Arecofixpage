@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-admin-brand-form-page',
@@ -14,6 +15,7 @@ export class AdminBrandFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
 
     id: string | null = null;
     form = signal({
@@ -31,7 +33,11 @@ export class AdminBrandFormPage implements OnInit {
         this.id = this.route.snapshot.paramMap.get('id');
         if (this.id) {
             const supabase = this.auth.getSupabaseClient();
-            const { data, error } = await supabase.from('brands').select('*').eq('id', this.id).single();
+            const { data, error } = await supabase.from('brands')
+                .select('*')
+                .eq('tenant_id', this.tenantService.getTenantId())
+                .eq('id', this.id)
+                .single();
             if (data) {
                 this.form.set({
                     name: data.name,
@@ -70,10 +76,16 @@ export class AdminBrandFormPage implements OnInit {
 
         try {
             if (this.id) {
-                const { error } = await supabase.from('brands').update(payload).eq('id', this.id);
+                const { error } = await supabase.from('brands')
+                    .update(payload)
+                    .eq('id', this.id)
+                    .eq('tenant_id', this.tenantService.getTenantId());
                 if (error) throw error;
             } else {
-                const { error } = await supabase.from('brands').insert(payload);
+                const { error } = await supabase.from('brands').insert({
+                    ...payload,
+                    tenant_id: this.tenantService.getTenantId()
+                });
                 if (error) throw error;
             }
             this.router.navigate(['/admin/brands']);

@@ -6,7 +6,7 @@ import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.i
 import { AuthService } from '@app/core/services/auth.service';
 
 import { OrderNotificationService } from '@app/features/orders/services/order-notification.service'; // Import Ecommerce Notification service
-
+import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 
 interface ProductOption {
     id: string;
@@ -29,6 +29,7 @@ export class AdminOrderFormPage implements OnInit {
     private orderService = inject(OrderService);
     private authService = inject(AuthService);
     private orderNotificationService = inject(OrderNotificationService); // Inject Ecommerce Service
+    private productRepository = inject(ProductRepository); // Inject clean ProductRepository
     private cdr = inject(ChangeDetectorRef);
 
 
@@ -45,7 +46,7 @@ export class AdminOrderFormPage implements OnInit {
         customer_name: '',
         customer_email: '',
         customer_phone: '',
-        customer_address: {
+        shipping_address: {
             street: '',
             number: '',
             city: 'Marcos Paz',
@@ -78,16 +79,19 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     async loadProducts() {
-        const supabase = this.authService.getSupabaseClient();
-        const { data, error } = await supabase
-            .from('products')
-            .select('id, name, sku, price, stock')
-            .eq('is_active', true)
-            .order('name');
-
-        if (!error && data) {
-            this.products = data;
-        }
+        this.productRepository.findAvailable().subscribe({
+            next: (products) => {
+                this.products = products.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    sku: p.sku || '',
+                    price: p.price,
+                    stock: p.stock || 0
+                }));
+                this.cdr.markForCheck();
+            },
+            error: (err) => console.error('Error loading products', err)
+        });
     }
 
     async loadOrder() {
@@ -95,7 +99,7 @@ export class AdminOrderFormPage implements OnInit {
 
         this.orderService.getOrderById(this.id).subscribe({
             next: (order: OrderWithItems) => {
-                let address = order.customer_address;
+                let address = order.shipping_address;
                 if (typeof address === 'string') {
                     address = {
                         street: address,
@@ -109,7 +113,7 @@ export class AdminOrderFormPage implements OnInit {
                     customer_name: order.customer_name,
                     customer_email: order.customer_email,
                     customer_phone: order.customer_phone,
-                    customer_address: address || { street: '', number: '', city: '', neighborhood: '' },
+                    shipping_address: address || { street: '', number: '', city: '', neighborhood: '' },
                     status: order.status,
                     subtotal: order.subtotal,
                     tax: order.tax,
@@ -210,7 +214,7 @@ export class AdminOrderFormPage implements OnInit {
         this.cdr.markForCheck();
     }
 
-    updateStatus(newStatus: 'pending' | 'processing' | 'completed' | 'cancelled') {
+    updateStatus(newStatus: Order['status']) {
         this.form.update(f => ({ ...f, status: newStatus }));
         this.cdr.markForCheck();
     }

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build:ssr": "ng build",
+    "serve:ssr": "node dist/arecofix/server/server.js",
+    "firebase:build": "npm run build:ssr",
+    "firebase:serve": "firebase emulators:start",
+    "firebase:deploy": "npm run firebase:build && firebase deploy --only functions,hosting"
+  }
+}

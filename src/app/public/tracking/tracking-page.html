@@ -1,126 +1,172 @@
-<div class="py-10 px-4">
-    <div class="max-w-md mx-auto bg-base-100 rounded-xl shadow-xl overflow-hidden text-base-content">
+<div class="py-10 px-4 min-h-screen bg-neutral-50 no-print">
+    <div class="max-w-xl mx-auto">
         <!-- Header -->
-        <div class="bg-primary p-6 text-center">
-            <h1 class="text-2xl font-bold text-white mb-2">Estado de Reparación</h1>
-            <p class="text-primary-content opacity-80 text-sm">Seguimiento en tiempo real</p>
+        <div class="mb-8 text-center">
+            <h1 class="text-2xl font-black text-neutral-800 tracking-tighter uppercase mb-1">Arecofix <span class="text-primary">Tracking</span></h1>
+            <p class="text-xs text-neutral-400 font-medium uppercase tracking-widest">Estado Técnico en Tiempo Real</p>
         </div>
 
-        <div class="p-6">
+        <div class="bg-white rounded-3xl shadow-2xl shadow-neutral-200/50 overflow-hidden border border-neutral-100">
             @if (loading()) {
-            <div class="flex flex-col items-center justify-center py-8">
-                <span class="loading loading-spinner loading-lg text-primary"></span>
-                <p class="mt-4 text-base-content/70">Buscando reparación...</p>
+            <div class="p-12 flex flex-col items-center">
+                <span class="loading loading-ring loading-lg text-primary"></span>
+                <p class="mt-4 text-xs font-bold text-neutral-400 uppercase animate-pulse">Consultando Satélite...</p>
             </div>
             } @else if (error()) {
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ error() }}</span>
-            </div>
-            <div class="mt-6 text-center">
-                <a routerLink="/" class="btn btn-outline btn-sm">Volver al Inicio</a>
+            <div class="p-12 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-rose-50 text-rose-500 rounded-full mb-6">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-black text-neutral-800 mb-2">{{ error() }}</h2>
+                <p class="text-sm text-neutral-400 mb-8 font-medium">Verificá tu código o contactanos por WhatsApp.</p>
+                <div class="flex flex-col gap-3">
+                    <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-success text-white rounded-2xl">
+                        <i class="fab fa-whatsapp text-lg"></i> Soporte Directo
+                    </a>
+                    <a routerLink="/" class="btn btn-ghost btn-sm text-neutral-400">Volver al inicio</a>
+                </div>
             </div>
             } @else if (repair(); as r) {
-            <!-- Status Badge -->
-            <div class="flex justify-center mb-6">
-                <div class="badge {{ getStatusColor(r.current_status_id) }} badge-lg p-4 font-bold uppercase">
-                    {{ getStatusLabel(r.current_status_id) }}
+            <!-- Status Card -->
+            <div class="p-6 transition-all duration-500" [ngClass]="getStatusColor(r.current_status_id)">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Estado de Reparación</span>
+                    <span class="text-[10px] font-mono font-bold opacity-60">#{{ r.tracking_code }}</span>
                 </div>
+                <h2 class="text-3xl font-black leading-tight mb-2 tracking-tight">
+                    {{ getStatusLabel(r.current_status_id) }}
+                </h2>
+                <p class="text-sm font-medium opacity-80 leading-relaxed">
+                    Tu {{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
+                </p>
             </div>
 
-            <!-- Device Info -->
-            <div class="space-y-4">
-                <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-base-content/70">Código de Seguimiento</span>
-                    <span class="font-bold text-primary">{{ r.tracking_code }}</span>
-                </div>
-
-                <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-base-content/70">Dispositivo</span>
-                    <span class="font-bold text-base-content">{{ r.device_model }}</span>
-                </div>
-
-                <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-base-content/70">IMEI / Serie</span>
-                    <span class="font-bold text-base-content">{{ r.imei || 'N/A' }}</span>
-                </div>
-
-
-                <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-base-content/70">Cliente</span>
-                    <span class="font-bold text-base-content">{{ r.customer_name }}</span>
-                </div>
-
-                <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-base-content/70">Fecha Ingreso</span>
-                    <span class="font-bold text-base-content">{{ (r.received_at || r.created_at) |
-                        date:'dd/MM/yyyy'
-                        }}</span>
-                </div>
-
-                @if (r.completed_at) {
-                <div class="flex justify-between border-b border-base-200 pb-2">
-                    <span class="font-semibold text-base-content/70">Fecha Completado</span>
-                    <span class="font-bold text-base-content">{{ r.completed_at | date:'dd/MM/yyyy' }}</span>
-                </div>
-                }
-
-                <div class="py-2">
-                    <span class="block font-semibold text-base-content/70 mb-1">Problema Reportado</span>
-                    <p class="text-sm bg-base-200 p-3 rounded-lg text-base-content">{{ r.issue_description }}</p>
-                </div>
-
-                @if (r.technician_notes && (r.current_status_id === 4 || r.current_status_id === 5))
-                {
-                <div class="py-2">
-                    <span class="block font-semibold text-base-content/70 mb-1">Diagnóstico / Solución</span>
-                    <p class="text-sm bg-green-50 p-3 rounded-lg border border-green-100 text-green-800">
-                        {{ r.technician_notes }}
-                    </p>
-                </div>
-                }
-
-                @if (r.images && r.images.length > 0) {
-                <div class="py-2">
-                    <span class="block font-semibold text-base-content/70 mb-2">Imágenes del Estado</span>
-                    <div class="grid grid-cols-2 gap-2">
-                        @for (img of r.images; track img) {
-                        <div class="aspect-square bg-base-200 rounded-lg overflow-hidden border border-base-300">
-                            <img [src]="img"
-                                class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                alt="Estado del equipo" (click)="openImage(img)">
-                        </div>
+            <div class="p-6 space-y-8">
+                <!-- Progress Line -->
+                <div class="relative pt-4">
+                    <div class="flex justify-between mb-4">
+                        @for (step of [1,2,3,4,5]; track step) {
+                            <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] font-black transition-all duration-500"
+                                [ngClass]="r.current_status_id >= step ? 'bg-primary border-primary text-white scale-110 shadow-lg shadow-primary/30' : 'bg-white border-neutral-100 text-neutral-300'">
+                                {{ step }}
+                            </div>
                         }
                     </div>
-                </div>
-                }
-
-                <!-- Costs -->
-                <div class="bg-base-200 p-4 rounded-lg mt-4">
-                    <div class="flex justify-between mb-1">
-                        <span class="text-sm text-base-content/70">Presupuesto</span>
-                        <span class="font-bold text-base-content">${{ r.estimated_cost }}</span>
-                    </div>
-                    <div class="flex justify-between mb-1 text-green-600 dark:text-green-400">
-                        <span class="text-sm">Seña</span>
-                        <span class="font-bold">-${{ r.deposit_amount }}</span>
-                    </div>
-                    <div class="divider my-1"></div>
-                    <div class="flex justify-between text-lg">
-                        <span class="font-bold text-base-content">Total a Pagar</span>
-                        <span class="font-bold text-primary">${{ (r.final_cost || r.estimated_cost || 0) -
-                            (r.deposit_amount || 0) }}</span>
+                    <div class="absolute top-[36px] left-0 right-0 h-0.5 bg-neutral-100 -z-10">
+                        <div class="h-full bg-primary transition-all duration-1000" [style.width.%]="(r.current_status_id - 1) * 25"></div>
                     </div>
                 </div>
-            </div>
 
-            <div class="mt-8 text-center">
-                <a [href]="'https://wa.me/' + whatsappNumber" target="_blank"
-                    class="btn btn-success btn-wide text-white">
-                    <i class="fab fa-whatsapp mr-2"></i> Consultar
-                </a>
+                <!-- Info Grid -->
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="bg-neutral-50 rounded-2xl p-5 border border-neutral-100">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none mb-1">Equipo en Taller</h4>
+                                <p class="text-sm font-bold text-neutral-800">{{ r.device_model }}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-neutral-400 font-medium">Fecha de Ingreso</span>
+                                <span class="text-neutral-800 font-bold uppercase">{{ (r.received_at || r.created_at) | date:'dd MMM yyyy' }}</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-neutral-400 font-medium">Motivo</span>
+                                <span class="text-neutral-600 font-medium wrap-break-word text-right max-w-[180px]">"{{ r.issue_description }}"</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (r.technician_notes || r.technical_report) {
+                    <div class="bg-primary/5 rounded-2xl p-5 border border-primary/10">
+                        <h4 class="text-[10px] font-black text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
+                             <span class="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
+                             Reporte Técnico
+                        </h4>
+                        <p class="text-xs font-medium text-neutral-700 leading-relaxed italic">
+                            "{{ r.technical_report || r.technician_notes }}"
+                        </p>
+                    </div>
+                    }
+
+                    <div class="bg-neutral-800 rounded-3xl p-6 text-white shadow-xl shadow-neutral-900/20">
+                        <div class="flex justify-between items-end mb-6">
+                            <div>
+                                <h4 class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-1">Presupuesto Final</h4>
+                                <p class="text-3xl font-black tracking-tighter">${{ (r.final_cost || r.estimated_cost || 0) - (r.deposit_amount || 0) }}</p>
+                            </div>
+                            <div class="text-right">
+                                @if (r.deposit_amount && r.deposit_amount > 0) {
+                                    <span class="badge badge-success text-[8px] font-black text-white p-2">SEÑA ENTREGADA: ${{ r.deposit_amount }}</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white/10 border-none text-white hover:bg-white/20 text-[10px] font-black uppercase">
+                                <i class="fas fa-print"></i> Talón
+                            </button>
+                            <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase">
+                                <i class="fab fa-whatsapp"></i> Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
             }
         </div>
+        
+        <div class="mt-10 text-center">
+            <p class="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.3em]">ArecoFix &copy; 2024</p>
+        </div>
     </div>
 </div>
+
+<!-- Print Only Ticket -->
+@if (repair(); as r) {
+<div class="print-only p-8 font-mono text-xs w-[80mm] mx-auto">
+    <div class="text-center mb-6 border-b border-black pb-4">
+        <h1 class="text-xl font-black uppercase">ARECOFIX</h1>
+        <p class="text-[8px] uppercase tracking-tighter">Gestión Técnica Profesional</p>
+        <p class="mt-2">OT #: {{ r.repair_number || '---' }}</p>
+    </div>
+
+    <div class="space-y-3 mb-6">
+        <div class="flex justify-between">
+            <span>TRACKING:</span>
+            <span class="font-bold">{{ r.tracking_code }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span>FECHA:</span>
+            <span>{{ (r.received_at || r.created_at) | date:'dd/MM/yy HH:mm' }}</span>
+        </div>
+        <div class="flex justify-between border-t border-black pt-2">
+            <span>CLIENTE:</span>
+            <span class="font-bold text-right truncate max-w-[120px]">{{ r.customer_name }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span>EQUIPO:</span>
+            <span class="font-bold text-right truncate max-w-[120px]">{{ r.device_model }}</span>
+        </div>
+    </div>
+
+    <div class="border-y border-black py-3 text-center mb-6">
+        <p class="font-bold uppercase mb-1">Saldo a Pagar</p>
+        <p class="text-2xl font-black">${{ (r.final_cost || r.estimated_cost || 0) - (r.deposit_amount || 0) }}</p>
+    </div>
+
+    <div class="text-[8px] leading-tight space-y-2 mb-8">
+        <p>* Presentar este talón para el retiro.</p>
+        <p>* No se entregan equipos sin comprobante.</p>
+        <p>* Garantía: 30 días sobre el trabajo realizado.</p>
+    </div>
+
+    <div class="text-center">
+        <div class="w-32 h-px bg-black mx-auto mb-1"></div>
+        <p class="text-[8px]">FIRMA TÉCNICA</p>
+    </div>
+</div>
+}

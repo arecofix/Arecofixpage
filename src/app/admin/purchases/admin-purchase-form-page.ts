@@ -3,6 +3,8 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
+import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 
 @Component({
     selector: 'app-admin-purchase-form-page',
@@ -13,6 +15,8 @@ import { AuthService } from '@app/core/services/auth.service';
 export class AdminPurchaseFormPage implements OnInit {
     private auth = inject(AuthService);
     private router = inject(Router);
+    private tenantService = inject(TenantService);
+    private productRepository = inject(ProductRepository);
 
     suppliers = signal<any[]>([]);
     products = signal<any[]>([]);
@@ -33,14 +37,21 @@ export class AdminPurchaseFormPage implements OnInit {
 
     async ngOnInit() {
         const supabase = this.auth.getSupabaseClient();
+        const tenantId = this.tenantService.getTenantId();
 
-        const [suppliersRes, productsRes] = await Promise.all([
-            supabase.from('suppliers').select('*').eq('is_active', true),
-            supabase.from('products').select('*').eq('is_active', true)
-        ]);
+        // 1. Fetch products using the clean Repository pattern
+        this.productRepository.findAvailable().subscribe(products => {
+            this.products.set(products);
+        });
 
-        if (suppliersRes.data) this.suppliers.set(suppliersRes.data);
-        if (productsRes.data) this.products.set(productsRes.data);
+        // 2. Safely fetch suppliers avoiding data leaks
+        const { data: suppliersRes } = await supabase
+            .from('suppliers')
+            .select('*')
+            .eq('is_active', true)
+            .eq('tenant_id', tenantId);
+
+        if (suppliersRes) this.suppliers.set(suppliersRes);
 
         this.loading.set(false);
     }
@@ -77,14 +88,17 @@ export class AdminPurchaseFormPage implements OnInit {
         const supabase = this.auth.getSupabaseClient();
 
         try {
+            const tenantId = this.tenantService.getTenantId();
+
             // 1. Create Purchase
             const { data: purchase, error: purchaseError } = await supabase
                 .from('purchases')
                 .insert({
                     supplier_id: this.form().supplier_id,
-                    purchase_date: this.form().purchase_date,
+                    date: this.form().purchase_date, // fixed mapped property per schema
                     status: this.form().status,
-                    total_amount: this.total()
+                    total_amount: this.total(),
+                    tenant_id: tenantId
                 })
                 .select()
                 .single();
@@ -96,7 +110,8 @@ export class AdminPurchaseFormPage implements OnInit {
                 purchase_id: purchase.id,
                 product_id: item.product_id,
                 quantity: item.quantity,
-                unit_cost: item.unit_cost
+                unit_cost: item.unit_cost,
+                tenant_id: tenantId
             }));
 
             const { error: itemsError } = await supabase
@@ -108,10 +123,10 @@ export class AdminPurchaseFormPage implements OnInit {
             // 3. Update Stock (if status is received)
             if (this.form().status === 'received') {
                 for (const item of this.items()) {
-                    // Using RPC would be better, but manual update for now
-                    const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.product_id).single();
+                    // Manual update respecting tenant
+                    const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.product_id).eq('tenant_id', tenantId).single();
                     if (currentProduct) {
-                        await supabase.from('products').update({ stock: currentProduct.stock + item.quantity }).eq('id', item.product_id);
+                        await supabase.from('products').update({ stock: currentProduct.stock + item.quantity }).eq('id', item.product_id).eq('tenant_id', tenantId);
                     }
                 }
             }

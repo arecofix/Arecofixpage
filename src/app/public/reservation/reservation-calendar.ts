@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '@app/core/services/auth.service';
+import { ContactService } from '@app/core/services/contact.service';
 
 @Component({
   selector: 'app-reservation-calendar',
@@ -11,7 +11,7 @@ import { AuthService } from '@app/core/services/auth.service';
   styleUrl: './reservation-calendar.css'
 })
 export class ReservationCalendar implements OnInit {
-  private auth = inject(AuthService);
+  private contactService = inject(ContactService);
 
   // Configuración
   whatsappNumber = '5491125960900'; 
@@ -139,7 +139,6 @@ export class ReservationCalendar implements OnInit {
     this.saving = true;
 
     try {
-      const supabase = this.auth.getSupabaseClient();
       const options: Intl.DateTimeFormatOptions = { 
         weekday: 'long', 
         year: 'numeric', 
@@ -148,14 +147,13 @@ export class ReservationCalendar implements OnInit {
       };
       const formattedDate = this.selectedDate.toLocaleDateString('es-ES', options);
       
-      // Save to DB
-      await supabase.from('contact_messages').insert({
+      // Save to DB using isolated service
+      await this.contactService.createMessage({
         name: this.customerName,
         phone: this.customerPhone,
         email: 'reserva@web.com', // Placeholder if email not asked
         subject: `Nueva Reserva: ${formattedDate} ${this.selectedTime}`,
-        message: `Reserva solicitada para el ${formattedDate} a las ${this.selectedTime}. Teléfono: ${this.customerPhone}`,
-        is_read: false
+        message: `Reserva solicitada para el ${formattedDate} a las ${this.selectedTime}. Teléfono: ${this.customerPhone}`
       });
 
       // Send WhatsApp

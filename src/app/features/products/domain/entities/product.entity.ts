@@ -1,3 +1,12 @@
+export interface ProductStockPerBranch {
+    id: string;
+    product_id: string;
+    branch_id: string;
+    quantity: number;
+    min_stock_alert: number;
+    updated_at: string;
+}
+
 /**
  * Product Entity
  * Represents a product in the catalog
@@ -16,13 +25,18 @@ export interface Product {
     is_active: boolean;
     condition?: 'new' | 'used' | 'refurbished';
     warranty?: string;
-    stock: number;
+    stock: number; // General stock (aggregate or legacy)
     min_stock_alert?: number;
     sku?: string;
     barcode?: string;
     currency?: 'ARS' | 'USD';
     created_at: string;
     updated_at: string;
+    tenant_id?: string;
+    deleted_at?: string;
+    
+    // Relations
+    branch_stock?: ProductStockPerBranch[];
 }
 
 /**

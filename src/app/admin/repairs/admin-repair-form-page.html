@@ -172,7 +172,7 @@
                 </div>
 
                 <!-- Security -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="form-control">
                         <label class="label">
                             <span class="label-text font-medium">PIN / Contraseña</span>
@@ -184,40 +184,128 @@
                     </div>
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Patrón de Desbloqueo</span>
+                            <span class="label-text font-medium">Patrón</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-draw-polygon text-gray-400"></i>
                             <input type="text" [(ngModel)]="form().security_pattern" name="security_pattern" class="grow"
-                                placeholder="Descripción del patrón (ej: Z, L, etc)" />
+                                placeholder="Ej: Z, L, etc" />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Passcode (Numérico/Texto)</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-key text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().device_passcode" name="device_passcode" class="grow" placeholder="Contraseña de pantalla" />
                         </label>
                     </div>
                 </div>
 
-                <div class="divider text-sm font-medium text-gray-500">Estado y Costos</div>
+                <div class="divider text-sm font-medium text-gray-500">Gestión Técnica & Repuestos</div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Estado</span>
-                        </label>
-                        <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full">
-                            <option [value]="1">Pendiente</option>
-                            <option [value]="2">En Progreso</option>
-                            <option [value]="3">Esperando Repuestos</option>
-                            <option [value]="4">Completado</option>
-                            <option [value]="5">Entregado</option>
-                            <option [value]="6">Cancelado</option>
-                        </select>
+                <!-- Parts Management -->
+                <div class="form-control bg-neutral-50 p-6 rounded-2xl border border-neutral-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-neutral-800 flex items-center gap-2">
+                            <i class="fas fa-box-open text-primary"></i> Repuestos Utilizados
+                        </h3>
+                        <div class="flex gap-2">
+                             <button type="button" (click)="loadProducts()" class="btn btn-sm btn-outline btn-primary rounded-xl">
+                                <i class="fas fa-plus"></i> Añadir Repuesto
+                             </button>
+                        </div>
                     </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead class="bg-white/50 text-neutral-400">
+                                <tr>
+                                    <th>Repuesto</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-right">Precio Venta</th>
+                                    <th class="text-right">Costo</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (part of form().parts; track $index) {
+                                <tr>
+                                    <td class="font-bold text-neutral-700">{{ part.name }}</td>
+                                    <td class="text-center">
+                                        <input type="number" [(ngModel)]="part.quantity" [name]="'part_qty_' + $index" (change)="calculateFinalCost()"
+                                            class="input input-xs input-bordered w-16 text-center" />
+                                    </td>
+                                    <td class="text-right font-mono text-primary font-bold">
+                                        {{ part.unit_price_at_time | currency:'ARS':'symbol':'1.0-0' }}
+                                    </td>
+                                    <td class="text-right font-mono text-neutral-400 text-[10px]">
+                                        {{ part.cost_at_time | currency:'ARS':'symbol':'1.0-0' }}
+                                    </td>
+                                    <td class="text-right">
+                                        <button type="button" (click)="removePart($index)" class="btn btn-ghost btn-xs text-rose-500">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                }
+                                @if (form().parts.length === 0) {
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-xs italic text-neutral-400">No hay repuestos cargados</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Costo Estimado</span>
+                            <span class="label-text font-medium">Mano de Obra (Labor Técnica)</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-dollar-sign text-gray-400"></i>
-                            <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost" class="grow" min="0" />
+                            <i class="fas fa-tools text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().technical_labor_cost" name="technical_labor_cost" (change)="calculateFinalCost()" class="grow" min="0" />
                         </label>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Estado Final</span>
+                        </label>
+                        <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full">
+                            <option [value]="1">PENDIENTE DE DIAGNÓSTICO</option>
+                            <option [value]="2">GESTIÓN DE REPUESTOS</option>
+                            <option [value]="3">EN REPARACIÓN</option>
+                            <option [value]="4">CONTROL DE CALIDAD</option>
+                            <option [value]="5">LISTO PARA RETIRAR</option>
+                            <option [value]="6">ENTREGADO</option>
+                            <option [value]="7">CANCELADO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-bold text-primary italic">Reporte Técnico (Público)</span>
+                    </label>
+                    <textarea [(ngModel)]="form().technical_report" name="technical_report"
+                        class="textarea textarea-bordered h-24 leading-relaxed font-mono text-xs"
+                        placeholder="Escribe el informe que verá el cliente en la web..."></textarea>
+                </div>
+
+                <div class="divider text-sm font-medium text-gray-500">Resumen Financiero</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Costo Total (Repuestos + Labor)</span>
+                        </label>
+                        <div class="text-3xl font-black text-neutral-800 tracking-tighter">
+                            {{ form().final_cost | currency:'ARS':'symbol':'1.0-0' }}
+                        </div>
                     </div>
                     <div class="form-control">
                         <label class="label">
@@ -230,12 +318,11 @@
                     </div>
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Costo Final</span>
+                            <span class="label-text font-bold text-green-600">Saldo Pendiente</span>
                         </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-cash-register text-gray-400"></i>
-                            <input type="number" [(ngModel)]="form().final_cost" name="final_cost" class="grow" min="0" />
-                        </label>
+                        <div class="text-3xl font-black text-green-600 tracking-tighter">
+                            {{ (form().final_cost - (form().deposit_amount || 0)) | currency:'ARS':'symbol':'1.0-0' }}
+                        </div>
                     </div>
                 </div>
 

@@ -1,111 +1,157 @@
 @if (isOpen()) {
 <div class="modal modal-open z-50">
-  <div class="modal-box w-11/12 max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl relative overflow-hidden">
-    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="close()">✕</button>
+  <div class="modal-box w-11/12 max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl relative p-0 overflow-hidden border border-gray-200 dark:border-gray-700">
     
-    <h3 class="font-bold text-2xl text-gray-800 dark:text-white mb-2">Edición Masiva</h3>
-    <p class="text-sm text-gray-500 mb-6">Aplicando cambios a <span class="badge badge-primary font-bold">{{ selectedIds().length }}</span> productos seleccionados.</p>
-
-    <!-- Mode Selector -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-8">
-      <button 
-        type="button"
-        (click)="mode.set('price_inflation')" 
-        [class.btn-active]="mode() === 'price_inflation'"
-        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
-        <i class="fas fa-percentage"></i> Inflación
-      </button>
-      <button 
-        type="button"
-        (click)="mode.set('currency_change')" 
-        [class.btn-active]="mode() === 'currency_change'"
-        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
-        <i class="fas fa-dollar-sign"></i> Moneda
-      </button>
-      <button 
-        type="button"
-        (click)="mode.set('brand_change')" 
-        [class.btn-active]="mode() === 'brand_change'" 
-        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
-        <i class="fas fa-tag"></i> Marca
-      </button>
-      <button 
-        type="button"
-        (click)="mode.set('status_change')" 
-        [class.btn-active]="mode() === 'status_change'" 
-        class="btn btn-sm md:btn-md btn-outline normal-case transition-all">
-        <i class="fas fa-power-off"></i> Estado
-      </button>
+    <!-- Header -->
+    <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-xl text-gray-800 dark:text-white">Edición Masiva</h3>
+        <p class="text-xs text-gray-500">Editando <span class="font-bold text-primary">{{ selectedIds().length }}</span> productos</p>
+      </div>
+      <button class="btn btn-sm btn-circle btn-ghost" (click)="close()" [disabled]="isProcessing()">✕</button>
     </div>
 
-    <!-- Active Form -->
-    <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-6 mb-8 min-h-[150px] flex flex-col justify-center animate-fade-in border border-dashed border-gray-300 dark:border-gray-600">
-      
-      @switch (mode()) {
-        @case ('price_inflation') {
-          <div class="form-control w-full max-w-xs mx-auto">
-            <label class="label">
-              <span class="label-text font-bold text-lg">Porcentaje de Aumento</span>
-            </label>
-            <div class="relative">
-              <input type="number" [(ngModel)]="inflationPercentage" placeholder="ej: 10" class="input input-bordered input-lg w-full pr-12 text-center font-bold text-2xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">%</span>
+    @if (!showConfirmation()) {
+      <!-- Main Form -->
+      <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+        
+        @if (error()) {
+            <div class="alert alert-error text-sm py-2">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error() }}</span>
             </div>
-            <label class="label">
-              <span class="label-text-alt text-gray-500">Ejemplo: 10% convertirá $100 -> $110</span>
-            </label>
+        }
+
+        <!-- STOCK SECTION -->
+        <div class="flex flex-col md:flex-row gap-4 items-start border-b border-gray-100 dark:border-gray-700 pb-6">
+          <div class="w-full md:w-1/3 pt-2">
+            <span class="font-bold text-sm uppercase tracking-wider text-gray-400">Existencias</span>
           </div>
-        }
-        @case ('currency_change') {
-            <div class="form-control w-full max-w-xs mx-auto">
-                <label class="label"><span class="label-text font-bold">Nueva Moneda</span></label>
-                <select [(ngModel)]="targetCurrency" class="select select-bordered select-lg w-full text-center text-xl">
-                    <option value="ARS">🇦🇷 Peso Argentino (ARS)</option>
-                    <option value="USD">🇺🇸 Dólar (USD)</option>
-                </select>
-                <p class="text-xs text-center mt-2 text-warning">
-                    <i class="fas fa-exclamation-triangle"></i> Solo cambia la etiqueta, no convierte valores.
-                </p>
-            </div>
-        }
-        @case ('brand_change') {
-            <div class="form-control w-full max-w-xs mx-auto">
-                <label class="label"><span class="label-text font-bold">Nueva Marca</span></label>
-                <select [(ngModel)]="targetBrandId" class="select select-bordered select-lg w-full">
-                    <option value="">Seleccionar...</option>
-                    @for(b of brands(); track b.id) {
-                        <option [value]="b.id">{{ b.name }}</option>
-                    }
-                </select>
-            </div>
-        }
-        @case ('status_change') {
-            <div class="form-control w-full max-w-xs mx-auto">
-                <label class="label cursor-pointer justify-center gap-4">
-                    <span class="label-text font-bold text-lg">Estado</span> 
-                    <input type="checkbox" [(ngModel)]="targetStatus" class="toggle toggle-success toggle-lg" />
-                    <span class="font-bold" [class.text-success]="targetStatus()" [class.text-gray-400]="!targetStatus()">
-                        {{ targetStatus() ? 'ACTIVO' : 'INACTIVO' }}
-                    </span>
-                </label>
-            </div>
-        }
-      }
-    </div>
+          <div class="w-full md:w-2/3 space-y-3">
+            <select [ngModel]="stockMode()" (ngModelChange)="stockMode.set($event)" class="select select-bordered w-full select-sm">
+                <option value="none">— Sin cambios —</option>
+                <option value="fixed">Cambiar a...</option>
+                <option value="increase">Aumentar en...</option>
+                <option value="decrease">Disminuir en...</option>
+            </select>
+            @if (stockMode() !== 'none') {
+                <input type="number" [ngModel]="stockValue()" (ngModelChange)="stockValue.set($event)" placeholder="Cantidad" 
+                       class="input input-bordered w-full input-sm animate-fade-in" />
+            }
+          </div>
+        </div>
 
-    <!-- Actions -->
-    <div class="modal-action">
-      <button class="btn btn-ghost" (click)="close()" [disabled]="isProcessing()">Cancelar</button>
-      <button class="btn btn-primary px-8" (click)="execute()" [disabled]="isProcessing()">
-        @if(isProcessing()) {
-            <span class="loading loading-spinner"></span> Procesando...
-        } @else {
-            Aplicar Cambios
-        }
-      </button>
-    </div>
+        <!-- PRICE SECTION -->
+        <div class="flex flex-col md:flex-row gap-4 items-start border-b border-gray-100 dark:border-gray-700 pb-6">
+          <div class="w-full md:w-1/3 pt-2">
+            <span class="font-bold text-sm uppercase tracking-wider text-gray-400">Precio</span>
+          </div>
+          <div class="w-full md:w-2/3 space-y-3">
+            <select [ngModel]="priceMode()" (ngModelChange)="priceMode.set($event)" class="select select-bordered w-full select-sm">
+                <option value="none">— Sin cambios —</option>
+                <option value="fixed">Precio fijo...</option>
+                <option value="percentage">Ajuste porcentual (+/- %)</option>
+            </select>
+            @if (priceMode() !== 'none') {
+                <div class="relative animate-fade-in">
+                    <input type="number" [ngModel]="priceValue()" (ngModelChange)="priceValue.set($event)" 
+                           [placeholder]="priceMode() === 'fixed' ? 'Monto fijo' : 'Porcentaje (ej: 10 o -5)'" 
+                           class="input input-bordered w-full input-sm" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+                        {{ priceMode() === 'fixed' ? '$' : '%' }}
+                    </span>
+                </div>
+            }
+          </div>
+        </div>
+
+        <!-- CATEGORY SECTION -->
+        <div class="flex flex-col md:flex-row gap-4 items-start border-b border-gray-100 dark:border-gray-700 pb-6">
+          <div class="w-full md:w-1/3 pt-2">
+            <span class="font-bold text-sm uppercase tracking-wider text-gray-400">Categoría</span>
+          </div>
+          <div class="w-full md:w-2/3">
+            <select [ngModel]="targetCategoryId()" (ngModelChange)="targetCategoryId.set($event)" class="select select-bordered w-full select-sm">
+                <option value="">— Sin cambios —</option>
+                @for(cat of categories(); track cat.id) {
+                    <option [value]="cat.id">{{ cat.name }}</option>
+                }
+            </select>
+          </div>
+        </div>
+
+        <!-- BRAND SECTION -->
+        <div class="flex flex-col md:flex-row gap-4 items-start border-b border-gray-100 dark:border-gray-700 pb-6">
+            <div class="w-full md:w-1/3 pt-2">
+              <span class="font-bold text-sm uppercase tracking-wider text-gray-400">Marca</span>
+            </div>
+            <div class="w-full md:w-2/3">
+              <select [ngModel]="targetBrandId()" (ngModelChange)="targetBrandId.set($event)" class="select select-bordered w-full select-sm">
+                  <option value="">— Sin cambios —</option>
+                  @for(b of brands(); track b.id) {
+                      <option [value]="b.id">{{ b.name }}</option>
+                  }
+              </select>
+            </div>
+          </div>
+
+        <!-- STATUS SECTION -->
+        <div class="flex flex-col md:flex-row gap-4 items-start">
+          <div class="w-full md:w-1/3 pt-2">
+            <span class="font-bold text-sm uppercase tracking-wider text-gray-400">Estado</span>
+          </div>
+          <div class="w-full md:w-2/3">
+            <select [ngModel]="targetStatus()" (ngModelChange)="targetStatus.set($event)" class="select select-bordered w-full select-sm">
+                <option value="none">— Sin cambios —</option>
+                <option value="active">Publicado (Activo)</option>
+                <option value="inactive">Borrador (Inactivo)</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="bg-gray-50 dark:bg-gray-700/50 p-6 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700">
+        <button class="btn btn-ghost" (click)="close()">Cancelar</button>
+        <button class="btn btn-primary px-10 shadow-lg shadow-primary/20" 
+                (click)="prepareExecute()"
+                [disabled]="!hasChanges()">
+          Vista Previa
+        </button>
+      </div>
+
+    } @else {
+      <!-- Confirmation State -->
+      <div class="p-10 text-center space-y-6 animate-fade-in">
+        <div class="w-20 h-20 bg-warning/10 text-warning rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-exclamation-triangle text-4xl"></i>
+        </div>
+        <div>
+          <h4 class="text-2xl font-bold text-gray-800 dark:text-white">¿Confirmar cambios masivos?</h4>
+          <p class="text-gray-500 mt-2">
+            Estás a punto de aplicar los cambios seleccionados a <span class="font-bold text-gray-800 dark:text-white">{{ selectedIds().length }} productos</span>. 
+            Esta acción no se puede deshacer fácilmente.
+          </p>
+        </div>
+
+        <div class="flex justify-center gap-4 mt-8">
+          <button class="btn btn-outline border-gray-300 px-8" (click)="showConfirmation.set(false)" [disabled]="isProcessing()">
+            Regresar
+          </button>
+          <button class="btn btn-primary px-12" (click)="execute()" [disabled]="isProcessing()">
+            @if (isProcessing()) {
+                <span class="loading loading-spinner"></span> Actualizando...
+            } @else {
+                ¡Sí, actualizar ahora!
+            }
+          </button>
+        </div>
+      </div>
+    }
+
   </div>
-  <form method="dialog" class="modal-backdrop bg-black/50 backdrop-blur-sm">
+  <form method="dialog" class="modal-backdrop bg-black/60 backdrop-blur-md">
     <button (click)="close()">close</button>
   </form>
 </div>

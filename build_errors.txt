@@ -1,0 +1,106 @@
+
+> arecofix@0.0.0 build
+> ng build --configuration production
+
+[33mÔØ»[39m Building...
+/*! ­ƒî╝ daisyUI 5.5.19 */
+[32mÔ£ö[39m Building...
+[35mPrerendered 0 static routes.[39m
+Application bundle generation failed. [17.467 seconds] - 2026-02-23T19:13:34.630Z
+
+X [ERROR] TS2322: Type 'OAuthResponse' is not assignable to type 'AuthResponse'.
+  Type '{ data: { provider: Provider; url: string; }; error: null; }' is not assignable to type 'AuthResponse'.
+    Type '{ data: { provider: Provider; url: string; }; error: null; }' is not assignable to type '{ data: { user: User | null; session: Session | null; }; error: null; }'.
+      Types of property 'data' are incompatible.
+        Type '{ provider: Provider; url: string; }' is missing the following properties from type '{ user: User | null; session: Session | null; }': user, session [plugin angular-compiler]
+
+    src/app/core/services/auth.service.ts:92:4:
+      92 Ôöé     return this.supabase.auth.signInWithOAuth({
+         ÔòÁ     ~~~~~~
+
+
+X [ERROR] TS2322: Type 'OAuthResponse' is not assignable to type 'AuthResponse'.
+  Type '{ data: { provider: Provider; url: string; }; error: null; }' is not assignable to type 'AuthResponse'.
+    Type '{ data: { provider: Provider; url: string; }; error: null; }' is not assignable to type '{ data: { user: User | null; session: Session | null; }; error: null; }'.
+      Types of property 'data' are incompatible.
+        Type '{ provider: Provider; url: string; }' is missing the following properties from type '{ user: User | null; session: Session | null; }': user, session [plugin angular-compiler]
+
+    src/app/core/services/auth.service.ts:99:4:
+      99 Ôöé     return this.supabase.auth.signInWithOAuth({
+         ÔòÁ     ~~~~~~
+
+
+X [ERROR] TS2322: Type 'OAuthResponse' is not assignable to type 'AuthResponse'.
+  Type '{ data: { provider: Provider; url: string; }; error: null; }' is not assignable to type 'AuthResponse'.
+    Type '{ data: { provider: Provider; url: string; }; error: null; }' is not assignable to type '{ data: { user: User | null; session: Session | null; }; error: null; }'.
+      Types of property 'data' are incompatible.
+        Type '{ provider: Provider; url: string; }' is missing the following properties from type '{ user: User | null; session: Session | null; }': user, session [plugin angular-compiler]
+
+    src/app/core/services/auth.service.ts:106:4:
+      106 Ôöé     return this.supabase.auth.signInWithOAuth({
+          ÔòÁ     ~~~~~~
+
+
+X [ERROR] TS2339: Property 'updatePassword' does not exist on type 'SupabaseAuthClient'. [plugin angular-compiler]
+
+    src/app/core/services/auth.service.ts:121:47:
+      121 Ôöé ...wait this.supabase.auth.updatePassword({ password: newPassword...
+          ÔòÁ                            ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'signIn' does not exist on type 'AuthService'. [plugin angular-compiler]
+
+    src/app/public/auth/login/login.component.ts:81:41:
+      81 Ôöé       const res = await this.authService.signIn(email, password);
+         ÔòÁ                                          ~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'AuthError' is not assignable to parameter of type 'string'. [plugin angular-compiler]
+
+    src/app/public/auth/login/login.component.ts:110:41:
+      110 Ôöé         this.error = this.parseAuthError(res.error);
+          ÔòÁ                                          ~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'AuthError' is not assignable to parameter of type 'string'. [plugin angular-compiler]
+
+    src/app/public/auth/login/login.component.ts:137:41:
+      137 Ôöé         this.error = this.parseAuthError(res.error);
+          ÔòÁ                                          ~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'AuthError' is not assignable to parameter of type 'string'. [plugin angular-compiler]
+
+    src/app/public/auth/login/login.component.ts:162:41:
+      162 Ôöé         this.error = this.parseAuthError(res.error);
+          ÔòÁ                                          ~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'signUp' does not exist on type 'AuthService'. [plugin angular-compiler]
+
+    src/app/public/auth/register/register.component.ts:144:41:
+      144 Ôöé       const res = await this.authService.signUp(email, password, {
+          ÔòÁ                                          ~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'AuthError' is not assignable to parameter of type 'string'. [plugin angular-compiler]
+
+    src/app/public/auth/register/register.component.ts:181:41:
+      181 Ôöé         this.error = this.parseAuthError(res.error);
+          ÔòÁ                                          ~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'AuthError' is not assignable to parameter of type 'string'. [plugin angular-compiler]
+
+    src/app/public/auth/register/register.component.ts:197:41:
+      197 Ôöé         this.error = this.parseAuthError(res.error);
+          ÔòÁ                                          ~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'AuthError' is not assignable to parameter of type 'string'. [plugin angular-compiler]
+
+    src/app/public/auth/register/register.component.ts:213:41:
+      213 Ôöé         this.error = this.parseAuthError(res.error);
+          ÔòÁ                                          ~~~~~~~~~
+
+

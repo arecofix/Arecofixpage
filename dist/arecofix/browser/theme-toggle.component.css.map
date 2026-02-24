@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["theme-toggle.component.ts"],
-  "sourcesContent": ["\n    @keyframes themeIconIn {\n      0% {\n        transform: scale(0) rotate(-180deg);\n        opacity: 0;\n      }\n      100% {\n        transform: scale(1) rotate(0);\n        opacity: 1;\n      }\n    }\n    :host .animate-theme-icon {\n      animation: themeIconIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;\n    }\n  "],
-  "mappings": ";AACI,WAAA;AACE;AACE,eAAA,MAAA,GAAA,OAAA;AACA,aAAA;AACF;AACA;AACE,eAAA,MAAA,GAAA,OAAA;AACA,aAAA;AACF;AACF;AACA,MAAA,CAAA;AACE,aAAA,YAAA,MAAA,aAAA,GAAA,EAAA,GAAA,EAAA,GAAA,EAAA,GAAA;AACF;",
-  "names": []
-}

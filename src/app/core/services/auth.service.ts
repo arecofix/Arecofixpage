@@ -1,143 +1,73 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { SupabaseClient, User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
+import { User, Session, AuthChangeEvent, AuthResponse } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
-import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { LoggerService } from './logger.service';
+import { ProfileService } from './profile.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
-
-export interface AuthResponse {
-  user: User | null;
-  session: Session | null;
-  error?: string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private supabase = inject(SUPABASE_CLIENT);
-  private router = inject(Router);
   private logger = inject(LoggerService);
   private platformId = inject(PLATFORM_ID);
-  private authState = new BehaviorSubject<{ user: User | null; session: Session | null }>({
-    user: null,
+  private profileService = inject(ProfileService);
+
+  private authState = new BehaviorSubject<{
+    session: Session | null;
+    user: User | null;
+    profile: UserProfile | null;
+  }>({
     session: null,
+    user: null,
+    profile: null
   });
 
   public authState$ = this.authState.asObservable();
 
   constructor() {
-    const isBrowser = isPlatformBrowser(this.platformId);
-    
-    if (isBrowser) {
-        this.initializeAuth();
+    if (isPlatformBrowser(this.platformId)) {
+      this.initAuth();
     }
   }
 
-  private initializeAuth() {
-    // Set up auth state listener
-    this.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-      if (session?.user) {
-        this.authState.next({
-          user: session.user,
-          session: session,
-        });
+  private async initAuth() {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (session) {
+      const profile = await this.profileService.getProfile(session.user.id);
+      this.authState.next({ session, user: session.user, profile });
+    }
+
+    this.supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      if (session) {
+        const profile = await this.profileService.getProfile(session.user.id);
+        this.authState.next({ session, user: session.user, profile });
       } else {
-        this.authState.next({
-          user: null,
-          session: null,
-        });
+        this.authState.next({ session: null, user: null, profile: null });
       }
     });
-  }
-
-  async signIn(email: string, password: string): Promise<AuthResponse> {
-
-    const { data, error } = await this.supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      return { user: null, session: null, error: error.message };
-    }
-    this.authState.next({
-      user: data.user,
-      session: data.session,
-    });
-
-    // Perfil: gestión 100% lado Supabase. No realizar upsert desde el cliente.
-    // Eliminado bloque de ensure-profile tras login.
-
-    return { user: data.user, session: data.session };
-  }
-
-  // Complete sign up with profile information
-  async signUp(
-    email: string,
-    password: string,
-    profile?: {
-      first_name?: string;
-      last_name?: string;
-      display_name?: string;
-      phone?: string;
-    }
-  ): Promise<AuthResponse> {
-    try {
-      // 1. Create Auth User
-      const { data, error } = await this.supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: environment.authRedirectUrl,
-          // We still send metadata just in case, but we don't rely on the trigger anymore
-          data: profile ? {
-            ...profile,
-            display_name: (profile.display_name ?? `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim()) || null,
-          } : undefined,
-        },
-      });
-
-      if (error) {
-        this.logger.error('Supabase signUp error', error);
-        return { user: null, session: null, error: error.message };
-      }
-
-      // 2. Profile creation is now handled by the Supabase Database Trigger 'on_auth_user_created'
-      // We no longer need to manually insert into the profiles table from the client.
-
-      this.authState.next({
-        user: data.user,
-        session: data.session,
-      });
-
-      return { user: data.user, session: data.session };
-
-    } catch (e: unknown) {
-      this.logger.error('Unexpected error during signup', e);
-      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
-      return { user: null, session: null, error: errorMessage };
-    }
   }
 
   async signOut(): Promise<string | null> {
     const { error } = await this.supabase.auth.signOut();
-    if (error) {
-      return error.message;
-    }
-    this.authState.next({
-      user: null,
-      session: null,
-    });
-    return null;
+    return error ? error.message : null;
+  }
+
+  getCurrentUser(): User | null {
+    return this.authState.value.user;
   }
 
   async getUser(): Promise<User | null> {
-    const { data } = await this.supabase.auth.getUser();
-    return data.user;
+    const { data: { user } } = await this.supabase.auth.getUser();
+    return user;
+  }
+
+  getCurrentSession(): Session | null {
+    return this.authState.value.session;
   }
 
   async getSession(): Promise<Session | null> {
@@ -146,36 +76,52 @@ export class AuthService {
   }
 
   async getUserProfile(userId: string): Promise<UserProfile | null> {
-    const { data, error } = await this.supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      this.logger.error('Error fetching profile', error);
-      return null;
-    }
-
-    return data as UserProfile;
+    return this.profileService.getProfile(userId);
   }
 
   async updateUserProfile(userId: string, profile: Partial<UserProfile>): Promise<UserProfile | null> {
-    const { data, error } = await this.supabase
-      .from('profiles')
-      .update(profile)
-      .eq('id', userId)
-      .select()
-      .single();
-
-    if (error) {
-      this.logger.error('Error updating profile', error);
-      return null;
-    }
-
-    return data as UserProfile;
+    return this.profileService.updateProfile(userId, profile);
   }
 
+  getSupabaseClient() {
+    return this.supabase;
+  }
+
+  // Social Logins
+  async signInWithGoogle(): Promise<any> {
+    return this.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: environment.authRedirectUrl }
+    });
+  }
+
+  async signInWithFacebook(): Promise<any> {
+    return this.supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: { redirectTo: environment.authRedirectUrl }
+    });
+  }
+
+  async signInWithGithub(): Promise<any> {
+    return this.supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: { redirectTo: environment.authRedirectUrl }
+    });
+  }
+
+  async signIn(email: string, password: string): Promise<any> {
+    return this.supabase.auth.signInWithPassword({ email, password });
+  }
+
+  async signUp(email: string, password: string, profileData: Partial<UserProfile>): Promise<any> {
+    return this.supabase.auth.signUp({
+      email,
+      password,
+      options: { data: profileData }
+    });
+  }
+
+  // Auth specific utilities
   async resetPassword(email: string): Promise<string | null> {
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
       redirectTo: environment.authRedirectUrl,
@@ -183,193 +129,8 @@ export class AuthService {
     return error ? error.message : null;
   }
 
-  // Additional utility methods
-  isAuthenticated(): boolean {
-    return this.authState.value.user !== null;
-  }
-
-  getCurrentUser(): User | null {
-    return this.authState.value.user;
-  }
-
-  getCurrentSession(): Session | null {
-    return this.authState.value.session;
-  }
-
-  getAuthState$(): Observable<{ user: User | null; session: Session | null }> {
-    return this.authState.asObservable();
-  }
-
-  async testDatabaseConnection(): Promise<boolean> {
-    try {
-      const { data, error } = await this.supabase
-        .from('profiles')
-        .select('id')
-        .limit(1);
-
-      this.logger.debug('Database connection test', { data, error });
-      return !error;
-    } catch (err: unknown) {
-      this.logger.error('Database connection test failed', err);
-      return false;
-    }
-  }
-
   async updatePassword(newPassword: string): Promise<string | null> {
-    const { error } = await this.supabase.auth.updateUser({
-      password: newPassword,
-    });
+    const { error } = await this.supabase.auth.updateUser({ password: newPassword });
     return error ? error.message : null;
-  }
-
-  async updateEmail(newEmail: string): Promise<string | null> {
-    const { error } = await this.supabase.auth.updateUser({
-      email: newEmail,
-    });
-    return error ? error.message : null;
-  }
-
-  async signInWithGoogle(): Promise<AuthResponse> {
-    const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-
-    if (error) {
-      return { user: null, session: null, error: error.message };
-    }
-
-    return { user: null, session: null };
-  }
-
-  async signInWithGithub(): Promise<AuthResponse> {
-    const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-
-    if (error) {
-      return { user: null, session: null, error: error.message };
-    }
-
-    return { user: null, session: null };
-  }
-
-  async signInWithFacebook(): Promise<AuthResponse> {
-    const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-
-    if (error) {
-      return { user: null, session: null, error: error.message };
-    }
-
-    return { user: null, session: null };
-  }
-
-  async verifyOTP(email: string, token: string): Promise<AuthResponse> {
-    const { data, error } = await this.supabase.auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
-    });
-
-    if (error) {
-      return { user: null, session: null, error: error.message };
-    }
-
-    this.authState.next({
-      user: data.user,
-      session: data.session,
-    });
-
-    return { user: data.user, session: data.session };
-  }
-
-  async sendMagicLink(email: string): Promise<string | null> {
-    const { error } = await this.supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: environment.authRedirectUrl,
-      },
-    });
-
-    return error ? error.message : null;
-  }
-
-  async checkEmailExists(email: string): Promise<boolean> {
-    try {
-      const { data, error } = await this.supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
-
-      return !error && data !== null;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  async deleteAccount(): Promise<string | null> {
-    const user = this.getCurrentUser();
-    if (!user) {
-      return 'No user is currently authenticated';
-    }
-
-    // First delete the profile
-    const { error: profileError } = await this.supabase
-      .from('profiles')
-      .delete()
-      .eq('id', user.id);
-
-    if (profileError) {
-      return profileError.message;
-    }
-
-    // Then delete the auth user
-    // Note: supabase.auth.admin is not available on the client side with anon key.
-    // This needs to be done via a secure backend endpoint or Edge Function.
-    // const { error: authError } = await this.supabase.auth.admin.deleteUser(user.id);
-
-    // if (authError) {
-    //   return authError.message;
-    // }
-
-    this.logger.warn('Account deletion requires backend implementation');
-
-    // Sign out
-    await this.signOut();
-
-    return null;
-  }
-
-  async refreshSession(): Promise<Session | null> {
-    const { data, error } = await this.supabase.auth.refreshSession();
-
-    if (error) {
-      this.logger.error('Error refreshing session', error);
-      return null;
-    }
-
-    if (data.session?.user) {
-      this.authState.next({
-        user: data.session.user,
-        session: data.session,
-      });
-    }
-
-    return data.session;
-  }
-
-  getSupabaseClient(): SupabaseClient {
-    return this.supabase;
   }
 }

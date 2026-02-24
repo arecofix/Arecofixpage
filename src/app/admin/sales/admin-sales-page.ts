@@ -3,8 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
+import { OrderService } from '@app/core/services/order.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
+import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { LoggerService } from '@app/core/services/logger.service';
+import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 
 interface CartItem extends Product {
@@ -21,6 +25,9 @@ export class AdminSalesPage implements OnInit {
     private auth = inject(AuthService);
     private router = inject(Router);
     private logger = inject(LoggerService);
+    private tenantService = inject(TenantService);
+    private productRepository = inject(ProductRepository);
+    private orderService = inject(OrderService);
 
     // Data Signals
     products = signal<Product[]>([]);
@@ -74,18 +81,16 @@ export class AdminSalesPage implements OnInit {
 
     async loadProducts() {
         this.loading.set(true);
-        const supabase = this.auth.getSupabaseClient();
-        const { data } = await supabase
-            .from('products')
-            .select('*')
-            .eq('is_active', true)
-            .gt('stock', 0)
-            .order('name');
-
-        if (data) {
-            this.products.set(data);
-        }
-        this.loading.set(false);
+        this.productRepository.findAvailable().subscribe({
+            next: (data) => {
+                this.products.set(data);
+                this.loading.set(false);
+            },
+            error: (err) => {
+                this.logger.error('Error loading products', err);
+                this.loading.set(false);
+            }
+        });
     }
 
     addToCart(product: Product) {
@@ -132,54 +137,51 @@ export class AdminSalesPage implements OnInit {
         const user = this.auth.getCurrentUser();
 
         try {
-            // 1. Create Sale
-            const { data: sale, error: saleError } = await supabase
-                .from('sales')
-                .insert({
-                    staff_id: user?.id,
-                    total_amount: this.cartTotal(),
-                    status: 'completed',
-                    payment_method: 'cash'
-                })
-                .select()
-                .single();
+            const tenantId = this.tenantService.getTenantId();
 
-            if (saleError) throw saleError;
+            // 1. Create Order (acting as a Sale)
+            const order: Order = {
+                customer_name: 'Venta Mostrador',
+                customer_email: 'mostrador@arecofix.com',
+                status: 'completed',
+                subtotal: this.cartTotal(),
+                tax: 0,
+                discount: 0,
+                total: this.cartTotal()
+            };
 
-            // 2. Create Sale Items
-            const saleItems = this.cart().map(item => ({
-                sale_id: sale.id,
+            const items: OrderItem[] = this.cart().map(item => ({
                 product_id: item.id,
-                quantity: item.quantity,
+                product_name: item.name,
                 unit_price: item.price,
+                quantity: item.quantity,
                 subtotal: item.price * item.quantity
             }));
 
-            const { error: itemsError } = await supabase
-                .from('sale_items')
-                .insert(saleItems);
+            const { data: createdOrder, error: orderError } = await this.orderService.createOrder(order, items);
+            if (orderError || !createdOrder) throw orderError || new Error("Order creation failed");
 
-            if (itemsError) throw itemsError;
-
-            // 3. Update Stock
+            // 3. Update Stock manually with isolation
             for (const item of this.cart()) {
-                const { error: stockError } = await supabase.rpc('decrement_stock', {
+                const { error: stockError } = await supabase.rpc('decrement_stock_tenant', {
                     row_id: item.id,
-                    amount: item.quantity
+                    amount: item.quantity,
+                    t_id: tenantId
                 });
                 
                 if (stockError) {
                     // Manual Fallback
-                    const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.id).single();
+                    const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.id).eq('tenant_id', tenantId).single();
                     if (currentProduct) {
-                        await supabase.from('products').update({ stock: currentProduct.stock - item.quantity }).eq('id', item.id);
+                        await supabase.from('products').update({ stock: currentProduct.stock - item.quantity }).eq('id', item.id).eq('tenant_id', tenantId);
                     }
                 }
             }
 
             // 4. Create Invoice
             await supabase.from('invoices').insert({
-                sale_id: sale.id,
+                order_id: createdOrder.id,
+                tenant_id: tenantId,
                 total_amount: this.cartTotal(),
                 type: 'B', 
                 issued_at: new Date().toISOString()

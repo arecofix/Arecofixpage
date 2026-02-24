@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/admin/brands/admin-brands.routes.ts"],
-  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_BRANDS_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Marcas',\r\n    loadComponent: () => import('./admin-brands-page').then(m => m.AdminBrandsPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nueva Marca',\r\n    loadComponent: () => import('./admin-brand-form-page').then(m => m.AdminBrandFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Marca',\r\n    loadComponent: () => import('./admin-brand-form-page').then(m => m.AdminBrandFormPage)\r\n  }\r\n];\r\n"],
-  "mappings": ";;;;;AAEO,IAAM,sBAA8B;EACzC;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAqB,EAAE,KAAK,OAAK,EAAE,eAAe;;EAEhF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAyB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;EAEvF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAyB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;;",
-  "names": []
-}

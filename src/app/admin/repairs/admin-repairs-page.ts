@@ -1,19 +1,48 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
+import { FormsModule } from '@angular/forms';
 import { Repair } from '@app/features/repairs/domain/entities/repair.entity';
+import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
+import { RepairStatusUtils } from '@app/features/repairs/domain/utils/repair-status.utils';
 
 @Component({
   selector: 'app-admin-repairs-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './admin-repairs-page.html',
 })
 export class AdminRepairsPage implements OnInit {
-  private auth = inject(AuthService);
+  private repairService = inject(AdminRepairService);
+  
   repairs = signal<Repair[]>([]);
   loading = signal(true);
+  error = signal<string | null>(null);
+  
+  // Search and Filter signals
+  searchTerm = signal('');
+  filterType = signal('all');
+
+  // Computed signal for filtered list
+  filteredRepairs = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    const type = this.filterType();
+    
+    return this.repairs().filter(repair => {
+      const matchesSearch = 
+        repair.customer_name?.toLowerCase().includes(term) ||
+        repair.customer_phone?.toLowerCase().includes(term) ||
+        repair.device_model?.toLowerCase().includes(term) ||
+        repair.tracking_code?.toLowerCase().includes(term);
+        
+      const matchesType = type === 'all' || 
+        repair.device_model?.toLowerCase().includes(type.toLowerCase());
+        
+      return matchesSearch && matchesType;
+    });
+  });
+
+  date = new Date();
 
   async ngOnInit() {
     await this.loadRepairs();
@@ -21,52 +50,49 @@ export class AdminRepairsPage implements OnInit {
 
   async loadRepairs() {
     this.loading.set(true);
-    const supabase = this.auth.getSupabaseClient();
-    const { data, error } = await supabase
-      .from('repairs')
-      .select('*')
-      .order('received_at', { ascending: false });
-
-    if (data) {
+    this.error.set(null);
+    try {
+      const data = await this.repairService.getAdminList();
       this.repairs.set(data);
+    } catch (e: any) {
+      this.error.set('Error al cargar las reparaciones: ' + e.message);
+    } finally {
+      this.loading.set(false);
     }
-    this.loading.set(false);
   }
 
   async deleteRepair(id: string) {
     if (!confirm('¿Estás seguro de eliminar este registro de reparación?')) return;
 
-    const supabase = this.auth.getSupabaseClient();
-    const { error } = await supabase.from('repairs').delete().eq('id', id);
-
-    if (!error) {
+    try {
+      this.loading.set(true);
+      await this.repairService.delete(id);
       await this.loadRepairs();
-    } else {
-      alert('Error al eliminar la reparación');
+    } catch (e: any) {
+      alert('Error al eliminar la reparación: ' + e.message);
+      this.loading.set(false);
     }
   }
 
-  getStatusColor(statusId: number): string {
-    switch (statusId) {
-      case 1: return 'badge-warning';
-      case 2: return 'badge-info';
-      case 3: return 'badge-secondary';
-      case 4: return 'badge-success';
-      case 5: return 'badge-success';
-      case 6: return 'badge-error';
-      default: return 'badge-ghost';
+  getWarrantyStatus(dateStr: string | undefined): { label: string, class: string } {
+    if (!dateStr) return { label: 'N/A', class: 'badge-ghost opacity-50' };
+    
+    const receivedDate = new Date(dateStr);
+    const diffTime = Math.abs(this.date.getTime() - receivedDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 30) {
+      return { label: 'EN GARANTÍA', class: 'badge-success' };
+    } else {
+      return { label: 'VENCIDA', class: 'badge-ghost opacity-50' };
     }
+  }
+
+  getStatusBadgeClass(statusId: number): string {
+    return RepairStatusUtils.getAdminBadgeClass(statusId);
   }
 
   getStatusLabel(statusId: number): string {
-    switch (statusId) {
-      case 1: return 'Pendiente';
-      case 2: return 'En Progreso';
-      case 3: return 'Esperando Repuestos';
-      case 4: return 'Completado';
-      case 5: return 'Entregado';
-      case 6: return 'Cancelado';
-      default: return 'Pendiente';
-    }
+    return RepairStatusUtils.getStatusUI(statusId).label;
   }
 }

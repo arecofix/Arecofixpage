@@ -25,6 +25,9 @@
   "overrides": {
     "gh-pages": "^6.3.0"
   },
+  "allowedCommonJsDependencies": [
+    "qrcode"
+  ],
   "private": true,
   "dependencies": {
     "@angular/cdk": "^21.1.5",

@@ -30,11 +30,11 @@ export class AdminRepairFormPage implements OnInit {
         customer_name: '',
         customer_phone: '',
         device_model: '',
-        device_type: 'smartphone', // Default
-        device_brand: 'generic', // Default
+        device_type: 'smartphone',
+        device_brand: 'generic',
         imei: '',
         issue_description: '',
-        current_status_id: RepairStatus.PENDING,
+        current_status_id: RepairStatus.PENDING_DIAGNOSIS,
         estimated_cost: 0,
         final_cost: 0,
         technician_notes: '',
@@ -47,13 +47,28 @@ export class AdminRepairFormPage implements OnInit {
         },
         security_pin: '',
         security_pattern: '',
+        device_passcode: '', // New field
         deposit_amount: 0,
         tracking_code: '',
         repair_number: 0,
-        images: [] as string[]
+        images: [] as string[],
+        technical_labor_cost: 0, // New field
+        technical_report: '', // New field
+        parts: [] as any[] // New field for RepairPart
     };
 
     form = signal({ ...this.initialFormState });
+    availableProducts = signal<any[]>([]); // To select parts from
+
+    async ngOnInit() {
+        this.id = this.route.snapshot.paramMap.get('id');
+        await this.loadCompanySettings();
+        await this.loadProducts(); // For parts selection
+        if (this.id) {
+            await this.loadRepair();
+        }
+        this.loading.set(false);
+    }
 
     loading = signal(true);
     saving = signal(false);
@@ -61,13 +76,8 @@ export class AdminRepairFormPage implements OnInit {
     company = signal<any>(null);
     uploadingImages = signal(false);
 
-    async ngOnInit() {
-        this.id = this.route.snapshot.paramMap.get('id');
-        await this.loadCompanySettings();
-        if (this.id) {
-            await this.loadRepair();
-        }
-        this.loading.set(false);
+    async loadProducts() {
+        // Placeholder for product selection logic (will implement if needed)
     }
 
     async onFileSelected(event: Event) {
@@ -121,6 +131,40 @@ export class AdminRepairFormPage implements OnInit {
         }
     }
 
+    addPart(product: any) {
+        this.form.update(f => {
+            const parts = [...f.parts];
+            parts.push({
+                product_id: product.id,
+                name: product.name, // For UI display
+                quantity: 1,
+                unit_price_at_time: product.price,
+                cost_at_time: product.cost || 0 // Assuming product has cost
+            });
+            return { ...f, parts };
+        });
+        this.calculateFinalCost();
+    }
+
+    removePart(index: number) {
+        this.form.update(f => {
+            const parts = [...f.parts];
+            parts.splice(index, 1);
+            return { ...f, parts };
+        });
+        this.calculateFinalCost();
+    }
+
+    calculateFinalCost() {
+        this.form.update(f => {
+            const partsTotal = f.parts.reduce((acc, p) => acc + (p.unit_price_at_time * p.quantity), 0);
+            return {
+                ...f,
+                final_cost: (f.technical_labor_cost || 0) + partsTotal
+            };
+        });
+    }
+
     async loadRepair() {
         if (!this.id) return;
         try {
@@ -141,10 +185,14 @@ export class AdminRepairFormPage implements OnInit {
                     checklist: data.checklist || this.initialFormState.checklist,
                     security_pin: data.security_pin || '',
                     security_pattern: data.security_pattern || '',
+                    device_passcode: data.device_passcode || '',
                     deposit_amount: data.deposit_amount || 0,
                     tracking_code: data.tracking_code,
                     repair_number: data.repair_number || 0,
-                    images: data.images || []
+                    images: data.images || [],
+                    technical_labor_cost: data.technical_labor_cost || 0,
+                    technical_report: data.technical_report || '',
+                    parts: data.parts || []
                 });
             }
         } catch (e: unknown) {
@@ -160,38 +208,20 @@ export class AdminRepairFormPage implements OnInit {
         try {
             const formData = this.form();
             
-            // Map form data to DTO
-            // Using logic to extend dto with necessary fields that might not be in CreateRepairDto strict definition but are handled by service/repo logic
-            const baseDto: CreateRepairDto = {
-                customer_name: formData.customer_name,
-                customer_phone: formData.customer_phone,
-                device_model: formData.device_model,
-                device_type: formData.device_type,
-                device_brand: formData.device_brand,
-                imei: formData.imei,
-                issue_description: formData.issue_description,
-                estimated_cost: formData.estimated_cost,
-                notes: '', // Optional notes field
-                images: formData.images,
-                checklist: formData.checklist,
-                security_pin: formData.security_pin,
-                security_pattern: formData.security_pattern,
-            };
-
-            // We augment the DTO with status and final_cost which are handled by the service/repo
-            const extendedDto = {
-                ...baseDto,
-                current_status_id: formData.current_status_id,
-                final_cost: formData.final_cost,
-                technician_notes: formData.technician_notes,
-                deposit_amount: formData.deposit_amount,
-                tracking_code: formData.tracking_code,
+            const payload: any = {
+                ...formData,
+                parts: formData.parts.map(p => ({
+                    product_id: p.product_id,
+                    quantity: p.quantity,
+                    unit_price_at_time: p.unit_price_at_time,
+                    cost_at_time: p.cost_at_time
+                }))
             };
 
             if (this.id) {
-                await this.repairService.update(this.id, extendedDto as UpdateRepairDto);
+                await this.repairService.update(this.id, payload);
             } else {
-                await this.repairService.create(extendedDto);
+                await this.repairService.create(payload);
             }
             this.router.navigate(['/admin/repairs']);
         } catch (e: any) {
@@ -220,7 +250,7 @@ export class AdminRepairFormPage implements OnInit {
 
         let message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
 
-        if (this.form().current_status_id === RepairStatus.COMPLETED) {
+        if (this.form().current_status_id === RepairStatus.READY_FOR_PICKUP) {
             // Use configured Google Map Review URL
             const reviewLink = environment.contact.socialMedia.googleMaps;
             message = `Hola ${customerName}, su reparación del ${device} ya está lista. Agradecemos su reseña en el siguiente enlace: ${reviewLink}`;

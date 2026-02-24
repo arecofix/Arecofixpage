@@ -1,53 +1,97 @@
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
     <h1 class="text-2xl font-bold text-gray-800 dark:text-green-400">Taller / Reparaciones</h1>
-    <a routerLink="/admin/repairs/new" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i> Nueva Reparación
-    </a>
+    <div class="flex gap-4 w-full md:w-auto">
+        <div class="relative grow">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" 
+                placeholder="Buscar cliente, tel o código..." 
+                class="input input-bordered pl-10 w-full rounded-xl" />
+        </div>
+        <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="select select-bordered text-gray-700 rounded-xl">
+            <option value="all">Ver Todos</option>
+            <option value="smartphone">Celulares</option>
+            <option value="pc">PC / Desktop</option>
+            <option value="notebook">Notebook / Netbook</option>
+            <option value="console">Consolas</option>
+            <option value="tablet">Tablets</option>
+        </select>
+        <a routerLink="/admin/repairs/new" class="btn btn-primary rounded-xl">
+            <i class="fas fa-plus"></i> Nueva
+        </a>
+    </div>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden text-gray-800">
+@if (error()) {
+    <div class="alert alert-error mb-6 rounded-2xl shadow-lg border-none text-white font-medium">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
+        <button (click)="loadRepairs()" class="btn btn-sm btn-ghost border-white/20 hover:bg-white/10 uppercase text-[10px]">Reintentar</button>
+    </div>
+}
+
+<div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-gray-800">
     <div class="overflow-x-auto">
         <table class="table w-full">
             <thead>
-                <tr class="text-gray-800">
-                    <th>Fecha</th>
-                    <th>Cliente</th>
+                <tr class="text-gray-400 bg-gray-50/50 uppercase text-[10px] tracking-widest font-black">
+                    <th class="py-5">Ingreso / Garantía</th>
+                    <th>Cliente / Código</th>
                     <th>Dispositivo</th>
-                    <th>Estado</th>
+                    <th>Estado de Reparación</th>
                     <th>Costo Est.</th>
-                    <th>Acciones</th>
+                    <th class="text-right">Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-50">
                 @if (loading()) {
                 <tr>
-                    <td colspan="6" class="text-center py-4">Cargando...</td>
+                    <td colspan="6" class="text-center py-12">
+                        <span class="loading loading-spinner loading-lg text-primary"></span>
+                        <p class="mt-2 text-gray-500 text-sm italic">Cargando taller...</p>
+                    </td>
                 </tr>
-                } @else if (repairs().length === 0) {
+                } @else if (filteredRepairs().length === 0) {
                 <tr>
-                    <td colspan="6" class="text-center py-4">No hay reparaciones registradas.</td>
+                    <td colspan="6" class="text-center py-20">
+                        <div class="text-gray-200 mb-4"><i class="fas fa-toolbox text-6xl"></i></div>
+                        <p class="text-gray-400 font-medium italic">No hay reparaciones que coincidan con la búsqueda.</p>
+                    </td>
                 </tr>
                 } @else {
-                @for (repair of repairs(); track repair.id) {
-                <tr class="text-gray-800">
-                    <td>{{ repair.received_at | date:'shortDate' }}</td>
-                    <td>
-                        <div class="font-bold">{{ repair.customer_name }}</div>
-                        <div class="text-sm opacity-50">{{ repair.customer_phone }}</div>
+                @for (repair of filteredRepairs(); track repair.id) {
+                <tr class="hover:bg-primary/2 transition-colors group">
+                    <td class="py-4">
+                        <div class="font-bold text-gray-700">{{ (repair.received_at || repair.created_at) | date:'dd/MM/yyyy' }}</div>
+                        <span class="badge badge-xs text-[9px] font-black tracking-tighter uppercase p-2 mt-1" 
+                               [ngClass]="getWarrantyStatus(repair.received_at || repair.created_at).class">
+                            {{ getWarrantyStatus(repair.received_at || repair.created_at).label }}
+                        </span>
                     </td>
-                    <td>{{ repair.device_model }}</td>
                     <td>
-                        <div class="badge" [ngClass]="getStatusColor(repair.current_status_id)">
+                        <div class="font-black text-primary tracking-tight leading-tight">{{ repair.customer_name }}</div>
+                        <div class="text-[10px] text-gray-500 font-medium mb-1"><i class="fas fa-phone-alt mr-1 text-gray-300"></i> {{ repair.customer_phone }}</div>
+                        <div class="badge badge-ghost badge-sm text-[9px] font-mono opacity-50 px-1 pt-0.5 rounded uppercase">{{ repair.tracking_code }}</div>
+                    </td>
+                    <td>
+                        <div class="font-bold text-gray-600 text-sm">{{ repair.device_model }}</div>
+                    </td>
+                    <td>
+                        <div class="badge border-none font-black text-[10px] py-3.5 px-4 tracking-tight uppercase" 
+                             [ngClass]="getStatusBadgeClass(repair.current_status_id)">
                             {{ getStatusLabel(repair.current_status_id) }}
                         </div>
                     </td>
-                    <td>{{ repair.estimated_cost | currency }}</td>
-                    <td>
-                        <div class="flex gap-2">
-                            <a [routerLink]="['/admin/repairs', repair.id]" class="btn btn-sm btn-ghost">
+                    <td class="font-black text-gray-800 tabular-nums">
+                        {{ repair.estimated_cost | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                    </td>
+                    <td class="text-right">
+                        <div class="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a [routerLink]="['/admin/repairs', repair.id]" class="btn btn-square btn-sm btn-ghost hover:bg-primary/10 hover:text-primary tooltip" data-tip="Editar Detalle">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-sm btn-ghost text-error" (click)="deleteRepair(repair.id)">
+                            <button class="btn btn-square btn-sm btn-ghost hover:bg-error/10 text-error tooltip" data-tip="Borrar Registro" (click)="deleteRepair(repair.id)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

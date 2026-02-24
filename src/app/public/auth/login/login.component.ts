@@ -237,7 +237,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     return url;
   }
 
-  private parseAuthError(error: string): string {
+  private parseAuthError(error: any): string {
+    const errorMsg = error?.message || error || '';
     const errorMap: { [key: string]: string } = {
       'Invalid login credentials': 'Email o contraseña incorrectos.',
       'Email not confirmed': 'Por favor confirma tu email antes de iniciar sesión.',
@@ -248,11 +249,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     };
 
     for (const [key, value] of Object.entries(errorMap)) {
-      if (error.toLowerCase().includes(key.toLowerCase())) {
+      if (typeof errorMsg === 'string' && errorMsg.toLowerCase().includes(key.toLowerCase())) {
         return value;
       }
     }
 
-    return error || 'Error al iniciar sesión.';
+    return typeof errorMsg === 'string' ? errorMsg : 'Error al iniciar sesión.';
   }
 }

@@ -1,35 +1,9 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <script>
-      // Silenciar Advertencias y Errores del Pixel de Facebook
-      var originalWarn = console.warn;
-      var originalError = console.error;
-
-      function filterConsoleMessages(msg) {
-        if (typeof msg === "string") {
-          return (
-            msg.includes("attribution-reporting") ||
-            msg.includes("browsing-topics") ||
-            msg.includes("A preload for")
-          );
-        }
-        return false;
-      }
-
-      console.warn = function () {
-        if (arguments[0] && filterConsoleMessages(arguments[0])) return;
-        originalWarn.apply(console, arguments);
-      };
-
-      console.error = function () {
-        if (arguments[0] && filterConsoleMessages(arguments[0])) return;
-        originalError.apply(console, arguments);
-      };
-    </script>
     <meta charset="utf-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://us.posthog.com https://us.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://*.google.com;" />
-    <title>Inicio - Soluciones Informáticas & Consultoría IT | Arecofix</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com;" />
+    <title>Soluciones Informáticas - Consultoría IT | Arecofix</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
@@ -45,7 +19,7 @@
     <meta property="og:type" content="website" />
     <meta
       property="og:title"
-      content="Inicio - Soluciones Informáticas & Consultoría IT | Arecofix"
+      content="Soluciones Informáticas - Consultoría IT | Arecofix"
     />
     <meta
       property="og:description"
@@ -59,7 +33,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Arecofix - Soluciones Informáticas & Consultoría IT"
+      content="Soluciones Informáticas - Consultoría IT | Arecofix"
     />
     <meta
       name="twitter:description"
@@ -187,7 +161,6 @@
         height="0"
         width="0"
         style="display: none; visibility: hidden"
-        allow="attribution-reporting; browsing-topics"
       ></iframe
     ></noscript>
     <!-- End Google Tag Manager (noscript) -->

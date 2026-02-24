@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
-import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
+import { UserProfile } from '@app/shared/interfaces/user.interface';
+import { ROLES } from '@app/core/constants/roles.constants';
 
 @Component({
     selector: 'app-admin-users-page',
@@ -11,8 +12,8 @@ import { UserProfile } from '@app/features/authentication/domain/entities/user.e
 })
 export class AdminUsersPage implements OnInit {
     private auth = inject(AuthService);
-    users = signal<UserProfile[]>([]);
-    loading = signal(true);
+    public users = signal<UserProfile[]>([]);
+    public loading = signal<boolean>(true);
 
     async ngOnInit() {
         await this.loadUsers();
@@ -26,15 +27,15 @@ export class AdminUsersPage implements OnInit {
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (data) {
-            this.users.set(data);
+        if (!error && data) {
+            this.users.set(data as UserProfile[]);
         }
         this.loading.set(false);
     }
 
-    async toggleRole(user: any) {
-        // Simple toggle for demo purposes, ideally a modal or select
-        const newRole = user.role === 'admin' ? 'user' : 'admin';
+    async toggleRole(user: UserProfile) {
+        // Toggle between ADMIN and USER for demo, or match new logic
+        const newRole = user.role === ROLES.ADMIN ? ROLES.USER : ROLES.ADMIN;
         const supabase = this.auth.getSupabaseClient();
         const { error } = await supabase
             .from('profiles')

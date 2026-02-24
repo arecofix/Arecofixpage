@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { MessageRepository } from '../../domain/repositories/message.repository';
 import { CrmMessage } from '../../domain/entities/crm-message.entity';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { Observable, from, map } from 'rxjs';
 
 @Injectable({
@@ -9,6 +10,7 @@ import { Observable, from, map } from 'rxjs';
 })
 export class SupabaseMessageRepository extends MessageRepository {
   private authService = inject(AuthService);
+  private tenantService = inject(TenantService);
   private supabase = this.authService.getSupabaseClient();
 
   saveMessage(message: CrmMessage): Observable<void> {
@@ -19,7 +21,8 @@ export class SupabaseMessageRepository extends MessageRepository {
         message: message.notes || `Dirección: ${message.address}`, // Mapping 'address' to message body or similar if usage requires
         address: message.address, // Assuming the table might have it, or it goes into 'message'
         created_at: message.date.toISOString(),
-        is_read: false
+        is_read: false,
+        tenant_id: this.tenantService.getTenantId()
     })).pipe(
       map(({ error }) => {
         if (error) {
@@ -32,7 +35,10 @@ export class SupabaseMessageRepository extends MessageRepository {
 
   getMessages(): Observable<CrmMessage[]> {
     return from(
-        this.supabase.from('contact_messages').select('*').order('created_at', { ascending: false })
+        this.supabase.from('contact_messages')
+            .select('*')
+            .eq('tenant_id', this.tenantService.getTenantId())
+            .order('created_at', { ascending: false })
     ).pipe(
         map(({ data, error }) => {
             if (error) throw error;

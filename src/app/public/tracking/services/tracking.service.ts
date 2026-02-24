@@ -11,6 +11,6 @@ export class TrackingService {
     async getRepairByCode(code: string) {
         const supabase = this.auth.getSupabaseClient();
         // Use the RPC function we defined in the migration for secure access
-        return await supabase.rpc('get_repair_by_tracking', { code });
+        return await supabase.rpc('get_repair_by_tracking', { t_code: code });
     }
 }

@@ -45,6 +45,11 @@ export class AiAgentService {
     
     // Dynamic import to avoid SSR crashes
     try {
+        // Check WebGPU availability first
+        if (!(navigator as any).gpu) {
+            throw new Error('WebGPU not supported in this browser');
+        }
+
         const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
         
         const initProgressCallback = (report: { text: string }) => {
@@ -63,7 +68,13 @@ export class AiAgentService {
     } catch (error) {
       console.error("Failed to load model", error);
       this.isLoadingModel.set(false);
-      this.loadingProgress.set("Error loading model: " + error);
+      
+      // Handle WebGPU-specific errors gracefully
+      if (error instanceof Error && error.message.includes('WebGPU')) {
+        this.loadingProgress.set("WebGPU no disponible. Usa Chrome/Edge para acceder a la IA.");
+      } else {
+        this.loadingProgress.set("Error loading model: " + error);
+      }
     }
   }
 

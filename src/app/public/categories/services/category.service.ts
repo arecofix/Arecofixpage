@@ -4,6 +4,7 @@ import { map, catchError } from 'rxjs/operators';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 import {
   iCategoriesResponse,
@@ -17,6 +18,7 @@ import {
 export class CategoryService {
   private supabase: SupabaseClient;
   private logger = inject(LoggerService);
+  private tenantService = inject(TenantService);
 
   constructor(private authService: AuthService) {
     this.supabase = this.authService.getSupabaseClient();
@@ -47,6 +49,7 @@ export class CategoryService {
       this.supabase
         .from('categories')
         .select('*', { count: 'exact' })
+        .eq('tenant_id', this.tenantService.getTenantId())
         .eq('is_active', true)
         .range(start, end)
     ).pipe(
@@ -71,6 +74,7 @@ export class CategoryService {
       this.supabase
         .from('categories')
         .select('*', { count: 'exact' })
+        .eq('tenant_id', this.tenantService.getTenantId())
         .eq('is_active', true)
         .order('name')
         .limit(_per_page)
@@ -91,6 +95,7 @@ export class CategoryService {
       this.supabase
         .from('categories')
         .select('*')
+        .eq('tenant_id', this.tenantService.getTenantId())
         .ilike('slug', slug) // Use ilike for case-insensitive matching
         .limit(1)
     ).pipe(
@@ -107,11 +112,12 @@ export class CategoryService {
   }
 
   public getById(id: string): Observable<iCategory | null> {
-    if (!id || id === 'null') return of(null);
+    if (!id || id === 'null' || id === '0') return of(null);
     return from(
       this.supabase
         .from('categories')
         .select('*')
+        .eq('tenant_id', this.tenantService.getTenantId())
         .eq('id', id)
         .single()
     ).pipe(
@@ -130,6 +136,7 @@ export class CategoryService {
       this.supabase
         .from('categories')
         .select('*')
+        .eq('tenant_id', this.tenantService.getTenantId())
         .eq('is_active', true)
         .order('name')
     ).pipe(

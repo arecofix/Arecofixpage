@@ -7,6 +7,7 @@ import { AdminProductService } from './services/admin-product.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-admin-products-page',
@@ -17,67 +18,64 @@ import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-m
 })
 export class AdminProductsPage implements OnInit {
   private productService = inject(AdminProductService);
-  public cdr = inject(ChangeDetectorRef);
+  private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   
   // Signals
   public products = signal<Product[]>([]);
-  public brands = signal<Brand[]>([]); // For bulk edit
+  public brands = signal<Brand[]>([]); 
+  public categories = signal<any[]>([]);
   public searchQuery = signal<string>('');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
   
-  // Selection Helper
+  // Selection
   public selectedIds = signal<Set<string>>(new Set());
-
-  // Bulk Edit Modal State
   public isBulkModalOpen = signal(false);
   
-  // Pagination Signals
+  // Pagination
   public currentPage = signal<number>(1);
   public itemsPerPage = signal<number>(10);
   
   public loading = signal<boolean>(true);
   public error = signal<string | null>(null);
 
-  // Computed: Filtered & Sorted (Full List)
+  constructor() {
+    this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
+      const page = params['_page'] ? Number(params['_page']) : 1;
+      this.currentPage.set(page || 1);
+    });
+  }
+
+  // Computed properties
   public allFilteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
-    let result = this.products();
+    let result = [...this.products()];
 
-    // 1. Filter
     if (query) {
       result = result.filter(p => 
         p.name.toLowerCase().includes(query) || 
-        p.slug?.toLowerCase().includes(query) ||
-        p.sku?.toLowerCase().includes(query) ||
-        p.barcode?.toLowerCase().includes(query)
+        p.sku?.toLowerCase().includes(query)
       );
     }
 
-    // 2. Sort
     const sort = this.sortOrder();
     return result.sort((a, b) => {
       switch (sort) {
         case 'price_asc': return a.price - b.price;
         case 'price_desc': return b.price - a.price;
-        case 'stock_asc': return a.stock - b.stock;
-        case 'stock_desc': return b.stock - a.stock;
-        case 'name_asc': default: return a.name.localeCompare(b.name);
+        case 'stock_asc': return (a.stock || 0) - (b.stock || 0);
+        case 'stock_desc': return (b.stock || 0) - (a.stock || 0);
+        default: return a.name.localeCompare(b.name);
       }
     });
   });
 
-  // Computed: Paginated Slice
   public paginatedProducts = computed(() => {
     const all = this.allFilteredProducts();
-    const page = this.currentPage();
-    const perPage = this.itemsPerPage();
-    
-    const start = (page - 1) * perPage;
-    return all.slice(start, start + perPage);
+    const start = (this.currentPage() - 1) * this.itemsPerPage();
+    return all.slice(start, start + this.itemsPerPage());
   });
 
-  // Computed: Total Pages
   public totalPages = computed(() => {
      return Math.ceil(this.allFilteredProducts().length / this.itemsPerPage());
   });
@@ -92,100 +90,89 @@ export class AdminProductsPage implements OnInit {
   public selectedIdsList = computed(() => Array.from(this.selectedIds()));
 
   async ngOnInit() {
-    // Sync URL params
-    this.route.queryParams.subscribe(params => {
-      const page = params['_page'] ? Number(params['_page']) : 1;
-      this.currentPage.set(page || 1);
-    });
+    await this.loadData();
+  }
 
+  async loadData() {
+    this.loading.set(true);
     try {
-      const [products, brands] = await Promise.all([
+      const [products, brands, categories] = await Promise.all([
           this.productService.getProducts(),
-          this.productService.getBrands()
+          this.productService.getBrands(),
+          this.productService.getCategories()
       ]);
       this.products.set(products);
       this.brands.set(brands);
+      this.categories.set(categories);
     } catch (e: any) {
-      this.error.set(e.message || 'Error al cargar productos');
+      this.error.set(e.message || 'Error al cargar datos');
     } finally {
       this.loading.set(false);
+      this.cdr.detectChanges();
     }
-  }
-
-  // Selection Logic
-  toggleSelection(id: string) {
-    this.selectedIds.update(set => {
-        const newSet = new Set(set);
-        if (newSet.has(id)) newSet.delete(id);
-        else newSet.add(id);
-        return newSet;
-    });
   }
 
   toggleSelectAll() {
     const pageItems = this.paginatedProducts();
-    const allSelected = this.isAllSelected();
-    
-    this.selectedIds.update(set => {
-        const newSet = new Set(set);
-        if (allSelected) {
-            pageItems.forEach(p => newSet.delete(p.id));
-        } else {
-            pageItems.forEach(p => newSet.add(p.id));
-        }
-        return newSet;
-    });
-  }
-  
-  openBulkEdit() {
-      if (this.selectedIds().size === 0) return;
-      this.isBulkModalOpen.set(true);
+    const currentSelected = new Set(this.selectedIds());
+    const allOnPageSelected = this.isAllSelected();
+
+    if (allOnPageSelected) {
+      pageItems.forEach(p => currentSelected.delete(p.id));
+    } else {
+      pageItems.forEach(p => currentSelected.add(p.id));
+    }
+    this.selectedIds.set(currentSelected);
   }
 
-  onBulkEditSuccess() {
-      this.selectedIds.set(new Set()); // Clear selection
-      this.ngOnInit(); // Reload data
+  toggleSelection(id: string) {
+    const currentSelected = new Set(this.selectedIds());
+    if (currentSelected.has(id)) {
+      currentSelected.delete(id);
+    } else {
+      currentSelected.add(id);
+    }
+    this.selectedIds.set(currentSelected);
   }
 
   clearSelection() {
-      this.selectedIds.set(new Set());
+    this.selectedIds.set(new Set());
+  }
+
+  updateSort(event: any) {
+    this.sortOrder.set(event.target.value);
+  }
+
+  openBulkEdit() {
+    this.isBulkModalOpen.set(true);
+  }
+
+  async onBulkEditSuccess() {
+    this.clearSelection();
+    await this.loadData();
   }
 
   async exportProducts() {
     try {
-      this.loading.set(true);
       await this.productService.exportProductsToCSV();
     } catch (e: any) {
-      this.error.set(e.message || 'Error al exportar productos');
-    } finally {
-      this.loading.set(false);
+      this.error.set('Error al exportar: ' + e.message);
     }
   }
 
-  async importProducts(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-    const file = input.files[0];
-
-    try {
-      this.loading.set(true);
-      const result = await this.productService.importProductsFromCSV(file);
-      alert(`Importación completada: ${result.success} productos importados/actualizados. ${result.errors} errores.`);
-      // Reload products
-      const data = await this.productService.getProducts();
-      this.products.set(data);
-    } catch (e: any) {
-      this.error.set(e.message || 'Error al importar productos');
-    } finally {
-      this.loading.set(false);
-      // Reset file input
-      input.value = '';
+  async importProducts(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        this.loading.set(true);
+        const result = await this.productService.importProductsFromCSV(file);
+        alert(`Éxito: ${result.success}, Errores: ${result.errors}`);
+        await this.loadData();
+      } catch (e: any) {
+        this.error.set('Error al importar: ' + e.message);
+      } finally {
+        this.loading.set(false);
+      }
     }
-  }
-
-  // Helpers for Template
-  updateSort(event: Event) {
-    const value = (event.target as HTMLSelectElement).value;
-    this.sortOrder.set(value as 'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc');
   }
 }

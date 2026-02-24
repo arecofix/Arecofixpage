@@ -4,6 +4,7 @@ import { map, catchError } from 'rxjs/operators';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { ProductRepository } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
@@ -14,7 +15,18 @@ import { ProductsParams, ProductsResponse } from '@app/public/products/interface
 export class SupabaseProductRepository extends ProductRepository {
   private authService = inject(AuthService);
   private logger = inject(LoggerService);
+  private tenantService = inject(TenantService);
   private supabase: SupabaseClient = this.authService.getSupabaseClient();
+  
+  protected useSoftDeletes = true;
+
+  private applyTenantFilter(query: any) {
+      let enhancedQuery = query.eq('tenant_id', this.tenantService.getTenantId());
+      if (this.useSoftDeletes) {
+          enhancedQuery = enhancedQuery.is('deleted_at', null);
+      }
+      return enhancedQuery;
+  }
 
   findWithFilters(params: ProductsParams = {}): Observable<ProductsResponse> {
     const {
@@ -35,21 +47,20 @@ export class SupabaseProductRepository extends ProductRepository {
     const start = (_page - 1) * _per_page;
     const end = start + _per_page - 1;
 
-    let query = this.supabase
+    let baseQuery = this.supabase
       .from('products')
-      .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at', { count: 'exact' })
+      .select(`
+        id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+        branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
+      `, { count: 'exact' })
       .eq('is_active', true);
-
-    // Apply filters
-    this.logger.debug('ProductRepository findWithFilters params:', params);
+      
+    let query = this.applyTenantFilter(baseQuery);
 
     if (params.category_ids && params.category_ids.length > 0) {
-      if (params.category_ids.length === 1) {
-        query = query.eq('category_id', params.category_ids[0]);
-      } else {
-        query = query.in('category_id', params.category_ids);
-      }
-    } else if (category_id !== undefined && category_id !== null) {
+      query = query.in('category_id', params.category_ids);
+    } else if (category_id) {
       query = query.eq('category_id', category_id);
     }
     
@@ -64,31 +75,26 @@ export class SupabaseProductRepository extends ProductRepository {
     if (min_price !== undefined) query = query.gte('price', min_price);
     if (max_price !== undefined) query = query.lte('price', max_price);
     
-    // Search query
     if (params.q) {
       query = query.or(`name.ilike.%${params.q}%,description.ilike.%${params.q}%`);
     }
 
-    // Apply sorting
     if (params._sort) {
       query = query.order(params._sort, { ascending: params._order === 'asc' });
     } else {
-      // Default sort
       query = query.order('created_at', { ascending: false });
     }
 
-    // Apply pagination
     query = query.range(start, end);
 
-    return from(query).pipe(
-      map(({ data, count, error }) => {
+    return from(query as any).pipe(
+      map((res: any) => {
+        const { data, count, error } = res;
         if (error) throw error;
 
         const totalItems = count || 0;
         const pages = Math.max(1, Math.ceil(totalItems / _per_page));
 
-        // Use any to bypass rigorous structure check between Entity and Interface Product types
-        // The _mapToEntity returns an object that satisfies the Interface (with 'featured')
         const products = (data || []).map((p: any) => this._mapToEntity(p));
 
         return {
@@ -98,143 +104,177 @@ export class SupabaseProductRepository extends ProductRepository {
           last: pages,
           pages,
           items: totalItems,
-          data: products, // This is any[], which is assignable to Product[] (Interface)
-        } as unknown as ProductsResponse; // Force cast to satisfy signature
-      }),
-      catchError((err) => {
-        this.logger.error('Supabase product query error', err);
-        return of({
-          first: 1,
-          prev: undefined,
-          next: undefined,
-          last: 1,
-          pages: 1,
-          items: 0,
-          data: [],
-        } as unknown as ProductsResponse);
+          data: products,
+        } as unknown as ProductsResponse;
       })
     );
   }
 
   findLowStock(threshold: number = 5): Observable<Product[]> {
-    return from(
-      this.supabase.from('products')
-        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
-        .lt('stock', threshold)
-    ).pipe(map(({ data, error }) => {
-      if (error) throw error;
-      return (data || []).map((p: any) => this._mapToEntity(p));
-    }));
+    let query = this.supabase.from('products')
+        .select(`
+          id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+          is_active, is_featured, sku, barcode, created_at, updated_at,
+          branch_stock:product_stock_per_branch!inner(quantity, branch_id)
+        `)
+        .lt('product_stock_per_branch.quantity', threshold);
+
+    return from(this.applyTenantFilter(query) as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        return (data || []).map((p: any) => this._mapToEntity(p));
+      })
+    );
   }
 
   findAvailable(): Observable<Product[]> {
-    return from(
-      this.supabase.from('products')
-        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
-        .gt('stock', 0)
-        .eq('is_active', true)
-    ).pipe(map(({ data, error }) => {
-      if (error) throw error;
-      return (data || []).map((p: any) => this._mapToEntity(p));
-    }));
+    let query = this.supabase.from('products')
+        .select(`
+          id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+          is_active, is_featured, sku, barcode, created_at, updated_at,
+          branch_stock:product_stock_per_branch!inner(quantity, branch_id)
+        `)
+        .gt('product_stock_per_branch.quantity', 0)
+        .eq('is_active', true);
+
+    return from(this.applyTenantFilter(query) as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        return (data || []).map((p: any) => this._mapToEntity(p));
+      })
+    );
   }
 
-  getAll(): Observable<Product[]> {
+  getAll(branch_id?: string): Observable<Product[]> {
+     let select = `
+          id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+          branch_stock:product_stock_per_branch(quantity, branch_id)
+     `;
+
+     let query = this.applyTenantFilter(this.supabase.from('products').select(select));
+
      return from(
-      this.supabase.from('products')
-        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
-        .order('created_at', { ascending: false })
-    ).pipe(map(({ data, error }) => {
-      if (error) throw error;
-      return (data || []).map((p: any) => this._mapToEntity(p));
-    }));
+       (query.order('created_at', { ascending: false }) as any)
+     ).pipe(map((res: any) => {
+       const { data, error } = res;
+       if (error) throw error;
+       return (data || []).map((p: any) => this._mapToEntity(p, branch_id));
+     }));
   }
 
   getById(id: string): Observable<Product> {
-    return from(
-      this.supabase.from('products')
-        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
-        .eq('id', id)
-        .single()
-    ).pipe(map(({ data, error }) => {
-      if (error) throw error;
-      return this._mapToEntity(data);
-    }));
+    let query = this.supabase.from('products')
+        .select(`
+          id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+          is_active, is_featured, sku, barcode, created_at, updated_at,
+          branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
+        `)
+        .eq('id', id);
+
+    let filteredQuery = this.applyTenantFilter(query).single();
+
+    return from(filteredQuery as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        return this._mapToEntity(data);
+      })
+    );
+  }
+
+  async uploadImage(file: File): Promise<string> {
+    const filePath = `products/${Date.now()}-${file.name}`;
+    const { data, error } = await this.supabase.storage.from('public-assets').upload(filePath, file);
+
+    if (error) throw error;
+
+    const { data: publicUrl } = this.supabase.storage.from('public-assets').getPublicUrl(data.path);
+    return publicUrl.publicUrl;
+  }
+
+  private async syncBranchStock(productId: string, quantity: number): Promise<void> {
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
+
+    const profile = await this.authService.getUserProfile(user.id);
+    if (!profile || !profile.branch_id) return;
+
+    await this.supabase
+        .from('product_stock_per_branch')
+        .upsert({
+            product_id: productId,
+            branch_id: profile.branch_id,
+            quantity: quantity,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'product_id,branch_id' });
   }
 
   create(product: Product): Observable<Product> {
-    const productData = {
-      ...product,
+    const { stock, ...productData } = product;
+    const payload = {
+      ...productData,
+      tenant_id: this.tenantService.getTenantId(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
     return from(
-      this.supabase
+      (this.supabase
         .from('products')
-        .insert(productData)
-        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
-        .single()
+        .insert(payload)
+        .select('*')
+        .single() as any)
     ).pipe(
-      map(({ data, error }) => {
-        if (error) {
-          this.logger.error('Error creating product', error);
-          throw error;
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        if (stock !== undefined) {
+            this.syncBranchStock(data.id, stock);
         }
         return this._mapToEntity(data);
-      }),
-      catchError((err) => {
-        this.logger.error('Failed to create product', err);
-        throw err;
       })
     );
   }
 
   update(id: string, product: Partial<Product>): Observable<Product> {
-    const updateData = {
-      ...product,
+    const { stock, ...productData } = product;
+    
+    // Evita error de modificación inmutable SQL
+    delete productData.tenant_id;
+    delete productData.id;
+
+    const payload = {
+      ...productData,
       updated_at: new Date().toISOString()
     };
 
-    return from(
-      this.supabase
-        .from('products')
-        .update(updateData)
-        .eq('id', id)
-        .select('id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, stock, is_active, is_featured, sku, barcode, created_at, updated_at')
-        .single()
-    ).pipe(
-      map(({ data, error }) => {
-        if (error) {
-          this.logger.error('Error updating product', error);
-          throw error;
+    let query = this.supabase.from('products').update(payload).eq('id', id);
+    let filteredQuery = this.applyTenantFilter(query).select('*').single();
+
+    return from(filteredQuery as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        if (stock !== undefined) {
+            this.syncBranchStock(id, stock);
         }
         return this._mapToEntity(data);
-      }),
-      catchError((err) => {
-        this.logger.error('Failed to update product', err);
-        throw err;
       })
     );
   }
 
   delete(id: string): Observable<void> {
-    return from(
-      this.supabase
-        .from('products')
-        .delete()
-        .eq('id', id)
-    ).pipe(
-      map(({ error }) => {
-        if (error) {
-          this.logger.error('Error deleting product', error);
-          throw error;
-        }
+    let query = this.supabase.from('products').delete().eq('id', id);
+    let filteredQuery = this.applyTenantFilter(query);
+
+    return from(filteredQuery as any).pipe(
+      map((res: any) => {
+        const { error } = res;
+        if (error) throw error;
         return void 0;
-      }),
-      catchError((err) => {
-        this.logger.error('Failed to delete product', err);
-        throw err;
       })
     );
   }
@@ -242,26 +282,22 @@ export class SupabaseProductRepository extends ProductRepository {
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
     if (!products.length) return of([]);
 
-    const dataToUpsert = products.map(p => ({
-        ...p,
-        updated_at: new Date().toISOString()
-    }));
+    const dataToUpsert = products.map(p => {
+        const { stock, ...rest } = p;
+        return {
+            ...rest,
+            tenant_id: this.tenantService.getTenantId(),
+            updated_at: new Date().toISOString()
+        };
+    });
 
     return from(
-      this.supabase.from('products')
-        .upsert(dataToUpsert, { onConflict: 'id' as any }) // cast 'id' if TS complains
-        .select()
+      (this.supabase.from('products').upsert(dataToUpsert).select() as any)
     ).pipe(
-      map(({ data, error }) => {
-        if (error) {
-           this.logger.error('Error upserting products', error);
-           throw error;
-        }
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
         return (data || []).map((p: any) => this._mapToEntity(p));
-      }),
-      catchError((err) => {
-        this.logger.error('Failed to upsert products', err);
-        throw err;
       })
     );
   }
@@ -269,34 +305,43 @@ export class SupabaseProductRepository extends ProductRepository {
   updateMany(products: Partial<Product>[]): Observable<void> {
     if (!products.length) return of(void 0);
 
-    // Parallel updates
     const updates = products.map(p => {
         if (!p.id) return Promise.resolve({ error: { message: 'Missing ID' } });
-        const { id, ...updateData } = p;
-        return this.supabase.from('products').update({
+        const { id, tenant_id, ...updateData } = p;
+        
+        let query = this.supabase.from('products').update({
             ...updateData,
             updated_at: new Date().toISOString()
         }).eq('id', id);
+        
+        return this.applyTenantFilter(query);
     });
 
     return from(Promise.all(updates)).pipe(
-        map((results) => {
-            const errors = results.filter((r: any) => r && r.error);
-            if (errors.length > 0) {
-                 this.logger.error('Some updates failed', errors);
-                 throw new Error(`Failed to update ${errors.length} products`);
-            }
-            return void 0;
-        }),
-        catchError(err => {
-            this.logger.error('Failed to update many products', err);
-            throw err;
-        })
+      map((results) => {
+        const errors = results.filter((r: any) => r && r.error);
+        if (errors.length > 0) {
+             throw new Error(`Failed to update ${errors.length} products`);
+        }
+        return void 0;
+      })
     );
   }
 
-  private _mapToEntity(p: any): any {
+  private _mapToEntity(p: any, branch_id?: string): Product {
     const isFeatured = Boolean(p['featured'] ?? p['is_featured'] ?? false);
+    let displayedStock = 0;
+    const branchStockList = p.branch_stock && Array.isArray(p.branch_stock) ? p.branch_stock : [];
+    
+    if (branch_id) {
+       const specificBranch = branchStockList.find((b: any) => b.branch_id === branch_id);
+       displayedStock = specificBranch ? Number(specificBranch.quantity) : 0;
+    } else if (branchStockList.length > 0) {
+       displayedStock = branchStockList.reduce((acc: number, curr: any) => acc + (Number(curr.quantity) || 0), 0);
+    } else {
+       displayedStock = Number(p['stock'] || 0);
+    }
+
     return {
           id: p['id'] as string,
           name: p['name'] as string,
@@ -307,18 +352,18 @@ export class SupabaseProductRepository extends ProductRepository {
           gallery_urls: p['gallery_urls'] || (p['image_url'] ? [p['image_url']] : []),
           category_id: p['category_id'] as string,
           brand_id: p['brand_id'] as string,
-          stock: Number(p['stock']),
+          stock: displayedStock,
           is_active: Boolean(p['is_active']),
           is_featured: isFeatured,
-          featured: isFeatured,
           sku: p['sku'] as string || '',
           barcode: p['barcode'] as string || '',
           currency: p['currency'] as 'ARS' | 'USD' || 'ARS',
-          condition: p['condition'] as string,
+          condition: p['condition'] as 'new' | 'used' | 'refurbished' | undefined,
           warranty: p['warranty'] as string,
           min_stock_alert: p['min_stock_alert'] ? Number(p['min_stock_alert']) : undefined,
           created_at: p['created_at'] as string,
           updated_at: p['updated_at'] as string,
+          branch_stock: p.branch_stock
     };
   }
 }

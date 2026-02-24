@@ -8,6 +8,7 @@ import { StatusColorPipe } from '@app/shared/pipes/status-color.pipe';
 import { LoggerService } from '@app/core/services/logger.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-admin-orders-page',
@@ -28,7 +29,7 @@ export class AdminOrdersPage implements OnInit {
 
     // Filters & Sort
     searchQuery = signal('');
-    filterStatus = signal<'all' | 'pending' | 'processing' | 'completed' | 'cancelled'>('all');
+    filterStatus = signal<'all' | 'pending' | 'paid' | 'completed' | 'cancelled'>('all');
     sortOrder = signal<'date_desc' | 'date_asc' | 'total_desc'>('date_desc');
 
     // Pagination
@@ -95,24 +96,23 @@ export class AdminOrdersPage implements OnInit {
         this.loadOrders();
     }
 
-    loadOrders() {
+    async loadOrders() {
         this.loading.set(true);
-        this.orderService.getOrders().subscribe({
-            next: (data: OrderWithItems[]) => {
-                this.orders.set(data);
-                this.loading.set(false);
-            },
-            error: (err: any) => {
-                this.error.set(err.message || 'Error al cargar pedidos');
-                this.loading.set(false);
-            }
-        });
+        try {
+            const data = await firstValueFrom(this.orderService.getOrders());
+            this.orders.set(data);
+        } catch (err: any) {
+            this.error.set(err.message || 'Error al cargar pedidos');
+        } finally {
+            this.loading.set(false);
+            this.cdr.detectChanges();
+        }
     }
 
     async toggleOrderStatus(order: OrderWithItems) {
-        if (order.status !== 'pending' && order.status !== 'processing') return;
+        if (order.status !== 'pending' && order.status !== 'paid') return;
 
-        const newStatus = order.status === 'pending' ? 'processing' : 'pending';
+        const newStatus = order.status === 'pending' ? 'paid' : 'pending';
         
         try {
             const { error } = await this.orderService.updateOrderStatus(order.id!, newStatus);

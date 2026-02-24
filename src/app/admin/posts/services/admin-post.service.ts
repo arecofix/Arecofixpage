@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { Post } from '@app/features/posts/domain/entities/post.entity';
 
 @Injectable({
@@ -7,12 +8,14 @@ import { Post } from '@app/features/posts/domain/entities/post.entity';
 })
 export class AdminPostService {
     private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
     private supabase = this.auth.getSupabaseClient();
 
     async getPosts(): Promise<Post[]> {
         const { data, error } = await this.supabase
             .from('blog_posts')
             .select('*')
+            .eq('tenant_id', this.tenantService.getTenantId())
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -24,6 +27,7 @@ export class AdminPostService {
             .from('blog_posts')
             .select('*')
             .eq('id', id)
+            .eq('tenant_id', this.tenantService.getTenantId())
             .single();
 
         if (error) throw error;
@@ -52,6 +56,8 @@ export class AdminPostService {
         delete dbPayload.meta_description;
         delete dbPayload.published;
 
+        dbPayload.tenant_id = this.tenantService.getTenantId();
+
         const { error } = await this.supabase.from('blog_posts').insert(dbPayload);
         if (error) throw error;
     }
@@ -70,12 +76,18 @@ export class AdminPostService {
         delete dbPayload.meta_description;
         delete dbPayload.published;
 
-        const { error } = await this.supabase.from('blog_posts').update(dbPayload).eq('id', id);
+        const { error } = await this.supabase.from('blog_posts')
+            .update(dbPayload)
+            .eq('id', id)
+            .eq('tenant_id', this.tenantService.getTenantId());
         if (error) throw error;
     }
 
     async deletePost(id: string): Promise<void> {
-        const { error } = await this.supabase.from('blog_posts').delete().eq('id', id);
+        const { error } = await this.supabase.from('blog_posts')
+            .delete()
+            .eq('id', id)
+            .eq('tenant_id', this.tenantService.getTenantId());
         if (error) throw error;
     }
 

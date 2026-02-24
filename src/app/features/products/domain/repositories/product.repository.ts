@@ -10,13 +10,13 @@ export abstract class ProductRepository {
     abstract findLowStock(threshold?: number): Observable<Product[]>;
     abstract findAvailable(): Observable<Product[]>;
 
-    abstract getAll(): Observable<Product[]>;
+    abstract getAll(branch_id?: string): Observable<Product[]>;
     abstract getById(id: string): Observable<Product>;
     abstract create(product: Product): Observable<Product>;
     abstract update(id: string, product: Partial<Product>): Observable<Product>;
     abstract delete(id: string): Observable<void>;
     
-    // Bulk Operations
+    abstract uploadImage(file: File): Promise<string>;
     abstract upsertMany(products: Partial<Product>[]): Observable<Product[]>;
     abstract updateMany(products: Partial<Product>[]): Observable<void>;
 }

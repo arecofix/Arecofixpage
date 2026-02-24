@@ -1,35 +1,9 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <script>
-      // Silenciar Advertencias y Errores del Pixel de Facebook
-      var originalWarn = console.warn;
-      var originalError = console.error;
-
-      function filterConsoleMessages(msg) {
-        if (typeof msg === "string") {
-          return (
-            msg.includes("attribution-reporting") ||
-            msg.includes("browsing-topics") ||
-            msg.includes("A preload for")
-          );
-        }
-        return false;
-      }
-
-      console.warn = function () {
-        if (arguments[0] && filterConsoleMessages(arguments[0])) return;
-        originalWarn.apply(console, arguments);
-      };
-
-      console.error = function () {
-        if (arguments[0] && filterConsoleMessages(arguments[0])) return;
-        originalError.apply(console, arguments);
-      };
-    </script>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://us.posthog.com https://us.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://*.google.com;"/>
-    <title>Inicio - Soluciones Informáticas & Consultoría IT | Arecofix</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com;"/>
+    <title>Soluciones Informáticas - Consultoría IT | Arecofix</title>
     <base href="/"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="description" content="Servicio Técnico especializado en Celulares, Consultoría IT, Desarrollo Web y Inteligencia Artificial en Marcos Paz."/>
@@ -40,7 +14,7 @@
     <!-- Open Graph / Facebook / WhatsApp Placeholders -->
     <meta property="fb:app_id" content="1209190100450173"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:title" content="Inicio - Soluciones Informáticas &amp; Consultoría IT | Arecofix"/>
+    <meta property="og:title" content="Soluciones Informáticas - Consultoría IT | Arecofix"/>
     <meta property="og:description" content="Reparación de Celulares en el acto, Desarrollo Web y Consultoría IT en Marcos Paz."/>
     <meta property="og:image" content="assets/img/branding/og-services.jpg"/>
     <meta property="og:url" content="https://arecofix.com.ar"/>
@@ -48,7 +22,7 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:title" content="Arecofix - Soluciones Informáticas &amp; Consultoría IT"/>
+    <meta name="twitter:title" content="Soluciones Informáticas - Consultoría IT | Arecofix"/>
     <meta name="twitter:description" content="Reparación de Celulares y Soluciones IT en Marcos Paz."/>
     <meta name="twitter:image" content="assets/img/branding/og-services.jpg"/>
 
@@ -66,7 +40,7 @@
     <link rel="dns-prefetch" href="https://www.googletagmanager.com"/>
 
     <!-- Critical fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&amp;family=Inter:wght@400;700&amp;display=swap" rel="stylesheet" media="print" onload="this.media = 'all'"/>
+    <style>@font-face{font-family:'Exo 2';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYlK-4E4Q.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYsK-4E4Q.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYnK-4E4Q.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYmK-4E4Q.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYoK-4.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYlK-4E4Q.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYsK-4E4Q.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYnK-4E4Q.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYmK-4E4Q.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Exo 2';font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/exo2/v26/7cHmv4okm5zmbtYoK-4.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}</style>
     <noscript>
       <link
         href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
@@ -153,7 +127,7 @@
         setTimeout(loadAnalytics, 8000);
       })();
     </script>
-  <link rel="stylesheet" href="styles.css" crossorigin="anonymous"></head>
+  <link rel="stylesheet" href="styles-5437QE27.css" crossorigin="anonymous"></head>
 
   <body><script type="text/javascript" id="ng-event-dispatch-contract">(()=>{function p(t,n,r,o,e,i,f,m){return{eventType:t,event:n,targetElement:r,eic:o,timeStamp:e,eia:i,eirp:f,eiack:m}}function u(t){let n=[],r=e=>{n.push(e)};return{c:t,q:n,et:[],etc:[],d:r,h:e=>{r(p(e.type,e,e.target,t,Date.now()))}}}function s(t,n,r){for(let o=0;o<n.length;o++){let e=n[o];(r?t.etc:t.et).push(e),t.c.addEventListener(e,t.h,r)}}function c(t,n,r,o,e=window){let i=u(t);e._ejsas||(e._ejsas={}),e._ejsas[n]=i,s(i,r),s(i,o,!0)}window.__jsaction_bootstrap=c;})();
 </script>
@@ -163,7 +137,6 @@
         height="0"
         width="0"
         style="display: none; visibility: hidden"
-        allow="attribution-reporting; browsing-topics"
       ></iframe
     ></noscript>
     <!-- End Google Tag Manager (noscript) -->
@@ -191,5 +164,5 @@
 
     <app-root></app-root>
     <!-- Analytics se carga dinámicamente sólo en producción -->
-  <link rel="modulepreload" href="chunk-37JUCHEQ.js"><link rel="modulepreload" href="chunk-QC2G4SN3.js"><link rel="modulepreload" href="chunk-YH56VV6G.js"><link rel="modulepreload" href="chunk-XUAOU2YN.js"><link rel="modulepreload" href="chunk-WEDM36GW.js"><link rel="modulepreload" href="chunk-B4BUXRTQ.js"><link rel="modulepreload" href="chunk-ZJZBKGOC.js"><link rel="modulepreload" href="chunk-SZ44J5DM.js"><link rel="modulepreload" href="chunk-MZTEREIC.js"><link rel="modulepreload" href="chunk-GR2FBAX3.js"><script src="main.js" type="module" crossorigin="anonymous"></script></body>
+  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-XECWOO46.js"><link rel="modulepreload" href="chunk-AWQLWEOW.js"><link rel="modulepreload" href="chunk-T3F2WVBP.js"><link rel="modulepreload" href="chunk-SBGEPZUY.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-WKY6L6NV.js"><link rel="modulepreload" href="chunk-BGHZUC77.js"><link rel="modulepreload" href="chunk-6WWONRBM.js"><script src="main-W6YLMJ35.js" type="module" crossorigin="anonymous"></script></body>
 </html>

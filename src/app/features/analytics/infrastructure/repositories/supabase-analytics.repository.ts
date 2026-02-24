@@ -3,16 +3,16 @@ import { AnalyticsRepository, DashboardStats } from '../../domain/repositories/a
 import { Observable, from, map } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseAnalyticsRepository implements AnalyticsRepository {
-  private auth = inject(AuthService);
+  private supabase = inject(SUPABASE_CLIENT);
 
   getDashboardStats(): Observable<DashboardStats> {
-    const supabase = this.auth.getSupabaseClient();
-    
-    return from(supabase.rpc('get_dashboard_stats')).pipe(
+    return from(this.supabase.rpc('get_dashboard_stats')).pipe(
       map(({ data, error }) => {
         if (error) throw error;
         

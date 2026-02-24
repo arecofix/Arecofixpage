@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { SupabaseClient, PostgrestError } from '@supabase/supabase-js';
 import { LoggerService } from './logger.service';
+import { TenantService } from './tenant.service';
 
 export interface CreateMessageDto {
     name: string;
@@ -17,6 +18,7 @@ export interface CreateMessageDto {
 export class ContactService {
     private authService = inject(AuthService);
     private logger = inject(LoggerService);
+    private tenantService = inject(TenantService);
     private supabase: SupabaseClient;
 
     constructor() {
@@ -31,7 +33,8 @@ export class ContactService {
                 phone: msg.phone || null,
                 subject: msg.subject || null,
                 message: msg.message,
-                is_read: false 
+                is_read: false,
+                tenant_id: this.tenantService.getTenantId()
             };
 
             const { error } = await this.supabase

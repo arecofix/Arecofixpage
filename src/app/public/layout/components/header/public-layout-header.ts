@@ -21,12 +21,13 @@ import { ThemeService } from '@app/core/services/theme.service';
 import { SearchService } from '@app/shared/services/search.service';
 import { AutoFocusDirective } from '@app/shared/directives/auto-focus.directive';
 import { Product } from '@app/features/products/domain/entities/product.entity';
+import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { NavItem } from '@app/shared/models/navigation.model';
 import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/models/navigation.data';
 import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
 import { ThemeToggleComponent } from '@app/shared/components/theme-toggle/theme-toggle.component';
 import { map } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'public-layout-header',
@@ -58,6 +59,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private productRepo = inject(ProductRepository);
 
   public user$ = this.authService.authState$.pipe(map((state) => state.user));
 
@@ -255,16 +257,10 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   async loadProducts() {
     if (!isPlatformBrowser(this.platformId)) return;
     try {
-      const supabase = this.authService.getSupabaseClient();
-      const { data } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .gt('stock', 0)
-        .order('name');
+      const data = await firstValueFrom(this.productRepo.findAvailable());
       if (data) this.products.set(data);
     } catch {
-      // Silent fail on SSR or no supabase
+      // Silent fail on SSR or network error
     }
   }
 

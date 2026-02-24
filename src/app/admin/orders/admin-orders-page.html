@@ -77,8 +77,8 @@
             [checked]="filterStatus() === 'all'" (click)="filterStatus.set('all')" />
             <input class="join-item btn" type="radio" name="status" aria-label="Pendientes"
               [checked]="filterStatus() === 'pending'" (click)="filterStatus.set('pending')" />
-              <input class="join-item btn" type="radio" name="status" aria-label="Procesando"
-                [checked]="filterStatus() === 'processing'" (click)="filterStatus.set('processing')" />
+              <input class="join-item btn" type="radio" name="status" aria-label="Pagado"
+                [checked]="filterStatus() === 'paid'" (click)="filterStatus.set('paid')" />
                 <input class="join-item btn" type="radio" name="status" aria-label="Completados"
                   [checked]="filterStatus() === 'completed'" (click)="filterStatus.set('completed')" />
                 </div>

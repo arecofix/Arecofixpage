@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-admin-category-form-page',
@@ -14,6 +15,7 @@ export class AdminCategoryFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
 
     id: string | null = null;
     categories = signal<any[]>([]);
@@ -36,13 +38,21 @@ export class AdminCategoryFormPage implements OnInit {
         const supabase = this.auth.getSupabaseClient();
         
         // Fetch all categories for the parent dropdown
-        const { data: categoriesData } = await supabase.from('categories').select('id, name').eq('is_active', true).order('name');
+        const { data: categoriesData } = await supabase.from('categories')
+            .select('id, name')
+            .eq('tenant_id', this.tenantService.getTenantId())
+            .eq('is_active', true)
+            .order('name');
         if (categoriesData) {
             this.categories.set(categoriesData);
         }
 
         if (this.id) {
-            const { data, error } = await supabase.from('categories').select('*').eq('id', this.id).single();
+            const { data, error } = await supabase.from('categories')
+                .select('*')
+                .eq('tenant_id', this.tenantService.getTenantId())
+                .eq('id', this.id)
+                .single();
             if (data) {
                 this.form.set({
                     name: data.name,
@@ -70,10 +80,16 @@ export class AdminCategoryFormPage implements OnInit {
 
         try {
             if (this.id) {
-                const { error } = await supabase.from('categories').update(payload).eq('id', this.id);
+                const { error } = await supabase.from('categories')
+                    .update(payload)
+                    .eq('id', this.id)
+                    .eq('tenant_id', this.tenantService.getTenantId());
                 if (error) throw error;
             } else {
-                const { error } = await supabase.from('categories').insert(payload);
+                const { error } = await supabase.from('categories').insert({
+                    ...payload,
+                    tenant_id: this.tenantService.getTenantId()
+                });
                 if (error) throw error;
             }
             this.router.navigate(['/admin/categories']);

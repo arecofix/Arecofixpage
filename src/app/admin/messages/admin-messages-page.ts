@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { Message } from '@app/features/customers/domain/entities/message.entity';
 
 @Component({
@@ -11,6 +12,7 @@ import { Message } from '@app/features/customers/domain/entities/message.entity'
 })
 export class AdminMessagesPage implements OnInit {
   private auth = inject(AuthService);
+  private tenantService = inject(TenantService);
   messages = signal<Message[]>([]);
   loading = signal(true);
 
@@ -24,6 +26,7 @@ export class AdminMessagesPage implements OnInit {
     const { data, error } = await supabase
       .from('contact_messages')
       .select('*')
+      .eq('tenant_id', this.tenantService.getTenantId())
       .order('created_at', { ascending: false });
 
     if (data) {
@@ -37,7 +40,8 @@ export class AdminMessagesPage implements OnInit {
     const { error } = await supabase
       .from('contact_messages')
       .update({ is_read: true })
-      .eq('id', id);
+      .eq('id', id)
+      .eq('tenant_id', this.tenantService.getTenantId());
 
     if (!error) {
       this.messages.update(msgs =>
@@ -50,7 +54,10 @@ export class AdminMessagesPage implements OnInit {
     if (!confirm('¿Estás seguro de eliminar este mensaje?')) return;
 
     const supabase = this.auth.getSupabaseClient();
-    const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+    const { error } = await supabase.from('contact_messages')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', this.tenantService.getTenantId());
 
     if (!error) {
       this.messages.update(msgs => msgs.filter(m => m.id !== id));

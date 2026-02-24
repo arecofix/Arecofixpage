@@ -6,6 +6,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { Post } from '@app/features/posts/domain/entities/post.entity';
 import { PostService } from '@app/features/posts/application/post.service';
 import { AuthService } from '@app/core/services/auth.service';
+import { ContactService } from '@app/core/services/contact.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
 import { environment } from 'src/environments/environment';
 
@@ -23,6 +24,7 @@ export class PostPage implements OnInit, OnDestroy {
     private titleService = inject(Title);
     private metaService = inject(Meta);
     private auth = inject(AuthService);
+    private contactService = inject(ContactService);
     private document = inject(DOCUMENT);
 
     post: Post | null = null;
@@ -177,16 +179,13 @@ export class PostPage implements OnInit, OnDestroy {
         this.cdr.markForCheck();
 
         try {
-            const supabase = this.auth.getSupabaseClient();
-            
-            // Save to DB
-            await supabase.from('contact_messages').insert({
+            // Save to DB via tenant-aware service
+            await this.contactService.createMessage({
                 name: this.contactName,
                 phone: this.contactPhone,
                 email: 'web-contact@arecofix.com', // Placeholder
                 subject: 'Consulta desde Landing Servicio Técnico',
-                message: this.contactMessage,
-                is_read: false
+                message: this.contactMessage
             });
 
             alert('¡Consulta enviada con éxito! Te responderemos a la brevedad.');

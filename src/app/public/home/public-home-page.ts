@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { environment } from '../../../environments/environment';
-import { AuthService } from '@app/core/services/auth.service';
+import { ContactService } from '@app/core/services/contact.service';
 
 import { HOME_CONTENT, HomeContent, QuoteForm } from './public-home.content';
 
@@ -33,7 +33,7 @@ import { HOME_CONTENT, HomeContent, QuoteForm } from './public-home.content';
 })
 export class PublicHomePage implements OnInit {
   private seoService = inject(SeoService);
-  private auth = inject(AuthService);
+  private contactService = inject(ContactService);
 
   whatsappNumber = environment.contact.whatsappNumber;
 
@@ -88,15 +88,12 @@ export class PublicHomePage implements OnInit {
 
     this.sendingQuote = true;
     try {
-      const supabase = this.auth.getSupabaseClient();
-
-      await supabase.from('contact_messages').insert({
+      await this.contactService.createMessage({
         name: this.quoteModel.name,
         email: this.quoteModel.email,
         phone: this.quoteModel.phone,
         subject: `Presupuesto IT: ${this.quoteModel.projectType} - ${this.quoteModel.company}`,
-        message: `Presupuesto: ${this.quoteModel.budget}\nDescripción: ${this.quoteModel.description}`,
-        is_read: false
+        message: `Presupuesto: ${this.quoteModel.budget}\nDescripción: ${this.quoteModel.description}`
       });
 
       alert('Solicitud enviada. Nos pondremos en contacto pronto.');

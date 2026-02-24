@@ -4,17 +4,17 @@ import { PublicHomePage } from './home/public-home-page';
 
 export const publicRoutes: Routes = [
   {
-    title: 'Inicio - IT Consultoria y Soluciones - Arecofix',
+    title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
     path: '',
     component: PublicLayout,
     children: [
       {
-        title: 'Inicio - IT Consultoria y Soluciones - Arecofix',
+        title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
         path: '',
         component: PublicHomePage,
         data: {
             seo: {
-                title: 'Soluciones de Software & Consultoría IT',
+                title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
                 description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
                 imageUrl: 'assets/img/branding/og-services.jpg'
             }

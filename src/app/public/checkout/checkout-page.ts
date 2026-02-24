@@ -14,6 +14,7 @@ import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ContactService } from '@app/core/services/contact.service';
 import { ProductService } from '@app/public/products/services/product.service';
+import { ProfileService } from '@app/core/services/profile.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -28,6 +29,7 @@ export class CheckoutPage {
   authService = inject(AuthService);
   contactService = inject(ContactService);
   productService = inject(ProductService);
+  profileService = inject(ProfileService);
   fb = inject(FormBuilder);
   router = inject(Router);
   notificationService = inject(NotificationService);
@@ -69,14 +71,14 @@ export class CheckoutPage {
       customer_name: formVal.name,
       customer_email: formVal.email,
       customer_phone: formVal.phone,
-      customer_address: formVal.address, // Structured object
+      shipping_address: formVal.address, // Structured object
       status: 'pending',
       subtotal: total,
       tax: 0,
       discount: 0,
       total: total,
       notes: formVal.notes,
-      customer_id: this.authService.getCurrentUser()?.id,
+      user_id: this.authService.getCurrentUser()?.id,
     };
 
     const orderItems: OrderItem[] = cartItems.map((item) => ({
@@ -136,16 +138,15 @@ ${formVal.notes || 'Ninguna'}`;
       // 3. Update Profile if logged in
       const currentUser = this.authService.getCurrentUser();
       if (currentUser) {
-         const supabase = this.authService.getSupabaseClient();
-         await supabase
-          .from('profiles')
-          .update({
-            phone: formVal.phone,
-            address: formVal.address, // Save JSONB object
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', currentUser.id)
-          .maybeSingle(); 
+         try {
+             await this.profileService.updateProfile(currentUser.id, {
+                 phone: formVal.phone,
+                 address: formVal.address, // Save JSONB object
+                 updated_at: new Date().toISOString()
+             });
+         } catch(e) {
+             console.log('Non-critical profile update error', e);
+         }
       }
 
       // 4. Feature purchased products

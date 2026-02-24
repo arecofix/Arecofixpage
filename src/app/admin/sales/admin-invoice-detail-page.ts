@@ -2,6 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { CompanyService } from '@app/core/services/company.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-admin-invoice-detail-page',
@@ -12,6 +14,8 @@ import { AuthService } from '@app/core/services/auth.service';
 export class AdminInvoiceDetailPage implements OnInit {
     private route = inject(ActivatedRoute);
     private auth = inject(AuthService);
+    private companyService = inject(CompanyService);
+    private tenantService = inject(TenantService);
 
     invoice = signal<any>(null);
     items = signal<any[]>([]);
@@ -26,7 +30,7 @@ export class AdminInvoiceDetailPage implements OnInit {
         
         try {
             // Fetch company settings
-            const { data: companyData } = await supabase.from('company_settings').select('*').maybeSingle();
+            const companyData = await this.companyService.getSettings();
             if (companyData) {
                 this.company.set(companyData);
             }
@@ -37,6 +41,7 @@ export class AdminInvoiceDetailPage implements OnInit {
                     .from('invoices')
                     .select('*, sales(*)')
                     .eq('id', id)
+                    .eq('tenant_id', this.tenantService.getTenantId())
                     .single();
 
                 if (invoiceError) throw invoiceError;
@@ -49,7 +54,8 @@ export class AdminInvoiceDetailPage implements OnInit {
                         const { data: items, error: itemsError } = await supabase
                             .from('sale_items')
                             .select('*, products(name)')
-                            .eq('sale_id', invoice.sales.id);
+                            .eq('sale_id', invoice.sales.id)
+                            .eq('tenant_id', this.tenantService.getTenantId());
                         
                         if (itemsError) {
                             console.error('Error fetching items:', itemsError);

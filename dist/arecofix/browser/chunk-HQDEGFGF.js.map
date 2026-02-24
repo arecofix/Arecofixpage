@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/admin/employees/admin-employees.routes.ts"],
-  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_EMPLOYEES_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Empleados',\r\n    loadComponent: () => import('./admin-employees-page').then(m => m.AdminEmployeesPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Empleado',\r\n    loadComponent: () => import('./admin-employee-form-page').then(m => m.AdminEmployeeFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Empleado',\r\n    loadComponent: () => import('./admin-employee-form-page').then(m => m.AdminEmployeeFormPage)\r\n  }\r\n];\r\n"],
-  "mappings": ";;;;;AAEO,IAAM,yBAAiC;EAC5C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAwB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;EAEtF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA4B,EAAE,KAAK,OAAK,EAAE,qBAAqB;;EAE7F;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA4B,EAAE,KAAK,OAAK,EAAE,qBAAqB;;;",
-  "names": []
-}

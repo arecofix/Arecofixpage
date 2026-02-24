@@ -5,23 +5,13 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from '../environments/environment';
+import { SupabaseService } from './core/services/supabase.service';
 import { SUPABASE_CLIENT } from './core/di/supabase-token';
 
-const supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
-    auth: {
-        persistSession: typeof window !== 'undefined' && !!window.localStorage,
-        autoRefreshToken: typeof window !== 'undefined' && !!window.localStorage,
-        detectSessionInUrl: typeof window !== 'undefined'
-    }
-});
-
-// Firebase imports REMOVED
 import { ProductRepository } from './features/products/domain/repositories/product.repository';
 import { SupabaseProductRepository } from './features/products/infrastructure/repositories/supabase-product.repository';
 import { CategoryRepository } from './features/products/domain/repositories/category.repository';
@@ -39,7 +29,13 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    { provide: SUPABASE_CLIENT, useValue: supabase },
+    
+    // Supabase Client Provider via SupabaseService
+    { 
+      provide: SUPABASE_CLIENT, 
+      useFactory: (supabaseService: SupabaseService) => supabaseService.getClient(),
+      deps: [SupabaseService]
+    },
 
     // Core Angular providers
     provideBrowserGlobalErrorListeners(),

@@ -7,6 +7,7 @@ import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { AnalyticsRepository, DashboardStats } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
 import { AnalyticsService } from '@app/core/services/analytics.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard-page',
@@ -99,78 +100,75 @@ export class AdminDashboardPage implements OnInit {
     this.loadAnalyticsInfo();
   }
 
-  loadStats() {
+  async loadStats() {
     this.loading.set(true);
     
-    this.analyticsRepo.getDashboardStats().subscribe({
-      next: (data) => {
-        // Update Summary Stats
-        this.stats.set({
-          users: data.users,
-          products: data.products,
-          sales: data.sales,
-          revenue: data.revenue
-        });
+    try {
+      const data = await firstValueFrom(this.analyticsRepo.getDashboardStats());
+      // Update Summary Stats
+      this.stats.set({
+        users: data.users,
+        products: data.products,
+        sales: data.sales,
+        revenue: data.revenue
+      });
 
-        // Update Sales Chart (Line)
-        if (data.sales_chart && data.sales_chart.length > 0) {
-            const months = data.sales_chart.map(d => this.formatMonth(d.period));
-            const totals = data.sales_chart.map(d => d.total);
-            
-            this.salesChartData = {
-                labels: months,
-                datasets: [
-                    { 
-                      data: totals, 
-                      label: 'Ventas ($)', 
-                      borderColor: CHART_COLORS.primary, 
-                      backgroundColor: CHART_COLORS.primaryTransparent, 
-                      fill: true 
-                    }
-                ]
-            };
-        }
-
-        // Update Products Chart (Bar)
-        if (data.products_chart && data.products_chart.length > 0) {
-            const productNames = data.products_chart.map(d => d.name);
-            const quantities = data.products_chart.map(d => d.quantity);
-
-            this.productsChartData = {
-                labels: productNames,
-                datasets: [
-                    { 
-                        data: quantities, 
-                        label: 'Unidades', 
-                        backgroundColor: CHART_COLORS.palette 
-                    }
-                ]
-            };
-        }
-
-        // Update Category Chart (Doughnut)
-        if (data.category_chart && data.category_chart.length > 0) {
-            const catNames = data.category_chart.map(d => d.name);
-            const catCounts = data.category_chart.map(d => d.count);
-
-            this.categoryChartData = {
-                labels: catNames,
-                datasets: [
-                    { 
-                        data: catCounts, 
-                        backgroundColor: CHART_COLORS.paletteAlt
-                    }
-                ]
-            };
-        }
-        
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading dashboard stats:', error);
-        this.loading.set(false);
+      // Update Sales Chart (Line)
+      if (data.sales_chart && data.sales_chart.length > 0) {
+          const months = data.sales_chart.map(d => this.formatMonth(d.period));
+          const totals = data.sales_chart.map(d => d.total);
+          
+          this.salesChartData = {
+              labels: months,
+              datasets: [
+                  { 
+                    data: totals, 
+                    label: 'Ventas ($)', 
+                    borderColor: CHART_COLORS.primary, 
+                    backgroundColor: CHART_COLORS.primaryTransparent, 
+                    fill: true 
+                  }
+              ]
+          };
       }
-    });
+
+      // Update Products Chart (Bar)
+      if (data.products_chart && data.products_chart.length > 0) {
+          const productNames = data.products_chart.map(d => d.name);
+          const quantities = data.products_chart.map(d => d.quantity);
+
+          this.productsChartData = {
+              labels: productNames,
+              datasets: [
+                  { 
+                      data: quantities, 
+                      label: 'Unidades', 
+                      backgroundColor: CHART_COLORS.palette 
+                  }
+              ]
+          };
+      }
+
+      // Update Category Chart (Doughnut)
+      if (data.category_chart && data.category_chart.length > 0) {
+          const catNames = data.category_chart.map(d => d.name);
+          const catCounts = data.category_chart.map(d => d.count);
+
+          this.categoryChartData = {
+              labels: catNames,
+              datasets: [
+                  { 
+                      data: catCounts, 
+                      backgroundColor: CHART_COLORS.paletteAlt
+                  }
+              ]
+          };
+      }
+    } catch (error) {
+      console.error('Error loading dashboard stats:', error);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   private formatMonth(yearMonth: string): string {

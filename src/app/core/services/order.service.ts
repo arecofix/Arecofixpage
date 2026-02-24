@@ -1,35 +1,46 @@
 import { Injectable, inject } from '@angular/core';
-import { AuthService } from './auth.service';
-import { SupabaseClient, PostgrestError } from '@supabase/supabase-js';
+import { PostgrestError } from '@supabase/supabase-js';
 import { LoggerService } from './logger.service';
 import { Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
 import { DbOrder, DbOrderItem } from '@app/shared/interfaces/db-models';
+import { SUPABASE_CLIENT } from '../di/supabase-token';
+import { AuthService } from './auth.service';
+import { TenantService } from './tenant.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class OrderService {
-    private authService = inject(AuthService);
+    private supabase = inject(SUPABASE_CLIENT);
     private logger = inject(LoggerService);
-    private supabase: SupabaseClient;
+    private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
 
-    constructor() {
-        this.supabase = this.authService.getSupabaseClient();
+    protected useSoftDeletes = true;
+
+    private applyTenantFilter(query: any) {
+        let enhancedQuery = query.eq('tenant_id', this.tenantService.getTenantId());
+        if (this.useSoftDeletes) {
+            enhancedQuery = enhancedQuery.is('deleted_at', null);
+        }
+        return enhancedQuery;
     }
 
     getOrders(): Observable<OrderWithItems[]> {
-        return from(
-            this.supabase
-                .from('orders')
-                .select('*, order_items(*)')
-                .order('created_at', { ascending: false })
-                .returns<DbOrder[]>()
-        ).pipe(
-            map(({ data, error }) => {
+        let query = this.supabase
+            .from('orders')
+            .select('*, order_items(*)');
+            
+        let filteredQuery = this.applyTenantFilter(query)
+            .order('created_at', { ascending: false });
+
+        return from(filteredQuery as any).pipe(
+            map((res: any) => {
+                const { data, error } = res;
                 if (error) throw error;
-                return (data || []).map(this.mapDbOrderToDomain);
+                return (data || []).map((o: any) => this.mapDbOrderToDomain(o));
             }),
             catchError((err: unknown) => {
                 this.handleError('Error fetching orders', err);
@@ -41,8 +52,8 @@ export class OrderService {
     getOrderById(id: string): Observable<OrderWithItems> {
         return from(
             Promise.all([
-                this.supabase.from('orders').select('*').eq('id', id).single(),
-                this.supabase.from('order_items').select('*').eq('order_id', id)
+                this.applyTenantFilter(this.supabase.from('orders').select('*').eq('id', id)).single(),
+                this.supabase.from('order_items').select('*').eq('order_id', id).eq('tenant_id', this.tenantService.getTenantId())
             ])
         ).pipe(
             map(([orderResult, itemsResult]) => {
@@ -63,24 +74,33 @@ export class OrderService {
 
     async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: Error | PostgrestError | null }> {
         try {
+            const user = this.auth.getCurrentUser();
+            let branchId: string | undefined;
+            if (user) {
+                const profile = await this.auth.getUserProfile(user.id);
+                branchId = profile?.branch_id;
+            }
+
             const orderId = crypto.randomUUID();
             const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
+            const tenantId = this.tenantService.getTenantId();
 
-            // Strict Payload construction for Supabase JSONB
-            const insertPayload: Partial<DbOrder> = {
+            const insertPayload: any = {
                 id: orderId,
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone || null,
-                customer_address: order.customer_address || null, // Sent as JSON object
+                shipping_address: order.shipping_address || null, // Updated mapping
                 status: order.status || 'pending',
                 subtotal: order.subtotal,
                 tax: order.tax,
                 discount: order.discount,
-                total_amount: order.total,
+                total_amount: order.total || order.total_amount, // Updated mapping
                 notes: order.notes || null,
                 order_number: orderNumber,
-                customer_id: order.customer_id || null
+                user_id: order.user_id || null, // Updated mapping
+                branch_id: branchId || null,
+                tenant_id: tenantId
             };
 
             const { error: orderError } = await this.supabase
@@ -92,10 +112,12 @@ export class OrderService {
             const itemsWithOrderId = items.map(item => ({
                 order_id: orderId,
                 product_id: item.product_id || null,
+                course_id: item.course_id || null,
                 product_name: item.product_name,
                 quantity: item.quantity,
                 unit_price: item.unit_price,
-                subtotal: item.subtotal
+                subtotal: item.subtotal,
+                tenant_id: tenantId
             }));
 
             const { error: itemsError } = await this.supabase
@@ -108,7 +130,8 @@ export class OrderService {
                 ...order, 
                 id: orderId, 
                 order_number: orderNumber,
-                created_at: new Date().toISOString() 
+                created_at: new Date().toISOString(),
+                tenant_id: tenantId
             };
             return { data: orderData, error: null };
         } catch (error: any) {
@@ -118,26 +141,29 @@ export class OrderService {
     }
 
     async updateOrderStatus(id: string, status: Order['status']): Promise<{ error: PostgrestError | Error | null }> {
-        const { error, data } = await this.supabase
+        let query = this.supabase
             .from('orders')
             .update({ status, updated_at: new Date().toISOString() })
-            .eq('id', id)
-            .select();
+            .eq('id', id);
+            
+        const { error, data } = await this.applyTenantFilter(query).select();
 
         if (error) this.handleError('Error updating order status', error);
         
         if (!error && (!data || data.length === 0)) {
-            return { error: new Error("Supabase RLS Error: No tienes permisos en la Base de Datos para cambiar el Estado de esta Orden. Ejecuta el SQL de ADMIN en Supabase.") };
+            return { error: new Error("Supabase RLS Error: Permission denied or Record filtered out.") };
         }
         
         return { error };
     }
 
     async deleteOrder(id: string): Promise<{ error: PostgrestError | null }> {
-        const { error } = await this.supabase
+        let query = this.supabase
             .from('orders')
             .delete()
             .eq('id', id);
+            
+        const { error } = await this.applyTenantFilter(query);
 
         if (error) this.handleError('Error deleting order', error);
         return { error };
@@ -145,68 +171,62 @@ export class OrderService {
     
     async updateOrder(id: string, order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: PostgrestError | Error | null }> {
         try {
-            const updatePayload: Partial<DbOrder> = {
+            const updatePayload: any = {
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone || null,
-                customer_address: order.customer_address || null,
+                shipping_address: order.shipping_address || null, // Updated schema mapped
                 status: order.status,
                 subtotal: order.subtotal,
                 tax: order.tax,
                 discount: order.discount,
-                total_amount: order.total,
+                total_amount: order.total || order.total_amount, // Updated mapping
                 notes: order.notes || null,
                 updated_at: new Date().toISOString()
             };
 
-            const { error: orderError, data: updatedOrdersData } = await this.supabase
+            let query = this.supabase
                 .from('orders')
                 .update(updatePayload)
-                .eq('id', id)
-                .select();
+                .eq('id', id);
+
+            const { error: orderError, data: updatedOrdersData } = await this.applyTenantFilter(query).select();
 
             if (orderError) throw orderError;
             
             if (!updatedOrdersData || updatedOrdersData.length === 0) {
-                throw new Error("Supabase RLS Error: El servidor bloqueó la actualización de la Orden. Activa los permisos de edición para 'orders' en Supabase.");
+                throw new Error("Supabase RLS Error: Permission denied or Record filtered out.");
             }
 
-            // Handle items update (delete missing, upsert current)
             await this.handleItemsUpdate(id, items);
 
-            // Refetch the updated order to properly construct the updatedDbOrder
-            const { data: fetchUpdatedData, error: fetchUpdatedError } = await this.supabase
+            let fetchQuery = this.supabase
                 .from('orders')
-                .select('*')
-                .eq('id', id)
-                .single();
+                .select('*, order_items(*)')
+                .eq('id', id);
+
+            const { data: fetchUpdatedData, error: fetchUpdatedError } = await this.applyTenantFilter(fetchQuery).single();
             
             if (fetchUpdatedError) throw fetchUpdatedError;
 
-            const updatedDbOrder = fetchUpdatedData as DbOrder;
-            // Fetch fresh items to return complete object
-            const { data: freshItems } = await this.supabase.from('order_items').select('*').eq('order_id', id);
-            
-            updatedDbOrder.order_items = freshItems as DbOrderItem[];
-            
-            return { data: this.mapDbOrderToDomain(updatedDbOrder), error: null };
+            return { data: this.mapDbOrderToDomain(fetchUpdatedData), error: null };
         } catch (error: unknown) {
             this.handleError('Error updating order', error);
             return { data: null, error: error as PostgrestError };
         }
     }
 
-    // --- Private Helper Methods ---
-
     private async handleItemsUpdate(orderId: string, items: OrderItem[]): Promise<void> {
+        const tenantId = this.tenantService.getTenantId();
         const { data: existingItems, error: fetchError } = await this.supabase
             .from('order_items')
             .select('id')
-            .eq('order_id', orderId);
+            .eq('order_id', orderId)
+            .eq('tenant_id', tenantId);
 
         if (fetchError) throw fetchError;
 
-        const existingIds: string[] = (existingItems || []).map((i: { id: string }) => i.id);
+        const existingIds: string[] = (existingItems || []).map((i: any) => i.id);
         const currentIds = items.filter(i => i.id).map(i => i.id);
         const idsToDelete = existingIds.filter((eid: string) => !currentIds.includes(eid));
 
@@ -214,7 +234,8 @@ export class OrderService {
             const { error: deleteError } = await this.supabase
                 .from('order_items')
                 .delete()
-                .in('id', idsToDelete);
+                .in('id', idsToDelete)
+                .eq('tenant_id', tenantId);
             if (deleteError) throw deleteError;
         }
 
@@ -225,7 +246,9 @@ export class OrderService {
             quantity: item.quantity,
             unit_price: item.unit_price,
             subtotal: item.subtotal,
-            product_id: item.product_id || null
+            product_id: item.product_id || null,
+            course_id: item.course_id || null, // Map from updated interface
+            tenant_id: tenantId
         }));
 
         const { error: upsertError } = await this.supabase
@@ -235,7 +258,7 @@ export class OrderService {
         if (upsertError) throw upsertError;
     }
 
-    private mapDbOrderToDomain(o: DbOrder): OrderWithItems {
+    private mapDbOrderToDomain(o: any): OrderWithItems {
         return {
             id: o.id,
             created_at: o.created_at,
@@ -244,15 +267,15 @@ export class OrderService {
             customer_name: o.customer_name,
             customer_email: o.customer_email,
             customer_phone: o.customer_phone || undefined,
-            customer_address: o.customer_address || undefined,
-            customer_id: o.customer_id || undefined,
+            shipping_address: o.shipping_address || o.customer_address || undefined,
+            user_id: o.user_id || o.customer_id || undefined,
             status: o.status,
             subtotal: o.subtotal,
             tax: o.tax,
             discount: o.discount,
             total: o.total_amount,
             notes: o.notes || undefined,
-            items: (o.order_items || []).map((i) => ({
+            items: (o.order_items || []).map((i: any) => ({
                 id: i.id,
                 order_id: i.order_id,
                 product_id: i.product_id || undefined,

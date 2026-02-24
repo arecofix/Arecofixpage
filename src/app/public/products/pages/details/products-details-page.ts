@@ -133,7 +133,7 @@ export class ProductsDetailsPage {
         this.seoService.setPageData({
             title: product.name,
             description: product.description || `Compra ${product.name} en Arecofix`,
-            imageUrl: product.image_url,
+            imageUrl: product.image_url || undefined,
             type: 'product',
             url: `/productos/detalle/${product.slug}`
         });
@@ -185,8 +185,8 @@ export class ProductsDetailsPage {
   categoryRs = rxResource({
     stream: () => toObservable(this.product, { injector: this.injector }).pipe(
       switchMap(product => {
-        if (!product) return of(null);
-        return this.categoryService.getById(product.category_id);
+        if (!product || !product.category_id) return of(null);
+        return this.categoryService.getById(product.category_id.toString());
       })
     )
   });

@@ -11,12 +11,12 @@ export class AnalyticsService {
     private isBrowser = isPlatformBrowser(this.platformId);
 
     constructor() {
-        if (this.isBrowser && environment.posthogKey) {
-            posthog.init(environment.posthogKey, {
+        if (this.isEnabled()) {
+            posthog.init(environment.posthogKey as string, {
                 api_host: environment.posthogHost || 'https://us.i.posthog.com',
-                person_profiles: 'identified_only', // or 'always' depending on preference
+                person_profiles: 'identified_only',
                 loaded: (ph) => {
-                    if (environment.production) ph.debug(false);
+                    ph.debug(false);
                 }
             });
         }
