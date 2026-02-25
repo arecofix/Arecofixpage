@@ -114,16 +114,17 @@ export class SupabaseProductRepository extends ProductRepository {
     let query = this.supabase.from('products')
         .select(`
           id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, created_at, updated_at,
-          branch_stock:product_stock_per_branch!inner(quantity, branch_id)
-        `)
-        .lt('product_stock_per_branch.quantity', threshold);
+          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+          branch_stock:product_stock_per_branch(quantity, branch_id)
+        `);
 
     return from(this.applyTenantFilter(query) as any).pipe(
       map((res: any) => {
         const { data, error } = res;
         if (error) throw error;
-        return (data || []).map((p: any) => this._mapToEntity(p));
+        return (data || [])
+            .map((p: any) => this._mapToEntity(p))
+            .filter((p: Product) => p.stock < threshold);
       })
     );
   }
@@ -132,17 +133,19 @@ export class SupabaseProductRepository extends ProductRepository {
     let query = this.supabase.from('products')
         .select(`
           id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, created_at, updated_at,
-          branch_stock:product_stock_per_branch!inner(quantity, branch_id)
+          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+          branch_stock:product_stock_per_branch(quantity, branch_id)
         `)
-        .gt('product_stock_per_branch.quantity', 0)
         .eq('is_active', true);
 
     return from(this.applyTenantFilter(query) as any).pipe(
       map((res: any) => {
         const { data, error } = res;
         if (error) throw error;
-        return (data || []).map((p: any) => this._mapToEntity(p));
+        // Filter those whose computed final stock is greater than 0
+        return (data || [])
+            .map((p: any) => this._mapToEntity(p))
+            .filter((p: Product) => p.stock > 0);
       })
     );
   }
@@ -169,7 +172,7 @@ export class SupabaseProductRepository extends ProductRepository {
     let query = this.supabase.from('products')
         .select(`
           id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, created_at, updated_at,
+          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
           branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
         `)
         .eq('id', id);

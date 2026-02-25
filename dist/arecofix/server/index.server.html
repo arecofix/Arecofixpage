@@ -2,7 +2,8 @@
 <html lang="es">
   <head>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com;"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co https://stats.g.doubleclick.net; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com https://stats.g.doubleclick.net;"/>
+
     <title>Soluciones Informáticas - Consultoría IT | Arecofix</title>
     <base href="/"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -61,6 +62,11 @@
           if (analyticsLoaded) return;
           analyticsLoaded = true;
 
+          // Skip analytics on localhost to avoid console noise
+          if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            return;
+          }
+
           // Google Tag Manager
           (function (w, d, s, l, i) {
             w[l] = w[l] || [];
@@ -103,8 +109,6 @@
             t = b.createElement(e);
             t.async = !0;
             t.src = v;
-            // Add permissions policy attributes if it were an iframe,
-            // but for script we use the console filter already implemented.
             s = b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t, s);
           })(
@@ -127,7 +131,7 @@
         setTimeout(loadAnalytics, 8000);
       })();
     </script>
-  <link rel="stylesheet" href="styles-5437QE27.css" crossorigin="anonymous"></head>
+  <link rel="stylesheet" href="styles-2UUSZTYU.css" crossorigin="anonymous"></head>
 
   <body><script type="text/javascript" id="ng-event-dispatch-contract">(()=>{function p(t,n,r,o,e,i,f,m){return{eventType:t,event:n,targetElement:r,eic:o,timeStamp:e,eia:i,eirp:f,eiack:m}}function u(t){let n=[],r=e=>{n.push(e)};return{c:t,q:n,et:[],etc:[],d:r,h:e=>{r(p(e.type,e,e.target,t,Date.now()))}}}function s(t,n,r){for(let o=0;o<n.length;o++){let e=n[o];(r?t.etc:t.et).push(e),t.c.addEventListener(e,t.h,r)}}function c(t,n,r,o,e=window){let i=u(t);e._ejsas||(e._ejsas={}),e._ejsas[n]=i,s(i,r),s(i,o,!0)}window.__jsaction_bootstrap=c;})();
 </script>
@@ -164,5 +168,5 @@
 
     <app-root></app-root>
     <!-- Analytics se carga dinámicamente sólo en producción -->
-  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-XECWOO46.js"><link rel="modulepreload" href="chunk-AWQLWEOW.js"><link rel="modulepreload" href="chunk-T3F2WVBP.js"><link rel="modulepreload" href="chunk-SBGEPZUY.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-WKY6L6NV.js"><link rel="modulepreload" href="chunk-BGHZUC77.js"><link rel="modulepreload" href="chunk-6WWONRBM.js"><script src="main-W6YLMJ35.js" type="module" crossorigin="anonymous"></script></body>
+  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-XECWOO46.js"><link rel="modulepreload" href="chunk-AWQLWEOW.js"><link rel="modulepreload" href="chunk-T3F2WVBP.js"><link rel="modulepreload" href="chunk-LESHTFLR.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-U236D7L5.js"><link rel="modulepreload" href="chunk-GBGIQ7VE.js"><link rel="modulepreload" href="chunk-TZSKIM7F.js"><script src="main-ZPF45HPS.js" type="module" crossorigin="anonymous"></script></body>
 </html>

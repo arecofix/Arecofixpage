@@ -6,7 +6,7 @@
         <span class="loading loading-spinner loading-lg"></span>
     </div>
   } @else {
-    <!-- Stats Cards -->
+    <!-- Stats Cards: E-Commerce & Workshop -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Users Card -->
         <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
@@ -20,38 +20,62 @@
             </div>
         </div>
 
-        <!-- Products Card -->
+        <!-- Repairs This Month (NEW) -->
         <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
             <div class="stat">
-                <div class="stat-figure text-secondary">
-                    <i class="fas fa-box text-3xl"></i>
+                <div class="stat-figure text-warning">
+                    <i class="fas fa-tools text-3xl"></i>
                 </div>
-                <div class="stat-title dark:text-gray-400">Productos</div>
-                <div class="stat-value text-secondary">{{ stats().products }}</div>
-                <div class="stat-desc dark:text-gray-500">En catálogo</div>
+                <div class="stat-title dark:text-gray-400">Reparaciones (Mes)</div>
+                <div class="stat-value text-warning">{{ stats().repairs_month }}</div>
+                <div class="stat-desc dark:text-gray-500">Equipos ingresados</div>
             </div>
         </div>
 
-        <!-- Sales Card -->
+        <!-- Revenue Repair (NEW) -->
+        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
+            <div class="stat">
+                <div class="stat-figure text-success">
+                    <i class="fas fa-hand-holding-usd text-3xl"></i>
+                </div>
+                <div class="stat-title dark:text-gray-400">Ganancia Taller</div>
+                <div class="stat-value text-success">{{ stats().repairs_revenue | currency }}</div>
+                <div class="stat-desc dark:text-gray-500">Este mes</div>
+            </div>
+        </div>
+
+        <!-- Fixed Devices (NEW) -->
+        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
+            <div class="stat">
+                <div class="stat-figure text-info">
+                    <i class="fas fa-check-circle text-3xl"></i>
+                </div>
+                <div class="stat-title dark:text-gray-400">Equipos Arreglados</div>
+                <div class="stat-value text-info">{{ stats().devices_fixed }}</div>
+                <div class="stat-desc dark:text-gray-500">Histórico de Taller</div>
+            </div>
+        </div>
+
+        <!-- E-Commerce Orders Card -->
         <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
             <div class="stat">
                 <div class="stat-figure text-accent">
                     <i class="fas fa-shopping-cart text-3xl"></i>
                 </div>
-                <div class="stat-title dark:text-gray-400">Ventas</div>
+                <div class="stat-title dark:text-gray-400">Ventas Tienda</div>
                 <div class="stat-value text-accent">{{ stats().sales }}</div>
                 <div class="stat-desc dark:text-gray-500">Total realizadas</div>
             </div>
         </div>
 
-        <!-- Revenue Card -->
+        <!-- E-Commerce Revenue Card -->
         <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
             <div class="stat">
-                <div class="stat-figure text-success">
+                <div class="stat-figure text-secondary">
                     <i class="fas fa-dollar-sign text-3xl"></i>
                 </div>
-                <div class="stat-title dark:text-gray-400">Ingresos</div>
-                <div class="stat-value text-success">{{ stats().revenue | currency }}</div>
+                <div class="stat-title dark:text-gray-400">Ingresos Tienda</div>
+                <div class="stat-value text-secondary">{{ stats().revenue | currency }}</div>
                 <div class="stat-desc dark:text-gray-500">Total facturado</div>
             </div>
         </div>

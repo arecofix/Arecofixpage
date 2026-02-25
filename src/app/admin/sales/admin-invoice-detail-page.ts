@@ -39,7 +39,7 @@ export class AdminInvoiceDetailPage implements OnInit {
                 // Fetch invoice
                 const { data: invoice, error: invoiceError } = await supabase
                     .from('invoices')
-                    .select('*, sales(*)')
+                    .select('*')
                     .eq('id', id)
                     .eq('tenant_id', this.tenantService.getTenantId())
                     .single();
@@ -50,11 +50,11 @@ export class AdminInvoiceDetailPage implements OnInit {
                     this.invoice.set(invoice);
 
                     // Fetch items
-                    if (invoice.sales?.id) {
+                    if (invoice.sale_id) {
                         const { data: items, error: itemsError } = await supabase
                             .from('sale_items')
                             .select('*, products(name)')
-                            .eq('sale_id', invoice.sales.id)
+                            .eq('sale_id', invoice.sale_id)
                             .eq('tenant_id', this.tenantService.getTenantId());
                         
                         if (itemsError) {

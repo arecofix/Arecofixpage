@@ -23,7 +23,11 @@
     ]
   },
   "overrides": {
-    "gh-pages": "^6.3.0"
+    "gh-pages": "^6.3.0",
+    "trim-newlines": "^3.0.1",
+    "uglify-js": "^3.19.3",
+    "ajv": "^8.17.2",
+    "minimatch": "^10.2.2"
   },
   "allowedCommonJsDependencies": [
     "qrcode"
@@ -38,7 +42,7 @@
     "@angular/platform-browser": "^21.1.5",
     "@angular/platform-server": "^21.1.5",
     "@angular/router": "^21.1.5",
-    "@angular/ssr": "^21.1.4",
+    "@angular/ssr": "^21.1.5",
     "@capacitor/android": "^8.1.0",
     "@capacitor/core": "^8.1.0",
     "@fortawesome/fontawesome-free": "^7.2.0",
@@ -51,6 +55,7 @@
     "chart.js": "^4.4.8",
     "express": "^4.21.2",
     "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
     "ng2-charts": "^8.0.0",
     "ngx-mask": "^21.0.1",
     "ngx-skeleton-loader": "^12.0.0",
@@ -60,20 +65,20 @@
     "zone.js": "~0.16.1"
   },
   "devDependencies": {
-    "@angular/build": "^21.1.4",
-    "@angular/cli": "^21.1.4",
+    "@angular/build": "^21.1.5",
+    "@angular/cli": "^21.1.5",
     "@angular/compiler-cli": "^21.1.5",
     "@capacitor/cli": "^8.1.0",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/jasmine": "~5.1.5",
     "@types/node": "^22.13.5",
-    "angular-cli-ghpages": "^2.0.0",
+    "angular-cli-ghpages": "^3.0.2",
     "autoprefixer": "^10.4.24",
     "daisyui": "^5.0.0",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.1",
+    "karma-coverage": "^2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.3",

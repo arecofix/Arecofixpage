@@ -24,7 +24,7 @@ export class AdminInvoicesPage implements OnInit {
         const supabase = this.auth.getSupabaseClient();
         const { data, error } = await supabase
             .from('invoices')
-            .select('*, sales(*)')
+            .select('*')
             .order('issued_at', { ascending: false });
 
         if (data) {

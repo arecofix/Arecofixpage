@@ -150,34 +150,39 @@
     </div>
   </section>
 
-  <!-- SEO CONTENT SECTION -->
+  <!-- SEO CONTENT SECTION ESTRUCTURAL Y SEMÁNTICO -->
   <section class="py-16 bg-white dark:bg-gray-800">
     <div class="container mx-auto px-4 max-w-4xl">
-      <div class="prose prose-lg dark:prose-invert mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-8">
-          {{ seoContent.title }}
-        </h2>
+      <main itemscope itemtype="https://schema.org/ProfessionalService" class="prose prose-lg dark:prose-invert mx-auto">
+        <article class="seo-content-block">
+          <!-- H1 Lógico: Unico, poderoso y claro -->
+          <header>
+            <h1 itemprop="name" class="text-4xl font-extrabold mb-4 dark:text-white">Servicio Técnico de Celulares en Marcos Paz</h1>
+            <p class="text-lg mb-6 leading-relaxed">¿Tu dispositivo dejó de funcionar, la batería se desgasta rápido o necesitas cambiar la pantalla rota en el acto? En <strong>Arecofix</strong> somos referentes indiscutidos en la reparación de celulares multimarca para Marcos Paz, Las Heras y Merlo.</p>
+          </header>
 
-        <p class="lead text-center mb-8">
-          {{ seoContent.intro }}
-        </p>
+          <!-- H2 Secundario: Agrupando problemas -->
+          <h2 class="text-2xl font-bold mt-8 mb-4 dark:text-white">Nuestros Servicios de Reparación Especializados</h2>
+          <p class="mb-4">Sabemos que estar sin tu teléfono es estar desconectado del mundo, el trabajo y los seres queridos. Por ello, aplicamos estándares de laboratorio para realizar diagnósticos profundos y precisos. Al trabajar con repuestos de primer nivel, aseguramos que la durabilidad de tu dispositivo móvil no se vea comprometida bajo ninguna circunstancia.</p>
+          
+          <!-- H3 de Contexto y Keywords long-tail -->
+          <h3 class="text-xl font-semibold mt-6 mb-3 dark:text-gray-200">Cambio de Módulos, Baterías y Pines de Carga</h3>
+          <p class="mb-4">Si enfrentas problemas como un pin de carga sulfatado o necesitas hacer microsoldadura en placas húmedas, nuestro equipo utiliza las herramientas correctas y procedimientos estandarizados para asegurar la supervivencia de la placa base (Motherboard). Al mismo tiempo, reemplazamos baterías degradadas devolviéndole a tu celular la autonomía del primer día.</p>
 
-        @for (section of seoContent.sections; track section.title) {
-          <h3>{{ section.title }}</h3>
-          <p>{{ section.content }}</p>
-        }
-
-        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 list-none pl-0 my-8">
-          @for (feature of seoContent.features; track feature.label) {
-            <li class="flex items-start gap-2">
-              <i class="fas fa-check-circle text-green-500 mt-1"></i>
-              <div class="text-sm">
-                <strong>{{ feature.label }}</strong> {{ feature.value }}
-              </div>
-            </li>
-          }
-        </ul>
-      </div>
+          <h3 class="text-xl font-semibold mt-6 mb-3 dark:text-gray-200">Soporte Técnico Multimarca</h3>
+          <p class="mb-4">Atendemos equipos de las marcas líderes del mercado internacional. Somos expertos brindando soporte especializado tanto en ecosistemas Android (incluyendo reparaciones físicas y lógicas de Samsung, Motorola, Xiaomi y LG) como destrabando los sofisticados candados e integraciones de hardware en todo el rango contemporáneo de dispositivos Apple iOS (iPhone).</p>
+          
+          <!-- Enlaces Internos Sugeridos (Quitan el efecto 'Dead end') -->
+          <nav aria-label="Navegación Relacionada" class="mt-8 p-6 bg-base-200 border border-base-300 rounded-xl">
+            <h3 class="text-lg font-bold mb-3">Te puede interesar:</h3>
+            <ul class="list-disc pl-5 space-y-2">
+              <li>Visitá ahora nuestro <a routerLink="/productos/categoria/repuestos" title="Ir a Repuestos Originales" class="text-primary font-medium hover:underline">Catálogo de Repuestos de Celulares</a> con stock inmediato.</li>
+              <li>¿Querés aprender este oficio? Mirá nuestros <a routerLink="/academy" title="Cursos de Reparación" class="text-primary font-medium hover:underline">cursos de Reparación de Hardware y Microsoldadura</a>.</li>
+              <li>Explorá también nuestro servicio enfocado en la <a routerLink="/productos/categoria/consolas" title="Servicio de Consolas" class="text-primary font-medium hover:underline">reparación de consolas de videojuegos PlayStation y Xbox</a>.</li>
+            </ul>
+          </nav>
+        </article>
+      </main>
     </div>
   </section>
 

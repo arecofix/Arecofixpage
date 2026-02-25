@@ -24,7 +24,7 @@ export const environment: Environment = {
 
   authRedirectUrl: 'https://arecofix.com.ar/#/login',
   enableProfileUpsert: false,
-  posthogKey: 'phc_8c09666b801027ec77ae6e3d39d3827f08833acc316174b73d9ec4ab26e1bdc3',
+  posthogKey: 'phc_PLACEHOLDER_DEV',
   posthogHost: 'https://us.i.posthog.com',
   // WhatsApp Configuration
   whatsappToken: 'EAARLwIJnO30BQJVYYg23XHI8YlOxew5mmmNrQJT5ZCbKj27RmMxVPslyaTfYKnJA4P5JZCk80JwnzOgZCF0zR5ZC2gDRm6TidoX0jHVE9rp77QHcehimvSmZClobDmSZAGXVv7NyK5RGuSZBbh5Fie1ykDfxeGw7NZCR2DkJabcZB6odycEjRgeBjEMqA9587UPZAPzVoPZAquACqZA0et2Q0pWcZCYDX3gsZC2VY6tlJ86oM5o7AEmaKDbUtveRLRAAAZCaa77S2MOerzRZCP4c394xVYQVH0RVyf9j5plybQZDZD',

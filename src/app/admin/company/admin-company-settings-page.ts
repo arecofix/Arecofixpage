@@ -34,6 +34,11 @@ export class AdminCompanySettingsPage implements OnInit {
     error = signal<string | null>(null);
     success = signal<string | null>(null);
 
+    // Branches Setup
+    branches = signal<any[]>([]);
+    newBranch = signal({ name: '', address: '', is_active: true });
+    savingBranch = signal(false);
+
     async ngOnInit() {
         await this.loadSettings();
     }
@@ -66,6 +71,14 @@ export class AdminCompanySettingsPage implements OnInit {
         } else if (error && error.code !== 'PGRST116') { // PGRST116 is "The result contains 0 rows"
             this.error.set(error.message);
         }
+
+        // Load Branches
+        const { data: branchData } = await supabase.from('branches')
+            .select('*')
+            .eq('tenant_id', tenantId)
+            .order('name');
+        
+        this.branches.set(branchData || []);
         this.loading.set(false);
     }
 
@@ -120,6 +133,64 @@ export class AdminCompanySettingsPage implements OnInit {
             this.error.set(e.message);
         } finally {
             this.saving.set(false);
+        }
+    }
+
+    // --- BRANCHES MANAGEMENT ---
+    async addBranch() {
+        const payload = this.newBranch();
+        if (!payload.name) {
+            this.error.set('El nombre de la sucursal es obligatorio.');
+            return;
+        }
+
+        this.savingBranch.set(true);
+        const supabase = this.auth.getSupabaseClient();
+        const tenantId = this.tenantService.getTenantId();
+
+        try {
+            const { error } = await supabase.from('branches').insert([{
+                name: payload.name,
+                address: payload.address,
+                is_active: payload.is_active,
+                tenant_id: tenantId
+            }]);
+
+            if (error) throw error;
+            
+            this.success.set('Sucursal agregada con éxito');
+            this.newBranch.set({ name: '', address: '', is_active: true });
+            await this.loadSettings(); // Reload to get the new list
+        } catch (e: any) {
+            this.error.set(e.message);
+        } finally {
+            this.savingBranch.set(false);
+        }
+    }
+
+    async deleteBranch(id: string) {
+        if (!confirm('¿Seguro que deseas eliminar esta sucursal?')) return;
+        const supabase = this.auth.getSupabaseClient();
+        try {
+            const { error } = await supabase.from('branches').delete().eq('id', id);
+            if (error) throw error;
+            this.success.set('Sucursal eliminada');
+            await this.loadSettings();
+        } catch (e: any) {
+            this.error.set(e.message);
+        }
+    }
+
+    async toggleBranchStatus(branch: any) {
+        const supabase = this.auth.getSupabaseClient();
+        try {
+            const { error } = await supabase.from('branches')
+                .update({ is_active: !branch.is_active })
+                .eq('id', branch.id);
+            if (error) throw error;
+            await this.loadSettings();
+        } catch (e: any) {
+            this.error.set(e.message);
         }
     }
 }

@@ -5,13 +5,69 @@
     [ngClass]="[(preferencesService.highContrast$ | async) ? 'high-contrast' : '']"
     [style.font-size.px]="(preferencesService.fontSize$ | async)">
     <!-- Navbar -->
-    <div class="w-full navbar bg-base-100 border-b border-base-300 lg:hidden text-base-content sticky top-0 z-40 shadow-sm">
-      <div class="flex-none">
+    <div class="w-full navbar bg-base-100 border-b border-base-300 text-base-content sticky top-0 z-40 shadow-sm">
+      <div class="flex-none lg:hidden">
         <label for="admin-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost text-base-content">
           <i class="fas fa-bars text-xl"></i>
         </label>
       </div>
-      <div class="flex-1 px-2 mx-2 font-bold text-lg">Arecofix Admin</div>
+      <div class="flex-1 px-2 mx-2 font-bold text-lg lg:hidden">Arecofix Admin</div>
+      <div class="flex-1 hidden lg:flex px-4 font-bold text-base-content">Panel de Administración</div>
+      
+      <!-- Notifications Bell -->
+      <div class="flex-none">
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+            <div class="indicator">
+              <i class="fas fa-bell text-xl text-gray-500 hover:text-primary transition-colors"></i>
+              @if (notificationService.unreadCount() > 0) {
+              <span class="badge badge-xs indicator-item badge-error px-1.5 py-2 animate-bounce cursor-pointer">{{ notificationService.unreadCount() }}</span>
+              }
+            </div>
+          </div>
+          <div tabindex="0" class="mt-3 z-1 card card-compact dropdown-content w-80 bg-base-100 shadow-2xl border border-base-300">
+            <div class="card-body p-0 max-h-96 overflow-y-auto">
+              <div class="px-4 py-3 border-b border-base-200 flex justify-between items-center bg-base-200/50 rounded-t-2xl sticky top-0 z-10 backdrop-blur">
+                <span class="font-bold text-base">Notificaciones</span>
+                @if (notificationService.unreadCount() > 0) {
+                <button type="button" class="text-xs text-primary font-medium hover:underline" (click)="notificationService.markAllAsRead()">Marcar leídas</button>
+                }
+              </div>
+              
+              @if (notificationService.dbNotifications().length === 0) {
+                <div class="p-8 text-center text-gray-500">
+                  <i class="fas fa-bell-slash text-4xl mb-3 opacity-30"></i>
+                  <p class="font-medium">Sin alertas por ahora</p>
+                </div>
+              }
+              
+              <ul class="menu p-0 w-full mb-2">
+                @for (notif of notificationService.dbNotifications(); track notif.id) {
+                <li class="border-b border-base-200 last:border-0" [class.bg-blue-50/50]="!notif.is_read" [class.dark:bg-blue-900/10]="!notif.is_read">
+                  <a class="flex flex-col items-start p-3 gap-1 hover:bg-base-200 rounded-none cursor-pointer" (click)="handleNotificationClick(notif)">
+                    <div class="flex w-full justify-between items-start">
+                      <span class="font-bold text-sm flex items-center gap-2" [class.text-base-content]="notif.is_read" [class.text-primary]="!notif.is_read">
+                        @if (notif.type === 'info') { <i class="fas fa-info-circle text-blue-500 text-base"></i> }
+                        @else if (notif.type === 'success') { <i class="fas fa-check-circle text-green-500 text-base"></i> }
+                        @else if (notif.type === 'warning') { <i class="fas fa-exclamation-triangle text-amber-500 text-base"></i> }
+                        @else if (notif.type === 'error') { <i class="fas fa-times-circle text-rose-500 text-base"></i> }
+                        @else { <i class="fas fa-bell text-gray-400 text-base"></i> }
+                        <span class="leading-tight">{{ notif.title }}</span>
+                      </span>
+                      @if (!notif.is_read) {
+                        <div class="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1 shadow shadow-primary/40"></div>
+                      }
+                    </div>
+                    <span class="text-xs text-base-content/70 line-clamp-2 leading-tight pl-6">{{ notif.message }}</span>
+                    <span class="text-[10px] text-gray-400 mt-1 pl-6">{{ notif.created_at | date:'dd/MM - HH:mm' }}</span>
+                  </a>
+                </li>
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Page Content -->

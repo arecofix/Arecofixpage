@@ -23,7 +23,10 @@ export class AdminDashboardPage implements OnInit {
     users: 0,
     products: 0,
     sales: 0,
-    revenue: 0
+    revenue: 0,
+    repairs_month: 0,
+    repairs_revenue: 0,
+    devices_fixed: 0
   });
 
   analyticsStats = signal({
@@ -110,7 +113,10 @@ export class AdminDashboardPage implements OnInit {
         users: data.users,
         products: data.products,
         sales: data.sales,
-        revenue: data.revenue
+        revenue: data.revenue,
+        repairs_month: data.repairs_month,
+        repairs_revenue: data.repairs_revenue,
+        devices_fixed: data.devices_fixed
       });
 
       // Update Sales Chart (Line)

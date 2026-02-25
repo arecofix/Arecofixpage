@@ -1,0 +1,163 @@
+{
+  "hash": "e0e4da9d",
+  "configHash": "491f618a",
+  "lockfileHash": "5f551a3c",
+  "browserHash": "ec684b71",
+  "optimized": {
+    "@angular/cdk/drag-drop": {
+      "src": "../../../../../../node_modules/@angular/cdk/fesm2022/drag-drop.mjs",
+      "file": "@angular_cdk_drag-drop.js",
+      "fileHash": "bdb4e842",
+      "needsInterop": false
+    },
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "aaeef25f",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "a727e3e1",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "bdba9fb4",
+      "needsInterop": false
+    },
+    "@angular/core/rxjs-interop": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/rxjs-interop.mjs",
+      "file": "@angular_core_rxjs-interop.js",
+      "fileHash": "597f30bc",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "8bc2ec28",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "bbff5ceb",
+      "needsInterop": false
+    },
+    "@angular/platform-server/init": {
+      "src": "../../../../../../node_modules/@angular/platform-server/fesm2022/init.mjs",
+      "file": "@angular_platform-server_init.js",
+      "fileHash": "40486a6e",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "87c26d64",
+      "needsInterop": false
+    },
+    "@angular/ssr": {
+      "src": "../../../../../../node_modules/@angular/ssr/fesm2022/ssr.mjs",
+      "file": "@angular_ssr.js",
+      "fileHash": "b775b2a5",
+      "needsInterop": false
+    },
+    "@angular/ssr/node": {
+      "src": "../../../../../../node_modules/@angular/ssr/fesm2022/node.mjs",
+      "file": "@angular_ssr_node.js",
+      "fileHash": "1dfbfa49",
+      "needsInterop": false
+    },
+    "@mlc-ai/web-llm": {
+      "src": "../../../../../../node_modules/@mlc-ai/web-llm/lib/index.js",
+      "file": "@mlc-ai_web-llm.js",
+      "fileHash": "c2449304",
+      "needsInterop": false
+    },
+    "@supabase/supabase-js": {
+      "src": "../../../../../../node_modules/@supabase/supabase-js/dist/index.mjs",
+      "file": "@supabase_supabase-js.js",
+      "fileHash": "ab953003",
+      "needsInterop": false
+    },
+    "angularx-qrcode": {
+      "src": "../../../../../../node_modules/angularx-qrcode/fesm2022/angularx-qrcode.mjs",
+      "file": "angularx-qrcode.js",
+      "fileHash": "c4435285",
+      "needsInterop": false
+    },
+    "express": {
+      "src": "../../../../../../node_modules/express/index.js",
+      "file": "express.js",
+      "fileHash": "fbda7241",
+      "needsInterop": true
+    },
+    "ng2-charts": {
+      "src": "../../../../../../node_modules/ng2-charts/fesm2022/ng2-charts.mjs",
+      "file": "ng2-charts.js",
+      "fileHash": "860f8d44",
+      "needsInterop": false
+    },
+    "posthog-js": {
+      "src": "../../../../../../node_modules/posthog-js/dist/module.js",
+      "file": "posthog-js.js",
+      "fileHash": "54e86a07",
+      "needsInterop": false
+    },
+    "rxjs": {
+      "src": "../../../../../../node_modules/rxjs/dist/cjs/index.js",
+      "file": "rxjs.js",
+      "fileHash": "28e4a0de",
+      "needsInterop": true
+    },
+    "rxjs/operators": {
+      "src": "../../../../../../node_modules/rxjs/dist/cjs/operators/index.js",
+      "file": "rxjs_operators.js",
+      "fileHash": "db6831ef",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "xhr2-E5RTESSH": {
+      "file": "xhr2-E5RTESSH.js"
+    },
+    "chunk-K33FMXZW": {
+      "file": "chunk-K33FMXZW.js"
+    },
+    "chunk-4PNJ6GGN": {
+      "file": "chunk-4PNJ6GGN.js"
+    },
+    "chunk-SNLTDW5F": {
+      "file": "chunk-SNLTDW5F.js"
+    },
+    "chunk-5Q4MXGYW": {
+      "file": "chunk-5Q4MXGYW.js"
+    },
+    "chunk-HAGLJ54U": {
+      "file": "chunk-HAGLJ54U.js"
+    },
+    "chunk-PGLWFIVK": {
+      "file": "chunk-PGLWFIVK.js"
+    },
+    "chunk-PGBO2T5S": {
+      "file": "chunk-PGBO2T5S.js"
+    },
+    "chunk-4TCA7SOB": {
+      "file": "chunk-4TCA7SOB.js"
+    },
+    "chunk-ILFUXRYK": {
+      "file": "chunk-ILFUXRYK.js"
+    },
+    "chunk-PN67XN2E": {
+      "file": "chunk-PN67XN2E.js"
+    },
+    "chunk-KQRMTIY5": {
+      "file": "chunk-KQRMTIY5.js"
+    },
+    "chunk-6DU2HRTW": {
+      "file": "chunk-6DU2HRTW.js"
+    }
+  }
+}

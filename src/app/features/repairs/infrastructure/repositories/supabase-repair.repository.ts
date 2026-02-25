@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto, RepairPart } from '../../domain/entities/repair.entity';
 import { AuthService } from '@app/core/services/auth.service';
@@ -26,7 +26,7 @@ export class SupabaseRepairRepository extends RepairRepository {
 
     getById(id: string): Observable<Repair> {
         let query = this.supabase.from('repairs')
-            .select('*, parts:repair_parts_used(*)')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
             .eq('id', id);
 
         return from(this.applyTenantFilter(query).single() as any).pipe(
@@ -56,30 +56,47 @@ export class SupabaseRepairRepository extends RepairRepository {
     }
 
     create(repair: CreateRepairDto): Observable<Repair> {
-        const payload = this.mapToDb(repair);
+        const { parts, images, ...baseRepair } = repair as any;
+        const payload = this.mapToDb(baseRepair);
         payload.tenant_id = this.tenantService.getTenantId(); // Inyectar tenant forzoso
         
         return from(this.supabase.from('repairs').insert(payload).select().single() as any).pipe(
             map((res: any) => {
                 const { data, error } = res;
                 if (error) throw error;
-                return this.mapFromDb(data);
+                return data;
+            }),
+            switchMap(async (data: any) => {
+                if (parts && parts.length > 0) {
+                    await this.syncParts(data.id, parts);
+                }
+                if (images && images.length > 0) {
+                    await this.syncImages(data.id, images);
+                }
+                const repairWithParts = { ...data, parts: parts || [], images: images || [] };
+                return this.mapFromDb(repairWithParts);
             })
         );
     }
 
     update(id: string, repair: UpdateRepairDto): Observable<void> {
-        const { parts, ...baseRepair } = repair;
+        const { parts, images, ...baseRepair } = repair as any;
         const payload = this.mapToDb(baseRepair);
         
-        let query = this.supabase.from('repairs').update(payload).eq('id', id);
+        let query = this.supabase.from('repairs').update(payload).eq('id', id).select();
 
         return from(this.applyTenantFilter(query) as any).pipe(
             map((res: any) => {
                 const { error, data } = res;
                 if (error) throw error;
+                return data;
+            }),
+            switchMap(async () => {
                 if (parts) {
-                    this.syncParts(id, parts);
+                    await this.syncParts(id, parts);
+                }
+                if (images) {
+                    await this.syncImages(id, images);
                 }
             })
         );
@@ -102,6 +119,20 @@ export class SupabaseRepairRepository extends RepairRepository {
         }
     }
 
+    private async syncImages(repairId: string, images: string[]): Promise<void> {
+        const tenantId = this.tenantService.getTenantId();
+        await this.supabase.from('repair_images').delete().eq('repair_id', repairId).eq('tenant_id', tenantId);
+        
+        if (images && images.length > 0) {
+            const imagesToInsert = images.map(img => ({
+                repair_id: repairId,
+                image_url: typeof img === 'string' ? img : (img as any).image_url,
+                tenant_id: tenantId
+            }));
+            await this.supabase.from('repair_images').insert(imagesToInsert);
+        }
+    }
+
     delete(id: string): Observable<void> {
         let query = this.supabase.from('repairs').delete().eq('id', id);
         return from(this.applyTenantFilter(query) as any).pipe(
@@ -117,7 +148,7 @@ export class SupabaseRepairRepository extends RepairRepository {
         // it's better to query directly for the scope of the tenant to avoid leakage.
         let query = this.supabase
             .from('repairs')
-            .select('*, parts:repair_parts_used(*)')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
             .eq('tracking_code', code);
             
         return from(this.applyTenantFilter(query).single() as any).pipe(
@@ -175,11 +206,12 @@ export class SupabaseRepairRepository extends RepairRepository {
         return {
             ...data,
             device_brand: data.device_brand || 'generic', 
+            images: data.images ? data.images.map((img: any) => typeof img === 'string' ? img : img.image_url) : []
         } as Repair;
     }
 
     private mapToDb(entity: Partial<UpdateRepairDto>): any {
-        const { device_brand, device_type, ...rest } = entity;
+        const { device_brand, device_type, images, ...rest } = entity as any;
         const payload: any = { ...rest };
         
         // Handle device_model concatenation if brand/type provided externally

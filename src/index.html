@@ -2,7 +2,11 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com;" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co https://stats.g.doubleclick.net; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com https://stats.g.doubleclick.net;"
+    />
+
     <title>Soluciones Informáticas - Consultoría IT | Arecofix</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -85,6 +89,11 @@
           if (analyticsLoaded) return;
           analyticsLoaded = true;
 
+          // Skip analytics on localhost to avoid console noise
+          if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            return;
+          }
+
           // Google Tag Manager
           (function (w, d, s, l, i) {
             w[l] = w[l] || [];
@@ -127,8 +136,6 @@
             t = b.createElement(e);
             t.async = !0;
             t.src = v;
-            // Add permissions policy attributes if it were an iframe,
-            // but for script we use the console filter already implemented.
             s = b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t, s);
           })(

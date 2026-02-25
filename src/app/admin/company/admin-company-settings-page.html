@@ -154,4 +154,78 @@
             </form>
         </div>
     </div>
+
+    <!-- SUCURSALES (Branches) MANAGEMENT -->
+    <div class="card bg-base-100 shadow-lg mt-8">
+        <div class="card-body p-6">
+            <h2 class="text-xl font-bold mb-4">Gestión de Sucursales</h2>
+            <p class="text-gray-500 mb-6 text-sm">Administra las ubicaciones físicas de tu negocio. Estas podrán ser asignadas a reparaciones o inventario.</p>
+
+            <!-- Listado de Sucursales -->
+            <div class="overflow-x-auto border rounded-xl mb-8">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr class="bg-base-200">
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Estado</th>
+                            <th class="text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (branch of branches(); track branch.id) {
+                        <tr>
+                            <td class="font-medium">{{ branch.name }}</td>
+                            <td>{{ branch.address || '--' }}</td>
+                            <td>
+                                <button class="badge cursor-pointer" 
+                                    [class.badge-success]="branch.is_active" 
+                                    [class.badge-ghost]="!branch.is_active"
+                                    (click)="toggleBranchStatus(branch)">
+                                    {{ branch.is_active ? 'Activa' : 'Inactiva' }}
+                                </button>
+                            </td>
+                            <td class="text-right">
+                                <button class="btn btn-ghost btn-sm text-error" (click)="deleteBranch(branch.id)" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        }
+                        @if (branches().length === 0) {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-gray-500">No hay sucursales registradas.</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Formulario para agregar Nueva Sucursal -->
+            <div class="bg-base-200 p-6 rounded-xl border border-base-300">
+                <h3 class="font-bold text-lg mb-4"><i class="fas fa-plus-circle text-primary mr-2"></i>Agregar Nueva Sucursal</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Nombre de la Sucursal</span></label>
+                        <input type="text" [(ngModel)]="newBranch().name" class="input input-bordered w-full" placeholder="Ej: Zona Centro" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Dirección (Opcional)</span></label>
+                        <input type="text" [(ngModel)]="newBranch().address" class="input input-bordered w-full" placeholder="Ej: San Martin 123" />
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center justify-between">
+                    <label class="cursor-pointer label flex gap-2">
+                        <input type="checkbox" [(ngModel)]="newBranch().is_active" class="checkbox checkbox-primary" />
+                        <span class="label-text">Sucursal Activa</span>
+                    </label>
+                    <button class="btn btn-primary" (click)="addBranch()" [disabled]="savingBranch() || !newBranch().name">
+                        @if(savingBranch()) { <span class="loading loading-spinner"></span> }
+                        Agregar Sucursal
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>

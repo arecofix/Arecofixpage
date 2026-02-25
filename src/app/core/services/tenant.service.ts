@@ -62,6 +62,7 @@ export class TenantService {
    * Resuelve el Tenant basado en el Hostname o Custom Domain de la URL del visitante.
    */
   async resolveTenantByHostname(hostname: string): Promise<Tenant | null> {
+    this.logger.info(`Resolving tenant for hostname: ${hostname}`);
     try {
       // 1. Buscamos primero si el negocio configuró un Custom Domain (Ej: mibau.com.ar)
       let { data, error } = await this.supabase
@@ -72,6 +73,7 @@ export class TenantService {
         .maybeSingle();
 
       if (error) {
+        this.logger.error(`Database error resolving custom domain: ${error.message}`, error);
         throw new DatabaseError(error.message, error);
       }
 
@@ -80,10 +82,11 @@ export class TenantService {
         const extractSubdomain = hostname.split('.')[0];
         
         // En localhost o dominio principal, buscamos un tenant base
-        const slugToSearch = (hostname.includes('localhost') || hostname === 'arecofix.com.ar') 
-          ? 'demo' // Cambia "demo" por el slug de tu tienda principal base
+        const slugToSearch = (hostname.includes('localhost') || hostname === 'arecofix.com.ar' || hostname === 'www.arecofix.com.ar') 
+          ? 'arecofix' 
           : extractSubdomain;
 
+        this.logger.debug(`Searching for tenant by slug: ${slugToSearch}`);
         const { data: slugData, error: slugError } = await this.supabase
           .from('tenants')
           .select('*')
@@ -92,26 +95,30 @@ export class TenantService {
           .maybeSingle();
 
         if (slugError) {
+           this.logger.error(`Database error resolving slug ${slugToSearch}: ${slugError.message}`, slugError);
            throw new DatabaseError(slugError.message, slugError);
         }
 
         if (slugData) {
             data = slugData;
         } else {
+            this.logger.warn(`No tenant found for slug: ${slugToSearch}. Using fallback.`);
             // 3. Fallback de Seguridad / Desarrollo:
-            // Si no se encuentra 'demo' ni el custom_domain, 
-            // trae el primer Tenant activo que exista en la DB para no romper la app entera.
-            const { data: fallbackData } = await this.supabase
+            const { data: fallbackData, error: fallbackError } = await this.supabase
                 .from('tenants')
                 .select('*')
                 .limit(1)
                 .maybeSingle();
             
+            if (fallbackError) {
+              this.logger.error('Error fetching fallback tenant', fallbackError);
+            }
+
             if (fallbackData) {
+                this.logger.info('Successfully recovered with fallback tenant', fallbackData.id);
                 data = fallbackData;
             } else {
-                // If there are literally no tenants in the database (or RLS blocks it), 
-                // inject a default silent mock tenant so dev environment does not panic.
+                this.logger.warn('No active tenants found in database. Loading mock tenant.');
                 const defaultTenant: Tenant = {
                     id: '00000000-0000-0000-0000-000000000000',
                     name: 'Arecofix Dev Local',
@@ -138,7 +145,8 @@ export class TenantService {
       return null;
       
     } catch (err) {
-      this.logger.error('Failed to resolve SaaS Tenant', err);
+      this.logger.error('Critical failure in resolveTenantByHostname', err);
+      // Ensure we always have a context even in catastrophic failure
       return null;
     }
   }

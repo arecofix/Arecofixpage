@@ -15,8 +15,12 @@ export class AnalyticsService {
             posthog.init(environment.posthogKey as string, {
                 api_host: environment.posthogHost || 'https://us.i.posthog.com',
                 person_profiles: 'identified_only',
-                loaded: (ph) => {
-                    ph.debug(false);
+                autocapture: true,
+                capture_pageview: true,
+                loaded: (ph: any) => {
+                    if (!environment.production) {
+                        ph.debug(true);
+                    }
                 }
             });
         }

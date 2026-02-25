@@ -1,0 +1,2 @@
+import './polyfills.server.mjs';
+import"./chunk-DGJQU3KY.mjs";var r=[{path:"",title:"Compras",loadComponent:()=>import("./chunk-J3OSCZAQ.mjs").then(e=>e.AdminPurchasesPage),\u0275entryName:"src/app/admin/purchases/admin-purchases-page.ts"},{path:"new",title:"Nueva Compra",loadComponent:()=>import("./chunk-ZQXSTPJK.mjs").then(e=>e.AdminPurchaseFormPage),\u0275entryName:"src/app/admin/purchases/admin-purchase-form-page.ts"}];export{r as ADMIN_PURCHASES_ROUTES};

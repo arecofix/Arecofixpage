@@ -8,19 +8,19 @@
             <thead>
                 <tr class="text-base-content">
                     <th>Usuario</th>
-                    <th>Rol</th>
+                    <th>Rol en el Negocio</th>
+                    <th>Sucursal Asignada</th>
                     <th>Fecha Registro</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @if (loading()) {
                 <tr>
-                    <td colspan="4" class="text-center py-4">Cargando...</td>
+                    <td colspan="4" class="text-center py-4">Cargando usuarios...</td>
                 </tr>
                 } @else if (users().length === 0) {
                 <tr>
-                    <td colspan="4" class="text-center py-4">No hay usuarios registrados.</td>
+                    <td colspan="4" class="text-center py-4 text-gray-400">No hay usuarios registrados.</td>
                 </tr>
                 } @else {
                 @for (user of users(); track user.id) {
@@ -35,22 +35,34 @@
                             </div>
                             <div>
                                 <div class="font-bold">{{ user.first_name }} {{ user.last_name }}</div>
-                                <div class="text-sm opacity-50">{{ user.email }}</div>
+                                <div class="text-xs opacity-50">{{ user.email }}</div>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <div class="badge" [class.badge-primary]="user.role === 'admin'"
-                            [class.badge-secondary]="user.role === 'staff'" [class.badge-ghost]="user.role === 'user'">
-                            {{ user.role | uppercase }}
-                        </div>
+                        <select class="select select-sm select-bordered w-full max-w-xs"
+                                [ngModel]="user.role"
+                                (ngModelChange)="updateUserRole(user, $event)">
+                            <option value="user">Cliente (User)</option>
+                            <option value="staff">Técnico (Staff)</option>
+                            <option value="admin">Administrador (Admin)</option>
+                        </select>
                     </td>
-                    <td>{{ user.created_at | date:'short' }}</td>
                     <td>
-                        <!-- <button class="btn btn-sm btn-ghost" (click)="toggleRole(user)">
-                  Cambiar Rol
-                </button> -->
+                        <select class="select select-sm select-bordered w-full max-w-xs"
+                                [ngModel]="user.branch_id"
+                                (ngModelChange)="updateUserBranch(user, $event)"
+                                [disabled]="user.role === 'admin' || user.role === 'user'">
+                            <option [ngValue]="null">-- Sin Sucursal Asignada --</option>
+                            @for (branch of branches(); track branch.id) {
+                                <option [ngValue]="branch.id">{{ branch.name }}</option>
+                            }
+                        </select>
+                        @if(user.role === 'admin') {
+                            <div class="text-[10px] text-gray-400 mt-1">Global (Todas las sucursales)</div>
+                        }
                     </td>
+                    <td class="text-sm opacity-70">{{ user.created_at | date:'shortDate' }}</td>
                 </tr>
                 }
                 }

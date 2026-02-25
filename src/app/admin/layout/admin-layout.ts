@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { NotificationService, AppNotification } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
 import { PreferencesService } from '@app/shared/services/preferences.service';
 
@@ -11,10 +12,11 @@ import { PreferencesService } from '@app/shared/services/preferences.service';
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AccessibilitySidebarComponent],
   templateUrl: './admin-layout.html',
 })
-export class AdminLayout {
+export class AdminLayout implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   public preferencesService = inject(PreferencesService);
+  public notificationService = inject(NotificationService);
 
   menuItems: any[] = [
     { title: 'Dashboard', path: '/admin/dashboard', icon: 'fa-chart-line' },
@@ -55,6 +57,24 @@ export class AdminLayout {
   toggleMenu(item: any) {
     if (item.children) {
       item.expanded = !item.expanded;
+    }
+  }
+
+  async ngOnInit() {
+    await this.notificationService.loadNotifications();
+    this.notificationService.subscribeToRealtime();
+  }
+
+  ngOnDestroy() {
+    this.notificationService.unsubscribe();
+  }
+
+  handleNotificationClick(notif: AppNotification) {
+    if (!notif.is_read) {
+      this.notificationService.markAsRead(notif.id);
+    }
+    if (notif.link) {
+      this.router.navigateByUrl(notif.link);
     }
   }
 
