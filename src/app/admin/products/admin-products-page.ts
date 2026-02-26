@@ -3,16 +3,17 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
-import { AdminProductService } from './services/admin-product.service';
+import { AdminProductService, ImportReport } from './services/admin-product.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
+import { ImportResultModalComponent } from './components/import-result-modal/import-result-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent],
+  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent],
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -37,7 +38,13 @@ export class AdminProductsPage implements OnInit {
   public itemsPerPage = signal<number>(10);
   
   public loading = signal<boolean>(true);
+  public importing = signal<boolean>(false);
+  public importProgress = signal<string>('');
   public error = signal<string | null>(null);
+
+  // Import result modal
+  public importReport = signal<ImportReport | null>(null);
+  public showImportResult = signal<boolean>(false);
 
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
@@ -161,18 +168,36 @@ export class AdminProductsPage implements OnInit {
   }
 
   async importProducts(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        this.loading.set(true);
-        const result = await this.productService.importProductsFromCSV(file);
-        alert(`Éxito: ${result.success}, Errores: ${result.errors}`);
-        await this.loadData();
-      } catch (e: any) {
-        this.error.set('Error al importar: ' + e.message);
-      } finally {
-        this.loading.set(false);
-      }
+    const file: File = event.target.files?.[0];
+    // Reset file input so the same file can be re-selected if needed
+    event.target.value = '';
+
+    if (!file) return;
+
+    try {
+      this.importing.set(true);
+      this.importProgress.set('Leyendo CSV y cargando inventario actual…');
+      this.error.set(null);
+      this.cdr.detectChanges();
+
+      const report = await this.productService.importProductsFromCSV(file);
+
+      this.importProgress.set('');
+      this.importReport.set(report);
+      this.showImportResult.set(true);
+      this.cdr.detectChanges();
+    } catch (e: any) {
+      this.error.set('Error al importar: ' + e.message);
+      this.importProgress.set('');
+    } finally {
+      this.importing.set(false);
+      this.cdr.detectChanges();
     }
+  }
+
+  async onImportResultClose() {
+    this.showImportResult.set(false);
+    this.importReport.set(null);
+    await this.loadData();
   }
 }

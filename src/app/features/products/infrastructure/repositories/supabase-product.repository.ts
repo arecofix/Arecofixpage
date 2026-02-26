@@ -5,9 +5,10 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { TenantService } from '@app/core/services/tenant.service';
-import { ProductRepository } from '../../domain/repositories/product.repository';
+import { ProductRepository, ImportProductSummary, BulkPriceUpdate } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
+
 
 @Injectable({
   providedIn: 'root'
@@ -186,6 +187,69 @@ export class SupabaseProductRepository extends ProductRepository {
         return this._mapToEntity(data);
       })
     );
+  }
+
+  /** Lean projection for import deduplication - only fetches fields needed to match & compare */
+  getAllForImport(): Observable<ImportProductSummary[]> {
+    const query = this.applyTenantFilter(
+      this.supabase.from('products').select(
+        'id, name, sku, price, image_url, gallery_urls, description, category_id, brand_id'
+      )
+    );
+    return from(query as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        return (data || []) as ImportProductSummary[];
+      })
+    );
+  }
+
+  /**
+   * Safe bulk price update - only modifies `price` (and optionally `name` for repuesto items).
+   * Processes in batches of 50 to avoid overloading the DB.
+   */
+  bulkUpdatePrices(updates: BulkPriceUpdate[]): Observable<{ updated: number; errors: number }> {
+    const CHUNK_SIZE = 50;
+    const chunks: BulkPriceUpdate[][] = [];
+    for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
+      chunks.push(updates.slice(i, i + CHUNK_SIZE));
+    }
+
+    const processChunks = async (): Promise<{ updated: number; errors: number }> => {
+      let updated = 0;
+      let errors = 0;
+
+      for (const chunk of chunks) {
+        const promises = chunk.map(async (item) => {
+          const payload: Record<string, any> = {
+            price: item.price,
+            updated_at: new Date().toISOString()
+          };
+          // Only update name if provided (i.e. was a 'repuesto' product needing renaming)
+          if (item.newName) {
+            payload['name'] = item.newName;
+          }
+
+          const { error } = await this.supabase
+            .from('products')
+            .update(payload)
+            .eq('id', item.id)
+            .eq('tenant_id', this.tenantService.getTenantId());
+
+          if (error) {
+            this.logger.error('bulkUpdatePrices', `Failed for product ${item.id}: ${error.message}`);
+            errors++;
+          } else {
+            updated++;
+          }
+        });
+        await Promise.all(promises);
+      }
+      return { updated, errors };
+    };
+
+    return from(processChunks());
   }
 
   async uploadImage(file: File): Promise<string> {

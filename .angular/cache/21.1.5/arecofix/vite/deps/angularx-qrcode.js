@@ -1,8 +1,8 @@
 import {
   DomSanitizer
-} from "./chunk-BOY3ENWP.js";
-import "./chunk-IDPNNFPZ.js";
+} from "./chunk-KP2Y7OQE.js";
 import "./chunk-N3OCTCSJ.js";
+import "./chunk-IDPNNFPZ.js";
 import "./chunk-AXPQLFXE.js";
 import {
   ChangeDetectionStrategy,

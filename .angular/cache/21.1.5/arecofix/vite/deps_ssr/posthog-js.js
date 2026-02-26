@@ -1,5 +1,5 @@
 import { createRequire } from 'module';const require = createRequire(import.meta.url);
-import "./chunk-6DU2HRTW.js";
+import "./chunk-SOE35BD4.js";
 
 // node_modules/posthog-js/dist/module.js
 var t = "undefined" != typeof window ? window : void 0;
