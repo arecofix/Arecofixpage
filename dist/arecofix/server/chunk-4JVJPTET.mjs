@@ -1,0 +1,706 @@
+import './polyfills.server.mjs';
+import {
+  CertificateGalleryComponent
+} from "./chunk-4YMXXR7P.mjs";
+import {
+  PreferencesService
+} from "./chunk-O5BNCA7P.mjs";
+import {
+  SeoService
+} from "./chunk-3LSO3424.mjs";
+import {
+  environment
+} from "./chunk-R72SLW3B.mjs";
+import {
+  DomSanitizer
+} from "./chunk-GLYZDHZB.mjs";
+import {
+  AsyncPipe,
+  CommonModule,
+  NgOptimizedImage
+} from "./chunk-NQCCIK3J.mjs";
+import {
+  Component,
+  inject,
+  map,
+  setClassMetadata,
+  ɵsetClassDebugInfo,
+  ɵɵadvance,
+  ɵɵclassProp,
+  ɵɵconditional,
+  ɵɵconditionalCreate,
+  ɵɵdefineComponent,
+  ɵɵdirectiveInject,
+  ɵɵelement,
+  ɵɵelementEnd,
+  ɵɵelementStart,
+  ɵɵgetCurrentView,
+  ɵɵlistener,
+  ɵɵnamespaceSVG,
+  ɵɵnextContext,
+  ɵɵpipe,
+  ɵɵpipeBind1,
+  ɵɵproperty,
+  ɵɵrepeater,
+  ɵɵrepeaterCreate,
+  ɵɵrepeaterTrackByIdentity,
+  ɵɵresetView,
+  ɵɵrestoreView,
+  ɵɵsanitizeResourceUrl,
+  ɵɵsanitizeUrl,
+  ɵɵtext,
+  ɵɵtextInterpolate,
+  ɵɵtextInterpolate1
+} from "./chunk-RN3QJLYL.mjs";
+import "./chunk-TB3YAHZW.mjs";
+
+// src/app/public/nosotros/nosotros.ts
+function NosotrosComponent_Conditional_0_For_15_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 11)(1, "div", 52);
+    \u0275\u0275text(2);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(3, "div", 53);
+    \u0275\u0275text(4);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(5, "div", 54);
+    \u0275\u0275text(6);
+    \u0275\u0275elementEnd()();
+  }
+  if (rf & 2) {
+    const achievement_r1 = ctx.$implicit;
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(achievement_r1.number);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(achievement_r1.label);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(achievement_r1.description);
+  }
+}
+function NosotrosComponent_Conditional_0_For_59_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 37)(1, "div", 55);
+    \u0275\u0275text(2);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(3, "h3", 56);
+    \u0275\u0275text(4);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(5, "p", 57);
+    \u0275\u0275text(6);
+    \u0275\u0275elementEnd()();
+  }
+  if (rf & 2) {
+    const value_r2 = ctx.$implicit;
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(value_r2.icon);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(value_r2.title);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", value_r2.description, " ");
+  }
+}
+function NosotrosComponent_Conditional_0_For_69_Conditional_5_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275element(0, "img", 62);
+  }
+  if (rf & 2) {
+    const member_r3 = \u0275\u0275nextContext().$implicit;
+    \u0275\u0275property("ngSrc", member_r3.image)("alt", member_r3.name);
+  }
+}
+function NosotrosComponent_Conditional_0_For_69_Conditional_6_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275text(0, " \u{1F468}\u200D\u{1F4BB} ");
+  }
+}
+function NosotrosComponent_Conditional_0_For_69_Conditional_14_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "a", 67);
+    \u0275\u0275element(1, "i", 68);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const member_r3 = \u0275\u0275nextContext().$implicit;
+    \u0275\u0275property("href", member_r3.linkedin, \u0275\u0275sanitizeUrl);
+  }
+}
+function NosotrosComponent_Conditional_0_For_69_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 40);
+    \u0275\u0275element(1, "div", 58);
+    \u0275\u0275elementStart(2, "div", 59)(3, "div", 60)(4, "div", 61);
+    \u0275\u0275conditionalCreate(5, NosotrosComponent_Conditional_0_For_69_Conditional_5_Template, 1, 2, "img", 62)(6, NosotrosComponent_Conditional_0_For_69_Conditional_6_Template, 1, 0);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(7, "div", 63)(8, "h3", 64);
+    \u0275\u0275text(9);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(10, "p", 65);
+    \u0275\u0275text(11);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(12, "p", 66);
+    \u0275\u0275text(13);
+    \u0275\u0275elementEnd();
+    \u0275\u0275conditionalCreate(14, NosotrosComponent_Conditional_0_For_69_Conditional_14_Template, 2, 1, "a", 67);
+    \u0275\u0275elementEnd()()();
+  }
+  if (rf & 2) {
+    const member_r3 = ctx.$implicit;
+    \u0275\u0275advance(5);
+    \u0275\u0275conditional(member_r3.image ? 5 : 6);
+    \u0275\u0275advance(4);
+    \u0275\u0275textInterpolate(member_r3.name);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate(member_r3.role);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", member_r3.bio, " ");
+    \u0275\u0275advance();
+    \u0275\u0275conditional(member_r3.linkedin ? 14 : -1);
+  }
+}
+function NosotrosComponent_Conditional_0_For_78_Conditional_7_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 74);
+    \u0275\u0275text(1);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const faq_r7 = \u0275\u0275nextContext().$implicit;
+    \u0275\u0275advance();
+    \u0275\u0275textInterpolate1(" ", faq_r7.answer, " ");
+  }
+}
+function NosotrosComponent_Conditional_0_For_78_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r4 = \u0275\u0275getCurrentView();
+    \u0275\u0275elementStart(0, "div", 44)(1, "button", 69);
+    \u0275\u0275listener("click", function NosotrosComponent_Conditional_0_For_78_Template_button_click_1_listener() {
+      const \u0275$index_184_r5 = \u0275\u0275restoreView(_r4).$index;
+      const ctx_r5 = \u0275\u0275nextContext(2);
+      return \u0275\u0275resetView(ctx_r5.toggleFAQ(\u0275$index_184_r5));
+    });
+    \u0275\u0275elementStart(2, "span", 70);
+    \u0275\u0275text(3);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(4, "span", 71);
+    \u0275\u0275namespaceSVG();
+    \u0275\u0275elementStart(5, "svg", 72);
+    \u0275\u0275element(6, "path", 73);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275conditionalCreate(7, NosotrosComponent_Conditional_0_For_78_Conditional_7_Template, 2, 1, "div", 74);
+    \u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const faq_r7 = ctx.$implicit;
+    const \u0275$index_184_r5 = ctx.$index;
+    const ctx_r5 = \u0275\u0275nextContext(2);
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(faq_r7.question);
+    \u0275\u0275advance();
+    \u0275\u0275classProp("rotate-180", ctx_r5.expandedFAQ === \u0275$index_184_r5);
+    \u0275\u0275advance(3);
+    \u0275\u0275conditional(ctx_r5.expandedFAQ === \u0275$index_184_r5 ? 7 : -1);
+  }
+}
+function NosotrosComponent_Conditional_0_Template(rf, ctx) {
+  if (rf & 1) {
+    \u0275\u0275elementStart(0, "div", 0)(1, "div", 1);
+    \u0275\u0275element(2, "div", 2)(3, "div", 3)(4, "div", 4);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(5, "div", 5)(6, "h1", 6);
+    \u0275\u0275text(7);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(8, "p", 7);
+    \u0275\u0275text(9);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(10, "p", 8);
+    \u0275\u0275text(11);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(12, "section", 9)(13, "div", 10);
+    \u0275\u0275repeaterCreate(14, NosotrosComponent_Conditional_0_For_15_Template, 7, 3, "div", 11, \u0275\u0275repeaterTrackByIdentity);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(16, "section", 12)(17, "div", 13)(18, "div", 14)(19, "div", 15)(20, "h2", 16);
+    \u0275\u0275text(21);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(22, "p", 17);
+    \u0275\u0275text(23);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(24, "div", 18)(25, "h3", 19);
+    \u0275\u0275text(26);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(27, "p", 20);
+    \u0275\u0275text(28);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(29, "div", 21)(30, "div", 22);
+    \u0275\u0275element(31, "iframe", 23);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(32, "div", 24)(33, "div", 25);
+    \u0275\u0275elementEnd()()()();
+    \u0275\u0275elementStart(34, "section", 26)(35, "div", 13)(36, "div", 27)(37, "div", 28)(38, "div", 29);
+    \u0275\u0275text(39, " \u{1F3AF} ");
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(40, "h3", 30);
+    \u0275\u0275text(41);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(42, "p", 31);
+    \u0275\u0275text(43);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(44, "div", 32)(45, "div", 33);
+    \u0275\u0275text(46, " \u{1F52D} ");
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(47, "h3", 30);
+    \u0275\u0275text(48);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(49, "p", 31);
+    \u0275\u0275text(50);
+    \u0275\u0275elementEnd()()()()();
+    \u0275\u0275elementStart(51, "section", 12)(52, "div", 13)(53, "div", 34)(54, "h2", 35);
+    \u0275\u0275text(55);
+    \u0275\u0275elementEnd();
+    \u0275\u0275element(56, "div", 36);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(57, "div", 27);
+    \u0275\u0275repeaterCreate(58, NosotrosComponent_Conditional_0_For_59_Template, 7, 3, "div", 37, \u0275\u0275repeaterTrackByIdentity);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(60, "section", 26)(61, "div", 13)(62, "div", 34)(63, "h2", 35);
+    \u0275\u0275text(64);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(65, "p", 38);
+    \u0275\u0275text(66);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(67, "div", 39);
+    \u0275\u0275repeaterCreate(68, NosotrosComponent_Conditional_0_For_69_Template, 15, 5, "div", 40, \u0275\u0275repeaterTrackByIdentity);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275element(70, "app-certificate-gallery", 41);
+    \u0275\u0275elementStart(71, "section", 12)(72, "div", 42)(73, "div", 34)(74, "h2", 35);
+    \u0275\u0275text(75);
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(76, "div", 43);
+    \u0275\u0275repeaterCreate(77, NosotrosComponent_Conditional_0_For_78_Template, 8, 4, "div", 44, \u0275\u0275repeaterTrackByIdentity);
+    \u0275\u0275elementEnd()()();
+    \u0275\u0275elementStart(79, "section", 45)(80, "div", 13)(81, "h2", 46);
+    \u0275\u0275text(82);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(83, "p", 47);
+    \u0275\u0275text(84);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(85, "div", 48)(86, "a", 49);
+    \u0275\u0275element(87, "i", 50);
+    \u0275\u0275text(88);
+    \u0275\u0275elementEnd();
+    \u0275\u0275elementStart(89, "a", 51);
+    \u0275\u0275text(90);
+    \u0275\u0275elementEnd()()()();
+  }
+  if (rf & 2) {
+    const content_r8 = ctx;
+    const ctx_r5 = \u0275\u0275nextContext();
+    \u0275\u0275advance(7);
+    \u0275\u0275textInterpolate1(" ", content_r8.title, " ");
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.subtitle, " ");
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.intro, " ");
+    \u0275\u0275advance(3);
+    \u0275\u0275repeater(content_r8.achievements);
+    \u0275\u0275advance(7);
+    \u0275\u0275textInterpolate(content_r8.history);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.historyText, " ");
+    \u0275\u0275advance(3);
+    \u0275\u0275textInterpolate(content_r8.foundation);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(' "', content_r8.foundationText, '" ');
+    \u0275\u0275advance(3);
+    \u0275\u0275property("src", ctx_r5.youtubeUrl, \u0275\u0275sanitizeResourceUrl);
+    \u0275\u0275advance(10);
+    \u0275\u0275textInterpolate(content_r8.mission);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.missionText, " ");
+    \u0275\u0275advance(5);
+    \u0275\u0275textInterpolate(content_r8.vision);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.visionText, " ");
+    \u0275\u0275advance(5);
+    \u0275\u0275textInterpolate(content_r8.valuesTitle);
+    \u0275\u0275advance(3);
+    \u0275\u0275repeater(content_r8.values);
+    \u0275\u0275advance(6);
+    \u0275\u0275textInterpolate(content_r8.teamTitle);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.teamSubtitle, " ");
+    \u0275\u0275advance(2);
+    \u0275\u0275repeater(content_r8.teamMembers);
+    \u0275\u0275advance(2);
+    \u0275\u0275property("title", "Nuestros Certificados");
+    \u0275\u0275advance(5);
+    \u0275\u0275textInterpolate(content_r8.faqTitle);
+    \u0275\u0275advance(2);
+    \u0275\u0275repeater(content_r8.faqs);
+    \u0275\u0275advance(5);
+    \u0275\u0275textInterpolate(content_r8.ctaTitle);
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.ctaText, " ");
+    \u0275\u0275advance(4);
+    \u0275\u0275textInterpolate1(" ", content_r8.ctaWhatsapp, " ");
+    \u0275\u0275advance(2);
+    \u0275\u0275textInterpolate1(" ", content_r8.ctaContact, " ");
+  }
+}
+var NosotrosComponent = class _NosotrosComponent {
+  preferencesService;
+  seoService = inject(SeoService);
+  sanitizer = inject(DomSanitizer);
+  /** Pre-sanitized YouTube embed URL so Angular trusts the iframe src binding */
+  youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.youtube.com/embed/l93eYkGMxsI?start=58&rel=0");
+  ngOnInit() {
+    this.seoService.setPageData({
+      title: "Sobre Nosotros",
+      description: "M\xE1s que una empresa de software. Somos un equipo apasionado por transformar negocios a trav\xE9s de la tecnolog\xEDa en Marcos Paz y el mundo.",
+      imageUrl: "assets/img/branding/og-nosotros.jpg"
+    });
+  }
+  expandedFAQ = null;
+  nosotrosContent = {
+    es: {
+      title: "M\xE1s que un Servicio T\xE9cnico",
+      subtitle: "Somos Arecofix",
+      intro: "En Arecofix, fusionamos la precisi\xF3n t\xE9cnica con la pasi\xF3n por ense\xF1ar. No solo reparamos dispositivos; construimos confianza y formamos futuro en Marcos Paz.",
+      achievements: [
+        { number: "5+", label: "A\xF1os de Trayectoria", description: "Innovando en Marcos Paz" },
+        { number: "2500+", label: "Dispositivos Recuperados", description: "Extendiendo la vida \xFAtil de la tecnolog\xEDa" },
+        { number: "500+", label: "Alumnos Capacitados", description: "Formando la pr\xF3xima generaci\xF3n de t\xE9cnicos" },
+        { number: "100%", label: "Garant\xEDa Asegurada", description: "Respaldo total en cada servicio" }
+      ],
+      history: "Nuestra Historia",
+      historyText: "Lo que comenz\xF3 en 2020 como un emprendimiento personal impulsado por la curiosidad y las ganas de resolver problemas, hoy es un referente tecnol\xF3gico en la zona. Arecofix naci\xF3 de la necesidad de un servicio t\xE9cnico honesto y profesional. Con el tiempo, esa misi\xF3n evolucion\xF3: nos dimos cuenta de que pod\xEDamos hacer m\xE1s que arreglar pantallas; pod\xEDamos brindar oportunidades a trav\xE9s de la educaci\xF3n.",
+      foundation: "Nuestra Esencia",
+      foundationText: "Creemos que la tecnolog\xEDa debe ser una herramienta de progreso, no de frustraci\xF3n. Por eso, cada reparaci\xF3n es una oportunidad para demostrar que las cosas se pueden hacer bien, con transparencia y dedicaci\xF3n.",
+      mission: "Misi\xF3n",
+      missionText: "Brindar soluciones tecnol\xF3gicas integrales que extiendan la vida \xFAtil de los dispositivos, mientras empoderamos a nuestra comunidad a trav\xE9s de la educaci\xF3n t\xE9cnica y el acceso a herramientas de calidad.",
+      vision: "Visi\xF3n",
+      visionText: "Ser el centro tecnol\xF3gico l\xEDder de la regi\xF3n, reconocido no solo por la excelencia en reparaciones, sino como un semillero de talento t\xE9cnico y un impulsor de la cultura de la reparaci\xF3n y la sostenibilidad.",
+      valuesTitle: "Valores que nos Gu\xEDan",
+      values: [
+        { title: "Transparencia Radical", description: "Sin letras chicas. Te explicamos exactamente qu\xE9 tiene tu equipo y cu\xE1nto costar\xE1 arreglarlo antes de empezar.", icon: "\u{1F50D}" },
+        { title: "Pasi\xF3n por Educar", description: "No solo reparamos, ense\xF1amos. Creemos en compartir el conocimiento para empoderar a nuestra comunidad.", icon: "\u{1F4DA}" },
+        { title: "Excelencia T\xE9cnica", description: "Nos capacitamos constantemente para estar a la vanguardia de las \xFAltimas tecnolog\xEDas y m\xE9todos de reparaci\xF3n.", icon: "\u{1F6E0}\uFE0F" },
+        { title: "Compromiso Local", description: "Orgullosamente de Marcos Paz, trabajamos para impulsar el desarrollo tecnol\xF3gico de nuestra ciudad.", icon: "\u{1F3D9}\uFE0F" },
+        { title: "Sostenibilidad", description: "Reparar es reciclar. Ayudamos a reducir la basura electr\xF3nica dando una segunda vida a tus dispositivos.", icon: "\u{1F331}" },
+        { title: "Empat\xEDa", description: "Entendemos lo importante que es tu dispositivo para vos. Lo tratamos con el mismo cuidado que si fuera nuestro.", icon: "\u2764\uFE0F" }
+      ],
+      teamTitle: "Quienes Hacen Arecofix",
+      teamSubtitle: "Conoce a las personas detr\xE1s de la tecnolog\xEDa.",
+      teamMembers: [
+        {
+          name: "Ezequiel Enrico Areco",
+          role: "Fundador & Director T\xE9cnico",
+          bio: "Apasionado por la tecnolog\xEDa desde joven. Fund\xF3 Arecofix con la visi\xF3n de profesionalizar el servicio t\xE9cnico en la regi\xF3n. Ingeniero de software y experto en microelectr\xF3nica, lidera el equipo con un enfoque en calidad y educaci\xF3n continua.",
+          image: "assets/img/perfil.jpeg",
+          linkedin: environment.contact.socialMedia.linkedin
+        }
+      ],
+      faqTitle: "Preguntas Frecuentes",
+      faqs: [
+        { question: "\xBFCu\xE1nto tiempo demora una reparaci\xF3n t\xEDpica?", answer: "Entendemos que tu tiempo vale. Cambios de bater\xEDa o pantalla suelen estar listos en el d\xEDa (1-3 horas). Diagn\xF3sticos m\xE1s complejos pueden tomar 24-48 horas. Siempre te mantendremos informado del estado v\xEDa WhatsApp.", open: false },
+        { question: "\xBFQu\xE9 garant\xEDa ofrecen?", answer: "Ofrecemos una garant\xEDa escrita de 90 d\xEDas sobre la mano de obra y los repuestos utilizados. Si la falla persiste por motivos no relacionados a nuevo da\xF1o f\xEDsico o l\xEDquido, lo solucionamos sin cargo.", open: false },
+        { question: "\xBFMis datos est\xE1n seguros?", answer: "Absolutamente. La privacidad es prioridad. No accedemos a tu informaci\xF3n personal a menos que sea estrictamente necesario para la reparaci\xF3n (ej. backup) y siempre con tu consentimiento previo.", open: false },
+        { question: "\xBFVenden repuestos para que yo lo repare?", answer: "\xA1S\xED! Apoyamos el derecho a reparar. Vendemos repuestos de calidad y herramientas. Adem\xE1s, si te interesa aprender, te invitamos a conocer nuestros cursos de reparaci\xF3n.", open: false },
+        { question: "\xBFHacen servicio a domicilio?", answer: "S\xED, contamos con servicio de retiro y entrega en Marcos Paz. Coordinamos el horario que m\xE1s te convenga para que no tengas que moverte de tu casa o trabajo.", open: false }
+      ],
+      ctaTitle: "\xBFListo para recuperar tu dispositivo?",
+      ctaText: "Contacta con nosotros hoy y descubre por qu\xE9 miles de clientes conf\xEDan en Arecofix.",
+      ctaWhatsapp: "Contactar por WhatsApp",
+      ctaContact: "Enviar Consulta"
+    },
+    en: {
+      title: "More Than Tech Support",
+      subtitle: "We Are Arecofix",
+      intro: "At Arecofix, we merge technical precision with a passion for teaching. We don't just repair devices; we build trust and shape the future in Marcos Paz.",
+      achievements: [
+        { number: "5+", label: "Years of Experience", description: "Innovating in Marcos Paz" },
+        { number: "2500+", label: "Devices Recovered", description: "Extending technology lifespan" },
+        { number: "500+", label: "Students Trained", description: "Training the next generation of technicians" },
+        { number: "100%", label: "Guaranteed Warranty", description: "Total backing in every service" }
+      ],
+      history: "Our History",
+      historyText: "What started in 2020 as a personal venture driven by curiosity and a desire to solve problems, is now a tech benchmark in the area. Arecofix was born from the need for honest and professional technical service. Over time, that mission evolved: we realized we could do more than fix screens; we could provide opportunities through education.",
+      foundation: "Our Essence",
+      foundationText: "We believe technology should be a tool for progress, not frustration. That's why every repair is a chance to show things can be done right, with transparency and dedication.",
+      mission: "Mission",
+      missionText: "To provide integral tech solutions that extend device lifespan, while empowering our community through technical education and access to quality tools.",
+      vision: "Vision",
+      visionText: "To be the leading tech hub in the region, recognized not only for repair excellence but as a nursery for technical talent and a driver of repair culture and sustainability.",
+      valuesTitle: "Values That Guide Us",
+      values: [
+        { title: "Radical Transparency", description: "No fine print. We explain exactly what your device needs and how much it will cost before starting.", icon: "\u{1F50D}" },
+        { title: "Passion for Teaching", description: "We don't just repair, we teach. We believe in sharing knowledge to empower our community.", icon: "\u{1F4DA}" },
+        { title: "Technical Excellence", description: "We constantly train to be at the forefront of the latest technologies and repair methods.", icon: "\u{1F6E0}\uFE0F" },
+        { title: "Local Commitment", description: "Proudly from Marcos Paz, we work to boost the technological development of our city.", icon: "\u{1F3D9}\uFE0F" },
+        { title: "Sustainability", description: "Repairing is recycling. We help reduce e-waste by giving a second life to your devices.", icon: "\u{1F331}" },
+        { title: "Empathy", description: "We understand how important your device is to you. We treat it with the same care as if it were ours.", icon: "\u2764\uFE0F" }
+      ],
+      teamTitle: "Who Makes Arecofix",
+      teamSubtitle: "Meet the people behind the technology.",
+      teamMembers: [
+        {
+          name: "Ezequiel Enrico Areco",
+          role: "Founder & Technical Director",
+          bio: "Passionate about technology since young. Founded Arecofix with the vision of professionalizing technical service in the region. Software engineer and microelectronics expert, leads the team with a focus on quality and continuous education.",
+          image: "/assets/img/perfil.jpeg",
+          linkedin: environment.contact.socialMedia.linkedin
+        }
+      ],
+      faqTitle: "Frequently Asked Questions",
+      faqs: [
+        { question: "How long does a typical repair take?", answer: "We understand your time is valuable. Battery or screen replacements are usually ready within the day (1-3 hours). More complex diagnostics can take 24-48 hours. We will always keep you updated via WhatsApp.", open: false },
+        { question: "What warranty do you offer?", answer: "We offer a 90-day written warranty on labor and parts used. If the fault persists for reasons unrelated to new physical or liquid damage, we fix it free of charge.", open: false },
+        { question: "Are my data safe?", answer: "Absolutely. Privacy is a priority. We do not access your personal information unless strictly necessary for the repair (e.g., backup) and always with your prior consent.", open: false },
+        { question: "Do you sell parts for me to repair it?", answer: "Yes! We support the right to repair. We sell quality parts and tools. Also, if you are interested in learning, we invite you to check out our repair courses.", open: false },
+        { question: "Do you offer home service?", answer: "Yes, we have pickup and delivery service in Marcos Paz. We coordinate the time that suits you best so you don't have to move from your home or work.", open: false }
+      ],
+      ctaTitle: "Ready to recover your device?",
+      ctaText: "Contact us today and discover why thousands of customers trust Arecofix.",
+      ctaWhatsapp: "Contact via WhatsApp",
+      ctaContact: "Send Inquiry"
+    }
+  };
+  content$;
+  constructor(preferencesService) {
+    this.preferencesService = preferencesService;
+    this.content$ = this.preferencesService.language$.pipe(map((lang) => this.nosotrosContent[lang]));
+  }
+  toggleFAQ(index) {
+    this.expandedFAQ = this.expandedFAQ === index ? null : index;
+  }
+  static \u0275fac = function NosotrosComponent_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _NosotrosComponent)(\u0275\u0275directiveInject(PreferencesService));
+  };
+  static \u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _NosotrosComponent, selectors: [["app-nosotros"]], decls: 2, vars: 3, consts: [[1, "relative", "min-h-[60vh]", "flex", "items-center", "justify-center", "overflow-hidden", "py-20", "bg-[#0a0a0a]"], [1, "absolute", "inset-0", "z-0"], [1, "absolute", "inset-0", "bg-linear-to-b", "from-gray-900/10", "to-[#0a0a0a]", "z-10"], [1, "absolute", "top-0", "right-0", "-mr-20", "-mt-20", "w-[500px]", "h-[500px]", "rounded-full", "bg-blue-600/10", "blur-[100px]", "animate-pulse-slow"], [1, "absolute", "bottom-0", "left-0", "-ml-20", "-mb-20", "w-[500px]", "h-[500px]", "rounded-full", "bg-indigo-600/10", "blur-[100px]"], [1, "relative", "z-10", "container", "mx-auto", "px-4", "text-center"], [1, "text-4xl", "md:text-7xl", "font-bold", "mb-6", "tracking-tight", "text-white", "drop-shadow-lg", "text-gradient-premium"], [1, "text-xl", "md:text-3xl", "text-blue-200", "mb-8", "font-light", "drop-shadow-md"], [1, "text-lg", "text-gray-300", "max-w-3xl", "mx-auto", "leading-relaxed", "drop-shadow-sm", "font-light"], [1, "py-12", "glass-panel", "-mt-10", "relative", "z-10", "container", "mx-auto", "px-4", "rounded-2xl", "shadow-2xl", "max-w-6xl", "border", "border-white/10", "backdrop-blur-xl", "hover:translate-y-[-5px]", "transition-transform", "duration-500"], [1, "grid", "grid-cols-2", "md:grid-cols-4", "gap-8", "text-center", "divide-x", "divide-gray-200", "dark:divide-white/5"], [1, "p-4", "group"], [1, "py-20", "bg-gray-50", "dark:bg-transparent"], [1, "container", "mx-auto", "px-4"], [1, "grid", "md:grid-cols-2", "gap-12", "items-center"], [1, "space-y-6"], [1, "text-3xl", "font-bold", "text-gray-900", "dark:text-white"], [1, "text-gray-600", "dark:text-gray-300", "leading-relaxed"], [1, "bg-white", "dark:bg-white/5", "p-6", "rounded-lg", "shadow-sm", "border-l-4", "border-blue-500", "backdrop-blur-sm"], [1, "font-bold", "text-gray-900", "dark:text-white", "mb-2"], [1, "text-gray-600", "dark:text-gray-300", "text-sm", "italic"], [1, "relative"], [1, "aspect-video", "rounded-xl", "overflow-hidden", "shadow-2xl", "border", "border-gray-200", "dark:border-white/10"], ["width", "100%", "height", "100%", "title", "Arecofix Video", "frameborder", "0", "allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share", "allowfullscreen", "", 3, "src"], [1, "absolute", "-bottom-6", "-right-6", "w-24", "h-24", "bg-blue-500/10", "dark:bg-blue-500/20", "rounded-full", "-z-10", "blur-xl"], [1, "absolute", "-top-6", "-left-6", "w-32", "h-32", "bg-indigo-500/10", "dark:bg-indigo-500/20", "rounded-full", "-z-10", "blur-xl"], [1, "py-20", "bg-white", "dark:bg-white/5", "backdrop-blur-sm"], [1, "grid", "grid-cols-2", "gap-4", "md:gap-8"], [1, "bg-linear-to-br", "from-blue-50", "to-indigo-50", "dark:from-blue-900/40", "dark:to-indigo-900/40", "p-4", "md:p-8", "rounded-2xl", "border", "border-gray-100", "dark:border-white/10", "hover:border-blue-500/30", "transition-colors", "shadow-sm", "dark:shadow-none"], [1, "w-12", "h-12", "bg-blue-100", "dark:bg-blue-600/80", "text-blue-600", "dark:text-white", "rounded-lg", "flex", "items-center", "justify-center", "text-2xl", "mb-6", "shadow-sm", "dark:shadow-lg", "backdrop-blur-md"], [1, "text-xl", "md:text-2xl", "font-bold", "text-gray-900", "dark:text-white", "mb-4"], [1, "text-xs", "md:text-base", "text-gray-600", "dark:text-gray-300", "leading-relaxed"], [1, "bg-linear-to-br", "from-purple-50", "to-pink-50", "dark:from-purple-900/40", "dark:to-pink-900/40", "p-4", "md:p-8", "rounded-2xl", "border", "border-gray-100", "dark:border-white/10", "hover:border-purple-500/30", "transition-colors", "shadow-sm", "dark:shadow-none"], [1, "w-12", "h-12", "bg-purple-100", "dark:bg-purple-600/80", "text-purple-600", "dark:text-white", "rounded-lg", "flex", "items-center", "justify-center", "text-2xl", "mb-6", "shadow-sm", "dark:shadow-lg", "backdrop-blur-md"], [1, "text-center", "mb-16"], [1, "text-3xl", "font-bold", "text-gray-900", "dark:text-white", "mb-4"], [1, "w-24", "h-1", "bg-blue-600", "mx-auto", "rounded-full"], [1, "bg-white", "dark:bg-white/5", "p-4", "md:p-8", "rounded-xl", "shadow-sm", "hover:shadow-md", "hover:bg-gray-50", "dark:hover:bg-white/10", "transition-all", "duration-300", "border", "border-gray-200", "dark:border-white/10", "backdrop-blur-sm"], [1, "text-gray-600", "dark:text-gray-400", "max-w-2xl", "mx-auto"], [1, "flex", "justify-center", "flex-wrap", "gap-8"], [1, "max-w-md", "w-full", "bg-white", "dark:bg-white/5", "rounded-2xl", "shadow-xl", "overflow-hidden", "border", "border-gray-200", "dark:border-white/10", "transform", "hover:-translate-y-1", "transition-transform", "duration-300", "backdrop-blur-md"], [3, "title"], [1, "container", "mx-auto", "px-4", "max-w-4xl"], [1, "space-y-4"], [1, "bg-white", "dark:bg-white/5", "rounded-lg", "shadow-sm", "border", "border-gray-200", "dark:border-white/10", "overflow-hidden", "backdrop-blur-sm"], [1, "py-20", "bg-linear-to-r", "from-blue-600/90", "to-indigo-600/90", "dark:from-blue-900/80", "dark:to-indigo-900/80", "text-white", "text-center", "backdrop-blur-md", "border-t", "border-white/10"], [1, "text-3xl", "md:text-4xl", "font-bold", "mb-6"], [1, "text-xl", "text-blue-100", "mb-10", "max-w-2xl", "mx-auto"], [1, "flex", "flex-col", "sm:flex-row", "gap-4", "justify-center"], ["href", "https://wa.me/541125960900", "target", "_blank", 1, "inline-flex", "items-center", "justify-center", "px-8", "py-4", "bg-green-500", "hover:bg-green-600", "text-white", "font-bold", "rounded-full", "transition-all", "transform", "hover:scale-105", "shadow-lg"], [1, "fab", "fa-whatsapp", "mr-2", "text-xl"], ["routerLink", "/contacto", 1, "inline-flex", "items-center", "justify-center", "px-8", "py-4", "bg-white", "text-blue-900", "font-bold", "rounded-full", "hover:bg-gray-100", "transition-all", "transform", "hover:scale-105", "shadow-lg"], [1, "text-4xl", "md:text-5xl", "font-black", "text-transparent", "bg-clip-text", "bg-linear-to-r", "from-blue-400", "to-indigo-500", "mb-2", "group-hover:scale-110", "transition-transform"], [1, "text-sm", "font-bold", "text-gray-900", "dark:text-white", "uppercase", "tracking-widest"], [1, "text-xs", "text-gray-500", "dark:text-gray-400", "mt-2", "font-mono"], [1, "text-3xl", "md:text-4xl", "mb-4", "md:mb-6"], [1, "text-lg", "md:text-xl", "font-bold", "text-gray-900", "dark:text-white", "mb-2", "md:mb-3"], [1, "text-xs", "md:text-sm", "text-gray-600", "dark:text-gray-400", "leading-relaxed"], [1, "h-32", "bg-linear-to-r", "from-blue-600", "to-indigo-600", "opacity-80"], [1, "px-8", "pb-8"], [1, "relative", "-mt-16", "mb-6"], [1, "w-32", "h-32", "mx-auto", "rounded-full", "border-4", "border-white", "dark:border-gray-900", "overflow-hidden", "bg-gray-100", "dark:bg-gray-800", "shadow-lg", "flex", "items-center", "justify-center", "text-4xl", "relative"], ["fill", "", 1, "object-cover", 3, "ngSrc", "alt"], [1, "text-center"], [1, "text-2xl", "font-bold", "text-gray-900", "dark:text-white", "mb-1"], [1, "text-blue-600", "dark:text-blue-400", "font-medium", "mb-4"], [1, "text-gray-600", "dark:text-gray-300", "text-sm", "leading-relaxed", "mb-6"], ["target", "_blank", 1, "text-gray-400", "hover:text-blue-600", "dark:hover:text-blue-400", "transition-colors", "inline-block", "p-2", 3, "href"], [1, "fab", "fa-linkedin", "text-2xl"], [1, "w-full", "px-6", "py-4", "text-left", "flex", "items-center", "justify-between", "focus:outline-none", "hover:bg-gray-50", "dark:hover:bg-white/10", "transition-colors", 3, "click"], [1, "font-semibold", "text-gray-900", "dark:text-white"], [1, "transform", "transition-transform", "duration-200"], ["fill", "none", "stroke", "currentColor", "viewBox", "0 0 24 24", 1, "w-5", "h-5", "text-gray-400"], ["stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M19 9l-7 7-7-7"], [1, "px-6", "pb-4", "text-gray-600", "dark:text-gray-300", "text-sm", "leading-relaxed", "border-t", "border-gray-200", "dark:border-white/10", "mt-2", "pt-4"]], template: function NosotrosComponent_Template(rf, ctx) {
+    if (rf & 1) {
+      \u0275\u0275conditionalCreate(0, NosotrosComponent_Conditional_0_Template, 91, 21);
+      \u0275\u0275pipe(1, "async");
+    }
+    if (rf & 2) {
+      let tmp_0_0;
+      \u0275\u0275conditional((tmp_0_0 = \u0275\u0275pipeBind1(1, 1, ctx.content$)) ? 0 : -1, tmp_0_0);
+    }
+  }, dependencies: [CommonModule, CertificateGalleryComponent, NgOptimizedImage, AsyncPipe], styles: ["\n\n/*# sourceMappingURL=nosotros.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NosotrosComponent, [{
+    type: Component,
+    args: [{ selector: "app-nosotros", standalone: true, imports: [CommonModule, CertificateGalleryComponent, NgOptimizedImage], template: `@if (content$ | async; as content) {\r
+  <!-- Hero Section -->\r
+  <!-- Hero Section -->\r
+  <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-[#0a0a0a]">\r
+    <!-- Background Image/Gradient -->\r
+    <div class="absolute inset-0 z-0">\r
+      <div class="absolute inset-0 bg-linear-to-b from-gray-900/10 to-[#0a0a0a] z-10"></div>\r
+      <!-- Decorative circles -->\r
+      <div class="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse-slow"></div>\r
+      <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[100px]"></div>\r
+    </div>\r
+    <div class="relative z-10 container mx-auto px-4 text-center">\r
+      <h1 class="text-4xl md:text-7xl font-bold mb-6 tracking-tight text-white drop-shadow-lg text-gradient-premium">\r
+        {{ content.title }}\r
+      </h1>\r
+      <p class="text-xl md:text-3xl text-blue-200 mb-8 font-light drop-shadow-md">\r
+        {{ content.subtitle }}\r
+      </p>\r
+      <p class="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed drop-shadow-sm font-light">\r
+        {{ content.intro }}\r
+      </p>\r
+    </div>\r
+  </div>\r
+  <!-- Stats Section -->\r
+  <section class="py-12 glass-panel -mt-10 relative z-10 container mx-auto px-4 rounded-2xl shadow-2xl max-w-6xl border border-white/10 backdrop-blur-xl hover:translate-y-[-5px] transition-transform duration-500">\r
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-200 dark:divide-white/5">\r
+      @for (achievement of content.achievements; track achievement) {\r
+        <div class="p-4 group">\r
+          <div class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500 mb-2 group-hover:scale-110 transition-transform">{{ achievement.number }}</div>\r
+          <div class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">{{ achievement.label }}</div>\r
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono">{{ achievement.description }}</div>\r
+        </div>\r
+      }\r
+    </div>\r
+  </section>\r
+  <!-- History & Foundation -->\r
+  <section class="py-20 bg-gray-50 dark:bg-transparent">\r
+    <div class="container mx-auto px-4">\r
+      <div class="grid md:grid-cols-2 gap-12 items-center">\r
+        <div class="space-y-6">\r
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ content.history }}</h2>\r
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">\r
+            {{ content.historyText }}\r
+          </p>\r
+          <div class="bg-white dark:bg-white/5 p-6 rounded-lg shadow-sm border-l-4 border-blue-500 backdrop-blur-sm">\r
+            <h3 class="font-bold text-gray-900 dark:text-white mb-2">{{ content.foundation }}</h3>\r
+            <p class="text-gray-600 dark:text-gray-300 text-sm italic">\r
+              "{{ content.foundationText }}"\r
+            </p>\r
+          </div>\r
+        </div>\r
+        <div class="relative">\r
+          <div class="aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10">\r
+            <iframe width="100%" height="100%" [src]="youtubeUrl"\r
+              title="Arecofix Video" frameborder="0"\r
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"\r
+              allowfullscreen>\r
+            </iframe>\r
+          </div>\r
+          <!-- Decorative dot pattern -->\r
+          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500/10 dark:bg-blue-500/20 rounded-full -z-10 blur-xl"></div>\r
+          <div class="absolute -top-6 -left-6 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full -z-10 blur-xl"></div>\r
+        </div>\r
+      </div>\r
+    </div>\r
+  </section>\r
+  <!-- Mission & Vision -->\r
+  <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">\r
+    <div class="container mx-auto px-4">\r
+      <div class="grid grid-cols-2 gap-4 md:gap-8">\r
+        <!-- Mission Card -->\r
+        <div class="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">\r
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-600/80 text-blue-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">\r
+            \u{1F3AF}\r
+          </div>\r
+          <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.mission }}</h3>\r
+          <p class="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">\r
+            {{ content.missionText }}\r
+          </p>\r
+        </div>\r
+        <!-- Vision Card -->\r
+        <div class="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">\r
+          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-600/80 text-purple-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">\r
+            \u{1F52D}\r
+          </div>\r
+          <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.vision }}</h3>\r
+          <p class="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">\r
+            {{ content.visionText }}\r
+          </p>\r
+        </div>\r
+      </div>\r
+    </div>\r
+  </section>\r
+  <!-- Values Section -->\r
+  <section class="py-20 bg-gray-50 dark:bg-transparent">\r
+    <div class="container mx-auto px-4">\r
+      <div class="text-center mb-16">\r
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.valuesTitle }}</h2>\r
+        <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>\r
+      </div>\r
+      <div class="grid grid-cols-2 gap-4 md:gap-8">\r
+        @for (value of content.values; track value) {\r
+          <div class="bg-white dark:bg-white/5 p-4 md:p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">\r
+            <div class="text-3xl md:text-4xl mb-4 md:mb-6">{{ value.icon }}</div>\r
+            <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">{{ value.title }}</h3>\r
+            <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">\r
+              {{ value.description }}\r
+            </p>\r
+          </div>\r
+        }\r
+      </div>\r
+    </div>\r
+  </section>\r
+  <!-- Team Section -->\r
+  <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">\r
+    <div class="container mx-auto px-4">\r
+      <div class="text-center mb-16">\r
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.teamTitle }}</h2>\r
+        <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">\r
+          {{ content.teamSubtitle }}\r
+        </p>\r
+      </div>\r
+      <div class="flex justify-center flex-wrap gap-8">\r
+        @for (member of content.teamMembers; track member) {\r
+          <div class="max-w-md w-full bg-white dark:bg-white/5 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-white/10 transform hover:-translate-y-1 transition-transform duration-300 backdrop-blur-md">\r
+            <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 opacity-80"></div>\r
+            <div class="px-8 pb-8">\r
+              <div class="relative -mt-16 mb-6">\r
+                <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl relative">\r
+                  <!-- Placeholder for image if not present -->\r
+                  @if (member.image) {\r
+                    <img [ngSrc]="member.image" [alt]="member.name" class="object-cover" fill>\r
+                  } @else {\r
+                    \u{1F468}\u200D\u{1F4BB}\r
+                  }\r
+                </div>\r
+              </div>\r
+              <div class="text-center">\r
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ member.name }}</h3>\r
+                <p class="text-blue-600 dark:text-blue-400 font-medium mb-4">{{ member.role }}</p>\r
+                <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">\r
+                  {{ member.bio }}\r
+                </p>\r
+                @if (member.linkedin) {\r
+                  <a [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block p-2">\r
+                    <i class="fab fa-linkedin text-2xl"></i>\r
+                  </a>\r
+                }\r
+              </div>\r
+            </div>\r
+          </div>\r
+        }\r
+      </div>\r
+    </div>\r
+  </section>\r
+  <!-- Certificate Gallery Section -->\r
+  <app-certificate-gallery [title]="'Nuestros Certificados'"></app-certificate-gallery>\r
+  <!-- FAQ Section -->\r
+  <section class="py-20 bg-gray-50 dark:bg-transparent">\r
+    <div class="container mx-auto px-4 max-w-4xl">\r
+      <div class="text-center mb-16">\r
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.faqTitle }}</h2>\r
+      </div>\r
+      <div class="space-y-4">\r
+        @for (faq of content.faqs; track faq; let i = $index) {\r
+          <div class="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden backdrop-blur-sm">\r
+            <button (click)="toggleFAQ(i)"\r
+              class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">\r
+              <span class="font-semibold text-gray-900 dark:text-white">{{ faq.question }}</span>\r
+              <span class="transform transition-transform duration-200" [class.rotate-180]="expandedFAQ === i">\r
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">\r
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>\r
+                </svg>\r
+              </span>\r
+            </button>\r
+            @if (expandedFAQ === i) {\r
+              <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">\r
+                {{ faq.answer }}\r
+              </div>\r
+            }\r
+          </div>\r
+        }\r
+      </div>\r
+    </div>\r
+  </section>\r
+  <!-- CTA Section -->\r
+  <section class="py-20 bg-linear-to-r from-blue-600/90 to-indigo-600/90 dark:from-blue-900/80 dark:to-indigo-900/80 text-white text-center backdrop-blur-md border-t border-white/10">\r
+    <div class="container mx-auto px-4">\r
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">{{ content.ctaTitle }}</h2>\r
+      <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">\r
+        {{ content.ctaText }}\r
+      </p>\r
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">\r
+        <a href="https://wa.me/541125960900" target="_blank"\r
+          class="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg">\r
+          <i class="fab fa-whatsapp mr-2 text-xl"></i>\r
+          {{ content.ctaWhatsapp }}\r
+        </a>\r
+        <a routerLink="/contacto"\r
+          class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">\r
+          {{ content.ctaContact }}\r
+        </a>\r
+      </div>\r
+    </div>\r
+  </section>\r
+}`, styles: ["/* src/app/public/nosotros/nosotros.css */\n/*# sourceMappingURL=nosotros.css.map */\n"] }]
+  }], () => [{ type: PreferencesService }], null);
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(NosotrosComponent, { className: "NosotrosComponent", filePath: "src/app/public/nosotros/nosotros.ts", lineNumber: 70 });
+})();
+export {
+  NosotrosComponent
+};
+//# sourceMappingURL=chunk-4JVJPTET.mjs.map

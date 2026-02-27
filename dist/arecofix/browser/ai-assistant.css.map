@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/ai-assistant/ai-assistant.css"],
+  "sourcesContent": ["@keyframes slide-up {\r\n  from {\r\n    opacity: 0;\r\n    transform: translateY(20px);\r\n  }\r\n  to {\r\n    opacity: 1;\r\n    transform: translateY(0);\r\n  }\r\n}\r\n\r\n.animate-slide-up {\r\n  animation: slide-up 0.3s ease-out forwards;\r\n}\r\n\r\n@keyframes pulse-width {\r\n  0% {\r\n    width: 0%;\r\n  }\r\n  50% {\r\n    width: 60%;\r\n  }\r\n  100% {\r\n    width: 100%;\r\n  }\r\n}\r\n\r\n.animate-pulse-width {\r\n  animation: pulse-width 2s infinite ease-in-out;\r\n}\r\n\r\n.glass-panel {\r\n  background: rgba(255, 255, 255, 0.05);\r\n  backdrop-filter: blur(10px);\r\n  -webkit-backdrop-filter: blur(10px);\r\n}\r\n\r\n.scrollbar-thin::-webkit-scrollbar {\r\n  width: 6px;\r\n}\r\n\r\n.scrollbar-thin::-webkit-scrollbar-track {\r\n  background: transparent;\r\n}\r\n\r\n.scrollbar-thin::-webkit-scrollbar-thumb {\r\n  background-color: rgba(156, 163, 175, 0.5);\r\n  border-radius: 20px;\r\n}\r\n"],
+  "mappings": ";AAAA,WAAA;AACE;AACE,aAAA;AACA,eAAA,WAAA;AACF;AACA;AACE,aAAA;AACA,eAAA,WAAA;AACF;AACF;AAEA,CAAA;AACE,aAAA,SAAA,KAAA,SAAA;AACF;AAEA,WAAA;AACE;AACE,WAAA;AACF;AACA;AACE,WAAA;AACF;AACA;AACE,WAAA;AACF;AACF;AAEA,CAAA;AACE,aAAA,YAAA,GAAA,SAAA;AACF;AAEA,CAAA;AACE,cAAA,KAAA,GAAA,EAAA,GAAA,EAAA,GAAA,EAAA;AACA,mBAAA,KAAA;AACA,2BAAA,KAAA;AACF;AAEA,CAAA,cAAA;AACE,SAAA;AACF;AAEA,CAJA,cAIA;AACE,cAAA;AACF;AAEA,CARA,cAQA;AACE,oBAAA,KAAA,GAAA,EAAA,GAAA,EAAA,GAAA,EAAA;AACA,iBAAA;AACF;",
+  "names": []
+}

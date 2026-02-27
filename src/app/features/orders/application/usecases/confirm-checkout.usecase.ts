@@ -56,7 +56,7 @@ export class ConfirmCheckoutUseCase {
         },
         items: orderItems,
         total: params.total,
-        status: 'A_PAGAR' // Requirement: Default Status
+        status: 'pending' // Requirement: Default Status
     });
 
     // 2. Prepare CRM Message Entity

@@ -1,5 +1,5 @@
 
-export type OrderStatus = 'A_PAGAR' | 'ABONADO' | 'CANCELADO' | 'COMPLETADO';
+export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
 
 export interface Cliente {
     name: string;
@@ -29,7 +29,7 @@ export class Order {
         this.id = data.id;
         this.clienteInfo = data.clienteInfo!;
         this.items = data.items || [];
-        this.status = data.status || 'A_PAGAR';
+        this.status = data.status || 'pending';
         this.total = data.total || 0;
         this.createdAt = data.createdAt;
         this.invoiceUrl = data.invoiceUrl;

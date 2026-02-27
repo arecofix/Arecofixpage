@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, computed } from '@angular/core';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
 import { ImportResultModalComponent } from './components/import-result-modal/import-result-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-admin-products-page',
@@ -27,6 +28,7 @@ export class AdminProductsPage implements OnInit {
   public brands = signal<Brand[]>([]); 
   public categories = signal<any[]>([]);
   public searchQuery = signal<string>('');
+  public selectedCategoryId = signal<string>('all');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
   
   // Selection
@@ -36,7 +38,8 @@ export class AdminProductsPage implements OnInit {
   
   // Pagination
   public currentPage = signal<number>(1);
-  public itemsPerPage = signal<number>(10);
+  public itemsPerPage = signal<number>(20); // Merged client per_page, let's use 20 for admin
+  public totalItems = signal<number>(0);
   
   public loading = signal<boolean>(true);
   public importing = signal<boolean>(false);
@@ -47,45 +50,39 @@ export class AdminProductsPage implements OnInit {
   public importReport = signal<ImportReport | null>(null);
   public showImportResult = signal<boolean>(false);
 
+  private searchSubject = new Subject<string>();
+
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
       const page = params['_page'] ? Number(params['_page']) : 1;
+      const q = params['q'] || '';
       this.currentPage.set(page || 1);
+      if (q && q !== this.searchQuery()) {
+        this.searchQuery.set(q);
+      }
+      this.loadData();
+    });
+
+    this.searchSubject.pipe(
+      takeUntilDestroyed(),
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(query => {
+       this.router.navigate([], {
+         relativeTo: this.route,
+         queryParams: { q: query || null, _page: 1 },
+         queryParamsHandling: 'merge'
+       });
     });
   }
 
   // Computed properties
-  public allFilteredProducts = computed(() => {
-    const query = this.searchQuery().toLowerCase();
-    let result = [...this.products()];
-
-    if (query) {
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(query) || 
-        p.sku?.toLowerCase().includes(query)
-      );
-    }
-
-    const sort = this.sortOrder();
-    return result.sort((a, b) => {
-      switch (sort) {
-        case 'price_asc': return a.price - b.price;
-        case 'price_desc': return b.price - a.price;
-        case 'stock_asc': return (a.stock || 0) - (b.stock || 0);
-        case 'stock_desc': return (b.stock || 0) - (a.stock || 0);
-        default: return a.name.localeCompare(b.name);
-      }
-    });
-  });
-
   public paginatedProducts = computed(() => {
-    const all = this.allFilteredProducts();
-    const start = (this.currentPage() - 1) * this.itemsPerPage();
-    return all.slice(start, start + this.itemsPerPage());
+    return this.products();
   });
 
   public totalPages = computed(() => {
-     return Math.ceil(this.allFilteredProducts().length / this.itemsPerPage());
+     return Math.ceil(this.totalItems() / this.itemsPerPage());
   });
 
   public isAllSelected = computed(() => {
@@ -97,27 +94,82 @@ export class AdminProductsPage implements OnInit {
 
   public selectedIdsList = computed(() => Array.from(this.selectedIds()));
 
+  private router = inject(Router);
+
   async ngOnInit() {
-    await this.loadData();
+    // Initial load handled by constructor subscribe
+  }
+
+  onSearchChange(query: string) {
+    this.searchQuery.set(query);
+    this.searchSubject.next(query);
   }
 
   async loadData() {
     this.loading.set(true);
     try {
-      const [products, brands, categories] = await Promise.all([
-          this.productService.getProducts(),
-          this.productService.getBrands(),
-          this.productService.getCategories()
-      ]);
-      this.products.set(products);
-      this.brands.set(brands);
-      this.categories.set(categories);
+      // 1. Fetch metadata (brands/categories) only once or if empty
+      if (this.brands().length === 0 || this.categories().length === 0) {
+        const [brands, categories] = await Promise.all([
+            this.productService.getBrands(),
+            this.productService.getCategories()
+        ]);
+        this.brands.set(brands);
+        this.categories.set(categories);
+      }
+
+      // 2. Fetch paginated products from server
+      const sortMap = {
+        'name_asc': { column: 'name', order: 'asc' },
+        'price_asc': { column: 'price', order: 'asc' },
+        'price_desc': { column: 'price', order: 'desc' },
+        'stock_asc': { column: 'stock', order: 'asc' },
+        'stock_desc': { column: 'stock', order: 'desc' }
+      };
+      
+      const currentSort = sortMap[this.sortOrder()] || sortMap['name_asc'];
+
+      const response = await this.productService.getProductsPaginated({
+          _page: this.currentPage(),
+          _per_page: this.itemsPerPage(),
+          q: this.searchQuery(),
+          category_id: this.selectedCategoryId() !== 'all' ? this.selectedCategoryId() : undefined,
+          _sort: currentSort.column,
+          _order: currentSort.order,
+          include_inactive: true
+      });
+
+      this.products.set(response.data || []);
+      this.totalItems.set(response.items || 0);
+
     } catch (e: any) {
       this.error.set(e.message || 'Error al cargar datos');
     } finally {
       this.loading.set(false);
       this.cdr.detectChanges();
     }
+  }
+
+  updateSort(event: any) {
+    this.sortOrder.set(event.target.value);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { _page: 1 },
+      queryParamsHandling: 'merge'
+    });
+    this.loadData();
+  }
+
+  onCategoryChange(event: any) {
+    this.selectedCategoryId.set(event.target.value);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { _page: 1 },
+      queryParamsHandling: 'merge'
+    });
+    this.loadData();
   }
 
   toggleSelectAll() {
@@ -145,10 +197,6 @@ export class AdminProductsPage implements OnInit {
 
   clearSelection() {
     this.selectedIds.set(new Set());
-  }
-
-  updateSort(event: any) {
-    this.sortOrder.set(event.target.value);
   }
 
   openBulkEdit() {

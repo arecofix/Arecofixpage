@@ -260,6 +260,7 @@ export class OrderService {
                 id: i.id,
                 order_id: i.order_id,
                 product_id: i.product_id || undefined,
+                course_id: i.course_id || undefined,
                 product_name: i.product_name,
                 quantity: i.quantity,
                 unit_price: i.unit_price,

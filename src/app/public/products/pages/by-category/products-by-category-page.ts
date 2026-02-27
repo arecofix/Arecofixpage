@@ -165,8 +165,9 @@ export class ProductsByCategoryPage {
               if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
 
               return this.productService.getData({
-                category_ids: targetCategoryIds, // Use category_ids instead of category_id
+                category_ids: targetCategoryIds,
                 _page: currentPage,
+                _per_page: 24, // Show more items per page
                 _sort,
                 _order,
                 min_price,

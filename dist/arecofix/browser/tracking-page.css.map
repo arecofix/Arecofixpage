@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["tracking-page.ts"],
+  "sourcesContent": ["\n        @media print {\n            .no-print {\n                display: none !important;\n            }\n            .print-only {\n                display: block !important;\n            }\n            body {\n                background: white;\n            }\n            .ticket-container {\n                border: 1px dashed #000;\n                padding: 20px;\n                width: 100%;\n                margin: 0;\n            }\n        }\n        .print-only {\n            display: none;\n        }\n    "],
+  "mappings": ";AACQ,OAAA;AACI,GAAA;AACI,aAAA;AACJ;AACA,GAAA;AACI,aAAA;AACJ;AACA;AACI,gBAAA;AACJ;AACA,GAAA;AACI,YAAA,IAAA,OAAA;AACA,aAAA;AACA,WAAA;AACA,YAAA;AACJ;AACJ;AACA,CAbI;AAcA,WAAA;AACJ;",
+  "names": []
+}

@@ -5097,11 +5097,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/categoria/repuestos/tools</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/categoria/modulos</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -5138,6 +5133,11 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/categoria/Placas_carga</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/repuestos/tools</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

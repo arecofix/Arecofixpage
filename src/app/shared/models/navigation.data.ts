@@ -129,7 +129,7 @@ export const NAVIGATION_ITEMS: NavItem[] = [
       {
         id: 'tienda-herramientas',
         label: 'Herramientas',
-        path: '/productos/categoria/herramientas',
+        path: '/productos/categoria/repuestos/tools',
         icon: 'fas fa-wrench',
         theme: 'tienda',
         description: 'Kits profesionales de reparación',

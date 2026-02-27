@@ -51,22 +51,40 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
      * Find all records for the current Tenant
      */
     getAll(orderBy?: { column: string; ascending?: boolean }): Observable<T[]> {
-        let query = this.supabase.from(this.tableName).select('*');
-        query = this.applyTenantFilter(query);
+        const fetchAll = async (): Promise<T[]> => {
+            let allData: T[] = [];
+            let fromIdx = 0;
+            let hasMore = true;
+            const CHUNK = 1000;
 
-        if (orderBy) {
-            query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
-        }
+            while (hasMore) {
+                let query = this.supabase.from(this.tableName).select('*');
+                query = this.applyTenantFilter(query);
 
-        return from(query).pipe(
-            map(({ data, error }) => {
+                if (orderBy) {
+                    query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+                }
+
+                const { data, error } = await (query.range(fromIdx, fromIdx + CHUNK - 1) as any);
+
                 if (error) {
                     this.logger.error(`Error fetching all ${this.tableName}`, error);
                     throw new DatabaseError(error.message, error);
                 }
-                return (data as T[]) || [];
-            })
-        );
+
+                const batch = (data as T[]) || [];
+                allData = [...allData, ...batch];
+
+                if (batch.length < CHUNK) {
+                    hasMore = false;
+                } else {
+                    fromIdx += CHUNK;
+                }
+            }
+            return allData;
+        };
+
+        return from(fetchAll());
     }
 
     /**

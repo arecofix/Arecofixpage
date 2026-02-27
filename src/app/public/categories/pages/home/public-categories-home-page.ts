@@ -58,7 +58,7 @@ export class PublicCategoriesHomePage {
     const res = this.categoriesRs.value();
     if (!res) return [];
 
-    const slugsToExclude = ['sports', 'deportes', 'music', 'música', 'clothing', 'ropa', "home-garden", 'hogar-jardín', 'automotive', 'automoviles', 'toys', 'juguetes', 'health-beauty', 'salud-belleza',, 'food-drinks', 'comida-bebidas'];
+    const slugsToExclude = ['sports', 'deportes', 'music', 'música', 'clothing', 'ropa', "home-garden", 'hogar-jardín', 'automotive', 'automoviles', 'toys', 'juguetes', 'health-beauty', 'salud-belleza', 'food-drinks', 'comida-bebidas'];
    return res.data.filter(
       (category) => !slugsToExclude.includes(category.slug.toLowerCase())
     );

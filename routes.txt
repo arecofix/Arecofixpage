@@ -1017,7 +1017,6 @@
 /productos/categoria/cursos
 /productos/categoria/celulares
 /productos/categoria/electronicos
-/productos/categoria/repuestos/tools
 /productos/categoria/modulos
 /productos/categoria/baterias
 /productos/categoria/reacondicionados
@@ -1026,6 +1025,7 @@
 /productos/categoria/Tablets
 /productos/categoria/pines
 /productos/categoria/Placas_carga
+/productos/categoria/repuestos/tools
 /academy/reparacion-celulares-basico
 /academy/Electricista-profesional
 /academy/Curso_armado_cv

@@ -3,12 +3,14 @@ import { OrderRepository } from '../../domain/repositories/order.repository';
 import { Order, OrderStatus } from '../../domain/entities/order.entity';
 import { AuthService } from '@app/core/services/auth.service';
 import { Observable, from, map, throwError } from 'rxjs';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseOrderRepository extends OrderRepository {
   private authService = inject(AuthService);
+  private tenantService = inject(TenantService);
   private supabase = this.authService.getSupabaseClient();
 
   createOrder(order: Order): Observable<Order> {
@@ -29,10 +31,11 @@ export class SupabaseOrderRepository extends OrderRepository {
         customer_name: order.clienteInfo.name,
         customer_email: order.clienteInfo.email,
         customer_phone: order.clienteInfo.phone,
-        customer_address: order.clienteInfo.address,
-        status: order.status, // 'A_PAGAR'
+        shipping_address: { address: order.clienteInfo.address },
+        status: order.status,
         total_amount: order.total,
         order_number: orderNumber,
+        tenant_id: this.tenantService.getTenantId(),
         created_at: new Date().toISOString()
       });
 
@@ -45,7 +48,8 @@ export class SupabaseOrderRepository extends OrderRepository {
       product_name: item.product_name,
       quantity: item.quantity,
       unit_price: item.unit_price,
-      subtotal: item.subtotal
+      subtotal: item.subtotal,
+      tenant_id: this.tenantService.getTenantId()
     }));
 
     const { error: itemsError } = await this.supabase
@@ -61,7 +65,9 @@ export class SupabaseOrderRepository extends OrderRepository {
 
   getOrders(): Observable<Order[]> {
     return from(
-      this.supabase.from('orders').select('*, order_items(*)')
+      this.supabase.from('orders')
+      .select('*, order_items(*)')
+      .eq('tenant_id', this.tenantService.getTenantId())
       .order('created_at', { ascending: false })
     ).pipe(
       map(({ data, error }) => {
@@ -88,7 +94,7 @@ export class SupabaseOrderRepository extends OrderRepository {
         name: dbRecord.customer_name,
         email: dbRecord.customer_email,
         phone: dbRecord.customer_phone,
-        address: dbRecord.customer_address
+        address: (dbRecord.shipping_address as any)?.address || ''
       },
       status: dbRecord.status,
       total: dbRecord.total_amount,
@@ -118,7 +124,7 @@ interface OrderDbRecord {
   customer_name: string;
   customer_email: string;
   customer_phone: string;
-  customer_address: string;
+  shipping_address: any;
   status: OrderStatus;
   total_amount: number;
   created_at: string;

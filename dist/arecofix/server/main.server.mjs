@@ -1,2 +1,41 @@
 import './polyfills.server.mjs';
-import{e,f as t,h as o,i as p,j as m}from"./chunk-RWCSIISF.mjs";import"./chunk-I7SKRB6J.mjs";import"./chunk-23M4NBE3.mjs";import"./chunk-6WXO3GZS.mjs";import"./chunk-5SYQL5LV.mjs";import"./chunk-ACF32YXE.mjs";import"./chunk-WYUXCDOP.mjs";import"./chunk-33PJM5TS.mjs";import"./chunk-OEE6LMKQ.mjs";import"./chunk-QIQJ6T5Y.mjs";import"./chunk-WUMV5ZNI.mjs";import"./chunk-QBNUQKUT.mjs";import"./chunk-WO5P5INO.mjs";import"./chunk-35OYAJOP.mjs";import"./chunk-HT57LKWA.mjs";import"./chunk-BLYQXFN2.mjs";import"./chunk-VF3MFHMJ.mjs";import{uc as r}from"./chunk-PUXVFRR7.mjs";import"./chunk-DGJQU3KY.mjs";import a from"./angular-app-manifest.mjs";e(a);export{m as default,p as \u0275destroyAngularServerApp,t as \u0275extractRoutesAndCreateRouteTree,o as \u0275getOrCreateAngularServerApp,r as \u0275resetCompiledComponents};
+import {
+  destroyAngularServerApp,
+  extractRoutesAndCreateRouteTree,
+  getOrCreateAngularServerApp,
+  main_server_default,
+  setAngularAppManifest
+} from "./chunk-ULB6V7AR.mjs";
+import "./chunk-6TWNUMFJ.mjs";
+import "./chunk-GD6QSWIA.mjs";
+import "./chunk-VBVV3U42.mjs";
+import "./chunk-WPRKDIZO.mjs";
+import "./chunk-XL3PKKWP.mjs";
+import "./chunk-GHI7DVCX.mjs";
+import "./chunk-XSIYETXB.mjs";
+import "./chunk-NQ4N4CVM.mjs";
+import "./chunk-3LSO3424.mjs";
+import "./chunk-EBVHUSN7.mjs";
+import "./chunk-EIU5CNMA.mjs";
+import "./chunk-KAY2H7H4.mjs";
+import "./chunk-QOHRYQPW.mjs";
+import "./chunk-R72SLW3B.mjs";
+import "./chunk-GLYZDHZB.mjs";
+import "./chunk-NQCCIK3J.mjs";
+import {
+  resetCompiledComponents
+} from "./chunk-RN3QJLYL.mjs";
+import "./chunk-SCNXJUDC.mjs";
+import "./chunk-TB3YAHZW.mjs";
+
+// angular:main-server-inject-manifest:angular:main-server-inject-manifest
+import manifest from "./angular-app-manifest.mjs";
+setAngularAppManifest(manifest);
+export {
+  main_server_default as default,
+  destroyAngularServerApp as \u0275destroyAngularServerApp,
+  extractRoutesAndCreateRouteTree as \u0275extractRoutesAndCreateRouteTree,
+  getOrCreateAngularServerApp as \u0275getOrCreateAngularServerApp,
+  resetCompiledComponents as \u0275resetCompiledComponents
+};
+//# sourceMappingURL=main.server.mjs.map

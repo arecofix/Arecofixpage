@@ -18,8 +18,7 @@ export class SupabaseMessageRepository extends MessageRepository {
         name: message.name,
         phone: message.phone || '',
         email: message.email,
-        message: message.notes || `Dirección: ${message.address}`, // Mapping 'address' to message body or similar if usage requires
-        address: message.address, // Assuming the table might have it, or it goes into 'message'
+        message: message.notes || `Dirección: ${message.address}`, // Mapping 'address' to message body
         created_at: message.date.toISOString(),
         is_read: false,
         tenant_id: this.tenantService.getTenantId()

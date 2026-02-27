@@ -36,22 +36,34 @@
         <div class="absolute -inset-0.5 bg-linear-to-r from-green-400 to-blue-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
         <div class="relative flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <i class="fas fa-search px-4 text-gray-400"></i>
-          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)"
             placeholder="Buscar por nombre, SKU, marca..."
             class="input input-ghost w-full focus:bg-transparent text-lg h-12" />
           </div>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-bold text-gray-500 hidden md:block">Ordenar:</span>
-        <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full bg-white dark:bg-gray-800">
-          <option value="name_asc">A-Z Nombre</option>
-          <option value="price_asc">Precio: Bajo a Alto</option>
-          <option value="price_desc">Precio: Alto a Bajo</option>
-          <option value="stock_asc">Stock: Bajo a Alto</option>
-          <option value="stock_desc">Stock: Alto a Bajo</option>
-        </select>
+      <div class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
+        <div class="flex items-center gap-2 w-full lg:w-48">
+          <span class="text-xs font-bold text-gray-500 hidden xl:block">Categoría:</span>
+          <select [ngModel]="selectedCategoryId()" (change)="onCategoryChange($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800">
+            <option value="all">Todas las Categorías</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 w-full lg:w-48">
+          <span class="text-xs font-bold text-gray-500 hidden xl:block">Ordenar:</span>
+          <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800">
+            <option value="name_asc">A-Z Nombre</option>
+            <option value="price_asc">Precio: Bajo a Alto</option>
+            <option value="price_desc">Precio: Alto a Bajo</option>
+            <option value="stock_asc">Stock: Bajo a Alto</option>
+            <option value="stock_desc">Stock: Alto a Bajo</option>
+          </select>
+        </div>
       </div>
     </div>
 

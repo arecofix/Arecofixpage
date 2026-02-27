@@ -23,9 +23,11 @@ export class AdminInventoryPage implements OnInit {
     error = signal<string | null>(null);
 
     // Filter & Sort
+    categories = signal<any[]>([]);
     searchQuery = signal<string>('');
     sortOrder = signal<'stock_asc' | 'stock_desc' | 'name_asc' | 'price_asc'>('stock_asc'); 
     filterStatus = signal<'all' | 'low_stock' | 'out_of_stock'>('all');
+    selectedCategoryId = signal<string>('all');
 
     // Pagination
     currentPage = signal<number>(1);
@@ -44,7 +46,12 @@ export class AdminInventoryPage implements OnInit {
             result = result.filter(p => p.stock === 0);
         }
 
-        // 2. Filter by Search
+        // 2. Filter by Category
+        if (this.selectedCategoryId() !== 'all') {
+            result = result.filter(p => p.category_id === this.selectedCategoryId());
+        }
+
+        // 3. Filter by Search
         if (query) {
             result = result.filter(p => 
                 p.name.toLowerCase().includes(query) || 
@@ -94,7 +101,19 @@ export class AdminInventoryPage implements OnInit {
         this.route.queryParams.subscribe(params => {
             if (params['_page']) this.currentPage.set(Number(params['_page']));
         });
-        await this.loadInventory();
+        await Promise.all([
+            this.loadInventory(),
+            this.loadCategories()
+        ]);
+    }
+
+    async loadCategories() {
+        try {
+            const cats = await this.productService.getCategories();
+            this.categories.set(cats);
+        } catch (e) {
+            console.error('Error loading categories', e);
+        }
     }
 
     async loadInventory() {
@@ -110,6 +129,12 @@ export class AdminInventoryPage implements OnInit {
     }
 
     // Helpers
+    getCategoryName(id?: string): string {
+        if (!id) return 'Sin categoría';
+        const cat = this.categories().find(c => c.id === id);
+        return cat ? cat.name : 'ID: ' + id.slice(0, 5);
+    }
+
     updateSort(event: Event) {
         this.sortOrder.set((event.target as HTMLSelectElement).value as any);
     }

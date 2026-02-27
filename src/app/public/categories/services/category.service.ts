@@ -74,7 +74,6 @@ export class CategoryService {
         .select('*', { count: 'exact' })
         .eq('tenant_id', this.tenantService.getTenantId())
         .eq('is_active', true)
-        .eq('type', 'product')
         .order('name')
         .limit(_per_page)
     ).pipe(
@@ -177,7 +176,6 @@ export class CategoryService {
         .select('*')
         .eq('tenant_id', this.tenantService.getTenantId())
         .eq('is_active', true)
-        .eq('type', 'product')
         .order('name')
     ).pipe(
       map(({ data, error }) => {

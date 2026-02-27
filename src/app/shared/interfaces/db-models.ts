@@ -2,6 +2,7 @@ export interface DbOrderItem {
     id: string;
     order_id: string;
     product_id: string | null;
+    course_id: string | null;
     product_name: string;
     quantity: number;
     unit_price: number;

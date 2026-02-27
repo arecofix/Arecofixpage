@@ -60,6 +60,14 @@ export class AdminProductService {
         return firstValueFrom(this.productRepo.getAll());
     }
 
+    async getProductsPaginated(params: any): Promise<any> {
+        const enrichedParams = {
+            ...params,
+            include_inactive: params.include_inactive ?? true
+        };
+        return firstValueFrom(this.productRepo.findWithFilters(enrichedParams));
+    }
+
     async getProduct(id: string): Promise<Product> {
         return firstValueFrom(this.productRepo.getById(id));
     }

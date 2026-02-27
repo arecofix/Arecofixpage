@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/inventory/admin-inventory.routes.ts"],
+  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_INVENTORY_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Inventario',\r\n    loadComponent: () => import('./admin-inventory-page').then(m => m.AdminInventoryPage)\r\n  }\r\n];\r\n"],
+  "mappings": ";;;;;;AAEO,IAAM,yBAAiC;EAC5C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,sBAAwB,EAAE,KAAK,OAAK,EAAE,kBAAkB;;;",
+  "names": []
+}

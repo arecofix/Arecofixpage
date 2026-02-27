@@ -53,4 +53,5 @@ export interface ProductsParams extends Partial<Product> {
   max_price?: number;
   q?: string;
   ids?: string[];
+  include_inactive?: boolean;
 }

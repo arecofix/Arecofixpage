@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/repairs/domain/repositories/repair.repository.ts"],
+  "sourcesContent": ["import { Observable } from 'rxjs';\r\nimport { Repair, CreateRepairDto, UpdateRepairDto } from '../entities/repair.entity';\r\n\r\nexport abstract class RepairRepository {\r\n    abstract getById(id: string): Observable<Repair>;\r\n    abstract getAll(limit?: number, offset?: number): Observable<Repair[]>;\r\n    abstract create(repair: CreateRepairDto): Observable<Repair>;\r\n    abstract update(id: string, repair: UpdateRepairDto): Observable<void>;\r\n    abstract delete(id: string): Observable<void>;\r\n    abstract getByTrackingCode(code: string): Observable<Repair>;\r\n    abstract uploadImage(file: File): Promise<string>;\r\n    abstract getAdminList(params: { branch_id?: string, limit?: number, offset?: number }): Observable<Repair[]>;\r\n}\r\n"],
+  "mappings": ";;;AAGM,IAAgB,mBAAhB,MAAgC;;",
+  "names": []
+}

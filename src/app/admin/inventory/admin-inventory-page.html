@@ -84,6 +84,15 @@
               [checked]="filterStatus() === 'out_of_stock'" (click)="filterStatus.set('out_of_stock')" />
             </div>
 
+            <!-- Category Filter -->
+            <select [ngModel]="selectedCategoryId()" (ngModelChange)="selectedCategoryId.set($event)" 
+              class="select select-bordered w-full lg:w-48">
+              <option value="all">Todas las Categorías</option>
+              @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.name }}</option>
+              }
+            </select>
+
             <!-- Sort -->
             <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full lg:w-auto">
               <option value="stock_asc">Menor Stock Primero</option>
@@ -128,7 +137,8 @@
                       </td>
                       <td>
                         <div class="font-mono text-xs">{{ product.sku || '---' }}</div>
-                        <div class="text-xs text-gray-500">Marca ID: {{ product.brand_id ? (product.brand_id | slice:0:5) : 'Genérica' }}</div>
+                        <div class="text-xs text-gray-400">Marca: {{ product.brand_id ? (product.brand_id | slice:0:5) : 'Genérica' }}</div>
+                        <div class="text-xs text-info font-semibold">{{ getCategoryName(product.category_id) }}</div>
                       </td>
                       <td class="text-center">
                         <div class="flex flex-col items-center">

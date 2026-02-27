@@ -13,6 +13,9 @@ import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
 import { TenantService } from './tenant.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
+import { App } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
+import { NgZone } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +26,7 @@ export class AuthService {
   private platformId = inject(PLATFORM_ID);
   private profileService = inject(ProfileService);
   private tenantService = inject(TenantService);
+  private ngZone = inject(NgZone);
 
   private authState = new BehaviorSubject<{
     session: Session | null;
@@ -39,7 +43,30 @@ export class AuthService {
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.initAuth();
+      this.setupDeepLinks();
     }
+  }
+
+  private setupDeepLinks() {
+    App.addListener('appUrlOpen', (data: any) => {
+      this.ngZone.run(async () => {
+        const url = new URL(data.url);
+        // Clean URL if it has fragments like #access_token
+        if (url.hash) {
+            const params = new URLSearchParams(url.hash.substring(1));
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+            if (accessToken && refreshToken) {
+                await this.supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                });
+                // Close browser if open
+                await Browser.close();
+            }
+        }
+      });
+    });
   }
 
   private async initAuth() {
@@ -105,27 +132,45 @@ export class AuthService {
 
   // Social Logins
   async signInWithGoogle(): Promise<any> {
-    const response = await this.supabase.auth.signInWithOAuth({
+    const { data, error } = await this.supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: environment.authRedirectUrl },
+      options: { 
+        redirectTo: environment.authRedirectUrl,
+        skipBrowserRedirect: true
+      },
     });
-    return response;
+    if (data?.url) {
+        await Browser.open({ url: data.url });
+    }
+    return { data, error };
   }
 
   async signInWithFacebook(): Promise<any> {
-    const response = await this.supabase.auth.signInWithOAuth({
+    const { data, error } = await this.supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: environment.authRedirectUrl },
+      options: { 
+        redirectTo: environment.authRedirectUrl,
+        skipBrowserRedirect: true
+      },
     });
-    return response;
+    if (data?.url) {
+        await Browser.open({ url: data.url });
+    }
+    return { data, error };
   }
 
   async signInWithGithub(): Promise<any> {
-    const response = await this.supabase.auth.signInWithOAuth({
+    const { data, error } = await this.supabase.auth.signInWithOAuth({
       provider: 'github',
-      options: { redirectTo: environment.authRedirectUrl },
+      options: { 
+        redirectTo: environment.authRedirectUrl,
+        skipBrowserRedirect: true
+      },
     });
-    return response;
+    if (data?.url) {
+        await Browser.open({ url: data.url });
+    }
+    return { data, error };
   }
 
   async signIn(email: string, password: string): Promise<any> {

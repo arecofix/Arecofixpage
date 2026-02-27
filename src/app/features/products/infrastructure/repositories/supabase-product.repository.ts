@@ -54,10 +54,15 @@ export class SupabaseProductRepository extends ProductRepository {
         id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
         is_active, is_featured, sku, barcode, stock, created_at, updated_at,
         branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
-      `, { count: 'exact' })
-      .eq('is_active', true);
+      `, { count: 'exact' });
       
     let query = this.applyTenantFilter(baseQuery);
+
+    if (params.is_active !== undefined) {
+      query = query.eq('is_active', params.is_active);
+    } else if (!params.include_inactive) {
+      query = query.eq('is_active', true);
+    }
 
     if (params.category_ids && params.category_ids.length > 0) {
       query = query.in('category_id', params.category_ids);
@@ -131,43 +136,77 @@ export class SupabaseProductRepository extends ProductRepository {
   }
 
   findAvailable(): Observable<Product[]> {
-    let query = this.supabase.from('products')
-        .select(`
-          id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
-          branch_stock:product_stock_per_branch(quantity, branch_id)
-        `)
-        .eq('is_active', true);
+    const fetchAll = async (): Promise<Product[]> => {
+      let allData: Product[] = [];
+      let fromIdx = 0;
+      let hasMore = true;
+      const CHUNK = 1000;
+      const select = `
+        id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+        branch_stock:product_stock_per_branch(quantity, branch_id)
+      `;
 
-    return from(this.applyTenantFilter(query) as any).pipe(
-      map((res: any) => {
-        const { data, error } = res;
+      while (hasMore) {
+        const query = this.applyTenantFilter(this.supabase.from('products').select(select))
+          .eq('is_active', true)
+          .order('name')
+          .range(fromIdx, fromIdx + CHUNK - 1);
+        
+        const { data, error } = await (query as any);
         if (error) throw error;
-        // Filter those whose computed final stock is greater than 0
-        return (data || [])
-            .map((p: any) => this._mapToEntity(p))
-            .filter((p: Product) => p.stock > 0);
-      })
-    );
+        
+        const products = (data || []).map((p: any) => this._mapToEntity(p));
+        allData = [...allData, ...products];
+        
+        if (products.length < CHUNK) {
+          hasMore = false;
+        } else {
+          fromIdx += CHUNK;
+        }
+      }
+      return allData;
+    };
+
+    return from(fetchAll());
   }
 
   getAll(branch_id?: string): Observable<Product[]> {
-     let select = `
-          id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
-          branch_stock:product_stock_per_branch(quantity, branch_id)
-     `;
+    const fetchAll = async (): Promise<Product[]> => {
+      let allData: Product[] = [];
+      let fromIdx = 0;
+      let hasMore = true;
+      const CHUNK = 1000;
+      const select = `
+        id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+        branch_stock:product_stock_per_branch(quantity, branch_id)
+      `;
 
-     let query = this.applyTenantFilter(this.supabase.from('products').select(select));
+      while (hasMore) {
+        let query = this.supabase.from('products').select(select);
+        query = this.applyTenantFilter(query);
+        // branch_id filter removed: column doesn't exist on 'products'. Mapping handles it.
+        
+        const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
+        if (error) throw error;
+        
+        const products = (data || []).map((p: any) => this._mapToEntity(p, branch_id));
+        allData = [...allData, ...products];
+        
+        if (products.length < CHUNK) {
+          hasMore = false;
+        } else {
+          fromIdx += CHUNK;
+        }
+      }
+      return allData;
+    };
 
-     return from(
-       (query.order('created_at', { ascending: false }) as any)
-     ).pipe(map((res: any) => {
-       const { data, error } = res;
-       if (error) throw error;
-       return (data || []).map((p: any) => this._mapToEntity(p, branch_id));
-     }));
+    return from(fetchAll());
   }
+
+
 
   getById(id: string): Observable<Product> {
     let query = this.supabase.from('products')
@@ -189,20 +228,37 @@ export class SupabaseProductRepository extends ProductRepository {
     );
   }
 
-  /** Lean projection for import deduplication - only fetches fields needed to match & compare */
+  /** Lean projection for import deduplication - fetches all products in batches to avoid limits */
   getAllForImport(): Observable<ImportProductSummary[]> {
-    const query = this.applyTenantFilter(
-      this.supabase.from('products').select(
-        'id, name, slug, sku, price, image_url, gallery_urls, description, category_id, brand_id'
-      )
-    );
-    return from(query as any).pipe(
-      map((res: any) => {
-        const { data, error } = res;
+    const fetchAll = async (): Promise<ImportProductSummary[]> => {
+      let allData: ImportProductSummary[] = [];
+      let fromIdx = 0;
+      let hasMore = true;
+      const CHUNK = 1000;
+
+      while (hasMore) {
+        const query = this.applyTenantFilter(
+          this.supabase.from('products').select(
+            'id, name, slug, sku, price, image_url, gallery_urls, description, category_id, brand_id'
+          )
+        ).range(fromIdx, fromIdx + CHUNK - 1);
+        
+        const { data, error } = await (query as any);
         if (error) throw error;
-        return (data || []) as ImportProductSummary[];
-      })
-    );
+        
+        const products = data || [];
+        allData = [...allData, ...products];
+        
+        if (products.length < CHUNK) {
+          hasMore = false;
+        } else {
+          fromIdx += CHUNK;
+        }
+      }
+      return allData;
+    };
+
+    return from(fetchAll());
   }
 
   /**
@@ -274,6 +330,7 @@ export class SupabaseProductRepository extends ProductRepository {
         .upsert({
             product_id: productId,
             branch_id: profile.branch_id,
+            tenant_id: this.tenantService.getTenantId(),
             quantity: quantity,
             updated_at: new Date().toISOString()
         }, { onConflict: 'product_id,branch_id' });

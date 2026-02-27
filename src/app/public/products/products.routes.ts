@@ -31,7 +31,21 @@ export const productsRoutes: Routes = [
   },
   {
     title: 'Productos por Categoría',
-    path: 'categoria/:categorySlug',
+    matcher: (segments: UrlSegment[]) => {
+      if (segments.length >= 2 && segments[0].path === 'categoria') {
+        const slug = segments.slice(1).map(s => s.path).join('/');
+        // Don't match if it's 'cursos' as that's handled above
+        if (slug === 'cursos') return null;
+        
+        return {
+          consumed: segments,
+          posParams: {
+            categorySlug: new UrlSegment(slug, {})
+          }
+        };
+      }
+      return null;
+    },
     loadComponent: () =>
       import(
         '@app/public/products/pages/by-category/products-by-category-page'
