@@ -41,6 +41,7 @@ export class AdminOrderFormPage implements OnInit {
 
 
     products: ProductOption[] = [];
+    clients: any[] = [];
 
     form = signal<Order>({
         customer_name: '',
@@ -58,6 +59,7 @@ export class AdminOrderFormPage implements OnInit {
         tax: 0,
         discount: 0,
         total: 0,
+        payment_method: 'efectivo',
         notes: ''
     });
 
@@ -66,31 +68,70 @@ export class AdminOrderFormPage implements OnInit {
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
 
-        // Load products
-        await this.loadProducts();
-
-        // Load order if editing
-        if (this.id) {
-            await this.loadOrder();
-        }
+        // Parallel initial loading
+        await Promise.all([
+            this.loadProducts(),
+            this.loadClients(),
+            this.id ? this.loadOrder() : Promise.resolve()
+        ]);
 
         this.loading = false;
         this.cdr.markForCheck();
     }
 
-    async loadProducts() {
-        this.productRepository.findAvailable().subscribe({
-            next: (products) => {
-                this.products = products.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    sku: p.sku || '',
-                    price: p.price,
-                    stock: p.stock || 0
+    async loadClients() {
+        try {
+            const { data, error } = await this.authService.getSupabaseClient()
+                .from('profiles')
+                .select('id, full_name, first_name, last_name, email, phone, address')
+                .eq('role', 'user')
+                .limit(50);
+            
+            if (data) {
+                this.clients = data.map((c: any) => ({
+                    ...c,
+                    displayName: c.full_name || `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email
                 }));
-                this.cdr.markForCheck();
-            },
-            error: (err) => console.error('Error loading products', err)
+            }
+        } catch (e) {
+            console.error('Error loading clients', e);
+        }
+    }
+
+    onSelectClient(clientName: string) {
+        const client = this.clients.find(c => c.displayName === clientName);
+        if (client) {
+            this.form.update(f => ({
+                ...f,
+                user_id: client.id,
+                customer_name: client.displayName,
+                customer_email: client.email || f.customer_email,
+                customer_phone: client.phone || f.customer_phone,
+                shipping_address: typeof client.address === 'string' ? { ...f.shipping_address as any, street: client.address } : (client.address || f.shipping_address)
+            }));
+        } else {
+            this.form.update(f => ({ ...f, customer_name: clientName }));
+        }
+    }
+
+    async loadProducts() {
+        return new Promise<void>((resolve) => {
+            this.productRepository.findAvailable().subscribe({
+                next: (products) => {
+                    this.products = products.map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        sku: p.sku || '',
+                        price: p.price,
+                        stock: p.stock || 0
+                    }));
+                    resolve();
+                },
+                error: (err) => {
+                    console.error('Error loading products', err);
+                    resolve();
+                }
+            });
         });
     }
 
@@ -119,6 +160,7 @@ export class AdminOrderFormPage implements OnInit {
                     tax: order.tax,
                     discount: order.discount,
                     total: order.total,
+                    payment_method: order.payment_method || 'efectivo',
                     notes: order.notes
                 });
                 this.items.set(order.items);

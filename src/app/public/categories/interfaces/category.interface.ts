@@ -12,8 +12,12 @@ export interface iCategory {
     id:          string;
     name:        string;
     description: string;
-    icon:        string;
+    icon?:       string;
     slug:        string;
-    featured:    boolean;
+    featured?:   boolean;
     parent_id?:  string;
+    type?:       'product' | 'course' | 'service';
+    is_active?:  boolean;
+    image_url?:  string;
+    tenant_id?:  string;
 }

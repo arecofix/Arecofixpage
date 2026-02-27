@@ -31,7 +31,7 @@ export class OrderService {
     getOrders(): Observable<OrderWithItems[]> {
         let query = this.supabase
             .from('orders')
-            .select('*, order_items(*)');
+            .select('id, order_number, customer_name, customer_email, customer_phone, shipping_address, status, subtotal, tax, discount, total_amount, notes, user_id, tenant_id, created_at, updated_at, deleted_at, payment_method, order_items(id, order_id, product_id, course_id, product_name, quantity, unit_price, subtotal, tenant_id, created_at)');
             
         let filteredQuery = this.applyTenantFilter(query)
             .order('created_at', { ascending: false });
@@ -52,8 +52,8 @@ export class OrderService {
     getOrderById(id: string): Observable<OrderWithItems> {
         return from(
             Promise.all([
-                this.applyTenantFilter(this.supabase.from('orders').select('*').eq('id', id)).single(),
-                this.supabase.from('order_items').select('*').eq('order_id', id).eq('tenant_id', this.tenantService.getTenantId())
+                this.applyTenantFilter(this.supabase.from('orders').select('id, order_number, customer_name, customer_email, customer_phone, shipping_address, status, subtotal, tax, discount, total_amount, notes, user_id, tenant_id, created_at, updated_at, deleted_at, payment_method').eq('id', id)).single(),
+                this.supabase.from('order_items').select('id, order_id, product_id, course_id, product_name, quantity, unit_price, subtotal, tenant_id, created_at').eq('order_id', id).eq('tenant_id', this.tenantService.getTenantId())
             ])
         ).pipe(
             map(([orderResult, itemsResult]) => {
@@ -75,12 +75,6 @@ export class OrderService {
     async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: Error | PostgrestError | null }> {
         try {
             const user = this.auth.getCurrentUser();
-            let branchId: string | undefined;
-            if (user) {
-                const profile = await this.auth.getUserProfile(user.id);
-                branchId = profile?.branch_id;
-            }
-
             const orderId = crypto.randomUUID();
             const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
             const tenantId = this.tenantService.getTenantId();
@@ -90,16 +84,17 @@ export class OrderService {
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone || null,
-                shipping_address: order.shipping_address || null, // Updated mapping
+                shipping_address: order.shipping_address || null,
                 status: order.status || 'pending',
                 subtotal: order.subtotal,
                 tax: order.tax,
                 discount: order.discount,
-                total_amount: order.total || order.total_amount, // Updated mapping
+                total: order.total || order.total_amount,
+                total_amount: order.total || order.total_amount,
                 notes: order.notes || null,
+                payment_method: order.payment_method || null,
                 order_number: orderNumber,
-                user_id: order.user_id || null, // Updated mapping
-                branch_id: branchId || null,
+                user_id: order.user_id || null,
                 tenant_id: tenantId
             };
 
@@ -146,7 +141,7 @@ export class OrderService {
             .update({ status, updated_at: new Date().toISOString() })
             .eq('id', id);
             
-        const { error, data } = await this.applyTenantFilter(query).select();
+        const { error, data } = await this.applyTenantFilter(query).select('id, status');
 
         if (error) this.handleError('Error updating order status', error);
         
@@ -175,13 +170,15 @@ export class OrderService {
                 customer_name: order.customer_name,
                 customer_email: order.customer_email,
                 customer_phone: order.customer_phone || null,
-                shipping_address: order.shipping_address || null, // Updated schema mapped
+                shipping_address: order.shipping_address || null,
                 status: order.status,
                 subtotal: order.subtotal,
                 tax: order.tax,
                 discount: order.discount,
-                total_amount: order.total || order.total_amount, // Updated mapping
+                total: order.total || order.total_amount,
+                total_amount: order.total || order.total_amount,
                 notes: order.notes || null,
+                payment_method: order.payment_method || null,
                 updated_at: new Date().toISOString()
             };
 
@@ -190,7 +187,7 @@ export class OrderService {
                 .update(updatePayload)
                 .eq('id', id);
 
-            const { error: orderError, data: updatedOrdersData } = await this.applyTenantFilter(query).select();
+            const { error: orderError, data: updatedOrdersData } = await this.applyTenantFilter(query).select('id');
 
             if (orderError) throw orderError;
             
@@ -200,16 +197,9 @@ export class OrderService {
 
             await this.handleItemsUpdate(id, items);
 
-            let fetchQuery = this.supabase
-                .from('orders')
-                .select('*, order_items(*)')
-                .eq('id', id);
-
-            const { data: fetchUpdatedData, error: fetchUpdatedError } = await this.applyTenantFilter(fetchQuery).single();
-            
-            if (fetchUpdatedError) throw fetchUpdatedError;
-
-            return { data: this.mapDbOrderToDomain(fetchUpdatedData), error: null };
+            // Fetching updated data is expensive and usually not needed on redirect
+            // Let's return the basic order info we have
+            return { data: { ...order, id }, error: null };
         } catch (error: unknown) {
             this.handleError('Error updating order', error);
             return { data: null, error: error as PostgrestError };
@@ -218,44 +208,35 @@ export class OrderService {
 
     private async handleItemsUpdate(orderId: string, items: OrderItem[]): Promise<void> {
         const tenantId = this.tenantService.getTenantId();
-        const { data: existingItems, error: fetchError } = await this.supabase
+        
+        // 1. Delete all existing items for this order (1 round trip)
+        const { error: deleteError } = await this.supabase
             .from('order_items')
-            .select('id')
+            .delete()
             .eq('order_id', orderId)
             .eq('tenant_id', tenantId);
 
-        if (fetchError) throw fetchError;
+        if (deleteError) throw deleteError;
 
-        const existingIds: string[] = (existingItems || []).map((i: any) => i.id);
-        const currentIds = items.filter(i => i.id).map(i => i.id);
-        const idsToDelete = existingIds.filter((eid: string) => !currentIds.includes(eid));
-
-        if (idsToDelete.length > 0) {
-            const { error: deleteError } = await this.supabase
-                .from('order_items')
-                .delete()
-                .in('id', idsToDelete)
-                .eq('tenant_id', tenantId);
-            if (deleteError) throw deleteError;
-        }
-
-        const itemsToUpsert = items.map(item => ({
-            ...(item.id ? { id: item.id } : {}),
+        // 2. Insert new items (1 round trip)
+        const itemsToInsert = items.map(item => ({
             order_id: orderId,
             product_name: item.product_name,
             quantity: item.quantity,
             unit_price: item.unit_price,
             subtotal: item.subtotal,
             product_id: item.product_id || null,
-            course_id: item.course_id || null, // Map from updated interface
+            course_id: item.course_id || null,
             tenant_id: tenantId
         }));
 
-        const { error: upsertError } = await this.supabase
-            .from('order_items')
-            .upsert(itemsToUpsert);
+        if (itemsToInsert.length > 0) {
+            const { error: insertError } = await this.supabase
+                .from('order_items')
+                .insert(itemsToInsert);
 
-        if (upsertError) throw upsertError;
+            if (insertError) throw insertError;
+        }
     }
 
     private mapDbOrderToDomain(o: any): OrderWithItems {

@@ -44,11 +44,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">RUC / CUIT</span>
+                            <span class="label-text font-medium">{{ form().ruc }} (Número)</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-id-card text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().ruc" name="ruc" class="grow" />
+                            <input type="text" [(ngModel)]="form().tax_id" name="tax_id" class="grow" placeholder="Ej: 20-12345678-9" />
                         </label>
                     </div>
                     <div class="form-control">
@@ -109,12 +109,22 @@
                     </div>
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Abreviatura Impuesto</span>
+                            <span class="label-text font-medium">Nombre del Impuesto</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-tag text-gray-400"></i>
                             <input type="text" [(ngModel)]="form().tax_abbreviation" name="tax_abbreviation" class="grow" 
                                 placeholder="Ej: IVA" />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Nombre de Identificación</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-fingerprint text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().ruc" name="ruc_name" class="grow" 
+                                placeholder="Ej: CUIT, CUIL, RUC" />
                         </label>
                     </div>
                     <div class="form-control">

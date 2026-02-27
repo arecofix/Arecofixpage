@@ -58,13 +58,16 @@
     <!-- Selection Bar (Floating) -->
     @if (selectedIds().size > 0) {
       <div class="fixed bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto z-40 animate-fade-in-up">
-        <div class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-full shadow-2xl px-6 py-3 flex items-center justify-between gap-6 border border-gray-700 dark:border-gray-200">
+        <div class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-full shadow-2xl px-6 py-3 flex items-center justify-between gap-4 border border-gray-700 dark:border-gray-200">
           <div class="font-bold whitespace-nowrap">
             <span class="badge badge-primary mr-2">{{ selectedIds().size }}</span> seleccionados
           </div>
           <div class="flex items-center gap-2">
-            <button (click)="openBulkEdit()" class="btn btn-sm btn-ghost hover:bg-white/20 dark:hover:bg-black/10 text-white dark:text-gray-900">
-              <i class="fas fa-edit mr-2"></i> Editar Masivo
+            <button (click)="openBulkEdit()" class="btn btn-sm btn-ghost hover:bg-white/20 dark:hover:bg-black/10 text-white dark:text-gray-900 whitespace-nowrap">
+              <i class="fas fa-pen mr-1.5"></i> Editar
+            </button>
+            <button (click)="openBulkDelete()" class="btn btn-sm btn-ghost hover:bg-error/30 text-error whitespace-nowrap">
+              <i class="fas fa-trash-alt mr-1.5"></i> Eliminar
             </button>
             <button (click)="clearSelection()" class="btn btn-circle btn-xs btn-ghost text-white dark:text-gray-900 opacity-70 hover:opacity-100">
               <i class="fas fa-times"></i>
@@ -260,6 +263,7 @@
               [selectedIds]="selectedIdsList()"
               [brands]="brands()"
               [categories]="categories()"
+              [initialTab]="bulkInitialTab()"
               (onSuccess)="onBulkEditSuccess()">
             </app-bulk-edit-modal>
 

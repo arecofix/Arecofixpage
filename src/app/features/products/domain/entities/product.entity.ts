@@ -23,8 +23,6 @@ export interface Product {
     gallery_urls?: string[];
     is_featured: boolean;
     is_active: boolean;
-    condition?: 'new' | 'used' | 'refurbished';
-    warranty?: string;
     stock: number; // General stock (aggregate or legacy)
     min_stock_alert?: number;
     sku?: string;
@@ -52,8 +50,6 @@ export interface CreateProductDto {
     image_url?: string;
     gallery_urls?: string[];
     is_featured?: boolean;
-    condition?: 'new' | 'used' | 'refurbished';
-    warranty?: string;
     stock: number;
     min_stock_alert?: number;
     sku?: string;

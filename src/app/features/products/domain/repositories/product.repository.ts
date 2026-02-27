@@ -7,6 +7,7 @@ import { ProductsParams, ProductsResponse } from '@app/public/products/interface
 export interface ImportProductSummary {
     id: string;
     name: string;
+    slug: string;
     sku?: string;
     price: number;
     image_url?: string;
@@ -40,4 +41,5 @@ export abstract class ProductRepository {
     abstract upsertMany(products: Partial<Product>[]): Observable<Product[]>;
     abstract updateMany(products: Partial<Product>[]): Observable<void>;
     abstract bulkUpdatePrices(updates: BulkPriceUpdate[]): Observable<{ updated: number; errors: number }>;
+    abstract bulkDelete(ids: string[]): Observable<void>;
 }

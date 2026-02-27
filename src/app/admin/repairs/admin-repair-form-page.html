@@ -298,10 +298,19 @@
 
                 <div class="divider text-sm font-medium text-gray-500">Resumen Financiero</div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Costo Total (Repuestos + Labor)</span>
+                            <span class="label-text font-medium">Presupuesto Inicial Estimado</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-calculator text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost" class="grow" min="0" />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Costo Total (Final)</span>
                         </label>
                         <div class="text-3xl font-black text-neutral-800 tracking-tighter">
                             {{ form().final_cost | currency:'ARS':'symbol':'1.0-0' }}

@@ -193,7 +193,7 @@ export class SupabaseProductRepository extends ProductRepository {
   getAllForImport(): Observable<ImportProductSummary[]> {
     const query = this.applyTenantFilter(
       this.supabase.from('products').select(
-        'id, name, sku, price, image_url, gallery_urls, description, category_id, brand_id'
+        'id, name, slug, sku, price, image_url, gallery_urls, description, category_id, brand_id'
       )
     );
     return from(query as any).pipe(
@@ -372,15 +372,27 @@ export class SupabaseProductRepository extends ProductRepository {
   updateMany(products: Partial<Product>[]): Observable<void> {
     if (!products.length) return of(void 0);
 
+    // Strip every field that is NOT a real DB column before sending
+    const DB_COLUMNS = new Set([
+      'id', 'name', 'slug', 'description', 'price', 'sale_price',
+      'stock', 'min_stock_alert', 'category_id', 'brand_id', 'model_id',
+      'image_url', 'gallery_urls', 'specifications', 'is_featured',
+      'is_active', 'sku', 'barcode', 'currency', 'is_global',
+      'created_at', 'updated_at', 'deleted_at', 'tenant_id'
+    ]);
+
     const updates = products.map(p => {
         if (!p.id) return Promise.resolve({ error: { message: 'Missing ID' } });
-        const { id, tenant_id, ...updateData } = p;
-        
-        let query = this.supabase.from('products').update({
-            ...updateData,
-            updated_at: new Date().toISOString()
-        }).eq('id', id);
-        
+        const { id, tenant_id, ...rest } = p as any;
+
+        // Keep only known DB columns
+        const cleanPayload: Record<string, any> = {};
+        for (const key of Object.keys(rest)) {
+          if (DB_COLUMNS.has(key)) cleanPayload[key] = (rest as any)[key];
+        }
+        cleanPayload['updated_at'] = new Date().toISOString();
+
+        let query = this.supabase.from('products').update(cleanPayload).eq('id', id);
         return this.applyTenantFilter(query);
     });
 
@@ -393,6 +405,28 @@ export class SupabaseProductRepository extends ProductRepository {
         return void 0;
       })
     );
+  }
+
+  /** Soft-delete multiple products at once (sets deleted_at timestamp) */
+  bulkDelete(ids: string[]): Observable<void> {
+    if (!ids.length) return of(void 0);
+    const CHUNK_SIZE = 100;
+    const chunks: string[][] = [];
+    for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
+      chunks.push(ids.slice(i, i + CHUNK_SIZE));
+    }
+    const tenantId = this.tenantService.getTenantId();
+    const processChunks = async () => {
+      for (const chunk of chunks) {
+        const { error } = await (this.supabase
+          .from('products')
+          .update({ deleted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .in('id', chunk)
+          .eq('tenant_id', tenantId) as any);
+        if (error) throw error;
+      }
+    };
+    return from(processChunks()).pipe(map(() => void 0));
   }
 
   private _mapToEntity(p: any, branch_id?: string): Product {
@@ -425,8 +459,6 @@ export class SupabaseProductRepository extends ProductRepository {
           sku: p['sku'] as string || '',
           barcode: p['barcode'] as string || '',
           currency: p['currency'] as 'ARS' | 'USD' || 'ARS',
-          condition: p['condition'] as 'new' | 'used' | 'refurbished' | undefined,
-          warranty: p['warranty'] as string,
           min_stock_alert: p['min_stock_alert'] ? Number(p['min_stock_alert']) : undefined,
           created_at: p['created_at'] as string,
           updated_at: p['updated_at'] as string,

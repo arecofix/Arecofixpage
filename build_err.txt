@@ -1,0 +1,22 @@
+[33mÔØ»[39m Building...
+/*! ­ƒî╝ daisyUI 5.5.19 */
+Ô£û Building... [FAILED: link.parentNode?.insertBefore is not a function]
+An unhandled exception occurred: link.parentNode?.insertBefore is not a function
+See "C:\Users\Ezequiel\AppData\Local\Temp\ng-7xbqZ2\angular-errors.log" for further details.
+C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\@angular-devkit\architect\node_modules\rxjs\dist\cjs\internal\util\reportUnhandledError.js:13
+            throw err;
+            ^
+
+TypeError: link.parentNode?.insertBefore is not a function
+    at BeastiesExtended.embedLinkedStylesheet (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\beasties\dist\index.cjs:663:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BeastiesExtended.embedLinkedStylesheet (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\@angular\build\src\utils\index-file\inline-critical-css.js:114:29)
+    at async Promise.all (index 0)
+    at async BeastiesExtended.process (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\beasties\dist\index.cjs:542:7)
+    at async InlineCriticalCssProcessor.process (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\@angular\build\src\utils\index-file\inline-critical-css.js:181:25)
+    at async IndexHtmlGenerator.runPlugins (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\@angular\build\src\utils\index-file\index-html-generator.js:71:28)
+    at async Promise.all (index 0)
+    at async IndexHtmlGenerator.process (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\@angular\build\src\utils\index-file\index-html-generator.js:56:42)
+    at async executePostBundleSteps (C:\Users\Ezequiel\Desktop\Utilidades\Trabajo\app\Proyectos\arecofix\Arecofixpage\node_modules\@angular\build\src\builders\application\execute-post-bundle.js:50:62)
+
+Node.js v22.18.0

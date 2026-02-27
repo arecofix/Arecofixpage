@@ -21,6 +21,12 @@ export interface Tenant {
   };
   currency: string;
   tax_percentage: number;
+  tax_id_name?: string;
+  tax_id?: string;
+  owner_name?: string;
+  location?: string;
+  contact_phone?: string;
+  contact_email?: string;
 }
 
 @Injectable({

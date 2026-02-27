@@ -39,9 +39,9 @@
               transition-all duration-200 group py-1 px-1.5"
        [routerLink]="['/']">
       <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Arecofix Logo"
-           class="h-8 w-auto object-contain hidden dark:block drop-shadow-lg" height="215" width="200" priority />
+           class="h-8 w-auto object-contain hidden dark:block drop-shadow-lg" height="32" width="30" priority />
       <img ngSrc="/assets/img/brands/logo/logo-light.webp" alt="Arecofix Logo"
-           class="h-8 w-auto object-contain dark:hidden drop-shadow-md" height="134" width="128" priority />
+           class="h-8 w-auto object-contain dark:hidden drop-shadow-md" height="32" width="31" priority />
       <span class="font-bold text-base xl:text-lg text-gray-900 dark:text-white font-heading
                    tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400
                    transition-colors hidden sm:inline truncate max-w-[120px] xl:max-w-none">
@@ -100,7 +100,7 @@
                       </span>
                       <div>
                         <p class="font-bold text-sm text-gray-900 dark:text-white">{{ item.label }}</p>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ item.description }}</p>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400">{{ item.description }}</p>
                       </div>
                     </div>
                   </div>
@@ -130,7 +130,7 @@
                               }
                             </span>
                             @if (child.description) {
-                              <p class="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">{{ child.description }}</p>
+                              <p class="text-[11px] text-gray-600 dark:text-gray-400 truncate mt-0.5">{{ child.description }}</p>
                             }
                           </div>
                           <svg class="w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform duration-200
@@ -196,7 +196,7 @@
                             }
                           </span>
                           @if (child.description) {
-                            <p class="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">{{ child.description }}</p>
+                            <p class="text-[11px] text-gray-600 dark:text-gray-400 truncate mt-0.5">{{ child.description }}</p>
                           }
                         </div>
                       </a>
@@ -384,9 +384,9 @@
     <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5 shrink-0">
       <a class="flex items-center gap-2" [routerLink]="['/']" (click)="closeMobileMenu()">
         <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Logo"
-             class="h-6 w-auto hidden dark:block" height="215" width="200" />
+             class="h-6 w-auto hidden dark:block" height="24" width="22" />
         <img ngSrc="/assets/img/brands/logo/logo-light.webp" alt="Logo"
-             class="h-6 w-auto dark:hidden" height="134" width="128" />
+             class="h-6 w-auto dark:hidden" height="24" width="23" />
         <span class="font-bold text-sm text-gray-900 dark:text-white font-heading">{{ appName }}</span>
       </a>
       <button (click)="closeMobileMenu()"

@@ -22,7 +22,7 @@ export const environment: Environment = {
 
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
-  posthogKey: 'phc_PLACEHOLDER_DEV',
+  posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
 
   // Contact Information

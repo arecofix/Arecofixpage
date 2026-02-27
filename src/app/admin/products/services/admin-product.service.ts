@@ -164,32 +164,116 @@ export class AdminProductService {
             return { inserted: 0, priceUpdated: 0, renamed: 0, skipped, details: ['No se encontraron filas válidas en el CSV.'] };
         }
 
-        // ── STEP 2: Load existing products (lean) ─────────────────────────
-        const existing: ImportProductSummary[] = await firstValueFrom(this.productRepo.getAllForImport());
+        // ── STEP 2: Load existing metadata ──────────────────────────────
+        const [existing, brands, categories] = await Promise.all([
+            firstValueFrom(this.productRepo.getAllForImport()),
+            this.getBrands(),
+            this.getCategories()
+        ]);
 
         // Build fast lookup indexes
         const byId   = new Map<string, ImportProductSummary>();
         const bySku  = new Map<string, ImportProductSummary>();
         const byName = new Map<string, ImportProductSummary>(); // normalised name → product
+        const bySlug = new Set<string>();
 
         for (const p of existing) {
             byId.set(p.id, p);
             if (p.sku) bySku.set(p.sku.trim().toLowerCase(), p);
             byName.set(this._normaliseName(p.name), p);
+            bySlug.add(p.slug);
         }
+
+        // Metadata lookups (mutable: we'll add auto-created entries)
+        const brandByName = new Map<string, string>();   // normalised name → brand id
+        const brandById   = new Set<string>();             // known brand UUIDs
+        brands.forEach(b => { brandByName.set(this._normaliseName(b.name), b.id); brandById.add(b.id); });
+
+        const catByName = new Map<string, string>();      // normalised name → category id
+        const catById   = new Set<string>();               // known category UUIDs
+        categories.forEach(c => { catByName.set(this._normaliseName(c.name), c.id); catById.add(c.id); });
+
+        // ── STEP 2b: Collect all brand/category names from CSV and auto-create missing ones ──
+        const details: string[] = [];
+        const brandNamesToCreate = new Set<string>();
+        const catNamesToCreate = new Set<string>();
+
+        for (const row of csvRows) {
+            // Brand: if provided and either NOT a UUID or a UUID that doesn't exist in DB
+            if (row.brand_id) {
+                if (this._isUuid(row.brand_id)) {
+                    // UUID that doesn't exist in DB → treat the CSV value as a problem; strip it
+                    // (We cannot reliably create a brand from a UUID string)
+                    if (!brandById.has(row.brand_id)) {
+                        // Mark as needing strip — handled in STEP 3
+                    }
+                } else {
+                    const normName = this._normaliseName(row.brand_id);
+                    if (!brandByName.has(normName)) {
+                        brandNamesToCreate.add(normName);
+                    }
+                }
+            }
+            // Category: same logic
+            if (row.category_id) {
+                if (this._isUuid(row.category_id)) {
+                    if (!catById.has(row.category_id)) {
+                        // invalid UUID → strip in STEP 3
+                    }
+                } else {
+                    const normName = this._normaliseName(row.category_id);
+                    if (!catByName.has(normName)) {
+                        catNamesToCreate.add(normName);
+                    }
+                }
+            }
+        }
+
+        // Auto-create missing brands
+        for (const normName of brandNamesToCreate) {
+            try {
+                const displayName = normName.charAt(0).toUpperCase() + normName.slice(1);
+                const newBrand = await firstValueFrom(
+                    this.brandRepo.create({ name: displayName, slug: StringUtils.slugify(normName), is_active: true } as any)
+                );
+                brandByName.set(normName, newBrand.id);
+                brandById.add(newBrand.id);
+                details.push(`ℹ️ Marca creada automáticamente: ${displayName}`);
+            } catch (e: any) {
+                details.push(`⚠️ No se pudo crear la marca "${normName}": ${e.message ?? e}`);
+            }
+        }
+
+        // Auto-create missing categories
+        for (const normName of catNamesToCreate) {
+            try {
+                const displayName = normName.charAt(0).toUpperCase() + normName.slice(1);
+                const newCat = await firstValueFrom(
+                    this.categoryRepo.create({ name: displayName, slug: StringUtils.slugify(normName), type: 'product', is_active: true } as any)
+                );
+                catByName.set(normName, newCat.id);
+                catById.add(newCat.id);
+                details.push(`ℹ️ Categoría creada automáticamente: ${displayName}`);
+            } catch (e: any) {
+                details.push(`⚠️ No se pudo crear la categoría "${normName}": ${e.message ?? e}`);
+            }
+        }
+
 
         // ── STEP 3: Classify ───────────────────────────────────────────────
         const priceUpdates: BulkPriceUpdate[] = [];   // existing – price only (±name fix)
         const toInsert: Partial<Product>[] = [];       // truly new products
+        const usedSlugsInBatch = new Set<string>();
 
         for (const row of csvRows) {
             const found = this._findExisting(row, byId, bySku, byName);
 
             if (found) {
                 // Product EXISTS → only update fields allowed
-                const update: BulkPriceUpdate = { id: found.id, price: row.price };
+                // Cap price to avoid numeric overflow (e.g. numeric(10,2))
+                const safePrice = Math.min(row.price, 99999999.99);
+                const update: BulkPriceUpdate = { id: found.id, price: safePrice };
 
-                // Rename only if current name is a generic "repuesto" variant
                 if (this._isGenericRepuesto(found.name) && row.name && !this._isGenericRepuesto(row.name)) {
                     update.newName = row.name;
                 }
@@ -197,17 +281,56 @@ export class AdminProductService {
                 priceUpdates.push(update);
             } else {
                 // Product does NOT EXIST → prepare for insertion
-                const slug = row.slug || StringUtils.slugify(row.name);
+                
+                // Resolve Brand ID — 3-way check:
+                // 1. If it's a valid UUID that exists in DB → use it directly
+                // 2. If it's a name (or unknown UUID) → look up by normalised name
+                // 3. Still not found → strip it (null) to avoid FK violation
+                let brandId: string | undefined = undefined;
+                if (row.brand_id) {
+                    if (this._isUuid(row.brand_id) && brandById.has(row.brand_id)) {
+                        brandId = row.brand_id;
+                    } else {
+                        // Try by name (covers both plain names and unrecognised UUIDs treated as strings)
+                        const norm = this._isUuid(row.brand_id)
+                            ? undefined  // unknown UUID — can't resolve as name, strip
+                            : brandByName.get(this._normaliseName(row.brand_id));
+                        brandId = norm;
+                    }
+                }
+
+                // Resolve Category ID — same 3-way logic
+                let catId: string | undefined = undefined;
+                if (row.category_id) {
+                    if (this._isUuid(row.category_id) && catById.has(row.category_id)) {
+                        catId = row.category_id;
+                    } else {
+                        const norm = this._isUuid(row.category_id)
+                            ? undefined
+                            : catByName.get(this._normaliseName(row.category_id));
+                        catId = norm;
+                    }
+                }
+
+                // Ensure unique slug
+                let baseSlug = row.slug || StringUtils.slugify(row.name);
+                let slug = baseSlug;
+                let counter = 1;
+                while (bySlug.has(slug) || usedSlugsInBatch.has(slug)) {
+                    slug = `${baseSlug}-${counter++}`;
+                }
+                usedSlugsInBatch.add(slug);
+
                 toInsert.push({
                     name: row.name,
                     slug: slug,
-                    price: row.price,
-                    stock: row.stock ?? 1,
+                    price: Math.min(row.price, 99999999.99),
+                    stock: Math.min(row.stock ?? 1, 99999), 
                     sku: row.sku || undefined,
                     barcode: row.barcode || undefined,
                     description: row.description || '',
-                    category_id: row.category_id || undefined,
-                    brand_id: row.brand_id || undefined,
+                    category_id: catId || undefined,
+                    brand_id: brandId || undefined,
                     image_url: row.image_url || undefined,
                     is_active: row.is_active ?? true,
                     is_featured: row.is_featured ?? false,
@@ -220,19 +343,20 @@ export class AdminProductService {
         let renamed = 0;
         let inserted = 0;
 
-        const details: string[] = [];
-
         // 4a. Bulk price updates
         if (priceUpdates.length > 0) {
-            const { updated, errors: updateErrors } = await firstValueFrom(
-                this.productRepo.bulkUpdatePrices(priceUpdates)
-            );
-            priceUpdated = priceUpdates.filter(u => !u.newName).length;
-            renamed = priceUpdates.filter(u => !!u.newName).length;
-            const effectivelyUpdated = updated;
-            details.push(`✅ ${effectivelyUpdated} productos actualizados (precio${renamed > 0 ? ` + ${renamed} renombrados` : ''}).`);
-            if (updateErrors > 0) {
-                details.push(`⚠️ ${updateErrors} actualizaciones fallaron.`);
+            try {
+                const { updated, errors: updateErrors } = await firstValueFrom(
+                    this.productRepo.bulkUpdatePrices(priceUpdates)
+                );
+                priceUpdated = priceUpdates.filter(u => !u.newName).length;
+                renamed = priceUpdates.filter(u => !!u.newName).length;
+                details.push(`✅ ${updated} productos actualizados (precio${renamed > 0 ? ` + ${renamed} renombrados` : ''}).`);
+                if (updateErrors > 0) {
+                    details.push(`⚠️ ${updateErrors} actualizaciones fallaron.`);
+                }
+            } catch (e: any) {
+                details.push(`⚠️ Error crítico en actualización de precios: ${e.message}`);
             }
         }
 
@@ -243,9 +367,18 @@ export class AdminProductService {
                 const chunk = toInsert.slice(i, i + INSERT_CHUNK);
                 try {
                     const upserted = await firstValueFrom(this.productRepo.upsertMany(chunk));
-                    inserted += upserted.length;
+                    inserted += (upserted || []).length;
                 } catch (e: any) {
-                    details.push(`⚠️ Error al insertar lote ${Math.floor(i / INSERT_CHUNK) + 1}: ${e.message}`);
+                    console.error('Batch error:', e);
+                    let errorMsg = e.message;
+                    if (errorMsg.includes('products_brand_id_fkey')) {
+                        errorMsg = 'Marca no encontrada (el ID o nombre no coincide)';
+                    } else if (errorMsg.includes('numeric field overflow')) {
+                        errorMsg = 'Número demasiado grande (precio o stock excede el límite)';
+                    } else if (errorMsg.includes('duplicate key')) {
+                        errorMsg = 'Nombre o SKU ya existe';
+                    }
+                    details.push(`⚠️ Error lote ${Math.floor(i / INSERT_CHUNK) + 1}: ${errorMsg}`);
                 }
             }
             details.push(`🆕 ${inserted} productos nuevos insertados.`);
@@ -292,17 +425,23 @@ export class AdminProductService {
         return n === 'repuesto' || n.startsWith('repuesto ') || n.endsWith(' repuesto');
     }
 
+    private _isUuid(text: string): boolean {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(text);
+    }
+
     // ────────────────────────────────────────────────────────────────────────
     // Bulk operations (used by BulkEditModal)
     // ────────────────────────────────────────────────────────────────────────
 
-    async bulkUpdate(ids: string[], payload: Partial<Product>): Promise<void> {
-        const updates = ids.map(id => ({ id, ...payload }));
-        await firstValueFrom(this.productRepo.updateMany(updates));
+    /** Build minimal clean payloads so only REAL DB columns reach Supabase */
+    async bulkCustomUpdate(updates: Array<{ id: string; payload: Record<string, any> }>): Promise<void> {
+        const products = updates.map(u => ({ id: u.id, ...u.payload }));
+        await firstValueFrom(this.productRepo.updateMany(products));
     }
 
-    async bulkCustomUpdate(updates: Partial<Product>[]): Promise<void> {
-        await firstValueFrom(this.productRepo.upsertMany(updates));
+    async bulkDelete(ids: string[]): Promise<void> {
+        await firstValueFrom(this.productRepo.bulkDelete(ids));
     }
 
     async bulkIncreasePrice(ids: string[], percentage: number): Promise<void> {

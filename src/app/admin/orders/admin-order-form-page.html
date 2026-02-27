@@ -9,8 +9,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Nombre *</label>
-                    <input type="text" [(ngModel)]="form().customer_name" name="customer_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    <input type="text" 
+                        [ngModel]="form().customer_name" 
+                        (ngModelChange)="onSelectClient($event)"
+                        name="customer_name" 
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                        list="clients-list"
+                        placeholder="Buscar cliente..."
                         required />
+                    <datalist id="clients-list">
+                        @for (client of clients; track client.id) {
+                            <option [value]="client.displayName">{{ client.email }}</option>
+                        }
+                    </datalist>
                 </div>
 
                 <div>
@@ -136,6 +147,17 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-base-content mb-1.5">Método de Pago</label>
+                        <select [(ngModel)]="form().payment_method" name="payment_method" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="mercadopago">Mercado Pago</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-base-content mb-1.5">Descuento</label>
                         <input type="number" [(ngModel)]="form().discount" (ngModelChange)="calculateTotals()"

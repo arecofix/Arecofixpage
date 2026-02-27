@@ -32,6 +32,7 @@ export class AdminProductsPage implements OnInit {
   // Selection
   public selectedIds = signal<Set<string>>(new Set());
   public isBulkModalOpen = signal(false);
+  public bulkInitialTab = signal<'edit' | 'delete'>('edit');
   
   // Pagination
   public currentPage = signal<number>(1);
@@ -151,6 +152,12 @@ export class AdminProductsPage implements OnInit {
   }
 
   openBulkEdit() {
+    this.bulkInitialTab.set('edit');
+    this.isBulkModalOpen.set(true);
+  }
+
+  openBulkDelete() {
+    this.bulkInitialTab.set('delete');
     this.isBulkModalOpen.set(true);
   }
 

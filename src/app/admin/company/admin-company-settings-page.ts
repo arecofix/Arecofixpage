@@ -18,7 +18,8 @@ export class AdminCompanySettingsPage implements OnInit {
         id: '',
         name: '',
         owner_name: '',
-        ruc: '',
+        tax_id: '',
+        ruc: 'CUIT/CUIL', // This will keep the display name of the tax id (label)
         address: '',
         tax_percentage: 21,
         tax_abbreviation: 'IVA',
@@ -57,8 +58,9 @@ export class AdminCompanySettingsPage implements OnInit {
             this.form.set({
                 id: data.id,
                 name: data.name,
-                owner_name: '', // Removed from schema
-                ruc: data.tax_id_name || 'CUIT/CUIL', // Mapped to tax_id_name roughly
+                owner_name: data.owner_name || '',
+                tax_id: data.tax_id || '',
+                ruc: data.tax_id_name || 'CUIT/CUIL',
                 address: data.location || '',
                 tax_percentage: data.tax_percentage || 21,
                 tax_abbreviation: data.tax_abbreviation || 'IVA',
@@ -104,10 +106,12 @@ export class AdminCompanySettingsPage implements OnInit {
         const payload = { ...this.form() };
         const tenantId = this.tenantService.getTenantId();
 
-        const updateData = {
+        const updateData: any = {
             name: payload.name,
+            owner_name: payload.owner_name,
+            tax_id: payload.tax_id,
             tax_id_name: payload.ruc,
-            location: payload.address || payload.location, // Merging address/location
+            location: payload.address || payload.location,
             tax_percentage: payload.tax_percentage,
             tax_abbreviation: payload.tax_abbreviation,
             contact_email: payload.email,
@@ -127,6 +131,16 @@ export class AdminCompanySettingsPage implements OnInit {
 
             if (error) throw error;
             
+            // Critical: Update the TenantService state so other components reflect the change
+            const { data: updatedTenant } = await supabase.from('tenants')
+                .select('*')
+                .eq('id', tenantId)
+                .single();
+            
+            if (updatedTenant) {
+                this.tenantService.setTenant(updatedTenant as any);
+            }
+
             this.success.set('Configuración de la empresa guardada correctamente');
             await this.loadSettings(); 
         } catch (e: any) {

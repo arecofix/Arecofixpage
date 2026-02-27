@@ -12,17 +12,22 @@ export class AnalyticsService {
 
     constructor() {
         if (this.isEnabled()) {
-            posthog.init(environment.posthogKey as string, {
-                api_host: environment.posthogHost || 'https://us.i.posthog.com',
-                person_profiles: 'identified_only',
-                autocapture: true,
-                capture_pageview: true,
-                loaded: (ph: any) => {
-                    if (!environment.production) {
-                        ph.debug(true);
+            try {
+                posthog.init(environment.posthogKey as string, {
+                    api_host: environment.posthogHost || 'https://us.i.posthog.com',
+                    person_profiles: 'identified_only',
+                    autocapture: true,
+                    capture_pageview: true,
+                    persistence: 'localStorage+cookie',
+                    loaded: (ph: any) => {
+                        if (!environment.production) {
+                            ph.debug(true);
+                        }
                     }
-                }
-            });
+                });
+            } catch (err) {
+                console.error('PostHog initialization failed', err);
+            }
         }
     }
 
