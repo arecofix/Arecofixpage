@@ -129,11 +129,17 @@ export class AdminRepairFormPage implements OnInit {
         try {
             const products = await this.productService.getProducts();
             this.availableProducts.set(products);
-            this.showProductModal.set(true);
         } catch (e: unknown) {
             console.error('Error loading products:', e);
             this.error.set('Error al cargar repuestos sugeridos');
         }
+    }
+
+    async openProductModal() {
+        if (this.availableProducts().length === 0) {
+            await this.loadProducts();
+        }
+        this.showProductModal.set(true);
     }
 
     async onFileSelected(event: Event) {
