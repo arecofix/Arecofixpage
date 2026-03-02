@@ -26,15 +26,15 @@
                     <a routerLink="/" class="btn btn-ghost btn-sm text-neutral-400">Volver al inicio</a>
                 </div>
             </div>
-            } @else if (repair(); as r) {
+            } @else if (mappedRepair(); as r) {
             <!-- Status Card -->
-            <div class="p-6 transition-all duration-500" [ngClass]="getStatusColor(r.current_status_id)">
+            <div class="p-6 transition-all duration-500" [ngClass]="r.ui.statusColor">
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Estado de Reparación</span>
                     <span class="text-[10px] font-mono font-bold opacity-60">#{{ r.tracking_code }}</span>
                 </div>
                 <h2 class="text-3xl font-black leading-tight mb-2 tracking-tight">
-                    {{ getStatusLabel(r.current_status_id) }}
+                    {{ r.ui.statusLabel }}
                 </h2>
                 <p class="text-sm font-medium opacity-80 leading-relaxed">
                     Tu {{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
@@ -126,7 +126,7 @@
 </div>
 
 <!-- Print Only Ticket -->
-@if (repair(); as r) {
+@if (mappedRepair(); as r) {
 <div class="print-only p-8 font-mono text-xs w-[80mm] mx-auto">
     <div class="text-center mb-6 border-b border-black pb-4">
         <h1 class="text-xl font-black uppercase">ARECOFIX</h1>

@@ -23,23 +23,51 @@ export class AdminRepairsPage implements OnInit {
   searchTerm = signal('');
   filterType = signal('all');
 
-  // Computed signal for filtered list
-  filteredRepairs = computed(() => {
+  // Mapped repairs with precalculated UI properties to avoid template function calls
+  mappedRepairs = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const type = this.filterType();
     
-    return this.repairs().filter(repair => {
-      const matchesSearch = 
-        repair.customer_name?.toLowerCase().includes(term) ||
-        repair.customer_phone?.toLowerCase().includes(term) ||
-        repair.device_model?.toLowerCase().includes(term) ||
-        repair.tracking_code?.toLowerCase().includes(term);
-        
-      const matchesType = type === 'all' || 
-        repair.device_model?.toLowerCase().includes(type.toLowerCase());
-        
-      return matchesSearch && matchesType;
-    });
+    return this.repairs()
+      .filter(repair => {
+        const matchesSearch = 
+          repair.customer_name?.toLowerCase().includes(term) ||
+          repair.customer_phone?.toLowerCase().includes(term) ||
+          repair.device_model?.toLowerCase().includes(term) ||
+          repair.tracking_code?.toLowerCase().includes(term);
+          
+        const matchesType = type === 'all' || 
+          repair.device_model?.toLowerCase().includes(type.toLowerCase());
+          
+        return matchesSearch && matchesType;
+      })
+      .map(repair => {
+        // Pre-calculate warranty status
+        let warrantyLabel = 'N/A';
+        let warrantyClass = 'badge-ghost opacity-50';
+        if (repair.received_at) {
+          const receivedDate = new Date(repair.received_at);
+          const diffTime = Math.abs(this.date.getTime() - receivedDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays <= 30) {
+            warrantyLabel = 'EN GARANTÍA';
+            warrantyClass = 'badge-success';
+          } else {
+            warrantyLabel = 'VENCIDA';
+            warrantyClass = 'badge-ghost opacity-50';
+          }
+        }
+
+        return {
+          ...repair,
+          ui: {
+            statusClass: RepairStatusUtils.getAdminBadgeClass(repair.current_status_id),
+            statusLabel: RepairStatusUtils.getStatusUI(repair.current_status_id).label,
+            warrantyLabel,
+            warrantyClass
+          }
+        };
+      });
   });
 
   date = new Date();
@@ -72,27 +100,5 @@ export class AdminRepairsPage implements OnInit {
       alert('Error al eliminar la reparación: ' + e.message);
       this.loading.set(false);
     }
-  }
-
-  getWarrantyStatus(dateStr: string | undefined): { label: string, class: string } {
-    if (!dateStr) return { label: 'N/A', class: 'badge-ghost opacity-50' };
-    
-    const receivedDate = new Date(dateStr);
-    const diffTime = Math.abs(this.date.getTime() - receivedDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays <= 30) {
-      return { label: 'EN GARANTÍA', class: 'badge-success' };
-    } else {
-      return { label: 'VENCIDA', class: 'badge-ghost opacity-50' };
-    }
-  }
-
-  getStatusBadgeClass(statusId: number): string {
-    return RepairStatusUtils.getAdminBadgeClass(statusId);
-  }
-
-  getStatusLabel(statusId: number): string {
-    return RepairStatusUtils.getStatusUI(statusId).label;
   }
 }

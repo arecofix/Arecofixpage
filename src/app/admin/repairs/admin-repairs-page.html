@@ -52,7 +52,7 @@
                         <p class="mt-2 text-gray-500 text-sm italic">Cargando taller...</p>
                     </td>
                 </tr>
-                } @else if (filteredRepairs().length === 0) {
+                } @else if (mappedRepairs().length === 0) {
                 <tr>
                     <td colspan="6" class="text-center py-20">
                         <div class="text-gray-200 mb-4"><i class="fas fa-toolbox text-6xl"></i></div>
@@ -60,38 +60,43 @@
                     </td>
                 </tr>
                 } @else {
-                @for (repair of filteredRepairs(); track repair.id) {
-                <tr class="hover:bg-primary/2 transition-colors group">
-                    <td class="py-4">
-                        <div class="font-bold text-gray-700">{{ (repair.received_at || repair.created_at) | date:'dd/MM/yyyy' }}</div>
-                        <span class="badge badge-xs text-[9px] font-black tracking-tighter uppercase p-2 mt-1" 
-                               [ngClass]="getWarrantyStatus(repair.received_at || repair.created_at).class">
-                            {{ getWarrantyStatus(repair.received_at || repair.created_at).label }}
-                        </span>
+                @for (repair of mappedRepairs(); track repair.id) {
+                <tr class="hover:bg-base-200 transition-colors">
+                    <td>
+                        <div class="font-bold text-lg text-primary">#{{ repair.repair_number | number:'3.0-0' }}</div>
+                        <div class="text-xs text-base-content/60">{{ repair.tracking_code }}</div>
                     </td>
                     <td>
-                        <div class="font-black text-primary tracking-tight leading-tight">{{ repair.customer_name }}</div>
-                        <div class="text-[10px] text-gray-500 font-medium mb-1"><i class="fas fa-phone-alt mr-1 text-gray-300"></i> {{ repair.customer_phone }}</div>
-                        <div class="badge badge-ghost badge-sm text-[9px] font-mono opacity-50 px-1 pt-0.5 rounded uppercase">{{ repair.tracking_code }}</div>
+                        <div class="font-bold whitespace-nowrap"><i class="fas fa-user text-base-content/50 mr-2"></i>{{ repair.customer_name }}</div>
+                        <div class="text-sm"><i class="fas fa-phone text-base-content/50 mr-2"></i>{{ repair.customer_phone }}</div>
                     </td>
                     <td>
-                        <div class="font-bold text-gray-600 text-sm">{{ repair.device_model }}</div>
+                        <div class="font-semibold"><i class="fas fa-mobile-alt text-base-content/50 mr-2"></i>{{ repair.device_model }}</div>
+                        <div class="text-xs text-base-content/70 max-w-[200px] truncate text-ellipsis">{{ repair.issue_description }}</div>
                     </td>
                     <td>
-                        <div class="badge border-none font-black text-[10px] py-3.5 px-4 tracking-tight uppercase" 
-                             [ngClass]="getStatusBadgeClass(repair.current_status_id)">
-                            {{ getStatusLabel(repair.current_status_id) }}
+                        <div class="flex flex-col gap-1 items-start">
+                            <span class="badge" [ngClass]="repair.ui.statusClass">
+                                {{ repair.ui.statusLabel }}
+                            </span>
                         </div>
                     </td>
-                    <td class="font-black text-gray-800 tabular-nums">
-                        {{ repair.estimated_cost | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                    <td>
+                        <div class="text-xs text-base-content/70">
+                            Ingreso: <span class="font-medium text-base-content">{{ repair.received_at | date:'shortDate' }}</span>
+                        </div>
+                        <div class="mt-1">
+                            <span class="badge badge-xs gap-1" [ngClass]="repair.ui.warrantyClass">
+                                {{ repair.ui.warrantyLabel }}
+                            </span>
+                        </div>
                     </td>
                     <td class="text-right">
-                        <div class="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                            <a [routerLink]="['/admin/repairs', repair.id]" class="btn btn-square btn-sm btn-ghost hover:bg-primary/10 hover:text-primary tooltip" data-tip="Editar Detalle">
+                        <div class="flex items-center gap-2">
+                            <a [routerLink]="['/admin/repairs', repair.id]" class="btn btn-sm btn-ghost btn-circle text-primary" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-square btn-sm btn-ghost hover:bg-error/10 text-error tooltip" data-tip="Borrar Registro" (click)="deleteRepair(repair.id)">
+                            <button (click)="deleteRepair(repair.id!)" class="btn btn-sm btn-ghost btn-circle text-error" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
@@ -50,6 +50,18 @@ export class TrackingPage implements OnInit {
     loading = signal(true);
     error = signal<string | null>(null);
 
+    mappedRepair = computed(() => {
+        const r = this.repair();
+        if (!r) return null;
+        return {
+            ...r,
+            ui: {
+                statusLabel: this.calculateStatusLabel(r.current_status_id),
+                statusColor: this.calculateStatusColor(r.current_status_id)
+            }
+        };
+    });
+
     async ngOnInit() {
         this.code = this.route.snapshot.paramMap.get('code');
         if (this.code) {
@@ -91,7 +103,7 @@ export class TrackingPage implements OnInit {
     }
 
     private async updateSeo(r: Repair) {
-        const statusName = this.getStatusLabel(r.current_status_id);
+        const statusName = this.calculateStatusLabel(r.current_status_id);
         let imageUrl = 'assets/img/branding/og-services.jpg';
 
         try {
@@ -113,7 +125,7 @@ export class TrackingPage implements OnInit {
         });
     }
 
-    getStatusLabel(statusId: number): string {
+    calculateStatusLabel(statusId: number): string {
         const statusMap: Record<number, string> = {
             [RepairStatus.PENDING_DIAGNOSIS]: 'PENDIENTE DE DIAGNÓSTICO',
             [RepairStatus.SUPPLY_MANAGEMENT]: 'GESTIÓN DE REPUESTOS',
@@ -126,7 +138,7 @@ export class TrackingPage implements OnInit {
         return statusMap[statusId] || 'PENDIENTE';
     }
 
-    getStatusColor(statusId: number): string {
+    calculateStatusColor(statusId: number): string {
         const colorMap: Record<number, string> = {
             [RepairStatus.PENDING_DIAGNOSIS]: 'bg-amber-100 text-amber-800 border-amber-200',
             [RepairStatus.SUPPLY_MANAGEMENT]: 'bg-cyan-100 text-cyan-800 border-cyan-200',

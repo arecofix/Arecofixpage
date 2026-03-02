@@ -131,7 +131,7 @@ export default `<!doctype html>
         setTimeout(loadAnalytics, 8000);
       })();
     </script>
-  <link rel="stylesheet" href="styles-VHAKO6JW.css" crossorigin="anonymous"></head>
+  <link rel="stylesheet" href="styles-RF64Z4CD.css" crossorigin="anonymous"></head>
 
   <body><script type="text/javascript" id="ng-event-dispatch-contract">(()=>{function p(t,n,r,o,e,i,f,m){return{eventType:t,event:n,targetElement:r,eic:o,timeStamp:e,eia:i,eirp:f,eiack:m}}function u(t){let n=[],r=e=>{n.push(e)};return{c:t,q:n,et:[],etc:[],d:r,h:e=>{r(p(e.type,e,e.target,t,Date.now()))}}}function s(t,n,r){for(let o=0;o<n.length;o++){let e=n[o];(r?t.etc:t.et).push(e),t.c.addEventListener(e,t.h,r)}}function c(t,n,r,o,e=window){let i=u(t);e._ejsas||(e._ejsas={}),e._ejsas[n]=i,s(i,r),s(i,o,!0)}window.__jsaction_bootstrap=c;})();
 </script>
@@ -168,6 +168,6 @@ export default `<!doctype html>
 
     <app-root></app-root>
     <!-- Analytics se carga dinámicamente sólo en producción -->
-  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-RVJC6SMP.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-7ASDDDDN.js"><link rel="modulepreload" href="chunk-Y277GW3E.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-DQJLPT7B.js"><link rel="modulepreload" href="chunk-CCLTAAKW.js"><link rel="modulepreload" href="chunk-NNZR67DL.js"><link rel="modulepreload" href="chunk-I7OKRB4L.js"><script src="main-WESQC7HE.js" type="module" crossorigin="anonymous"></script></body>
+  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-RVJC6SMP.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-7ASDDDDN.js"><link rel="modulepreload" href="chunk-Y277GW3E.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-DQJLPT7B.js"><link rel="modulepreload" href="chunk-CCLTAAKW.js"><link rel="modulepreload" href="chunk-NNZR67DL.js"><link rel="modulepreload" href="chunk-I7OKRB4L.js"><script src="main-OV5MPGAL.js" type="module" crossorigin="anonymous"></script></body>
 </html>
 `;
