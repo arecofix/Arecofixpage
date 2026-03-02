@@ -26,6 +26,33 @@
                     <input type="text" [(ngModel)]="form().last_name" name="last_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         required>
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Email (Requerido para inicio de sesión)</label>
+                    <input type="email" [(ngModel)]="form().email" name="email" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                        required [disabled]="!!id"> <!-- Disable email editing if updating -->
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
+                    <input type="tel" [(ngModel)]="form().phone" name="phone" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Rol en el Sistema</label>
+                    <select [(ngModel)]="form().role" name="role" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
+                        <option value="staff">Empleado / Técnico</option>
+                        <option value="admin">Administrador (Control Total)</option>
+                    </select>
+                </div>
+
+                @if (!id) {
+                <div>
+                    <label class="block text-sm font-medium text-base-content mb-1.5">Contraseña</label>
+                    <input type="password" [(ngModel)]="form().password" name="password" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                        required minlength="6" placeholder="Mínimo 6 caracteres">
+                </div>
+                }
             </div>
 
             <div class="mt-4">
