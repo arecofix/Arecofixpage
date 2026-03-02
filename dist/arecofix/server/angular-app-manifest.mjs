@@ -7,390 +7,408 @@ export default {
   routes: undefined,
   entryPointToBrowserMapping: {
   "node_modules/@mlc-ai/web-llm/lib/index.js": [
-    "chunk-EZP7SFDH.js"
+    "chunk-HDZ74XN4.js"
   ],
   "src/app/admin/repairs/admin-repair-form-page.ts": [
-    "chunk-AXF75SOL.js",
-    "chunk-2DAVW2HS.js",
-    "chunk-7YWLATDR.js",
-    "chunk-EJD3GE5R.js",
-    "chunk-U4PZDU6F.js",
-    "chunk-CQ2W4MXD.js"
+    "chunk-7LECDL3C.js",
+    "chunk-OVSRRSOG.js",
+    "chunk-FK6H3RFT.js",
+    "chunk-AZBIAASJ.js",
+    "chunk-BYXBJQAS.js",
+    "chunk-3T5YPGGX.js",
+    "chunk-UO5M3KBC.js"
   ],
   "src/app/admin/repairs/admin-repairs.routes.ts": [
-    "chunk-Z22KUITM.js"
+    "chunk-FG7X3NXR.js"
   ],
   "src/app/admin/messages/admin-messages-page.ts": [
-    "chunk-DPPEV7VN.js"
+    "chunk-WKMYKG2D.js"
   ],
   "src/app/admin/messages/admin-messages.routes.ts": [
-    "chunk-BKKHZY4Z.js"
+    "chunk-5GLR7GXI.js"
   ],
   "src/app/admin/posts/admin-posts-page.ts": [
-    "chunk-6NMFP64Z.js",
-    "chunk-IUQCZAY5.js"
+    "chunk-FME4L4BY.js",
+    "chunk-A5IVSE2K.js"
   ],
   "src/app/admin/posts/admin-post-form-page.ts": [
-    "chunk-5LI2J2DG.js",
-    "chunk-IUQCZAY5.js"
+    "chunk-4S35CJ2N.js",
+    "chunk-A5IVSE2K.js"
   ],
   "src/app/admin/posts/admin-posts.routes.ts": [
-    "chunk-JCHD6AIY.js"
+    "chunk-RYDJL2SO.js"
   ],
   "src/app/admin/admin.routes.ts": [
-    "chunk-26L7WYZN.js"
+    "chunk-B5RJK676.js"
   ],
   "src/app/admin/orders/admin-orders.routes.ts": [
-    "chunk-IXNYTB4U.js"
+    "chunk-W5OIRWXU.js"
   ],
   "src/app/admin/services/admin-services-page.ts": [
-    "chunk-ONKNQEX3.js"
+    "chunk-OJ5OWBYN.js"
   ],
   "src/app/admin/services/admin-service-form-page.ts": [
-    "chunk-C7TPPEYT.js"
+    "chunk-YJAKTKH4.js"
   ],
   "src/app/admin/services/admin-services.routes.ts": [
-    "chunk-3SKUTR4Z.js"
+    "chunk-L3QOKO5P.js"
   ],
   "src/app/admin/repairs/admin-repairs-page.ts": [
-    "chunk-7KM5Z3RT.js",
-    "chunk-2DAVW2HS.js",
-    "chunk-U4PZDU6F.js"
+    "chunk-AXFZFWJ2.js",
+    "chunk-OVSRRSOG.js",
+    "chunk-BYXBJQAS.js"
   ],
   "node_modules/html2canvas/dist/html2canvas.js": [
-    "chunk-WROLUZ4V.js"
+    "chunk-Z27M7K2C.js"
   ],
   "node_modules/dompurify/dist/purify.es.mjs": [
-    "chunk-YGLZNEXW.js"
+    "chunk-LFZHQARY.js"
   ],
   "node_modules/canvg/lib/index.es.js": [
-    "chunk-4SVVXQG2.js",
-    "chunk-7YWLATDR.js"
+    "chunk-4O5FIFOP.js",
+    "chunk-FK6H3RFT.js"
   ],
   "src/app/admin/purchases/admin-purchases.routes.ts": [
-    "chunk-2U53JNL5.js"
+    "chunk-QGXCJ3IX.js"
   ],
   "src/app/admin/users/admin-users-page.ts": [
-    "chunk-5VLELYLA.js"
+    "chunk-LWOHO2TK.js"
   ],
   "src/app/admin/users/admin-users.routes.ts": [
-    "chunk-UM42WHUY.js"
+    "chunk-KFOPVEOC.js"
   ],
   "src/app/admin/courses/admin-courses-page.ts": [
-    "chunk-RV72LVCK.js",
-    "chunk-SPT7TP4Q.js"
+    "chunk-BRVJFBEG.js",
+    "chunk-WP3PUXSU.js"
   ],
   "src/app/admin/courses/admin-course-form-page.ts": [
-    "chunk-Z2QUC5OV.js",
-    "chunk-SPT7TP4Q.js"
+    "chunk-PNXYI7FU.js",
+    "chunk-WP3PUXSU.js"
   ],
   "src/app/admin/courses/admin-courses.routes.ts": [
-    "chunk-EKTIOQAS.js"
+    "chunk-3XZF55IN.js"
   ],
   "src/app/admin/orders/admin-orders-page.ts": [
-    "chunk-3CWIRIB3.js",
-    "chunk-DAUE7PPW.js",
-    "chunk-W43WNFKI.js"
+    "chunk-74AO5XM7.js",
+    "chunk-NZBKPKP6.js",
+    "chunk-PI4Y55AZ.js"
   ],
   "src/app/admin/orders/admin-order-form-page.ts": [
-    "chunk-CJV7NYLO.js",
-    "chunk-DAUE7PPW.js"
+    "chunk-JWTCM3F3.js",
+    "chunk-NZBKPKP6.js"
   ],
   "src/app/admin/sales/admin-sales-page.ts": [
-    "chunk-WF63PZ2T.js",
-    "chunk-DAUE7PPW.js",
-    "chunk-W43WNFKI.js"
+    "chunk-R3QBKHRD.js",
+    "chunk-NZBKPKP6.js",
+    "chunk-PI4Y55AZ.js"
   ],
   "src/app/admin/sales/admin-invoices-page.ts": [
-    "chunk-O4HZZGDD.js"
+    "chunk-WIFF6YC3.js"
   ],
   "src/app/admin/sales/admin-invoice-detail-page.ts": [
-    "chunk-LBA5ND7X.js",
-    "chunk-CQ2W4MXD.js"
+    "chunk-2GAMFEOA.js",
+    "chunk-3T5YPGGX.js"
   ],
   "src/app/admin/sales/admin-sales.routes.ts": [
-    "chunk-3BWLKJAN.js"
+    "chunk-4R7FEZWO.js"
   ],
   "src/app/admin/inventory/admin-inventory-page.ts": [
-    "chunk-NKQJB4UY.js",
-    "chunk-EJD3GE5R.js",
-    "chunk-W43WNFKI.js"
+    "chunk-RYV5KXMN.js",
+    "chunk-AZBIAASJ.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-UO5M3KBC.js"
   ],
   "src/app/admin/inventory/admin-inventory.routes.ts": [
-    "chunk-OUKUHMZT.js"
+    "chunk-BTP4UDZT.js"
   ],
   "src/app/admin/purchases/admin-purchases-page.ts": [
-    "chunk-UEVYHIG5.js"
+    "chunk-QR7C7KH4.js"
   ],
   "src/app/admin/purchases/admin-purchase-form-page.ts": [
-    "chunk-JDQJSZ7T.js"
+    "chunk-VK4R3LOC.js"
   ],
   "src/app/admin/suppliers/admin-suppliers-page.ts": [
-    "chunk-WQNLMXJV.js"
+    "chunk-KD6MIQ4D.js"
   ],
   "src/app/admin/suppliers/admin-supplier-form-page.ts": [
-    "chunk-GX7CCEU3.js"
+    "chunk-JE5Y2VQE.js"
   ],
   "src/app/admin/suppliers/admin-suppliers.routes.ts": [
-    "chunk-ZQ3VTRJZ.js"
+    "chunk-2QN7OHIK.js"
   ],
   "src/app/admin/company/admin-company-settings-page.ts": [
-    "chunk-73DV43UW.js"
+    "chunk-G5V3UIY5.js"
   ],
   "src/app/admin/company/admin-company.routes.ts": [
-    "chunk-VBCHBUZG.js"
+    "chunk-PSJE2YLB.js"
   ],
   "src/app/admin/employees/admin-employees-page.ts": [
-    "chunk-H5OOSZYL.js"
+    "chunk-BUAM67ID.js"
   ],
   "src/app/admin/employees/admin-employee-form-page.ts": [
-    "chunk-ACWO3A7H.js"
+    "chunk-UEM5KA5V.js"
   ],
   "src/app/admin/employees/admin-employees.routes.ts": [
-    "chunk-F4FF3WTZ.js"
+    "chunk-A3CWISAL.js"
   ],
   "src/app/admin/categories/admin-category-form-page.ts": [
-    "chunk-ZRFZSBVX.js"
+    "chunk-EECP5Y34.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js"
   ],
   "src/app/admin/categories/admin-categories.routes.ts": [
-    "chunk-NYWSOUQE.js"
+    "chunk-V3FKDERQ.js"
   ],
   "src/app/admin/brands/admin-brands-page.ts": [
-    "chunk-DHZAFXMD.js"
+    "chunk-GR6REWXI.js"
   ],
   "src/app/admin/brands/admin-brand-form-page.ts": [
-    "chunk-FYT4YWWV.js"
+    "chunk-E27B6IAX.js"
   ],
   "src/app/admin/brands/admin-brands.routes.ts": [
-    "chunk-QFMP7JJB.js"
+    "chunk-SV4H546I.js"
   ],
   "src/app/admin/clients/admin-clients-page.ts": [
-    "chunk-WPUGHKY7.js"
+    "chunk-GXM2QFY7.js"
   ],
   "src/app/admin/clients/admin-client-form-page.ts": [
-    "chunk-VROIPWCJ.js"
+    "chunk-QA355LGD.js"
   ],
   "src/app/admin/clients/admin-clients.routes.ts": [
-    "chunk-Q643C3DZ.js"
+    "chunk-GBI5GN2R.js"
   ],
   "src/app/public/recursos/recursos.component.ts": [
-    "chunk-DC55JY54.js"
+    "chunk-YF4WW5XI.js"
   ],
   "src/app/public/public.routes.ts": [
-    "chunk-XZMVHVHV.js",
-    "chunk-GUMHHYLY.js",
-    "chunk-EECV4RMG.js",
-    "chunk-VRGTTU5P.js",
-    "chunk-E27AYZUW.js"
+    "chunk-46JCPOUR.js",
+    "chunk-EQ4A5ETV.js",
+    "chunk-OGE2LXHH.js",
+    "chunk-MYBRJXAJ.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/admin/layout/admin-layout.ts": [
-    "chunk-FX2ZAXQL.js",
-    "chunk-GUMHHYLY.js",
-    "chunk-EECV4RMG.js"
+    "chunk-BRRLU6GZ.js",
+    "chunk-EQ4A5ETV.js",
+    "chunk-OGE2LXHH.js"
   ],
   "src/app/admin/dashboard/admin-dashboard-page.ts": [
-    "chunk-C2BDW7ZJ.js"
+    "chunk-KOOMFTL7.js"
   ],
   "src/app/admin/products/admin-products-page.ts": [
-    "chunk-GTW7GILK.js",
-    "chunk-EJD3GE5R.js",
-    "chunk-W43WNFKI.js",
-    "chunk-OXRRQGKG.js"
+    "chunk-XNZ3F7PO.js",
+    "chunk-AZBIAASJ.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-UO5M3KBC.js"
   ],
   "src/app/admin/products/admin-product-form-page.ts": [
-    "chunk-ZRUIJBCK.js",
-    "chunk-EJD3GE5R.js"
+    "chunk-PPYDYZMW.js",
+    "chunk-AZBIAASJ.js",
+    "chunk-UO5M3KBC.js"
   ],
   "src/app/admin/products/admin-products.routes.ts": [
-    "chunk-UALDFV77.js"
+    "chunk-T5D7X4IV.js"
   ],
   "src/app/admin/categories/admin-categories-page.ts": [
-    "chunk-AADGVLTP.js"
+    "chunk-3YSZM5WL.js"
   ],
   "src/app/public/checkout/checkout-page.ts": [
-    "chunk-UB6TL37B.js",
-    "chunk-DAUE7PPW.js",
-    "chunk-VRGTTU5P.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-YRSDMLNX.js",
+    "chunk-NZBKPKP6.js",
+    "chunk-MYBRJXAJ.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/posts/post-page.ts": [
-    "chunk-HCCE7NWX.js",
-    "chunk-66B2ZSJN.js",
-    "chunk-SQOKMBJC.js",
-    "chunk-VRGTTU5P.js"
+    "chunk-CY2H2QN6.js",
+    "chunk-7WFWK6DR.js",
+    "chunk-TP3OLUTG.js",
+    "chunk-MYBRJXAJ.js"
   ],
   "src/app/public/tracking/tracking-page.ts": [
-    "chunk-3CDWH3CH.js",
-    "chunk-U4PZDU6F.js",
-    "chunk-CQ2W4MXD.js"
+    "chunk-SFW226LU.js",
+    "chunk-BYXBJQAS.js",
+    "chunk-3T5YPGGX.js"
   ],
   "src/app/public/privacy/privacy.component.ts": [
-    "chunk-QDL7OU27.js"
+    "chunk-Y7AD4MA4.js"
   ],
   "src/app/public/terms/terms.component.ts": [
-    "chunk-L2PA5AFH.js"
+    "chunk-RLA3LTRZ.js"
   ],
   "src/app/public/blog/blog.component.ts": [
-    "chunk-NEFPQKNH.js",
-    "chunk-66B2ZSJN.js"
+    "chunk-MW4ZPOZQ.js",
+    "chunk-7WFWK6DR.js"
   ],
   "src/app/public/sitemap/sitemap.component.ts": [
-    "chunk-CFHRLNYQ.js"
+    "chunk-PIVRKHHO.js"
   ],
   "src/app/public/fixtecnicos/fixtecnicos.component.ts": [
-    "chunk-K4F4QCIX.js",
-    "chunk-66B2ZSJN.js"
+    "chunk-UBTAUBLI.js",
+    "chunk-7WFWK6DR.js"
   ],
   "src/app/public/gsm/gsm.routes.ts": [
-    "chunk-MMSSM36N.js",
-    "chunk-EECV4RMG.js"
+    "chunk-E2ONAGU5.js",
+    "chunk-OGE2LXHH.js"
   ],
   "src/app/public/portfolio/portfolio.ts": [
-    "chunk-IY4UYDES.js",
-    "chunk-YLYUX466.js",
-    "chunk-EECV4RMG.js"
+    "chunk-6YGEHVR2.js",
+    "chunk-FXHONYIG.js",
+    "chunk-OGE2LXHH.js"
   ],
   "src/app/public/nosotros/nosotros.ts": [
-    "chunk-YFK74NJX.js",
-    "chunk-YLYUX466.js",
-    "chunk-EECV4RMG.js"
+    "chunk-6RVLGVJT.js",
+    "chunk-FXHONYIG.js",
+    "chunk-OGE2LXHH.js"
   ],
   "src/app/public/contacto/contacto.ts": [
-    "chunk-QASGDSB5.js",
-    "chunk-EECV4RMG.js"
+    "chunk-HBLTKCNM.js",
+    "chunk-OGE2LXHH.js"
   ],
   "src/app/public/servicios/servicios.ts": [
-    "chunk-HOU6RLF3.js",
-    "chunk-EECV4RMG.js",
-    "chunk-CV6KBVFM.js",
-    "chunk-OXRRQGKG.js"
+    "chunk-72QMNXQP.js",
+    "chunk-OGE2LXHH.js",
+    "chunk-CGSMRQ3D.js",
+    "chunk-POD4HRXZ.js"
   ],
   "src/app/public/servicios/pages/detail/service-detail.component.ts": [
-    "chunk-574SQ5LU.js",
-    "chunk-CV6KBVFM.js"
+    "chunk-ISC2FCOQ.js",
+    "chunk-CGSMRQ3D.js"
   ],
   "src/app/public/cursos/cursos.ts": [
-    "chunk-A2YHU36Q.js",
-    "chunk-SPT7TP4Q.js",
-    "chunk-TSFVBXON.js",
-    "chunk-W43WNFKI.js",
-    "chunk-MB7OW326.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-J7ZKSYPH.js",
-    "chunk-PAHDEXUL.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-TTMZUAUN.js",
+    "chunk-WP3PUXSU.js",
+    "chunk-FT2NH25R.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-UPSZB7IT.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-FNOMVEKC.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js",
+    "chunk-RVT6SOKL.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/cursos/course-detail/course-detail.component.ts": [
-    "chunk-UGPFGRDG.js",
-    "chunk-SPT7TP4Q.js",
-    "chunk-MB7OW326.js"
+    "chunk-2KJUVR6J.js",
+    "chunk-WP3PUXSU.js",
+    "chunk-UPSZB7IT.js"
   ],
   "src/app/public/repuestos/repuestos.ts": [
-    "chunk-TXMYKTSF.js",
-    "chunk-TSFVBXON.js",
-    "chunk-W43WNFKI.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-J7ZKSYPH.js",
-    "chunk-PAHDEXUL.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-75HRF26V.js",
+    "chunk-FT2NH25R.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-FNOMVEKC.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js",
+    "chunk-RVT6SOKL.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/products/pages/by-category/products-by-category-page.ts": [
-    "chunk-IQJF5OBN.js",
-    "chunk-LIQI56ZA.js",
-    "chunk-TSFVBXON.js",
-    "chunk-W43WNFKI.js",
-    "chunk-MB7OW326.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-J7ZKSYPH.js",
-    "chunk-PAHDEXUL.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-B6664NTC.js",
+    "chunk-C5AGD4LA.js",
+    "chunk-FT2NH25R.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-UPSZB7IT.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-FNOMVEKC.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js",
+    "chunk-RVT6SOKL.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/products/pages/details/products-details-page.ts": [
-    "chunk-KVS7FPYD.js",
-    "chunk-LIQI56ZA.js",
-    "chunk-MB7OW326.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-J7ZKSYPH.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-DUHJOH5O.js",
+    "chunk-C5AGD4LA.js",
+    "chunk-UPSZB7IT.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-FNOMVEKC.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/products/pages/featured/products-featured-page.ts": [
-    "chunk-HLFQJU4X.js",
-    "chunk-TSFVBXON.js",
-    "chunk-W43WNFKI.js",
-    "chunk-MB7OW326.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-PAHDEXUL.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-SR2YZZMD.js",
+    "chunk-FT2NH25R.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-UPSZB7IT.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-RVT6SOKL.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/products/products.routes.ts": [
-    "chunk-7WAA6YND.js"
+    "chunk-ET6XKEZR.js"
   ],
   "src/app/public/auth/login/login.component.ts": [
-    "chunk-YLANOIAG.js"
+    "chunk-K6MAFVWK.js"
   ],
   "src/app/public/auth/register/register.component.ts": [
-    "chunk-LIU3WFN4.js"
+    "chunk-LDCLXYAX.js"
   ],
   "src/app/public/profile/profile.component.ts": [
-    "chunk-WUDLO4MG.js"
+    "chunk-XPCKVDDC.js"
   ],
   "node_modules/@capacitor/app/dist/esm/web.js": [
-    "chunk-LG7YINS7.js"
+    "chunk-MRPGOKYE.js"
   ],
   "node_modules/@capacitor/browser/dist/esm/web.js": [
-    "chunk-PETRFRYC.js"
+    "chunk-UR6Z7I77.js"
   ],
   "src/app/public/landing/celular/celular-landing.component.ts": [
-    "chunk-6SRRXU64.js",
-    "chunk-SQOKMBJC.js",
-    "chunk-VRGTTU5P.js",
-    "chunk-LIQI56ZA.js"
+    "chunk-TXZRYWRH.js",
+    "chunk-TP3OLUTG.js",
+    "chunk-MYBRJXAJ.js",
+    "chunk-C5AGD4LA.js"
   ],
   "src/app/public/categories/pages/home/public-categories-home-page.ts": [
-    "chunk-VI2NEDYI.js",
-    "chunk-TSFVBXON.js",
-    "chunk-W43WNFKI.js",
-    "chunk-MB7OW326.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-J7ZKSYPH.js"
+    "chunk-J5ZAWPQG.js",
+    "chunk-FT2NH25R.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-UPSZB7IT.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-FNOMVEKC.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js"
   ],
   "src/app/public/categories/categories.routes.ts": [
-    "chunk-NCKA7BG2.js"
+    "chunk-BX3PJOIL.js"
   ],
   "src/app/public/products/pages/all/products-all-page.ts": [
-    "chunk-SAPNKFNE.js",
-    "chunk-LIQI56ZA.js",
-    "chunk-TSFVBXON.js",
-    "chunk-W43WNFKI.js",
-    "chunk-MB7OW326.js",
-    "chunk-OXRRQGKG.js",
-    "chunk-PAHDEXUL.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-T5CHE2I5.js",
+    "chunk-C5AGD4LA.js",
+    "chunk-FT2NH25R.js",
+    "chunk-PI4Y55AZ.js",
+    "chunk-UPSZB7IT.js",
+    "chunk-POD4HRXZ.js",
+    "chunk-RVT6SOKL.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ],
   "src/app/public/products/pages/index/products-index-page.ts": [
-    "chunk-S4GEAWGH.js",
-    "chunk-J7ZKSYPH.js",
-    "chunk-PAHDEXUL.js",
-    "chunk-XYL2VWIS.js",
-    "chunk-2X54MGFE.js",
-    "chunk-E27AYZUW.js"
+    "chunk-O4L2BHZ5.js",
+    "chunk-FNOMVEKC.js",
+    "chunk-WT46BASI.js",
+    "chunk-UO5M3KBC.js",
+    "chunk-RVT6SOKL.js",
+    "chunk-OCSLIUPP.js",
+    "chunk-BOPEFEYP.js",
+    "chunk-TQ5PDKCI.js"
   ]
 },
   assets: {
-    'index.csr.html': {size: 8470, hash: 'ab7f7617b1e024e6328f673c10e1c2c394851ccdd7a822f190208b42d24179cb', text: () => import('./assets-chunks/index_csr_html.mjs').then(m => m.default)},
-    'index.server.html': {size: 9010, hash: 'a55124da9db38818f213a5a0f5ad25f40f6f2d229c3490b90b8135911b9106e1', text: () => import('./assets-chunks/index_server_html.mjs').then(m => m.default)}
+    'index.csr.html': {size: 15847, hash: 'babfdcf77bd7feeb23431e038e8cd96687f11c6a27b3b3559a512dc8305f17d0', text: () => import('./assets-chunks/index_csr_html.mjs').then(m => m.default)},
+    'index.server.html': {size: 16387, hash: '38a13b8c556d8165ffeee206eec30f8061325614df0ca9056225b08d540a70ee', text: () => import('./assets-chunks/index_server_html.mjs').then(m => m.default)}
   },
 };

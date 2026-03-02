@@ -5,7 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { TenantService } from '@app/core/services/tenant.service';
-
+import { StringUtils } from '@app/shared/utils/string.utils';
 import {
   iCategoriesResponse,
   iRequestParams,
@@ -185,6 +185,72 @@ export class CategoryService {
       catchError((err) => {
         this.logger.error('Supabase Error getAll:', err);
         return of([]);
+      })
+    );
+  }
+
+  public create(category: Partial<iCategory>): Observable<iCategory> {
+    const tenantId = this.tenantService.getTenantId();
+    const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+    const slug = category.slug || StringUtils.slugify(category.name || '');
+    
+    const payload: any = {
+      ...category,
+      slug: slug,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    if (!isFallback) {
+        payload['tenant_id'] = tenantId;
+    }
+
+    return from(
+      this.supabase
+        .from('categories')
+        .insert(payload)
+        .select('*')
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data as iCategory;
+      }),
+      catchError((err) => {
+        this.logger.error('Supabase Error create category:', err);
+        throw err;
+      })
+    );
+  }
+
+  public update(id: string, category: Partial<iCategory>): Observable<iCategory> {
+    const tenantId = this.tenantService.getTenantId();
+    const payload = {
+      ...category,
+      updated_at: new Date().toISOString()
+    };
+    
+    // Safety: never update ID or tenant_id
+    delete (payload as any).id;
+    delete (payload as any).tenant_id;
+
+    let query = this.supabase
+      .from('categories')
+      .update(payload)
+      .eq('id', id);
+
+    if (tenantId !== '00000000-0000-0000-0000-000000000000') {
+      query = query.eq('tenant_id', tenantId);
+    }
+
+    return from(query.select('*').single() as unknown as Promise<any>).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data as iCategory;
+      }),
+      catchError((err) => {
+        this.logger.error('Supabase Error update category:', err);
+        throw err;
       })
     );
   }

@@ -53,8 +53,10 @@ export function app(): express.Express {
               'Authorization': `Bearer ${environment.supabaseKey}`
             }
           };
-          // Fetch products that are public / active
-          const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?select=slug`, fetchOptions);
+          // Fetch products that are public / active / not deleted
+          // We use a high limit (10,000) to ensure we get all products for the sitemap
+          const queryParams = 'select=slug&is_active=eq.true&deleted_at=is.null&limit=10000';
+          const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?${queryParams}`, fetchOptions);
           if (productsRes.ok) {
             const products = await productsRes.json();
             products.forEach((p: any) => {

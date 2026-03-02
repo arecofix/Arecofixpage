@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["public-category-card.ts"],
-  "sourcesContent": ["\n    :host { display: block; height: 100%; }\n    .line-clamp-2 {\n      display: -webkit-box;\n      -webkit-line-clamp: 2;\n      -webkit-box-orient: vertical;\n      overflow: hidden;\n    }\n  "],
-  "mappings": ";AACI;AAAQ,WAAA;AAAgB,UAAA;AAAc;AACtC,CAAA;AACE,WAAA;AACA,sBAAA;AACA,sBAAA;AACA,YAAA;AACF;",
-  "names": []
-}

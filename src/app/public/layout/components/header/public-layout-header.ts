@@ -269,6 +269,15 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     this.showResults.set(!!this.searchQuery());
   }
 
+  public goToSearch(): void {
+    const query = this.searchQuery().trim();
+    if (query) {
+      this.showResults.set(false);
+      this.closeMobileMenu();
+      this.router.navigate(['/productos'], { queryParams: { q: query, _page: 1 } });
+    }
+  }
+
   public selectProduct(product: Product) {
     this.searchQuery.set('');
     this.showResults.set(false);

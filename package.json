@@ -1,6 +1,7 @@
 {
   "name": "arecofix",
   "version": "0.0.0",
+  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
     "dev": "rm -rf .angular && ng serve",
@@ -10,7 +11,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "deploy": "npm run build && npm run generate-sitemap && node scripts/remove-preloads.mjs",
-    "generate-sitemap": "node scripts/generate-sitemap.mjs"
+    "generate-sitemap": "node scripts/generate-sitemap.mjs",
+    "electron:dev": "ng build --configuration development --base-href ./ && electron .",
+    "electron:build": "ng build --configuration production --base-href ./ && electron-builder build --windows"
   },
   "prettier": {
     "overrides": [
@@ -29,9 +32,6 @@
     "ajv": "^8.17.2",
     "minimatch": "^10.2.2"
   },
-  "allowedCommonJsDependencies": [
-    "qrcode"
-  ],
   "private": true,
   "dependencies": {
     "@angular/cdk": "^21.1.5",
@@ -77,6 +77,8 @@
     "angular-cli-ghpages": "^3.0.2",
     "autoprefixer": "^10.4.24",
     "daisyui": "^5.0.0",
+    "electron": "^40.6.1",
+    "electron-builder": "^26.8.1",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
@@ -87,5 +89,23 @@
     "tailwindcss": "^4.0.0",
     "typescript": "~5.9.3",
     "url": "^0.11.4"
+  },
+  "build": {
+    "appId": "com.arecofix.desktop",
+    "productName": "Arecofix",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/arecofix/browser/**/*",
+      "electron/main.js"
+    ],
+    "win": {
+      "icon": "dist/arecofix/browser/assets/img/brands/logo/Logo.ico",
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, from, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
@@ -22,7 +22,16 @@ export class SupabaseProductRepository extends ProductRepository {
   protected useSoftDeletes = true;
 
   private applyTenantFilter(query: any) {
-      let enhancedQuery = query.eq('tenant_id', this.tenantService.getTenantId());
+      const tenantId = this.tenantService.getTenantId();
+      let enhancedQuery = query;
+      
+      // Si el tenantId es real, filtramos por él explícitamente.
+      // Si es el fallback (ceros), NO filtramos para permitir que el RLS 
+      // del servidor use get_my_tenant() de forma transparente.
+      if (tenantId !== '00000000-0000-0000-0000-000000000000') {
+          enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+      }
+      
       if (this.useSoftDeletes) {
           enhancedQuery = enhancedQuery.is('deleted_at', null);
       }
@@ -323,27 +332,78 @@ export class SupabaseProductRepository extends ProductRepository {
     if (!user) return;
 
     const profile = await this.authService.getUserProfile(user.id);
-    if (!profile || !profile.branch_id) return;
+    
+    let targetBranchId = profile?.branch_id;
 
-    await this.supabase
+    // Si el usuario (ej. Admin) no tiene una sucursal asignada explícitamente:
+    // 1. Buscamos si el producto ya está asignado a alguna sucursal.
+    // 2. Si no, buscamos la primera sucursal disponible en el sistema.
+    if (!targetBranchId) {
+       const { data: existingBranches } = await this.supabase
+         .from('product_stock_per_branch')
+         .select('branch_id')
+         .eq('product_id', productId)
+         .limit(1);
+         
+       if (existingBranches && existingBranches.length > 0) {
+         targetBranchId = existingBranches[0].branch_id;
+       } else {
+         const { data: anyBranch } = await this.supabase
+           .from('branches')
+           .select('id')
+           .limit(1);
+           
+         if (anyBranch && anyBranch.length > 0) {
+           targetBranchId = anyBranch[0].id;
+         } else {
+           return; // No hay sucursales creadas en la base de datos
+         }
+       }
+    }
+
+    // Solución para Upsert sin Unique Constraint: Buscar primero, luego Update o Insert
+    const { data: existing } = await this.supabase
         .from('product_stock_per_branch')
-        .upsert({
-            product_id: productId,
-            branch_id: profile.branch_id,
-            tenant_id: this.tenantService.getTenantId(),
-            quantity: quantity,
-            updated_at: new Date().toISOString()
-        }, { onConflict: 'product_id,branch_id' });
+        .select('id')
+        .eq('product_id', productId)
+        .eq('branch_id', targetBranchId)
+        .maybeSingle();
+
+    if (existing && existing.id) {
+        await this.supabase
+            .from('product_stock_per_branch')
+            .update({
+                quantity: quantity,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+    } else {
+        await this.supabase
+            .from('product_stock_per_branch')
+            .insert({
+                product_id: productId,
+                branch_id: targetBranchId,
+                tenant_id: this.tenantService.getTenantId(),
+                quantity: quantity,
+                updated_at: new Date().toISOString()
+            });
+    }
   }
 
   create(product: Product): Observable<Product> {
     const { stock, ...productData } = product;
-    const payload = {
+    const tenantId = this.tenantService.getTenantId();
+    const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+
+    const payload: any = {
       ...productData,
-      tenant_id: this.tenantService.getTenantId(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
+
+    if (!isFallback) {
+        payload['tenant_id'] = tenantId;
+    }
 
     return from(
       (this.supabase
@@ -352,11 +412,11 @@ export class SupabaseProductRepository extends ProductRepository {
         .select('*')
         .single() as any)
     ).pipe(
-      map((res: any) => {
+      switchMap(async (res: any) => {
         const { data, error } = res;
         if (error) throw error;
         if (stock !== undefined) {
-            this.syncBranchStock(data.id, stock);
+             await this.syncBranchStock(data.id, stock);
         }
         return this._mapToEntity(data);
       })
@@ -379,11 +439,11 @@ export class SupabaseProductRepository extends ProductRepository {
     let filteredQuery = this.applyTenantFilter(query).select('*').single();
 
     return from(filteredQuery as any).pipe(
-      map((res: any) => {
+      switchMap(async (res: any) => {
         const { data, error } = res;
         if (error) throw error;
         if (stock !== undefined) {
-            this.syncBranchStock(id, stock);
+            await this.syncBranchStock(id, stock);
         }
         return this._mapToEntity(data);
       })
@@ -406,21 +466,33 @@ export class SupabaseProductRepository extends ProductRepository {
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
     if (!products.length) return of([]);
 
+    const tenantId = this.tenantService.getTenantId();
+    const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+
     const dataToUpsert = products.map(p => {
-        const { stock, ...rest } = p;
-        return {
-            ...rest,
-            tenant_id: this.tenantService.getTenantId(),
+        const payload: any = {
+            ...p,
             updated_at: new Date().toISOString()
         };
+        if (!isFallback) {
+            payload['tenant_id'] = tenantId;
+        }
+        return payload;
     });
 
     return from(
       (this.supabase.from('products').upsert(dataToUpsert).select() as any)
     ).pipe(
-      map((res: any) => {
+      switchMap(async (res: any) => {
         const { data, error } = res;
         if (error) throw error;
+        
+        for (const row of (data || [])) {
+            if (row.stock !== undefined && row.stock !== null) {
+                await this.syncBranchStock(row.id, row.stock);
+            }
+        }
+        
         return (data || []).map((p: any) => this._mapToEntity(p));
       })
     );
@@ -438,8 +510,14 @@ export class SupabaseProductRepository extends ProductRepository {
       'created_at', 'updated_at', 'deleted_at', 'tenant_id'
     ]);
 
-    const updates = products.map(p => {
-        if (!p.id) return Promise.resolve({ error: { message: 'Missing ID' } });
+    const performUpdates = async () => {
+      const results = [];
+      for (const p of products) {
+        if (!p.id) {
+          results.push({ error: { message: 'Missing ID' } });
+          continue;
+        }
+        
         const { id, tenant_id, ...rest } = p as any;
 
         // Keep only known DB columns
@@ -450,10 +528,20 @@ export class SupabaseProductRepository extends ProductRepository {
         cleanPayload['updated_at'] = new Date().toISOString();
 
         let query = this.supabase.from('products').update(cleanPayload).eq('id', id);
-        return this.applyTenantFilter(query);
-    });
+        query = this.applyTenantFilter(query);
+        
+        const res = await query;
+        results.push(res);
 
-    return from(Promise.all(updates)).pipe(
+        // Synchronize branch stock if stock is provided and there was no error
+        if (!res.error && rest.stock !== undefined) {
+          await this.syncBranchStock(id, rest.stock);
+        }
+      }
+      return results;
+    };
+
+    return from(performUpdates()).pipe(
       map((results) => {
         const errors = results.filter((r: any) => r && r.error);
         if (errors.length > 0) {
@@ -462,6 +550,27 @@ export class SupabaseProductRepository extends ProductRepository {
         return void 0;
       })
     );
+  }
+
+  /** 
+   * Updates the category_id for multiple products at once.
+   * Uses .in('id', ids) filter and ensures tenant_id constraint.
+   */
+  bulkUpdateCategory(ids: string[], categoryId: string): Observable<void> {
+    if (!ids.length) return of(void 0);
+    const tenantId = this.tenantService.getTenantId();
+    
+    const process = async () => {
+      const { error } = await this.supabase
+        .from('products')
+        .update({ category_id: categoryId, updated_at: new Date().toISOString() })
+        .in('id', ids)
+        .eq('tenant_id', tenantId);
+        
+      if (error) throw error;
+    };
+    
+    return from(process()).pipe(map(() => void 0));
   }
 
   /** Soft-delete multiple products at once (sets deleted_at timestamp) */
@@ -475,6 +584,7 @@ export class SupabaseProductRepository extends ProductRepository {
     const tenantId = this.tenantService.getTenantId();
     const processChunks = async () => {
       for (const chunk of chunks) {
+        // Marcamos como borrados asegurando que solo afecte a los productos del tenant actual
         const { error } = await (this.supabase
           .from('products')
           .update({ deleted_at: new Date().toISOString(), updated_at: new Date().toISOString() })

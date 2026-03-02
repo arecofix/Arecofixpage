@@ -260,13 +260,14 @@
       <div class="join transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500/40 rounded-full">
         <input type="text" placeholder="Buscar..."
                [(ngModel)]="searchQuery" (input)="onSearchInput()"
+               (keyup.enter)="goToSearch()"
                class="input input-sm input-bordered rounded-l-full
                       bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white
                       border-transparent focus:border-transparent
                       w-28 2xl:w-48 focus:w-48 2xl:focus:w-64
                       transition-all duration-300 placeholder-gray-500 text-sm" />
-        <button class="btn btn-sm btn-primary rounded-r-full border-none text-white px-3"
-                aria-label="Buscar">
+        <button (click)="goToSearch()" class="btn btn-sm btn-primary rounded-r-full border-none text-white px-3"
+                aria-label="Ejecutar búsqueda">
           <i class="fas fa-search"></i>
         </button>
       </div>
@@ -286,7 +287,7 @@
                        class="w-9 h-9 object-contain rounded-lg bg-white dark:bg-white/5
                               border border-gray-100 dark:border-white/10" />
                   <div class="flex-1 min-w-0">
-                    <span class="font-medium text-sm text-gray-800 dark:text-gray-200 line-clamp-1">{{ product.name }}</span>
+                    <span class="font-medium text-sm text-gray-800 dark:text-gray-200">{{ product.name }}</span>
                     <span class="text-xs font-bold text-blue-600 dark:text-blue-400">${{ product.price }}</span>
                   </div>
                 </a>
@@ -405,10 +406,11 @@
                [appAutoFocus]="searchService.focusRequested$"
                [appAutoFocusImmediate]="searchFocusRequested()"
                [(ngModel)]="searchQuery" (input)="onSearchInput()"
+               (keyup.enter)="goToSearch()"
                class="input input-sm input-bordered w-full bg-gray-50 dark:bg-white/5
                       border-gray-200 dark:border-white/10 text-gray-900 dark:text-white
                       join-item rounded-l-lg text-sm placeholder-gray-400" />
-        <button class="btn btn-sm btn-primary join-item rounded-r-lg border-none px-3">
+        <button (click)="goToSearch()" class="btn btn-sm btn-primary join-item rounded-r-lg border-none px-3">
           <i class="fas fa-search text-xs"></i>
         </button>
       </div>
@@ -423,7 +425,7 @@
               <img [src]="product.image_url || '/assets/img/no-image.png'" [alt]="product.name"
                    class="w-7 h-7 object-contain rounded bg-white border" />
               <div class="flex-1 min-w-0">
-                <span class="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-1">{{ product.name }}</span>
+                <span class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ product.name }}</span>
                 <span class="text-[11px] text-blue-600 dark:text-blue-400 font-bold">${{ product.price }}</span>
               </div>
             </a>
@@ -538,7 +540,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                           <a [routerLink]="['/productos/detalle', item.product.slug]" (click)="toggleCart()"
-                             class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 hover:text-blue-600
+                             class="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600
                                     transition-colors">
                             {{ item.product.name }}
                           </a>

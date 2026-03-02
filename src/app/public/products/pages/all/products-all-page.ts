@@ -83,6 +83,7 @@ export class ProductsAllPage {
 
         return this.productService.getData({
           _page: currentPage,
+          _per_page: 24,
           _sort,
           _order,
           min_price,

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../node_modules/@capacitor/browser/dist/esm/index.js"],
+  "sourcesContent": ["import { registerPlugin } from '@capacitor/core';\nconst Browser = registerPlugin('Browser', {\n    web: () => import('./web').then((m) => new m.BrowserWeb()),\n});\nexport * from './definitions';\nexport { Browser };\n"],
+  "mappings": ";;;;;;AACA,IAAM,UAAU,eAAe,WAAW;AAAA,EACtC,KAAK,MAAM,OAAO,mBAAO,EAAE,KAAK,CAAC,MAAM,IAAI,EAAE,WAAW,CAAC;AAC7D,CAAC;",
+  "names": []
+}

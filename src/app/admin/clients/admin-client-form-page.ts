@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-admin-client-form-page',
@@ -14,6 +15,7 @@ export class AdminClientFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
 
     id: string | null = null;
     form = signal({
@@ -40,8 +42,8 @@ export class AdminClientFormPage implements OnInit {
                     last_name: data.last_name || '',
                     email: data.email || '',
                     phone: data.phone || '',
-                    address: data.address || '', // Assuming address exists in profiles
-                    dni: data.dni || '', // Assuming dni exists in profiles
+                    address: data.address || '', 
+                    dni: data.dni || '',
                 });
             }
         }
@@ -59,11 +61,21 @@ export class AdminClientFormPage implements OnInit {
                 const { error } = await supabase.from('profiles').update(payload).eq('id', this.id);
                 if (error) throw error;
             } else {
-                // Creating a new user is complex (requires auth.users insert).
-                // For now, we might just show an error or handle it differently.
-                // Or we can use a separate 'clients' table if we want to manage non-user clients.
-                // But for now, let's assume we are editing existing users.
-                throw new Error('Creación de nuevos usuarios debe hacerse desde el registro.');
+                const { error } = await supabase.rpc('create_client', {
+                    p_first_name: payload.first_name,
+                    p_last_name: payload.last_name,
+                    p_email: payload.email,
+                    p_phone: payload.phone,
+                    p_address: payload.address,
+                    p_dni: payload.dni,
+                    p_tenant_id: this.tenantService.getTenantId()
+                });
+                
+                if (error) {
+                    // Fallback local error handling message
+                    console.error(error);
+                    throw new Error('Error al registrar cliente: ' + error.message + '. Asegúrate de correr la actualización SQL de la base de datos (docs/create-client-rpc.sql).');
+                }
             }
             this.router.navigate(['/admin/clients']);
         } catch (e: any) {

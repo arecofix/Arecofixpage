@@ -100,12 +100,24 @@ export class BulkEditModalComponent implements OnChanges {
   async execute() {
     this.isProcessing.set(true);
     this.showConfirmation.set(false);
+    const ids = this.selectedIds();
 
     try {
       if (this.activeTab() === 'delete') {
         await this.productService.bulkDelete(this.selectedIds());
       } else {
-        await this._executeEdit();
+        // Optimization: if ONLY category is changing and nothing else, use the dedicated bulk method
+        const onlyCategory = this.targetCategoryId() !== '' && 
+                             this.priceMode() === 'none' && 
+                             this.stockMode() === 'none' && 
+                             this.targetBrandId() === '' && 
+                             this.targetStatus() === 'none';
+        
+        if (onlyCategory) {
+          await this.productService.bulkUpdateCategory(ids, this.targetCategoryId());
+        } else {
+          await this._executeEdit();
+        }
       }
       this.onSuccess.emit();
       this.close();

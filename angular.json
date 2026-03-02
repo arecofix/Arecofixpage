@@ -65,6 +65,13 @@
             "styles": [
               "src/styles.css",
               "src/assets/css/fontawesome.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "jspdf",
+              "qrcode",
+              "raf",
+              "rgbcolor",
+              "core-js"
             ]
           },
           "configurations": {

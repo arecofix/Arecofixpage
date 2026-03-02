@@ -1,9 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
+import { CategoryService } from '@app/public/categories/services/category.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-admin-category-form-page',
@@ -14,8 +13,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 export class AdminCategoryFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private auth = inject(AuthService);
-    private tenantService = inject(TenantService);
+    private categoryService = inject(CategoryService);
 
     id: string | null = null;
     categories = signal<any[]>([]);
@@ -24,8 +22,8 @@ export class AdminCategoryFormPage implements OnInit {
         slug: '',
         description: '',
         image_url: '',
-        type: 'product',
-        parent_id: '' as string | null,
+        type: 'product' as 'product' | 'course' | 'service',
+        parent_id: undefined as string | undefined,
         is_active: true,
     });
 
@@ -35,34 +33,32 @@ export class AdminCategoryFormPage implements OnInit {
 
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
-        const supabase = this.auth.getSupabaseClient();
         
         // Fetch all categories for the parent dropdown
-        const { data: categoriesData } = await supabase.from('categories')
-            .select('id, name')
-            .eq('tenant_id', this.tenantService.getTenantId())
-            .eq('is_active', true)
-            .order('name');
-        if (categoriesData) {
-            this.categories.set(categoriesData);
+        try {
+            const list = await firstValueFrom(this.categoryService.getAll());
+            this.categories.set(list);
+        } catch (e) {
+            console.error('Error fetching parent categories:', e);
         }
 
         if (this.id) {
-            const { data, error } = await supabase.from('categories')
-                .select('*')
-                .eq('tenant_id', this.tenantService.getTenantId())
-                .eq('id', this.id)
-                .single();
-            if (data) {
-                this.form.set({
-                    name: data.name,
-                    slug: data.slug,
-                    description: data.description || '',
-                    image_url: data.image_url || data.icon || '',
-                    type: data.type,
-                    parent_id: data.parent_id || null,
-                    is_active: data.is_active,
-                });
+            try {
+                const category = await firstValueFrom(this.categoryService.getById(this.id));
+                if (category) {
+                    this.form.set({
+                        name: category.name,
+                        slug: category.slug,
+                        description: category.description || '',
+                        image_url: category.image_url || (category as any).icon || '',
+                        type: category.type as any,
+                        parent_id: category.parent_id || undefined,
+                        is_active: !!category.is_active,
+                    });
+                }
+            } catch (e) {
+                console.error('Error loading category:', e);
+                this.error.set('No se pudo cargar la categoría.');
             }
         }
         this.loading.set(false);
@@ -71,39 +67,25 @@ export class AdminCategoryFormPage implements OnInit {
     async save() {
         this.saving.set(true);
         this.error.set(null);
-        const supabase = this.auth.getSupabaseClient();
+        
         const payload = { ...this.form() };
-
-        if (!payload.slug) {
-            payload.slug = this.slugify(payload.name);
-        }
 
         try {
             if (this.id) {
-                const { error } = await supabase.from('categories')
-                    .update(payload)
-                    .eq('id', this.id)
-                    .eq('tenant_id', this.tenantService.getTenantId());
-                if (error) throw error;
+                await firstValueFrom(this.categoryService.update(this.id, payload));
             } else {
-                const { error } = await supabase.from('categories').insert({
-                    ...payload,
-                    tenant_id: this.tenantService.getTenantId()
-                });
-                if (error) throw error;
+                await firstValueFrom(this.categoryService.create(payload));
             }
             this.router.navigate(['/admin/categories']);
         } catch (e: any) {
-            this.error.set(e.message);
+            console.error('Save error:', e);
+            if (e.message?.includes('row-level security') || e.code === '42501') {
+                this.error.set('Error de permisos: No tienes autorización para realizar esta acción en este tenant.');
+            } else {
+                this.error.set(e.message || 'Ocurrió un error al guardar la categoría.');
+            }
         } finally {
             this.saving.set(false);
         }
-    }
-
-    private slugify(text: string): string {
-        return text.toString().toLowerCase().trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-');
     }
 }

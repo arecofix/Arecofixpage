@@ -110,9 +110,15 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
      * Create new record (Automáticamente empaca el Tenant ID)
      */
     create(item: Partial<T>): Observable<T> {
+        let tenantId = this.tenantService.getTenantId();
+        
+        // Si el tenantId es el fallback (ceros), preferimos NO enviarlo en el payload
+        // para que la base de datos aplique el DEFAULT (public.get_my_tenant()).
+        const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+
         const payload = this.isGlobalTable 
             ? item 
-            : { ...item, tenant_id: this.tenantService.getTenantId() };
+            : (isFallback ? { ...item } : { ...item, tenant_id: tenantId });
 
         return from(
             this.supabase

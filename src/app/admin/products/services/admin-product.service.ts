@@ -452,6 +452,10 @@ export class AdminProductService {
         await firstValueFrom(this.productRepo.bulkDelete(ids));
     }
 
+    async bulkUpdateCategory(ids: string[], categoryId: string): Promise<void> {
+        await firstValueFrom(this.productRepo.bulkUpdateCategory(ids, categoryId));
+    }
+
     async bulkIncreasePrice(ids: string[], percentage: number): Promise<void> {
         const response = await firstValueFrom(this.productRepo.findWithFilters({ ids: ids }));
         const products = response.data;

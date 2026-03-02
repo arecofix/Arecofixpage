@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/admin/clients/admin-clients.routes.ts"],
-  "sourcesContent": ["import { Routes } from '@angular/router';\r\n\r\nexport const ADMIN_CLIENTS_ROUTES: Routes = [\r\n  {\r\n    path: '',\r\n    title: 'Clientes',\r\n    loadComponent: () => import('./admin-clients-page').then(m => m.AdminClientsPage)\r\n  },\r\n  {\r\n    path: 'new',\r\n    title: 'Nuevo Cliente',\r\n    loadComponent: () => import('./admin-client-form-page').then(m => m.AdminClientFormPage)\r\n  },\r\n  {\r\n    path: ':id',\r\n    title: 'Editar Cliente',\r\n    loadComponent: () => import('./admin-client-form-page').then(m => m.AdminClientFormPage)\r\n  }\r\n];\r\n"],
-  "mappings": ";;;;;AAEO,IAAM,uBAA+B;EAC1C;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAAsB,EAAE,KAAK,OAAK,EAAE,gBAAgB;;EAElF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA0B,EAAE,KAAK,OAAK,EAAE,mBAAmB;;EAEzF;IACE,MAAM;IACN,OAAO;IACP,eAAe,MAAM,OAAO,qBAA0B,EAAE,KAAK,OAAK,EAAE,mBAAmB;;;",
-  "names": []
-}

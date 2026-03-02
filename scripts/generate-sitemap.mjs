@@ -49,13 +49,40 @@ async function generateSitemap() {
     });
   }
   
-  // 3. Fetch Products
-  const { data: products } = await supabase.from('products').select('slug');
-  if (products) {
-    products.forEach(p => {
-        if (p.slug) routes.push(`/productos/detalle/${p.slug}`);
-    });
+  // 3. Fetch All Active Products (with Pagination)
+  let allProducts = [];
+  let fromIdx = 0;
+  let hasMore = true;
+  const CHUNK = 1000;
+
+  while (hasMore) {
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('slug')
+      .eq('is_active', true)
+      .is('deleted_at', null)
+      .range(fromIdx, fromIdx + CHUNK - 1);
+
+    if (error) {
+      console.error('Error fetching products:', error);
+      break;
+    }
+
+    if (products && products.length > 0) {
+      allProducts = [...allProducts, ...products];
+      if (products.length < CHUNK) {
+        hasMore = false;
+      } else {
+        fromIdx += CHUNK;
+      }
+    } else {
+      hasMore = false;
+    }
   }
+
+  allProducts.forEach(p => {
+    if (p.slug) routes.push(`/productos/detalle/${p.slug}`);
+  });
 
    // 4. Fetch Categories
    const { data: categories } = await supabase.from('categories').select('slug');
@@ -87,7 +114,10 @@ async function generateSitemap() {
   }).join('')}
 </urlset>`;
 
-  const outputPath = path.join(process.cwd(), 'src', 'assets', 'sitemap.xml');
+  const publicDir = path.join(process.cwd(), 'public');
+  if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir);
+  
+  const outputPath = path.join(publicDir, 'sitemap.xml');
   fs.writeFileSync(outputPath, sitemap);
   console.log(`Sitemap generated at ${outputPath} with ${routes.length} URLs.`);
 

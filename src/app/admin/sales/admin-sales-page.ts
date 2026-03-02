@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { OrderService } from '@app/core/services/order.service';
@@ -71,11 +71,20 @@ export class AdminSalesPage implements OnInit {
         // Reset pagination on search
         effect(() => {
             this.searchQuery();
-            this.currentPage.set(1);
-        });
+            // Optional: reset to page 1 on search
+            // We should only do this if it's an actual user search interaction, 
+            // but the effect trigger is enough for now. The URL will still govern the current page via route subscription.
+        }, { allowSignalWrites: true });
     }
 
+    private route = inject(ActivatedRoute);
+
     async ngOnInit() {
+        this.route.queryParams.subscribe((params: any) => {
+            const page = params['_page'] ? parseInt(params['_page'], 10) : 1;
+            this.currentPage.set(page || 1);
+        });
+
         await this.loadProducts();
     }
 

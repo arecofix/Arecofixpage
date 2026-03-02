@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["product-card.ts"],
-  "sourcesContent": ["\n    .line-clamp-2 {\n      display: -webkit-box;\n      -webkit-line-clamp: 2;\n      -webkit-box-orient: vertical;\n      overflow: hidden;\n    }\n    \n    .line-clamp-3 {\n      display: -webkit-box;\n      -webkit-line-clamp: 3;\n      -webkit-box-orient: vertical;\n      overflow: hidden;\n    }\n  "],
-  "mappings": ";AACI,CAAA;AACE,WAAA;AACA,sBAAA;AACA,sBAAA;AACA,YAAA;AACF;AAEA,CAAA;AACE,WAAA;AACA,sBAAA;AACA,sBAAA;AACA,YAAA;AACF;",
-  "names": []
-}

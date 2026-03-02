@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["public-home-page.ts"],
-  "sourcesContent": ["\n    .tech-grid {\n      display: grid;\n      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));\n      gap: 2rem;\n    }\n  "],
-  "mappings": ";AACI,CAAA;AACE,WAAA;AACA,yBAAA,OAAA,SAAA,EAAA,OAAA,KAAA,EAAA;AACA,OAAA;AACF;",
-  "names": []
-}

@@ -24,6 +24,7 @@ export class AdminRepairFormPage implements OnInit {
     private companyService = inject(CompanyService);
     private repairService = inject(AdminRepairService);
     private productService = inject(AdminProductService);
+    private auth = inject(AuthService);
 
     id: string | null = null;
     date = new Date();
@@ -71,21 +72,58 @@ export class AdminRepairFormPage implements OnInit {
     });
     showProductModal = signal(false);
 
-    async ngOnInit() {
-        this.id = this.route.snapshot.paramMap.get('id');
-        await this.loadCompanySettings();
-        await this.loadProducts(); // For parts selection
-        if (this.id) {
-            await this.loadRepair();
-        }
-        this.loading.set(false);
-    }
-
     loading = signal(true);
     saving = signal(false);
     error = signal<string | null>(null);
     company = signal<any>(null);
     uploadingImages = signal(false);
+    
+    clients: any[] = []; // Store fetched clients
+    
+    async loadClients() {
+        try {
+            const { data, error } = await this.auth.getSupabaseClient()
+                .from('profiles')
+                .select('id, full_name, first_name, last_name, email, phone, address, dni')
+                .eq('role', 'user')
+                .limit(100);
+            
+            if (data) {
+                this.clients = data.map((c: any) => ({
+                    ...c,
+                    displayName: c.full_name || `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email || 'Sin nombre'
+                }));
+            }
+        } catch (e) {
+            console.error('Error loading clients', e);
+        }
+    }
+
+    onSelectClient(clientName: string) {
+        const client = this.clients.find(c => c.displayName === clientName);
+        if (client) {
+            this.form.update(f => ({
+                ...f,
+                customer_name: client.displayName,
+                customer_phone: client.phone || f.customer_phone
+            }));
+            // Optionally, we could store client.id to the payload explicitly,
+            // but the current schema uses customer_name heavily. We'll stick to the UI autocomplete.
+        } else {
+            this.form.update(f => ({ ...f, customer_name: clientName }));
+        }
+    }
+
+    async ngOnInit() {
+        this.id = this.route.snapshot.paramMap.get('id');
+        await Promise.all([
+            this.loadCompanySettings(),
+            this.loadProducts(),
+            this.loadClients(),
+            this.id ? this.loadRepair() : Promise.resolve()
+        ]);
+        this.loading.set(false);
+    }
 
     async loadProducts() {
         try {
