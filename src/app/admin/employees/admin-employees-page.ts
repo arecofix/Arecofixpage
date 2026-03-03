@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
+import { EmployeeService } from '@app/features/customers/application/services/employee.service';
 import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
 
 @Component({
@@ -11,7 +11,7 @@ import { UserProfile } from '@app/features/authentication/domain/entities/user.e
     templateUrl: './admin-employees-page.html',
 })
 export class AdminEmployeesPage implements OnInit {
-    private auth = inject(AuthService);
+    private employeeService = inject(EmployeeService);
     employees = signal<UserProfile[]>([]);
     loading = signal(true);
 
@@ -21,17 +21,13 @@ export class AdminEmployeesPage implements OnInit {
 
     async loadEmployees() {
         this.loading.set(true);
-        const supabase = this.auth.getSupabaseClient();
-        // Employees are profiles with role 'admin' or 'staff'
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .in('role', ['admin', 'staff'])
-            .order('created_at', { ascending: false });
-
-        if (data) {
+        try {
+            const data = await this.employeeService.getAll();
             this.employees.set(data);
+        } catch (error) {
+            console.error('Error loading employees:', error);
+        } finally {
+            this.loading.set(false);
         }
-        this.loading.set(false);
     }
 }

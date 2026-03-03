@@ -39,19 +39,21 @@ export default {
     "chunk-OOVOHVKC.js"
   ],
   "src/app/admin/admin.routes.ts": [
-    "chunk-H73EJ4M6.js"
+    "chunk-JPH3MNN7.js"
   ],
   "src/app/admin/orders/admin-orders.routes.ts": [
     "chunk-MSEELC3W.js"
   ],
   "src/app/admin/services/admin-services-page.ts": [
-    "chunk-OJ5OWBYN.js"
+    "chunk-C5HOTEBY.js",
+    "chunk-OTWM5GNN.js"
   ],
   "src/app/admin/services/admin-service-form-page.ts": [
-    "chunk-Z4U2ZEG5.js"
+    "chunk-6TANNSDT.js",
+    "chunk-OTWM5GNN.js"
   ],
   "src/app/admin/services/admin-services.routes.ts": [
-    "chunk-CUNSBIXY.js"
+    "chunk-DFYATFMJ.js"
   ],
   "src/app/admin/repairs/admin-repairs-page.ts": [
     "chunk-3WBYQWEI.js",
@@ -128,13 +130,15 @@ export default {
     "chunk-R46M6GG7.js"
   ],
   "src/app/admin/suppliers/admin-suppliers-page.ts": [
-    "chunk-KD6MIQ4D.js"
+    "chunk-GZYLHZFC.js",
+    "chunk-UD3D4MTD.js"
   ],
   "src/app/admin/suppliers/admin-supplier-form-page.ts": [
-    "chunk-NRYCXNEL.js"
+    "chunk-P4W6FYT7.js",
+    "chunk-UD3D4MTD.js"
   ],
   "src/app/admin/suppliers/admin-suppliers.routes.ts": [
-    "chunk-DV5SDPMR.js"
+    "chunk-WXVFASFM.js"
   ],
   "src/app/admin/company/admin-company-settings-page.ts": [
     "chunk-ETOO5TAK.js"
@@ -163,10 +167,10 @@ export default {
     "chunk-GR6REWXI.js"
   ],
   "src/app/admin/brands/admin-brand-form-page.ts": [
-    "chunk-GKKBBN2J.js"
+    "chunk-TH3NW7ZN.js"
   ],
   "src/app/admin/brands/admin-brands.routes.ts": [
-    "chunk-YEWQ4TRQ.js"
+    "chunk-WSCJA5YC.js"
   ],
   "src/app/admin/clients/admin-clients-page.ts": [
     "chunk-GXM2QFY7.js"
@@ -408,7 +412,7 @@ export default {
   ]
 },
   assets: {
-    'index.csr.html': {size: 15847, hash: 'e07c1c91d58a59f00da8aa5a2032d15cd32b6d85b8290a27c3c1a92b65081e04', text: () => import('./assets-chunks/index_csr_html.mjs').then(m => m.default)},
-    'index.server.html': {size: 16387, hash: 'a71fbd8e9714cc1e86fd23cdbb69251b0a28fa463d2a265576e7b320ab2574a4', text: () => import('./assets-chunks/index_server_html.mjs').then(m => m.default)}
+    'index.csr.html': {size: 15847, hash: 'ace66f534abdd8c55ad8d89203793df950461f57c64342446d926a800ce2fadb', text: () => import('./assets-chunks/index_csr_html.mjs').then(m => m.default)},
+    'index.server.html': {size: 16387, hash: '5fe4d952943c79d0ccd8686fed0eeb89530557396c2a435eeb9aeebc2f029d12', text: () => import('./assets-chunks/index_server_html.mjs').then(m => m.default)}
   },
 };

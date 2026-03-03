@@ -167,6 +167,6 @@ export default `<!doctype html>
 
     <app-root></app-root>
     <!-- Analytics se carga dinámicamente sólo en producción -->
-  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-RVJC6SMP.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-7ASDDDDN.js"><link rel="modulepreload" href="chunk-Y277GW3E.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-DQJLPT7B.js"><link rel="modulepreload" href="chunk-CCLTAAKW.js"><link rel="modulepreload" href="chunk-NNZR67DL.js"><link rel="modulepreload" href="chunk-I7OKRB4L.js"><script src="main-OV5MPGAL.js" type="module" crossorigin="anonymous"></script></body>
+  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-IFZRJIKS.js"><link rel="modulepreload" href="chunk-RVJC6SMP.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-7ASDDDDN.js"><link rel="modulepreload" href="chunk-Y277GW3E.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-DQJLPT7B.js"><link rel="modulepreload" href="chunk-CCLTAAKW.js"><link rel="modulepreload" href="chunk-NNZR67DL.js"><script src="main-2GG2VB2A.js" type="module" crossorigin="anonymous"></script></body>
 </html>
 `;

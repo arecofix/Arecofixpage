@@ -11,6 +11,7 @@ import {
   iRequestParams,
   iCategory,
 } from '@app/public/categories/interfaces';
+import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,7 @@ export class CategoryService {
   private supabase: SupabaseClient;
   private logger = inject(LoggerService);
   private tenantService = inject(TenantService);
+  private categoryRepo = inject(CategoryRepository);
 
   constructor(private authService: AuthService) {
     this.supabase = this.authService.getSupabaseClient();
@@ -149,109 +151,21 @@ export class CategoryService {
 
   public getById(id: string): Observable<iCategory | null> {
     if (!id || id === 'null' || id === '0') return of(null);
-    return from(
-      this.supabase
-        .from('categories')
-        .select('*')
-        .eq('tenant_id', this.tenantService.getTenantId())
-        .eq('id', id)
-        .single()
-    ).pipe(
-      map(({ data, error }) => {
-        if (error) throw error;
-        return data as iCategory;
-      }),
-      catchError((err) => {
-        this.logger.error('Supabase Error:', err);
-        return of(null);
-      })
-    );
+    return this.categoryRepo.getById(id) as Observable<iCategory>;
   }
 
   /** Returns all product-type categories for the current tenant */
   public getAll(): Observable<iCategory[]> {
-    return from(
-      this.supabase
-        .from('categories')
-        .select('*')
-        .eq('tenant_id', this.tenantService.getTenantId())
-        .eq('is_active', true)
-        .order('name')
-    ).pipe(
-      map(({ data, error }) => {
-        if (error) throw error;
-        return (data || []) as iCategory[];
-      }),
-      catchError((err) => {
-        this.logger.error('Supabase Error getAll:', err);
-        return of([]);
-      })
-    );
+    return this.categoryRepo.getAll({ column: 'name', ascending: true }) as Observable<iCategory[]>;
   }
 
   public create(category: Partial<iCategory>): Observable<iCategory> {
-    const tenantId = this.tenantService.getTenantId();
-    const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
     const slug = category.slug || StringUtils.slugify(category.name || '');
-    
-    const payload: any = {
-      ...category,
-      slug: slug,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-
-    if (!isFallback) {
-        payload['tenant_id'] = tenantId;
-    }
-
-    return from(
-      this.supabase
-        .from('categories')
-        .insert(payload)
-        .select('*')
-        .single()
-    ).pipe(
-      map(({ data, error }) => {
-        if (error) throw error;
-        return data as iCategory;
-      }),
-      catchError((err) => {
-        this.logger.error('Supabase Error create category:', err);
-        throw err;
-      })
-    );
+    const payload = { ...category, slug };
+    return this.categoryRepo.create(payload) as Observable<iCategory>;
   }
 
   public update(id: string, category: Partial<iCategory>): Observable<iCategory> {
-    const tenantId = this.tenantService.getTenantId();
-    const payload = {
-      ...category,
-      updated_at: new Date().toISOString()
-    };
-    
-    // Safety: never update ID or tenant_id
-    delete (payload as any).id;
-    delete (payload as any).tenant_id;
-
-    let query = this.supabase
-      .from('categories')
-      .update(payload)
-      .eq('id', id);
-
-    if (tenantId !== '00000000-0000-0000-0000-000000000000') {
-      query = query.eq('tenant_id', tenantId);
-    }
-
-    return from(query.select('*').single() as unknown as Promise<any>).pipe(
-      map(({ data, error }) => {
-        if (error) throw error;
-        return data as iCategory;
-      }),
-      catchError((err) => {
-        this.logger.error('Supabase Error update category:', err);
-        throw err;
-      })
-    );
+    return this.categoryRepo.update(id, category) as Observable<iCategory>;
   }
 }

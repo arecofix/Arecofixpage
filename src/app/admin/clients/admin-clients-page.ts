@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
+import { CustomerService } from '@app/features/customers/application/services/customer.service';
 import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
 
 @Component({
@@ -11,7 +11,7 @@ import { UserProfile } from '@app/features/authentication/domain/entities/user.e
     templateUrl: './admin-clients-page.html',
 })
 export class AdminClientsPage implements OnInit {
-    private auth = inject(AuthService);
+    private customerService = inject(CustomerService);
     clients = signal<UserProfile[]>([]);
     loading = signal(true);
 
@@ -21,29 +21,13 @@ export class AdminClientsPage implements OnInit {
 
     async loadClients() {
         this.loading.set(true);
-        const supabase = this.auth.getSupabaseClient();
-        // Assuming clients are just profiles with role 'user' or we filter by something else.
-        // For now, let's fetch all profiles that are not admin/staff or just all profiles.
-        // The requirement says "Clientes: Nombre, Dirección, Celular, Email, DNI, estado".
-        // We might need to check if we have these fields in profiles or if we need a separate clients table.
-        // The plan didn't specify a separate clients table, so we'll use profiles.
-        // But wait, the user might want to register clients who are not system users (no login).
-        // If so, we need a clients table. The user request said "Clientes: que tenga...".
-        // Usually in a repair shop, clients might not have a login.
-        // I'll check if I created a clients table. I didn't in the SQL script.
-        // I should probably use 'profiles' for now, or create a 'clients' table if they want offline clients.
-        // Given the fields "DNI", "Dirección", "Celular", these are in profiles (or should be).
-        // I'll query profiles for now.
-
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('role', 'user') // Assuming 'user' role is for clients
-            .order('created_at', { ascending: false });
-
-        if (data) {
+        try {
+            const data = await this.customerService.getAll();
             this.clients.set(data);
+        } catch (error) {
+            console.error('Error loading clients:', error);
+        } finally {
+            this.loading.set(false);
         }
-        this.loading.set(false);
     }
 }
