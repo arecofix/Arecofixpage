@@ -3,7 +3,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
+import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-admin-brand-form-page',
@@ -15,7 +16,7 @@ export class AdminBrandFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private auth = inject(AuthService);
-    private tenantService = inject(TenantService);
+    private brandRepo = inject(BrandRepository);
 
     id: string | null = null;
     form = signal({
@@ -32,19 +33,19 @@ export class AdminBrandFormPage implements OnInit {
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
         if (this.id) {
-            const supabase = this.auth.getSupabaseClient();
-            const { data, error } = await supabase.from('brands')
-                .select('*')
-                .eq('tenant_id', this.tenantService.getTenantId())
-                .eq('id', this.id)
-                .single();
-            if (data) {
-                this.form.set({
-                    name: data.name,
-                    slug: data.slug,
-                    logo_url: data.logo_url || '',
-                    is_active: data.is_active,
-                });
+            try {
+                const data = await firstValueFrom(this.brandRepo.getById(this.id));
+                if (data) {
+                    this.form.set({
+                        name: data.name || '',
+                        slug: data.slug || '',
+                        logo_url: data.logo_url || '',
+                        is_active: data.is_active ?? true,
+                    });
+                }
+            } catch (err) {
+                console.error('Error loading brand:', err);
+                this.error.set('Error al cargar la marca.');
             }
         }
         this.loading.set(false);
@@ -67,7 +68,7 @@ export class AdminBrandFormPage implements OnInit {
     async save() {
         this.saving.set(true);
         this.error.set(null);
-        const supabase = this.auth.getSupabaseClient();
+        
         const payload = { ...this.form() };
 
         if (!payload.slug) {
@@ -76,21 +77,13 @@ export class AdminBrandFormPage implements OnInit {
 
         try {
             if (this.id) {
-                const { error } = await supabase.from('brands')
-                    .update(payload)
-                    .eq('id', this.id)
-                    .eq('tenant_id', this.tenantService.getTenantId());
-                if (error) throw error;
+                await firstValueFrom(this.brandRepo.update(this.id, payload as any));
             } else {
-                const { error } = await supabase.from('brands').insert({
-                    ...payload,
-                    tenant_id: this.tenantService.getTenantId()
-                });
-                if (error) throw error;
+                await firstValueFrom(this.brandRepo.create(payload as any));
             }
             this.router.navigate(['/admin/brands']);
         } catch (e: any) {
-            this.error.set(e.message);
+            this.error.set(e.message || 'Error al guardar la marca');
         } finally {
             this.saving.set(false);
         }

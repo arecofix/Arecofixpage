@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
 import { Supplier } from '@app/features/customers/domain/entities/supplier.entity';
+import { SupplierService } from '@app/features/customers/application/services/supplier.service';
 
 @Component({
     selector: 'app-admin-suppliers-page',
@@ -11,7 +11,7 @@ import { Supplier } from '@app/features/customers/domain/entities/supplier.entit
     templateUrl: './admin-suppliers-page.html',
 })
 export class AdminSuppliersPage implements OnInit {
-    private auth = inject(AuthService);
+    private supplierService = inject(SupplierService);
     suppliers = signal<Supplier[]>([]);
     loading = signal(true);
 
@@ -21,15 +21,15 @@ export class AdminSuppliersPage implements OnInit {
 
     async loadSuppliers() {
         this.loading.set(true);
-        const supabase = this.auth.getSupabaseClient();
-        const { data, error } = await supabase
-            .from('suppliers')
-            .select('*')
-            .order('name');
-
-        if (data) {
-            this.suppliers.set(data);
+        try {
+            const data = await this.supplierService.getAll();
+            // Default order by name in service is better, but sorting here in memory for now
+            const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
+            this.suppliers.set(sortedData);
+        } catch (error) {
+            console.error('Error loading suppliers:', error);
+        } finally {
+            this.loading.set(false);
         }
-        this.loading.set(false);
     }
 }
