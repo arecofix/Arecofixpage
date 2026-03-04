@@ -131,7 +131,7 @@ export default `<!doctype html>
         setTimeout(loadAnalytics, 8000);
       })();
     </script>
-  <link rel="stylesheet" href="styles-357DGATT.css" crossorigin="anonymous"></head>
+  <link rel="stylesheet" href="styles-J7ERNZYF.css" crossorigin="anonymous"></head>
 
   <body ngcm="">
     <!-- Google Tag Manager (noscript) -->
@@ -167,6 +167,6 @@ export default `<!doctype html>
 
     <app-root></app-root>
     <!-- Analytics se carga dinámicamente sólo en producción -->
-  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-VH6TGKH3.js"><link rel="modulepreload" href="chunk-MBM3W5GD.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-4PIIFI5I.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-A7YYDXUX.js"><link rel="modulepreload" href="chunk-2W2WL3RP.js"><link rel="modulepreload" href="chunk-Y277GW3E.js"><link rel="modulepreload" href="chunk-VDHUN3S2.js"><script src="main-67F5AQW3.js" type="module" crossorigin="anonymous"></script></body>
+  <link rel="modulepreload" href="chunk-FBYEXMDY.js"><link rel="modulepreload" href="chunk-VH6TGKH3.js"><link rel="modulepreload" href="chunk-MBM3W5GD.js"><link rel="modulepreload" href="chunk-J4Q5NFZK.js"><link rel="modulepreload" href="chunk-4PIIFI5I.js"><link rel="modulepreload" href="chunk-6KLMDNRR.js"><link rel="modulepreload" href="chunk-A7YYDXUX.js"><link rel="modulepreload" href="chunk-2W2WL3RP.js"><link rel="modulepreload" href="chunk-Y277GW3E.js"><link rel="modulepreload" href="chunk-VDHUN3S2.js"><script src="main-EMHDIHVF.js" type="module" crossorigin="anonymous"></script></body>
 </html>
 `;
