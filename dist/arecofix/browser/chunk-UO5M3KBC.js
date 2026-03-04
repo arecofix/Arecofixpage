@@ -1,1 +1,0 @@
-var e=class{static slugify(r){return r.toString().toLowerCase().trim().replace(/\s+/g,"-").replace(/&/g,"-and-").replace(/[^a-z0-9-]/g,"").replace(/-+/g,"-")}static capitalize(r){return r?r.charAt(0).toUpperCase()+r.slice(1):""}};export{e as a};

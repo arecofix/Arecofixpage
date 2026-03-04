@@ -23,8 +23,53 @@
           {
             "key": "Cache-Control",
             "value": "no-cache"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "SAMEORIGIN"
           }
         ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/productos/categoria/modulos",
+        "destination": "/productos/categoria/repuestos/modulos",
+        "type": 301
+      },
+      {
+        "source": "/productos/categoria/baterias",
+        "destination": "/productos/categoria/repuestos/baterias",
+        "type": 301
+      },
+      {
+        "source": "/productos/categoria/pantallas",
+        "destination": "/productos/categoria/repuestos/pantallas",
+        "type": 301
+      },
+      {
+        "source": "/productos/categoria/pines",
+        "destination": "/productos/categoria/repuestos/pines",
+        "type": 301
+      },
+      {
+        "source": "/productos/categoria/consolas",
+        "destination": "/productos/categoria/repuestos/consolas",
+        "type": 301
+      },
+      {
+        "source": "/productos/categoria/herramientas",
+        "destination": "/productos/categoria/repuestos/herramientas",
+        "type": 301
+      },
+      {
+        "source": "/productos/categoria/accesorios",
+        "destination": "/productos/categoria/repuestos/accesorios",
+        "type": 301
       }
     ],
     "rewrites": [
@@ -46,3 +91,4 @@
     }
   }
 }
+

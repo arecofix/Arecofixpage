@@ -61,8 +61,9 @@ export class SupabaseProductRepository extends ProductRepository {
       .from('products')
       .select(`
         id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-        is_active, is_featured, sku, barcode, stock, created_at, updated_at,
-        branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
+        branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert),
+        branches(name)
       `, { count: 'exact' });
       
     let query = this.applyTenantFilter(baseQuery);
@@ -192,7 +193,7 @@ export class SupabaseProductRepository extends ProductRepository {
     let query = this.supabase.from('products')
         .select(`
           id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+          is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
           branch_stock:product_stock_per_branch(quantity, branch_id)
         `);
 
@@ -215,7 +216,7 @@ export class SupabaseProductRepository extends ProductRepository {
       const CHUNK = 1000;
       const select = `
         id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-        is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
         branch_stock:product_stock_per_branch(quantity, branch_id)
       `;
 
@@ -251,7 +252,7 @@ export class SupabaseProductRepository extends ProductRepository {
       const CHUNK = 1000;
       const select = `
         id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-        is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
         branch_stock:product_stock_per_branch(quantity, branch_id)
       `;
 
@@ -284,7 +285,7 @@ export class SupabaseProductRepository extends ProductRepository {
     let query = this.supabase.from('products')
         .select(`
           id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, stock, created_at, updated_at,
+          is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
           branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
         `)
         .eq('id', id);
@@ -690,9 +691,12 @@ export class SupabaseProductRepository extends ProductRepository {
           barcode: p['barcode'] as string || '',
           currency: p['currency'] as 'ARS' | 'USD' || 'ARS',
           min_stock_alert: p['min_stock_alert'] ? Number(p['min_stock_alert']) : undefined,
+          is_global: Boolean(p['is_global']),
+          branch_id: p['branch_id'] as string,
           created_at: p['created_at'] as string,
           updated_at: p['updated_at'] as string,
-          branch_stock: p.branch_stock
+          branch_stock: p.branch_stock,
+          branches: p.branches
     };
   }
 }

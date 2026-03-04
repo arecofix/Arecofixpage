@@ -6,9 +6,12 @@ import { ProductRepository, BulkPriceUpdate, ImportProductSummary } from '@app/f
 import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
 import { AuthService } from '@app/core/services/auth.service';
+import { NotificationService } from '@app/core/services/notification.service';
 import { CsvService } from '@app/shared/services/csv.service';
 import { StringUtils } from '@app/shared/utils/string.utils';
 import { firstValueFrom } from 'rxjs';
+import { ROLES } from '@app/core/constants/roles.constants';
+import { TenantService } from '@app/core/services/tenant.service';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
 export interface ImportReport {
@@ -50,11 +53,17 @@ export class AdminProductService {
     private categoryRepo = inject(CategoryRepository);
     private csvService = inject(CsvService);
     private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
+    private notificationService = inject(NotificationService);
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();
         if (user) {
             const profile = await this.auth.getUserProfile(user.id);
+            // Si es súper administrador o el dueño central, ve todos los productos omitiendo el filtro de sucursal
+            if (this.auth.isSuperAdmin() || profile?.role === ROLES.TENANT_OWNER) {
+                return firstValueFrom(this.productRepo.getAll());
+            }
             return firstValueFrom(this.productRepo.getAll(profile?.branch_id));
         }
         return firstValueFrom(this.productRepo.getAll());
@@ -80,7 +89,54 @@ export class AdminProductService {
         return firstValueFrom(this.categoryRepo.getAll());
     }
 
+    async getBranches(): Promise<any[]> {
+        const supabase = this.auth.getSupabaseClient();
+        const tenantId = this.tenantService.getTenantId();
+        const { data } = await supabase.from('branches')
+            .select('*')
+            .eq('tenant_id', tenantId)
+            .eq('is_active', true)
+            .order('name');
+        return data || [];
+    }
+
     async createProduct(payload: Partial<Product>): Promise<void> {
+        const user = this.auth.getCurrentUser();
+        if (user) {
+            const profile = await this.auth.getUserProfile(user.id);
+            if (profile && profile.role === ROLES.STAFF) {
+                // Si es empleado, se aprueba manual por el dueño. Queda vinculado a la sucursal inactivo.
+                payload.is_active = false;
+                payload.is_global = false;
+                payload.branch_id = profile.branch_id;
+                
+                // Dispara solicitud al administrador/dueño para revisión
+                const supabase = this.auth.getSupabaseClient();
+                const tenantId = profile.tenant_id || this.tenantService.getTenantId();
+
+                // Buscar a los administradores del tenant para notificar
+                const { data: admins } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .in('role', [ROLES.ADMIN, ROLES.TENANT_OWNER, ROLES.SUPER_ADMIN])
+                    .eq('tenant_id', tenantId);
+
+                if (admins && admins.length > 0) {
+                    const noficationsToInsert = admins.map(a => ({
+                        tenant_id: tenantId,
+                        user_id: a.id,
+                        title: 'Nuevo Producto (Requiere Revisión)',
+                        message: `El empleado ha solicitado dar de alta el producto: ${payload.name}. Revísalo y apruébalo desde el catálogo.`,
+                        type: 'warning',
+                        link: '/admin/products'
+                    }));
+                    await supabase.from('notifications').insert(noficationsToInsert);
+                }
+            } else if (profile && (profile.role === ROLES.ADMIN || profile.role === ROLES.TENANT_OWNER)) {
+                // Admin que crea define por defecto como global y sin branch fija, o puede definir a cuál va.
+                if (payload.is_global === undefined) payload.is_global = true; 
+            }
+        }
         await firstValueFrom(this.productRepo.create(payload as Product));
     }
 

@@ -8,7 +8,7 @@ import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
 import { ThemeService } from './core/services/theme.service';
-import { TenantService } from './core/services/tenant.service';
+import { TenantService } from './shared/services/tenant.service';
 
 @Component({
 
@@ -35,15 +35,15 @@ export class App implements OnInit {
     this.seoService.initialize();
 
     if (isPlatformBrowser(this.platformId)) {
-      // 1. Resolver Tenant Context SaaS basado en la URL antes que todo
-      const currentHost = this.document.location.hostname;
-      this.tenantService.resolveTenantByHostname(currentHost).then(tenant => {
-        if (!tenant) {
-          this.logger.warn('No SaaS Tenant context found for this domain!');
+      // Inicializar el servicio de tenants primero
+      this.tenantService.getCurrentTenant$().subscribe((tenant: any) => {
+        if (tenant) {
+          console.log(`🏢 Tenant activo: ${tenant.name} (${tenant.isMain ? 'Principal' : 'Sucursal'})`);
         }
       });
 
-      // 2. SEO Redirection Rule Heredada
+      // SEO Redirection Rule Heredada
+      const currentHost = window.location.hostname;
       if (currentHost === 'celulares.arecofix.com.ar') {
         this.document.location.href = 'https://arecofix.com.ar/celular';
         return;

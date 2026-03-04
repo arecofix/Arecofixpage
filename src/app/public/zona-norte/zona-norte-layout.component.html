@@ -1,0 +1,214 @@
+<div class="zona-norte-layout">
+  <!-- Header Personalizado -->
+  <header class="sucursal-header">
+    <div class="container">
+      <nav class="navbar">
+        <!-- Logo de la sucursal -->
+        <div class="navbar-brand">
+          <img [src]="sucursal.logo" 
+               [alt]="sucursal.nombre" 
+               class="brand-logo"
+               onerror="this.style.display='none'">
+          <div class="brand-text">
+            <h1 class="brand-name">{{ sucursal.nombre }}</h1>
+            <p class="brand-tagline">{{ sucursal.subtitulo }}</p>
+          </div>
+        </div>
+
+        <!-- Menú de navegación desktop -->
+        <ul class="navbar-nav desktop-menu">
+          <li class="nav-item" *ngFor="let item of menuItems">
+            <a class="nav-link" 
+               [routerLink]="item.path" 
+               routerLinkActive="active"
+               (click)="closeMobileMenu()">
+              <i class="fas" [class]="item.icon"></i>
+              {{ item.title }}
+            </a>
+          </li>
+        </ul>
+
+        <!-- Contacto header -->
+        <div class="header-contact desktop-only">
+          <button class="contact-btn whatsapp-btn" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+          </button>
+          <button class="contact-btn phone-btn" (click)="llamarTelefono()">
+            <i class="fas fa-phone"></i>
+            <span>Llamar</span>
+          </button>
+        </div>
+
+        <!-- Botón menú móvil -->
+        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+          <i class="fas" [class]="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+        </button>
+      </nav>
+
+      <!-- Menú móvil -->
+      <div class="mobile-menu" [class.active]="mobileMenuOpen">
+        <ul class="mobile-nav">
+          <li class="mobile-nav-item" *ngFor="let item of menuItems">
+            <a class="mobile-nav-link" 
+               [routerLink]="item.path" 
+               routerLinkActive="active"
+               (click)="closeMobileMenu()">
+              <i class="fas" [class]="item.icon"></i>
+              {{ item.title }}
+            </a>
+          </li>
+        </ul>
+        <div class="mobile-contact">
+          <button class="contact-btn whatsapp-btn" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+          </button>
+          <button class="contact-btn phone-btn" (click)="llamarTelefono()">
+            <i class="fas fa-phone"></i>
+            Llamar
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="sucursal-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer Personalizado -->
+  <footer class="sucursal-footer">
+    <div class="container">
+      <div class="footer-content">
+        <!-- Sección empresa -->
+        <div class="footer-section">
+          <div class="footer-brand">
+            <img [src]="sucursal.logo" 
+                 [alt]="sucursal.nombre" 
+                 class="footer-logo"
+                 onerror="this.style.display='none'">
+            <h3>{{ sucursal.nombre }}</h3>
+            <p>{{ empresa.descripcion }}</p>
+          </div>
+        </div>
+
+        <!-- Servicios -->
+        <div class="footer-section">
+          <h4>Nuestros Servicios</h4>
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/Zona-Norte']" routerLinkActive="active">
+                <i class="fas fa-home"></i>
+                Inicio
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/Zona-Norte/servicios']" routerLinkActive="active">
+                <i class="fas fa-tools"></i>
+                Servicios
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/Zona-Norte/productos']" routerLinkActive="active">
+                <i class="fas fa-shopping-bag"></i>
+                Productos
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/Zona-Norte/galeria']" routerLinkActive="active">
+                <i class="fas fa-images"></i>
+                Galería
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/Zona-Norte/nosotros']" routerLinkActive="active">
+                <i class="fas fa-users"></i>
+                Nosotros
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [routerLink]="['/Zona-Norte/contacto']" routerLinkActive="active">
+                <i class="fas fa-envelope"></i>
+                Contacto
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contacto -->
+        <div class="footer-section">
+          <h4>Contacto</h4>
+          <div class="footer-contact-info">
+            <div class="contact-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ sucursal.direccion }}</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-phone"></i>
+              <span>{{ sucursal.telefono }}</span>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-envelope"></i>
+              <span>{{ sucursal.email }}</span>
+            </div>
+          </div>
+          <div class="footer-social">
+            <button class="social-btn whatsapp" (click)="contactarWhatsApp()">
+              <i class="fab fa-whatsapp"></i>
+            </button>
+            <button class="social-btn phone" (click)="llamarTelefono()">
+              <i class="fas fa-phone"></i>
+            </button>
+            <button class="social-btn email" (click)="enviarEmail()">
+              <i class="fas fa-envelope"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Horarios -->
+        <div class="footer-section">
+          <h4>Horarios de Atención</h4>
+          <div class="footer-hours">
+            <div class="hours-item">
+              <span class="days">Lunes a Viernes</span>
+              <span class="time">08:00 - 18:00</span>
+            </div>
+            <div class="hours-item">
+              <span class="days">Sábados</span>
+              <span class="time">09:00 - 13:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom footer -->
+      <div class="footer-bottom">
+        <div class="footer-bottom-content">
+          <div class="footer-copyright">
+            <p>&copy; {{ empresa.fundado }} {{ sucursal.nombre }} - Todos los derechos reservados</p>
+          </div>
+          <div class="footer-developer">
+            <p>Desarrollado por <a href="https://arecofix.com.ar" target="_blank">Arecofix - Soluciones Digitales</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Botón flotante WhatsApp -->
+  <button class="floating-whatsapp" (click)="contactarWhatsApp()" title="Contactar por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </button>
+
+  <!-- Botón scroll to top -->
+  <button class="scroll-to-top" (click)="scrollToTop()" title="Volver arriba">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Overlay para menú móvil -->
+  <div class="mobile-overlay" 
+       [class.active]="mobileMenuOpen" 
+       (click)="closeMobileMenu()"></div>
+</div>

@@ -1,0 +1,100 @@
+<div class="zona-norte-servicios">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="container">
+        <h1 class="hero-title">Nuestros Servicios</h1>
+        <p class="hero-subtitle">Calidad y profesionalismo en cada trabajo que realizamos</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            Consultar Ahora
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="llamarTelefono()">
+            <i class="fas fa-phone"></i>
+            Llamar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Servicios Detallados -->
+  <section class="services-detail-section">
+    <div class="container">
+      <div class="services-grid">
+        <div class="service-card" *ngFor="let servicio of servicios">
+          <div class="service-header">
+            <div class="service-icon">
+              <i class="fas" [class]="servicio.icono"></i>
+            </div>
+            <div class="service-info">
+              <h2 class="service-title">{{ servicio.titulo }}</h2>
+              <div class="service-meta">
+                <span class="service-time">
+                  <i class="fas fa-clock"></i>
+                  {{ servicio.tiempo }}
+                </span>
+                <span class="service-warranty">
+                  <i class="fas fa-shield-alt"></i>
+                  {{ servicio.garantia }} de garantía
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="service-image">
+            <img [src]="servicio.imagen" 
+                 [alt]="servicio.titulo"
+                 onerror="this.src='assets/img/branches/zona-norte/service-placeholder.jpg'">
+          </div>
+          
+          <div class="service-content">
+            <p class="service-description">{{ servicio.descripcion }}</p>
+            
+            <div class="service-features">
+              <h3>Características Principales:</h3>
+              <ul>
+                <li *ngFor="let feature of servicio.caracteristicas">
+                  <i class="fas fa-check-circle"></i>
+                  {{ feature }}
+                </li>
+              </ul>
+            </div>
+            
+            <div class="service-actions">
+              <button class="btn btn-primary" (click)="contactarWhatsApp(servicio.titulo)">
+                <i class="fab fa-whatsapp"></i>
+                Consultar por este servicio
+              </button>
+              <button class="btn btn-outline" (click)="llamarTelefono()">
+                <i class="fas fa-phone"></i>
+                Llamar ahora
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿Necesitas presupuesto para tus espacios?</h2>
+        <p class="cta-subtitle">Contactanos hoy mismo y recibí asesoramiento profesional sin compromiso</p>
+        <div class="cta-actions">
+          <button class="btn btn-primary btn-lg" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="llamarTelefono()">
+            <i class="fas fa-phone"></i>
+            Llamar Ahora
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

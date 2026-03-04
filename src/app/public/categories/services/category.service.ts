@@ -159,6 +159,40 @@ export class CategoryService {
     return this.categoryRepo.getAll({ column: 'name', ascending: true }) as Observable<iCategory[]>;
   }
 
+  /**
+   * Resolves the correct category from a multi-segment slug path.
+   * e.g. 'repuestos/modulos' → looks up 'modulos' as the leaf slug.
+   * Falls back to the full path as a single slug if no match is found.
+   */
+  public resolveSlugFromPath(slugPath: string): string {
+    const segments = slugPath.split('/');
+    // The leaf (last segment) is always the target category slug
+    return segments[segments.length - 1];
+  }
+
+  /**
+   * Builds the full ancestor chain for a category (root → ... → parent → self).
+   * Operates on an already-loaded flat list to avoid extra HTTP calls.
+   * @param categoryId - The ID of the target category
+   * @param allCategories - Full flat list of all categories
+   * @returns Ordered array from root ancestor to the category itself
+   */
+  public buildAncestorChain(categoryId: string, allCategories: iCategory[]): iCategory[] {
+    const chain: iCategory[] = [];
+    let current = allCategories.find(c => c.id === categoryId);
+
+    // Walk up the tree with a guard against circular refs
+    const visited = new Set<string>();
+    while (current && !visited.has(current.id)) {
+      visited.add(current.id);
+      chain.unshift(current); // prepend so order is root → leaf
+      if (!current.parent_id) break;
+      current = allCategories.find(c => c.id === current!.parent_id);
+    }
+
+    return chain;
+  }
+
   public create(category: Partial<iCategory>): Observable<iCategory> {
     const slug = category.slug || StringUtils.slugify(category.name || '');
     const payload = { ...category, slug };

@@ -176,8 +176,9 @@
                 <table class="table table-zebra w-full">
                     <thead>
                         <tr class="bg-base-200">
-                            <th>Nombre</th>
-                            <th>Dirección</th>
+                            <th>Nombre / Enlace</th>
+                            <th>Dirección / Slug</th>
+                            <th class="text-center">Recargo (%)</th>
                             <th>Estado</th>
                             <th class="text-right">Acciones</th>
                         </tr>
@@ -185,8 +186,16 @@
                     <tbody>
                         @for (branch of branches(); track branch.id) {
                         <tr>
-                            <td class="font-medium">{{ branch.name }}</td>
-                            <td>{{ branch.address || '--' }}</td>
+                            <td>
+                                <div class="font-bold">{{ branch.name }}</div>
+                                <div class="text-[10px] opacity-70 font-mono">/{{ branch.slug }}</div>
+                            </td>
+                            <td>
+                                <div class="text-xs">{{ branch.address || '--' }}</div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-outline border-emerald-500 text-emerald-600 font-bold">+{{ branch.global_markup_percentage || 0 }}%</span>
+                            </td>
                             <td>
                                 <button class="badge cursor-pointer" 
                                     [class.badge-success]="branch.is_active" 
@@ -196,9 +205,18 @@
                                 </button>
                             </td>
                             <td class="text-right">
-                                <button class="btn btn-ghost btn-sm text-error" (click)="deleteBranch(branch.id)" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="flex justify-end gap-1">
+                                    <a [routerLink]="'/' + branch.slug + '/admin'" class="btn btn-primary btn-sm rounded-xl gap-2 shadow-sm font-bold" title="Administrar Panel de Sucursal">
+                                        <i class="fas fa-external-link-alt text-xs"></i>
+                                        <span>Administrar</span>
+                                    </a>
+                                    <button class="btn btn-ghost btn-sm text-blue-500" (click)="openEditBranchModal(branch)" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-ghost btn-sm text-error" (click)="deleteBranch(branch.id)" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         }
@@ -214,10 +232,18 @@
             <!-- Formulario para agregar Nueva Sucursal -->
             <div class="bg-base-200 p-6 rounded-xl border border-base-300">
                 <h3 class="font-bold text-lg mb-4"><i class="fas fa-plus-circle text-primary mr-2"></i>Agregar Nueva Sucursal</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Nombre de la Sucursal</span></label>
+                        <label class="label"><span class="label-text">Nombre Sucursal</span></label>
                         <input type="text" [(ngModel)]="newBranch().name" class="input input-bordered w-full" placeholder="Ej: Zona Centro" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Slug (URL)</span></label>
+                        <input type="text" [(ngModel)]="newBranch().slug" class="input input-bordered w-full font-mono text-xs" placeholder="zona-centro" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Recargo Global (%)</span></label>
+                        <input type="number" [(ngModel)]="newBranch().global_markup_percentage" class="input input-bordered w-full" placeholder="0" />
                     </div>
                     <div class="form-control">
                         <label class="label"><span class="label-text">Dirección (Opcional)</span></label>
@@ -239,3 +265,41 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Editar Sucursal -->
+@if (editingBranch()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm animate-fade-in px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up border border-gray-100 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+            <h3 class="font-bold text-xl">Editar Sucursal</h3>
+            <button class="btn btn-sm btn-circle btn-ghost" (click)="editingBranch.set(null)">✕</button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="form-control">
+                <label class="label"><span class="label-text font-bold">Nombre</span></label>
+                <input type="text" [(ngModel)]="tempBranch.name" name="edit_name" class="input input-bordered w-full" />
+            </div>
+            <div class="form-control">
+                <label class="label"><span class="label-text font-bold">Slug</span></label>
+                <input type="text" [(ngModel)]="tempBranch.slug" name="edit_slug" class="input input-bordered w-full font-mono" />
+            </div>
+            <div class="form-control">
+                <label class="label"><span class="label-text font-bold">Recargo Global (%)</span></label>
+                <input type="number" [(ngModel)]="tempBranch.global_markup_percentage" name="edit_markup" class="input input-bordered w-full" />
+                <p class="text-[10px] text-gray-500 mt-1">Este porcentaje se sumará al precio de costo de los productos en esta sucursal.</p>
+            </div>
+            <div class="form-control">
+                <label class="label"><span class="label-text font-bold">Dirección</span></label>
+                <input type="text" [(ngModel)]="tempBranch.address" name="edit_address" class="input input-bordered w-full" />
+            </div>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-900/50 p-6 flex justify-end gap-3">
+            <button class="btn btn-ghost" (click)="editingBranch.set(null)">Cancelar</button>
+            <button class="btn btn-primary px-8" (click)="updateBranch()" [disabled]="savingBranch()">
+                @if(savingBranch()) { <span class="loading loading-spinner"></span> }
+                Guardar Cambios
+            </button>
+        </div>
+    </div>
+</div>
+}

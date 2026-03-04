@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
   User,
@@ -27,6 +27,9 @@ export class AuthService {
   private profileService = inject(ProfileService);
   private tenantService = inject(TenantService);
   private ngZone = inject(NgZone);
+  
+  // Súper Administrador Global
+  public isSuperAdmin = signal<boolean>(false);
 
   private authState = new BehaviorSubject<{
     session: Session | null;
@@ -39,6 +42,11 @@ export class AuthService {
   });
 
   public authState$ = this.authState.asObservable();
+
+  // Método para obtener el perfil actual
+  getCurrentProfile(): UserProfile | null {
+    return this.authState.value.profile;
+  }
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -76,6 +84,9 @@ export class AuthService {
     if (session) {
       const profile = await this.ensureProfile(session);
       this.authState.next({ session, user: session.user, profile });
+      if (profile?.email === 'ezequielenrico15@gmail.com' || profile?.role === 'super_admin') {
+        this.isSuperAdmin.set(true);
+      }
     }
 
     this.supabase.auth.onAuthStateChange(
@@ -83,8 +94,12 @@ export class AuthService {
         if (session) {
           const profile = await this.ensureProfile(session);
           this.authState.next({ session, user: session.user, profile });
+          if (profile?.email === 'ezequielenrico15@gmail.com' || profile?.role === 'super_admin') {
+            this.isSuperAdmin.set(true);
+          }
         } else {
           this.authState.next({ session: null, user: null, profile: null });
+          this.isSuperAdmin.set(false);
         }
       },
     );
@@ -118,6 +133,12 @@ export class AuthService {
         updated_at: new Date().toISOString(),
       };
 
+      // 🚨 Configuración de Súper Admin Central (ezequielenrico15@gmail.com)
+      if (payload.email === 'ezequielenrico15@gmail.com') {
+        payload.role = 'super_admin';
+        this.isSuperAdmin.set(true);
+      }
+
       // Only include tenant_id if it is not the fallback placeholder
       if (!isFallback) {
         payload['tenant_id'] = tenantId;
@@ -135,7 +156,13 @@ export class AuthService {
       }
 
       this.logger.info(`Profile auto-created for user ${session.user.id}`);
-      return data as UserProfile | null;
+      
+      const createdProfile = data as UserProfile | null;
+      if (createdProfile?.email === 'ezequielenrico15@gmail.com' || createdProfile?.role === 'super_admin') {
+        this.isSuperAdmin.set(true);
+      }
+      
+      return createdProfile;
     } catch (err) {
       this.logger.error('ensureProfile error', err);
       return null;

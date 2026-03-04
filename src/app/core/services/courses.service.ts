@@ -162,12 +162,29 @@ export class CoursesService {
     }
 
     createCourse(course: Partial<Course>): Observable<PostgrestSingleResponse<Course | null>> {
+        console.log('🚀 CoursesService.createCourse called');
+        console.log('📚 Course data:', course);
+        
         return from(
             this.supabase
                 .from('courses')
                 .insert(course)
                 .select()
                 .single()
+        ).pipe(
+            map(result => {
+                console.log('📊 Create course result:', result);
+                if (result.error) {
+                    console.error('❌ Create course error:', result.error);
+                } else {
+                    console.log('✅ Course created successfully:', result.data);
+                }
+                return result;
+            }),
+            catchError(error => {
+                console.error('💥 Create course exception:', error);
+                throw error;
+            })
         ) as Observable<PostgrestSingleResponse<Course | null>>;
     }
 
@@ -232,22 +249,33 @@ export class CoursesService {
     }
 
     saveModules(courseId: string, modules: Partial<Module>[]): Observable<any> {
+        console.log('🚀 CoursesService.saveModules called');
+        console.log('📚 Course ID:', courseId);
+        console.log('📦 Modules to save:', modules);
+        
         return from((async () => {
             // Check if mock IDs are involved, indicating the DB isn't ready or we are on mock fallbacks
             if (courseId.length < 5) {
+                console.log('⚠️ Mock mode detected, skipping module save');
                 // Return success immediately to not break the UI while on mock mode
                 return { success: true, warning: 'Mock mode active, modules not saved to DB.' };
             }
 
+            console.log('🔄 Real DB mode, saving modules...');
+            
             // Real DB logic: Need to get the tenant_id from the course first (since course_modules requires it)
             const { data: courseRef } = await (this.supabase.from('courses').select('tenant_id').eq('id', courseId) as any).maybeSingle();
             const tenantId = courseRef?.tenant_id;
+            
+            console.log('🏢 Course tenant ID:', tenantId);
 
             // 1. Filter out valid existing IDs to keep
             const currentIds = modules.filter(m => m.id && m.id.length > 10).map(m => m.id);
+            console.log('📋 Current module IDs to keep:', currentIds);
             
             // 2. Delete modules for this course that are NOT in the newly saved list
             if (currentIds.length > 0) {
+                console.log('🗑️ Deleting modules not in current list...');
                 await this.supabase.from('course_modules')
                     .delete()
                     .eq('course_id', courseId)

@@ -5,11 +5,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { OrderService } from '@app/core/services/order.service';
+import { InvoiceService } from '@app/features/sales/application/invoice.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { LoggerService } from '@app/core/services/logger.service';
 import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { FinanceService } from '@app/core/services/finance.service';
 
 interface CartItem extends Product {
     quantity: number;
@@ -28,6 +30,8 @@ export class AdminSalesPage implements OnInit {
     private tenantService = inject(TenantService);
     private productRepository = inject(ProductRepository);
     private orderService = inject(OrderService);
+    private invoiceService = inject(InvoiceService);
+    private financeService = inject(FinanceService);
 
     // Data Signals
     products = signal<Product[]>([]);
@@ -40,6 +44,7 @@ export class AdminSalesPage implements OnInit {
     isCartOpenMobile = signal(false); // For mobile responsiveness
     customerName = signal('');
     discount = signal<number>(0);
+    paymentMethod = signal<'efectivo' | 'transferencia' | 'tarjeta'>('efectivo');
 
     // Pagination Signals
     currentPage = signal(1);
@@ -157,15 +162,13 @@ export class AdminSalesPage implements OnInit {
         if (this.cart().length === 0) return;
         this.processing.set(true);
         const supabase = this.auth.getSupabaseClient();
-        const user = this.auth.getCurrentUser();
+        const tenantId = this.tenantService.getTenantId();
 
         try {
-            const tenantId = this.tenantService.getTenantId();
-
             // 1. Create Order (acting as a Sale)
             const order: Order = {
                 customer_name: this.customerName() || 'Consumidor Final',
-                customer_email: 'mostrador@arecofix.com',
+                customer_email: undefined,
                 status: 'completed',
                 subtotal: this.cartSubtotal(),
                 tax: 0,
@@ -182,37 +185,58 @@ export class AdminSalesPage implements OnInit {
             }));
 
             const { data: createdOrder, error: orderError } = await this.orderService.createOrder(order, items);
-            if (orderError || !createdOrder) throw orderError || new Error("Order creation failed");
+            if (orderError || !createdOrder) throw orderError || new Error('Order creation failed');
 
-            // 3. Update Stock manually with isolation
+            // 2. Decrement stock (with fallback)
             for (const item of this.cart()) {
                 const { error: stockError } = await supabase.rpc('decrement_stock_tenant', {
                     row_id: item.id,
                     amount: item.quantity,
                     t_id: tenantId
                 });
-                
                 if (stockError) {
-                    // Manual Fallback
-                    const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.id).eq('tenant_id', tenantId).single();
-                    if (currentProduct) {
-                        await supabase.from('products').update({ stock: currentProduct.stock - item.quantity }).eq('id', item.id).eq('tenant_id', tenantId);
+                    const { data: cur } = await supabase
+                        .from('products').select('stock')
+                        .eq('id', item.id).eq('tenant_id', tenantId).single();
+                    if (cur) {
+                        await supabase.from('products')
+                            .update({ stock: cur.stock - item.quantity })
+                            .eq('id', item.id).eq('tenant_id', tenantId);
                     }
                 }
             }
 
-            // 4. Create Invoice
-            await supabase.from('invoices').insert({
-                order_id: createdOrder.id,
-                tenant_id: tenantId,
-                total_amount: this.finalTotal(),
-                type: 'B', 
-                issued_at: new Date().toISOString(),
-                customer_name: this.customerName() || 'Consumidor Final'
+            // 3. Generate Invoice via InvoiceService (duplicate guard + canonical totals)
+            const invoiceResult = await this.invoiceService.generateInvoice({
+                order_id:      createdOrder.id,
+                customer_name: this.customerName() || 'Consumidor Final',
+                type:          'B',
+                origin:        'sale',
+                subtotal:      this.cartSubtotal(),
+                tax_amount:    0,
+                discount:      this.discount(),
+                total_amount:  this.finalTotal(),
             });
 
+            if (invoiceResult.error) {
+                this.logger.error('Invoice creation failed after sale', invoiceResult.error);
+                // Don't block the sale — the order was already created
+            }
+
+            // 4. Record Cash Movement [USER-REQ]
+            if (this.paymentMethod() === 'efectivo' && createdOrder?.id) {
+                await this.financeService.recordMovement({
+                    amount: this.finalTotal(),
+                    type: 'income',
+                    category: 'sale',
+                    payment_method: 'cash',
+                    reference_id: createdOrder.id,
+                    notes: `Venta POS - Ticket #${createdOrder.id.substring(0,8)}`
+                });
+            }
+
             this.clearCart();
-            this.router.navigate(['/admin/invoices']);
+            this.router.navigate(['/admin/sales/invoices']);
 
         } catch (e: any) {
             this.logger.error('Checkout error', e);

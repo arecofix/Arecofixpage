@@ -45,6 +45,10 @@ export class AdminOrderFormPage implements OnInit {
     products: ProductOption[] = [];
     clients: any[] = [];
 
+    // Product autocomplete state
+    productSearchQueries = signal<string[]>([]);
+    showProductDropdowns = signal<boolean[]>([]);
+
     form = signal<Order>({
         customer_name: '',
         customer_email: '',
@@ -264,26 +268,43 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     async save() {
+        console.log('🚀 Save method called');
+        
         if (this.items().length === 0) {
+            console.log('❌ No items in order');
             this.error = 'Debes agregar al menos un producto';
             this.cdr.markForCheck();
             return;
         }
 
+        console.log('📋 Order items:', this.items());
+        console.log('📋 Order form:', this.form());
+
         this.saving = true;
         this.error = null;
 
         try {
+            console.log('🔄 Starting order creation...');
             let result;
+            
             if (this.id) {
+                console.log('📝 Updating existing order:', this.id);
                 result = await this.orderService.updateOrder(this.id, this.form(), this.items());
             } else {
+                console.log('➕ Creating new order');
                 result = await this.orderService.createOrder(this.form(), this.items());
             }
 
+            console.log('📊 Order service result:', result);
+
             const { error } = result;
 
-            if (error) throw error;
+            if (error) {
+                console.error('❌ Order service error:', error);
+                throw error;
+            }
+
+            console.log('✅ Order created/updated successfully');
 
             // Check for status change and notify
             if (this.id && this.originalStatus && this.form().status !== this.originalStatus) {
@@ -304,12 +325,78 @@ export class AdminOrderFormPage implements OnInit {
                 }
             }
 
+            console.log('🏠 Redirecting to orders list');
             this.router.navigate(['/admin/orders']);
+            
         } catch (e: any) {
+            console.error('💥 Save method error:', e);
             this.error = e.message || 'Error al guardar pedido';
-            this.saving = false;
+            this.saving = false; // Reset saving state on error
             this.cdr.markForCheck();
         }
-
     }
+
+    // Product autocomplete methods
+    onProductInput(index: number, query: string) {
+        const queries = [...this.productSearchQueries()];
+        queries[index] = query.toLowerCase();
+        this.productSearchQueries.set(queries);
+    }
+
+    onProductFocus(index: number) {
+        const dropdowns = [...this.showProductDropdowns()];
+        dropdowns[index] = true;
+        this.showProductDropdowns.set(dropdowns);
+    }
+
+    onProductBlur(index: number) {
+        // Delay hiding to allow click on dropdown items
+        setTimeout(() => {
+            const dropdowns = [...this.showProductDropdowns()];
+            dropdowns[index] = false;
+            this.showProductDropdowns.set(dropdowns);
+        }, 200);
+    }
+
+    getFilteredProducts(index: number): ProductOption[] {
+        const query = this.productSearchQueries()[index] || '';
+        if (!query) return this.products;
+        
+        return this.products.filter(product => 
+            product.name.toLowerCase().includes(query) ||
+            product.sku.toLowerCase().includes(query) ||
+            product.price.toString().includes(query)
+        );
+    }
+
+    showProductDropdown(index: number): boolean {
+        return this.showProductDropdowns()[index] || false;
+    }
+
+    selectProduct(index: number, product: ProductOption) {
+        this.items.update(items => {
+            const newItems = [...items];
+            newItems[index] = {
+                ...newItems[index],
+                product_id: product.id,
+                product_name: product.name,
+                product_sku: product.sku,
+                unit_price: product.price,
+                subtotal: product.price * newItems[index].quantity
+            };
+            return newItems;
+        });
+
+        // Hide dropdown and clear search
+        const dropdowns = [...this.showProductDropdowns()];
+        dropdowns[index] = false;
+        this.showProductDropdowns.set(dropdowns);
+        
+        const queries = [...this.productSearchQueries()];
+        queries[index] = '';
+        this.productSearchQueries.set(queries);
+        
+        this.calculateTotals();
+    }
+
 }

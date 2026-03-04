@@ -1,0 +1,56 @@
+<div class="pagination-container" *ngIf="pagination && pagination.totalPages > 1">
+  <!-- Rango de items -->
+  <div class="pagination-info" *ngIf="showItemRange">
+    <span class="item-range">{{ itemRange }}</span>
+  </div>
+
+  <div class="pagination-wrapper">
+    <!-- Selector de tamaño de página -->
+    <div class="page-size-selector" *ngIf="showPageSizeSelector">
+      <label for="page-size">Mostrar:</label>
+      <select id="page-size" (change)="onPageSizeChange($event)">
+        <option 
+          *ngFor="let size of pageSizeOptions" 
+          [value]="size"
+          [selected]="size === pagination.limit">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="pagination-controls">
+      <!-- Botón anterior -->
+      <button 
+        class="pagination-btn prev-btn" 
+        (click)="onPreviousPage()"
+        [disabled]="isPageDisabled('prev')"
+        title="Página anterior">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- Números de página -->
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of pageNumbers"
+          class="page-number"
+          [class.active]="isPageActive(page)"
+          [class.ellipsis]="isEllipsis(page)"
+          [disabled]="isEllipsis(page)"
+          (click)="onPageClick(page)">
+          <span *ngIf="!isEllipsis(page)">{{ page }}</span>
+          <span *ngIf="isEllipsis(page)">...</span>
+        </button>
+      </div>
+
+      <!-- Botón siguiente -->
+      <button 
+        class="pagination-btn next-btn" 
+        (click)="onNextPage()"
+        [disabled]="isPageDisabled('next')"
+        title="Página siguiente">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

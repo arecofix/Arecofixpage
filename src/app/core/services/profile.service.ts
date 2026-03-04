@@ -34,7 +34,7 @@ export class ProfileService {
       .update(profile)
       .eq('id', userId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       this.logger.error('Error updating profile', error);

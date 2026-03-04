@@ -1,0 +1,174 @@
+<div class="zona-norte-nosotros">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="container">
+        <h1 class="hero-title">Sobre Nosotros</h1>
+        <p class="hero-subtitle">Conocé nuestra historia, nuestro equipo y el compromiso que nos define</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Historia -->
+  <section class="history-section">
+    <div class="container">
+      <div class="history-content">
+        <div class="history-text">
+          <h2>{{ historia.titulo }}</h2>
+          <p>{{ historia.contenido }}</p>
+          <div class="history-stats">
+            <div class="stat-item">
+              <div class="stat-number">{{ historia.anioFundacion }}</div>
+              <div class="stat-label">Años de Experiencia</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ historia.empleados }}+</div>
+              <div class="stat-label">Profesionales</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ historia.proyectosCompletados }}+</div>
+              <div class="stat-label">Proyectos Completados</div>
+            </div>
+          </div>
+        </div>
+        <div class="history-image">
+          <img src="assets/img/branches/zona-norte/nosotros-hero.jpg" 
+               alt="Nuestra historia"
+               onerror="this.src='assets/img/branches/zona-norte/nosotros-placeholder.jpg'">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Misión y Visión -->
+  <section class="mission-vision-section">
+    <div class="container">
+      <div class="mission-vision-grid">
+        <div class="mission-card">
+          <div class="card-icon">
+            <i class="fas" [class]="mision.icono"></i>
+          </div>
+          <h3>{{ mision.titulo }}</h3>
+          <p>{{ mision.contenido }}</p>
+        </div>
+        <div class="vision-card">
+          <div class="card-icon">
+            <i class="fas" [class]="vision.icono"></i>
+          </div>
+          <h3>{{ vision.titulo }}</h3>
+          <p>{{ vision.contenido }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Valores -->
+  <section class="values-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Nuestros Valores</h2>
+        <p>Los principios que guían cada uno de nuestros trabajos</p>
+      </div>
+      <div class="values-grid">
+        <div class="value-card" *ngFor="let valor of valores">
+          <div class="value-icon">
+            <i class="fas" [class]="valor.icono"></i>
+          </div>
+          <h3>{{ valor.titulo }}</h3>
+          <p>{{ valor.descripcion }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipo -->
+  <section class="team-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Nuestro Equipo</h2>
+        <p>Profesionales apasionados y comprometidos con la excelencia</p>
+      </div>
+      <div class="team-grid">
+        <div class="team-member" *ngFor="let miembro of equipo">
+          <div class="member-photo">
+            <img [src]="miembro.foto" 
+                 [alt]="miembro.nombre"
+                 onerror="this.src='assets/img/branches/zona-norte/team-placeholder.jpg'">
+          </div>
+          <div class="member-info">
+            <h3>{{ miembro.nombre }}</h3>
+            <div class="member-role">{{ miembro.cargo }}</div>
+            <div class="member-meta">
+              <span><i class="fas fa-briefcase"></i> {{ miembro.experiencia }}</span>
+              <span><i class="fas fa-tools"></i> {{ miembro.especialidad }}</span>
+            </div>
+            <p>{{ miembro.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clientes -->
+  <section class="clients-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Clientes que Confían en Nosotros</h2>
+        <p>Hoteles 5 estrellas, consorcios, hospitales y más</p>
+      </div>
+      <div class="clients-grid">
+        <div class="client-card" *ngFor="let cliente of clientes">
+          <div class="client-logo">
+            <img [src]="cliente.logo" 
+                 [alt]="cliente.nombre"
+                 onerror="this.src='assets/img/branches/zona-norte/client-placeholder.jpg'">
+          </div>
+          <div class="client-info">
+            <h4>{{ cliente.nombre }}</h4>
+            <span class="client-type">{{ cliente.tipo }}</span>
+            <p class="client-testimonial">{{ cliente.testimonio }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certificaciones -->
+  <section class="certifications-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Certificaciones y Garantías</h2>
+        <p>La seguridad y confianza de nuestros clientes es nuestra prioridad</p>
+      </div>
+      <div class="certifications-grid">
+        <div class="certification-card" *ngFor="let cert of certificaciones">
+          <div class="cert-icon">
+            <i class="fas" [class]="cert.icono"></i>
+          </div>
+          <h4>{{ cert.nombre }}</h4>
+          <p>{{ cert.descripcion }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿Listo para trabajar con los mejores?</h2>
+        <p class="cta-subtitle">Contactanos hoy mismo y descubrí por qué somos la elección número uno en restauración</p>
+        <div class="cta-actions">
+          <button class="btn btn-primary btn-lg" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="llamarTelefono()">
+            <i class="fas fa-phone"></i>
+            Llamar Ahora
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,13 +1,14 @@
 import { Component, inject, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-admin-company-settings-page',
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, RouterLink],
     templateUrl: './admin-company-settings-page.html',
 })
 export class AdminCompanySettingsPage implements OnInit {
@@ -38,7 +39,9 @@ export class AdminCompanySettingsPage implements OnInit {
 
     // Branches Setup
     branches = signal<any[]>([]);
-    newBranch = signal({ name: '', address: '', is_active: true });
+    newBranch = signal({ name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true });
+    editingBranch = signal<any | null>(null);
+    tempBranch = { name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true, id: '' };
     savingBranch = signal(false);
 
     async ngOnInit() {
@@ -179,10 +182,15 @@ export class AdminCompanySettingsPage implements OnInit {
         const supabase = this.auth.getSupabaseClient();
         const tenantId = this.tenantService.getTenantId();
 
+        // Generate slug if empty
+        const slug = payload.slug || payload.name.toLowerCase().trim().replace(/\s+/g, '-');
+
         try {
             const { error } = await supabase.from('branches').insert([{
                 name: payload.name,
                 address: payload.address,
+                slug: slug,
+                global_markup_percentage: payload.global_markup_percentage,
                 is_active: payload.is_active,
                 tenant_id: tenantId
             }]);
@@ -190,8 +198,46 @@ export class AdminCompanySettingsPage implements OnInit {
             if (error) throw error;
             
             this.success.set('Sucursal agregada con éxito');
-            this.newBranch.set({ name: '', address: '', is_active: true });
+            this.newBranch.set({ name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true });
             await this.loadSettings(); // Reload to get the new list
+        } catch (e: any) {
+            this.error.set(e.message);
+        } finally {
+            this.savingBranch.set(false);
+            this.cdr.markForCheck();
+        }
+    }
+
+    openEditBranchModal(branch: any) {
+        this.tempBranch = { ...branch };
+        this.editingBranch.set(branch);
+        this.cdr.markForCheck();
+    }
+
+    async updateBranch() {
+        const branch = this.tempBranch;
+        if (!branch.id) return;
+
+        this.savingBranch.set(true);
+        this.cdr.markForCheck();
+        const supabase = this.auth.getSupabaseClient();
+
+        try {
+            const { error } = await supabase.from('branches')
+                .update({
+                    name: branch.name,
+                    address: branch.address,
+                    slug: branch.slug,
+                    global_markup_percentage: branch.global_markup_percentage,
+                    is_active: branch.is_active
+                })
+                .eq('id', branch.id);
+
+            if (error) throw error;
+
+            this.success.set('Sucursal actualizada');
+            this.editingBranch.set(null);
+            await this.loadSettings();
         } catch (e: any) {
             this.error.set(e.message);
         } finally {

@@ -1,19 +1,21 @@
 <div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans no-print text-gray-800 dark:text-gray-200">
   <div class="max-w-6xl mx-auto animate-fade-in-up">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white/50 dark:bg-gray-800/50 p-6 rounded-3xl backdrop-blur-lg border border-white dark:border-gray-800 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all max-sm:shadow-sm">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white/50 dark:bg-gray-800/50 p-6 rounded-3xl backdrop-blur-lg border border-white dark:border-gray-800 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all max-sm:shadow-sm">
       <div class="flex items-center gap-3">
-        <a routerLink="/admin/purchases" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
-          <i class="fas fa-arrow-left"></i>
-        </a>
         <div class="w-10 h-10 rounded-2xl bg-linear-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-            <i class="fas fa-shopping-cart"></i>
+            <i class="fas fa-truck-loading"></i>
         </div>
         <div>
             <h1 class="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-green-600 to-emerald-500 tracking-tight dark:from-green-400 dark:to-emerald-300">
-                Registrar Compra
+                Compras a Proveedores
             </h1>
         </div>
+      </div>
+      <div>
+        <a routerLink="/admin/purchases/new" class="btn bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white border-none rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50">
+            <i class="fas fa-plus"></i> Registrar Compra
+        </a>
       </div>
     </div>
     
@@ -45,7 +47,7 @@
                     <tr class="text-gray-400 dark:text-gray-500 font-bold text-[10px] tracking-widest uppercase">
                         <th class="px-6 py-4 rounded-tl-4xl">Fecha Registro</th>
                         <th class="px-6 py-4">Proveedor</th>
-                        <th class="px-6 py-4 text-center">Estado</th>
+                        <th class="px-6 py-4 text-center">Estado / Pago</th>
                         <th class="px-6 py-4 text-right">Monto Total</th>
                         <th class="px-6 py-4 text-right rounded-tr-4xl">Acciones</th>
                     </tr>
@@ -63,19 +65,27 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            @if(purchase.status === 'received') {
-                                <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
-                                   Recibido
+                            <div class="flex flex-col items-center gap-1">
+                                <!-- Status Badge -->
+                                @if(purchase.status === 'received') {
+                                    <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                                       Recibido
+                                    </span>
+                                } @else if(purchase.status === 'ordered') {
+                                    <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-yellow-50 text-yellow-600 border border-yellow-100 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20">
+                                       Pendiente
+                                    </span>
+                                } @else if(purchase.status === 'cancelled') {
+                                    <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-red-50 text-red-600 border border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">
+                                       Cancelado
+                                    </span>
+                                }
+                                
+                                <!-- Payment Method Badge -->
+                                <span class="text-[9px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-widest mt-1">
+                                    <i class="fas fa-wallet mr-1 opacity-70"></i> {{ purchase.payment_method || 'S/N' }}
                                 </span>
-                            } @else if(purchase.status === 'ordered') {
-                                <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-yellow-50 text-yellow-600 border border-yellow-100 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20">
-                                   Pendiente
-                                </span>
-                            } @else if(purchase.status === 'cancelled') {
-                                <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-red-50 text-red-600 border border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">
-                                   Cancelado
-                                </span>
-                            }
+                            </div>
                         </td>
                         
                         <td class="px-6 py-4 text-right">
@@ -111,6 +121,10 @@
                           } @else if(purchase.status === 'cancelled') {
                               <span class="px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm bg-red-50 text-red-600 border border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">Cancelado</span>
                           }
+                     </div>
+                     <!-- Added payment method mobile -->
+                     <div class="text-right mt-1">
+                         <span class="text-[9px] uppercase font-bold text-gray-500 tracking-widest"><i class="fas fa-wallet opacity-70"></i> {{ purchase.payment_method || 'S/N' }}</span>
                      </div>
                 </div>
             }

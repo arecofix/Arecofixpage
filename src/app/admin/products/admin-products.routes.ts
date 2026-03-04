@@ -12,6 +12,11 @@ export const ADMIN_PRODUCTS_ROUTES: Routes = [
     loadComponent: () => import('./admin-product-form-page').then(m => m.AdminProductFormPage)
   },
   {
+    path: 'approvals',
+    title: 'Aprobaciones de Catálogo',
+    loadComponent: () => import('./admin-approvals-page').then(m => m.AdminApprovalsPage)
+  },
+  {
     path: ':id',
     title: 'Editar Producto',
     loadComponent: () => import('./admin-product-form-page').then(m => m.AdminProductFormPage)

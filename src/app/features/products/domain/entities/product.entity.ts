@@ -17,12 +17,15 @@ export interface Product {
     slug: string;
     description: string;
     price: number;
+    sale_price?: number;
     category_id: string;
     brand_id?: string;
     image_url?: string;
     gallery_urls?: string[];
     is_featured: boolean;
     is_active: boolean;
+    is_global?: boolean;
+    branch_id?: string;
     stock: number; // General stock (aggregate or legacy)
     min_stock_alert?: number;
     sku?: string;
@@ -35,6 +38,7 @@ export interface Product {
     
     // Relations
     branch_stock?: ProductStockPerBranch[];
+    branches?: { name: string };
 }
 
 /**

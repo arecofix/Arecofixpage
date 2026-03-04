@@ -8,6 +8,7 @@ export interface Purchase {
     suppliers?: { name: string }; // Joined data from Supabase
     total_amount: number;
     status: 'pending' | 'ordered' | 'received' | 'cancelled';
+    payment_method?: string;
     notes?: string;
     created_at: string;
     updated_at: string;

@@ -436,8 +436,13 @@ export class AdminCourseFormPage implements OnInit {
     });
   }
 
-  save() {
+  async save() {
+    console.log('🚀 Save method called');
+    console.log('📋 Form valid:', !this.form.invalid);
+    console.log('📋 Form values:', this.form.value);
+    
     if (this.form.invalid) {
+      console.log('❌ Form is invalid');
       this.form.markAllAsTouched();
       alert('Por favor completa todos los campos requeridos');
       return;
@@ -445,38 +450,52 @@ export class AdminCourseFormPage implements OnInit {
 
     this.saving = true;
     const { modules, ...courseData } = this.form.value;
+    
+    console.log('📚 Course data to save:', courseData);
+    console.log('📦 Modules to save:', modules);
 
-    const request = this.isEditing && this.courseId
-      ? this.coursesService.updateCourse(this.courseId, courseData)
-      : this.coursesService.createCourse(courseData);
-
-    request.subscribe({
-      next: (res) => {
-        const savedCourseId = res?.data?.id || this.courseId;
-        
-        if (savedCourseId && modules && modules.length >= 0) {
-            this.coursesService.saveModules(savedCourseId, modules).subscribe({
-                next: () => {
-                    this.saving = false;
-                    this.router.navigate(['/admin/courses']);
-                },
-                error: (modErr) => {
-                    console.error('Error saving modules', modErr);
-                    alert('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario. Error: ' + (modErr.message || modErr));
-                    this.saving = false;
-                    this.router.navigate(['/admin/courses']);
-                }
-            });
-        } else {
-            this.saving = false;
-            this.router.navigate(['/admin/courses']);
-        }
-      },
-      error: (err) => {
-        console.error('Error saving course', err);
-        alert('Error al guardar: ' + err.message);
-        this.saving = false;
+    try {
+      console.log('🔄 Starting course creation/update...');
+      
+      let courseResult;
+      if (this.isEditing && this.courseId) {
+        console.log('📝 Updating existing course:', this.courseId);
+        courseResult = await this.coursesService.updateCourse(this.courseId, courseData).toPromise();
+      } else {
+        console.log('➕ Creating new course');
+        courseResult = await this.coursesService.createCourse(courseData).toPromise();
       }
-    });
+
+      console.log('📊 Course save result:', courseResult);
+
+      if (courseResult?.error) {
+        console.error('❌ Course save error:', courseResult.error);
+        throw new Error(courseResult.error.message || 'Error al guardar el curso');
+      }
+
+      const savedCourseId = courseResult?.data?.id || this.courseId;
+      console.log('✅ Course saved with ID:', savedCourseId);
+      
+      if (savedCourseId && modules && modules.length >= 0) {
+        console.log('📦 Saving modules...');
+        try {
+          await this.coursesService.saveModules(savedCourseId, modules).toPromise();
+          console.log('✅ Modules saved successfully');
+        } catch (modErr: any) {
+          console.error('❌ Error saving modules:', modErr);
+          alert('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario. Error: ' + (modErr.message || modErr));
+        }
+      }
+      
+      console.log('🏠 Redirecting to courses list');
+      this.router.navigate(['/admin/courses']);
+      
+    } catch (err: any) {
+      console.error('💥 Save method error:', err);
+      alert('Error al guardar: ' + err.message);
+    } finally {
+      this.saving = false;
+      console.log('✅ Save method completed, saving state reset');
+    }
   }
 }

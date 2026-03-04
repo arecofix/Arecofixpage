@@ -1,0 +1,231 @@
+<div class="zona-norte-productos">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="container">
+        <h1 class="hero-title">Nuestros Productos</h1>
+        <p class="hero-subtitle">Productos profesionales de alta calidad para todos tus proyectos de restauración</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filtros y Búsqueda -->
+  <section class="filters-section">
+    <div class="container">
+      <div class="filters-header">
+        <h2>Filtrar Productos</h2>
+        <div class="filters-actions">
+          <div class="view-toggle">
+            <button 
+              class="view-btn" 
+              [class.active]="viewMode === 'grid'"
+              (click)="toggleViewMode()"
+              title="Vista de cuadrícula">
+              <i class="fas fa-th"></i>
+            </button>
+            <button 
+              class="view-btn" 
+              [class.active]="viewMode === 'list'"
+              (click)="toggleViewMode()"
+              title="Vista de lista">
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
+          <button 
+            class="clear-filters-btn" 
+            *ngIf="hasActiveFilters()"
+            (click)="clearFilters()"
+            title="Limpiar filtros">
+            <i class="fas fa-times"></i>
+            Limpiar ({{ getActiveFiltersCount() }})
+          </button>
+        </div>
+      </div>
+
+      <div class="filters-grid">
+        <!-- Búsqueda -->
+        <div class="filter-group">
+          <label for="search">Buscar</label>
+          <div class="search-input">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              id="search"
+              [(ngModel)]="searchQuery"
+              (input)="onSearchChange()"
+              placeholder="Buscar productos...">
+          </div>
+        </div>
+
+        <!-- Categoría -->
+        <div class="filter-group">
+          <label for="category">Categoría</label>
+          <select id="category" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Marca -->
+        <div class="filter-group">
+          <label for="brand">Marca</label>
+          <select id="brand" [(ngModel)]="selectedBrand" (change)="onBrandChange()">
+            <option value="">Todas las marcas</option>
+            <option *ngFor="let brand of brands" [value]="brand">
+              {{ brand }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Rango de precio -->
+        <div class="filter-group">
+          <label for="priceRange">Rango de precio</label>
+          <select id="priceRange" [(ngModel)]="selectedPriceRange" (change)="onPriceRangeChange()">
+            <option *ngFor="let range of getPriceRanges()" [value]="range.value">
+              {{ range.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Ordenar -->
+        <div class="filter-group">
+          <label for="sort">Ordenar por</label>
+          <select id="sort" [(ngModel)]="sortBy" (change)="onSortChange()">
+            <option value="name">Nombre</option>
+            <option value="price-asc">Precio: Menor a mayor</option>
+            <option value="price-desc">Precio: Mayor a menor</option>
+            <option value="featured">Destacados</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contenido Principal -->
+  <section class="products-section">
+    <div class="container">
+      <!-- Loading -->
+      <div class="loading-container" *ngIf="loading">
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Cargando productos...</p>
+        </div>
+      </div>
+
+      <!-- Lista de Productos -->
+      <div class="products-container" *ngIf="!loading">
+        <!-- Grid View -->
+        <div class="products-grid" [class.grid-view]="viewMode === 'grid'" [class.list-view]="viewMode === 'list'">
+          <div class="product-card" 
+               *ngFor="let product of products"
+               [class.grid-card]="viewMode === 'grid'"
+               [class.list-card]="viewMode === 'list'">
+            
+            <!-- Imagen del producto -->
+            <div class="product-image">
+              <img [src]="product.imageUrl" 
+                   [alt]="product.name"
+                   onerror="this.src='assets/img/branches/zona-norte/product-placeholder.jpg'">
+              
+              <!-- Badge de descuento -->
+              <div class="discount-badge" *ngIf="hasDiscount(product)">
+                -{{ getDiscountPercentage(product) }}%
+              </div>
+              
+              <!-- Badge de destacado -->
+              <div class="featured-badge" *ngIf="product.isFeatured">
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+
+            <!-- Información del producto -->
+            <div class="product-info">
+              <div class="product-header">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <span class="product-sku">SKU: {{ product.sku }}</span>
+              </div>
+
+              <p class="product-description">{{ product.description }}</p>
+
+              <div class="product-meta">
+                <span class="product-category">{{ product.category }}</span>
+                <span class="product-brand">{{ product.brand }}</span>
+              </div>
+
+              <!-- Precios -->
+              <div class="product-pricing">
+                <div class="price-container">
+                  <span class="current-price">{{ formatPrice(getProductPrice(product)) }}</span>
+                  <span class="original-price" *ngIf="hasDiscount(product)">
+                    {{ formatPrice(product.price) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Stock -->
+              <div class="stock-status" [class]="getStockStatusClass(product)">
+                <i class="fas" 
+                   [class]="isInStock(product) ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                {{ getStockStatus(product) }}
+              </div>
+
+              <!-- Acciones -->
+              <div class="product-actions">
+                <button class="btn btn-primary" (click)="contactarWhatsApp(product)">
+                  <i class="fab fa-whatsapp"></i>
+                  Consultar
+                </button>
+                <button class="btn btn-outline">
+                  <i class="fas fa-info-circle"></i>
+                  Detalles
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div class="empty-state" *ngIf="products.length === 0">
+          <div class="empty-content">
+            <i class="fas fa-search"></i>
+            <h3>No se encontraron productos</h3>
+            <p>Intenta ajustar los filtros o términos de búsqueda</p>
+            <button class="btn btn-primary" (click)="clearFilters()">
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination-wrapper" *ngIf="pagination && pagination.pagination.totalPages > 1">
+        <app-pagination
+          [pagination]="pagination.pagination"
+          [showItemRange]="true"
+          [showPageSizeSelector]="true"
+          [pageSizeOptions]="[12, 24, 48]"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿No encontrás lo que buscas?</h2>
+        <p class="cta-subtitle">Contactanos y te asesoraremos sobre el producto perfecto para tu proyecto</p>
+        <div class="cta-actions">
+          <button class="btn btn-whatsapp btn-lg" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            Contactar Asesor
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

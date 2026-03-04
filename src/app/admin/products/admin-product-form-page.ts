@@ -21,7 +21,7 @@ export class AdminProductFormPage implements OnInit {
   id: string | null = null;
   
   // Form State
-  form = signal({
+  formVal = {
     sku: '',
     barcode: '',
     name: '',
@@ -33,12 +33,15 @@ export class AdminProductFormPage implements OnInit {
     brand_id: '',
     category_id: '',
     is_active: true,
+    is_global: true,
+    branch_id: '',
     images: [] as string[],
-  });
+  };
 
   // Resources
   brands = signal<any[]>([]);
   categories = signal<any[]>([]);
+  branches = signal<any[]>([]);
 
   // UI State
   loading = true;
@@ -49,19 +52,21 @@ export class AdminProductFormPage implements OnInit {
 
   async ngOnInit() {
     try {
-      const [brands, categories] = await Promise.all([
+      const [brands, categories, branches] = await Promise.all([
         this.productService.getBrands(),
-        this.productService.getCategories()
+        this.productService.getCategories(),
+        this.productService.getBranches()
       ]);
 
       this.brands.set(brands);
       this.categories.set(categories);
+      this.branches.set(branches);
 
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
         const data = await this.productService.getProduct(this.id);
         if (data) {
-          this.form.set({
+          this.formVal = {
             sku: data.sku || '',
             barcode: data.barcode || '',
             name: data.name || '',
@@ -73,8 +78,10 @@ export class AdminProductFormPage implements OnInit {
             brand_id: data.brand_id || '',
             category_id: data.category_id || '',
             is_active: data.is_active ?? true,
+            is_global: data.is_global ?? true,
+            branch_id: data.branch_id || '',
             images: data.gallery_urls || (data.image_url ? [data.image_url] : []),
-          });
+          };
         }
       }
     } catch (e: any) {
@@ -86,23 +93,23 @@ export class AdminProductFormPage implements OnInit {
   }
 
   generateBarcode() {
-    const sku = this.form().sku;
-    const barcode = sku ? sku : `GEN-${Date.now()}`;
-    this.form.update(f => ({ ...f, barcode }));
+    const sku = this.formVal.sku;
+    this.formVal.barcode = sku ? sku : `GEN-${Date.now()}`;
+    this.cdr.markForCheck();
   }
 
   generateSlug() {
-    const name = this.form().name;
+    const name = this.formVal.name;
     if (name) {
-      const slug = this.productService.slugify(name);
-      this.form.update(f => ({ ...f, slug }));
+      this.formVal.slug = this.productService.slugify(name);
+      this.cdr.markForCheck();
     }
   }
 
   async save() {
     this.saving = true;
     this.error = null;
-    const formVal = this.form();
+    const formVal = this.formVal;
 
     // Basic Validation
     if (!formVal.name || formVal.price < 0) {
@@ -128,6 +135,8 @@ export class AdminProductFormPage implements OnInit {
       brand_id: formVal.brand_id || null,
       category_id: formVal.category_id || null,
       is_active: formVal.is_active,
+      is_global: formVal.is_global,
+      branch_id: formVal.branch_id || null,
       image_url: formVal.images.length > 0 ? formVal.images[0] : null, // Main image
     };
 

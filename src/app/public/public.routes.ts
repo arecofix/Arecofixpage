@@ -1,12 +1,15 @@
 import { Routes } from '@angular/router';
+import { TenantIsolationGuard } from '@app/shared/guards/tenant-isolation.guard';
 import { PublicLayout } from '@app/public/layout/public-layout';
 import { PublicHomePage } from './home/public-home-page';
+import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 
 export const publicRoutes: Routes = [
   {
     title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
     path: '',
     component: PublicLayout,
+    canActivate: [TenantIsolationGuard],
     children: [
       {
         title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
@@ -352,6 +355,93 @@ export const publicRoutes: Routes = [
             imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
           }
         }
+      },
+      {
+        title: 'Zona Norte - Sudamericana Enlozados',
+        path: 'Zona-Norte',
+        loadComponent: () => import('@app/public/zona-norte/zona-norte-layout.component').then(m => m.ZonaNorteLayoutComponent),
+        canActivate: [TenantIsolationGuard],
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('@app/public/zona-norte/pages/home/zona-norte-home.component').then(m => m.ZonaNorteHomeComponent),
+            data: {
+              title: 'Sudamericana Enlozados | Plomería y Restauración de Baños',
+              seo: {
+                title: 'Sudamericana Enlozados | Plomería y Restauración de Baños en Zona Norte',
+                description: 'Especialistas en enlozado de bañeras, jacuzzis, sanitarios, azulejos y pulido de parquet. 15 años de experiencia. Servicio en todo el país.',
+                imageUrl: 'assets/img/branches/zona-norte/hero-1.jpg',
+                keywords: 'enlozado bañeras, plomeria zona norte, restauracion baños, pulido parquet, azulejos, sanitarios, jacuzzi, hidromasajes',
+                type: 'website'
+              }
+            }
+          },
+          {
+            path: 'servicios',
+            loadComponent: () => import('@app/public/zona-norte/pages/servicios/zona-norte-servicios.component').then(m => m.ZonaNorteServiciosComponent),
+            data: {
+              title: 'Servicios | Sudamericana Enlozados',
+              seo: {
+                title: 'Nuestros Servicios | Sudamericana Enlozados',
+                description: 'Conocé todos nuestros servicios: enlozado de bañeras, restauración de sanitarios, instalación de azulejos y pulido de parquet.',
+                imageUrl: 'assets/img/branches/zona-norte/servicios-hero.jpg'
+              }
+            }
+          },
+          {
+            path: 'galeria',
+            loadComponent: () => import('@app/public/zona-norte/pages/galeria/zona-norte-galeria.component').then(m => m.ZonaNorteGaleriaComponent),
+            data: {
+              title: 'Galería | Sudamericana Enlozados',
+              seo: {
+                title: 'Galería de Trabajos | Sudamericana Enlozados',
+                description: 'Mirá nuestros trabajos realizados: hoteles 5 estrellas, consorcios, residencias y más.',
+                imageUrl: 'assets/img/branches/zona-norte/galeria-hero.jpg'
+              }
+            }
+          },
+          {
+            path: 'nosotros',
+            loadComponent: () => import('@app/public/zona-norte/pages/nosotros/zona-norte-nosotros.component').then(m => m.ZonaNorteNosotrosComponent),
+            data: {
+              title: 'Nosotros | Sudamericana Enlozados',
+              seo: {
+                title: 'Sobre Nosotros | Sudamericana Enlozados',
+                description: 'Conocé nuestra historia, 15 años de experiencia y por qué somos líderes en enlozado y restauración de baños.',
+                imageUrl: 'assets/img/branches/zona-norte/nosotros-hero.jpg'
+              }
+            }
+          },
+          {
+            path: 'productos',
+            loadComponent: () => import('@app/public/zona-norte/pages/productos/zona-norte-productos.component').then(m => m.ZonaNorteProductosComponent),
+            data: {
+              title: 'Productos | Sudamericana Enlozados',
+              seo: {
+                title: 'Nuestros Productos | Sudamericana Enlozados',
+                description: 'Productos profesionales de alta calidad para enlozado, restauración y mantenimiento de baños y pisos.',
+                imageUrl: 'assets/img/branches/zona-norte/productos-hero.jpg'
+              }
+            }
+          },
+          {
+            path: 'contacto',
+            loadComponent: () => import('@app/public/zona-norte/pages/contacto/zona-norte-contacto.component').then(m => m.ZonaNorteContactoComponent),
+            data: {
+              title: 'Contacto | Sudamericana Enlozados',
+              seo: {
+                title: 'Contacto | Sudamericana Enlozados',
+                description: 'Contactanos para tu presupuesto de enlozado de bañeras, restauración de sanitarios o pulido de parquet. Beazley 3735, Pompeya.',
+                imageUrl: 'assets/img/branches/zona-norte/contacto-hero.jpg'
+              }
+            }
+          }
+        ]
+      },
+      {
+        title: 'Tienda de Sucursal',
+        matcher: branchSlugMatcher,
+        loadComponent: () => import('@app/public/branch-store/branch-store.component').then(m => m.BranchStoreComponent),
       },
     ],
   },

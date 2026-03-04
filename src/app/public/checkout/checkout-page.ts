@@ -22,6 +22,7 @@ import { firstValueFrom } from 'rxjs';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './checkout-page.html',
+  styleUrl: './checkout-page.css',
 })
 export class CheckoutPage {
   cartService = inject(CartService);

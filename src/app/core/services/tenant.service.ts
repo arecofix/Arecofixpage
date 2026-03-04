@@ -45,6 +45,17 @@ export class TenantService {
   public isInitialized = this._isInitialized.asReadonly();
 
   /**
+   * Inicializa el servicio resolviendo el tenant desde el hostname actual.
+   * Útil para usar en APP_INITIALIZER.
+   */
+  async init(): Promise<void> {
+    if (isPlatformBrowser(this.platformId)) {
+      const hostname = window.location.hostname;
+      await this.resolveTenantByHostname(hostname);
+    }
+  }
+
+  /**
    * Obtiene el ID del Tenant actual de forma sincrónica. Lanza error si no está seteado en un contexto requerido.
    */
   getTenantId(): string {

@@ -1,0 +1,264 @@
+<div class="zona-norte-page">
+  <!-- Hero Section con Carousel -->
+  <section class="hero-section">
+    <div class="carousel-container">
+      <div class="carousel-slide" *ngFor="let image of carouselImages; let i = index" 
+           [class.active]="i === currentImageIndex">
+        <img [src]="image.url" [alt]="image.alt" 
+             onerror="this.src='assets/img/placeholder/bathroom-placeholder.jpg'">
+        <div class="carousel-overlay">
+          <div class="hero-content">
+            <h1 class="hero-title">Sudamericana Enlozados</h1>
+            <p class="hero-subtitle">Especialistas en Plomería y Restauración de Baños</p>
+            <div class="hero-buttons">
+              <button class="btn btn-primary" (click)="contactarWhatsApp()">
+                <i class="fab fa-whatsapp"></i> Contactar Ahora
+              </button>
+              <a href="#contacto" class="btn btn-secondary">Solicitar Presupuesto</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Controles del carousel -->
+      <button class="carousel-control prev" (click)="prevImage()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="carousel-control next" (click)="nextImage()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      
+      <!-- Indicadores -->
+      <div class="carousel-indicators">
+        <button *ngFor="let image of carouselImages; let i = index"
+                class="indicator"
+                [class.active]="i === currentImageIndex"
+                (click)="goToImage(i)"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Servicios Principales -->
+  <section class="services-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <p class="section-subtitle">Calidad y garantía en cada trabajo</p>
+      </div>
+      
+      <div class="services-grid">
+        <div class="service-card" *ngFor="let servicio of servicios">
+          <div class="service-icon">
+            <i class="fas" [class]="servicio.icono"></i>
+          </div>
+          <div class="service-content">
+            <h3 class="service-title">{{ servicio.titulo }}</h3>
+            <p class="service-subtitle">{{ servicio.descripcion }}</p>
+            <p class="service-detail">{{ servicio.detalle }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Antes y Después -->
+  <section class="before-after-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Resultados Garantizados</h2>
+        <p class="section-subtitle">Antes y Después de Nuestro Trabajo</p>
+      </div>
+      
+      <div class="before-after-container">
+        <div class="comparison-card">
+          <div class="comparison-item before">
+            <img src="assets/img/services/banera-antes.jpg" alt="Bañera antes del tratamiento" 
+                 onerror="this.src='assets/img/placeholder/before-placeholder.jpg'">
+            <div class="comparison-label">ANTES</div>
+          </div>
+          <div class="comparison-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+          <div class="comparison-item after">
+            <img src="assets/img/services/banera-despues.jpg" alt="Bañera después del tratamiento"
+                 onerror="this.src='assets/img/placeholder/after-placeholder.jpg'">
+            <div class="comparison-label">DESPUÉS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nosotros -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h2 class="section-title">NOSOTROS</h2>
+          <p class="about-description">
+            Contamos con un personal entrenado y capacitado para el desarrollo de cada una de sus actividades, 
+            en sus diversas áreas. Atendida por su propio dueño. Con más de 15 años de experiencia, 
+            con la responsabilidad y garantía que nos caracteriza.
+          </p>
+          <p class="about-description">
+            Atendemos principales Hoteles 5 estrellas de Capital Federal, inmobiliarias, Hospitales, 
+            consorcios y un sinnúmero de clientes que día a día se van sumando, por la honestidad y 
+            responsabilidad de Enlozados Sudamericana.
+          </p>
+          <div class="about-highlight">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Nuestro objetivo es satisfacer a nuestros clientes.</span>
+          </div>
+        </div>
+        <div class="about-features">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-award"></i>
+            </div>
+            <h4>15+ Años de Experiencia</h4>
+            <p>Garantía y profesionalismo en cada trabajo</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h4>Personal Capacitado</h4>
+            <p>Equipo especializado en cada área</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <h4>Clientes Corporativos</h4>
+            <p>Hoteles 5 estrellas, inmobiliarias y consorcios</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cobertura -->
+  <section class="coverage-section">
+    <div class="container">
+      <div class="coverage-content">
+        <div class="coverage-text">
+          <h2 class="section-title">TRABAJAMOS EN TODO EL PAIS</h2>
+          <p class="coverage-description">
+            Cobertura nacional para brindar nuestros servicios de calidad en cualquier punto del país.
+          </p>
+          <div class="coverage-benefits">
+            <div class="benefit-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Servicio en todo el territorio nacional</span>
+            </div>
+            <div class="benefit-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Respuesta rápida y eficiente</span>
+            </div>
+            <div class="benefit-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Misma calidad en cualquier ubicación</span>
+            </div>
+          </div>
+        </div>
+        <div class="coverage-map">
+          <img src="assets/img/services/argentina-map.svg" alt="Cobertura nacional" 
+               onerror="this.src='assets/img/placeholder/map-placeholder.jpg'">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto" class="contact-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">CONTACTANOS</h2>
+        <p class="section-subtitle">Envianos tu consulta y te responderemos a la brevedad</p>
+      </div>
+      
+      <div class="contact-content">
+        <div class="contact-form">
+          <h3>ENVIANOS TU CONSULTA</h3>
+          <form (ngSubmit)="enviarConsulta()">
+            <div class="form-group">
+              <label for="nombre">Nombre y Apellido</label>
+              <input type="text" id="nombre" [(ngModel)]="contactoForm.nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" id="telefono" [(ngModel)]="contactoForm.telefono" required>
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" [(ngModel)]="contactoForm.email" required>
+            </div>
+            <div class="form-group">
+              <label for="consulta">Consulta</label>
+              <textarea id="consulta" [(ngModel)]="contactoForm.consulta" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-paper-plane"></i> Enviar Consulta
+            </button>
+          </form>
+        </div>
+        
+        <div class="contact-info">
+          <h3>CONTACTANOS</h3>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="contact-details">
+              <h4>DIRECCIÓN:</h4>
+              <p>Beazley 3735 - Pompeya CABA</p>
+            </div>
+          </div>
+          
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="contact-details">
+              <h4>CELULAR:</h4>
+              <p>(011) 15-6304-9494</p>
+            </div>
+          </div>
+          
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="contact-details">
+              <h4>E-MAIL:</h4>
+              <p>enlosud@hotmail.com</p>
+            </div>
+          </div>
+          
+          <div class="contact-whatsapp">
+            <button class="btn btn-whatsapp" (click)="contactarWhatsApp()">
+              <i class="fab fa-whatsapp"></i>
+              Contactar por WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="assets/img/brands/logo/logo-normal1.PNG" alt="Sudamericana Enlozados">
+          <h3>Sudamericana Enlozados</h3>
+        </div>
+        <div class="footer-info">
+          <p>&copy; 2018 Sudamericana Enlozados - Pulido y Plastiﬁcado</p>
+          <p>Desarrollado por: Arecofix - Soluciones Digitales</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

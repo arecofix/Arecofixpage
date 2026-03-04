@@ -12,7 +12,23 @@
         </label>
       </div>
       <div class="flex-1 px-2 mx-2 font-bold text-lg lg:hidden">Arecofix Admin</div>
-      <div class="flex-1 hidden lg:flex px-4 font-bold text-base-content">Panel de Administración</div>
+      <div class="flex-1 hidden lg:flex px-4 font-bold text-base-content items-center gap-4">
+        <span>Panel de Administración</span>
+        
+        <!-- Súper Admin Branch Selector -->
+        @if (authService.isSuperAdmin()) {
+          <div class="flex items-center gap-2 ml-4">
+            <span class="text-xs uppercase opacity-50 font-bold">Sucursal:</span>
+            <select class="select select-sm select-bordered bg-base-100/50" (change)="onBranchSelected($event)">
+              <option value="">🏠 Todas (Central)</option>
+              @for (branch of branches(); track branch.id) {
+                <option [value]="branch.id">{{ branch.name }}</option>
+              }
+            </select>
+            <span class="badge badge-primary badge-sm bg-blue-600 border-none animate-pulse">SUPER ADMIN</span>
+          </div>
+        }
+      </div>
       
       <!-- Notifications Bell -->
       <div class="flex-none">

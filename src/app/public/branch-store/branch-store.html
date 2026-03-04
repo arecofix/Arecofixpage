@@ -1,0 +1,100 @@
+<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans no-print text-gray-800 dark:text-gray-200">
+    <div class="max-w-7xl mx-auto animate-fade-in-up">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 bg-white/60 dark:bg-gray-800/60 p-8 rounded-4xl backdrop-blur-xl border border-white dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+            <!-- Aesthetic bg -->
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+            <div class="z-10 w-full text-center md:text-left">
+                @if (branch()) {
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 mb-2">
+                        <div class="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-inner">
+                            <i class="fas fa-store text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight">
+                                Tienda {{ branch()?.name }}
+                            </h1>
+                            <p class="text-gray-500 font-medium tracking-wide mt-1">
+                                <i class="fas fa-map-marker-alt opacity-50 mr-1"></i> {{ branch()?.address || 'Sucursal Online' }}
+                            </p>
+                        </div>
+                    </div>
+                } @else {
+                    <h1 class="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight">
+                        Cargando Tienda...
+                    </h1>
+                }
+            </div>
+        </div>
+
+        @if (error()) {
+            <div class="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
+                <div class="w-24 h-24 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mb-6 text-red-500">
+                    <i class="fas fa-store-slash text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Página no encontrada</h2>
+                <p class="text-gray-500 max-w-sm">{{ error() }}</p>
+                <a routerLink="/" class="mt-6 btn btn-outline btn-primary rounded-2xl">Volver al Inicio</a>
+            </div>
+        } @else if (loading()) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-pulse">
+                @for (i of [1,2,3,4,5,6,7,8]; track i) {
+                    <div class="bg-gray-200 dark:bg-gray-800 h-80 rounded-4xl"></div>
+                }
+            </div>
+        } @else {
+            @if (products().length === 0) {
+                <div class="flex flex-col items-center justify-center py-24 text-center animate-fade-in opacity-80">
+                    <i class="fas fa-box-open text-6xl text-gray-300 dark:text-gray-600 mb-6"></i>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Catálogo Vacío</h3>
+                    <p class="text-gray-500 mt-2">Próximamente estaremos agregando nuestros productos.</p>
+                </div>
+            } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in-up">
+                    @for (product of products(); track product.id) {
+                        <!-- Product Card -->
+                        <div class="group bg-white dark:bg-gray-800/80 rounded-4xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative flex flex-col h-full overflow-hidden">
+                            
+                            <!-- Origin Badge -->
+                            @if(product.is_global && product.branch_id !== branch()?.id) {
+                                <div class="absolute top-4 left-4 z-10">
+                                    <span class="px-2.5 py-1 rounded-lg backdrop-blur-md bg-white/80 dark:bg-gray-900/80 text-[10px] uppercase font-black tracking-widest text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
+                                        <i class="fas fa-star mr-1 opacity-70"></i> Catálogo Central
+                                    </span>
+                                </div>
+                            }
+
+                            <!-- Image -->
+                            <div class="aspect-square bg-gray-50 dark:bg-gray-900 rounded-3xl mb-4 overflow-hidden relative">
+                                <img [src]="product.image_url || 'assets/img/no-image.png'" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            </div>
+
+                            <!-- Info -->
+                            <div class="flex flex-col flex-1 px-2">
+                                <div class="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">
+                                    {{ product.brand_id ? 'Marca ID: ' + (product.brand_id | slice:0:8) : 'General' }}
+                                </div>
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-tight mb-3 line-clamp-2" [title]="product.name">
+                                    {{ product.name }}
+                                </h3>
+
+                                <div class="mt-auto flex items-end justify-between">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-400 font-medium mb-0.5">Precio</span>
+                                        <span class="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                                            {{ product.price | currency:product.currency:'symbol':'1.0-0' }}
+                                        </span>
+                                    </div>
+                                    <button class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white transition-colors flex items-center justify-center">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

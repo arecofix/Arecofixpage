@@ -50,6 +50,11 @@ export class AdminProductsPage implements OnInit {
   public importReport = signal<ImportReport | null>(null);
   public showImportResult = signal<boolean>(false);
 
+  // Stock editing
+  public editingStock = signal<string | null>(null);
+  public tempStock = signal<number>(0);
+  public savingStock = signal<boolean>(false);
+
   private searchSubject = new Subject<string>();
 
   constructor() {
@@ -254,5 +259,44 @@ export class AdminProductsPage implements OnInit {
     this.showImportResult.set(false);
     this.importReport.set(null);
     await this.loadData();
+  }
+
+  // Stock editing methods
+  startStockEdit(productId: string, currentStock: number) {
+    this.editingStock.set(productId);
+    this.tempStock.set(currentStock);
+  }
+
+  async saveStock(productId: string) {
+    if (this.savingStock()) return;
+    
+    const newStock = this.tempStock();
+    if (newStock < 0) {
+      this.error.set('El stock no puede ser negativo');
+      return;
+    }
+
+    this.savingStock.set(true);
+    try {
+      await this.productService.updateProduct(productId, { stock: newStock });
+      
+      // Update the product in the local array
+      this.products.update(products => 
+        products.map(p => p.id === productId ? { ...p, stock: newStock } : p)
+      );
+      
+      this.editingStock.set(null);
+      this.error.set(null);
+    } catch (e: any) {
+      this.error.set('Error al actualizar stock: ' + e.message);
+    } finally {
+      this.savingStock.set(false);
+      this.cdr.detectChanges();
+    }
+  }
+
+  cancelStockEdit() {
+    this.editingStock.set(null);
+    this.tempStock.set(0);
   }
 }

@@ -1,0 +1,259 @@
+<div class="branch-dashboard">
+  <!-- Header con información de la sucursal -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="branch-info">
+        <h1 class="dashboard-title">
+          <i class="fas fa-store"></i>
+          {{ branchInfo().name }}
+        </h1>
+        <p class="dashboard-subtitle">{{ getDashboardMessage() }}</p>
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn btn-outline" (click)="refreshStats()" [disabled]="loading()">
+          <i class="fas fa-sync-alt" [class.fa-spin]="loading()"></i>
+          Actualizar
+        </button>
+        
+        <!-- Solo Super Admin puede ver controles globales -->
+        <div class="global-controls" *ngIf="isSuperAdmin()">
+          <button class="btn btn-primary" routerLink="/admin">
+            <i class="fas fa-globe"></i>
+            Vista Global
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading()">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Cargando estadísticas...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error()">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="refreshStats()">Reintentar</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content" *ngIf="!loading() && !error()">
+    
+    <!-- Tarjetas de Estadísticas Principales -->
+    <div class="stats-grid">
+      <!-- Usuarios -->
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value" [class]="getStatColor(stats().users)">
+            {{ stats().users }}
+          </h3>
+          <p class="stat-label">Usuarios</p>
+        </div>
+      </div>
+
+      <!-- Productos -->
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value" [class]="getStatColor(stats().products)">
+            {{ stats().products }}
+          </h3>
+          <p class="stat-label">Productos</p>
+        </div>
+      </div>
+
+      <!-- Ventas -->
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value" [class]="getStatColor(stats().sales)">
+            {{ stats().sales }}
+          </h3>
+          <p class="stat-label">Ventas</p>
+        </div>
+      </div>
+
+      <!-- Ingresos -->
+      <div class="stat-card highlight">
+        <div class="stat-icon">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value" [class]="getStatColor(stats().revenue, 1000)">
+            {{ formatCurrency(stats().revenue) }}
+          </h3>
+          <p class="stat-label">Ingresos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas Adicionales (solo si hay datos o es Super Admin) -->
+    <div class="secondary-stats" *ngIf="hasData() || isSuperAdmin()">
+      <div class="stats-grid">
+        <!-- Reparaciones del Mes -->
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-tools"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value" [class]="getStatColor(stats().repairs_month)">
+              {{ stats().repairs_month }}
+            </h3>
+            <p class="stat-label">Reparaciones del Mes</p>
+          </div>
+        </div>
+
+        <!-- Ingresos por Reparaciones -->
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-wrench"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value" [class]="getStatColor(stats().repairs_revenue, 500)">
+              {{ formatCurrency(stats().repairs_revenue) }}
+            </h3>
+            <p class="stat-label">Ingresos por Reparaciones</p>
+          </div>
+        </div>
+
+        <!-- Dispositivos Reparados -->
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value" [class]="getStatColor(stats().devices_fixed)">
+              {{ stats().devices_fixed }}
+            </h3>
+            <p class="stat-label">Dispositivos Reparados</p>
+          </div>
+        </div>
+
+        <!-- Aprobaciones Pendientes -->
+        <div class="stat-card" [class.warning]="stats().pending_approvals > 0">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value" [class]="getStatColor(stats().pending_approvals, 1)">
+              {{ stats().pending_approvals }}
+            </h3>
+            <p class="stat-label">Aprobaciones Pendientes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos (solo si hay datos) -->
+    <div class="charts-section" *ngIf="hasData()">
+      
+      <!-- Gráfico de Ventas -->
+      <div class="chart-container" *ngIf="salesChartData().labels.length > 0">
+        <div class="chart-header">
+          <h3 class="chart-title">Ventas del Año</h3>
+          <div class="chart-badge" *ngIf="isBranchAdmin()">
+            <i class="fas fa-store"></i>
+            {{ branchInfo().name }}
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas baseChart [type]="salesChartType" [data]="salesChartData()" [options]="salesChartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <!-- Gráfico de Productos -->
+        <div class="chart-container half" *ngIf="productsChartData().labels.length > 0">
+          <div class="chart-header">
+            <h3 class="chart-title">Productos Más Vendidos</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas baseChart [type]="productsChartType" [data]="productsChartData()" [options]="productsChartOptions"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfico de Categorías -->
+        <div class="chart-container half" *ngIf="categoryChartData().labels.length > 0">
+          <div class="chart-header">
+            <h3 class="chart-title">Ventas por Categoría</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas baseChart [type]="categoryChartType" [data]="categoryChartData()" [options]="categoryChartOptions"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado Vacío (para Branch Admin sin datos) -->
+    <div class="empty-state" *ngIf="!hasData() && isBranchAdmin()">
+      <div class="empty-content">
+        <i class="fas fa-chart-line"></i>
+        <h3>Sin estadísticas disponibles</h3>
+        <p>Aún no tienes ventas, productos o actividades registradas en {{ branchInfo().name }}.</p>
+        <div class="empty-actions">
+          <button class="btn btn-primary" (click)="goToProducts()">
+            <i class="fas fa-plus"></i>
+            Agregar Productos
+          </button>
+          <button class="btn btn-outline" (click)="goToSettings()">
+            <i class="fas fa-cog"></i>
+            Configurar Sucursal
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="quick-actions" *ngIf="isBranchAdmin()">
+      <div class="actions-header">
+        <h3>Acciones Rápidas</h3>
+      </div>
+      <div class="actions-grid">
+        <button class="action-card" (click)="goToProducts()">
+          <div class="action-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="action-content">
+            <h4>Gestionar Productos</h4>
+            <p>Agregar, editar o eliminar productos</p>
+          </div>
+        </button>
+
+        <button class="action-card" (click)="goToOrders()">
+          <div class="action-icon">
+            <i class="fas fa-receipt"></i>
+          </div>
+          <div class="action-content">
+            <h4>Ver Órdenes</h4>
+            <p>Gestionar órdenes de compra</p>
+          </div>
+        </button>
+
+        <button class="action-card" (click)="goToSettings()">
+          <div class="action-icon">
+            <i class="fas fa-cog"></i>
+          </div>
+          <div class="action-content">
+            <h4>Configuración</h4>
+            <p>Ajustes de la sucursal</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

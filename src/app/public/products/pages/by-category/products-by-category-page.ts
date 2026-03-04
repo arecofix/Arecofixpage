@@ -18,10 +18,7 @@ import {
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
-import {
-  iCategoriesResponse,
-  iCategory,
-} from '@app/public/categories/interfaces';
+import { iCategory } from '@app/public/categories/interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import {
   Pagination,
@@ -55,6 +52,8 @@ export class ProductsByCategoryPage {
   public cartService: CartService = inject(CartService);
 
   public currentCategory = signal<iCategory | null>(null);
+  /** Stores the full ancestor chain (root → ... → current) for hierarchical breadcrumbs */
+  private ancestorChain = signal<iCategory[]>([]);
 
   // Filter signals to bind to UI inputs
   minPriceInput = signal<number | null>(null);
@@ -64,18 +63,38 @@ export class ProductsByCategoryPage {
     stream: () => this.categoryService.getFeaturedData()
   });
 
+  /**
+   * Builds hierarchical breadcrumbs dynamically.
+   * Example: Inicio > Productos > Repuestos > Módulos
+   * Each ancestor gets a clickable URL; the current category is the terminal item.
+   */
   breadcrumbItems = computed(() => {
-    const category = this.currentCategory();
+    const chain = this.ancestorChain();
     const items: BreadcrumbItem[] = [
-        { label: 'Inicio', url: '/' },
-        { label: 'Productos', url: '/productos' }
+      { label: 'Inicio', url: '/' },
+      { label: 'Productos', url: '/productos' },
     ];
 
-    if (category) {
-        items.push({ label: category.name });
-    } else {
-        items.push({ label: 'Categoría' });
+    if (chain.length === 0) {
+      // Fallback while data loads
+      items.push({ label: 'Categoría' });
+      return items;
     }
+
+    // Build the hierarchical slug path for each ancestor
+    // e.g., chain = [repuestos, modulos] → /productos/categoria/repuestos, /productos/categoria/repuestos/modulos
+    chain.forEach((cat, idx) => {
+      const slugPath = chain
+        .slice(0, idx + 1)
+        .map(c => c.slug)
+        .join('/');
+      const isLast = idx === chain.length - 1;
+      items.push({
+        label: cat.name,
+        url: isLast ? undefined : `/productos/categoria/${slugPath}`,
+      });
+    });
+
     return items;
   });
 
@@ -127,39 +146,62 @@ export class ProductsByCategoryPage {
   productsRs = rxResource({
     stream: () =>
       combineLatest([
-        this.route.params.pipe(map(({ categorySlug }) => categorySlug)),
+        this.route.params.pipe(map(({ categorySlug }) => categorySlug as string)),
         this.route.queryParams,
       ]).pipe(
-        switchMap(([slug, params]) =>
-          combineLatest({
-            categoryResponse: this.categoryService.getDataBySlug(slug),
-            allCategories: this.categoryService.getAll().pipe(catchError(() => of([])))
+        switchMap(([slugPath, params]) => {
+          /**
+           * Support for hierarchical URL paths.
+           * e.g. slugPath = 'repuestos/modulos' → leaf slug = 'modulos'
+           * This allows both old (/productos/categoria/modulos) and new
+           * (/productos/categoria/repuestos/modulos) URLs to resolve correctly.
+           */
+          const leafSlug = this.categoryService.resolveSlugFromPath(slugPath || '');
+
+          return combineLatest({
+            categoryResponse: this.categoryService.getDataBySlug(leafSlug),
+            allCategories: this.categoryService.getAll().pipe(catchError(() => of([]))),
           }).pipe(
-            tap(({ categoryResponse }) => {
-              this.currentCategory.set(categoryResponse.data?.[0] || null);
+            tap(({ categoryResponse, allCategories }) => {
+              const cat = categoryResponse.data?.[0] || null;
+              this.currentCategory.set(cat);
+
+              // Build hierarchical ancestor chain for dynamic breadcrumbs
+              if (cat && (allCategories as iCategory[]).length > 0) {
+                const chain = this.categoryService.buildAncestorChain(
+                  cat.id,
+                  allCategories as iCategory[]
+                );
+                this.ancestorChain.set(chain);
+              } else {
+                this.ancestorChain.set(cat ? [cat] : []);
+              }
             }),
             switchMap(({ categoryResponse, allCategories }) => {
               const currentCat = categoryResponse.data?.[0];
               const categoryId = currentCat?.id;
-              
+
               if (!categoryId) {
-                // Silent fail for missing category slugs rather than warning in console
+                // Silent fail for missing category slugs
                 return of({
-                  first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: []
+                  first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [],
                 });
               }
 
-              // Get all descendant IDs to filter products by category AND subcategories
-              const targetCategoryIds = this.getAllDescendantIds(categoryId, allCategories as iCategory[]);
+              // Recursive: get all descendant IDs so /repuestos shows /modulos, /baterias, etc.
+              const targetCategoryIds = this.getAllDescendantIds(
+                categoryId,
+                allCategories as iCategory[]
+              );
 
               const currentPage = +params['_page'] || 1;
               const _sort = params['_sort'];
               const _order = params['_order'] as 'asc' | 'desc';
               const min_price = params['min_price'] ? +params['min_price'] : undefined;
               const max_price = params['max_price'] ? +params['max_price'] : undefined;
-              const q = params['q'] || undefined; // Grab 'q'
+              const q = params['q'] || undefined;
 
-              // Sync local signals
+              // Sync local filter signals with URL params
               if (this.searchQuery() !== (q || '')) this.searchQuery.set(q || '');
               if (this.minPriceInput() === null && min_price) this.minPriceInput.set(min_price);
               if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
@@ -167,16 +209,16 @@ export class ProductsByCategoryPage {
               return this.productService.getData({
                 category_ids: targetCategoryIds,
                 _page: currentPage,
-                _per_page: 24, // Show more items per page
+                _per_page: 24,
                 _sort,
                 _order,
                 min_price,
                 max_price,
-                q // Pass 'q'
+                q,
               });
             })
-          )
-        ) 
+          );
+        })
       ),
   });
 

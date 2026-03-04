@@ -1,4 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { StructuredLoggerService } from '@app/core/infrastructure/logging/structured-logger.service';
+
+// Type-safe CSV export interface
+export interface CsvExportable {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+// Extended interface for entities with specific properties
+export interface CsvExportableEntity extends CsvExportable {
+  id?: string;
+  name?: string;
+  slug?: string;
+  description?: string;
+  price?: number;
+  stock?: number;
+  category_id?: string;
+  brand_id?: string;
+  image_url?: string;
+  is_active?: boolean;
+  is_featured?: boolean;
+  sku?: string;
+  barcode?: string;
+}
 
 export interface CsvImportResult<T> {
   data: Partial<T>[];
@@ -9,9 +32,47 @@ export interface CsvImportResult<T> {
   providedIn: 'root'
 })
 export class CsvService {
-  constructor() {}
+  private logger = inject(StructuredLoggerService);
 
-  async parse<T>(file: File, parser: (values: string[], headers: string[]) => T | null): Promise<CsvImportResult<T>> {
+  /**
+   * Export data to CSV with proper type safety
+   */
+  exportToCsv<T extends CsvExportable>(
+    data: T[], 
+    filename: string, 
+    headers?: (keyof T)[]
+  ): void {
+    try {
+      if (!data || data.length === 0) {
+        this.logger.warn('CsvService', 'No data to export');
+        return;
+      }
+
+      // Use provided headers or extract from first item
+      const csvHeaders = headers || (Object.keys(data[0]) as (keyof T)[]);
+      
+      const csvContent = this.buildCsvContent(data, csvHeaders);
+      this.downloadCsv(csvContent, filename);
+      
+      this.logger.info('CsvService', 'CSV exported successfully', { 
+        filename, 
+        recordCount: data.length 
+      });
+    } catch (error) {
+      this.logger.error('CsvService', 'Failed to export CSV', error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Parse CSV file with type safety
+   */
+  async parse<T>(
+    file: File, 
+    parser: (values: string[], headers: string[]) => T | null
+  ): Promise<CsvImportResult<T>> {
+    const endTimer = this.logger.startTimer('CsvService', 'parseCsv');
+    
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -36,7 +97,7 @@ export class CsvService {
             const values = this.parseLine(line);
             
             if (values.length !== headers.length) {
-              console.warn(`Skipping line ${i + 1}: Column count mismatch`);
+              this.logger.warn('CsvService', `Skipping line ${i + 1}: Column count mismatch`);
               errorCount++;
               continue;
             }
@@ -49,28 +110,43 @@ export class CsvService {
             }
           }
 
+          endTimer();
+          this.logger.info('CsvService', 'CSV parsed successfully', { 
+            recordCount: data.length,
+            errors: errorCount
+          });
+          
           resolve({ data, errors: errorCount });
         } catch (error) {
+          endTimer();
+          this.logger.error('CsvService', 'Failed to parse CSV', error as Error);
           reject(error);
         }
       };
 
-      reader.onerror = (error) => reject(error);
+      reader.onerror = () => {
+        endTimer();
+        this.logger.error('CsvService', 'File read error');
+        reject(new Error('Failed to read file'));
+      };
+
       reader.readAsText(file);
     });
   }
 
-  exportToCsv<T>(data: T[], filename: string, headers: (keyof T | string)[]): void {
-    if (!data.length) return;
-
+  private buildCsvContent<T extends CsvExportable>(
+    data: T[], 
+    headers: (keyof T)[]
+  ): string {
     const csvContent = [
       headers.join(','),
       ...data.map(item => {
         return headers.map(header => {
-          const value = (item as any)[header];
-          const safeValue = value === undefined || value === null ? '' : value;
+          const value = item[header];
+          const safeValue = value === undefined || value === null ? '' : String(value);
           
-          if (typeof safeValue === 'string' && (safeValue.includes(',') || safeValue.includes('"') || safeValue.includes('\n'))) {
+          // Escape commas, quotes, and newlines
+          if (safeValue.includes(',') || safeValue.includes('"') || safeValue.includes('\n')) {
             return `"${safeValue.replace(/"/g, '""')}"`;
           }
           return safeValue;
@@ -78,34 +154,49 @@ export class CsvService {
       })
     ].join('\n');
 
+    return csvContent;
+  }
+
+  private downloadCsv(csvContent: string, filename: string): void {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `${filename}.csv`);
     link.style.visibility = 'hidden';
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
   }
 
   private parseLine(line: string): string[] {
-    const values: string[] = [];
+    const result: string[] = [];
+    let current = '';
     let inQuotes = false;
-    let currentValue = '';
     
-    for (let char of line) {
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
       if (char === '"') {
-        inQuotes = !inQuotes;
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++; // Skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
       } else if (char === ',' && !inQuotes) {
-        values.push(currentValue);
-        currentValue = '';
+        result.push(current.trim());
+        current = '';
       } else {
-        currentValue += char;
+        current += char;
       }
     }
-    values.push(currentValue);
-    return values;
+    
+    result.push(current.trim());
+    return result;
   }
 }

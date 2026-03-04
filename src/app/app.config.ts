@@ -3,6 +3,7 @@ import {
   ErrorHandler,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
+  APP_INITIALIZER,
 } from '@angular/core';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
@@ -24,11 +25,20 @@ import { AnalyticsRepository } from './features/analytics/domain/repositories/an
 import { SupabaseAnalyticsRepository } from './features/analytics/infrastructure/repositories/supabase-analytics.repository';
 import { UserProfileRepository } from './core/repositories/user-profile.repository';
 import { SupabaseUserProfileRepository } from './core/infrastructure/repositories/supabase-user-profile.repository';
+import { TenantService } from './core/services/tenant.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    
+    // Initializer to resolve Tenant Context before anything else
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (tenantService: TenantService) => () => tenantService.init(),
+      deps: [TenantService],
+      multi: true
+    },
     
     // Supabase Client Provider via SupabaseService
     { 

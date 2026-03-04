@@ -15,54 +15,147 @@
             </div>
             }
 
+            <!-- Selector de modo de creación (solo para nuevos empleados) -->
+            @if (!id) {
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-base-content mb-3">Tipo de Creación</label>
+                <div class="flex gap-4">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="creationMode" value="new" 
+                               [(ngModel)]="creationMode()" 
+                               (change)="onCreationModeChange('new')"
+                               class="radio radio-primary mr-2">
+                        <span class="text-base-content">Crear nuevo usuario</span>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="creationMode" value="existing" 
+                               [(ngModel)]="creationMode()" 
+                               (change)="onCreationModeChange('existing')"
+                               class="radio radio-primary mr-2">
+                        <span class="text-base-content">Asignar usuario existente</span>
+                    </label>
+                </div>
+            </div>
+            }
+
+            <!-- Selector de usuarios existentes -->
+            @if (!id && creationMode() === 'existing') {
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-base-content mb-1.5">
+                    Seleccionar Usuario Existente
+                    @if (loadingUsers()) {
+                    <span class="loading loading-spinner loading-xs ml-2"></span>
+                    }
+                </label>
+                <select [(ngModel)]="selectedUserId()" 
+                        (change)="onUserSelect($any($event.target).value)"
+                        name="selectedUser" 
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <option value="">-- Seleccione un usuario --</option>
+                    @for (user of availableUsers(); track user.id) {
+                    <option [value]="user.id">
+                        {{ user.email }} 
+                        @if (user.first_name || user.last_name) {
+                        - {{ user.first_name }} {{ user.last_name }}
+                        }
+                    </option>
+                    }
+                </select>
+                @if (availableUsers().length === 0 && !loadingUsers()) {
+                <p class="text-sm text-base-content/60 mt-2">
+                    No hay usuarios disponibles para asignar como empleados.
+                </p>
+                }
+            </div>
+            }
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
-                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                        required>
+                    <input type="text" [(ngModel)]="form().first_name" name="first_name" 
+                           class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                           [disabled]="creationMode() === 'existing' && selectedUserId()"
+                           required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
-                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                        required>
+                    <input type="text" [(ngModel)]="form().last_name" name="last_name" 
+                           class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                           [disabled]="creationMode() === 'existing' && selectedUserId()"
+                           required>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Email (Requerido para inicio de sesión)</label>
-                    <input type="email" [(ngModel)]="form().email" name="email" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                        required [disabled]="!!id"> <!-- Disable email editing if updating -->
+                    <label class="block text-sm font-medium text-base-content mb-1.5">
+                        Email (Requerido para inicio de sesión)
+                        @if (creationMode() === 'existing' && selectedUserId()) {
+                        <span class="text-xs text-base-content/60 ml-1">(No editable)</span>
+                        }
+                    </label>
+                    <input type="email" [(ngModel)]="form().email" name="email" 
+                           class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                           [disabled]="!!id || (creationMode() === 'existing' && selectedUserId())"
+                           required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
-                    <input type="tel" [(ngModel)]="form().phone" name="phone" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <input type="tel" [(ngModel)]="form().phone" name="phone" 
+                           class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                           [disabled]="creationMode() === 'existing' && selectedUserId()">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Rol en el Sistema</label>
-                    <select [(ngModel)]="form().role" name="role" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
+                    <select [(ngModel)]="form().role" name="role" 
+                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" 
+                            required>
                         <option value="staff">Empleado / Técnico</option>
                         <option value="admin">Administrador (Control Total)</option>
                     </select>
                 </div>
 
-                @if (!id) {
+                @if (!id && creationMode() === 'new') {
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Contraseña</label>
-                    <input type="password" [(ngModel)]="form().password" name="password" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                        required minlength="6" placeholder="Mínimo 6 caracteres">
+                    <input type="password" [(ngModel)]="form().password" name="password" 
+                           class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                           required minlength="6" placeholder="Mínimo 6 caracteres">
                 </div>
                 }
             </div>
 
+            <!-- Información de modo de creación -->
+            @if (!id && creationMode() === 'existing' && selectedUserId()) {
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle"></i>
+                <span>
+                    Estás asignando el usuario existente como empleado. 
+                    El usuario ya tiene acceso al sistema y solo se le asignará el rol seleccionado.
+                </span>
+            </div>
+            }
+
+            @if (!id && creationMode() === 'new') {
+            <div class="alert alert-success mt-4">
+                <i class="fas fa-user-plus"></i>
+                <span>
+                    Se creará un nuevo usuario con acceso al sistema. 
+                    Recibirá un email de confirmación y podrá iniciar sesión con la contraseña proporcionada.
+                </span>
+            </div>
+            }
+
             <div class="mt-4">
                 <label class="block text-sm font-medium text-base-content mb-1.5">Foto de Perfil</label>
                 <input type="file" (change)="onFileChange($event)"
-                    class="file-input file-input-bordered file-input-primary w-full bg-base-100 text-base-content" accept="image/*">
+                       class="file-input file-input-bordered file-input-primary w-full bg-base-100 text-base-content" 
+                       accept="image/*"
+                       [disabled]="creationMode() === 'existing' && selectedUserId()">
                 @if (form().avatar_url) {
                 <div class="mt-4">
                     <img [src]="form().avatar_url" alt="Avatar preview"
-                        class="w-24 h-24 rounded-full object-cover border-2 border-base-200 shadow-sm">
+                         class="w-24 h-24 rounded-full object-cover border-2 border-base-200 shadow-sm">
                 </div>
                 }
             </div>

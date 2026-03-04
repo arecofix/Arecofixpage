@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-8 max-w-4xl">
+<div class="checkout-page-container container mx-auto px-4 py-8 max-w-4xl">
     <h1 class="text-3xl font-bold mb-8 text-center text-primary">Finalizar Compra</h1>
 
     @if (orderSuccess()) {
@@ -159,8 +159,8 @@
                         <textarea formControlName="notes" class="textarea textarea-bordered w-full bg-base-100 text-base-content"></textarea>
                     </div>
 
-                    <div class="mt-6">
-                        <button type="submit" class="btn btn-primary btn-block btn-lg"
+                    <div class="mt-6 checkout-action-buttons">
+                        <button type="submit" class="checkout-submit-btn btn btn-primary btn-block btn-lg"
                             [disabled]="isProcessing() || cartService.cartItems().length === 0">
                             @if (isProcessing()) {
                             <span class="loading loading-spinner"></span>

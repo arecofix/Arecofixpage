@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   Injector,
   signal,
@@ -24,11 +23,13 @@ import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/bre
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
 import { Product, ProductsResponse } from '../../interfaces';
+import { iCategory } from '@app/public/categories/interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { FavoritesService } from '@app/shared/services/favorites.service';
 /*  */
+
 
 @Component({
   selector: 'app-products-details-page',
@@ -58,21 +59,42 @@ export class ProductsDetailsPage {
 
 
 
+  /**
+   * Hierarchical breadcrumbs for the product detail page.
+   * Example: Inicio > Productos > Repuestos > Módulos > Módulo Huawei P30 Lite OLED
+   * Uses the ancestor chain loaded by categoryRs.
+   */
   breadcrumbItems = computed(() => {
     const product = this.product();
-    const category = this.categoryRs.value();
+    const { category, ancestorChain } = this.categoryRs.value() ?? {};
     const items: BreadcrumbItem[] = [
       { label: 'Inicio', url: '/' },
-      { label: 'Productos', url: '/productos' }
+      { label: 'Productos', url: '/productos' },
     ];
 
-    if (category) {
+    // Build clickable path for every ancestor in root→leaf order
+    if (ancestorChain && ancestorChain.length > 0) {
+      ancestorChain.forEach((cat, idx) => {
+        const slugPath = ancestorChain
+          .slice(0, idx + 1)
+          .map(c => c.slug)
+          .join('/');
+        const isLeaf = idx === ancestorChain.length - 1;
+        items.push({
+          label: cat.name,
+          url: `/productos/categoria/${slugPath}`,
+        });
+        // If this IS the leaf category, it stays clickable (user can go back)
+      });
+    } else if (category) {
+      // Fallback: single-level category (no parent)
       items.push({ label: category.name, url: `/productos/categoria/${category.slug}` });
     }
 
     if (product) {
-      items.push({ label: product.name });
+      items.push({ label: product.name }); // Current page — no link
     }
+
     return items;
   });
 
@@ -124,65 +146,109 @@ export class ProductsDetailsPage {
 
   constructor() {
     toObservable(this.product, { injector: this.injector }).subscribe(product => {
-      if (product) {
-        // Initialize selected image if not set
-        if (!this.selectedImage()) {
-            this.selectedImage.set(product.image_url || null);
-        }
+      if (!product) return;
 
-        // Automatically generate semantic SEO keywords for tech products
-        const nameKeywords = product.name.toLowerCase()
-            .replace(/[^a-z0-9áéíóúñ ]/g, '')
-            .split(' ')
-            .filter(word => word.length > 3)
-            .join(', ');
-            
-        const semanticKeywords = `repuesto, módulo, pantalla, repair, arecofix, ${nameKeywords}`;
-
-        this.seoService.setPageData({
-            title: product.name,
-            description: product.description || `Comprá ${product.name} al mejor precio en Arecofix. Stock disponible de repuestos y módulos.`,
-            imageUrl: product.image_url || undefined,
-            type: 'product',
-            url: `/productos/detalle/${product.slug}`,
-            keywords: semanticKeywords
-        });
-
-        // JSON-LD Structured Data
-        const scriptId = 'product-json-ld';
-        let script = this.document.getElementById(scriptId) as HTMLScriptElement;
-        
-        if (!script) {
-            script = this.document.createElement('script');
-            script.id = scriptId;
-            script.type = 'application/ld+json';
-            this.document.head.appendChild(script);
-        }
-
-        script.text = JSON.stringify({
-          "@context": "https://schema.org/",
-          "@type": "Product",
-          "name": product.name,
-          "image": product.image_url ? [`https://arecofix.com.ar${product.image_url}`] : [],
-          "description": product.description || `Compra ${product.name} en Arecofix`,
-          "brand": {
-            "@type": "Brand",
-            "name": "Arecofix"
-          },
-          "sku": product.sku || product.id,
-          "offers": {
-            "@type": "Offer",
-            "url": `https://arecofix.com.ar/productos/detalle/${product.slug}`,
-            "priceCurrency": "ARS",
-            "price": product.price,
-            "availability": "https://schema.org/InStock",
-            "seller": {
-              "@type": "Organization",
-              "name": "Arecofix"
-            }
-          }
-        });
+      // Initialize selected image on first load
+      if (!this.selectedImage()) {
+        this.selectedImage.set(product.image_url || null);
       }
+
+      // ── SEO / Open Graph / WhatsApp ────────────────────────────────────────
+      // image_url from Supabase is already an absolute https:// URL.
+      // WhatsApp requires: og:image as absolute URL + width/height hints.
+      const absoluteImageUrl = product.image_url
+        ? (product.image_url.startsWith('http')
+            ? product.image_url
+            : `https://arecofix.com.ar${product.image_url}`)
+        : 'https://arecofix.com.ar/assets/img/branding/og-services.jpg';
+
+      const productDescription = product.description
+        ? product.description.slice(0, 155) + (product.description.length > 155 ? '...' : '')
+        : `Comprá ${product.name} al mejor precio en Arecofix. Stock disponible con garantía.`;
+
+      const nameKeywords = product.name
+        .toLowerCase()
+        .replace(/[^a-z0-9áéíóúñ ]/g, '')
+        .split(' ')
+        .filter(w => w.length > 3)
+        .join(', ');
+
+      // Set all standard + social meta tags via SeoService
+      this.seoService.setPageData({
+        title: product.name,
+        description: productDescription,
+        imageUrl: absoluteImageUrl,
+        type: 'product',
+        url: `/productos/detalle/${product.slug}`,
+        keywords: `repuesto, módulo, pantalla, repair, arecofix, ${nameKeywords}`,
+        twitterCard: 'summary_large_image',
+      });
+
+      // Extra OG tags WhatsApp needs that SeoService doesn't set by default
+      this.setWhatsAppOgTags(absoluteImageUrl, productDescription);
+
+      // ── JSON-LD Product Schema ──────────────────────────────────────────────
+      this.injectProductSchema(product, absoluteImageUrl);
+    });
+  }
+
+  /**
+   * Injects extra Open Graph tags required for WhatsApp/Telegram link previews.
+   * WhatsApp uses og:image, og:image:width, og:image:height, and og:image:type.
+   */
+  private setWhatsAppOgTags(imageUrl: string, description: string): void {
+    const meta = this.document.head;
+    const setOrCreate = (property: string, content: string) => {
+      let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
+      if (!el) {
+        el = this.document.createElement('meta');
+        el.setAttribute('property', property);
+        this.document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    setOrCreate('og:image', imageUrl);
+    setOrCreate('og:image:secure_url', imageUrl);
+    setOrCreate('og:image:width', '1200');
+    setOrCreate('og:image:height', '630');
+    setOrCreate('og:image:type', 'image/jpeg');
+    setOrCreate('og:description', description);
+    setOrCreate('og:site_name', 'Arecofix');
+  }
+
+  /**
+   * Injects the JSON-LD Product schema for Google rich results.
+   * Uses a stable script ID so it replaces itself on navigation.
+   */
+  private injectProductSchema(product: Product, imageUrl: string): void {
+    const scriptId = 'product-json-ld';
+    let script = this.document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!script) {
+      script = this.document.createElement('script');
+      script.id = scriptId;
+      script.type = 'application/ld+json';
+      this.document.head.appendChild(script);
+    }
+
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org/',
+      '@type': 'Product',
+      name: product.name,
+      image: [imageUrl],
+      description: product.description || `Comprá ${product.name} en Arecofix`,
+      brand: { '@type': 'Brand', name: 'Arecofix' },
+      sku: product.sku || product.id,
+      offers: {
+        '@type': 'Offer',
+        url: `https://arecofix.com.ar/productos/detalle/${product.slug}`,
+        priceCurrency: 'ARS',
+        price: product.price,
+        availability: (product.stock ?? 1) > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        seller: { '@type': 'Organization', name: 'Arecofix' },
+      },
     });
   }
 
@@ -192,11 +258,28 @@ export class ProductsDetailsPage {
 
   private injector = inject(Injector);
 
+  /**
+   * Loads the product's direct category AND its full ancestor chain.
+   * Returns { category, ancestorChain } so breadcrumbs can build the
+   * complete path: Inicio > Productos > Repuestos > Módulos > [product]
+   */
   categoryRs = rxResource({
     stream: () => toObservable(this.product, { injector: this.injector }).pipe(
       switchMap(product => {
-        if (!product || !product.category_id) return of(null);
-        return this.categoryService.getById(product.category_id.toString());
+        if (!product?.category_id) return of(null);
+        return combineLatest({
+          category: this.categoryService.getById(product.category_id.toString()),
+          allCategories: this.categoryService.getAll(),
+        }).pipe(
+          map(({ category, allCategories }) => {
+            if (!category) return null;
+            const ancestorChain = this.categoryService.buildAncestorChain(
+              category.id,
+              allCategories
+            );
+            return { category, ancestorChain };
+          })
+        );
       })
     )
   });

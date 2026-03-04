@@ -15,7 +15,7 @@ export interface Order {
     order_number?: string;
     user_id?: string; // in DB it's user_id, not customer_id
     customer_name: string;
-    customer_email: string;
+    customer_email?: string;
     customer_phone?: string;
     shipping_address?: Address | string; // in DB it's shipping_address
     status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';

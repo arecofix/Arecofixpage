@@ -23,6 +23,10 @@
       <input #fileInput type="file" accept=".csv" class="hidden" (change)="importProducts($event)" />
 
 
+      <a routerLink="/admin/products/approvals" class="btn btn-outline btn-warning btn-sm md:btn-md shadow-lg shadow-amber-500/10 whitespace-nowrap">
+        <i class="fas fa-clipboard-check mr-2"></i> Revisión
+      </a>
+
       <a routerLink="/admin/products/new" class="btn btn-primary btn-sm md:btn-md shadow-lg shadow-green-500/20 whitespace-nowrap">
         <i class="fas fa-plus mr-2"></i> Nuevo
       </a>
@@ -143,7 +147,18 @@
                           </div>
                         </div>
                         <div>
-                          <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ product.name }}</div>
+                          <div class="flex items-center gap-2">
+                            <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ product.name }}</div>
+                            @if (product.is_global) {
+                              <span class="badge badge-xs badge-info text-white font-bold">
+                                <i class="fas fa-globe text-xs mr-1"></i>Global
+                              </span>
+                            } @else {
+                              <span class="badge badge-xs badge-outline text-gray-500 font-bold">
+                                <i class="fas fa-store text-xs mr-1"></i>Local
+                              </span>
+                            }
+                          </div>
                           <div class="text-xs text-gray-400 font-mono">{{ product.slug }}</div>
                         </div>
                       </div>
@@ -162,17 +177,43 @@
                       <td class="font-mono font-bold text-indigo-600 dark:text-indigo-400">
                         {{ product.price | currency: product.currency || 'ARS' }}
                       </td>
-                      <td>
+                      <td (click)="$event.stopPropagation()">
                         <div class="flex items-center gap-2">
-                          <div class="radial-progress text-xs"
-                            [class.text-success]="!product.stock || product.stock > 10"
-                            [class.text-warning]="product.stock && product.stock <= 10 && product.stock > 0"
-                            [class.text-error]="product.stock === 0"
-                            [style.--value]="product.stock ? (product.stock > 100 ? 100 : product.stock) : 0"
-                            style="--size:2rem;">
-                            {{ product.stock || 0 }}
-                          </div>
-                          @if(product.stock === 0) { <span class="badge badge-error badge-xs">Agotado</span> }
+                          @if (editingStock() === product.id) {
+                            <div class="flex items-center gap-1">
+                              <input type="number" 
+                                     #stockInput
+                                     class="input input-xs input-bordered w-16 text-center" 
+                                     [value]="tempStock()"
+                                     (input)="tempStock.set($any($event.target).value)"
+                                     (keydown.enter)="saveStock(product.id)"
+                                     (keydown.escape)="cancelStockEdit()"
+                                     min="0"
+                                     autofocus>
+                              <button (click)="saveStock(product.id)" 
+                                      class="btn btn-xs btn-success btn-circle">
+                                <i class="fas fa-check"></i>
+                              </button>
+                              <button (click)="cancelStockEdit()" 
+                                      class="btn btn-xs btn-error btn-circle">
+                                <i class="fas fa-times"></i>
+                              </button>
+                            </div>
+                          } @else {
+                            <div class="flex items-center gap-2 cursor-pointer hover:bg-base-200 rounded p-1" 
+                                 (click)="startStockEdit(product.id, product.stock || 0)">
+                              <div class="radial-progress text-xs"
+                                [class.text-success]="!product.stock || product.stock > 10"
+                                [class.text-warning]="product.stock && product.stock <= 10 && product.stock > 0"
+                                [class.text-error]="product.stock === 0"
+                                [style.--value]="product.stock ? (product.stock > 100 ? 100 : product.stock) : 0"
+                                style="--size:2rem;">
+                                {{ product.stock || 0 }}
+                              </div>
+                              @if(product.stock === 0) { <span class="badge badge-error badge-xs">Agotado</span> }
+                              <i class="fas fa-edit text-xs text-gray-400"></i>
+                            </div>
+                          }
                         </div>
                       </td>
                       <td>

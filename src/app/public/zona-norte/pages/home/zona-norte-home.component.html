@@ -1,0 +1,178 @@
+<div class="zona-norte-home">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-carousel">
+      <div class="carousel-slide" 
+           *ngFor="let image of heroImages; let i = index" 
+           [class.active]="i === currentImageIndex">
+        <img [src]="image.url" 
+             [alt]="image.title" 
+             onerror="this.src='assets/img/branches/zona-norte/hero-placeholder.jpg'">
+        <div class="hero-overlay">
+          <div class="hero-content">
+            <h1 class="hero-title">{{ image.title }}</h1>
+            <p class="hero-subtitle">{{ image.subtitle }}</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-lg" (click)="contactarWhatsApp()">
+                <i class="fab fa-whatsapp"></i>
+                Consultar Ahora
+              </button>
+              <a routerLink="/Zona-Norte/servicios" class="btn btn-secondary btn-lg">
+                <i class="fas fa-tools"></i>
+                Ver Servicios
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Carousel controls -->
+      <button class="carousel-control prev" (click)="prevImage()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="carousel-control next" (click)="nextImage()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      
+      <!-- Indicators -->
+      <div class="carousel-indicators">
+        <button *ngFor="let image of heroImages; let i = index"
+                class="indicator"
+                [class.active]="i === currentImageIndex"
+                (click)="goToImage(i)"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Estadísticas -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item" *ngFor="let stat of estadisticas">
+          <div class="stat-number">{{ stat.numero }}</div>
+          <div class="stat-text">{{ stat.texto }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Servicios Principales -->
+  <section class="services-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <p class="section-subtitle">Calidad y profesionalismo en cada trabajo</p>
+      </div>
+      
+      <div class="services-grid">
+        <div class="service-card" *ngFor="let servicio of servicios">
+          <div class="service-image">
+            <img [src]="servicio.imagen" 
+                 [alt]="servicio.titulo"
+                 onerror="this.src='assets/img/branches/zona-norte/service-placeholder.jpg'">
+            <div class="service-icon">
+              <i class="fas" [class]="servicio.icono"></i>
+            </div>
+          </div>
+          <div class="service-content">
+            <h3 class="service-title">{{ servicio.titulo }}</h3>
+            <p class="service-description">{{ servicio.descripcion }}</p>
+            <ul class="service-features">
+              <li *ngFor="let feature of servicio.caracteristicas">
+                <i class="fas fa-check-circle"></i>
+                {{ feature }}
+              </li>
+            </ul>
+            <button class="btn btn-primary" (click)="contactarWhatsApp('Quiero información sobre {{ servicio.titulo }}')">
+              <i class="fas fa-info-circle"></i>
+              Consultar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Proyectos Destacados -->
+  <section class="projects-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Proyectos Destacados</h2>
+        <p class="section-subtitle">Trabajos que nos enorgullecen</p>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" *ngFor="let proyecto of proyectos">
+          <div class="project-image">
+            <img [src]="proyecto.imagen" 
+                 [alt]="proyecto.titulo"
+                 onerror="this.src='assets/img/branches/zona-norte/project-placeholder.jpg'">
+            <div class="project-overlay">
+              <span class="project-category">{{ proyecto.categoria }}</span>
+            </div>
+          </div>
+          <div class="project-content">
+            <h3 class="project-title">{{ proyecto.titulo }}</h3>
+            <p class="project-description">{{ proyecto.descripcion }}</p>
+            <button class="btn btn-outline" (click)="contactarWhatsApp('Quiero información sobre el proyecto: {{ proyecto.titulo }}')">
+              <i class="fas fa-search"></i>
+              Ver Detalles
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Qué Dicen Nuestros Clientes</h2>
+        <p class="section-subtitle">La confianza de quienes nos eligen</p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card" *ngFor="let testimonio of testimonios">
+          <div class="testimonial-stars">
+            <i class="fas fa-star" 
+               *ngFor="let star of getStars(testimonio.calificacion); let i = index"
+               [class.filled]="star === 1"></i>
+          </div>
+          <p class="testimonial-text">"{{ testimonio.texto }}"</p>
+          <div class="testimonial-author">
+            <div class="author-info">
+              <h4 class="author-name">{{ testimonio.nombre }}</h4>
+              <p class="author-role">{{ testimonio.cargo }}</p>
+              <p class="author-company">{{ testimonio.empresa }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Llamada a la Acción -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿Listo para transformar tus espacios?</h2>
+        <p class="cta-subtitle">Contactanos hoy mismo y solicitá un presupuesto sin compromiso</p>
+        <div class="cta-actions">
+          <button class="btn btn-primary btn-lg" (click)="contactarWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="llamarTelefono()">
+            <i class="fas fa-phone"></i>
+            Llamar Ahora
+          </button>
+          <a routerLink="/Zona-Norte/contacto" class="btn btn-outline btn-lg">
+            <i class="fas fa-envelope"></i>
+            Formulario
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

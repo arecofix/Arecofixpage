@@ -150,39 +150,200 @@
     </div>
   </section>
 
-  <!-- SEO CONTENT SECTION ESTRUCTURAL Y SEMÁNTICO -->
-  <section class="py-16 bg-white dark:bg-gray-800">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <main itemscope itemtype="https://schema.org/ProfessionalService" class="prose prose-lg dark:prose-invert mx-auto">
-        <article class="seo-content-block">
-          <!-- H1 Lógico: Unico, poderoso y claro -->
-          <header>
-            <h1 itemprop="name" class="text-4xl font-extrabold mb-4 dark:text-white">Servicio Técnico de Celulares en Marcos Paz</h1>
-            <p class="text-lg mb-6 leading-relaxed">¿Tu dispositivo dejó de funcionar, la batería se desgasta rápido o necesitas cambiar la pantalla rota en el acto? En <strong>Arecofix</strong> somos referentes indiscutidos en la reparación de celulares multimarca para Marcos Paz, Las Heras y Merlo.</p>
+  <!--
+    SEO CONTENT SECTION — Mobile First
+    ✦ Mobile  : hidden (display:none) — no penaliza velocidad ni conversión
+    ✦ Desktop : layout horizontal de 2 columnas — máximo aprovechamiento visual
+    ✦ Estilo  : Minimalista, tipografía limpia, gap generoso
+  -->
+  <section
+    class="hidden md:block py-20 bg-white dark:bg-gray-900"
+    aria-label="Información sobre el servicio"
+  >
+    <div class="container mx-auto px-6 lg:px-8 max-w-6xl">
+      <!-- Grid 2 columnas: Texto principal | Links relacionados -->
+      <div class="grid md:grid-cols-2 gap-16 items-start">
+        <!-- Columna izquierda: Contenido editorial SEO -->
+        <article
+          itemscope
+          itemtype="https://schema.org/ProfessionalService"
+          class="space-y-8"
+        >
+          <header class="space-y-4">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400"
+            >
+              Arecofix — Marcos Paz
+            </span>
+            <h2
+              itemprop="name"
+              class="text-3xl lg:text-4xl font-extrabold leading-tight text-gray-900 dark:text-white tracking-tight"
+            >
+              Servicio Técnico de Celulares en Marcos Paz
+            </h2>
+            <p
+              class="text-base lg:text-lg text-gray-500 dark:text-gray-400 leading-relaxed"
+            >
+              ¿Tu dispositivo dejó de funcionar, la batería se desgasta rápido o
+              necesitas cambiar la pantalla rota en el acto? En
+              <strong class="text-gray-700 dark:text-gray-200">Arecofix</strong>
+              somos referentes en la reparación de celulares multimarca para
+              Marcos Paz, Las Heras y Merlo.
+            </p>
           </header>
 
-          <!-- H2 Secundario: Agrupando problemas -->
-          <h2 class="text-2xl font-bold mt-8 mb-4 dark:text-white">Nuestros Servicios de Reparación Especializados</h2>
-          <p class="mb-4">Sabemos que estar sin tu teléfono es estar desconectado del mundo, el trabajo y los seres queridos. Por ello, aplicamos estándares de laboratorio para realizar diagnósticos profundos y precisos. Al trabajar con repuestos de primer nivel, aseguramos que la durabilidad de tu dispositivo móvil no se vea comprometida bajo ninguna circunstancia.</p>
-          
-          <!-- H3 de Contexto y Keywords long-tail -->
-          <h3 class="text-xl font-semibold mt-6 mb-3 dark:text-gray-200">Cambio de Módulos, Baterías y Pines de Carga</h3>
-          <p class="mb-4">Si enfrentas problemas como un pin de carga sulfatado o necesitas hacer microsoldadura en placas húmedas, nuestro equipo utiliza las herramientas correctas y procedimientos estandarizados para asegurar la supervivencia de la placa base (Motherboard). Al mismo tiempo, reemplazamos baterías degradadas devolviéndole a tu celular la autonomía del primer día.</p>
+          <div class="space-y-6 text-gray-500 dark:text-gray-400">
+            <div class="space-y-2">
+              <h3
+                class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Cambio de Módulos, Baterías y Pines de Carga
+              </h3>
+              <p class="leading-relaxed text-sm lg:text-base">
+                Aplicamos estándares de laboratorio para diagnósticos profundos.
+                Microsoldadura, reemplazo de pines sulfatados y baterías
+                degradadas con repuestos de primer nivel.
+              </p>
+            </div>
 
-          <h3 class="text-xl font-semibold mt-6 mb-3 dark:text-gray-200">Soporte Técnico Multimarca</h3>
-          <p class="mb-4">Atendemos equipos de las marcas líderes del mercado internacional. Somos expertos brindando soporte especializado tanto en ecosistemas Android (incluyendo reparaciones físicas y lógicas de Samsung, Motorola, Xiaomi y LG) como destrabando los sofisticados candados e integraciones de hardware en todo el rango contemporáneo de dispositivos Apple iOS (iPhone).</p>
-          
-          <!-- Enlaces Internos Sugeridos (Quitan el efecto 'Dead end') -->
-          <nav aria-label="Navegación Relacionada" class="mt-8 p-6 bg-base-200 border border-base-300 rounded-xl">
-            <h3 class="text-lg font-bold mb-3">Te puede interesar:</h3>
-            <ul class="list-disc pl-5 space-y-2">
-              <li>Visitá ahora nuestro <a routerLink="/productos/categoria/repuestos" title="Ir a Repuestos Originales" class="text-primary font-medium hover:underline">Catálogo de Repuestos de Celulares</a> con stock inmediato.</li>
-              <li>¿Querés aprender este oficio? Mirá nuestros <a routerLink="/academy" title="Cursos de Reparación" class="text-primary font-medium hover:underline">cursos de Reparación de Hardware y Microsoldadura</a>.</li>
-              <li>Explorá también nuestro servicio enfocado en la <a routerLink="/productos/categoria/consolas" title="Servicio de Consolas" class="text-primary font-medium hover:underline">reparación de consolas de videojuegos PlayStation y Xbox</a>.</li>
-            </ul>
-          </nav>
+            <div class="space-y-2">
+              <h3
+                class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Soporte Técnico Multimarca
+              </h3>
+              <p class="leading-relaxed text-sm lg:text-base">
+                Samsung, Motorola, Xiaomi, LG y toda la gama Apple iOS (iPhone).
+                Reparaciones físicas y lógicas en un solo lugar, con garantía
+                escrita.
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <h3
+                class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Reparación de Consolas de Videojuegos
+              </h3>
+              <p class="leading-relaxed text-sm lg:text-base">
+                PlayStation 4/5, Xbox y Nintendo Switch. Servicio de reballing,
+                limpieza profunda y cambio de pasta térmica para devolverle la
+                vida a tu consola.
+              </p>
+            </div>
+          </div>
         </article>
-      </main>
+
+        <!-- Columna derecha: Navegación relacionada (Internal Linking SEO) -->
+        <aside class="space-y-6">
+          <h3
+            class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500"
+          >
+            También te puede interesar
+          </h3>
+
+          <nav aria-label="Servicios relacionados" class="space-y-3">
+            <a
+              routerLink="/productos/categoria/repuestos"
+              title="Catálogo de Repuestos Originales"
+              class="group flex items-center gap-4 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-indigo-200 dark:hover:border-indigo-900 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all duration-200"
+            >
+              <div
+                class="shrink-0 w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center"
+              >
+                <i
+                  class="fas fa-microchip text-indigo-600 dark:text-indigo-400"
+                ></i>
+              </div>
+              <div>
+                <p
+                  class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors"
+                >
+                  Catálogo de Repuestos
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Módulos, baterías y pines — stock inmediato
+                </p>
+              </div>
+              <i
+                class="fas fa-arrow-right ml-auto text-gray-300 dark:text-gray-600 group-hover:text-indigo-400 transition-colors"
+              ></i>
+            </a>
+
+            <a
+              routerLink="/academy"
+              title="Cursos de Reparación de Celulares"
+              class="group flex items-center gap-4 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-violet-200 dark:hover:border-violet-900 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-all duration-200"
+            >
+              <div
+                class="shrink-0 w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center"
+              >
+                <i
+                  class="fas fa-graduation-cap text-violet-600 dark:text-violet-400"
+                ></i>
+              </div>
+              <div>
+                <p
+                  class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors"
+                >
+                  Cursos de Reparación
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Hardware, microsoldadura y más — 500+ alumnos
+                </p>
+              </div>
+              <i
+                class="fas fa-arrow-right ml-auto text-gray-300 dark:text-gray-600 group-hover:text-violet-400 transition-colors"
+              ></i>
+            </a>
+
+            <a
+              routerLink="/productos/categoria/repuestos/consolas"
+              title="Reparación de Consolas PlayStation y Xbox"
+              class="group flex items-center gap-4 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all duration-200"
+            >
+              <div
+                class="shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center"
+              >
+                <i
+                  class="fas fa-gamepad text-emerald-600 dark:text-emerald-400"
+                ></i>
+              </div>
+              <div>
+                <p
+                  class="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors"
+                >
+                  Consolas de Videojuegos
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  PlayStation, Xbox y Nintendo Switch
+                </p>
+              </div>
+              <i
+                class="fas fa-arrow-right ml-auto text-gray-300 dark:text-gray-600 group-hover:text-emerald-400 transition-colors"
+              ></i>
+            </a>
+          </nav>
+
+          <!-- Trust signals mini -->
+          <div
+            class="pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-4 text-xs text-gray-400 dark:text-gray-500"
+          >
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-shield-check text-green-500"></i> Garantía
+              Escrita
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-certificate text-yellow-500"></i> Repuestos
+              Originales
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-map-marker-alt text-red-500"></i> Marcos Paz, Bs.
+              As.
+            </span>
+          </div>
+        </aside>
+      </div>
     </div>
   </section>
 
@@ -972,12 +1133,12 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         @for (review of reviews; track review.name) {
-            <!-- Review Card -->
+          <!-- Review Card -->
           <a
-             href="https://share.google/Fnume9zIn9XpY4Xiu"
-             target="_blank"
-             class="relative flex h-full flex-col justify-between rounded-2xl bg-base-100 p-6 shadow-sm ring-1 ring-base-200 transition-all hover:shadow-md hover:-translate-y-1"
-             >
+            href="https://share.google/Fnume9zIn9XpY4Xiu"
+            target="_blank"
+            class="relative flex h-full flex-col justify-between rounded-2xl bg-base-100 p-6 shadow-sm ring-1 ring-base-200 transition-all hover:shadow-md hover:-translate-y-1"
+          >
             <div>
               <div class="flex items-center gap-x-4 mb-4">
                 <div
@@ -986,13 +1147,15 @@
                     review.bgColor
                   "
                 >
-                  {{ review.initial | slice:0:1 }}
+                  {{ review.initial | slice: 0 : 1 }}
                 </div>
                 <div>
                   <h3 class="text-lg font-semibold leading-7 text-base-content">
                     {{ review.name }}
                   </h3>
-                  <div class="flex items-center gap-1 text-sm text-base-content/60">
+                  <div
+                    class="flex items-center gap-1 text-sm text-base-content/60"
+                  >
                     <p>{{ review.date }}</p>
                     <span>•</span>
                     <div class="flex text-yellow-400 text-xs">

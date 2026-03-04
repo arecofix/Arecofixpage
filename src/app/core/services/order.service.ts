@@ -73,11 +73,21 @@ export class OrderService {
     }
 
     async createOrder(order: Order, items: OrderItem[]): Promise<{ data: Order | null; error: Error | PostgrestError | null }> {
+        console.log('🚀 OrderService.createOrder called');
+        console.log('📋 Order data:', order);
+        console.log('📦 Items data:', items);
+        
         try {
             const user = this.auth.getCurrentUser();
+            console.log('👤 Current user:', user);
+            
             const orderId = crypto.randomUUID();
             const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
             const tenantId = this.tenantService.getTenantId();
+            
+            console.log('🏢 Tenant ID:', tenantId);
+            console.log('🆔 Order ID:', orderId);
+            console.log('🔢 Order Number:', orderNumber);
 
             const insertPayload: any = {
                 id: orderId,
@@ -98,11 +108,20 @@ export class OrderService {
                 tenant_id: tenantId
             };
 
+            console.log('💾 Inserting order payload:', insertPayload);
+
             const { error: orderError } = await this.supabase
                 .from('orders')
                 .insert(insertPayload);
 
-            if (orderError) throw orderError;
+            console.log('📊 Order insert result:', { orderError });
+
+            if (orderError) {
+                console.error('❌ Order insert error:', orderError);
+                throw orderError;
+            }
+
+            console.log('✅ Order inserted successfully');
 
             const itemsWithOrderId = items.map(item => ({
                 order_id: orderId,
@@ -115,11 +134,20 @@ export class OrderService {
                 tenant_id: tenantId
             }));
 
+            console.log('📦 Items to insert:', itemsWithOrderId);
+
             const { error: itemsError } = await this.supabase
                 .from('order_items')
                 .insert(itemsWithOrderId);
 
-            if (itemsError) throw itemsError;
+            console.log('📊 Items insert result:', { itemsError });
+
+            if (itemsError) {
+                console.error('❌ Items insert error:', itemsError);
+                throw itemsError;
+            }
+
+            console.log('✅ Items inserted successfully');
 
             const orderData: Order = { 
                 ...order, 
@@ -128,8 +156,12 @@ export class OrderService {
                 created_at: new Date().toISOString(),
                 tenant_id: tenantId
             };
+            
+            console.log('🎉 Order creation completed:', orderData);
             return { data: orderData, error: null };
+            
         } catch (error: any) {
+            console.error('💥 Critical error creating order:', error);
             this.handleError('Critical error creating order', error);
             return { data: null, error: error };
         }

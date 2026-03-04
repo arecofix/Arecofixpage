@@ -6,6 +6,9 @@ import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { Product } from '@app/features/products/domain/entities/product.entity';
+import { FinanceService } from '@app/core/services/finance.service';
+import { Location } from '@angular/common';
+import { AdminProductService } from '../products/services/admin-product.service';
 
 @Component({
     selector: 'app-admin-purchase-form-page',
@@ -18,14 +21,20 @@ export class AdminPurchaseFormPage implements OnInit {
     private router = inject(Router);
     private tenantService = inject(TenantService);
     private productRepository = inject(ProductRepository);
+    private financeService = inject(FinanceService);
+    private location = inject(Location);
+    private adminProductService = inject(AdminProductService);
 
     suppliers = signal<any[]>([]);
+    branches = signal<any[]>([]);
     products = signal<Product[]>([]);
 
     form = signal({
         supplier_id: '',
+        branch_id: '',
         purchase_date: new Date().toISOString().split('T')[0],
         status: 'received',
+        payment_method: 'efectivo',
     });
 
     items = signal<any[]>([]); // { product_id, name, quantity, unit_cost }
@@ -81,6 +90,9 @@ export class AdminPurchaseFormPage implements OnInit {
             .eq('tenant_id', tenantId);
 
         if (suppliersRes) this.suppliers.set(suppliersRes);
+
+        const branchesRes = await this.adminProductService.getBranches();
+        this.branches.set(branchesRes);
 
         this.loading.set(false);
     }
@@ -186,9 +198,11 @@ export class AdminPurchaseFormPage implements OnInit {
                 .from('purchases')
                 .insert({
                     supplier_id: this.form().supplier_id,
+                    branch_id: this.form().branch_id || null,
                     date: this.form().purchase_date,
                     status: this.form().status,
                     total_amount: this.total(),
+                    payment_method: this.form().payment_method,
                     tenant_id: tenantId
                 })
                 .select()
@@ -223,6 +237,19 @@ export class AdminPurchaseFormPage implements OnInit {
                     }
                 }
             }
+            
+            // 4. Record Cash Movement if applicable [USER-REQ]
+            if (this.form().payment_method === 'efectivo') {
+                await this.financeService.recordMovement({
+                    amount: this.total(),
+                    type: 'expense',
+                    category: 'purchase',
+                    branch_id: this.form().branch_id || null,
+                    payment_method: 'cash',
+                    reference_id: purchase.id,
+                    notes: `Compra a proveedor #${purchase.id.substring(0,8)}`
+                });
+            }
 
             this.router.navigate(['/admin/purchases']);
         } catch (e: any) {
@@ -230,5 +257,9 @@ export class AdminPurchaseFormPage implements OnInit {
         } finally {
             this.saving.set(false);
         }
+    }
+
+    goBack() {
+        this.router.navigate(['/admin/purchases']);
     }
 }

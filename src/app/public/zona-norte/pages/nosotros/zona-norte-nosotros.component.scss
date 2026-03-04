@@ -1,0 +1,561 @@
+.zona-norte-nosotros {
+  // Hero Section
+  .hero-section {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    padding: 6rem 0;
+    color: white;
+    text-align: center;
+  }
+
+  .hero-content {
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.3rem;
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  // History Section
+  .history-section {
+    padding: 6rem 0;
+    background: white;
+  }
+
+  .history-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    
+    @media (max-width: 968px) {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .history-text {
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      color: #4b5563;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .history-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .stat-item {
+    text-align: center;
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #3b82f6;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+  }
+
+  .history-image {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    
+    img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+  }
+
+  // Mission Vision Section
+  .mission-vision-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  }
+
+  .mission-vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    
+    @media (max-width: 968px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .mission-card,
+  .vision-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+  }
+
+  .card-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    
+    i {
+      font-size: 2rem;
+      color: white;
+    }
+  }
+
+  .mission-card h3,
+  .vision-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .mission-card p,
+  .vision-card p {
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  // Values Section
+  .values-section {
+    padding: 6rem 0;
+    background: white;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 1rem;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        border-radius: 2px;
+      }
+    }
+    
+    p {
+      font-size: 1.2rem;
+      color: #6b7280;
+      margin-top: 1.5rem;
+    }
+  }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+
+  .value-card {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #f9fafb;
+      transform: translateY(-3px);
+    }
+    
+    .value-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      
+      i {
+        font-size: 1.8rem;
+        color: white;
+      }
+    }
+    
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // Team Section
+  .team-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+  }
+
+  .team-member {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+  }
+
+  .member-photo {
+    height: 250px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .member-info {
+    padding: 2rem;
+    text-align: center;
+    
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    
+    .member-role {
+      color: #3b82f6;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .member-meta {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #6b7280;
+      
+      span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        i {
+          color: #3b82f6;
+        }
+      }
+    }
+    
+    p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // Clients Section
+  .clients-section {
+    padding: 6rem 0;
+    background: white;
+  }
+
+  .clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .client-card {
+    background: #f9fafb;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      transform: translateY(-3px);
+    }
+    
+    .client-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      border-radius: 12px;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+    
+    h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    
+    .client-type {
+      color: #3b82f6;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    
+    .client-testimonial {
+      color: #6b7280;
+      line-height: 1.6;
+      font-style: italic;
+      margin: 0;
+    }
+  }
+
+  // Certifications Section
+  .certifications-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  }
+
+  .certifications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .certification-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    
+    .cert-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      
+      i {
+        font-size: 2rem;
+        color: white;
+      }
+    }
+    
+    h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // CTA Section
+  .cta-section {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    padding: 6rem 0;
+    color: white;
+    text-align: center;
+  }
+
+  .cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+    
+    .cta-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+    
+    .cta-subtitle {
+      font-size: 1.2rem;
+      color: #d1d5db;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+    
+    .cta-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  // Buttons
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    
+    &.btn-lg {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+    
+    &.btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: white;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+      }
+    }
+    
+    &.btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .hero-content {
+      padding: 0 1rem;
+      
+      .hero-title {
+        font-size: 2.2rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.1rem;
+      }
+    }
+    
+    .history-text h2 {
+      font-size: 1.8rem;
+    }
+    
+    .section-header h2 {
+      font-size: 2rem;
+    }
+    
+    .team-grid,
+    .clients-grid,
+    .certifications-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .cta-content {
+      padding: 0 1rem;
+      
+      .cta-title {
+        font-size: 2rem;
+      }
+      
+      .cta-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  }
+}

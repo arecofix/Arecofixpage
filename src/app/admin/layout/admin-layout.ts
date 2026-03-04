@@ -5,6 +5,8 @@ import { AuthService } from '@app/core/services/auth.service';
 import { NotificationService, AppNotification } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
 import { PreferencesService } from '@app/shared/services/preferences.service';
+import { BranchService, Branch } from '@app/core/services/branch.service';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-admin-layout',
@@ -13,10 +15,14 @@ import { PreferencesService } from '@app/shared/services/preferences.service';
   templateUrl: './admin-layout.html',
 })
 export class AdminLayout implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private router = inject(Router);
+  private branchService = inject(BranchService);
   public preferencesService = inject(PreferencesService);
   public notificationService = inject(NotificationService);
+
+  public branches = signal<Branch[]>([]);
+  public currentBranchId = signal<string | null>(null);
 
   menuItems: any[] = [
     { title: 'Dashboard', path: '/admin/dashboard', icon: 'fa-chart-line' },
@@ -42,6 +48,7 @@ export class AdminLayout implements OnInit, OnDestroy {
       expanded: false,
       children: [
         { title: 'Empleados', path: '/admin/employees', icon: 'fa-id-card' },
+        { title: 'Sucursales', path: '/admin/company', icon: 'fa-map-marker-alt' },
         { title: 'Proveedores', path: '/admin/suppliers', icon: 'fa-truck' },
         { title: 'Facturación', path: '/admin/sales/invoices', icon: 'fa-file-invoice-dollar' },
       ]
@@ -63,6 +70,34 @@ export class AdminLayout implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.notificationService.loadNotifications();
     this.notificationService.subscribeToRealtime();
+
+    if (this.authService.isSuperAdmin()) {
+      await this.loadAllBranches();
+    }
+  }
+
+  async loadAllBranches() {
+    const supabase = this.authService.getSupabaseClient();
+    const { data } = await supabase.from('branches').select('*').eq('is_active', true);
+    if (data) {
+      this.branches.set(data);
+    }
+  }
+
+  onBranchSelected(event: any) {
+    const branchId = event.target.value;
+    this.currentBranchId.set(branchId);
+    
+    // Find the branch slug to navigate to the correct admin URL
+    const selectedBranch = this.branches().find(branch => branch.id === branchId);
+    
+    if (selectedBranch && selectedBranch.slug) {
+      console.log(' Navigating to branch admin:', selectedBranch.slug);
+      // Navigate to the branch-specific admin panel
+      this.router.navigate([`/${selectedBranch.slug}/admin`]);
+    } else {
+      console.warn(' Branch not found or missing slug:', branchId);
+    }
   }
 
   ngOnDestroy() {

@@ -3,9 +3,9 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white/50 dark:bg-gray-800/50 p-6 rounded-3xl backdrop-blur-lg border border-white dark:border-gray-800 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all max-sm:shadow-sm">
       <div class="flex items-center gap-3">
-        <a routerLink="/admin/purchases" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+        <button type="button" (click)="goBack()" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
           <i class="fas fa-arrow-left"></i>
-        </a>
+        </button>
         <div class="w-10 h-10 rounded-2xl bg-linear-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
             <i class="fas fa-shopping-cart"></i>
         </div>
@@ -41,7 +41,7 @@
                 <h2 class="text-xl text-gray-800 dark:text-white font-bold">Datos de la Factura / Remito</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               <div class="form-control">
                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-400">Proveedor</span></label>
                 <select [(ngModel)]="form().supplier_id" name="supplier_id"
@@ -49,6 +49,17 @@
                   <option value="" disabled selected>Seleccione un proveedor</option>
                   @for (supplier of suppliers(); track supplier.id) {
                     <option [value]="supplier.id">{{ supplier.name }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-control">
+                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-400">Sucursal (Destino)</span></label>
+                <select [(ngModel)]="form().branch_id" name="branch_id"
+                  class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-300 dark:focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition-all font-medium text-gray-700 dark:text-gray-200">
+                  <option value="">Central (Principal)</option>
+                  @for (branch of branches(); track branch.id) {
+                    <option [value]="branch.id">{{ branch.name }}</option>
                   }
                 </select>
               </div>
@@ -71,6 +82,17 @@
                   [ngClass]="{'text-emerald-600 dark:text-emerald-400': form().status === 'received', 'text-yellow-600 dark:text-yellow-400': form().status === 'ordered'}">
                   <option value="received">R - Recibido (Suma Stock)</option>
                   <option value="ordered">P - Pendiente (No Suma)</option>
+                </select>
+              </div>
+
+              <div class="form-control">
+                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-400">Método de Pago</span></label>
+                <select [(ngModel)]="form().payment_method" name="payment_method"
+                  class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-emerald-300 dark:focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition-all font-bold text-gray-700 dark:text-gray-200 shadow-sm text-center">
+                  <option value="efectivo">Efectivo 💵</option>
+                  <option value="transferencia">Transferencia 🏦</option>
+                  <option value="tarjeta">Tarjeta 💳</option>
+                  <option value="cheque">Cheque 📃</option>
                 </select>
               </div>
             </div>

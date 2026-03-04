@@ -1,12 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { AnalyticsRepository, DashboardStats } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
 import { AnalyticsService } from '@app/core/services/analytics.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
+import { AdminProductService } from '@app/admin/products/services/admin-product.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -18,6 +21,10 @@ import { firstValueFrom } from 'rxjs';
 export class AdminDashboardPage implements OnInit {
   private analyticsRepo = inject(AnalyticsRepository);
   private analyticsService = inject(AnalyticsService);
+  private authService = inject(AuthService);
+  private tenantService = inject(TenantService);
+  private adminProductService = inject(AdminProductService);
+  private router = inject(Router);
 
   stats = signal({
     users: 0,
@@ -26,7 +33,8 @@ export class AdminDashboardPage implements OnInit {
     revenue: 0,
     repairs_month: 0,
     repairs_revenue: 0,
-    devices_fixed: 0
+    devices_fixed: 0,
+    pending_approvals: 0
   });
 
   analyticsStats = signal({
@@ -36,6 +44,10 @@ export class AdminDashboardPage implements OnInit {
   });
 
   loading = signal(true);
+
+  // Branch Management for Super Admin
+  branches = signal<any[]>([]);
+  isSuperAdmin = this.authService.isSuperAdmin;
 
   // Sales over the Year Chart
   public salesChartOptions: ChartConfiguration['options'] = {
@@ -101,6 +113,9 @@ export class AdminDashboardPage implements OnInit {
   ngOnInit() {
     this.loadStats();
     this.loadAnalyticsInfo();
+    if (this.isSuperAdmin()) {
+      this.loadBranches();
+    }
   }
 
   async loadStats() {
@@ -116,7 +131,8 @@ export class AdminDashboardPage implements OnInit {
         revenue: data.revenue,
         repairs_month: data.repairs_month,
         repairs_revenue: data.repairs_revenue,
-        devices_fixed: data.devices_fixed
+        devices_fixed: data.devices_fixed,
+        pending_approvals: await this.getPendingApprovalsCount()
       });
 
       // Update Sales Chart (Line)
@@ -189,6 +205,37 @@ export class AdminDashboardPage implements OnInit {
       sessionId: this.analyticsService.getSessionId(),
       distinctId: this.analyticsService.getDistinctId(),
     });
+  }
+
+  async getPendingApprovalsCount(): Promise<number> {
+    try {
+      const supabase = this.authService.getSupabaseClient();
+      const tenantId = this.tenantService.getTenantId();
+      const { count, error } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', false)
+        .eq('tenant_id', tenantId)
+        .not('branch_id', 'is', null);
+      
+      if (error) return 0;
+      return count || 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  async loadBranches(): Promise<void> {
+    try {
+      const branchesData = await this.adminProductService.getBranches();
+      this.branches.set(branchesData);
+    } catch (error) {
+      console.error('Error loading branches:', error);
+    }
+  }
+
+  goToBranch(branchSlug: string): void {
+    this.router.navigate([`/${branchSlug}/admin`]);
   }
 
   posthogStatus(): string {

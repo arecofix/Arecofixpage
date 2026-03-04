@@ -3,6 +3,7 @@ import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto, RepairStatus, RepairPart } from '../../domain/entities/repair.entity';
 import { Observable, firstValueFrom } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
+import { InvoiceService } from '@app/features/sales/application/invoice.service';
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +11,7 @@ import { AuthService } from '@app/core/services/auth.service';
 export class AdminRepairService {
     private repository = inject(RepairRepository);
     private auth = inject(AuthService);
+    private invoiceService = inject(InvoiceService);
 
     // Status logic
     private readonly STATUS_DELIVERED = RepairStatus.DELIVERED;
@@ -58,6 +60,7 @@ export class AdminRepairService {
 
     async update(id: string, dto: UpdateRepairDto): Promise<void> {
         const payload = { ...dto };
+        const originalRepair = await this.getById(id);
 
         // Logic: Set completed_at if status changes to final
         if (payload.current_status_id && this.isFinalStatus(payload.current_status_id)) {
@@ -67,6 +70,42 @@ export class AdminRepairService {
         }
 
         await firstValueFrom(this.repository.update(id, payload));
+
+        // [USER-REQ-5] AUTOMATIC INVOICING TRIGGER
+        // If status changed to DELIVERED and there is a total balance to pay, generate invoice.
+        if (payload.current_status_id === this.STATUS_DELIVERED && originalRepair) {
+            const totalToInvoice = payload.final_cost ?? originalRepair.final_cost;
+            
+            if (totalToInvoice && totalToInvoice > 0) {
+                try {
+                    await this.invoiceService.generateInvoice({
+                        customer_id: originalRepair.customer_id,
+                        customer_name: originalRepair.customer_name || 'Cliente Taller',
+                        type: 'B',
+                        origin: 'repair',
+                        repair_id: id as any,
+                        subtotal: totalToInvoice,
+                        tax_amount: 0,
+                        discount: 0,
+                        total_amount: totalToInvoice,
+                        notes: `Liquidación de Reparación #${originalRepair.tracking_code}`,
+                        items: [
+                            {
+                                description: `Servicio Técnico: ${originalRepair.device_model || 'Equipo'} - ${originalRepair.issue_description?.substring(0, 50)}...`,
+                                quantity: 1,
+                                unit_price: totalToInvoice,
+                                tax_rate: 0,
+                                subtotal: totalToInvoice,
+                                total: totalToInvoice
+                            }
+                        ]
+                    } as any);
+                } catch (invoiceErr) {
+                    // We don't block the repair update if invoice fails, but we log it.
+                    console.error('Failed to generate automated invoice for repair', invoiceErr);
+                }
+            }
+        }
     }
 
     async uploadImage(file: File): Promise<string> {

@@ -191,6 +191,16 @@
                     <span class="text-red-400 font-bold">-{{ discount() | currency:'ARS':'symbol':'1.0-0' }}</span>
                 </div>
 
+                <div class="flex justify-between items-center text-sm font-medium">
+                    <span class="flex items-center gap-2">Pago</span>
+                    <select [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" 
+                            class="bg-gray-800 border border-gray-700 rounded-lg py-1 px-2 text-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                        <option value="efectivo">Efectivo 💵</option>
+                        <option value="transferencia">Transferencia 🏦</option>
+                        <option value="tarjeta">Tarjeta 💳</option>
+                    </select>
+                </div>
+
                 <div class="h-px w-full bg-gray-800 my-3"></div>
                 
                 <div class="flex justify-between items-end">

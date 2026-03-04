@@ -1,0 +1,89 @@
+/* FIX: Superposición con botón WhatsApp - Punto de Venta */
+
+/* Contenedor principal del checkout con z-index alto */
+.checkout-page-container {
+  position: relative;
+  z-index: 100000; /* Mayor que el z-index de WhatsApp (99999) */
+}
+
+/* Botones de acción principales del checkout */
+.checkout-action-buttons {
+  position: relative;
+  z-index: 100001; /* Asegurar que esté por encima de WhatsApp */
+}
+
+/* Botón principal de checkout */
+.checkout-submit-btn {
+  position: relative;
+  z-index: 100002;
+  transform: translateZ(0); /* Hardware acceleration */
+  backface-visibility: hidden;
+}
+
+/* Botón de WhatsApp en checkout (si existe) */
+.checkout-whatsapp-btn {
+  position: relative;
+  z-index: 100003;
+}
+
+/* Contenedor del formulario */
+.checkout-form-container {
+  position: relative;
+  z-index: 100000;
+}
+
+/* Overlay de procesamiento */
+.checkout-processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100004; /* El más alto para modales */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive: Ajustar z-index para móviles */
+@media (max-width: 768px) {
+  .checkout-page-container {
+    z-index: 100000;
+  }
+  
+  .checkout-action-buttons {
+    z-index: 100001;
+    margin-bottom: 80px; /* Espacio extra para evitar superposición */
+  }
+  
+  .checkout-submit-btn {
+    z-index: 100002;
+  }
+}
+
+/* Asegurar que los tooltips y popups estén por encima */
+.checkout-tooltip {
+  position: absolute;
+  z-index: 100005;
+}
+
+/* Fix para cualquier modal o dropdown en checkout */
+.checkout-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100006;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor de mensajes de error/éxito */
+.checkout-message-container {
+  position: relative;
+  z-index: 100007;
+}
