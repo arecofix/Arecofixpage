@@ -38,6 +38,8 @@ export class AdminSalesPage implements OnInit {
     loading = signal(false);
     processing = signal(false);
     isCartOpenMobile = signal(false); // For mobile responsiveness
+    customerName = signal('');
+    discount = signal<number>(0);
 
     // Pagination Signals
     currentPage = signal(1);
@@ -64,7 +66,8 @@ export class AdminSalesPage implements OnInit {
     totalPages = computed(() => Math.ceil(this.filteredProducts().length / this.itemsPerPage()));
 
     // Computed: Cart Totals
-    cartTotal = computed(() => this.cart().reduce((acc, item) => acc + (item.price * item.quantity), 0));
+    cartSubtotal = computed(() => this.cart().reduce((acc, item) => acc + (item.price * item.quantity), 0));
+    finalTotal = computed(() => Math.max(0, this.cartSubtotal() - (this.discount() || 0)));
     cartCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
 
     constructor() {
@@ -123,6 +126,17 @@ export class AdminSalesPage implements OnInit {
         this.cart.update(items => items.filter(i => i.id !== productId));
     }
 
+    clearCart() {
+        this.cart.set([]);
+        this.discount.set(0);
+        this.customerName.set('');
+    }
+
+    updateDiscount(value: any) {
+        const num = parseFloat(value);
+        this.discount.set(isNaN(num) ? 0 : num);
+    }
+
     updateQuantity(productId: string, change: number) {
         this.cart.update(items => {
             return items.map(i => {
@@ -150,13 +164,13 @@ export class AdminSalesPage implements OnInit {
 
             // 1. Create Order (acting as a Sale)
             const order: Order = {
-                customer_name: 'Venta Mostrador',
+                customer_name: this.customerName() || 'Consumidor Final',
                 customer_email: 'mostrador@arecofix.com',
                 status: 'completed',
-                subtotal: this.cartTotal(),
+                subtotal: this.cartSubtotal(),
                 tax: 0,
-                discount: 0,
-                total: this.cartTotal()
+                discount: this.discount(),
+                total: this.finalTotal()
             };
 
             const items: OrderItem[] = this.cart().map(item => ({
@@ -191,12 +205,13 @@ export class AdminSalesPage implements OnInit {
             await supabase.from('invoices').insert({
                 order_id: createdOrder.id,
                 tenant_id: tenantId,
-                total_amount: this.cartTotal(),
+                total_amount: this.finalTotal(),
                 type: 'B', 
-                issued_at: new Date().toISOString()
+                issued_at: new Date().toISOString(),
+                customer_name: this.customerName() || 'Consumidor Final'
             });
 
-            this.cart.set([]);
+            this.clearCart();
             this.router.navigate(['/admin/invoices']);
 
         } catch (e: any) {
