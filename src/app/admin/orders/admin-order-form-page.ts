@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+
 import { OrderService } from '@app/core/services/order.service';
 import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
 import { AuthService } from '@app/core/services/auth.service';
@@ -19,7 +21,7 @@ interface ProductOption {
 @Component({
     selector: 'app-admin-order-form-page',
     standalone: true,
-    imports: [FormsModule, RouterLink],
+    imports: [CommonModule, FormsModule, RouterLink, CurrencyPipe, DecimalPipe],
     templateUrl: './admin-order-form-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
