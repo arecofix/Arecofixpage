@@ -22,7 +22,7 @@
 
     <!-- Error State -->
     @if (error()) {
-        <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-red-700 dark:text-red-400 mb-8 border border-red-100 dark:border-red-900">
+        <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-l-red-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-red-700 dark:text-red-400 mb-8 border border-red-100 dark:border-red-900">
             <div class="flex items-center gap-3">
                 <i class="fas fa-exclamation-triangle text-xl"></i>
                 <span class="font-medium font-sm">{{ error() }}</span>
@@ -206,7 +206,7 @@
                          <div class="flex flex-col gap-1">
                              <div class="inline-flex gap-2">
                                 <span class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-500/20">#{{ repair.repair_number | number:'1.0-0' }}</span>
-                                <span class="font-mono text-[10px] text-gray-500 border rounded px-1 flex items-center"><i class="fas fa-barcode mr-1"></i> {{ repair.tracking_code?.substring(0,8) }}</span>
+                                <span class="font-mono text-[10px] text-gray-500 border rounded px-1 flex items-center"><i class="fas fa-barcode mr-1"></i> {{ repair.tracking_code.substring(0,8) }}</span>
                              </div>
                              <span class="font-black text-gray-900 dark:text-white text-lg leading-tight mt-1">{{ repair.customer_name }}</span>
                          </div>
