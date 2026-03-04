@@ -37,7 +37,7 @@
             <div class="project-overlay">
               <div class="project-category">
                 <i class="fas fa-tag"></i>
-                {{ categorias.find(c => c.id === proyecto.categoria)?.nombre }}
+                {{ getNombreCategoria(proyecto.categoria) }}
               </div>
               <button class="view-btn">
                 <i class="fas fa-search-plus"></i>

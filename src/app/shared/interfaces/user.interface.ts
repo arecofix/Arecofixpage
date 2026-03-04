@@ -1,5 +1,17 @@
 export type UserRole = 'super_admin' | 'tenant_owner' | 'technician' | 'staff' | 'user' | 'admin';
 
+export interface Address {
+  street?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  coordinates?: {
+    lat?: number;
+    lng?: number;
+  };
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -10,7 +22,7 @@ export interface UserProfile {
   avatar_url?: string | null;
   bio?: string | null;
   phone?: string | null;
-  address?: any | null;
+  address?: Address | null;
   created_at?: string;
   updated_at?: string;
   is_active?: boolean;

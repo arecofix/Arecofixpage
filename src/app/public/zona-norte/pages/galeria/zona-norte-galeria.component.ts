@@ -20,6 +20,12 @@ export class ZonaNorteGaleriaComponent {
 
   categoriaActual = 'todos';
 
+  // Método para obtener nombre de categoría de forma segura
+  getNombreCategoria(categoriaId: string): string {
+    const categoria = this.categorias.find(c => c.id === categoriaId);
+    return categoria?.nombre || 'Sin categoría';
+  }
+
   proyectos = [
     {
       id: 1,

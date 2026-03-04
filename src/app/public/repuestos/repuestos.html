@@ -34,7 +34,8 @@
                          <i class="fas fa-search text-lg"></i>
                      </div>
                      <input 
-                         [ngModel]="searchQuery()" 
+                         [ngModel]="searchQueryValue" 
+                         (ngModelChange)="searchQueryValue = $event" 
                          (ngModelChange)="onSearch($event)" 
                          type="text" 
                          placeholder="Buscar repuesto (ej: Módulo iPhone 11)..." 
@@ -76,7 +77,7 @@
                         class="btn btn-sm rounded-full">Todo</button>
                 </div>
 
-                <select [ngModel]="currentSort()" (ngModelChange)="applyFilter('sort', $event)"
+                <select [ngModel]="currentSortValue" (ngModelChange)="currentSortValue = $event"
                     class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500 min-w-[180px]">
                     <option value="relevance">Relevancia</option>
                     <option value="price-asc">Precio: Menor a Mayor</option>
@@ -213,7 +214,7 @@
              <!-- Brands -->
              <div>
                 <h4 class="font-bold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Marca</h4>
-                <select [ngModel]="currentBrand()" (ngModelChange)="applyFilter('brand', $event)"
+                <select [ngModel]="currentBrandValue" (ngModelChange)="currentBrandValue = $event"
                     class="select select-bordered w-full bg-white dark:bg-gray-700">
                     <option value="all">Todas las Marcas</option>
                     @for (b of brands(); track b.id) { <option [value]="b.id">{{b.name}}</option> }
@@ -225,7 +226,7 @@
                 <h4 class="font-bold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Precio Máximo</h4>
                 <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-400">$</span>
-                    <input [ngModel]="currentMaxPrice()" (ngModelChange)="applyFilter('price', $event)" type="number" min="0" placeholder="Ej: 50.000"
+                    <input [ngModel]="currentMaxPriceValue" (ngModelChange)="currentMaxPriceValue = $event" type="number" min="0" placeholder="Ej: 50.000"
                     class="input input-bordered w-full pl-8 bg-white dark:bg-gray-700" />
                 </div>
               </div>

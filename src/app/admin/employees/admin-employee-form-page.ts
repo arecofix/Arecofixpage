@@ -44,6 +44,24 @@ export class AdminEmployeeFormPage implements OnInit {
     creationMode = signal<'new' | 'existing'>('new');
     selectedUserId = signal<string | null>(null);
     
+    // Propiedad para ngModel binding
+    get creationModeValue(): 'new' | 'existing' {
+        return this.creationMode();
+    }
+    
+    set creationModeValue(value: 'new' | 'existing') {
+        this.creationMode.set(value);
+    }
+    
+    // Propiedad para ngModel binding de selectedUserId
+    get selectedUserIdValue(): string | null {
+        return this.selectedUserId();
+    }
+    
+    set selectedUserIdValue(value: string | null) {
+        this.selectedUserId.set(value);
+    }
+    
     // Usuarios disponibles para asignar
     availableUsers = signal<AvailableUser[]>([]);
     loadingUsers = signal(false);

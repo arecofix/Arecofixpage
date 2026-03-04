@@ -7,6 +7,20 @@ yarn-error.log*
 firebase-debug.log*
 firebase-debug.*.log*
 
+# Binary files that shouldn't be in repo
+*.apk
+*.exe
+*.mp4
+*.jar
+*.rar
+*.zip
+*.tar.gz
+
+# Build outputs
+android/app/build/
+dist/
+deploy-temp/
+
 # Firebase cache
 .firebase/
 

@@ -162,7 +162,7 @@ export class AdminProductService {
             'is_active', 'is_featured', 'sku', 'barcode'
         ];
 
-        this.csvService.exportToCsv(products, 'products_export', headers);
+        this.csvService.exportToCsv(products as any, 'products_export', headers);
     }
 
     // ────────────────────────────────────────────────────────────────────────

@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.google.com https://*.google.com.ar https://*.google-analytics.com https://*.facebook.com https://*.googletagmanager.com https://tailwindcss.com https://images.unsplash.com https://www.transparenttextures.com https://ui-avatars.com https://huggingface.co https://stats.g.doubleclick.net; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com https://stats.g.doubleclick.net;"
+    />
+
+    <title>Soluciones Informáticas - Consultoría IT | Arecofix</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Servicio Técnico especializado en Celulares, Consultoría IT, Desarrollo Web y Inteligencia Artificial en Marcos Paz."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Arecofix" />
+    <meta name="theme-color" content="#1f2136" />
+
+    <!-- Open Graph / Facebook / WhatsApp Placeholders -->
+    <!-- IMPORTANT: og:image MUST be an absolute URL for WhatsApp/Facebook crawlers -->
+    <meta property="fb:app_id" content="1209190100450173" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Soluciones Informáticas - Consultoría IT | Arecofix"
+    />
+    <meta
+      property="og:description"
+      content="Reparación de Celulares en el acto, Desarrollo Web y Consultoría IT en Marcos Paz."
+    />
+    <meta property="og:image" content="https://arecofix.com.ar/assets/img/branding/og-services.jpg" />
+    <meta property="og:image:secure_url" content="https://arecofix.com.ar/assets/img/branding/og-services.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:url" content="https://arecofix.com.ar" />
+    <meta property="og:site_name" content="Arecofix" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Soluciones Informáticas - Consultoría IT | Arecofix"
+    />
+    <meta
+      name="twitter:description"
+      content="Reparación de Celulares y Soluciones IT en Marcos Paz."
+    />
+    <meta name="twitter:image" content="https://arecofix.com.ar/assets/img/branding/og-services.jpg" />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="assets/img/brands/logo/Logo.ico"
+    />
+    <link rel="manifest" href="site.webmanifest" />
+
+    <!-- Preconnect to critical origins -->
+    <link rel="preconnect" href="https://arecofix.com.ar" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co" />
+
+    <!-- DNS-prefetch for deferred third-party origins -->
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+    <!-- Critical fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- SILENCIAMIENTO INMEDIATO DE ERRORES DE TERCEROS - ANTES DE CUALQUIER SCRIPT -->
+    <script>
+      // SILENCIAR ERRORES DE TERCEROS INMEDIATAMENTE - PRIMERA LÍNEA DE EJECUCIÓN
+      (function() {
+        'use strict';
+        
+        // Guardar métodos originales
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        
+        // Función de filtrado ultra agresiva
+        function shouldSilenceMessage(message) {
+          const msg = message.toLowerCase();
+          
+          // Lista negra exhaustiva de errores de terceros
+          const blockedPatterns = [
+            'cross-origin-opener-policy',
+            'attribution-reporting',
+            'browsing-topics',
+            'fbevents.js',
+            'postmessage',
+            'js?id=g-n7dqdvm8med',
+            '1304105440826069',
+            'gtm-nlvcrsjr',
+            'unrecognized feature',
+            'facebook',
+            'google-analytics',
+            'googletagmanager',
+            'doubleclick',
+            'analytics',
+            'gtag',
+            'fbq',
+            'postmessage',
+            'policy would block',
+            'window.postmessage'
+          ];
+          
+          return blockedPatterns.some(pattern => msg.includes(pattern));
+        }
+        
+        // Reemplazar console.error
+        console.error = function(...args) {
+          const message = args.join(' ');
+          if (shouldSilenceMessage(message)) {
+            return; // Silenciar errores de terceros
+          }
+          return originalError.apply(console, args);
+        };
+        
+        // Reemplazar console.warn
+        console.warn = function(...args) {
+          const message = args.join(' ');
+          if (shouldSilenceMessage(message)) {
+            return; // Silenciar warnings de terceros
+          }
+          return originalWarn.apply(console, args);
+        };
+        
+        // Reemplazar console.log (solo para errores específicos)
+        console.log = function(...args) {
+          const message = args.join(' ');
+          if (shouldSilenceMessage(message)) {
+            return; // Silenciar logs de terceros problemáticos
+          }
+          return originalLog.apply(console, args);
+        };
+        
+        // Envolver postMessage para evitar errores COOP
+        if (typeof window !== 'undefined') {
+          const originalPostMessage = window.postMessage;
+          window.postMessage = function(...args) {
+            try {
+              return originalPostMessage.apply(this, args);
+            } catch (error) {
+              // Silenciar errores de cross-origin
+              if (error.message && (
+                error.message.includes('cross-origin') || 
+                error.message.includes('opener') ||
+                error.message.includes('policy')
+              )) {
+                return;
+              }
+              throw error;
+            }
+          };
+        }
+        
+        // Marcar que el silenciamiento está activo
+        window.__ERROR_SILENCING_ACTIVE = true;
+        
+        // Interceptar errores no capturados
+        window.addEventListener('error', function(event) {
+          if (shouldSilenceMessage(event.message)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        });
+        
+        // Interceptar promesas rechazadas
+        window.addEventListener('unhandledrejection', function(event) {
+          if (event.reason && shouldSilenceMessage(event.reason.toString())) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        });
+        
+      })();
+    </script>
+
+    <!-- Analytics Lazy Loader -->
+    <script>
+      (function () {
+        if (window.location.hash && window.location.hash.startsWith("#/")) {
+          var newPath = window.location.hash.substring(1);
+          window.history.replaceState(null, "", newPath);
+        }
+
+        var analyticsLoaded = false;
+        function loadAnalytics() {
+          if (analyticsLoaded) return;
+          analyticsLoaded = true;
+
+          // Skip analytics on localhost to avoid console noise
+          if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            console.log("🔧 Analytics desactivado en modo desarrollo");
+            return;
+          }
+
+          // Add COOP policy to prevent postMessage errors
+          if (typeof window !== 'undefined' && window.document) {
+            var meta = document.createElement('meta');
+            meta.httpEquiv = 'Cross-Origin-Opener-Policy';
+            meta.content = 'same-origin-allow-popups';
+            document.head.appendChild(meta);
+          }
+
+          try {
+
+          // Google Tag Manager
+          (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            var f = d.getElementsByTagName(s)[0],
+              j = d.createElement(s),
+              dl = l != "dataLayer" ? "&l=" + l : "";
+            j.async = true;
+            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+            f.parentNode.insertBefore(j, f);
+          })(window, document, "script", "dataLayer", "GTM-NLVCRSJR");
+
+          // GTAG
+          var gtagScript = document.createElement("script");
+          gtagScript.async = true;
+          gtagScript.src =
+            "https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED";
+          document.head.appendChild(gtagScript);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag("js", new Date());
+          gtag("config", "G-N7DQDV8MED");
+
+          // Meta Pixel with Permissions-Policy to avoid console noise
+          !(function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+              n.callMethod
+                ? n.callMethod.apply(n, arguments)
+                : n.queue.push(arguments);
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = "2.0";
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          })(
+            window,
+            document,
+            "script",
+            "https://connect.facebook.net/en_US/fbevents.js",
+          );
+          fbq("init", "1304105440826069");
+          fbq("track", "PageView");
+          } catch (error) {
+            console.warn("⚠️ Error loading analytics:", error);
+          }
+        }
+
+        var events = ["mousedown", "keydown", "touchstart", "scroll"];
+        events.forEach(function (e) {
+          window.addEventListener(e, loadAnalytics, {
+            once: true,
+            passive: true,
+          });
+        });
+        setTimeout(loadAnalytics, 8000);
+      })();
+    </script>
+  </head>
+
+  <body>
+    <app-root></app-root>
+    
+    <!-- Script para silenciar errores de terceros ANTES de que carguen -->
+    <script>
+      (function() {
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.error = function(...args) {
+          const message = args.join(' ');
+          // Filtrar errores conocidos de terceros
+          if (message.includes('Cross-Origin-Opener-Policy') ||
+              message.includes('attribution-reporting') ||
+              message.includes('browsing-topics') ||
+              message.includes('fbevents.js') ||
+              message.includes('postMessage') ||
+              message.includes('js?id=G-N7DQDV8MED') ||
+              message.includes('1304105440826069')) {
+            return; // Silenciar estos errores
+          }
+          return originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+          const message = args.join(' ');
+          // Filtrar warnings conocidos de terceros
+          if (message.includes('Unrecognized feature') ||
+              message.includes('fbevents.js') ||
+              message.includes('js?id=G-N7DQDV8MED')) {
+            return; // Silenciar estos warnings
+          }
+          return originalWarn.apply(console, args);
+        };
+      })();
+    </script>
+    
+    <noscript>Please enable JavaScript to continue using this application.</noscript>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-NLVCRSJR"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+    ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Meta Pixel Code (noscript) -->
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=1304105440826069&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code (noscript) -->
+    <noscript>
+      <div style="text-align: center; padding: 20px">
+        <h1>Arecofix - Soluciones Informáticas</h1>
+        <p>Este sitio requiere JavaScript. Servicio Tecnico de Celulares</p>
+        <p>
+          Si tenés problemas, escribinos a:
+          <a href="mailto:info@arecofix.com.ar" style="color: #5bbad5"
+            >info@arecofix.com.ar</a
+          >
+        </p>
+      </div>
+    </noscript>
+  </body>
+</html>

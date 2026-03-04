@@ -1,5 +1,20 @@
 /* eslint-disable */
 /* tslint:disable */
+
+export interface ProductSpecification {
+  weight?: number;
+  dimensions?: {
+    length?: number;
+    width?: number;
+    height?: number;
+  };
+  color?: string;
+  material?: string;
+  warranty?: string;
+  features?: string[];
+  technical_details?: Record<string, string | number | boolean>;
+}
+
 export interface ProductsResponse {
   first: number;
   prev?: number;
@@ -25,7 +40,7 @@ export interface Product {
   model_id?: string | null;
   image_url?: string | null;
   gallery_urls?: string[]; // array of strings (text[])
-  specifications?: any; // jsonb
+  specifications?: ProductSpecification; // jsonb
   featured?: boolean; // map to 'is_featured' but typically used as 'featured' in frontend, maybe both
   is_featured?: boolean;
   is_active?: boolean;

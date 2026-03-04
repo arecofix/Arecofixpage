@@ -27,21 +27,22 @@ export class TenantIsolationGuard implements CanActivate {
     if (targetBranch) {
       // Si estamos navegando a una sucursal, asegurar que el tenant correcto esté activo
       if (!this.tenantService.isCurrentTenant(targetBranch.id)) {
-        console.log(`🔄 Cambiando a tenant: ${targetBranch.name}`);
+        // Temporarily use console until structured logging is properly configured
+        console.log(`Switching to branch tenant: ${targetBranch.name}`);
         this.tenantService.setCurrentTenant(targetBranch.id);
         return true;
       }
     } else {
       // Si no es una ruta de sucursal, asegurar que estamos en el tenant principal
       if (!this.tenantService.isMainTenant()) {
-        console.log(`🔄 Cambiando a tenant principal`);
+        console.log('Switching to main tenant');
         this.tenantService.setCurrentTenant('central');
       }
     }
     
     // Validar que el tenant actual tenga acceso a la ruta solicitada
     if (!this.validateRouteAccess(state.url, currentTenant)) {
-      console.warn(`❌ Acceso denegado a la ruta: ${state.url} para tenant: ${currentTenant?.name}`);
+      console.warn(`Access denied to route: ${state.url} for tenant: ${currentTenant?.name}`);
       this.router.navigate(['/']);
       return false;
     }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -23,7 +23,8 @@ import { SeoService } from '@app/core/services/seo.service';
     standalone: true,
     imports: [CommonModule, FormsModule, ProductCard, Pagination, RouterLink],
     templateUrl: './repuestos.html',
-    styleUrl: './repuestos.scss'
+    styleUrl: './repuestos.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RepuestosComponent implements OnInit {
     whatsappNumber = environment.contact.whatsappNumber;
@@ -58,6 +59,48 @@ export class RepuestosComponent implements OnInit {
     
     // Quick View Logic
     isQuickViewOpen = signal(false);
+
+    // Propiedades para ngModel binding
+    get searchQueryValue(): string {
+        return this.searchQuery();
+    }
+    
+    set searchQueryValue(value: string) {
+        this.searchQuery.set(value);
+    }
+    
+    get currentCategoryValue(): string {
+        return String(this.currentCategory());
+    }
+    
+    set currentCategoryValue(value: string) {
+        this.applyFilter('category', value);
+    }
+    
+    get currentBrandValue(): string {
+        return String(this.currentBrand());
+    }
+    
+    set currentBrandValue(value: string) {
+        this.applyFilter('brand', value);
+    }
+    
+    get currentMaxPriceValue(): number | null {
+        const value = this.currentMaxPrice();
+        return value !== null ? Number(value) : null;
+    }
+    
+    set currentMaxPriceValue(value: number | null) {
+        this.applyFilter('price', value);
+    }
+    
+    get currentSortValue(): string {
+        return String(this.currentSort());
+    }
+    
+    set currentSortValue(value: string) {
+        this.applyFilter('sort', value);
+    }
     quickViewProduct = signal<Product | null>(null);
 
     // Visible Categories for Sidebar

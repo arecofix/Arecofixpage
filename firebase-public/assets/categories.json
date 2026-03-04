@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,  
+    "name": "Electrónicos",
+    "description": "Dispositivos y gadgets",
+    "icon": "fas fa-laptop",
+    "slug": "electronics",
+    "featured": true
+  },
+  {
+    "id": 2,
+    "name": "Cursos",
+    "description": "Capacitaciones y materiales educativos",
+    "icon": "fas fa-book",
+    "slug": "Cursos",
+    "featured": true
+  },
+  {
+    "id": 5,
+    "name": "Domotica",
+    "description": "Tu casa más inteligente: herramientas para el hogar",
+    "icon": "fas fa-home",
+    "slug": "domotica",
+    "featured": true
+  },
+  {
+    "id": 3,
+    "name": "Ropa",
+    "description": "Vestimenta y accesorios",
+    "icon": "fas fa-tshirt",
+    "slug": "clothing",
+    "featured": false
+  },
+  {
+    "id": 4,
+    "name": "Deportes",
+    "description": "Equipos y artículos deportivos",
+    "icon": "fas fa-football-ball",
+    "slug": "sports",
+    "featured": false
+  },
+  {
+    "id": 6,
+    "name": "Salud y Belleza",
+    "description": "Productos de cuidado personal",
+    "icon": "fas fa-heart",
+    "slug": "health-beauty",
+    "featured": false
+  },
+  {
+    "id": 7,
+    "name": "Automóviles",
+    "description": "Vehículos y accesorios automotrices",
+    "icon": "fas fa-car",
+    "slug": "automotive",
+    "featured": false
+  },
+  {
+    "id": 8,
+    "name": "Juguetes",
+    "description": "Juguetes y entretenimiento infantil",
+    "icon": "fas fa-gamepad",
+    "slug": "toys",
+    "featured": false
+  },
+  {
+    "id": 9,
+    "name": "Comida y Bebidas",
+    "description": "Alimentos y bebidas gourmet",
+    "icon": "fas fa-utensils",
+    "slug": "food-drinks",
+    "featured": false
+  },
+  {
+    "id": 10,
+    "name": "Música",
+    "description": "Instrumentos y equipos de audio",
+    "icon": "fas fa-music",
+    "slug": "music",
+    "featured": false
+  }
+]

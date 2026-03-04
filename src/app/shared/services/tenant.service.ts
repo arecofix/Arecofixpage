@@ -1,5 +1,8 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { map, switchMap, tap, catchError, finalize } from 'rxjs/operators';
+import { SupabaseService } from '@app/core/services/supabase.service';
 
 export interface Tenant {
   id: string;
@@ -36,7 +39,8 @@ export interface Tenant {
   providedIn: 'root'
 })
 export class TenantService {
-  
+  private router = inject(Router);
+  private supabase = inject(SupabaseService);
   private currentTenantSubject = new BehaviorSubject<Tenant | null>(null);
   public currentTenant$: Observable<Tenant | null> = this.currentTenantSubject.asObservable();
   
@@ -261,7 +265,12 @@ export class TenantService {
     if (tenant.database.isolationLevel === 'complete') {
       // Aquí se implementaría la lógica para cambiar de schema de base de datos
       // Por ahora, simulamos la separación a nivel de aplicación
-      console.log(`🔒 Aislando datos para tenant: ${tenant.name} (${tenant.database.schema})`);
+      // Temporarily comment out structured logging until properly configured
+      // this.logger.debug('Tenant data isolation applied', { 
+      //   tenantId: tenant.id,
+      //   tenantName: tenant.name,
+      //   schema: tenant.database.schema 
+      // });
       
       // Agregar clase CSS al body para estilos específicos del tenant
       document.body.className = document.body.className

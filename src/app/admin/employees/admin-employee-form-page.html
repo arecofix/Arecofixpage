@@ -22,14 +22,14 @@
                 <div class="flex gap-4">
                     <label class="cursor-pointer">
                         <input type="radio" name="creationMode" value="new" 
-                               [(ngModel)]="creationMode()" 
+                               [(ngModel)]="creationModeValue" 
                                (change)="onCreationModeChange('new')"
                                class="radio radio-primary mr-2">
                         <span class="text-base-content">Crear nuevo usuario</span>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="creationMode" value="existing" 
-                               [(ngModel)]="creationMode()" 
+                               [(ngModel)]="creationModeValue" 
                                (change)="onCreationModeChange('existing')"
                                class="radio radio-primary mr-2">
                         <span class="text-base-content">Asignar usuario existente</span>
@@ -47,7 +47,7 @@
                     <span class="loading loading-spinner loading-xs ml-2"></span>
                     }
                 </label>
-                <select [(ngModel)]="selectedUserId()" 
+                <select [(ngModel)]="selectedUserIdValue" 
                         (change)="onUserSelect($any($event.target).value)"
                         name="selectedUser" 
                         class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
@@ -74,14 +74,14 @@
                     <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
                     <input type="text" [(ngModel)]="form().first_name" name="first_name" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                           [disabled]="creationMode() === 'existing' && selectedUserId()"
+                           [disabled]="creationMode() === 'existing' && !!selectedUserId()"
                            required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
                     <input type="text" [(ngModel)]="form().last_name" name="last_name" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                           [disabled]="creationMode() === 'existing' && selectedUserId()"
+                           [disabled]="creationMode() === 'existing' && !!selectedUserId()"
                            required>
                 </div>
 
@@ -94,7 +94,7 @@
                     </label>
                     <input type="email" [(ngModel)]="form().email" name="email" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                           [disabled]="!!id || (creationMode() === 'existing' && selectedUserId())"
+                           [disabled]="!!id || (creationMode() === 'existing' && !!selectedUserId())"
                            required>
                 </div>
 
@@ -102,7 +102,7 @@
                     <label class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
                     <input type="tel" [(ngModel)]="form().phone" name="phone" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
-                           [disabled]="creationMode() === 'existing' && selectedUserId()">
+                           [disabled]="creationMode() === 'existing' && !!selectedUserId()">
                 </div>
 
                 <div>
@@ -151,7 +151,7 @@
                 <input type="file" (change)="onFileChange($event)"
                        class="file-input file-input-bordered file-input-primary w-full bg-base-100 text-base-content" 
                        accept="image/*"
-                       [disabled]="creationMode() === 'existing' && selectedUserId()">
+                       [disabled]="creationMode() === 'existing' && !!selectedUserId()">
                 @if (form().avatar_url) {
                 <div class="mt-4">
                     <img [src]="form().avatar_url" alt="Avatar preview"

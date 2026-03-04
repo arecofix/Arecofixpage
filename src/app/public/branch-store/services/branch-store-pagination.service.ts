@@ -173,16 +173,19 @@ export class BranchStorePaginationService {
 
     // Ejecutar consulta
     return new Observable(observer => {
-      query.then(({ data, error, count }) => {
-        if (error) {
+      (async () => {
+        try {
+          const { data, error, count } = await query;
+          if (error) {
+            observer.error(error);
+          } else {
+            observer.next({ data, count });
+            observer.complete();
+          }
+        } catch (error: any) {
           observer.error(error);
-        } else {
-          observer.next({ data, count });
-          observer.complete();
         }
-      }).catch((error: any) => {
-        observer.error(error);
-      });
+      })();
     });
   }
 
