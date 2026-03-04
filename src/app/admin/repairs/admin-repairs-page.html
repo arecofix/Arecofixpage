@@ -1,103 +1,175 @@
-<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-green-400">Taller / Reparaciones</h1>
-    <div class="flex gap-4 w-full md:w-auto">
-        <div class="relative grow">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-fade-in-up">
+    <div>
+         <h1 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-emerald-700 flex items-center gap-3">
+            <i class="fas fa-tools text-green-500"></i> Gestión de Reparaciones
+         </h1>
+         <p class="text-sm text-gray-500 mt-1">Administra el taller, garantías y estado de los equipos.</p>
+    </div>
+    <div class="flex gap-3 w-full md:w-auto">
+        <div class="relative grow max-w-md">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
                 <i class="fas fa-search"></i>
             </span>
             <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" 
-                placeholder="Buscar cliente, tel o código..." 
-                class="input input-bordered pl-10 w-full rounded-xl" />
+                placeholder="Buscar cliente, teléfono o código..." 
+                class="input input-bordered pl-12 w-full rounded-2xl bg-white shadow-sm focus:ring-2 focus:ring-green-500/20 transition-all" />
         </div>
-        <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="select select-bordered text-gray-700 rounded-xl">
-            <option value="all">Ver Todos</option>
-            <option value="smartphone">Celulares</option>
-            <option value="pc">PC / Desktop</option>
-            <option value="notebook">Notebook / Netbook</option>
-            <option value="console">Consolas</option>
-            <option value="tablet">Tablets</option>
+        <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="select select-bordered text-gray-700 rounded-2xl bg-white shadow-sm hover:border-green-400 transition-colors">
+            <option value="all">📁 Ver Todos</option>
+            <option value="smartphone">📱 Celulares</option>
+            <option value="pc">💻 PC / Desktop</option>
+            <option value="notebook">💻 Notebook / Netbook</option>
+            <option value="console">🎮 Consolas</option>
+            <option value="tablet">📱 Tablets</option>
         </select>
-        <a routerLink="/admin/repairs/new" class="btn btn-primary rounded-xl">
-            <i class="fas fa-plus"></i> Nueva
+        <a routerLink="/admin/repairs/new" class="btn bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-2xl shadow-lg shadow-green-500/30 border-none transform hover:-translate-y-0.5 transition-all">
+            <i class="fas fa-plus"></i> Ingreso
         </a>
     </div>
 </div>
 
 @if (error()) {
-    <div class="alert alert-error mb-6 rounded-2xl shadow-lg border-none text-white font-medium">
-        <i class="fas fa-exclamation-triangle"></i>
+    <div class="alert alert-error mb-6 rounded-2xl shadow-lg border-none text-white font-medium animate-shake">
+        <i class="fas fa-exclamation-triangle text-xl"></i>
         <span>{{ error() }}</span>
-        <button (click)="loadRepairs()" class="btn btn-sm btn-ghost border-white/20 hover:bg-white/10 uppercase text-[10px]">Reintentar</button>
+        <button (click)="loadRepairs()" class="btn btn-sm btn-ghost border-white/20 hover:bg-white/10 uppercase text-[10px] tracking-wider rounded-xl">Reintentar</button>
     </div>
 }
 
-<div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-gray-800">
+<!-- Stats Overview -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <div>
+            <div class="text-sm text-gray-500 font-medium">Total Órdenes</div>
+            <div class="text-2xl font-bold text-gray-800">{{ mappedRepairs().length }}</div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-2xl">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <div>
+            <div class="text-sm text-gray-500 font-medium">En Taller</div>
+            <div class="text-2xl font-bold text-gray-800">{{ inWorkshopCount() }}</div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-green-50 text-green-500 flex items-center justify-center text-2xl">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div>
+            <div class="text-sm text-gray-500 font-medium">Para Retirar</div>
+            <div class="text-2xl font-bold text-gray-800">{{ readyToPickupCount() }}</div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center text-2xl">
+            <i class="fas fa-truck-loading"></i>
+        </div>
+        <div>
+            <div class="text-sm text-gray-500 font-medium">Repuestos Pendientes</div>
+            <div class="text-2xl font-bold text-gray-800">{{ pendingPartsCount() }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="table w-full">
+        <table class="table w-full border-collapse">
             <thead>
-                <tr class="text-gray-400 bg-gray-50/50 uppercase text-[10px] tracking-widest font-black">
-                    <th class="py-5">Ingreso / Garantía</th>
-                    <th>Cliente / Código</th>
-                    <th>Dispositivo</th>
-                    <th>Estado de Reparación</th>
-                    <th>Costo Est.</th>
-                    <th class="text-right">Acciones</th>
+                <tr class="text-gray-500 bg-gray-50/80 uppercase text-[10px] tracking-widest font-bold border-b border-gray-100">
+                    <th class="py-5 px-6 rounded-tl-3xl">Ingreso / Seguimiento</th>
+                    <th class="px-6">Cliente</th>
+                    <th class="px-6">Equipo & Falla</th>
+                    <th class="px-6 text-center">Estado</th>
+                    <th class="px-6 text-right">Costos</th>
+                    <th class="py-5 px-6 text-right rounded-tr-3xl">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-gray-50/50">
                 @if (loading()) {
                 <tr>
-                    <td colspan="6" class="text-center py-12">
-                        <span class="loading loading-spinner loading-lg text-primary"></span>
-                        <p class="mt-2 text-gray-500 text-sm italic">Cargando taller...</p>
+                    <td colspan="6" class="text-center py-20">
+                        <span class="loading loading-spinner loading-lg text-green-500"></span>
+                        <p class="mt-4 text-gray-400 font-medium animate-pulse">Sincronizando órdenes...</p>
                     </td>
                 </tr>
                 } @else if (mappedRepairs().length === 0) {
                 <tr>
-                    <td colspan="6" class="text-center py-20">
-                        <div class="text-gray-200 mb-4"><i class="fas fa-toolbox text-6xl"></i></div>
-                        <p class="text-gray-400 font-medium italic">No hay reparaciones que coincidan con la búsqueda.</p>
+                    <td colspan="6" class="text-center py-24">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                            <i class="fas fa-tools text-4xl text-gray-300"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-700">Sin Resultados</h3>
+                        <p class="text-gray-400 font-medium mt-1">No hay reparaciones que coincidan con los filtros actuales.</p>
+                        @if (searchTerm() || filterType() !== 'all') {
+                            <button (click)="searchTerm.set(''); filterType.set('all')" class="mt-4 btn btn-sm btn-outline text-gray-500 rounded-xl">Limpiar Filtros</button>
+                        }
                     </td>
                 </tr>
                 } @else {
                 @for (repair of mappedRepairs(); track repair.id) {
-                <tr class="hover:bg-base-200 transition-colors">
-                    <td>
-                        <div class="font-bold text-lg text-primary">#{{ repair.repair_number | number:'3.0-0' }}</div>
-                        <div class="text-xs text-base-content/60">{{ repair.tracking_code }}</div>
+                <tr class="hover:bg-gray-50/80 transition-all duration-200 group">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center font-bold border border-green-100 shadow-sm">
+                                #{{ repair.repair_number | number:'1.0-0' }}
+                            </div>
+                            <div>
+                                <div class="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors" title="Código de seguimiento">
+                                    {{ repair.tracking_code }}
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                    <i class="far fa-calendar-alt"></i> {{ repair.received_at | date:'dd/MM/yy' }}
+                                </div>
+                            </div>
+                        </div>
                     </td>
-                    <td>
-                        <div class="font-bold whitespace-nowrap"><i class="fas fa-user text-base-content/50 mr-2"></i>{{ repair.customer_name }}</div>
-                        <div class="text-sm"><i class="fas fa-phone text-base-content/50 mr-2"></i>{{ repair.customer_phone }}</div>
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-800 flex items-center gap-2">
+                             {{ repair.customer_name }}
+                        </div>
+                        <div class="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
+                            <i class="fab fa-whatsapp text-green-500"></i> {{ repair.customer_phone || 'Sin tel.' }}
+                        </div>
                     </td>
-                    <td>
-                        <div class="font-semibold"><i class="fas fa-mobile-alt text-base-content/50 mr-2"></i>{{ repair.device_model }}</div>
-                        <div class="text-xs text-base-content/70 max-w-[200px] truncate text-ellipsis">{{ repair.issue_description }}</div>
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-800"><i class="fas fa-mobile-alt text-gray-400 mr-2"></i>{{ repair.device_model }}</div>
+                        <div class="text-xs text-gray-500 mt-1 max-w-[220px] line-clamp-2 leading-tight" [title]="repair.issue_description">
+                            {{ repair.issue_description }}
+                        </div>
                     </td>
-                    <td>
-                        <div class="flex flex-col gap-1 items-start">
-                            <span class="badge" [ngClass]="repair.ui.statusClass">
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex flex-col gap-1.5 items-center">
+                            <span class="badge border-none px-3 py-1 text-xs font-bold rounded-lg shadow-sm w-full sm:w-auto" [ngClass]="repair.ui.statusClass">
                                 {{ repair.ui.statusLabel }}
                             </span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-xs text-base-content/70">
-                            Ingreso: <span class="font-medium text-base-content">{{ repair.received_at | date:'shortDate' }}</span>
-                        </div>
-                        <div class="mt-1">
-                            <span class="badge badge-xs gap-1" [ngClass]="repair.ui.warrantyClass">
-                                {{ repair.ui.warrantyLabel }}
+                            <span class="badge badge-sm gap-1 border-none shadow-sm rounded-md text-[10px]" [ngClass]="repair.ui.warrantyClass">
+                                <i class="fas fa-shield-alt"></i> {{ repair.ui.warrantyLabel }}
                             </span>
                         </div>
                     </td>
-                    <td class="text-right">
-                        <div class="flex items-center gap-2">
-                            <a [routerLink]="['/admin/repairs', repair.id]" class="btn btn-sm btn-ghost btn-circle text-primary" title="Editar">
-                                <i class="fas fa-edit"></i>
+                    <td class="px-6 py-4 text-right">
+                        <div class="text-xs text-gray-500">Total</div>
+                        <div class="font-bold text-gray-800">{{ (repair.final_cost || repair.estimated_cost) | currency:'ARS':'symbol':'1.0-0' }}</div>
+                        @if((repair.deposit_amount || 0) > 0) {
+                            <div class="text-[10px] text-green-600 font-medium mt-0.5" title="Seña abonada">
+                                Seña: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
+                            </div>
+                        }
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <a [routerLink]="['/admin/repairs', repair.id]" 
+                               class="btn btn-sm btn-circle btn-ghost text-blue-500 hover:bg-blue-50 transition-colors tooltip tooltip-left" data-tip="Editar Taller">
+                                <i class="fas fa-tools"></i>
                             </a>
-                            <button (click)="deleteRepair(repair.id!)" class="btn btn-sm btn-ghost btn-circle text-error" title="Eliminar">
-                                <i class="fas fa-trash"></i>
+                            <button (click)="deleteRepair(repair.id!)" 
+                                class="btn btn-sm btn-circle btn-ghost text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors tooltip tooltip-left" data-tip="Eliminar Ficha">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </td>

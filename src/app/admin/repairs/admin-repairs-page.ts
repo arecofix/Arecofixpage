@@ -70,6 +70,11 @@ export class AdminRepairsPage implements OnInit {
       });
   });
 
+  // Derived statistics to fix Angular template parsing limits with arrow functions
+  inWorkshopCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 3 || r.current_status_id === 1).length);
+  readyToPickupCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 5).length);
+  pendingPartsCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 2).length);
+
   date = new Date();
 
   async ngOnInit() {

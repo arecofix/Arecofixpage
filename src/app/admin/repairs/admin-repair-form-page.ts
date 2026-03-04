@@ -8,14 +8,13 @@ import { AdminRepairService } from '@app/features/repairs/application/services/a
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
 import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/repairs/domain/entities/repair.entity';
 import { environment } from '@env/environment';
-import { QRCodeComponent } from 'angularx-qrcode';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 @Component({
     selector: 'app-admin-repair-form-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, QRCodeComponent],
+    imports: [CommonModule, FormsModule, RouterLink],
     templateUrl: './admin-repair-form-page.html',
 })
 export class AdminRepairFormPage implements OnInit {

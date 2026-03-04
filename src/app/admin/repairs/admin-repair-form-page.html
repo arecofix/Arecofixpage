@@ -1,593 +1,469 @@
-<div class="container mx-auto p-4 max-w-5xl no-print">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-green-600">{{ id ? 'Editar Reparación' : 'Nueva Reparación' }}</h1>
-        <a routerLink="/admin/repairs" class="btn btn-circle btn-ghost text-base-content">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+<div class="container mx-auto p-4 lg:p-8 max-w-6xl no-print animate-fade-in">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white/50 p-6 rounded-3xl backdrop-blur-lg border border-white max-sm:shadow-sm">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 bg-white/50 border border-gray-100 hover:bg-white shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 tracking-tight">
+                    {{ id ? 'Taller de Reparación' : 'Nuevo Ingreso Técnico' }}
+                </h1>
+            </div>
+            @if(id && form().tracking_code) {
+                <div class="text-sm font-medium text-gray-500 mt-2 ml-12 flex items-center gap-2">
+                    <span class="bg-gray-100 border border-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-mono shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+                        <i class="fas fa-barcode text-gray-400 mr-1"></i> {{ form().tracking_code }}
+                    </span>
+                    <span class="text-[10px] uppercase tracking-widest bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-lg border border-yellow-200 font-bold">Orden #{{ form().repair_number | number:'3.0-0' }}</span>
+                </div>
+            }
+        </div>
+        
+        <div class="flex items-center gap-3 md:ml-auto w-full md:w-auto mt-4 md:mt-0 ml-12 md:ml-0">
+             @if (id && form().tracking_code) {
+                <button type="button" (click)="shareWhatsApp()"
+                    class="btn bg-[#25D366] hover:bg-[#1DA851] text-white border-none rounded-xl shadow-[0_4px_15px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.4)] transition-all">
+                    <i class="fab fa-whatsapp text-lg"></i> Notificar
+                </button>
+             }
+             <button type="button" (click)="printOrder()" class="btn btn-outline bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border-gray-200 rounded-xl shadow-sm transition-all" [disabled]="saving()">
+                 <i class="fas fa-print"></i> PDF / Talón
+             </button>
+        </div>
     </div>
 
-    <div class="card bg-base-100 shadow-lg">
-        <div class="card-body p-6">
-            @if (loading()) {
-            <div class="flex justify-center py-12">
-                <span class="loading loading-spinner loading-lg text-primary"></span>
+    @if (loading()) {
+        <div class="flex flex-col items-center justify-center py-32">
+            <div class="relative w-20 h-20">
+                <div class="absolute inset-0 rounded-full border-t-4 border-emerald-500 border-opacity-20"></div>
+                <div class="absolute inset-0 rounded-full border-t-4 border-emerald-500 animate-spin"></div>
+                <i class="fas fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-emerald-500 text-2xl"></i>
             </div>
-            } @else {
-            <form (ngSubmit)="save()" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Customer Info -->
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Nombre del Cliente</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2 pb-0">
-                            <i class="fas fa-search text-gray-400"></i>
-                            <input type="text" [ngModel]="form().customer_name" (ngModelChange)="onSelectClient($event)" 
-                                name="customer_name" class="grow h-full" list="repair-clients-list" placeholder="Buscar en clientes guardados..." required autocomplete="off" />
-                        </label>
-                        <datalist id="repair-clients-list">
-                            @for (client of clients; track client.id) {
-                                <option [value]="client.displayName">{{ client.phone ? client.phone + ' - ' : '' }}{{ client.email }}</option>
-                            }
-                        </datalist>
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Teléfono</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-phone text-gray-400"></i>
-                            <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone" class="grow" />
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Device Info -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Modelo del Dispositivo</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-mobile-alt text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().device_model" name="device_model" class="grow" required
-                                placeholder="Ej: iPhone 11, Samsung A52..." />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">IMEI / Serie</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-barcode text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().imei" name="imei" class="grow" placeholder="Opcional" />
-                        </label>
-                    </div>
-                </div>
+            <p class="text-emerald-600 mt-6 font-medium tracking-wide animate-pulse">Escaneando sistema...</p>
+        </div>
+    } @else {
+        
+        <form (ngSubmit)="save()" class="space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- Images -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Imágenes del Equipo</span>
-                    </label>
-                    <div class="flex flex-col gap-4">
-                        <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" 
-                            class="file-input file-input-bordered w-full" 
-                            [disabled]="uploadingImages()" />
+                <!-- Columna Izquierda (Datos Generales) -->
+                <div class="lg:col-span-8 flex flex-col gap-8">
+                    
+                    <!-- Tarjeta: Cliente -->
+                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-blue-400 to-indigo-500 opacity-80"></div>
                         
-                        @if (uploadingImages()) {
-                            <div class="flex items-center gap-2 text-sm text-gray-500">
-                                <span class="loading loading-spinner loading-xs"></span>
-                                Subiendo imágenes...
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg shadow-inner">
+                                <i class="fas fa-user-astronaut"></i>
                             </div>
-                        }
+                            <h2 class="text-xl text-gray-800 font-bold">Datos del Cliente</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-control">
+                                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600">Nombre Completo</span></label>
+                                <div class="relative group/input">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400 group-focus-within/input:text-blue-500 transition-colors"></i>
+                                    </div>
+                                    <input type="text" [ngModel]="form().customer_name" (ngModelChange)="onSelectClient($event)" 
+                                        name="customer_name" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 focus:bg-white border-gray-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-700" list="repair-clients-list" placeholder="Seleccionar en cartera..." required autocomplete="off" />
+                                </div>
+                                <datalist id="repair-clients-list">
+                                    @for (client of clients; track client.id) {
+                                        <option [value]="client.displayName">{{ client.phone ? client.phone + ' - ' : '' }}{{ client.email }}</option>
+                                    }
+                                </datalist>
+                            </div>
+                            <div class="form-control">
+                                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600">Whatsapp / Teléfono</span></label>
+                                <div class="relative group/input">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fab fa-whatsapp text-gray-400 group-focus-within/input:text-green-500 transition-colors"></i>
+                                    </div>
+                                    <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 focus:bg-white border-gray-200 focus:border-green-300 focus:ring-4 focus:ring-green-100 transition-all font-medium text-gray-700" placeholder="+54 9..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        @if (form().images.length > 0) {
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                @for (img of form().images; track img; let i = $index) {
-                                    <div class="relative group aspect-square bg-base-200 rounded-lg overflow-hidden border border-base-300">
-                                        <img [src]="img" class="w-full h-full object-cover" alt="Repair image" />
-                                        <button type="button" (click)="removeImage(i)" 
-                                            class="absolute top-1 right-1 btn btn-circle btn-xs btn-error opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                    <!-- Tarjeta: Equipo y Falla -->
+                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
+                        
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-lg shadow-inner">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <h2 class="text-xl text-gray-800 font-bold">Diagnóstico y Equipo</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="form-control">
+                                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600">Modelo del Equipo</span></label>
+                                <input type="text" [(ngModel)]="form().device_model" name="device_model" class="input input-bordered w-full rounded-2xl bg-gray-50 focus:bg-white border-gray-200 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 transition-all font-bold text-gray-800" required placeholder="Ej: iPhone 13 Pro Max" />
+                            </div>
+                            <div class="form-control">
+                                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600">IMEI o N° Serie</span></label>
+                                <div class="relative group/input">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fas fa-barcode text-gray-400 group-focus-within/input:text-purple-500 transition-colors"></i>
+                                    </div>
+                                    <input type="text" [(ngModel)]="form().imei" name="imei" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 focus:bg-white border-gray-200 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 transition-all font-mono text-gray-600 tracking-wider" placeholder="Opcional..." />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-control mb-8">
+                            <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600">Motivo de Ingreso / Fallas reportadas</span></label>
+                            <textarea [(ngModel)]="form().issue_description" name="issue_description" class="textarea textarea-bordered h-28 w-full rounded-2xl bg-gray-50 focus:bg-white border-gray-200 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 transition-all text-gray-700 leading-relaxed resize-none" placeholder="El cliente indica que la pantalla no enciende, pero vibra al conectarlo al cargador..."></textarea>
+                        </div>
+
+                        <!-- Estado y Seguridad -->
+                        <div class="bg-gray-50/50 p-6 rounded-3xl border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-5 flex items-center gap-2"><i class="fas fa-lock text-gray-400"></i> Protocolo de Seguridad</h3>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                                <div class="form-control">
+                                    <input type="text" [(ngModel)]="form().security_pin" name="security_pin" class="input input-sm input-bordered rounded-xl text-center font-bold tracking-[0.2em] bg-white border-gray-200" placeholder="PIN EJ: 1234" />
+                                </div>
+                                <div class="form-control">
+                                    <input type="text" [(ngModel)]="form().security_pattern" name="security_pattern" class="input input-sm input-bordered rounded-xl text-center font-medium bg-white border-gray-200" placeholder="Patrón: (L, Z, M)" />
+                                </div>
+                                <div class="form-control">
+                                    <input type="text" [(ngModel)]="form().device_passcode" name="device_passcode" class="input input-sm input-bordered rounded-xl text-center font-medium bg-white border-gray-200 text-xs" placeholder="Passcode Texto" />
+                                </div>
+                            </div>
+
+                            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2 mt-2"><i class="fas fa-box text-gray-400"></i> Inventario de Recepción</h3>
+                            
+                            <div class="flex flex-wrap gap-2.5">
+                                <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2 "
+                                    [ngClass]="form().checklist.charger ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'">
+                                    <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger" class="hidden" />
+                                    <i class="fas" [ngClass]="form().checklist.charger ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">Cargador</span>
+                                </label>
+                                
+                                <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
+                                    [ngClass]="form().checklist.battery ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'">
+                                    <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery" class="hidden" />
+                                    <i class="fas" [ngClass]="form().checklist.battery ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">Batería extraíble</span>
+                                </label>
+                                
+                                <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
+                                    [ngClass]="form().checklist.chip ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'">
+                                    <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" class="hidden" />
+                                    <i class="fas" [ngClass]="form().checklist.chip ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">SIM / NanoSIM</span>
+                                </label>
+                                
+                                <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
+                                    [ngClass]="form().checklist.sd ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'">
+                                    <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" class="hidden" />
+                                    <i class="fas" [ngClass]="form().checklist.sd ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">MicroSD</span>
+                                </label>
+                                
+                                <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
+                                    [ngClass]="form().checklist.case ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'">
+                                    <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" class="hidden" />
+                                    <i class="fas" [ngClass]="form().checklist.case ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">Funda</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta: Gestión de Taller -->
+                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-emerald-400 to-teal-500 opacity-80"></div>
+                        
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg shadow-inner">
+                                    <i class="fas fa-toolbox"></i>
+                                </div>
+                                <h2 class="text-xl text-gray-800 font-bold">Gestión de Taller</h2>
+                            </div>
+                            <button type="button" (click)="openProductModal()" class="btn btn-sm btn-outline hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 border-gray-200 rounded-xl text-xs font-bold transition-all shadow-sm">
+                                <i class="fas fa-plus"></i> Usar Repuesto
+                            </button>
+                        </div>
+                        
+                        <!-- Tabla de Repuestos -->
+                        <div class="border border-gray-100 rounded-2xl overflow-hidden mb-8 shadow-sm">
+                            <table class="w-full text-left text-sm text-gray-600">
+                                <thead class="bg-gray-50 font-medium text-gray-500 uppercase text-[10px] tracking-wider">
+                                    <tr>
+                                        <th class="py-3 px-4">Ítem / Repuesto</th>
+                                        <th class="py-3 px-4 text-center w-24">QTY</th>
+                                        <th class="py-3 px-4 text-right">Unitario</th>
+                                        <th class="py-3 px-4 text-right">Subtotal</th>
+                                        <th class="py-3 px-4 text-right w-12"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @for (part of form().parts; track $index) {
+                                    <tr class="hover:bg-gray-50/50 transition-colors group/row">
+                                        <td class="py-3 px-4 font-bold text-gray-800 flex flex-col justify-center gap-0.5">
+                                            {{ part.name }}
+                                            <span class="font-mono text-[9px] text-gray-400">Costo Base: {{ part.cost_at_time | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                        </td>
+                                        <td class="py-3 px-4 text-center">
+                                            <input type="number" [(ngModel)]="part.quantity" [name]="'part_qty_' + $index" (change)="calculateFinalCost()" class="input input-sm input-bordered rounded-lg w-16 text-center font-bold font-mono focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 bg-white" min="1" />
+                                        </td>
+                                        <td class="py-3 px-4 text-right font-mono text-gray-600">
+                                            {{ part.unit_price_at_time | currency:'ARS':'symbol':'1.0-0' }}
+                                        </td>
+                                        <td class="py-3 px-4 text-right font-mono font-bold text-emerald-600">
+                                            {{ (part.unit_price_at_time * part.quantity) | currency:'ARS':'symbol':'1.0-0' }}
+                                        </td>
+                                        <td class="py-3 px-4 text-right">
+                                            <button type="button" (click)="removePart($index)" class="btn btn-circle btn-ghost btn-xs text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    }
+                                    @if (form().parts.length === 0) {
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center text-gray-400">
+                                            <i class="fas fa-box-open text-3xl mb-2 opacity-50"></i>
+                                            <p class="text-xs font-medium uppercase tracking-widest opacity-70">No se vincularon repuestos</p>
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Technical Notes & Report -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-control">
+                                <label class="label pb-1.5"><span class="label-text font-bold text-gray-600 flex items-center gap-2"><i class="fas fa-user-secret text-gray-400"></i> Bitácora Técnica (Privado)</span></label>
+                                <textarea [(ngModel)]="form().technician_notes" name="technician_notes" class="textarea textarea-bordered h-32 w-full rounded-2xl bg-[#fffef0] focus:bg-[#fffae8] border-yellow-200 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 transition-all font-mono text-xs text-yellow-900 leading-relaxed shadow-inner" placeholder="Pistas levantadas, puentes hechos, consumo de la fuente en 0.2A..."></textarea>
+                            </div>
+                            <div class="form-control">
+                                <label class="label pb-1.5"><span class="label-text font-bold text-emerald-600 flex items-center gap-2"><i class="fas fa-file-invoice text-emerald-400"></i> Reporte al Cliente (Público)</span></label>
+                                <textarea [(ngModel)]="form().technical_report" name="technical_report" class="textarea textarea-bordered h-32 w-full rounded-2xl bg-emerald-50/30 focus:bg-emerald-50 border-emerald-200 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition-all text-sm text-emerald-900 leading-relaxed shadow-sm" placeholder="Se limpió el flex de carga. Equipo ensamblado y testeado ok..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Images Upload -->
+                        <div class="mt-8 pt-6 border-t border-gray-100 border-dashed">
+                             <label class="label pb-1.5"><span class="label-text font-bold text-gray-600 flex items-center gap-2"><i class="fas fa-camera text-gray-400"></i> Evidencia Fotográfica</span></label>
+                             <div class="flex flex-col gap-4 mt-2">
+                                <div class="relative group/file">
+                                    <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" [disabled]="uploadingImages()" />
+                                    <div class="w-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl py-6 bg-gray-50 font-medium text-gray-500 group-hover/file:border-emerald-400 group-hover/file:bg-emerald-50 transition-colors">
+                                         @if(uploadingImages()) {
+                                             <span class="loading loading-spinner text-emerald-500"></span> <span class="ml-2 text-emerald-600">Subiendo a Cloud...</span>
+                                         } @else {
+                                             <i class="fas fa-cloud-upload-alt text-2xl mr-3 text-gray-400 group-hover/file:text-emerald-500"></i> Click o Arrastrar fotos del equipo
+                                         }
+                                    </div>
+                                </div>
+
+                                @if (form().images.length > 0) {
+                                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-2">
+                                        @for (img of form().images; track img; let i = $index) {
+                                            <div class="relative group aspect-square rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                                                <img [src]="img" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" alt="Repair image" />
+                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                     <button type="button" (click)="removeImage(i)" class="btn btn-circle btn-sm btn-error text-white shadow-xl hover:scale-110">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
                                 }
                             </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Descripción del Problema</span>
-                    </label>
-                    <textarea [(ngModel)]="form().issue_description" name="issue_description"
-                        class="textarea textarea-bordered h-24 leading-relaxed"
-                        placeholder="Describe la falla reportada por el cliente..."></textarea>
-                </div>
-
-                <div class="divider text-sm font-medium text-gray-500">Detalles del Equipo</div>
-
-                <!-- Checklist -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Accesorios Recibidos</span>
-                    </label>
-                    <div class="flex flex-wrap gap-3">
-                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
-                            [class.bg-primary-content]="form().checklist.charger"
-                            [class.border-primary]="form().checklist.charger"
-                            [class.text-primary]="form().checklist.charger"
-                            [class.bg-gray-100]="!form().checklist.charger"
-                            [class.border-gray-300]="!form().checklist.charger"
-                            [class.text-gray-700]="!form().checklist.charger">
-                            <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger" 
-                                class="checkbox checkbox-primary checkbox-sm" />
-                            <span class="font-medium">Cargador</span>
-                        </label>
-
-                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
-                            [class.bg-primary-content]="form().checklist.battery"
-                            [class.border-primary]="form().checklist.battery"
-                            [class.text-primary]="form().checklist.battery"
-                            [class.bg-gray-100]="!form().checklist.battery"
-                            [class.border-gray-300]="!form().checklist.battery"
-                            [class.text-gray-700]="!form().checklist.battery">
-                            <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery" 
-                                class="checkbox checkbox-primary checkbox-sm" />
-                            <span class="font-medium">Batería</span>
-                        </label>
-
-                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
-                            [class.bg-primary-content]="form().checklist.chip"
-                            [class.border-primary]="form().checklist.chip"
-                            [class.text-primary]="form().checklist.chip"
-                            [class.bg-gray-100]="!form().checklist.chip"
-                            [class.border-gray-300]="!form().checklist.chip"
-                            [class.text-gray-700]="!form().checklist.chip">
-                            <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" 
-                                class="checkbox checkbox-primary checkbox-sm" />
-                            <span class="font-medium">Chip</span>
-                        </label>
-
-                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
-                            [class.bg-primary-content]="form().checklist.sd"
-                            [class.border-primary]="form().checklist.sd"
-                            [class.text-primary]="form().checklist.sd"
-                            [class.bg-gray-100]="!form().checklist.sd"
-                            [class.border-gray-300]="!form().checklist.sd"
-                            [class.text-gray-700]="!form().checklist.sd">
-                            <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" 
-                                class="checkbox checkbox-primary checkbox-sm" />
-                            <span class="font-medium">Tarjeta SD</span>
-                        </label>
-
-                        <label class="cursor-pointer select-none transition-all duration-200 border rounded-lg px-4 py-2 flex items-center gap-3 hover:bg-gray-200"
-                            [class.bg-primary-content]="form().checklist.case"
-                            [class.border-primary]="form().checklist.case"
-                            [class.text-primary]="form().checklist.case"
-                            [class.bg-gray-100]="!form().checklist.case"
-                            [class.border-gray-300]="!form().checklist.case"
-                            [class.text-gray-700]="!form().checklist.case">
-                            <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" 
-                                class="checkbox checkbox-primary checkbox-sm" />
-                            <span class="font-medium">Funda</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Security -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">PIN / Contraseña</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-lock text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().security_pin" name="security_pin" class="grow" placeholder="1234" />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Patrón</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-draw-polygon text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().security_pattern" name="security_pattern" class="grow"
-                                placeholder="Ej: Z, L, etc" />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Passcode (Numérico/Texto)</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-key text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().device_passcode" name="device_passcode" class="grow" placeholder="Contraseña de pantalla" />
-                        </label>
-                    </div>
-                </div>
-
-                <div class="divider text-sm font-medium text-gray-500">Gestión Técnica & Repuestos</div>
-
-                <!-- Parts Management -->
-                <div class="form-control bg-neutral-50 p-6 rounded-2xl border border-neutral-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-neutral-800 flex items-center gap-2">
-                            <i class="fas fa-box-open text-primary"></i> Repuestos Utilizados
-                        </h3>
-                        <div class="flex gap-2">
-                             <button type="button" (click)="openProductModal()" class="btn btn-sm btn-outline btn-primary rounded-xl">
-                                <i class="fas fa-plus"></i> Añadir Repuesto
-                             </button>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="table table-sm">
-                            <thead class="bg-white/50 text-neutral-400">
-                                <tr>
-                                    <th>Repuesto</th>
-                                    <th class="text-center">Cant.</th>
-                                    <th class="text-right">Precio Venta</th>
-                                    <th class="text-right">Costo</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (part of form().parts; track $index) {
-                                <tr>
-                                    <td class="font-bold text-neutral-700">{{ part.name }}</td>
-                                    <td class="text-center">
-                                        <input type="number" [(ngModel)]="part.quantity" [name]="'part_qty_' + $index" (change)="calculateFinalCost()"
-                                            class="input input-xs input-bordered w-16 text-center" />
-                                    </td>
-                                    <td class="text-right font-mono text-primary font-bold">
-                                        {{ part.unit_price_at_time | currency:'ARS':'symbol':'1.0-0' }}
-                                    </td>
-                                    <td class="text-right font-mono text-neutral-400 text-[10px]">
-                                        {{ part.cost_at_time | currency:'ARS':'symbol':'1.0-0' }}
-                                    </td>
-                                    <td class="text-right">
-                                        <button type="button" (click)="removePart($index)" class="btn btn-ghost btn-xs text-rose-500">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                }
-                                @if (form().parts.length === 0) {
-                                <tr>
-                                    <td colspan="5" class="text-center py-4 text-xs italic text-neutral-400">No hay repuestos cargados</td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Mano de Obra (Labor Técnica)</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-tools text-gray-400"></i>
-                            <input type="number" [(ngModel)]="form().technical_labor_cost" name="technical_labor_cost" (change)="calculateFinalCost()" class="grow" min="0" />
-                        </label>
-                    </div>
+                <!-- Columna Derecha (Finanzas y Estado) -->
+                <div class="lg:col-span-4 flex flex-col gap-8">
                     
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Estado Final</span>
-                        </label>
-                        <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full">
-                            <option [value]="1">PENDIENTE DE DIAGNÓSTICO</option>
-                            <option [value]="2">GESTIÓN DE REPUESTOS</option>
-                            <option [value]="3">EN REPARACIÓN</option>
-                            <option [value]="4">CONTROL DE CALIDAD</option>
-                            <option [value]="5">LISTO PARA RETIRAR</option>
-                            <option [value]="6">ENTREGADO</option>
-                            <option [value]="7">CANCELADO</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-bold text-primary italic">Reporte Técnico (Público)</span>
-                    </label>
-                    <textarea [(ngModel)]="form().technical_report" name="technical_report"
-                        class="textarea textarea-bordered h-24 leading-relaxed font-mono text-xs"
-                        placeholder="Escribe el informe que verá el cliente en la web..."></textarea>
-                </div>
-
-                <div class="divider text-sm font-medium text-gray-500">Resumen Financiero</div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Presupuesto Inicial Estimado</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-calculator text-gray-400"></i>
-                            <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost" class="grow" min="0" />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Costo Total (Final)</span>
-                        </label>
-                        <div class="text-3xl font-black text-neutral-800 tracking-tighter">
-                            {{ form().final_cost | currency:'ARS':'symbol':'1.0-0' }}
+                    <!-- Tarjeta: Estado Maestro -->
+                    <div class="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Ciclo de Reparación</h3>
+                        </div>
+                        
+                        <div class="form-control">
+                            <label class="label pb-1.5"><span class="label-text font-semibold text-gray-500 text-xs uppercase tracking-widest">Cambiar Estado</span></label>
+                            <div class="relative">
+                                <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full rounded-xl bg-gray-50 font-bold border-gray-200 focus:ring-4 focus:ring-blue-100 h-14 pl-12 text-sm appearance-none transition-all shadow-sm"
+                                        [ngClass]="{
+                                            'text-yellow-600': form().current_status_id === 1 || form().current_status_id === 2,
+                                            'text-blue-600': form().current_status_id === 3,
+                                            'text-purple-600': form().current_status_id === 4,
+                                            'text-green-600': form().current_status_id === 5 || form().current_status_id === 6,
+                                            'text-red-600': form().current_status_id === 7
+                                        }">
+                                    <option [value]="1">📌 PENDIENTE DE DIAGNÓSTICO</option>
+                                    <option [value]="2">📦 ESPERANDO REPUESTOS</option>
+                                    <option [value]="3">⚙️ EN REPARACIÓN</option>
+                                    <option [value]="4">🧪 CONTROL DE CALIDAD</option>
+                                    <option [value]="5">✅ LISTO PARA RETIRAR</option>
+                                    <option [value]="6">🤝 ENTREGADO AL CLIENTE</option>
+                                    <option [value]="7">❌ CANCELADO / DEVOLUCIÓN</option>
+                                </select>
+                                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                    <div class="w-4 h-4 rounded-full shadow-sm"
+                                        [ngClass]="{
+                                            'bg-yellow-400': form().current_status_id === 1 || form().current_status_id === 2,
+                                            'bg-blue-400': form().current_status_id === 3,
+                                            'bg-purple-400': form().current_status_id === 4,
+                                            'bg-emerald-400': form().current_status_id === 5 || form().current_status_id === 6,
+                                            'bg-red-400': form().current_status_id === 7
+                                        }"></div>
+                                </div>
+                                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400"><i class="fas fa-chevron-down"></i></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Seña / Adelanto</span>
-                        </label>
-                        <label class="input input-bordered flex items-center gap-2">
-                            <i class="fas fa-hand-holding-usd text-gray-400"></i>
-                            <input type="number" [(ngModel)]="form().deposit_amount" name="deposit_amount" class="grow" min="0" />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-bold text-green-600">Saldo Pendiente</span>
-                        </label>
-                        <div class="text-3xl font-black text-green-600 tracking-tighter">
-                            {{ (form().final_cost - (form().deposit_amount || 0)) | currency:'ARS':'symbol':'1.0-0' }}
+
+                    <!-- Tarjeta: Finanzas y Costos -->
+                    <div class="bg-gray-900 rounded-[2rem] p-1 shadow-xl relative overflow-hidden group">
+                        <!-- Neon Glow effect -->
+                        <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                        
+                        <div class="relative bg-gray-900 rounded-[calc(2rem-4px)] p-6 z-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shadow-[0_0_15px_rgba(52,211,153,0.3)]">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <h3 class="font-bold text-white tracking-wide">Presupuesto Final</h3>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="form-control">
+                                    <label class="label pb-1"><span class="label-text text-gray-400 text-[10px] uppercase tracking-widest font-bold">Base Presupuesto ($)</span></label>
+                                    <input type="number" [(ngModel)]="form().estimated_cost" name="estimated_cost" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label pb-1"><span class="label-text text-gray-400 text-[10px] uppercase tracking-widest font-bold">Labor Técnica (M.O)</span></label>
+                                    <input type="number" [(ngModel)]="form().technical_labor_cost" name="technical_labor_cost" (change)="calculateFinalCost()" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
+                                </div>
+                                
+                                <div class="border-t border-gray-700/50 my-2 shadow-[0_-1px_0_rgba(255,255,255,0.05)]"></div>
+
+                                <div>
+                                    <div class="flex justify-between items-end mb-1">
+                                         <span class="text-gray-400 text-sm">Costo Subtotal</span>
+                                         <span class="text-gray-300 font-mono font-medium">{{ form().final_cost | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-control mt-4">
+                                    <label class="label pb-1"><span class="label-text text-emerald-400 text-[10px] uppercase tracking-widest font-bold">Seña / Recibido a Cuenta ($)</span></label>
+                                    <input type="number" [(ngModel)]="form().deposit_amount" name="deposit_amount" class="input input-bordered w-full rounded-xl bg-emerald-900/30 border-emerald-500/50 text-emerald-400 focus:bg-emerald-900/40 focus:border-emerald-400 font-mono text-lg" min="0" />
+                                </div>
+
+                                <div class="bg-black/40 rounded-xl p-4 mt-6 border border-white/5 backdrop-blur-sm">
+                                    <div class="text-gray-500 text-[10px] uppercase tracking-widest font-bold mb-1">TOTAL A COBRAR</div>
+                                    <div class="text-4xl font-black text-white tracking-tighter flex items-start gap-1">
+                                        <span class="text-2xl text-emerald-500 mt-1">$</span>
+                                        {{ (form().final_cost - (form().deposit_amount || 0)) | number:'1.0-0' }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-medium">Notas del Técnico (Interno)</span>
-                    </label>
-                    <textarea [(ngModel)]="form().technician_notes" name="technician_notes"
-                        class="textarea textarea-bordered h-24 leading-relaxed"
-                        placeholder="Detalles de la reparación realizada..."></textarea>
-                </div>
-
-                <!-- Error Message -->
-                @if (error()) {
-                <div class="alert alert-error mb-6 shadow-sm">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>{{ error() }}</span>
-                </div>
-                }
-
-                <!-- Actions -->
-                <div class="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-base-200">
-                    @if (id && form().tracking_code) {
-                    <button type="button" (click)="shareWhatsApp()"
-                        class="btn bg-green-600 hover:bg-green-700 text-white border-none w-full sm:w-auto">
-                        <i class="fab fa-whatsapp mr-2"></i> Compartir
-                    </button>
-                    }
-
-                    <button type="button" (click)="printOrder()" class="btn btn-outline w-full sm:w-auto"
-                        [disabled]="saving()">
-                        <i class="fas fa-print mr-2"></i> Imprimir Orden
-                    </button>
-                    <a routerLink="/admin/repairs" class="btn btn-error text-white w-full sm:w-auto">Cancelar</a>
-                    <button type="submit" class="btn btn-primary w-full sm:w-auto"
-                        [disabled]="saving() || !form().customer_name || !form().device_model">
-                        @if (saving()) {
-                        <span class="loading loading-spinner loading-xs"></span>
+                    <!-- Sticky Save Box -->
+                    <div class="bg-white rounded-[2rem] p-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col gap-3 sticky top-4">
+                        @if (error()) {
+                        <div class="alert alert-error text-white font-medium p-3 rounded-xl text-sm shadow-sm flex items-start">
+                            <i class="fas fa-exclamation-circle text-lg mt-0.5"></i>
+                            <span class="leading-tight">{{ error() }}</span>
+                        </div>
                         }
-                        Guardar Reparación
-                    </button>
+
+                        <button type="submit" class="btn btn-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all text-lg"
+                            [disabled]="saving() || !form().customer_name || !form().device_model">
+                            @if (saving()) {
+                                <span class="loading loading-spinner text-white opacity-80"></span> Guardando...
+                            } @else {
+                                <i class="fas fa-save mr-1 opacity-80"></i> Guardar Ficha
+                            }
+                        </button>
+                    </div>
+
                 </div>
-            </form>
-            }
-        </div>
-    </div>
+            </div>
+        </form>
+    }
 </div>
 
 <!-- Modal Selección de Repuestos -->
 @if (showProductModal()) {
-<div class="modal modal-open">
-    <div class="modal-box w-11/12 max-w-2xl bg-white shadow-2xl rounded-2xl p-6">
-        <h3 class="font-bold text-lg mb-4 text-green-700 flex items-center gap-2">
-            <i class="fas fa-box"></i> Seleccionar Repuesto
-        </h3>
-        
-        <div class="form-control mb-4">
-            <label class="input input-bordered flex items-center gap-2">
-                <i class="fas fa-search text-gray-400"></i>
-                <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" name="searchQuery" class="grow" placeholder="Buscar repuesto por nombre..." />
-            </label>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm animate-fade-in px-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-slide-up border border-white relative">
+        <div class="bg-gray-50 p-6 border-b border-gray-100 flex justify-between items-center relative">
+            <h3 class="font-bold text-xl text-gray-800 flex items-center gap-3">
+                <i class="fas fa-box text-emerald-500 bg-emerald-100 w-10 h-10 rounded-full flex items-center justify-center"></i> 
+                Catálogo de Stock
+            </h3>
+            <button type="button" class="btn btn-sm btn-circle btn-ghost text-gray-400 shadow-none border-none hover:bg-gray-200 focus:outline-none" (click)="showProductModal.set(false)">
+                <i class="fas fa-times text-lg"></i>
+            </button>
         </div>
+        
+        <div class="p-6">
+            <div class="form-control mb-4">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" class="input input-bordered w-full pl-11 rounded-2xl bg-gray-50 border-gray-200 focus:bg-white focus:border-emerald-300 focus:ring-4 focus:ring-emerald-100 transition-all font-medium text-gray-700" placeholder="Buscar pantalla, pin de carga, batería..." />
+                </div>
+            </div>
 
-        <div class="max-h-96 overflow-y-auto pr-2">
-            @if (filteredProducts().length === 0) {
-            <p class="text-sm text-gray-500 text-center py-6 italic">No se encontraron repuestos.</p>
-            }
-            @for (product of filteredProducts(); track product.id) {
-            <div class="flex justify-between items-center py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors px-2 rounded-lg">
-                <div class="flex items-center gap-3">
-                    @if (product.image_url) {
-                        <img [src]="product.image_url" alt="" class="w-10 h-10 object-cover rounded-md border border-gray-200" />
-                    } @else {
-                        <div class="w-10 h-10 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-gray-400">
-                            <i class="fas fa-image"></i>
-                        </div>
-                    }
-                    <div>
-                        <div class="font-bold text-gray-800">{{ product.name }}</div>
-                        <div class="text-xs text-gray-500">
-                            <span [class.text-red-500]="product.stock === 0" [class.text-amber-500]="product.stock > 0 && product.stock <= 5" [class.text-green-500]="product.stock > 5">
-                                Stock: {{ product.stock }}
-                            </span>
-                            <span class="mx-2">|</span>
-                            Precio: <span class="font-medium text-primary">{{ product.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+            <div class="max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                @if (filteredProducts().length === 0) {
+                    <div class="flex flex-col items-center justify-center py-10 opacity-50">
+                        <i class="fas fa-dolly text-5xl mb-3 text-gray-300"></i>
+                        <p class="text-sm font-medium">Buscando en bodega...</p>
+                    </div>
+                }
+                @for (product of filteredProducts(); track product.id) {
+                <div class="flex justify-between items-center py-4 border-b border-gray-50 hover:bg-emerald-50/50 transition-colors px-3 rounded-xl group/item">
+                    <div class="flex items-center gap-4">
+                        @if (product.image_url) {
+                            <img [src]="product.image_url" alt="" class="w-12 h-12 object-cover rounded-xl shadow-sm border border-gray-200 bg-white" />
+                        } @else {
+                            <div class="w-12 h-12 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center text-gray-300 shadow-inner">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        }
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm mb-0.5 group-hover/item:text-emerald-700 transition-colors">{{ product.name }}</div>
+                            <div class="text-xs text-gray-500 flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-md font-bold text-[10px] uppercase border"
+                                    [class.bg-red-50]="product.stock === 0" [class.text-red-600]="product.stock === 0" [class.border-red-100]="product.stock === 0"
+                                    [class.bg-amber-50]="product.stock > 0 && product.stock <= 5" [class.text-amber-600]="product.stock > 0 && product.stock <= 5" [class.border-amber-100]="product.stock > 0 && product.stock <= 5"
+                                    [class.bg-green-50]="product.stock > 5" [class.text-green-600]="product.stock > 5" [class.border-green-100]="product.stock > 5">
+                                    Stock: {{ product.stock }}
+                                </span>
+                                <span class="text-gray-300">|</span>
+                                <span class="font-bold text-emerald-600">{{ product.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                            </div>
                         </div>
                     </div>
+                    <button type="button" class="btn btn-sm bg-gray-100 hover:bg-emerald-500 hover:text-white border-none rounded-lg text-gray-600 font-bold transition-all shadow-sm" (click)="addPart(product); showProductModal.set(false)" [disabled]="product.stock === 0">
+                        <i class="fas fa-plus"></i> Añadir
+                    </button>
                 </div>
-                <button type="button" class="btn btn-sm btn-primary rounded-xl" (click)="addPart(product); showProductModal.set(false)">
-                    <i class="fas fa-plus mr-1"></i> Añadir
-                </button>
+                }
             </div>
-            }
-        </div>
-        <div class="modal-action mt-6 pt-4 border-t border-gray-100">
-            <button type="button" class="btn rounded-xl" (click)="showProductModal.set(false)">Cerrar</button>
         </div>
     </div>
 </div>
 }
 
-<!-- Print Layout (Hidden on screen via CSS, visible on print via CSS) -->
-<div class="print-container font-sans text-xs leading-tight hidden">
-    <div class="flex flex-col h-full">
-        <!-- Main Ticket (Top) -->
-        <div class="w-full pb-4 border-b-2 border-dashed border-gray-400 mb-4 flex flex-col">
-            <!-- Header -->
-            <div class="flex justify-between items-start mb-2 border-b border-gray-300 pb-2">
-                <div class="flex items-center">
-                    @if (company()?.logo_url) {
-                        <img [src]="company().logo_url" alt="Logo" class="h-10 w-auto mr-3 object-contain">
-                    }
-                    <div>
-                        <h1 class="text-lg font-bold uppercase mb-0">Orden #{{ (form().repair_number | number:'3.0-0') || '---' }}</h1>
-                        <div class="text-[9px] text-gray-600">
-                            <span>{{ date | date:'dd/MM/yyyy' }}</span> |
-                            <span>ID: {{ form().tracking_code }}</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- QR Code for tracking -->
-                <div class="text-right flex items-center gap-2">
-                    <div class="flex flex-col items-center">
-                         @if (form().tracking_code) {
-                            <qrcode [qrdata]="getTrackingUrl()" [width]="60" [margin]="0" [errorCorrectionLevel]="'M'"></qrcode>
-                         }
-                    </div>
-                    <div class="text-right">
-                        <h2 class="font-bold text-base text-green-700 uppercase">{{ company()?.name || 'ARECOFIX' }}</h2>
-                        <div class="text-[9px] text-gray-600 leading-tight">
-                            <p>{{ company()?.address }}</p>
-                            <p>{{ company()?.phone }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Grid (2 Columns) -->
-            <div class="grid grid-cols-2 gap-3 mb-2 grow">
-                <!-- Col 1: Customer, Device, Security -->
-                <div class="flex flex-col gap-2">
-                    <div class="border border-gray-300 rounded p-1">
-                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">CLIENTE & EQUIPO</h3>
-                        <div class="px-1 text-[9px]">
-                            <div class="flex justify-between"><span class="font-bold">Nombre:</span> <span class="truncate ml-1">{{ form().customer_name }}</span></div>
-                            <div class="flex justify-between"><span class="font-bold">Tel:</span> <span class="truncate ml-1">{{ form().customer_phone }}</span></div>
-                            <div class="border-t border-gray-200 my-0.5"></div>
-                            <div class="flex justify-between"><span class="font-bold">Modelo:</span> <span class="truncate ml-1">{{ form().device_model }}</span></div>
-                            <div class="flex justify-between"><span class="font-bold">IMEI:</span> <span class="truncate ml-1">{{ form().imei }}</span></div>
-                        </div>
-                    </div>
-
-                    <div class="border border-gray-300 rounded p-1">
-                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">SEGURIDAD</h3>
-                        <div class="px-1 text-[9px]">
-                            <div class="flex justify-between"><span class="font-bold">PIN:</span> <span>{{ form().security_pin }}</span></div>
-                            <div class="flex justify-between"><span class="font-bold">Patrón:</span> <span>{{ form().security_pattern }}</span></div>
-                            <div class="mt-1 pt-1 border-t border-gray-200">
-                                <div class="grid grid-cols-3 gap-0.5 text-[8px]">
-                                    <span>[{{ form().checklist.charger ? 'X' : ' ' }}] Carg</span>
-                                    <span>[{{ form().checklist.battery ? 'X' : ' ' }}] Bat</span>
-                                    <span>[{{ form().checklist.chip ? 'X' : ' ' }}] Chip</span>
-                                    <span>[{{ form().checklist.sd ? 'X' : ' ' }}] SD</span>
-                                    <span>[{{ form().checklist.case ? 'X' : ' ' }}] Funda</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Col 2: Costs, Fault -->
-                <div class="flex flex-col gap-2">
-                    <div class="border border-gray-300 rounded p-1">
-                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">PRECIOS</h3>
-                        <div class="px-1 text-[9px]">
-                            <div class="flex justify-between">
-                                <span class="font-bold">Presupuesto:</span>
-                                <span>$ {{ form().estimated_cost }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-bold">Seña:</span>
-                                <span>$ {{ form().deposit_amount }}</span>
-                            </div>
-                            <div class="flex justify-between border-t border-gray-300 pt-0.5 mt-0.5 font-bold">
-                                <span>Total:</span>
-                                <span>$ {{ form().final_cost || form().estimated_cost }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="border border-gray-300 rounded p-1 grow">
-                        <h3 class="font-bold bg-gray-100 px-1 text-[9px] mb-0.5">FALLA / NOTAS</h3>
-                        <div class="px-1 text-[9px] h-full overflow-hidden leading-tight">
-                            {{ form().issue_description }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <hr>
-            <br>
-
-            <div class="mt-auto">
-                <div class="flex justify-between items-end text-[9px]">
-                    <div class="w-5/12 text-center border-t border-black pt-1">FIRMA CLIENTE</div>
-                    <div class="w-5/12 text-center border-t border-black pt-1">FIRMA TÉCNICO</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stub (Bottom) -->
-        <div class="w-full pt-2 flex flex-col justify-between">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <div class="text-center mb-3">
-                        <h2 class="font-bold text-xs uppercase border-b border-black pb-1 mb-1">TALÓN DE RETIRO</h2>
-                        <div class="text-[10px] font-bold truncate">{{ company()?.name || 'ARECOFIX' }}</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="text-sm font-bold mb-0.5 text-center border border-gray-300 rounded bg-gray-50">#{{ (form().repair_number | number:'3.0-0') || '---' }}</div>
-                        <div class="text-[9px] text-center text-gray-600">{{ date | date:'dd/MM/yyyy' }}</div>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <div class="border border-gray-300 rounded p-1">
-                        <div class="text-[9px]">
-                            <div class="flex justify-between"><span class="font-bold">Cliente:</span> <span class="truncate ml-1">{{ form().customer_name }}</span></div>
-                            <div class="flex justify-between"><span class="font-bold">Equipo:</span> <span class="truncate ml-1">{{ form().device_model }}</span></div>
-                        </div>
-                    </div>
-
-                    <div class="border border-gray-300 rounded p-1">
-                        <div class="text-[9px]">
-                            <div class="flex justify-between"><span class="font-bold">Presupuesto:</span> <span>$ {{ form().estimated_cost }}</span></div>
-                            <div class="flex justify-between"><span class="font-bold"></span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Conditions & Footer -->
-            <div class="mt-2 pt-2 border-t border-gray-300">
-                <div class="text-[8px] text-gray-500 text-justify leading-tight mb-2">
-                    CONDICIONES: La empresa no se responsabiliza por la pérdida de información. Pasados los 90 días el equipo se considerará abandonado. La garantía cubre únicamente la reparación realizada y por un plazo de 30 días. No cubre daños por mal uso, golpes o humedad.
-                </div>
-                <div class="text-center font-bold text-[10px]">
-                    Este talón deberá ser presentado indefectiblemente para retirar el equipo.
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
