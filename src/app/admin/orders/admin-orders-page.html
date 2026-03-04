@@ -1,239 +1,256 @@
-<div class="max-w-7xl mx-auto pb-20 p-4">
+<!-- Admin Orders List Layout -->
+<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans">
 
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4 border-b border-gray-200 dark:border-gray-800 mb-6">
+  <!-- Header Minimalista -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 animate-fade-in-down">
     <div>
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
-        <i class="fas fa-shopping-bag text-green-500"></i> Pedidos
+      <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+        <span class="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+          <i class="fas fa-shipping-fast"></i>
+        </span>
+        Envíos y Órdenes
       </h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400">Gestiona las órdenes de compra de tus clientes.</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">Gestiona y despacha los pedidos de tus clientes de la tienda online.</p>
     </div>
 
-    <a routerLink="/admin/orders/new" class="btn btn-primary shadow-lg shadow-green-500/20">
-      <i class="fas fa-plus mr-2"></i> Nuevo Pedido
-    </a>
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <a routerLink="/admin/orders/new" class="btn w-full sm:w-auto bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white border-none rounded-2xl shadow-lg shadow-orange-500/30 transform hover:-translate-y-0.5 transition-all">
+        <i class="fas fa-plus mr-1 opacity-80"></i> Crear Pedido Manual
+      </a>
+    </div>
   </div>
 
-  <!-- Stats Dashboard -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-      <div class="stat">
-        <div class="stat-figure text-primary">
-          <i class="fas fa-list-alt text-3xl opacity-50"></i>
+  <!-- Stats Dashboard (SaaS Style) -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 100ms;">
+    <!-- Total KPI -->
+    <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-blue-400 to-blue-500 opacity-80"></div>
+        <div class="flex justify-between items-center mb-2">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">Total Pedidos</div>
+            <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center"><i class="fas fa-list-alt"></i></div>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider">Total Pedidos</div>
-        <div class="stat-value text-primary">{{ stats().total }}</div>
-      </div>
+        <div class="text-3xl font-black text-gray-900 dark:text-white">{{ stats().total }}</div>
     </div>
 
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
-      [class.border-warning]="stats().pending > 0">
-      <div class="stat">
-        <div class="stat-figure text-warning">
-          <i class="fas fa-clock text-3xl opacity-50"></i>
+    <!-- Pending KPI -->
+    <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-orange-100 dark:hover:border-orange-900 transition-all duration-300">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-orange-400 to-amber-500 opacity-80"></div>
+        <div class="flex justify-between items-center mb-2">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">Pendientes / Proceso</div>
+            <div class="w-8 h-8 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center"><i class="fas fa-clock"></i></div>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider text-warning">Pendientes</div>
-        <div class="stat-value text-warning">{{ stats().pending }}</div>
-      </div>
+        <div class="text-3xl font-black text-gray-900 dark:text-white">{{ stats().pending }}</div>
     </div>
 
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-      <div class="stat">
-        <div class="stat-figure text-success">
-          <i class="fas fa-check-circle text-3xl opacity-50"></i>
+    <!-- Completed KPI -->
+    <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-emerald-100 dark:hover:border-emerald-900 transition-all duration-300">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-emerald-400 to-emerald-500 opacity-80"></div>
+        <div class="flex justify-between items-center mb-2">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">Enviados / Pagados</div>
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider text-success">Completados</div>
-        <div class="stat-value text-success">{{ stats().completed }}</div>
-      </div>
+        <div class="text-3xl font-black text-gray-900 dark:text-white">{{ stats().completed }}</div>
     </div>
 
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-      <div class="stat">
-        <div class="stat-figure text-info">
-          <i class="fas fa-dollar-sign text-3xl opacity-50"></i>
+    <!-- Revenue KPI -->
+    <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-fuchsia-100 dark:hover:border-fuchsia-900 transition-all duration-300">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-fuchsia-400 to-purple-500 opacity-80"></div>
+        <div class="flex justify-between items-center mb-2">
+            <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">Ingresos Brutos</div>
+            <div class="w-8 h-8 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-500/10 text-fuchsia-500 flex items-center justify-center"><i class="fas fa-dollar-sign"></i></div>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider">Ingresos Totales</div>
-        <div class="stat-value text-info text-2xl overflow-hidden text-ellipsis">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
-      </div>
+        <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white overflow-hidden text-ellipsis">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
     </div>
   </div>
 
   <!-- Controls Bar -->
-  <div class="flex flex-col lg:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+  <div class="flex flex-col lg:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-gray-100 dark:border-gray-700 items-center animate-fade-in-up" style="animation-delay: 200ms;">
     <!-- Search -->
-    <div class="flex-1">
-      <div class="relative">
-        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-        <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-          placeholder="Buscar cliente, número de pedido..."
-          class="input input-bordered w-full pl-10" />
-        </div>
+    <div class="flex-1 w-full relative group">
+      <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
+      <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+        placeholder="Buscar cliente, email, # pedido..."
+        class="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium text-gray-800 dark:text-gray-200" />
+    </div>
+
+    <!-- Filter Tabs (Glassmorphism look) -->
+    <div class="w-full lg:w-auto overflow-x-auto custom-scrollbar pb-2 lg:pb-0">
+      <div class="flex bg-gray-50 dark:bg-gray-900 rounded-2xl p-1 border border-gray-200 dark:border-gray-700">
+         <button class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
+                 [ngClass]="filterStatus() === 'all' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+                 (click)="filterStatus.set('all')">Todos</button>
+         <button class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
+                 [ngClass]="filterStatus() === 'pending' ? 'bg-white dark:bg-gray-800 text-orange-600 dark:text-orange-400 shadow-sm' : 'text-gray-500 hover:text-orange-500'"
+                 (click)="filterStatus.set('pending')">Pendientes / Proc.</button>
+         <button class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
+                 [ngClass]="filterStatus() === 'paid' ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 hover:text-blue-500'"
+                 (click)="filterStatus.set('paid')">Cobrados</button>
+         <button class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
+                 [ngClass]="filterStatus() === 'completed' ? 'bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 hover:text-emerald-500'"
+                 (click)="filterStatus.set('completed')">Enviados / Listo</button>
       </div>
+    </div>
 
-      <!-- Filter Tabs -->
-      <div class="overflow-x-auto pb-2 lg:pb-0">
-        <div class="join">
-          <input class="join-item btn" type="radio" name="status" aria-label="Todos"
-            [checked]="filterStatus() === 'all'" (click)="filterStatus.set('all')" />
-            <input class="join-item btn" type="radio" name="status" aria-label="Pendientes"
-              [checked]="filterStatus() === 'pending'" (click)="filterStatus.set('pending')" />
-              <input class="join-item btn" type="radio" name="status" aria-label="Pagado"
-                [checked]="filterStatus() === 'paid'" (click)="filterStatus.set('paid')" />
-                <input class="join-item btn" type="radio" name="status" aria-label="Completados"
-                  [checked]="filterStatus() === 'completed'" (click)="filterStatus.set('completed')" />
+    <!-- Sort -->
+    <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="w-full lg:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-bold text-gray-700 dark:text-gray-300 cursor-pointer appearance-none">
+      <option value="date_desc">🕒 Más Recientes</option>
+      <option value="date_asc">🕰️ Más Antiguos</option>
+      <option value="total_desc">💰 Mayor Monto</option>
+    </select>
+  </div>
+
+  <!-- Content -->
+  @if (loading()) {
+    <div class="flex flex-col justify-center items-center py-20 animate-pulse">
+      <span class="loading loading-spinner text-orange-500 w-12 h-12 mb-4"></span>
+      <span class="text-sm font-medium text-gray-500">Cargando logística...</span>
+    </div>
+  } @else if (error()) {
+    <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 p-4 rounded-r-xl flex items-center gap-3 animate-fade-in text-red-700 dark:text-red-400">
+      <i class="fas fa-exclamation-triangle text-xl"></i>
+      <span class="font-medium font-sm">{{ error() }}</span>
+    </div>
+  } @else {
+
+    <!-- Desktop Table (SaaS Style) -->
+    <div class="hidden md:block bg-white dark:bg-gray-800/50 rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 dark:border-gray-800 animate-fade-in-up" style="animation-delay: 300ms;">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10">
+          <tr class="text-gray-400 dark:text-gray-500 font-bold text-[10px] tracking-widest uppercase">
+            <th class="px-6 py-4 rounded-tl-4xl">Pedido</th>
+            <th class="px-6 py-4">Cliente info</th>
+            <th class="px-6 py-4">Resumen Items</th>
+            <th class="px-6 py-4">Total</th>
+            <th class="px-6 py-4">Estado</th>
+            <th class="px-6 py-4">Fecha</th>
+            <th class="px-6 py-4 text-right rounded-tr-4xl">Filtros</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-50 dark:divide-gray-800/50">
+          @for (order of paginatedOrders(); track order.id) {
+            <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="font-mono text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 px-2 py-1 rounded inline-block border border-orange-100 dark:border-orange-500/20">{{ order.order_number }}</div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ order.customer_name }}</div>
+                <div class="text-[10px] text-gray-500 font-mono mt-0.5 truncate max-w-[150px]"><i class="fas fa-envelope mr-1 opacity-50"></i> {{ order.customer_email || 'Sin email' }}</div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-xs max-w-[200px]">
+                    @if (order.items && order.items.length > 0) {
+                      <div class="truncate text-gray-700 dark:text-gray-300 font-medium">
+                        <span class="font-black text-gray-900 dark:text-white mr-1">{{ order.items[0].quantity }}x</span> {{ order.items[0].product_name }}
+                      </div>
+                      @if(order.items.length > 1) { 
+                        <div class="mt-1"><span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase">+{{ order.items.length - 1 }} prod.</span></div>
+                      }
+                    } @else {
+                      <span class="italic text-gray-400 text-[10px] bg-gray-50 px-2 py-1 rounded">Caja vacía</span>
+                    }
                 </div>
-              </div>
+              </td>
+              <td class="px-6 py-4">
+                 <div class="font-black text-gray-900 dark:text-white">{{ order.total | currency:'ARS':'symbol':'1.0-0' }}</div>
+                 <div class="text-[9px] text-gray-400 uppercase tracking-wider mt-0.5 font-bold">Impuestos incl.</div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm"
+                  [ngClass]="order.status | statusColor">
+                  {{ order.status | orderStatus }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-xs text-gray-500 font-medium">
+                <div>{{ order.created_at | date:'dd MMM yyyy' }}</div>
+                <div class="text-[10px] opacity-70">{{ order.created_at | date:'HH:mm' }} hs</div>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  @if (order.status === 'pending') {
+                    <button (click)="toggleOrderStatus(order)" class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center tooltip tooltip-left shadow-sm" data-tip="Marcar Pagado">
+                      <i class="fas fa-check-double text-[10px]"></i>
+                    </button>
+                  }
+                  <a [routerLink]="['/admin/orders', order.id]" class="w-8 h-8 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center tooltip tooltip-left shadow-sm" data-tip="Ver Detalle">
+                    <i class="fas fa-eye text-[10px]"></i>
+                  </a>
+                  <a [routerLink]="['/admin/orders', order.id, 'edit']" class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center tooltip tooltip-left shadow-sm" data-tip="Editar Módulo">
+                    <i class="fas fa-pen text-[10px]"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-              <!-- Sort -->
-              <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full lg:w-auto">
-                <option value="date_desc">Más Recientes</option>
-                <option value="date_asc">Más Antiguos</option>
-                <option value="total_desc">Mayor Monto</option>
-              </select>
+    <!-- Mobile Cards (SaaS Style) -->
+    <div class="md:hidden grid grid-cols-1 gap-4 animate-fade-in-up" style="animation-delay: 300ms;">
+      @for (order of paginatedOrders(); track order.id) {
+        <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex flex-col">
+                <span class="font-mono text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 px-2 py-0.5 rounded border border-orange-100 inline-flex w-fit mb-1">{{ order.order_number }}</span>
+                <span class="font-black text-gray-900 dark:text-white text-lg leading-tight">{{ order.customer_name }}</span>
+                <span class="text-[10px] text-gray-400 mt-1"><i class="far fa-clock"></i> {{ order.created_at | date:'dd MMM, HH:mm' }}</span>
+              </div>
+              <div class="px-2 py-1 rounded border text-[9px] font-black uppercase tracking-wider backdrop-blur-sm" [ngClass]="order.status | statusColor">
+                {{ order.status | orderStatus }}
+              </div>
             </div>
 
-            <!-- Content -->
-            @if (loading()) {
-              <div class="flex justify-center p-12">
-                <span class="loading loading-spinner loading-lg text-primary"></span>
-              </div>
-            } @else if (error()) {
-              <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>{{ error() }}</span>
-              </div>
-            } @else {
+            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-3 mb-4 border border-gray-100 dark:border-gray-800">
+               <ul class="text-xs space-y-2">
+                   @for(item of order.items.slice(0, 2); track item.id) {
+                     <li class="flex justify-between text-gray-700 dark:text-gray-300 font-medium">
+                       <span class="truncate pr-2"><span class="font-black text-gray-900 dark:text-white mr-1">{{ item.quantity }}x</span> {{ item.product_name }}</span>
+                     </li>
+                   }
+                   @if(order.items && order.items.length > 2) {
+                     <li class="text-[10px] text-gray-400 italic pt-1 border-t border-gray-200 dark:border-gray-700 border-dashed">+ {{ order.items.length - 2 }} productos adicionales...</li>
+                   }
+               </ul>
+            </div>
 
-              <!-- Desktop Table -->
-              <div class="hidden md:block bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
-                <table class="table w-full">
-                  <thead class="bg-gray-50 dark:bg-gray-700/50">
-                    <tr class="text-gray-600 dark:text-gray-300 font-bold uppercase text-xs tracking-wider">
-                      <th>Pedido</th>
-                      <th>Cliente</th>
-                      <th>Productos</th>
-                      <th>Total</th>
-                      <th>Estado</th>
-                      <th>Fecha</th>
-                      <th class="text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (order of paginatedOrders(); track order.id) {
-                      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                        <td class="font-mono font-bold text-primary">{{ order.order_number }}</td>
-                        <td>
-                          <div class="font-bold text-gray-900 dark:text-white">{{ order.customer_name }}</div>
-                          <div class="text-xs text-gray-500">{{ order.customer_email }}</div>
-                        </td>
-                        <td>
-                          <div class="text-sm max-w-xs truncate">
-                            @if (order.items && order.items.length > 0) {
-                              <span class="font-bold">{{ order.items[0].quantity }}x</span> {{ order.items[0].product_name }}
-                              @if(order.items.length > 1) { <span class="badge badge-xs badge-ghost">+{{ order.items.length - 1 }} más</span> }
-                            } @else {
-                              <span class="italic text-gray-400">Sin items</span>
-                            }
-                          </div>
-                        </td>
-                        <td class="font-bold text-gray-900 dark:text-white">
-                          {{ order.total | currency }}
-                        </td>
-                        <td>
-                          <span class="badge badge-sm font-semibold border-0"
-                            [ngClass]="order.status | statusColor">
-                            {{ order.status | orderStatus }}
-                          </span>
-                        </td>
-                        <td class="text-xs text-gray-500">
-                          {{ order.created_at | date:'dd MMM yyyy, HH:mm' }}
-                        </td>
-                        <td class="text-right">
-                          <div class="flex justify-end gap-2">
-                            @if (order.status === 'pending') {
-                              <button (click)="toggleOrderStatus(order)" class="btn btn-sm btn-ghost text-green-500 tooltip" data-tip="Marcar Pagado">
-                                <i class="fas fa-check-dollar"></i>
-                              </button>
-                            }
-                            <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-ghost text-gray-500 tooltip" data-tip="Ver Detalle">
-                              <i class="fas fa-eye"></i>
-                            </a>
-                            <a [routerLink]="['/admin/orders', order.id, 'edit']" class="btn btn-sm btn-ghost text-indigo-500 tooltip" data-tip="Editar">
-                              <i class="fas fa-pen"></i>
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+            <div class="flex justify-between items-end border-t border-gray-100 dark:border-gray-800 pt-4">
+              <div>
+                 <div class="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Total a cobrar</div>
+                 <span class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ order.total | currency:'ARS':'symbol':'1.0-0' }}</span>
               </div>
 
-              <!-- Mobile Cards -->
-              <div class="md:hidden grid grid-cols-1 gap-4">
-                @for (order of paginatedOrders(); track order.id) {
-                  <div class="card bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div class="card-body p-4">
-                      <div class="flex justify-between items-start mb-2">
-                        <div class="flex flex-col">
-                          <span class="font-mono text-xs font-bold text-primary">{{ order.order_number }}</span>
-                          <span class="text-xs text-gray-400">{{ order.created_at | date:'short' }}</span>
-                        </div>
-                        <div class="badge badge-sm border-0 font-bold" [ngClass]="order.status | statusColor">
-                          {{ order.status | orderStatus }}
-                        </div>
-                      </div>
-
-                      <h3 class="font-bold text-gray-900 dark:text-white">{{ order.customer_name }}</h3>
-
-                      <div class="py-2 border-y border-dashed border-gray-200 dark:border-gray-700 my-2">
-                        <ul class="text-sm space-y-1">
-                          @for(item of order.items.slice(0, 2); track item.id) {
-                            <li class="flex justify-between">
-                              <span class="truncate pr-2"><span class="font-bold">{{ item.quantity }}x</span> {{ item.product_name }}</span>
-                            </li>
-                          }
-                          @if(order.items && order.items.length > 2) {
-                            <li class="text-xs text-gray-400 italic">+{{ order.items.length - 2 }} productos más...</li>
-                          }
-                        </ul>
-                      </div>
-
-                      <div class="flex justify-between items-center mt-2">
-                        <span class="text-xl font-bold text-gray-900 dark:text-white">{{ order.total | currency }}</span>
-
-                        <div class="flex justify-end gap-2">
-                          @if(order.status === 'pending') {
-                            <button (click)="toggleOrderStatus(order)" class="btn btn-sm btn-ghost text-green-500 tooltip tooltip-left" data-tip="Marcar Pagado">
-                              <i class="fas fa-check-dollar"></i>
-                            </button>
-                          }
-                          <a [routerLink]="['/admin/orders', order.id]" class="btn btn-sm btn-ghost text-gray-500 tooltip tooltip-top" data-tip="Ver Detalle">
-                            <i class="fas fa-eye"></i>
-                          </a>
-                          <a [routerLink]="['/admin/orders', order.id, 'edit']" class="btn btn-sm btn-ghost text-indigo-500 tooltip tooltip-left" data-tip="Editar">
-                            <i class="fas fa-pen"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="flex gap-2">
+                @if(order.status === 'pending') {
+                  <button (click)="toggleOrderStatus(order)" class="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
+                    <i class="fas fa-check-double text-sm"></i>
+                  </button>
                 }
+                <a [routerLink]="['/admin/orders', order.id]" class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-all shadow-sm">
+                  <i class="fas fa-eye text-sm"></i>
+                </a>
               </div>
+            </div>
+        </div>
+      }
+    </div>
 
-              <!-- Pagination -->
-              @if (filteredOrders().length > 0) {
-                <div class="mt-8 flex justify-center pb-8">
-                  <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
-                </div>
-              }
+    <!-- Pagination -->
+    @if (filteredOrders().length > 0) {
+      <div class="mt-8 flex justify-center pb-8">
+        <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
+      </div>
+    }
 
-              <!-- Empty State -->
-              @if (filteredOrders().length === 0) {
-                <div class="text-center py-20 opacity-50">
-                  <i class="fas fa-shopping-bag text-4xl mb-3"></i>
-                  <p>No se encontraron pedidos.</p>
-                </div>
-              }
-            }
-          </div>
+    <!-- Empty State (SaaS Style) -->
+    @if (filteredOrders().length === 0) {
+      <div class="flex flex-col items-center justify-center py-20 animate-fade-in text-center px-4">
+        <div class="w-24 h-24 rounded-full bg-gray-50 dark:bg-gray-800 border-4 border-white dark:border-gray-900 shadow-xl flex items-center justify-center mb-6">
+          <i class="fas fa-shipping-fast text-4xl text-gray-300 dark:text-gray-600"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">No se encontraron envíos</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm">No hay órdenes que coincidan con tu búsqueda o filtros actuales. Modifica los parámetros e intenta de nuevo.</p>
+      </div>
+    }
+
+  }
+</div>
