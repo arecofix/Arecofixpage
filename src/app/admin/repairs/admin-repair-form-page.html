@@ -6,7 +6,7 @@
                 <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 bg-white/50 border border-gray-100 hover:bg-white shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all">
                     <i class="fas fa-arrow-left"></i>
                 </a>
-                <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 tracking-tight">
+                <h1 class="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-emerald-600 to-teal-500 tracking-tight">
                     {{ id ? 'Taller de Reparación' : 'Nuevo Ingreso Técnico' }}
                 </h1>
             </div>
@@ -20,7 +20,7 @@
             }
         </div>
         
-        <div class="flex items-center gap-3 md:ml-auto w-full md:w-auto mt-4 md:mt-0 ml-12 md:ml-0">
+        <div class="flex items-center gap-3 md:ml-auto w-full md:w-auto mt-4 md:mt-0 ml-12">
              @if (id && form().tracking_code) {
                 <button type="button" (click)="shareWhatsApp()"
                     class="btn bg-[#25D366] hover:bg-[#1DA851] text-white border-none rounded-xl shadow-[0_4px_15px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.4)] transition-all">
@@ -51,8 +51,8 @@
                 <div class="lg:col-span-8 flex flex-col gap-8">
                     
                     <!-- Tarjeta: Cliente -->
-                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
-                        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-blue-400 to-indigo-500 opacity-80"></div>
+                    <div class="bg-white rounded-4xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-blue-400 to-indigo-500 opacity-80"></div>
                         
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg shadow-inner">
@@ -90,8 +90,8 @@
                     </div>
 
                     <!-- Tarjeta: Equipo y Falla -->
-                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
-                        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
+                    <div class="bg-white rounded-4xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
                         
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-lg shadow-inner">
@@ -174,8 +174,8 @@
                     </div>
 
                     <!-- Tarjeta: Gestión de Taller -->
-                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
-                        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-emerald-400 to-teal-500 opacity-80"></div>
+                    <div class="bg-white rounded-4xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 relative overflow-hidden group hover:border-emerald-100 transition-colors">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-emerald-400 to-teal-500 opacity-80"></div>
                         
                         <div class="flex justify-between items-center mb-6">
                             <div class="flex items-center gap-3">
@@ -287,7 +287,7 @@
                 <div class="lg:col-span-4 flex flex-col gap-8">
                     
                     <!-- Tarjeta: Estado Maestro -->
-                    <div class="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100">
+                    <div class="bg-white rounded-4xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
                                 <i class="fas fa-sync-alt"></i>
@@ -330,9 +330,9 @@
                     </div>
 
                     <!-- Tarjeta: Finanzas y Costos -->
-                    <div class="bg-gray-900 rounded-[2rem] p-1 shadow-xl relative overflow-hidden group">
+                    <div class="bg-gray-900 rounded-4xl p-1 shadow-xl relative overflow-hidden group">
                         <!-- Neon Glow effect -->
-                        <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                        <div class="absolute -inset-1 bg-linear-to-r from-emerald-500 via-teal-500 to-blue-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
                         
                         <div class="relative bg-gray-900 rounded-[calc(2rem-4px)] p-6 z-10">
                             <div class="flex items-center gap-3 mb-6">
@@ -379,7 +379,7 @@
                     </div>
 
                     <!-- Sticky Save Box -->
-                    <div class="bg-white rounded-[2rem] p-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col gap-3 sticky top-4">
+                    <div class="bg-white rounded-4xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col gap-3 sticky top-4">
                         @if (error()) {
                         <div class="alert alert-error text-white font-medium p-3 rounded-xl text-sm shadow-sm flex items-start">
                             <i class="fas fa-exclamation-circle text-lg mt-0.5"></i>
@@ -387,7 +387,7 @@
                         </div>
                         }
 
-                        <button type="submit" class="btn btn-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all text-lg"
+                        <button type="submit" class="btn btn-lg bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all text-lg"
                             [disabled]="saving() || !form().customer_name || !form().device_model">
                             @if (saving()) {
                                 <span class="loading loading-spinner text-white opacity-80"></span> Guardando...

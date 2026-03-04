@@ -130,12 +130,22 @@ export class ProductsDetailsPage {
             this.selectedImage.set(product.image_url || null);
         }
 
+        // Automatically generate semantic SEO keywords for tech products
+        const nameKeywords = product.name.toLowerCase()
+            .replace(/[^a-z0-9áéíóúñ ]/g, '')
+            .split(' ')
+            .filter(word => word.length > 3)
+            .join(', ');
+            
+        const semanticKeywords = `repuesto, módulo, pantalla, repair, arecofix, ${nameKeywords}`;
+
         this.seoService.setPageData({
             title: product.name,
-            description: product.description || `Compra ${product.name} en Arecofix`,
+            description: product.description || `Comprá ${product.name} al mejor precio en Arecofix. Stock disponible de repuestos y módulos.`,
             imageUrl: product.image_url || undefined,
             type: 'product',
-            url: `/productos/detalle/${product.slug}`
+            url: `/productos/detalle/${product.slug}`,
+            keywords: semanticKeywords
         });
 
         // JSON-LD Structured Data

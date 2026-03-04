@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@app/core/services/auth.service';
@@ -13,6 +13,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 export class AdminCompanySettingsPage implements OnInit {
     private auth = inject(AuthService);
     private tenantService = inject(TenantService);
+    private cdr = inject(ChangeDetectorRef);
 
     form = signal({
         id: '',
@@ -82,6 +83,7 @@ export class AdminCompanySettingsPage implements OnInit {
         
         this.branches.set(branchData || []);
         this.loading.set(false);
+        this.cdr.markForCheck();
     }
 
     async onFileChange(event: any) {
@@ -92,16 +94,20 @@ export class AdminCompanySettingsPage implements OnInit {
         const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file);
         if (error) {
             this.error.set(error.message);
+            this.cdr.markForCheck();
             return;
         }
         const { data: publicUrl } = supabase.storage.from('public-assets').getPublicUrl(data.path);
         this.form.update((f) => ({ ...f, logo_url: publicUrl.publicUrl }));
+        this.cdr.markForCheck();
     }
 
     async save() {
         this.saving.set(true);
         this.error.set(null);
         this.success.set(null);
+        this.cdr.markForCheck();
+        
         const supabase = this.auth.getSupabaseClient();
         const payload = { ...this.form() };
         const tenantId = this.tenantService.getTenantId();
@@ -125,11 +131,19 @@ export class AdminCompanySettingsPage implements OnInit {
         };
 
         try {
-            const { error } = await supabase.from('tenants')
+            const { data: updatedRows, error } = await supabase.from('tenants')
                 .update(updateData)
-                .eq('id', tenantId);
+                .eq('id', tenantId)
+                .select();
 
             if (error) throw error;
+            
+            if (!updatedRows || updatedRows.length === 0) {
+                this.error.set("No se guardaron los cambios. Es probable que no tengas permisos (RLS) para editar esta empresa o el ID de la empresa no coincida con el tuyo.");
+                this.saving.set(false);
+                this.cdr.markForCheck();
+                return;
+            }
             
             // Critical: Update the TenantService state so other components reflect the change
             const { data: updatedTenant } = await supabase.from('tenants')
@@ -147,6 +161,7 @@ export class AdminCompanySettingsPage implements OnInit {
             this.error.set(e.message);
         } finally {
             this.saving.set(false);
+            this.cdr.markForCheck();
         }
     }
 
@@ -155,10 +170,12 @@ export class AdminCompanySettingsPage implements OnInit {
         const payload = this.newBranch();
         if (!payload.name) {
             this.error.set('El nombre de la sucursal es obligatorio.');
+            this.cdr.markForCheck();
             return;
         }
 
         this.savingBranch.set(true);
+        this.cdr.markForCheck();
         const supabase = this.auth.getSupabaseClient();
         const tenantId = this.tenantService.getTenantId();
 
@@ -179,6 +196,7 @@ export class AdminCompanySettingsPage implements OnInit {
             this.error.set(e.message);
         } finally {
             this.savingBranch.set(false);
+            this.cdr.markForCheck();
         }
     }
 
@@ -192,6 +210,8 @@ export class AdminCompanySettingsPage implements OnInit {
             await this.loadSettings();
         } catch (e: any) {
             this.error.set(e.message);
+        } finally {
+            this.cdr.markForCheck();
         }
     }
 
@@ -205,6 +225,8 @@ export class AdminCompanySettingsPage implements OnInit {
             await this.loadSettings();
         } catch (e: any) {
             this.error.set(e.message);
+        } finally {
+            this.cdr.markForCheck();
         }
     }
 }

@@ -89,23 +89,29 @@ export class CursosComponent implements OnInit {
 
     // Resource for Related Products (Tools/Kits)
     productsRs = rxResource({
-        stream: () => this.categoryService.getDataBySlug('cursos').pipe(
-            switchMap(category => {
-                if (!category.data?.[0]?.id) return of({ data: [], meta: { total: 0 } });
-                
-                return this.productService.getData({
-                    category_id: category.data[0].id,
-                    _page: this.paginationService.currentPage() || 1,
-                    _sort: this.sort(),
-                    _order: this.order()
-                });
-            })
-        )
+        stream: () => {
+            const page = this.paginationService.currentPage() || 1;
+            const sort = this.sort();
+            const order = this.order();
+
+            return this.categoryService.getDataBySlug('repuestos/tools').pipe(
+                switchMap(category => {
+                    if (!category.data?.[0]?.id) return of({ data: [], meta: { total: 0 } });
+                    
+                    return this.productService.getData({
+                        category_id: category.data[0].id,
+                        _page: page,
+                        _sort: sort,
+                        _order: order
+                    });
+                })
+            );
+        }
     });
 
     paginationData = computed<iPagination | null>(() => {
         const data = this.productsRs.value();
-        if (!data || !('data' in data)) return null;
+        if (!data || typeof data !== 'object' || !('data' in data)) return null;
         
         // Helper to safely extract pagination info
         const { data: items, ...meta } = data as any; 

@@ -78,9 +78,9 @@ export const CONTACTO_CONTENT: { en: ContactoContent; es: ContactoContent } = {
         phoneInfoValue: '+54 11 2596-0900',
         phoneInfoHours: 'Lunes a Viernes de 9:00 a 18:00',
         emailInfoLabel: 'Correo electrónico',
-        emailInfoValue: 'Respuesta en menos de 24 horas',
+        emailInfoValue: 'info@arecofix.com.ar',
         supportLabel: 'Soporte',
-        supportValue: 'Asistencia técnica especializada',
+        supportValue: 'info@arecofix.com.ar',
         socialTitle: 'Síguenos en redes'
     },
     en: {
@@ -122,9 +122,9 @@ export const CONTACTO_CONTENT: { en: ContactoContent; es: ContactoContent } = {
         phoneInfoValue: '+54 11 2596-0900',
         phoneInfoHours: 'Monday to Friday from 9:00 to 18:00',
         emailInfoLabel: 'Email',
-        emailInfoValue: 'Response in less than 24 hours',
+        emailInfoValue: 'info@arecofix.com.ar',
         supportLabel: 'Support',
-        supportValue: 'Specialized technical assistance',
+        supportValue: 'info@arecofix.com.ar',
         socialTitle: 'Follow us on social media'
     }
 };

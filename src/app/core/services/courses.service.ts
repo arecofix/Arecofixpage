@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
 import { from, Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
 export interface Course {
@@ -94,26 +94,11 @@ export class CoursesService {
 
     private readonly mockModules: Module[] = [
         // Curso 1: Basico
-        { 
-            id: 'm1-1', course_id: '1', title: 'Módulo 1: Fundamentos y Herramientas', 
-            description: 'Introducción a la electrónica, multímetro, estación de calor.', order: 1 
-        },
-        { 
-            id: 'm1-2', course_id: '1', title: 'Módulo 2: Desarme y Reconocimiento', 
-            description: 'Técnicas de apertura, identificación de partes y buses.', order: 2 
-        },
-        { 
-            id: 'm1-3', course_id: '1', title: 'Módulo 3: Pantallas y Táctiles', 
-            description: 'Diferencias OLED/LCD, cambio de glass vs módulo completo.', order: 3 
-        },
-        { 
-            id: 'm1-4', course_id: '1', title: 'Módulo 4: Baterías y Carga', 
-            description: 'Diagnóstico de baterías, pines de carga y consumo.', order: 4 
-        },
-        { 
-            id: 'm1-5', course_id: '1', title: 'Módulo 5: Software Básico', 
-            description: 'Hard reset, flasheo y cuentas Google.', order: 5 
-        },
+        { id: 'm1-1', course_id: '1', title: 'Módulo 1: Fundamentos y Herramientas', description: 'Introducción a la electrónica, multímetro, estación de calor.', order: 1 },
+        { id: 'm1-2', course_id: '1', title: 'Módulo 2: Desarme y Reconocimiento', description: 'Técnicas de apertura, identificación de partes y buses.', order: 2 },
+        { id: 'm1-3', course_id: '1', title: 'Módulo 3: Pantallas y Táctiles', description: 'Diferencias OLED/LCD, cambio de glass vs módulo completo.', order: 3 },
+        { id: 'm1-4', course_id: '1', title: 'Módulo 4: Baterías y Carga', description: 'Diagnóstico de baterías, pines de carga y consumo.', order: 4 },
+        { id: 'm1-5', course_id: '1', title: 'Módulo 5: Software Básico', description: 'Hard reset, flasheo y cuentas Google.', order: 5 },
 
         // Curso 2: Microelectronica
         { id: 'm2-1', course_id: '2', title: 'Módulo 1: Lectura de Planos', description: 'Schematics, boardview y seguimiento de líneas.', order: 1 },
@@ -137,7 +122,7 @@ export class CoursesService {
         return from(
             this.supabase
                 .from('courses')
-                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at, duration, schedule')
+                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at, duration, schedule, instructor_name, rating, students')
                 .order('created_at', { ascending: false })
                 .returns<Course[]>()
         );
@@ -207,31 +192,98 @@ export class CoursesService {
     }
 
     getModulesByCourseId(courseId: string): Observable<{ data: Module[], error: any }> {
-         // TEMPORARY FIX: Return mock data immediately to prevent 404 network errors 
-         // until the 'modules' table migration is applied by the user.
-         return of({ data: this.mockModules, error: null });
-
-         /* 
-         // Original Implementation (Restore when table exists):
          return from(
              this.supabase
-                .from('modules')
-                .select('*')
+                .from('course_modules')
+                .select('id, course_id, title, description, order:order_index')
                 .eq('course_id', courseId)
-                .order('order', { ascending: true })
+                .order('order_index', { ascending: true })
                 .returns<Module[]>()
          ).pipe(
-             map(({ data, error }) => {
-                 if (error || !data || data.length === 0) {
-                     return { data: this.mockModules, error: null };
+             switchMap(({ data, error }) => {
+                 if (!error && data && data.length > 0) {
+                     return of({ data, error: null });
                  }
-                 return { data, error };
-             }),
-             catchError((err) => {
-                 return of({ data: this.mockModules, error: null });
+                 
+                 // Fallback: If no modules found or table doesn't exist, we must provide the correct mock ones
+                 // First, get the course to know its slug so we can map it to mock modules
+                 return from(this.supabase.from('courses').select('slug').eq('id', courseId).single()).pipe(
+                     map((res: any) => {
+                         const slug = res.data?.slug;
+                         let targetMockCourseId = courseId; // default to passed ID if it's already a mock ID
+                         
+                         // Map real DB courses to mock modules by their slug
+                         if (slug === 'reparacion-celulares-basico') targetMockCourseId = '1';
+                         else if (slug === 'curso-avanzado-microelectronica') targetMockCourseId = '2';
+                         else if (slug === 'curso-electricidad') targetMockCourseId = '3';
+                         else if (slug === 'aprendizaje-practico') targetMockCourseId = '4';
+
+                         const filtered = this.mockModules.filter(m => m.course_id === targetMockCourseId);
+                         return { data: filtered, error: null };
+                     }),
+                     catchError(() => {
+                         // Extremely silent fallback
+                         const filtered = this.mockModules.filter(m => m.course_id === courseId);
+                         return of({ data: filtered, error: null });
+                     })
+                 );
              })
          );
-         */
+    }
+
+    saveModules(courseId: string, modules: Partial<Module>[]): Observable<any> {
+        return from((async () => {
+            // Check if mock IDs are involved, indicating the DB isn't ready or we are on mock fallbacks
+            if (courseId.length < 5) {
+                // Return success immediately to not break the UI while on mock mode
+                return { success: true, warning: 'Mock mode active, modules not saved to DB.' };
+            }
+
+            // Real DB logic: Need to get the tenant_id from the course first (since course_modules requires it)
+            const { data: courseRef } = await this.supabase.from('courses').select('tenant_id').eq('id', courseId).single();
+            const tenantId = courseRef?.tenant_id;
+
+            // 1. Filter out valid existing IDs to keep
+            const currentIds = modules.filter(m => m.id && m.id.length > 10).map(m => m.id);
+            
+            // 2. Delete modules for this course that are NOT in the newly saved list
+            if (currentIds.length > 0) {
+                await this.supabase.from('course_modules')
+                    .delete()
+                    .eq('course_id', courseId)
+                    .not('id', 'in', `(${currentIds.join(',')})`);
+            } else {
+                // If the new list has no valid DB IDs, wipe all existing modules for the course
+                await this.supabase.from('course_modules').delete().eq('course_id', courseId);
+            }
+
+            // 3. Upsert the new and existing ones
+            const toUpsert = modules.map((m, idx) => {
+                const payload: any = {
+                    course_id: courseId,
+                    title: m.title,
+                    description: m.description,
+                    order_index: idx + 1
+                };
+                if (tenantId) payload.tenant_id = tenantId;
+                
+                // Only include the ID if it looks like a real database UUID (length > 10)
+                if (m.id && m.id.length > 10) {
+                    payload.id = m.id;
+                }
+                return payload;
+            });
+
+            if (toUpsert.length > 0) {
+                const { data, error } = await this.supabase.from('course_modules').upsert(toUpsert).select();
+                if (error) {
+                    console.error("Error saving modules:", error);
+                    throw error;
+                }
+                return data;
+            }
+            return [];
+        })());
     }
 
     async registerStudent(data: any): Promise<{ data: any, error: any }> {

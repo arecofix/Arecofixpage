@@ -29,7 +29,7 @@ export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
   '/celular': {
     title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
     description: 'Arreglo de pantallas, baterías y pines de carga en el acto. Calidad garantizada en Marcos Paz.',
-    imageUrl: 'assets/img/branding/og-celulares.jpg',
+    imageUrl: 'assets/img/branding/og-celulares-pro.png',
     keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix'
   },
   '/contacto': {
@@ -51,7 +51,7 @@ export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
   '/academy': {
     title: 'Arecofix Academy | Cursos de Tecnología',
     description: 'Aprendé reparación de celulares, programación y más con nuestros cursos presenciales y online.',
-    imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+    imageUrl: 'assets/img/branding/og-academy-pro.png'
   }
 };
 

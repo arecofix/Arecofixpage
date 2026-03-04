@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Router, RouterLink } from '@angular/router';
@@ -24,6 +24,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
   constructor() {
@@ -39,6 +40,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.loading = true;
+    this.cdr.markForCheck();
     try {
       const currentUser = await this.authService.getUser();
       this.isLoggedIn = !!currentUser;
@@ -58,6 +60,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       console.error('Profile load error:', err);
     } finally {
       this.loading = false;
+      this.cdr.markForCheck();
     }
     
     // Safety timeout
@@ -65,6 +68,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (this.loading) {
         this.loading = false;
         this.error = 'Tiempo de espera agotado al cargar el perfil.';
+        this.cdr.markForCheck();
       }
     }, 5000);
   }
@@ -78,6 +82,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     const error = await this.authService.signOut();
     if (error) {
       this.error = error;
+      this.cdr.markForCheck();
       return;
     }
     this.router.navigate(['/login']);
@@ -93,12 +98,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     this.saving = true;
+    this.cdr.markForCheck();
     try {
       const currentUser = await this.authService.getUser();
       if (!currentUser) {
         // No hay sesión, mostramos error y sugerimos iniciar sesión
         this.saving = false;
         this.error = 'Necesitas iniciar sesión para actualizar tu perfil.';
+        this.cdr.markForCheck();
         return;
       }
 
@@ -120,10 +127,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
       } else {
         this.error = 'Error al actualizar el perfil.';
       }
+      this.cdr.markForCheck();
     } catch (err) {
       this.saving = false;
       this.error = 'Error al actualizar el perfil.';
       console.error('Profile update error:', err);
+      this.cdr.markForCheck();
     }
   }
 
@@ -132,12 +141,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (!this.isEditing && this.user) {
       this.form.patchValue(this.user);
     }
+    this.cdr.markForCheck();
   }
 
   resetForm() {
     if (this.user) {
       this.form.patchValue(this.user);
       this.isEditing = false;
+      this.cdr.markForCheck();
     }
   }
 }

@@ -69,3 +69,10 @@ node_modules/
 .dataconnect
 node_modules
 Arecofixpage.rar
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
