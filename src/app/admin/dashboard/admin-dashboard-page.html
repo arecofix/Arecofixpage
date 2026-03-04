@@ -1,93 +1,99 @@
-<div class="p-6">
-  <h1 class="text-2xl font-bold mb-6 text-black dark:text-green-400">Panel de Control</h1>
+<!-- Main Admin Dashboard -->
+<div class="px-3 md:px-6 py-6 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans">
   
-  @if (loading()) {
-    <div class="flex justify-center py-12">
-        <span class="loading loading-spinner loading-lg"></span>
-    </div>
-  } @else {
-    <!-- Stats Cards: E-Commerce & Workshop -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Users Card -->
-        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="stat">
-                <div class="stat-figure text-primary">
-                    <i class="fas fa-users text-3xl"></i>
-                </div>
-                <div class="stat-title dark:text-gray-400">Usuarios</div>
-                <div class="stat-value text-primary">{{ stats().users }}</div>
-                <div class="stat-desc dark:text-gray-500">Registrados</div>
-            </div>
+    <!-- Header Minimalista -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 animate-fade-in-down">
+        <div>
+             <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+                 <span class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                     <i class="fas fa-chart-pie"></i>
+                 </span>
+                 Panel de Control
+             </h1>
+             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">Resumen general del negocio y rendimiento financiero.</p>
         </div>
 
-        <!-- Repairs This Month (NEW) -->
-        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="stat">
-                <div class="stat-figure text-warning">
-                    <i class="fas fa-tools text-3xl"></i>
-                </div>
-                <div class="stat-title dark:text-gray-400">Reparaciones (Mes)</div>
-                <div class="stat-value text-warning">{{ stats().repairs_month }}</div>
-                <div class="stat-desc dark:text-gray-500">Equipos ingresados</div>
-            </div>
-        </div>
-
-        <!-- Revenue Repair (NEW) -->
-        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="stat">
-                <div class="stat-figure text-success">
-                    <i class="fas fa-hand-holding-usd text-3xl"></i>
-                </div>
-                <div class="stat-title dark:text-gray-400">Ganancia Taller</div>
-                <div class="stat-value text-success">{{ stats().repairs_revenue | currency }}</div>
-                <div class="stat-desc dark:text-gray-500">Este mes</div>
-            </div>
-        </div>
-
-        <!-- Fixed Devices (NEW) -->
-        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="stat">
-                <div class="stat-figure text-info">
-                    <i class="fas fa-check-circle text-3xl"></i>
-                </div>
-                <div class="stat-title dark:text-gray-400">Equipos Arreglados</div>
-                <div class="stat-value text-info">{{ stats().devices_fixed }}</div>
-                <div class="stat-desc dark:text-gray-500">Histórico de Taller</div>
-            </div>
-        </div>
-
-        <!-- E-Commerce Orders Card -->
-        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="stat">
-                <div class="stat-figure text-accent">
-                    <i class="fas fa-shopping-cart text-3xl"></i>
-                </div>
-                <div class="stat-title dark:text-gray-400">Ventas Tienda</div>
-                <div class="stat-value text-accent">{{ stats().sales }}</div>
-                <div class="stat-desc dark:text-gray-500">Total realizadas</div>
-            </div>
-        </div>
-
-        <!-- E-Commerce Revenue Card -->
-        <div class="stats shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="stat">
-                <div class="stat-figure text-secondary">
-                    <i class="fas fa-dollar-sign text-3xl"></i>
-                </div>
-                <div class="stat-title dark:text-gray-400">Ingresos Tienda</div>
-                <div class="stat-value text-secondary">{{ stats().revenue | currency }}</div>
-                <div class="stat-desc dark:text-gray-500">Total facturado</div>
-            </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <a routerLink="/admin/sales" class="btn btn-sm md:btn-md bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-2xl shadow-lg shadow-blue-500/30 transform hover:-translate-y-0.5 transition-all w-full sm:w-auto">
+                <i class="fas fa-cash-register mr-1 opacity-80"></i> Nueva Venta
+            </a>
+            <a routerLink="/admin/repairs/new" class="btn btn-sm md:btn-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all w-full sm:w-auto">
+                <i class="fas fa-tools mr-1 opacity-80"></i> Ingreso a Taller
+            </a>
         </div>
     </div>
+  
+    @if (loading()) {
+        <div class="flex flex-col items-center justify-center py-20 animate-pulse">
+            <div class="w-16 h-16 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin mb-4"></div>
+            <span class="text-sm font-medium text-gray-500">Cargando métricas...</span>
+        </div>
+    } @else {
+        
+        <!-- KPIs Section -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 100ms;">
+            
+            <!-- KPI: Ingresos Totales (Tienda) -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-blue-400 to-indigo-500 opacity-80"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ingresos Tienda</div>
+                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+            </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Sales Chart -->
-        <div class="card shadow lg:col-span-2 bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Resumen de Ventas</h2>
-                <div class="h-80 w-full">
+            <!-- KPI: Ganancia Taller -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-emerald-100 dark:hover:border-emerald-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-emerald-400 to-teal-500 opacity-80"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                </div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Mes Rep. (Ganancia)</div>
+                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().repairs_revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+            </div>
+
+            <!-- KPI: Ventas Exitosas -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-purple-100 dark:hover:border-purple-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Cant. Ventas</div>
+                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().sales }}</div>
+            </div>
+
+            <!-- KPI: Equipos Arreglados -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-orange-100 dark:hover:border-orange-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-orange-400 to-amber-500 opacity-80"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Equipos Fix.</div>
+                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().devices_fixed }}</div>
+            </div>
+
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 200ms;">
+            
+            <!-- Sales Line Chart (Takes up 2 columns on large screens) -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-chart-area text-blue-500"></i> Evolución de Ingresos
+                    </h2>
+                </div>
+                <div class="h-64 sm:h-80 w-full relative">
                     <canvas baseChart
                         [data]="salesChartData"
                         [options]="salesChartOptions"
@@ -95,13 +101,15 @@
                     </canvas>
                 </div>
             </div>
-        </div>
 
-        <!-- Top Products Chart -->
-        <div class="card shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Productos Top</h2>
-                <div class="h-64 w-full">
+            <!-- Top Products Chart -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-star text-amber-500"></i> Prod. Estrella
+                    </h2>
+                </div>
+                <div class="h-56 sm:h-64 w-full flex-1 relative flex items-center justify-center">
                     <canvas baseChart
                         [data]="productsChartData"
                         [options]="productsChartOptions"
@@ -109,13 +117,18 @@
                     </canvas>
                 </div>
             </div>
+
         </div>
 
-        <!-- Category Chart -->
-        <div class="card shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Ventas por Categoría</h2>
-                <div class="h-64 w-full flex justify-center">
+        <!-- Lower Section (Category & System) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up" style="animation-delay: 300ms;">
+            
+            <!-- Category Chart -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
+                <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-fuchsia-500"></i> Ventas por Categoría
+                </h2>
+                <div class="h-56 sm:h-64 w-full flex justify-center items-center">
                     <canvas baseChart
                         [data]="categoryChartData"
                         [options]="categoryChartOptions"
@@ -123,82 +136,88 @@
                     </canvas>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Quick Actions -->
-        <div class="card shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Acciones Rápidas</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <a routerLink="/admin/products/new" class="btn btn-outline btn-primary">
-                        <i class="fas fa-plus mr-2"></i> Nuevo Producto
+            <!-- Quick Access Menu -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
+                <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-bolt text-yellow-500"></i> Accesos Directos
+                </h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <a routerLink="/admin/products" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:border-blue-200 dark:hover:border-blue-500/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-gray-600 dark:text-gray-300 group">
+                        <i class="fas fa-box text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-center">Inventario</span>
                     </a>
-                    <a routerLink="/admin/sales" class="btn btn-outline btn-accent">
-                        <i class="fas fa-cash-register mr-2"></i> Nueva Venta
+                    
+                    <a routerLink="/admin/repairs" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all text-gray-600 dark:text-gray-300 group">
+                        <i class="fas fa-tools text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-emerald-500 transition-colors"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-center">Taller</span>
                     </a>
-                    <a routerLink="/admin/users" class="btn btn-outline dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-gray-900">
-                        <i class="fas fa-user-plus mr-2"></i> Gestionar Usuarios
+
+                    <a routerLink="/admin/users" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:border-purple-200 dark:hover:border-purple-500/30 hover:text-purple-600 dark:hover:text-purple-400 transition-all text-gray-600 dark:text-gray-300 group">
+                        <i class="fas fa-users text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-purple-500 transition-colors"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-center">Clientes</span>
                     </a>
-                    <a routerLink="/admin/repairs" class="btn btn-outline btn-secondary">
-                        <i class="fas fa-tools mr-2"></i> Taller
+
+                    <a routerLink="/admin/orders" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-200 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 transition-all text-gray-600 dark:text-gray-300 group">
+                        <i class="fas fa-shipping-fast text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-orange-500 transition-colors"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-center">Envíos</span>
                     </a>
                 </div>
             </div>
-        </div>
 
-        <!-- Analytics & System Status -->
-        <div class="card shadow bg-base-100 dark:bg-gray-800 text-base-content dark:text-white">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Analytics & Sistema</h2>
-                <div class="space-y-4">
-                    <!-- System Status -->
-                    <div class="flex justify-between items-center">
-                        <span>Base de Datos</span>
-                        <span class="badge badge-success">Conectado</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span>Analytics (PostHog)</span>
-                        <span class="badge badge-success">{{ posthogStatus() }}</span>
-                    </div>
+            <!-- System Status -->
+            <div class="bg-gray-900 rounded-4xl p-5 sm:p-8 shadow-xl relative overflow-hidden group border border-gray-800">
+                <div class="absolute -inset-1 bg-linear-to-br from-gray-800 to-gray-950 rounded-[2rem] opacity-50 z-0"></div>
+                
+                <div class="relative z-10 flex flex-col h-full mt-auto">
+                    <h2 class="text-base sm:text-lg font-black text-white mb-6 flex items-center gap-2">
+                        <i class="fas fa-server text-emerald-400"></i> Sistema & Salud
+                    </h2>
                     
-                    <!-- PostHog Metrics -->
+                    <div class="space-y-3 sm:space-y-4 flex-1">
+                        <!-- Database -->
+                        <div class="flex justify-between items-center bg-gray-800/50 p-2 sm:p-3 rounded-2xl border border-gray-700/50">
+                            <span class="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
+                                <i class="fas fa-database text-gray-500"></i> BD Conectada
+                            </span>
+                            <div class="flex items-center gap-2 text-[10px] sm:text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">
+                                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div> OK
+                            </div>
+                        </div>
+                        
+                        <!-- Analytics -->
+                        <div class="flex justify-between items-center bg-gray-800/50 p-2 sm:p-3 rounded-2xl border border-gray-700/50">
+                            <span class="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
+                                <i class="fas fa-chart-line text-gray-500"></i> Analytics
+                            </span>
+                            <div class="flex items-center gap-2 text-[10px] sm:text-xs font-bold" [ngClass]="analyticsStats().enabled ? 'text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg' : 'text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg'">
+                                <div class="w-2 h-2 rounded-full" [ngClass]="analyticsStats().enabled ? 'bg-emerald-400' : 'bg-amber-400'"></div>
+                                {{ posthogStatus() }}
+                            </div>
+                        </div>
+
+                        <!-- Data details -->
+                        <div class="mt-4 pt-4 border-t border-gray-800">
+                             <div class="flex justify-between items-center text-[10px] sm:text-xs text-gray-400 mb-2">
+                                 <span>Sesión Actual:</span>
+                                 <span class="font-mono text-gray-300">{{ analyticsStats().sessionId ? 'Activa' : 'N/A' }}</span>
+                             </div>
+                             <div class="flex justify-between items-center text-[10px] sm:text-xs text-gray-400">
+                                 <span>ID Usuario:</span>
+                                 <span class="font-mono text-gray-300 truncate max-w-[90px] md:max-w-[120px]">{{ analyticsStats().distinctId || 'Anónimo' }}</span>
+                             </div>
+                        </div>
+                    </div>
+
                     @if (analyticsStats().enabled) {
-                      <div class="divider my-2"></div>
-                      <div class="space-y-3">
-                        <div class="flex justify-between items-center text-sm">
-                          <span class="flex items-center gap-2">
-                            <i class="fas fa-eye text-info"></i>
-                            <span>Sesión Actual</span>
-                          </span>
-                          <span class="font-semibold">{{ analyticsStats().sessionId ? 'Activa' : 'N/A' }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                          <span class="flex items-center gap-2">
-                            <i class="fas fa-user text-primary"></i>
-                            <span>Usuario</span>
-                          </span>
-                          <span class="font-semibold text-xs">{{ analyticsStats().distinctId || 'Anónimo' }}</span>
-                        </div>
-                        <a 
-                          href="https://us.posthog.com/project/253677/dashboard/791256" 
-                          target="_blank" 
-                          class="btn btn-sm btn-outline btn-info w-full mt-2"
-                        >
-                          <i class="fas fa-chart-line mr-2"></i>
-                          Ver Dashboard Completo
-                        </a>
-                      </div>
-                    } @else {
-                      <div class="alert alert-warning text-xs mt-4">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>PostHog no está inicializado correctamente</span>
-                      </div>
+                    <a href="https://us.posthog.com/project/253677/dashboard/791256" target="_blank" 
+                       class="mt-6 w-full py-2.5 sm:py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white text-[10px] sm:text-sm font-bold border border-white/10 transition-colors flex items-center justify-center gap-2">
+                        <span>Ver Reporte Avanzado</span> <i class="fas fa-external-link-alt text-[8px] sm:text-xs opacity-50"></i>
+                    </a>
                     }
                 </div>
             </div>
+
         </div>
-    </div>
-  }
+    }
 </div>
