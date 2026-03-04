@@ -32,7 +32,7 @@ export abstract class ProductRepository {
 
     abstract getAll(branch_id?: string): Observable<Product[]>;
     abstract getAllForImport(): Observable<ImportProductSummary[]>;
-    abstract getById(id: string): Observable<Product>;
+    abstract getById(id: string): Observable<Product | null>;
     abstract create(product: Product): Observable<Product>;
     abstract update(id: string, product: Partial<Product>): Observable<Product>;
     abstract delete(id: string): Observable<void>;

@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { Repair, CreateRepairDto, UpdateRepairDto } from '../entities/repair.entity';
 
 export abstract class RepairRepository {
-    abstract getById(id: string): Observable<Repair>;
+    abstract getById(id: string): Observable<Repair | null>;
     abstract getAll(limit?: number, offset?: number): Observable<Repair[]>;
     abstract create(repair: CreateRepairDto): Observable<Repair>;
     abstract update(id: string, repair: UpdateRepairDto): Observable<void>;

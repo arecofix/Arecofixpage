@@ -18,7 +18,7 @@ export class SupabaseUserProfileRepository extends BaseRepository<UserProfile> i
     super(supabase, logger);
   }
 
-  getProfile(id: string): Observable<UserProfile> {
+  getProfile(id: string): Observable<UserProfile | null> {
     return this.getById(id);
   }
 

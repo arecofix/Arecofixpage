@@ -52,7 +52,7 @@ export class OrderService {
     getOrderById(id: string): Observable<OrderWithItems> {
         return from(
             Promise.all([
-                this.applyTenantFilter(this.supabase.from('orders').select('id, order_number, customer_name, customer_email, customer_phone, shipping_address, status, subtotal, tax, discount, total_amount, notes, user_id, tenant_id, created_at, updated_at, deleted_at, payment_method').eq('id', id)).single(),
+                (this.applyTenantFilter(this.supabase.from('orders').select('id, order_number, customer_name, customer_email, customer_phone, shipping_address, status, subtotal, tax, discount, total_amount, notes, user_id, tenant_id, created_at, updated_at, deleted_at, payment_method').eq('id', id)) as any).maybeSingle(),
                 this.supabase.from('order_items').select('id, order_id, product_id, course_id, product_name, quantity, unit_price, subtotal, tenant_id, created_at').eq('order_id', id).eq('tenant_id', this.tenantService.getTenantId())
             ])
         ).pipe(

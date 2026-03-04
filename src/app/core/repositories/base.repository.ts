@@ -88,20 +88,20 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     }
 
     /**
-     * Find record by ID (safely isolated within current Tenant)
+     * Find record by ID (safely isolated within current Tenant).
+     * Uses maybeSingle() to gracefully return null when no row is found (avoids 406/PGRST116).
      */
-    getById(id: string): Observable<T> {
+    getById(id: string): Observable<T | null> {
         let query = this.supabase.from(this.tableName).select('*').eq('id', id);
         query = this.applyTenantFilter(query);
 
-        return from(query.single()).pipe(
-            map(({ data, error }) => {
+        return from((query as any).maybeSingle()).pipe(
+            map(({ data, error }: any) => {
                 if (error) {
-                    if (error.code === 'PGRST116') throw new Error('Not found'); // Simplificado para componente que usa catchError
                     this.logger.error(`Error fetching ${this.tableName} by ID`, error);
                     throw new DatabaseError(error.message, error);
                 }
-                return data as T;
+                return data as T | null; // null when row doesn't exist
             })
         );
     }

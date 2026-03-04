@@ -74,20 +74,72 @@ export class AuthService {
       data: { session },
     } = await this.supabase.auth.getSession();
     if (session) {
-      const profile = await this.profileService.getProfile(session.user.id);
+      const profile = await this.ensureProfile(session);
       this.authState.next({ session, user: session.user, profile });
     }
 
     this.supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         if (session) {
-          const profile = await this.profileService.getProfile(session.user.id);
+          const profile = await this.ensureProfile(session);
           this.authState.next({ session, user: session.user, profile });
         } else {
           this.authState.next({ session: null, user: null, profile: null });
         }
       },
     );
+  }
+
+  /**
+   * Ensures a profile row exists for the given session user.
+   * If no profile exists yet, creates one from auth user metadata.
+   * This permanently fixes the PGRST116 issue for new/OAuth users.
+   */
+  private async ensureProfile(session: Session): Promise<UserProfile | null> {
+    try {
+      const existingProfile = await this.profileService.getProfile(session.user.id);
+      if (existingProfile) return existingProfile;
+
+      // Profile row doesn't exist yet — auto-create it from auth metadata
+      const meta = session.user.user_metadata || {};
+      const tenantId = this.tenantService.getTenantId();
+      const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+
+      const payload: any = {
+        id: session.user.id,
+        email: session.user.email || meta['email'] || '',
+        first_name: meta['first_name'] || meta['given_name'] || null,
+        last_name: meta['last_name'] || meta['family_name'] || null,
+        full_name: meta['full_name'] || meta['name'] || null,
+        avatar_url: meta['avatar_url'] || meta['picture'] || null,
+        role: meta['role'] || session.user.app_metadata?.['role'] || 'user',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Only include tenant_id if it is not the fallback placeholder
+      if (!isFallback) {
+        payload['tenant_id'] = tenantId;
+      }
+
+      const { data, error } = await this.supabase
+        .from('profiles')
+        .upsert(payload, { onConflict: 'id' })
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        this.logger.error('Failed to auto-create profile row', error);
+        return null;
+      }
+
+      this.logger.info(`Profile auto-created for user ${session.user.id}`);
+      return data as UserProfile | null;
+    } catch (err) {
+      this.logger.error('ensureProfile error', err);
+      return null;
+    }
   }
 
   async signOut(): Promise<string | null> {

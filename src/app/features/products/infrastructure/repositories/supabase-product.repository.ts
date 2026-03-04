@@ -280,7 +280,7 @@ export class SupabaseProductRepository extends ProductRepository {
 
 
 
-  getById(id: string): Observable<Product> {
+  getById(id: string): Observable<Product | null> {
     let query = this.supabase.from('products')
         .select(`
           id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
@@ -289,13 +289,13 @@ export class SupabaseProductRepository extends ProductRepository {
         `)
         .eq('id', id);
 
-    let filteredQuery = this.applyTenantFilter(query).single();
+    let filteredQuery = (this.applyTenantFilter(query) as any).maybeSingle();
 
     return from(filteredQuery as any).pipe(
       map((res: any) => {
         const { data, error } = res;
         if (error) throw error;
-        return this._mapToEntity(data);
+        return data ? this._mapToEntity(data) : null;
       })
     );
   }

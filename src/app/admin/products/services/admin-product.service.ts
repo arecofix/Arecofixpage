@@ -68,7 +68,7 @@ export class AdminProductService {
         return firstValueFrom(this.productRepo.findWithFilters(enrichedParams));
     }
 
-    async getProduct(id: string): Promise<Product> {
+    async getProduct(id: string): Promise<Product | null> {
         return firstValueFrom(this.productRepo.getById(id));
     }
 

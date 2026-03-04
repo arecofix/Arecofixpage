@@ -15,7 +15,7 @@ export class AdminRepairService {
     private readonly STATUS_DELIVERED = RepairStatus.DELIVERED;
     private readonly STATUS_CANCELLED = RepairStatus.CANCELLED;
 
-    async getById(id: string): Promise<Repair> {
+    async getById(id: string): Promise<Repair | null> {
         return firstValueFrom(this.repository.getById(id));
     }
 

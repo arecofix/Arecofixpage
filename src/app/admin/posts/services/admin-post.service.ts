@@ -22,16 +22,16 @@ export class AdminPostService {
         return (data || []).map((post: any) => this.mapToEntity(post));
     }
 
-    async getPost(id: string): Promise<Post> {
-        const { data, error } = await this.supabase
+    async getPost(id: string): Promise<Post | null> {
+        const { data, error } = await (this.supabase
             .from('blog_posts')
             .select('*')
             .eq('id', id)
-            .eq('tenant_id', this.tenantService.getTenantId())
-            .single();
+            .eq('tenant_id', this.tenantService.getTenantId()) as any)
+            .maybeSingle();
 
         if (error) throw error;
-        return this.mapToEntity(data);
+        return data ? this.mapToEntity(data) : null;
     }
 
     private mapToEntity(data: any): Post {

@@ -24,16 +24,16 @@ export class SupabaseRepairRepository extends RepairRepository {
         return enhancedQuery;
     }
 
-    getById(id: string): Observable<Repair> {
+    getById(id: string): Observable<Repair | null> {
         let query = this.supabase.from('repairs')
             .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
             .eq('id', id);
 
-        return from(this.applyTenantFilter(query).single() as any).pipe(
+        return from((this.applyTenantFilter(query) as any).maybeSingle()).pipe(
             map((res: any) => {
                 const { data, error } = res;
                 if (error) throw error;
-                return this.mapFromDb(data);
+                return data ? this.mapFromDb(data) : null;
             })
         );
     }

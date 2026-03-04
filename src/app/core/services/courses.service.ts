@@ -122,7 +122,7 @@ export class CoursesService {
         return from(
             this.supabase
                 .from('courses')
-                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at, duration, schedule, instructor_name, rating, students')
+                .select('id, title, slug, price, sale_price, level, is_active, image_url, created_at, duration, schedule, instructor_name')
                 .order('created_at', { ascending: false })
                 .returns<Course[]>()
         );
@@ -134,7 +134,7 @@ export class CoursesService {
                 .from('courses')
                 .select('*')
                 .eq('slug', slug)
-                .single()
+                .maybeSingle()
         ).pipe(
             map(({ data, error }) => {
                 if (error || !data) {
@@ -157,7 +157,7 @@ export class CoursesService {
                 .from('courses')
                 .select('*')
                 .eq('id', id)
-                .single()
+                .maybeSingle()
         ) as Observable<PostgrestSingleResponse<Course | null>>;
     }
 
@@ -207,7 +207,7 @@ export class CoursesService {
                  
                  // Fallback: If no modules found or table doesn't exist, we must provide the correct mock ones
                  // First, get the course to know its slug so we can map it to mock modules
-                 return from(this.supabase.from('courses').select('slug').eq('id', courseId).single()).pipe(
+                 return from((this.supabase.from('courses').select('slug').eq('id', courseId) as any).maybeSingle()).pipe(
                      map((res: any) => {
                          const slug = res.data?.slug;
                          let targetMockCourseId = courseId; // default to passed ID if it's already a mock ID
@@ -240,7 +240,7 @@ export class CoursesService {
             }
 
             // Real DB logic: Need to get the tenant_id from the course first (since course_modules requires it)
-            const { data: courseRef } = await this.supabase.from('courses').select('tenant_id').eq('id', courseId).single();
+            const { data: courseRef } = await (this.supabase.from('courses').select('tenant_id').eq('id', courseId) as any).maybeSingle();
             const tenantId = courseRef?.tenant_id;
 
             // 1. Filter out valid existing IDs to keep

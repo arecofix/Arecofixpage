@@ -55,6 +55,11 @@ export class AdminPostFormPage implements OnInit {
         try {
             this.loading = true;
             const post = await this.postService.getPost(id);
+            if (!post) {
+                alert('Entrada no encontrada');
+                this.router.navigate(['/admin/posts']);
+                return;
+            }
             this.form.patchValue(post);
             this.imagePreview = post.image || null;
         } catch (error) {

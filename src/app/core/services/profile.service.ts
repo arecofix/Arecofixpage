@@ -4,7 +4,7 @@ import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { LoggerService } from './logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProfileService {
   private supabase = inject(SupabaseService).getClient();
@@ -15,17 +15,20 @@ export class ProfileService {
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to gracefully return null when no row exists (avoids 406/PGRST116)
 
     if (error) {
       this.logger.error('Error fetching profile', error);
       return null;
     }
 
-    return data as UserProfile;
+    return data as UserProfile | null;
   }
 
-  async updateProfile(userId: string, profile: Partial<UserProfile>): Promise<UserProfile | null> {
+  async updateProfile(
+    userId: string,
+    profile: Partial<UserProfile>,
+  ): Promise<UserProfile | null> {
     const { data, error } = await this.supabase
       .from('profiles')
       .update(profile)
@@ -46,7 +49,7 @@ export class ProfileService {
       .from('profiles')
       .select('id')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
     return !error && data !== null;
   }

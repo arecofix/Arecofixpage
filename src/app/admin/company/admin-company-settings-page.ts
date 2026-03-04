@@ -53,7 +53,7 @@ export class AdminCompanySettingsPage implements OnInit {
         const { data, error } = await supabase.from('tenants')
             .select('*')
             .eq('id', tenantId)
-            .single();
+            .maybeSingle();
 
         if (data) {
             this.form.set({
@@ -149,7 +149,7 @@ export class AdminCompanySettingsPage implements OnInit {
             const { data: updatedTenant } = await supabase.from('tenants')
                 .select('*')
                 .eq('id', tenantId)
-                .single();
+                .maybeSingle();
             
             if (updatedTenant) {
                 this.tenantService.setTenant(updatedTenant as any);
