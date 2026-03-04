@@ -91,7 +91,70 @@ export class SupabaseProductRepository extends ProductRepository {
     if (max_price !== undefined) query = query.lte('price', max_price);
     
     if (params.q) {
-      query = query.or(`name.ilike.%${params.q}%,description.ilike.%${params.q}%`);
+      // Búsqueda Humana: Mapeo de términos habituales a palabras técnicas o similares del rubro.
+      const queryStr = params.q.toLowerCase().trim();
+      
+      const techSynonyms: Record<string, string[]> = {
+        // Pantallas y Módulos
+        'modulo': ['módulo', 'display', 'pantalla', 'tactil', 'touch', 'lcd', 'oled', 'amoled'],
+        'modulos': ['módulo', 'display', 'pantalla', 'tactil', 'touch', 'lcd', 'oled', 'amoled'],
+        'pantalla': ['módulo', 'display', 'modulo', 'lcd', 'touch'],
+        'pantallas': ['módulo', 'display', 'modulo', 'lcd', 'touch'],
+        'display': ['módulo', 'pantalla', 'modulo', 'lcd'],
+        'visor': ['vidrio', 'glass', 'cristal'],
+        'vidrio': ['visor', 'glass', 'cristal', 'templado'],
+        'glass': ['visor', 'vidrio', 'cristal'],
+
+        // Baterías y Energía
+        'bateria': ['batería', 'pila', 'battery'],
+        'baterias': ['batería', 'pila', 'battery'],
+        'pin': ['carga', 'conector', 'puerto', 'flex', 'zócalo', 'zocalo'],
+        'pines': ['carga', 'conector', 'puerto', 'flex', 'zócalo', 'zocalo'],
+        'cargador': ['fuente', 'trafo', 'transformador', 'cable'],
+        'cable': ['usb', 'datos', 'cargador'],
+
+        // Componentes internos y microelectrónica
+        'repuesto': ['módulo', 'pantalla', 'bateria', 'pin', 'flex', 'placa', 'ic', 'chip', 'microfono', 'parlante'],
+        'repuestos': ['módulo', 'pantalla', 'bateria', 'pin', 'flex', 'placa', 'ic', 'chip', 'microfono', 'parlante'],
+        'placa': ['mother', 'logica', 'mainboard', 'subplaca', 'pba'],
+        'flex': ['cinta', 'cable', 'fpc', 'flex', 'flexor'],
+        'microfono': ['mic', 'micrófono'],
+        'parlante': ['auricular', 'speaker', 'altavoz', 'buzzer', 'campana'],
+        'camara': ['cámara', 'lente'],
+
+        // Herramientas y Consumibles
+        'herramienta': ['destornillador', 'pinza', 'estacion', 'soldador', 'microscopio', 'multimetro', 'tester'],
+        'herramientas': ['destornillador', 'pinza', 'estacion', 'soldador', 'microscopio', 'multimetro', 'tester'],
+        'estaño': ['soldadura', 'solder', 'pasta'],
+        'pegamento': ['b7000', 't7000', 't8000', 'uv', 'cinta', 'adhesivo'],
+      };
+
+      // Separamos las palabras que el usuario buscó
+      const searchWords = queryStr.split(/\s+/);
+      const extendedWords = new Set<string>();
+
+      for (let word of searchWords) {
+        // Removemos acentos para cotejar en el diccionario
+        word = word.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        
+        // Evitamos buscar palabras muy cortas (ej: "de", "el", "a") a menos que sea un producto exacto ("ic")
+        if (word.length <= 2 && word !== 'ic' && word !== 'uv') {
+            continue;
+        }
+
+        extendedWords.add(word); // Agregamos la palabra original depurada
+        
+        if (techSynonyms[word]) {
+            techSynonyms[word].forEach(syn => extendedWords.add(syn));
+        }
+      }
+      
+      // Creamos una cadena global de OR clauses. 
+      // Por cada palabra expandida (ej: modulo, pantalla, display) forzamos que pueda estar contenida en el nombre o descripción
+      if (extendedWords.size > 0) {
+          const orClauses = Array.from(extendedWords).map(w => `name.ilike.%${w}%,description.ilike.%${w}%`);
+          query = query.or(orClauses.join(','));
+      }
     }
 
     if (params._sort) {
