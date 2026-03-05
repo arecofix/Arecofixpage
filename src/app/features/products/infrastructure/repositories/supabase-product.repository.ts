@@ -153,7 +153,7 @@ export class SupabaseProductRepository extends ProductRepository {
       // Creamos una cadena global de OR clauses. 
       // Por cada palabra expandida (ej: modulo, pantalla, display) forzamos que pueda estar contenida en el nombre o descripción
       if (extendedWords.size > 0) {
-          const orClauses = Array.from(extendedWords).map(w => `name.ilike.%${w}%,description.ilike.%${w}%`);
+          const orClauses = Array.from(extendedWords).map(w => `name.ilike.%${w}%,description.ilike.%${w}%,sku.ilike.%${w}%`);
           query = query.or(orClauses.join(','));
       }
     }
@@ -658,6 +658,76 @@ export class SupabaseProductRepository extends ProductRepository {
       }
     };
     return from(processChunks()).pipe(map(() => void 0));
+  }
+
+  search(query: string, categoryId?: string): Observable<Product[]> {
+    const queryStr = query.toLowerCase().trim();
+    if (!queryStr) return of([]);
+
+    let baseQuery = this.supabase
+      .from('products')
+      .select(`
+        id, name, slug, description, price, currency, image_url, gallery_urls, category_id, brand_id, 
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
+        branch_stock:product_stock_per_branch(quantity, branch_id),
+        branches(name)
+      `);
+      
+    let supabaseQuery = this.applyTenantFilter(baseQuery).eq('is_active', true);
+
+    if (categoryId) {
+      supabaseQuery = supabaseQuery.eq('category_id', categoryId);
+    }
+
+    // Advanced Fuzzy Search Logic:
+    // 1. Full Text Search for better ranking
+    // 2. Fallback to ILIKE with synonyms if FTS yields few results (handled by Postgres or here)
+    
+    // Using Postgres Full Text Search if available on the 'name' column
+    // For many languages/scenarios, we combine search terms with AND
+    const terms = queryStr.split(/\s+/).filter(t => t.length > 1);
+    const ftsQuery = terms.map(t => `'${t}':*`).join(' & ');
+
+    // We use a broader approach: name ILIKE or textSearch
+    // Supabase .or() with textsearch is not directly supported in the same way as ilike
+    // so we use the smart synonym logic but improved
+    
+    const synonyms: Record<string, string[]> = {
+        'modulo': ['módulo', 'display', 'pantalla', 'lcd', 'touch'],
+        'pin': ['carga', 'conector', 'puerto', 'zocalo'],
+        'bateria': ['batería', 'pila', 'battery'],
+        'vidrio': ['visor', 'glass', 'cristal'],
+        'placa': ['mother', 'logica', 'mainboard'],
+    };
+
+    const searchWords = new Set<string>();
+    terms.forEach(t => {
+        searchWords.add(t);
+        const normalized = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (synonyms[normalized]) {
+            synonyms[normalized].forEach(s => searchWords.add(s));
+        }
+    });
+
+    // Create OR clauses for each word in both name and description
+    const orClauses = Array.from(searchWords).map(w => `name.ilike.%${w}%,description.ilike.%${w}%,sku.ilike.%${w}%`);
+    supabaseQuery = supabaseQuery.or(orClauses.join(','));
+
+    return from(supabaseQuery as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) throw error;
+        
+        // Frontend Ranking: Sort results by how many search terms match
+        const products = (data || []).map((p: any) => this._mapToEntity(p));
+        
+        return products.sort((a: Product, b: Product) => {
+            const countA = terms.filter(t => a.name.toLowerCase().includes(t)).length;
+            const countB = terms.filter(t => b.name.toLowerCase().includes(t)).length;
+            return countB - countA; // Rank higher those with more matching terms
+        });
+      })
+    );
   }
 
   private _mapToEntity(p: any, branch_id?: string): Product {

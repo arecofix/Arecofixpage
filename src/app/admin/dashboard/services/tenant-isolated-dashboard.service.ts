@@ -108,7 +108,7 @@ export class TenantIsolatedDashboardService {
       repairs_month: Math.floor(globalStats.repairs_month * branchMultiplier),
       repairs_revenue: Math.floor(globalStats.repairs_revenue * branchMultiplier),
       devices_fixed: Math.floor(globalStats.devices_fixed * branchMultiplier),
-      pending_approvals: Math.floor(globalStats.pending_approvals * branchMultiplier),
+      pending_approvals: Math.floor((globalStats.pending_approvals || 0) * branchMultiplier),
       sales_chart: this.filterSalesChartByBranch(globalStats.sales_chart, branchMultiplier),
       products_chart: this.filterProductsChartByBranch(globalStats.products_chart, branchMultiplier),
       category_chart: this.filterCategoryChartByBranch(globalStats.category_chart, branchMultiplier),

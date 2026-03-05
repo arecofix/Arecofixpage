@@ -144,18 +144,16 @@ export class SupabaseRepairRepository extends RepairRepository {
     }
 
     getByTrackingCode(code: string): Observable<Repair> {
-        // Since get_repair_by_tracking RPC might bypass RLS if using SECURITY DEFINER, or we aren't sending tenant id,
-        // it's better to query directly for the scope of the tenant to avoid leakage.
-        let query = this.supabase
-            .from('repairs')
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
-            .eq('tracking_code', code);
-            
-        return from(this.applyTenantFilter(query).single() as any).pipe(
+        // Use RPC function to bypass RLS for public tracking access
+        return from(this.supabase.rpc('get_repair_by_tracking', { t_code: code }) as any).pipe(
             map((res: any) => {
                 const { data, error } = res;
                 if (error) throw error;
-                return this.mapFromDb(data);
+                if (!data || (Array.isArray(data) && data.length === 0)) {
+                    throw new Error('No repair found');
+                }
+                const repairData = Array.isArray(data) ? data[0] : data;
+                return this.mapFromDb(repairData);
             })
         );
     }

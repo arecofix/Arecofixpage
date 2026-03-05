@@ -1,9 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import { CHART_COLORS } from './constants/chart-colors.constant';
 import { TenantIsolatedDashboardService, TenantDashboardStats } from './services/tenant-isolated-dashboard.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/shared/services/tenant.service';
@@ -12,7 +9,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-branch-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, BaseChartDirective],
+  imports: [CommonModule, RouterLink],
   templateUrl: './branch-dashboard.component.html',
   styleUrls: ['./branch-dashboard.component.scss']
 })
@@ -61,67 +58,67 @@ export class BranchDashboardComponent implements OnInit {
     };
   });
 
-  // Configuración de gráficos
-  salesChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: true, position: 'bottom' },
-      title: { display: true, text: 'Ventas del Año' }
-    }
-  };
+  // Configuración de gráficos (temporalmente deshabilitada)
+  // salesChartOptions: ChartConfiguration['options'] = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: { display: true, position: 'bottom' },
+  //     title: { display: true, text: 'Ventas del Año' }
+  //   }
+  // };
 
-  salesChartType: ChartType = 'line';
-  salesChartData = signal<ChartData<'line'>>({
-    labels: [],
-    datasets: [
-      { 
-        data: [], 
-        label: 'Ventas ($)', 
-        borderColor: CHART_COLORS.primary, 
-        backgroundColor: CHART_COLORS.primaryTransparent, 
-        fill: true 
-      },
-    ]
-  });
+  // salesChartType: ChartType = 'line';
+  // salesChartData = signal<ChartData<'line'>>({
+  //   labels: [],
+  //   datasets: [
+  //     { 
+  //       data: [], 
+  //       label: 'Ventas ($)', 
+  //       borderColor: CHART_COLORS.primary, 
+  //       backgroundColor: CHART_COLORS.primaryTransparent, 
+  //       fill: true 
+  //     },
+  //   ]
+  // });
 
-  productsChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      title: { display: true, text: 'Productos Más Vendidos' }
-    }
-  };
+  // productsChartOptions: ChartConfiguration['options'] = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: { display: false },
+  //     title: { display: true, text: 'Productos Más Vendidos' }
+  //   }
+  // };
 
-  productsChartType: ChartType = 'bar';
-  productsChartData = signal<ChartData<'bar'>>({
-    labels: [],
-    datasets: [
-      { 
-        data: [], 
-        label: 'Unidades', 
-        backgroundColor: CHART_COLORS.palette
-      }
-    ]
-  });
+  // productsChartType: ChartType = 'bar';
+  // productsChartData = signal<ChartData<'bar'>>({
+  //   labels: [],
+  //   datasets: [
+  //     { 
+  //       data: [], 
+  //       label: 'Unidades', 
+  //       backgroundColor: CHART_COLORS.palette
+  //     }
+  //   ]
+  // });
 
-  categoryChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: true, position: 'right' },
-      title: { display: true, text: 'Ventas por Categoría' }
-    }
-  };
+  // categoryChartOptions: ChartConfiguration['options'] = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: { display: true, position: 'right' },
+  //     title: { display: true, text: 'Ventas por Categoría' }
+  //   }
+  // };
 
-  categoryChartType: ChartType = 'doughnut';
-  categoryChartData = signal<ChartData<'doughnut'>>({
-    labels: [],
-    datasets: [
-      { data: [], backgroundColor: CHART_COLORS.paletteAlt }
-    ]
-  });
+  // categoryChartType: ChartType = 'doughnut';
+  // categoryChartData = signal<ChartData<'doughnut'>>({
+  //   labels: [],
+  //   datasets: [
+  //     { data: [], backgroundColor: CHART_COLORS.paletteAlt }
+  //   ]
+  // });
 
   async ngOnInit() {
     await this.validateAccess();
@@ -165,7 +162,7 @@ export class BranchDashboardComponent implements OnInit {
     this.dashboardService.getDashboardStats(branchSlug || undefined).subscribe({
       next: (stats) => {
         this.stats.set(stats);
-        this.updateCharts(stats);
+        // this.updateCharts(stats); // Temporalmente deshabilitado
         this.loading.set(false);
       },
       error: (error) => {
@@ -177,61 +174,61 @@ export class BranchDashboardComponent implements OnInit {
   }
 
   /**
-   * Actualiza los gráficos con los datos recibidos
+   * Actualiza los gráficos con los datos recibidos (temporalmente deshabilitado)
    */
-  private updateCharts(stats: TenantDashboardStats): void {
-    // Actualizar gráfico de ventas
-    if (stats.sales_chart && stats.sales_chart.length > 0) {
-      const months = stats.sales_chart.map(d => this.formatMonth(d.period));
-      const totals = stats.sales_chart.map(d => d.total);
+  // private updateCharts(stats: TenantDashboardStats): void {
+  //   // Actualizar gráfico de ventas
+  //   if (stats.sales_chart && stats.sales_chart.length > 0) {
+  //     const months = stats.sales_chart.map(d => this.formatMonth(d.period));
+  //     const totals = stats.sales_chart.map(d => d.total);
       
-      this.salesChartData.set({
-        labels: months,
-        datasets: [
-          { 
-            data: totals, 
-            label: 'Ventas ($)', 
-            borderColor: CHART_COLORS.primary, 
-            backgroundColor: CHART_COLORS.primaryTransparent, 
-            fill: true 
-          }
-        ]
-      });
-    }
+  //     this.salesChartData.set({
+  //       labels: months,
+  //       datasets: [
+  //         { 
+  //           data: totals, 
+  //           label: 'Ventas ($)', 
+  //           borderColor: CHART_COLORS.primary, 
+  //           backgroundColor: CHART_COLORS.primaryTransparent, 
+  //           fill: true 
+  //         }
+  //       ]
+  //     });
+  //   }
 
-    // Actualizar gráfico de productos
-    if (stats.products_chart && stats.products_chart.length > 0) {
-      const productNames = stats.products_chart.map(d => d.name);
-      const quantities = stats.products_chart.map(d => d.quantity);
+  //   // Actualizar gráfico de productos
+  //   if (stats.products_chart && stats.products_chart.length > 0) {
+  //     const productNames = stats.products_chart.map(d => d.name);
+  //     const quantities = stats.products_chart.map(d => d.quantity);
 
-      this.productsChartData.set({
-        labels: productNames,
-        datasets: [
-          { 
-            data: quantities, 
-            label: 'Unidades', 
-            backgroundColor: CHART_COLORS.palette 
-          }
-        ]
-      });
-    }
+  //     this.productsChartData.set({
+  //       labels: productNames,
+  //       datasets: [
+  //         { 
+  //           data: quantities, 
+  //           label: 'Unidades', 
+  //           backgroundColor: CHART_COLORS.palette 
+  //         }
+  //       ]
+  //     });
+  //   }
 
-    // Actualizar gráfico de categorías
-    if (stats.category_chart && stats.category_chart.length > 0) {
-      const catNames = stats.category_chart.map(d => d.name);
-      const catCounts = stats.category_chart.map(d => d.count);
+  //   // Actualizar gráfico de categorías
+  //   if (stats.category_chart && stats.category_chart.length > 0) {
+  //     const catNames = stats.category_chart.map(d => d.name);
+  //     const catCounts = stats.category_chart.map(d => d.count);
 
-      this.categoryChartData.set({
-        labels: catNames,
-        datasets: [
-          { 
-            data: catCounts, 
-            backgroundColor: CHART_COLORS.paletteAlt
-          }
-        ]
-      });
-    }
-  }
+  //     this.categoryChartData.set({
+  //       labels: catNames,
+  //       datasets: [
+  //         { 
+  //           data: catCounts, 
+  //           backgroundColor: CHART_COLORS.paletteAlt
+  //         }
+  //       ]
+  //     });
+  //   }
+  // }
 
   /**
    * Formatea el mes para mostrar en los gráficos

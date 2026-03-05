@@ -8,6 +8,7 @@ export interface DashboardStats {
   repairs_month: number;
   repairs_revenue: number;
   devices_fixed: number;
+  pending_approvals?: number;
   sales_chart: { period: string; total: number }[];
   products_chart: { name: string; quantity: number }[];
   category_chart: { name: string; count: number }[];

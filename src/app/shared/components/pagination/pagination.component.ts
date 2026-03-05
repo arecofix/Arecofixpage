@@ -1,9 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { PaginationConfig } from '../../services/pagination.service';
 
 @Component({
   selector: 'app-pagination',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.scss']
 })

@@ -55,8 +55,8 @@
           <i class="fas fa-users"></i>
         </div>
         <div class="stat-content">
-          <h3 class="stat-value" [class]="getStatColor(stats().users)">
-            {{ stats().users }}
+          <h3 class="stat-value" [class]="getStatColor(stats().users || 0)">
+            {{ stats().users || 0 }}
           </h3>
           <p class="stat-label">Usuarios</p>
         </div>
@@ -68,8 +68,8 @@
           <i class="fas fa-box"></i>
         </div>
         <div class="stat-content">
-          <h3 class="stat-value" [class]="getStatColor(stats().products)">
-            {{ stats().products }}
+          <h3 class="stat-value" [class]="getStatColor(stats().products || 0)">
+            {{ stats().products || 0 }}
           </h3>
           <p class="stat-label">Productos</p>
         </div>
@@ -81,7 +81,7 @@
           <i class="fas fa-shopping-cart"></i>
         </div>
         <div class="stat-content">
-          <h3 class="stat-value" [class]="getStatColor(stats().sales)">
+          <h3 class="stat-value" [class]="getStatColor(stats().sales || 0)">
             {{ stats().sales }}
           </h3>
           <p class="stat-label">Ventas</p>
@@ -94,8 +94,8 @@
           <i class="fas fa-dollar-sign"></i>
         </div>
         <div class="stat-content">
-          <h3 class="stat-value" [class]="getStatColor(stats().revenue, 1000)">
-            {{ formatCurrency(stats().revenue) }}
+          <h3 class="stat-value" [class]="getStatColor(stats().revenue || 0, 1000)">
+            {{ formatCurrency(stats().revenue || 0) }}
           </h3>
           <p class="stat-label">Ingresos</p>
         </div>
@@ -111,7 +111,7 @@
             <i class="fas fa-tools"></i>
           </div>
           <div class="stat-content">
-            <h3 class="stat-value" [class]="getStatColor(stats().repairs_month)">
+            <h3 class="stat-value" [class]="getStatColor(stats().repairs_month || 0)">
               {{ stats().repairs_month }}
             </h3>
             <p class="stat-label">Reparaciones del Mes</p>
@@ -124,8 +124,8 @@
             <i class="fas fa-wrench"></i>
           </div>
           <div class="stat-content">
-            <h3 class="stat-value" [class]="getStatColor(stats().repairs_revenue, 500)">
-              {{ formatCurrency(stats().repairs_revenue) }}
+            <h3 class="stat-value" [class]="getStatColor(stats().repairs_revenue || 0, 500)">
+              {{ formatCurrency(stats().repairs_revenue || 0) }}
             </h3>
             <p class="stat-label">Ingresos por Reparaciones</p>
           </div>
@@ -137,7 +137,7 @@
             <i class="fas fa-mobile-alt"></i>
           </div>
           <div class="stat-content">
-            <h3 class="stat-value" [class]="getStatColor(stats().devices_fixed)">
+            <h3 class="stat-value" [class]="getStatColor(stats().devices_fixed || 0)">
               {{ stats().devices_fixed }}
             </h3>
             <p class="stat-label">Dispositivos Reparados</p>
@@ -145,13 +145,13 @@
         </div>
 
         <!-- Aprobaciones Pendientes -->
-        <div class="stat-card" [class.warning]="stats().pending_approvals > 0">
+        <div class="stat-card" [class.warning]="false">
           <div class="stat-icon">
             <i class="fas fa-clock"></i>
           </div>
           <div class="stat-content">
-            <h3 class="stat-value" [class]="getStatColor(stats().pending_approvals, 1)">
-              {{ stats().pending_approvals }}
+            <h3 class="stat-value" [class]="getStatColor(stats().pending_approvals || 0, 1)">
+              {{ stats().pending_approvals || 0 }}
             </h3>
             <p class="stat-label">Aprobaciones Pendientes</p>
           </div>
@@ -159,45 +159,7 @@
       </div>
     </div>
 
-    <!-- Gráficos (solo si hay datos) -->
-    <div class="charts-section" *ngIf="hasData()">
-      
-      <!-- Gráfico de Ventas -->
-      <div class="chart-container" *ngIf="salesChartData().labels.length > 0">
-        <div class="chart-header">
-          <h3 class="chart-title">Ventas del Año</h3>
-          <div class="chart-badge" *ngIf="isBranchAdmin()">
-            <i class="fas fa-store"></i>
-            {{ branchInfo().name }}
-          </div>
-        </div>
-        <div class="chart-wrapper">
-          <canvas baseChart [type]="salesChartType" [data]="salesChartData()" [options]="salesChartOptions"></canvas>
-        </div>
-      </div>
-
-      <div class="charts-row">
-        <!-- Gráfico de Productos -->
-        <div class="chart-container half" *ngIf="productsChartData().labels.length > 0">
-          <div class="chart-header">
-            <h3 class="chart-title">Productos Más Vendidos</h3>
-          </div>
-          <div class="chart-wrapper">
-            <canvas baseChart [type]="productsChartType" [data]="productsChartData()" [options]="productsChartOptions"></canvas>
-          </div>
-        </div>
-
-        <!-- Gráfico de Categorías -->
-        <div class="chart-container half" *ngIf="categoryChartData().labels.length > 0">
-          <div class="chart-header">
-            <h3 class="chart-title">Ventas por Categoría</h3>
-          </div>
-          <div class="chart-wrapper">
-            <canvas baseChart [type]="categoryChartType" [data]="categoryChartData()" [options]="categoryChartOptions"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Gráficos deshabilitados temporalmente -->
 
     <!-- Estado Vacío (para Branch Admin sin datos) -->
     <div class="empty-state" *ngIf="!hasData() && isBranchAdmin()">

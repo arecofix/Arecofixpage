@@ -26,15 +26,15 @@
                     <a routerLink="/" class="btn btn-ghost btn-sm text-neutral-400">Volver al inicio</a>
                 </div>
             </div>
-            } @else if (mappedRepair(); as r) {
+            } @else if (repair(); as r) {
             <!-- Status Card -->
-            <div class="p-6 transition-all duration-500" [ngClass]="r.ui.statusColor">
+            <div class="p-6 transition-all duration-500" [ngClass]="r.status_color">
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Estado de Reparación</span>
                     <span class="text-[10px] font-mono font-bold opacity-60">#{{ r.tracking_code }}</span>
                 </div>
                 <h2 class="text-3xl font-black leading-tight mb-2 tracking-tight">
-                    {{ r.ui.statusLabel }}
+                    {{ r.status_label }}
                 </h2>
                 <p class="text-sm font-medium opacity-80 leading-relaxed">
                     Tu {{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
@@ -72,7 +72,7 @@
                         <div class="space-y-3">
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Fecha de Ingreso</span>
-                                <span class="text-neutral-800 font-bold uppercase">{{ (r.received_at || r.created_at) | date:'dd MMM yyyy' }}</span>
+                                <span class="text-neutral-800 font-bold uppercase">{{ r.received_at | date:'dd MMM yyyy' }}</span>
                             </div>
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Motivo</span>
@@ -81,14 +81,14 @@
                         </div>
                     </div>
 
-                    @if (r.technician_notes || r.technical_report) {
+                    @if (r.technician_report) {
                     <div class="bg-primary/5 rounded-2xl p-5 border border-primary/10">
                         <h4 class="text-[10px] font-black text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
                              <span class="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
                              Reporte Técnico
                         </h4>
                         <p class="text-xs font-medium text-neutral-700 leading-relaxed italic">
-                            "{{ r.technical_report || r.technician_notes }}"
+                            "{{ r.technician_report }}"
                         </p>
                     </div>
                     }
@@ -97,7 +97,7 @@
                         <div class="flex justify-between items-end mb-6">
                             <div>
                                 <h4 class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-1">Presupuesto Final</h4>
-                                <p class="text-3xl font-black tracking-tighter">${{ (r.final_cost || r.estimated_cost || 0) - (r.deposit_amount || 0) }}</p>
+                                <p class="text-3xl font-black tracking-tighter">${{ r.balance_to_pay }}</p>
                             </div>
                             <div class="text-right">
                                 @if (r.deposit_amount && r.deposit_amount > 0) {
@@ -125,48 +125,77 @@
     </div>
 </div>
 
-<!-- Print Only Ticket -->
-@if (mappedRepair(); as r) {
-<div class="print-only p-8 font-mono text-xs w-[80mm] mx-auto">
-    <div class="text-center mb-6 border-b border-black pb-4">
-        <h1 class="text-xl font-black uppercase">ARECOFIX</h1>
-        <p class="text-[8px] uppercase tracking-tighter">Gestión Técnica Profesional</p>
-        <p class="mt-2">OT #: {{ r.repair_number || '---' }}</p>
+<!-- Print Only Ticket: Withdrawal Stub -->
+@if (repair(); as r) {
+<div class="print-only withdrawal-ticket text-black p-4">
+    <div class="text-center border-b-2 border-dashed border-black pb-4 mb-4">
+        <h1 class="text-2xl font-black uppercase tracking-tighter">ARECOFIX</h1>
+        <p class="text-[10px] font-bold">SERVICIO TÉCNICO ESPECIALIZADO</p>
+        <p class="text-[9px] mt-1">Av. Dr. Smith 123, San Antonio de Areco</p>
+        <p class="text-[9px]">WhatsApp: +54 9 2326 123456</p>
+        <div class="mt-2 inline-block border-2 border-black px-4 py-1">
+            <p class="text-sm font-black">ORDEN DE SERVICIO #{{ r.repair_number || 'S/N' }}</p>
+        </div>
     </div>
 
-    <div class="space-y-3 mb-6">
+    <div class="space-y-2 text-[11px] mb-4">
         <div class="flex justify-between">
-            <span>TRACKING:</span>
-            <span class="font-bold">{{ r.tracking_code }}</span>
-        </div>
-        <div class="flex justify-between">
-            <span>FECHA:</span>
-            <span>{{ (r.received_at || r.created_at) | date:'dd/MM/yy HH:mm' }}</span>
-        </div>
-        <div class="flex justify-between border-t border-black pt-2">
-            <span>CLIENTE:</span>
-            <span class="font-bold text-right truncate max-w-[120px]">{{ r.customer_name }}</span>
+            <span class="font-bold">FECHA:</span>
+            <span>{{ r.received_at | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
         <div class="flex justify-between">
-            <span>EQUIPO:</span>
-            <span class="font-bold text-right truncate max-w-[120px]">{{ r.device_model }}</span>
+            <span class="font-bold">CLIENTE:</span>
+            <span class="uppercase">{{ r.customer_name || 'Particular' }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="font-bold">EQUIPO:</span>
+            <span class="uppercase">{{ r.device_model }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="font-bold">FALLA:</span>
+            <span class="italic max-w-[150px] text-right">"{{ r.issue_description }}"</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="font-bold uppercase">Cód. Seguimiento:</span>
+            <span class="font-black">{{ r.tracking_code }}</span>
         </div>
     </div>
 
-    <div class="border-y border-black py-3 text-center mb-6">
-        <p class="font-bold uppercase mb-1">Saldo a Pagar</p>
-        <p class="text-2xl font-black">${{ (r.final_cost || r.estimated_cost || 0) - (r.deposit_amount || 0) }}</p>
+    <div class="border-y-2 border-black py-4 text-center mb-4">
+        <p class="text-[10px] font-bold uppercase mb-1">Saldo a Cancelar al Retirar</p>
+        <p class="text-3xl font-black">${{ r.balance_to_pay }}</p>
+        @if (r.deposit_amount > 0) {
+            <p class="text-[9px] mt-1 italic">Incluye seña de ${{ r.deposit_amount }}</p>
+        }
     </div>
 
-    <div class="text-[8px] leading-tight space-y-2 mb-8">
-        <p>* Presentar este talón para el retiro.</p>
-        <p>* No se entregan equipos sin comprobante.</p>
-        <p>* Garantía: 30 días sobre el trabajo realizado.</p>
+    <div class="flex justify-center mb-6">
+        <div class="text-center">
+            <img [src]="qrCodeUrl()" alt="QR Tracking" class="w-32 h-32 mx-auto border border-black p-1">
+            <p class="text-[8px] mt-1 font-bold">ESCANEÁ PARA SEGUIMIENTO</p>
+        </div>
     </div>
 
-    <div class="text-center">
-        <div class="w-32 h-px bg-black mx-auto mb-1"></div>
-        <p class="text-[8px]">FIRMA TÉCNICA</p>
+    <div class="text-[8px] leading-[1.2] space-y-2 mb-8 text-justify border-t border-black pt-2">
+        <p>1. Presente este talón obligatorio para el retiro de su equipo. Sin excepción.</p>
+        <p>2. Los repuestos están garantizados por 30 días a partir de la fecha de entrega, cubriendo solo fallas de fabricación (no golpes, humedad o mal uso).</p>
+        <p>3. Equipos no retirados pasados los 60 días se considerarán en abandono (Ley 24.240).</p>
+        <p>4. La casa no se responsabiliza por la pérdida de datos. Haga backup previo.</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mt-12">
+        <div class="text-center">
+            <div class="border-t border-black mx-4 mt-6"></div>
+            <p class="text-[8px] mt-1">FIRMA CLIENTE</p>
+        </div>
+        <div class="text-center">
+            <div class="border-t border-black mx-4 mt-6"></div>
+            <p class="text-[8px] mt-1">ARECOFIX</p>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center">
+        <p class="text-[9px] font-black uppercase tracking-widest">arecofix.com.ar</p>
     </div>
 </div>
 }

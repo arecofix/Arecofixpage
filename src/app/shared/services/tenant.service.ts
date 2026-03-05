@@ -124,6 +124,13 @@ export class TenantService {
    * Detecta el tenant actual basado en la URL
    */
   private detectCurrentTenant(): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined') {
+      // Si estamos en el servidor, usar el tenant principal por defecto
+      this.setCurrentTenant('central');
+      return;
+    }
+    
     const path = window.location.pathname;
     const slug = path.split('/')[1]; // Obtiene el primer segmento de la URL
     
@@ -197,6 +204,11 @@ export class TenantService {
    * Actualiza el favicon
    */
   private updateFavicon(faviconUrl?: string): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return; // No podemos manipular el DOM en el servidor
+    }
+    
     if (faviconUrl) {
       let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
       if (!link) {
@@ -212,6 +224,11 @@ export class TenantService {
    * Actualiza el título de la página
    */
   private updatePageTitle(companyName: string): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return; // No podemos manipular el DOM en el servidor
+    }
+    
     const baseTitle = companyName;
     const currentTitle = document.title;
     
@@ -239,6 +256,11 @@ export class TenantService {
    * Actualiza un meta tag específico
    */
   private updateMetaTag(attribute: string, name: string, content: string): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return; // No podemos manipular el DOM en el servidor
+    }
+    
     let meta: HTMLMetaElement | null = document.querySelector(`meta[${attribute}="${name}"]`);
     if (!meta) {
       meta = document.createElement('meta');
@@ -252,6 +274,11 @@ export class TenantService {
    * Aplica variables CSS para colores del tenant
    */
   private applyCSSVariables(branding: Tenant['branding']): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return; // No podemos manipular el DOM en el servidor
+    }
+    
     const root = document.documentElement;
     root.style.setProperty('--tenant-primary-color', branding.primaryColor);
     root.style.setProperty('--tenant-secondary-color', branding.secondaryColor);
@@ -272,6 +299,11 @@ export class TenantService {
       //   schema: tenant.database.schema 
       // });
       
+      // Verificar si estamos en el navegador (SSR-safe)
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return; // No podemos manipular el DOM en el servidor
+      }
+      
       // Agregar clase CSS al body para estilos específicos del tenant
       document.body.className = document.body.className
         .replace(/tenant-\w+/g, '') // Remover clases de tenant anteriores
@@ -279,11 +311,13 @@ export class TenantService {
       document.body.classList.add(`tenant-${tenant.id}`);
       
       // Almacenar información del tenant para uso en servicios
-      localStorage.setItem('currentTenant', JSON.stringify({
-        id: tenant.id,
-        schema: tenant.database.schema,
-        isolationLevel: tenant.database.isolationLevel
-      }));
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('currentTenant', JSON.stringify({
+          id: tenant.id,
+          schema: tenant.database.schema,
+          isolationLevel: tenant.database.isolationLevel
+        }));
+      }
     }
   }
 
@@ -321,16 +355,29 @@ export class TenantService {
    * Limpia el aislamiento del tenant actual
    */
   clearTenantIsolation(): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return; // No podemos manipular el DOM en el servidor
+    }
+    
     document.body.className = document.body.className
       .replace(/tenant-\w+/g, '')
       .trim();
-    localStorage.removeItem('currentTenant');
+    
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('currentTenant');
+    }
   }
 
   /**
    * Navega a un tenant específico
    */
   navigateToTenant(tenantId: string): void {
+    // Verificar si estamos en el navegador (SSR-safe)
+    if (typeof window === 'undefined') {
+      return; // No podemos navegar en el servidor
+    }
+    
     const tenant = this.tenants.get(tenantId);
     if (tenant) {
       const baseUrl = window.location.origin;
