@@ -213,13 +213,6 @@ export class TrackingPage implements OnInit {
         doc.setFontSize(16);
         doc.text(`$ ${r.balance_to_pay.toLocaleString('es-AR')}`, 40, y, { align: 'center' });
         
-        if (r.deposit_amount > 0) {
-            y += 4;
-            doc.setFontSize(6);
-            doc.setFont('helvetica', 'italic');
-            doc.text(`(Incluye seña descontada de $ ${r.deposit_amount.toLocaleString('es-AR')})`, 40, y, { align: 'center' });
-        }
-        
         y += 8;
         (doc as any).setLineDash([2, 2], 0);
         doc.line(5, y, 75, y);
