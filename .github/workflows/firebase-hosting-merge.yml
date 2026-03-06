@@ -18,3 +18,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ARECOFIX_20698 }}
           channelId: live
           projectId: arecofix-20698
+          target: areco-fix
