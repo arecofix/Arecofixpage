@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "areco-fix",
     "public": "dist/arecofix",
     "ignore": [
       "firebase.json",
