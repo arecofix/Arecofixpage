@@ -30,9 +30,9 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_ARECO_FIX }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_ARECOFIX_20698 }}"
           channelId: live
-          projectId: areco-fix
+          projectId: arecofix-20698
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
 
