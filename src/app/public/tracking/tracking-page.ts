@@ -123,10 +123,131 @@ export class TrackingPage implements OnInit {
     // Removed old calculation methods as they are now in the logic layer
 
 
-    printTicket() {
-        if (typeof window !== 'undefined') {
-            window.print();
+    async printTicket() {
+        if (!this.repair()) return;
+        const r = this.repair()!;
+        
+        // Dynamically import jsPDF
+        const { jsPDF } = await import('jspdf');
+        
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [80, 150] // Ticket format (receipt width)
+        });
+
+        const primaryColor: [number, number, number] = [22, 163, 74]; // Emerald 600
+        
+        let y = 10;
+        
+        // Header
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('ARECOFIX', 40, y, { align: 'center' });
+        
+        y += 5;
+        doc.setFontSize(8);
+        doc.text('SERVICIO TÉCNICO ESPECIALIZADO', 40, y, { align: 'center' });
+        
+        y += 4;
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.text('WhatsApp: +54 9 2326 123456', 40, y, { align: 'center' });
+        
+        y += 8;
+        doc.setDrawColor(0);
+        doc.setLineWidth(0.5);
+        (doc as any).setLineDash([2, 2], 0);
+        doc.line(5, y, 75, y);
+        (doc as any).setLineDash([], 0); // Reset dash
+        
+        y += 8;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`TALÓN DE RETIRO # ${r.repair_number || 'S/N'}`, 40, y, { align: 'center' });
+        
+        y += 8;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Fecha:`, 5, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${new Date(r.received_at).toLocaleDateString()}`, 75, y, { align: 'right' });
+        
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Cliente:`, 5, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${(r.customer_name || 'Particular').toUpperCase()}`, 75, y, { align: 'right' });
+        
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Equipo:`, 5, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${r.device_model.toUpperCase()}`, 75, y, { align: 'right' });
+        
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Motivo:`, 5, y);
+        doc.setFont('helvetica', 'italic');
+        const splitIssue = doc.splitTextToSize(`"${r.issue_description}"`, 55);
+        doc.text(splitIssue, 75, y, { align: 'right' });
+        
+        y += (splitIssue.length * 4) + 2;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Cód. Seguimiento:`, 5, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${r.tracking_code}`, 75, y, { align: 'right' });
+
+        y += 8;
+        (doc as any).setLineDash([2, 2], 0);
+        doc.line(5, y, 75, y);
+        (doc as any).setLineDash([], 0);
+        
+        y += 8;
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SALDO A CANCELAR AL RETIRAR', 40, y, { align: 'center' });
+        
+        y += 8;
+        doc.setFontSize(16);
+        doc.text(`$ ${r.balance_to_pay.toLocaleString('es-AR')}`, 40, y, { align: 'center' });
+        
+        if (r.deposit_amount > 0) {
+            y += 4;
+            doc.setFontSize(6);
+            doc.setFont('helvetica', 'italic');
+            doc.text(`(Incluye seña descontada de $ ${r.deposit_amount.toLocaleString('es-AR')})`, 40, y, { align: 'center' });
         }
+        
+        y += 8;
+        (doc as any).setLineDash([2, 2], 0);
+        doc.line(5, y, 75, y);
+        (doc as any).setLineDash([], 0);
+        
+        y += 8;
+        doc.setFontSize(5);
+        doc.setFont('helvetica', 'normal');
+        doc.text('1. Presente este talón obligatorio para el retiro.', 5, y);
+        y += 3;
+        doc.text('2. Las reparaciones tienen 30 días de garantía.', 5, y);
+        y += 3;
+        doc.text('3. Equipos no retirados en 60 días se consideran en abandono.', 5, y);
+        y += 3;
+        doc.text('4. No nos responsabilizamos por pérdida de datos.', 5, y);
+        
+        y += 15;
+        doc.line(15, y, 65, y);
+        y += 4;
+        doc.setFontSize(6);
+        doc.text('ARECOFIX', 40, y, { align: 'center' });
+        
+        y += 6;
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'bold');
+        doc.text('arecofix.com.ar', 40, y, { align: 'center' });
+
+        doc.save(`Arecofix_Talon_${r.repair_number || 'S-N'}_${r.tracking_code}.pdf`);
     }
 
     openImage(url: string) {
