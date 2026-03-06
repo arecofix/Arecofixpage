@@ -34,8 +34,6 @@ jobs:
           channelId: live
           projectId: arecofix-20698
           target: areco-fix
-        env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
 
       # --- GITHUB PAGES DEPLOYMENT ---
       - name: Build for GitHub Pages (Base Href)
