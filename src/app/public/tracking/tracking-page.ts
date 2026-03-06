@@ -153,7 +153,7 @@ export class TrackingPage implements OnInit {
         y += 4;
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
-        doc.text('WhatsApp: +54 9 2326 123456', 40, y, { align: 'center' });
+        doc.text(`WhatsApp: +54 1125960900`, 40, y, { align: 'center' });
         
         y += 8;
         doc.setDrawColor(0);

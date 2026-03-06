@@ -71,6 +71,10 @@
                         </div>
                         <div class="space-y-3">
                             <div class="flex justify-between text-xs">
+                                <span class="text-neutral-400 font-medium">Cliente</span>
+                                <span class="text-neutral-800 font-bold uppercase truncate max-w-[180px] text-right">{{ r.customer_name || 'Particular' }}</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Fecha de Ingreso</span>
                                 <span class="text-neutral-800 font-bold uppercase">{{ r.received_at | date:'dd MMM yyyy' }}</span>
                             </div>
