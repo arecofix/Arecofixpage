@@ -22,8 +22,8 @@ export class GetRepairTrackingUseCase {
    * Calculation: Saldo a Abonar = Costo Total - Seña
    */
   private mapToPublicDto(repair: Repair): PublicRepairDto {
-    const totalCost = repair.final_cost || repair.estimated_cost || 0;
-    const deposit = repair.deposit_amount || 0;
+    const totalCost = Number(repair.final_cost) || Number(repair.estimated_cost) || 0;
+    const deposit = Number(repair.deposit_amount) || 0;
     
     // Core Domain Calculation
     const balance = Math.max(0, totalCost - deposit);
