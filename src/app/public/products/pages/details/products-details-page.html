@@ -9,20 +9,6 @@
         <!-- Product Details Page (Redesigned) -->
         <div class="bg-white dark:bg-gray-900 pt-6">
     
-         <div class="container mx-auto px-4 lg:px-8 mt-4 mb-4 flex justify-end">
-              <div class="relative w-full max-w-xs">
-                  <input 
-                      type="text" 
-                      placeholder="Buscar producto..." 
-                      [(ngModel)]="searchQuery"
-                      (keyup.enter)="onSearch()"
-                      class="input input-bordered w-full pl-10 h-10" />
-                  <button (click)="onSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle">
-                      <i class="fas fa-search text-gray-400"></i>
-                  </button>
-              </div>
-          </div>
-    
           <app-breadcrumbs [items]="breadcrumbItems()"></app-breadcrumbs>
     
           <!-- Main Layout Grid -->
@@ -92,8 +78,10 @@
                     <ul role="list">
                       <li>Garantía: 3 meses</li>
                       @if(item.sku) { <li>SKU: {{ item.sku }}</li> }
-                      <li>Envío a todo el país</li>
-                      <li>Stock disponible</li>
+                      <li>Envío: Despacho en 24hs/48hs</li>
+                      <li [class.text-green-600]="(item.stock ?? 0) > 0" [class.text-red-600]="(item.stock ?? 0) <= 0">
+                        {{ (item.stock ?? 0) > 0 ? 'Stock: ' + item.stock + ' unidades' : 'Sin Stock actualmente' }}
+                      </li>
                     </ul>
                   </div>
                </div>

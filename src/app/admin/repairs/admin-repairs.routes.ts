@@ -7,6 +7,11 @@ export const ADMIN_REPAIRS_ROUTES: Routes = [
     loadComponent: () => import('./admin-repairs-page').then(m => m.AdminRepairsPage)
   },
   {
+    path: 'stats',
+    title: 'Estadísticas y BI',
+    loadComponent: () => import('./stats/repair-stats.component').then(m => m.AdminRepairStatsComponent)
+  },
+  {
     path: 'new',
     title: 'Nueva Reparación',
     loadComponent: () => import('./admin-repair-form-page').then(m => m.AdminRepairFormPage)

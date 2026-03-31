@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { DatabaseError } from '../errors/application.error';
 import { LoggerService } from './logger.service';
@@ -18,6 +19,19 @@ export interface Tenant {
     logo_url?: string | null;
     favicon_url?: string | null;
     primary_color?: string;
+    secondary_color?: string;
+    company_name?: string;
+    address?: string;
+    email?: string;
+    phone?: string;
+    whatsapp?: string;
+  };
+  features?: {
+    hasProducts?: boolean;
+    hasServices?: boolean;
+    hasCourses?: boolean;
+    hasRepairs?: boolean;
+    hasBlog?: boolean;
   };
   currency: string;
   tax_percentage: number;
@@ -27,6 +41,12 @@ export interface Tenant {
   location?: string;
   contact_phone?: string;
   contact_email?: string;
+  business_hours?: string;
+  social_links?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
 }
 
 @Injectable({
@@ -43,6 +63,9 @@ export class TenantService {
   
   private _isInitialized = signal<boolean>(false);
   public isInitialized = this._isInitialized.asReadonly();
+  
+  // Create observable here to capture injection context
+  private _currentTenant$ = toObservable(this._currentTenant);
 
   /**
    * Inicializa el servicio resolviendo el tenant desde el hostname actual.
@@ -79,7 +102,7 @@ export class TenantService {
    * Resuelve el Tenant basado en el Hostname o Custom Domain de la URL del visitante.
    */
   async resolveTenantByHostname(hostname: string): Promise<Tenant | null> {
-    this.logger.info(`Resolving tenant for hostname: ${hostname}`);
+    // console.debug(`Resolving tenant for hostname: ${hostname}`);
     try {
       // 1. Buscamos primero si el negocio configuró un Custom Domain (Ej: mibau.com.ar)
       let { data, error } = await this.supabase
@@ -103,7 +126,7 @@ export class TenantService {
           ? 'arecofix' 
           : extractSubdomain;
 
-        this.logger.debug(`Searching for tenant by slug: ${slugToSearch}`);
+        // console.debug(`Searching for tenant by slug: ${slugToSearch}`);
         const { data: slugData, error: slugError } = await this.supabase
           .from('tenants')
           .select('*')
@@ -184,7 +207,108 @@ export class TenantService {
       }
     }
     
-    this.logger.info(`Context switched to Tenant: ${tenant.name} (${tenant.id})`);
+    // this.logger.info(`Context switched to Tenant: ${tenant.name} (${tenant.id})`);
+  }
+
+  /**
+   * Obtiene el tenant actual (Síncrono para compatibilidad)
+   */
+  getCurrentTenant(): Tenant | null {
+    return this._currentTenant();
+  }
+
+  /**
+   * Obtiene el tenant actual como Observable (para compatibilidad RxJS)
+   */
+  getCurrentTenant$(): Observable<Tenant | null> {
+    return this._currentTenant$;
+  }
+
+  /**
+   * Verifica si estamos en el tenant principal
+   */
+  isMainTenant(): boolean {
+    const current = this._currentTenant();
+    return current?.slug === 'arecofix' || 
+           current?.id === '00000000-0000-0000-0000-000000000000' ||
+           !current;
+  }
+
+  /**
+   * Verifica si estamos en una sucursal
+   */
+  isBranch(): boolean {
+    return !this.isMainTenant();
+  }
+
+  /**
+   * Verifica si coincide el hostname con los dominios principales de la plataforma
+   */
+  isMainDomain(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return true;
+    const hostname = window.location.hostname;
+    return hostname.includes('localhost') || 
+           hostname === 'arecofix.com.ar' || 
+           hostname === 'www.arecofix.com.ar' ||
+           hostname.endsWith('.web.app') || // Firebase default
+           hostname.endsWith('.firebaseapp.com'); // Firebase default
+  }
+
+  /**
+   * Verifica si el ID coincide con el activo
+   */
+  isCurrentTenant(tenantId: string): boolean {
+    return this._currentTenant()?.id === tenantId;
+  }
+
+  /**
+   * Obtiene todas las sucursales (async para cumplimiento de guardias legacy)
+   */
+  getBranches(): any[] {
+     const current = this._currentTenant();
+     return current && !this.isMainTenant() ? [current] : [];
+  }
+
+  /**
+   * Establece un tenant por ID (Async)
+   */
+  async setCurrentTenant(tenantId: string): Promise<void> {
+    if (tenantId === 'central') {
+       await this.resolveTenantByHostname('arecofix.com.ar');
+       return;
+    }
+    
+    // Si ya es el actual, no hacer nada
+    if (this._currentTenant()?.id === tenantId) return;
+
+    const { data, error } = await this.supabase
+      .from('tenants')
+      .select('*')
+      .eq('id', tenantId)
+      .maybeSingle();
+
+    if (data) {
+      this.setTenant(data as Tenant);
+    }
+  }
+
+  /**
+   * Busca un tenant por su slug
+   */
+  async getTenantBySlug(slug: string): Promise<Tenant | null> {
+    const { data, error } = await this.supabase
+      .from('tenants')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_active', true)
+      .maybeSingle();
+    
+    if (error) {
+      this.logger.error(`Error fetching tenant by slug ${slug}: ${error.message}`);
+      return null;
+    }
+    
+    return data as Tenant;
   }
 
   /**

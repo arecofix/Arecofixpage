@@ -6,18 +6,18 @@ import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 
 export const publicRoutes: Routes = [
   {
-    title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
+    title: 'Arecofix',
     path: '',
     component: PublicLayout,
     canActivate: [TenantIsolationGuard],
     children: [
       {
-        title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
+        title: 'Arecofix',
         path: '',
         component: PublicHomePage,
         data: {
             seo: {
-                title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
+                title: 'Arecofix',
                 description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
                 imageUrl: 'assets/img/branding/og-services.jpg'
             }

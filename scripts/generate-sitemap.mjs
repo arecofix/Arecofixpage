@@ -50,6 +50,7 @@ async function generateSitemap() {
   }
   
   // 3. Fetch All Active Products (with Pagination)
+  console.log('Fetching active products for sitemap & routes...');
   let allProducts = [];
   let fromIdx = 0;
   let hasMore = true;
@@ -58,13 +59,13 @@ async function generateSitemap() {
   while (hasMore) {
     const { data: products, error } = await supabase
       .from('products')
-      .select('slug')
+      .select('slug, name')
       .eq('is_active', true)
-      .is('deleted_at', null)
+      .limit(CHUNK)
       .range(fromIdx, fromIdx + CHUNK - 1);
 
     if (error) {
-      console.error('Error fetching products:', error);
+      console.error(' [31m[ERROR] Failed to fetch products from Supabase: [0m', error.message);
       break;
     }
 
@@ -78,6 +79,13 @@ async function generateSitemap() {
     } else {
       hasMore = false;
     }
+  }
+
+  console.log(`Found ${allProducts.length} active products.`);
+
+  if (allProducts.length === 0) {
+    console.warn(' [33m[WARNING] No products found! This will result in 0 product routes being pre-rendered. [0m');
+    console.warn(' [33mCheck if your products table has RLS policies allowing SELECT for the "anon" role. [0m');
   }
 
   allProducts.forEach(p => {

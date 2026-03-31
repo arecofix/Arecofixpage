@@ -7,133 +7,133 @@
     "@angular/cdk/drag-drop": {
       "src": "../../../../../../node_modules/@angular/cdk/fesm2022/drag-drop.mjs",
       "file": "@angular_cdk_drag-drop.js",
-      "fileHash": "ce582e0a",
+      "fileHash": "8605afae",
       "needsInterop": false
     },
     "@angular/common": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
       "file": "@angular_common.js",
-      "fileHash": "7ecdee50",
+      "fileHash": "c71b7543",
       "needsInterop": false
     },
     "@angular/common/http": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
       "file": "@angular_common_http.js",
-      "fileHash": "d783e62c",
+      "fileHash": "b36ba475",
       "needsInterop": false
     },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
-      "fileHash": "5ac6cdcb",
+      "fileHash": "26061721",
       "needsInterop": false
     },
     "@angular/core/rxjs-interop": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/rxjs-interop.mjs",
       "file": "@angular_core_rxjs-interop.js",
-      "fileHash": "06091180",
+      "fileHash": "590552d6",
       "needsInterop": false
     },
     "@angular/forms": {
       "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
       "file": "@angular_forms.js",
-      "fileHash": "9dbfd933",
+      "fileHash": "bc178aff",
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
-      "fileHash": "9bf266b1",
+      "fileHash": "f4a96b64",
       "needsInterop": false
     },
     "@angular/platform-server/init": {
       "src": "../../../../../../node_modules/@angular/platform-server/fesm2022/init.mjs",
       "file": "@angular_platform-server_init.js",
-      "fileHash": "564f06ee",
+      "fileHash": "6dbbfbe1",
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
-      "fileHash": "33bb96db",
+      "fileHash": "36e49158",
       "needsInterop": false
     },
     "@angular/ssr": {
       "src": "../../../../../../node_modules/@angular/ssr/fesm2022/ssr.mjs",
       "file": "@angular_ssr.js",
-      "fileHash": "c2471356",
+      "fileHash": "f9242803",
       "needsInterop": false
     },
     "@angular/ssr/node": {
       "src": "../../../../../../node_modules/@angular/ssr/fesm2022/node.mjs",
       "file": "@angular_ssr_node.js",
-      "fileHash": "29359cdf",
+      "fileHash": "6378c616",
       "needsInterop": false
     },
     "@capacitor/app": {
       "src": "../../../../../../node_modules/@capacitor/app/dist/esm/index.js",
       "file": "@capacitor_app.js",
-      "fileHash": "021565ca",
+      "fileHash": "7cc9cf47",
       "needsInterop": false
     },
     "@capacitor/browser": {
       "src": "../../../../../../node_modules/@capacitor/browser/dist/esm/index.js",
       "file": "@capacitor_browser.js",
-      "fileHash": "44895851",
+      "fileHash": "dd496289",
       "needsInterop": false
     },
     "@mlc-ai/web-llm": {
       "src": "../../../../../../node_modules/@mlc-ai/web-llm/lib/index.js",
       "file": "@mlc-ai_web-llm.js",
-      "fileHash": "44ee14f1",
+      "fileHash": "3455c5fa",
       "needsInterop": false
     },
     "@supabase/supabase-js": {
       "src": "../../../../../../node_modules/@supabase/supabase-js/dist/index.mjs",
       "file": "@supabase_supabase-js.js",
-      "fileHash": "983f1cf2",
+      "fileHash": "9bde94f5",
       "needsInterop": false
     },
     "express": {
       "src": "../../../../../../node_modules/express/index.js",
       "file": "express.js",
-      "fileHash": "4c11f3c1",
+      "fileHash": "cfa89fd4",
       "needsInterop": true
     },
     "jspdf": {
       "src": "../../../../../../node_modules/jspdf/dist/jspdf.node.min.js",
       "file": "jspdf.js",
-      "fileHash": "9d3bc814",
+      "fileHash": "0d59dcab",
       "needsInterop": true
     },
     "jspdf-autotable": {
       "src": "../../../../../../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.mjs",
       "file": "jspdf-autotable.js",
-      "fileHash": "bc64b230",
+      "fileHash": "03d837b0",
       "needsInterop": false
     },
     "ng2-charts": {
       "src": "../../../../../../node_modules/ng2-charts/fesm2022/ng2-charts.mjs",
       "file": "ng2-charts.js",
-      "fileHash": "79ebe7c0",
+      "fileHash": "fbbbe910",
       "needsInterop": false
     },
     "posthog-js": {
       "src": "../../../../../../node_modules/posthog-js/dist/module.js",
       "file": "posthog-js.js",
-      "fileHash": "5fc903fd",
+      "fileHash": "c2585d40",
       "needsInterop": false
     },
     "rxjs": {
       "src": "../../../../../../node_modules/rxjs/dist/cjs/index.js",
       "file": "rxjs.js",
-      "fileHash": "5f0c1b05",
+      "fileHash": "b06bcd8b",
       "needsInterop": true
     },
     "rxjs/operators": {
       "src": "../../../../../../node_modules/rxjs/dist/cjs/operators/index.js",
       "file": "rxjs_operators.js",
-      "fileHash": "079ed1e8",
+      "fileHash": "44debd80",
       "needsInterop": true
     }
   },
@@ -150,20 +150,20 @@
     "chunk-PUCS3D5Y": {
       "file": "chunk-PUCS3D5Y.js"
     },
-    "chunk-LUWNUKHY": {
-      "file": "chunk-LUWNUKHY.js"
+    "chunk-NHRHAUYE": {
+      "file": "chunk-NHRHAUYE.js"
     },
-    "chunk-JWEG3AM2": {
-      "file": "chunk-JWEG3AM2.js"
+    "chunk-EH6ENNXP": {
+      "file": "chunk-EH6ENNXP.js"
     },
-    "chunk-XZW6R5US": {
-      "file": "chunk-XZW6R5US.js"
-    },
-    "chunk-7ZVUTWRO": {
-      "file": "chunk-7ZVUTWRO.js"
+    "chunk-EIPM642T": {
+      "file": "chunk-EIPM642T.js"
     },
     "chunk-R5OCHRIS": {
       "file": "chunk-R5OCHRIS.js"
+    },
+    "chunk-7ZVUTWRO": {
+      "file": "chunk-7ZVUTWRO.js"
     },
     "chunk-V5RSY5U6": {
       "file": "chunk-V5RSY5U6.js"

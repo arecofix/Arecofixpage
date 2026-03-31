@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SeoService } from '@app/core/services/seo.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CoursesService, Course, Module } from '@app/core/services/courses.service';
 import { switchMap, catchError } from 'rxjs/operators';
@@ -20,6 +21,7 @@ export class CourseDetailComponent implements OnInit {
   private coursesService = inject(CoursesService);
   private cd = inject(ChangeDetectorRef);
   private sanitizer = inject(DomSanitizer);
+  private seoService = inject(SeoService);
 
   course: Course | null = null;
   loading = true;
@@ -157,6 +159,7 @@ export class CourseDetailComponent implements OnInit {
           }
 
           this.course = courseData;
+          if (this.course) this.setSEO(this.course);
           this.loadModules(this.course!.id);
           this.loading = false;
           this.cd.detectChanges();
@@ -242,5 +245,40 @@ export class CourseDetailComponent implements OnInit {
           this.registering = false;
           this.cd.detectChanges(); // Force update to hide loading state
       }
+  }
+
+  private setSEO(course: Course) {
+    const description = course.description || `Convertite en profesional con nuestro curso de ${course.title} en Arecofix Academy.`;
+    const imageUrl = course.image_url || 'assets/img/branding/og-academy.jpg';
+
+    this.seoService.setPageData({
+      title: `${course.title} | Arecofix Academy`,
+      description: description,
+      imageUrl: imageUrl,
+      type: 'article'
+    });
+
+    this.setWhatsAppOgTags(imageUrl, description, course.title);
+  }
+
+  private setWhatsAppOgTags(imageUrl: string, description: string, courseTitle: string): void {
+     if (typeof document === 'undefined') return;
+     const meta = document.head;
+     const setOrCreate = (property: string, content: string) => {
+       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
+       if (!el) {
+         el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el);
+       }
+       el.setAttribute('content', content);
+     };
+     const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `${window.location.host === 'localhost:4200' ? 'http://localhost:4200' : 'https://arecofix.com.ar'}/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
+     setOrCreate('og:title', `${courseTitle} | Arecofix Academy`);
+     setOrCreate('og:image', absoluteImageUrl);
+     setOrCreate('og:image:secure_url', absoluteImageUrl);
+     setOrCreate('og:image:width', '1200');
+     setOrCreate('og:image:height', '630');
+     setOrCreate('og:description', description);
+     setOrCreate('og:site_name', 'Arecofix Academy');
+     setOrCreate('og:type', 'article');
   }
 }

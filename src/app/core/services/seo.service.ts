@@ -22,7 +22,7 @@ const SEO_DATA_KEY = makeStateKey<SeoData>('SEO_DATA');
 // Dictionary of predefined Meta Tags based on internal routes
 export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
   '/': {
-    title: 'Soluciones de Software & Consultoría IT',
+    title: 'Soluciones Informáticas - Consultoría IT | Arecofix',
     description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
     imageUrl: 'assets/img/branding/og-services.jpg'
   },
@@ -105,8 +105,23 @@ export class SeoService {
         }
       }
 
-      // If no static or activated route data exists, enforce absolute defaults
+      // 3. Fallback to defaults (ONLY if not a dynamic detail route)
       if (!seoData) {
+        const isDynamic = currentPath.includes('/detalle/') || 
+                         currentPath.includes('/posts/') || 
+                         currentPath.includes('/tracking/') || 
+                         currentPath.includes('/categoria/');
+
+        if (isDynamic) {
+          // Force set the URL to avoid root duplicate detection by Facebook
+          this.setPageData({
+             title: 'Arecofix',
+             description: 'Reparación de celulares y servicios IT especializados.',
+             url: currentPath 
+          });
+          return;
+        }
+
         seoData = {
           title: 'Arecofix - Servicio Técnico de Celulares y Soluciones IT',
           description: 'Experto en reparación de celulares en el acto, desarrollo web y transformación digital en Marcos Paz.',
@@ -150,9 +165,9 @@ export class SeoService {
     }
 
     const { 
-        title, 
-        description, 
-        imageUrl, 
+        title = 'Arecofix', 
+        description = 'Reparación de celulares y servicios IT especializados.', 
+        imageUrl = 'assets/img/branding/og-services.jpg', 
         type = 'website', 
         keywords, 
         schema,
@@ -198,6 +213,9 @@ export class SeoService {
     this.metaService.updateTag({ property: 'og:type', content: type });
     this.metaService.updateTag({ property: 'og:url', content: finalUrl });
     this.metaService.updateTag({ property: 'og:image', content: finalImageUrl });
+    this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
+    this.metaService.updateTag({ property: 'og:image:height', content: '630' });
+    
     if (finalImageUrl.startsWith('https')) {
         this.metaService.updateTag({ property: 'og:image:secure_url', content: finalImageUrl });
     }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { TenantIsolatedDashboardService, TenantDashboardStats } from './services/tenant-isolated-dashboard.service';
 import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/shared/services/tenant.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -28,11 +28,13 @@ export class BranchDashboardComponent implements OnInit {
     revenue: 0,
     repairs_month: 0,
     repairs_revenue: 0,
+    repairs_profit: 0,
     devices_fixed: 0,
     pending_approvals: 0, // Agregada propiedad faltante
     sales_chart: [],
     products_chart: [],
     category_chart: [],
+    profit_chart: [],
     tenantId: '',
     isBranchAdmin: false,
     branchName: ''

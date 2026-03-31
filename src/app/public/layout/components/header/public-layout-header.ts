@@ -26,6 +26,7 @@ import { NavItem } from '@app/shared/models/navigation.model';
 import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/models/navigation.data';
 import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
 import { ThemeToggleComponent } from '@app/shared/components/theme-toggle/theme-toggle.component';
+import { SearchUtils } from '@app/shared/utils/search.utils';
 import { map } from 'rxjs/operators';
 import { Subscription, firstValueFrom } from 'rxjs';
 
@@ -92,15 +93,19 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   public showResults = signal(false);
 
   public filteredProducts = computed(() => {
-    const query = this.searchQuery().toLowerCase();
+    const query = this.searchQuery().trim();
     if (!query) return [];
+
     return this.products()
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.sku?.toLowerCase().includes(query) ||
-          p.barcode?.toLowerCase().includes(query)
-      )
+      .filter((p) => {
+        const searchScope = `${p.name} ${p.sku || ''} ${p.barcode || ''}`;
+        return SearchUtils.matches(query, searchScope);
+      })
+      .sort((a, b) => {
+          const scoreA = SearchUtils.getRelevanceScore(a.name, query);
+          const scoreB = SearchUtils.getRelevanceScore(b.name, query);
+          return scoreB - scoreA || a.name.localeCompare(b.name);
+      })
       .slice(0, 10);
   });
 

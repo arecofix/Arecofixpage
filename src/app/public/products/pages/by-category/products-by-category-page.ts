@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of, tap, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, catchError } from 'rxjs/operators';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { SeoService } from '@app/core/services/seo.service';
 
 import {
   IsErrorComponent,
@@ -50,6 +51,7 @@ export class ProductsByCategoryPage {
   private productService: ProductService = inject(ProductService);
   public paginationService: PaginationService = inject(PaginationService);
   public cartService: CartService = inject(CartService);
+  private seoService: SeoService = inject(SeoService);
 
   public currentCategory = signal<iCategory | null>(null);
   /** Stores the full ancestor chain (root → ... → current) for hierarchical breadcrumbs */
@@ -173,8 +175,10 @@ export class ProductsByCategoryPage {
                   allCategories as iCategory[]
                 );
                 this.ancestorChain.set(chain);
+                this.setSEO(cat);
               } else {
                 this.ancestorChain.set(cat ? [cat] : []);
+                if (cat) this.setSEO(cat);
               }
             }),
             switchMap(({ categoryResponse, allCategories }) => {
@@ -281,6 +285,52 @@ export class ProductsByCategoryPage {
        },
        queryParamsHandling: 'merge',
      });
+  }
+
+  private setSEO(category: iCategory) {
+    const description = category.description || `Explorá nuestra selección de ${category.name} en Arecofix. Calidad y mejores precios garantizados.`;
+    const imageUrl = category.image_url || 'assets/img/branding/og-services.jpg';
+
+    this.seoService.setPageData({
+      title: `${category.name} | Arecofix`,
+      description: description,
+      imageUrl: imageUrl,
+      type: 'website'
+    });
+    
+    // Extra OG tags for WhatsApp
+    this.setWhatsAppOgTags(imageUrl, description, category.name);
+  }
+
+  private setWhatsAppOgTags(imageUrl: string, description: string, categoryName: string): void {
+     // Check if we are in the browser
+     if (typeof document === 'undefined') return;
+
+     const meta = document.head;
+     const setOrCreate = (property: string, content: string) => {
+       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
+       if (!el) {
+         el = document.createElement('meta');
+         el.setAttribute('property', property);
+         document.head.appendChild(el);
+       }
+       el.setAttribute('content', content);
+     };
+
+     // Ensure absolute image URL
+     const absoluteImageUrl = imageUrl.startsWith('http') 
+        ? imageUrl 
+        : `https://arecofix.com.ar/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
+
+     setOrCreate('og:title', `${categoryName} | Arecofix`);
+     setOrCreate('og:image', absoluteImageUrl);
+     setOrCreate('og:image:secure_url', absoluteImageUrl);
+     setOrCreate('og:image:width', '1200');
+     setOrCreate('og:image:height', '630');
+     setOrCreate('og:image:type', 'image/jpeg');
+     setOrCreate('og:description', description);
+     setOrCreate('og:site_name', 'Arecofix');
+     setOrCreate('og:type', 'website');
   }
 }
 export default ProductsByCategoryPage;

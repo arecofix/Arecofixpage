@@ -13,4 +13,22 @@ export class TrackingService {
         // Use the RPC function we defined in the migration for secure access
         return await supabase.rpc('get_repair_by_tracking', { t_code: code });
     }
+
+    async acceptUpsell(code: string) {
+        const supabase = this.auth.getSupabaseClient();
+        return await supabase.rpc('accept_upsell_vidrio', { p_tracking_code: code });
+    }
+
+    async getRecommendedAccessories(code: string) {
+        const supabase = this.auth.getSupabaseClient();
+        return await supabase.rpc('get_recommended_accessories', { p_tracking_code: code });
+    }
+
+    async addAccessoryUpsell(code: string, productId: string) {
+        const supabase = this.auth.getSupabaseClient();
+        return await supabase.rpc('add_upsell_item_to_repair', { 
+            p_tracking_code: code,
+            p_product_id: productId
+        });
+    }
 }

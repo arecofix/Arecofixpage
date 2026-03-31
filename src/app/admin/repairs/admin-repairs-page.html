@@ -33,46 +33,30 @@
         </div>
     }
 
-    <!-- Stats Dashboard (SaaS Style) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 100ms;">
-        <!-- Total Orders KPI -->
-        <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300">
-            <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-blue-400 to-indigo-500 opacity-80"></div>
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">En Sistema</div>
-                <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center"><i class="fas fa-clipboard-list"></i></div>
+    <!-- BI Dashboard Entry Point -->
+    <div class="mb-8 w-full animate-fade-in-up" style="animation-delay: 100ms;">
+        <div class="bg-gray-900 rounded-4xl p-1 shadow-xl relative overflow-hidden group">
+            <div class="absolute -inset-1 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+            <div class="relative bg-gray-900 rounded-[calc(2rem-4px)] p-6 z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white tracking-wide">Inteligencia Financiera</h3>
+                        <p class="text-gray-400 text-sm font-medium mt-1">Análisis de rentabilidad real: Ingresos Brutos vs Costo de Insumos</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6 w-full md:w-auto">
+                    <div class="hidden sm:block text-right">
+                        <div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">En Laboratorio</div>
+                        <div class="text-xl font-black text-emerald-400">{{ inWorkshopCount() }} <span class="text-xs text-gray-400 font-medium tracking-normal ml-1">equipos</span></div>
+                    </div>
+                    <a routerLink="/admin/repairs/stats" class="btn w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white border-none rounded-2xl shadow-[0_4px_20px_rgba(99,102,241,0.4)] flex items-center gap-2 transition-all">
+                        Ver Dashboard <i class="fas fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
             </div>
-            <div class="text-3xl font-black text-gray-900 dark:text-white">{{ mappedRepairs().length }}</div>
-        </div>
-
-        <!-- In Workshop KPI -->
-        <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-orange-100 dark:hover:border-orange-900 transition-all duration-300">
-            <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-orange-400 to-amber-500 opacity-80"></div>
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">En Taller</div>
-                <div class="w-8 h-8 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center"><i class="fas fa-cogs"></i></div>
-            </div>
-            <div class="text-3xl font-black text-gray-900 dark:text-white">{{ inWorkshopCount() }}</div>
-        </div>
-
-        <!-- Ready KPI -->
-        <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-emerald-100 dark:hover:border-emerald-900 transition-all duration-300">
-            <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-emerald-400 to-teal-500 opacity-80"></div>
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">Para Retirar</div>
-                <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
-            </div>
-            <div class="text-3xl font-black text-gray-900 dark:text-white">{{ readyToPickupCount() }}</div>
-        </div>
-
-        <!-- Pending Parts KPI -->
-        <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-purple-100 dark:hover:border-purple-900 transition-all duration-300">
-            <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold tracking-wider uppercase">Esperando Resp.</div>
-                <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-500 flex items-center justify-center"><i class="fas fa-truck-loading"></i></div>
-            </div>
-            <div class="text-3xl font-black text-gray-900 dark:text-white">{{ pendingPartsCount() }}</div>
         </div>
     </div>
 
@@ -89,7 +73,7 @@
         <!-- Filter Dropdown -->
         <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="w-full lg:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-300 cursor-pointer appearance-none">
             <option value="all">📁 Ver Todos los Equipos</option>
-            <option value="smartphone">📱 SmartPhones</option>
+            <option value="smartphone">📱 Celulares</option>
             <option value="pc">💻 PC / Desktop</option>
             <option value="notebook">💻 Notebooks</option>
             <option value="console">🎮 Consolas</option>
@@ -153,6 +137,11 @@
                             <div class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                 <i class="fas fa-mobile-alt text-gray-400 dark:text-gray-500"></i> {{ repair.device_model }}
                             </div>
+                            @if(repair.upsell_vidrio) {
+                                <span class="mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex w-fit items-center gap-1 shadow-[0_2px_10px_rgba(168,85,247,0.2)]">
+                                    <i class="fas fa-star text-amber-500"></i> Vidrio Adicional
+                                </span>
+                            }
                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-[200px] truncate" [title]="repair.issue_description">
                                  {{ repair.issue_description }}
                             </div>
@@ -219,6 +208,13 @@
                          <div class="flex items-center gap-2 mb-2 font-bold text-gray-800 dark:text-gray-200 text-sm">
                              <i class="fas fa-mobile-alt text-gray-400"></i> {{ repair.device_model }}
                          </div>
+                         @if(repair.upsell_vidrio) {
+                             <div class="mb-2">
+                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 inline-flex items-center gap-1 shadow-sm">
+                                     <i class="fas fa-star text-amber-500"></i> Vidrio Adicional
+                                 </span>
+                             </div>
+                         }
                          <p class="text-[11px] text-gray-600 dark:text-gray-400 italic line-clamp-2 leading-relaxed border-l-2 border-emerald-500/30 pl-2">
                              "{{ repair.issue_description }}"
                          </p>

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { EmployeeService } from '@app/features/customers/application/services/employee.service';
-import { TenantService } from '@app/shared/services/tenant.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 interface AvailableUser {
     id: string;

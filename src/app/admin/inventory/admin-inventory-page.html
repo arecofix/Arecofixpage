@@ -94,10 +94,11 @@
             </select>
 
             <!-- Sort -->
-            <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full lg:w-auto">
+            <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered w-full lg:w-auto font-bold">
+              <option value="relevance">Relevancia / Nombre</option>
               <option value="stock_asc">Menor Stock Primero</option>
               <option value="stock_desc">Mayor Stock Primero</option>
-              <option value="name_asc">Nombre (A-Z)</option>
+              <option value="name_asc">Alfabetico (A-Z)</option>
             </select>
           </div>
 

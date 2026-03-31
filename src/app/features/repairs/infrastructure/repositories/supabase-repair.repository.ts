@@ -5,6 +5,7 @@ import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto, RepairPart } from '../../domain/entities/repair.entity';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { DatabaseError } from '@app/core/errors/application.error';
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +18,15 @@ export class SupabaseRepairRepository extends RepairRepository {
     protected useSoftDeletes = true;
 
     private applyTenantFilter(query: any) {
-        let enhancedQuery = query.eq('tenant_id', this.tenantService.getTenantId());
+        const tenantId = this.tenantService.getTenantId();
+        let enhancedQuery = query;
+
+        // If tenantId is our fallback (zeros), bypass direct eq filter 
+        // and allow Supabase RLS policies to handle identification.
+        if (tenantId !== '00000000-0000-0000-0000-000000000000') {
+            enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+        }
+
         if (this.useSoftDeletes) {
             enhancedQuery = enhancedQuery.is('deleted_at', null);
         }
@@ -32,7 +41,7 @@ export class SupabaseRepairRepository extends RepairRepository {
         return from((this.applyTenantFilter(query) as any).maybeSingle()).pipe(
             map((res: any) => {
                 const { data, error } = res;
-                if (error) throw error;
+                if (error) throw new DatabaseError(error.message, error);
                 return data ? this.mapFromDb(data) : null;
             })
         );
@@ -134,7 +143,7 @@ export class SupabaseRepairRepository extends RepairRepository {
     }
 
     delete(id: string): Observable<void> {
-        let query = this.supabase.from('repairs').delete().eq('id', id);
+        let query = this.supabase.from('repairs').update({ deleted_at: new Date().toISOString() }).eq('id', id);
         return from(this.applyTenantFilter(query) as any).pipe(
             map((res: any) => {
                 const { error } = res;
@@ -143,14 +152,14 @@ export class SupabaseRepairRepository extends RepairRepository {
         );
     }
 
-    getByTrackingCode(code: string): Observable<Repair> {
+    getByTrackingCode(code: string): Observable<Repair | null> {
         // Use RPC function to bypass RLS for public tracking access
         return from(this.supabase.rpc('get_repair_by_tracking', { t_code: code }) as any).pipe(
             map((res: any) => {
                 const { data, error } = res;
                 if (error) throw error;
                 if (!data || (Array.isArray(data) && data.length === 0)) {
-                    throw new Error('No repair found');
+                    return null;
                 }
                 const repairData = Array.isArray(data) ? data[0] : data;
                 return this.mapFromDb(repairData);
@@ -182,7 +191,7 @@ export class SupabaseRepairRepository extends RepairRepository {
         
         let query = this.supabase
             .from('repairs')
-            .select('*')
+            .select('*, parts:repair_parts_used(*)')
             .range(offset, offset + limit - 1);
 
         if (branch_id) {
@@ -203,25 +212,35 @@ export class SupabaseRepairRepository extends RepairRepository {
     private mapFromDb(data: any): Repair {
         return {
             ...data,
+            customer_id: data.client_id, // Mapear client_id de DB a customer_id de Entidad
             device_brand: data.device_brand || 'generic', 
-            images: data.images ? data.images.map((img: any) => typeof img === 'string' ? img : img.image_url) : []
+            device_type: data.device_type || 'smartphone',
+            images: data.images 
+                ? data.images.map((img: any) => typeof img === 'string' ? img : (img.image_url || img)) 
+                : []
         } as Repair;
     }
 
     private mapToDb(entity: Partial<UpdateRepairDto>): any {
-        const { device_brand, device_type, images, ...rest } = entity as any;
-        const payload: any = { ...rest };
+        const { images, parts, customer_id, ...payload } = entity as any;
         
-        // Handle device_model concatenation if brand/type provided externally
-        if (device_brand || device_type) {
-            let model = payload.device_model || '';
-            if (device_brand && device_brand.toLowerCase() !== 'generic') {
-                model = `${device_brand} ${model}`;
+        // Mapear customer_id de Entidad a client_id de DB
+        if (customer_id) {
+            payload.client_id = customer_id;
+        }
+
+        // Asegurar que device_brand y device_type tengan valores si faltan
+        payload.device_brand = payload.device_brand || 'generic';
+        payload.device_type = payload.device_type || 'smartphone';
+
+        // Ensure device_model doesn't end up with duplicate brands
+        if (payload.device_brand && payload.device_brand.toLowerCase() !== 'generic' && payload.device_model) {
+            const brand = payload.device_brand.toLowerCase();
+            const model = payload.device_model.toLowerCase();
+            
+            if (!model.startsWith(brand)) {
+                payload.device_model = `${payload.device_brand} ${payload.device_model}`.trim();
             }
-            if (device_type && device_type !== 'smartphone') {
-                model = `${model} (${device_type})`;
-            }
-            payload.device_model = model.trim();
         }
 
         return payload;

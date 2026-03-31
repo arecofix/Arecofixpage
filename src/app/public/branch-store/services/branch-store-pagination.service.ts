@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/shared/services/tenant.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 export interface PaginatedProducts {
   data: Product[];

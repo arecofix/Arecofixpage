@@ -8,7 +8,7 @@ import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
 import { ThemeService } from './core/services/theme.service';
-import { TenantService } from './shared/services/tenant.service';
+import { TenantService } from './core/services/tenant.service';
 
 @Component({
 
@@ -26,8 +26,8 @@ export class App implements OnInit {
   private analytics = inject(AnalyticsService);
   private logger = inject(LoggerService);
   private seoService = inject(SeoService);
-  private themeService = inject(ThemeService); // Ensures theme is applied before first paint
-  private tenantService = inject(TenantService); // Guardián del ecosistema SaaS
+  private themeService = inject(ThemeService); 
+  private tenantService = inject(TenantService); 
   private platformId = inject(PLATFORM_ID);
   private document = inject(DOCUMENT);
 
@@ -36,11 +36,13 @@ export class App implements OnInit {
 
     if (isPlatformBrowser(this.platformId)) {
       // Inicializar el servicio de tenants primero
+      /*
       this.tenantService.getCurrentTenant$().subscribe((tenant: any) => {
         if (tenant) {
-          console.log(`🏢 Tenant activo: ${tenant.name} (${tenant.isMain ? 'Principal' : 'Sucursal'})`);
+          console.debug(`🏢 Tenant activo: ${tenant.name} (${this.tenantService.isMainTenant() ? 'Principal' : 'Sucursal'})`);
         }
       });
+      */
 
       // SEO Redirection Rule Heredada
       const currentHost = window.location.hostname;

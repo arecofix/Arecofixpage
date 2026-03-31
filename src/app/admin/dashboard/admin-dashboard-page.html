@@ -10,7 +10,7 @@
                  </span>
                  Panel de Control
                  @if (isSuperAdmin()) {
-                     <span class="text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-1 rounded-full shadow-lg">
+                     <span class="text-sm font-bold text-white bg-linear-to-r from-purple-600 to-pink-600 px-3 py-1 rounded-full shadow-lg">
                          Super Admin
                      </span>
                  }
@@ -42,7 +42,7 @@
     } @else {
         
         <!-- KPIs Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 100ms;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 100ms;">
             
             <!-- KPI: Ingresos Totales (Tienda) -->
             <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300">
@@ -53,31 +53,32 @@
                     </div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ingresos Tienda</div>
-                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
             </div>
 
-            <!-- KPI: Ganancia Taller -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-emerald-100 dark:hover:border-emerald-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-emerald-400 to-teal-500 opacity-80"></div>
+            <!-- KPI: Ingresos Taller -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-teal-100 dark:hover:border-teal-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-teal-400 to-emerald-500 opacity-80"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
                         <i class="fas fa-tools"></i>
                     </div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Mes Rep. (Ganancia)</div>
-                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().repairs_revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ventas Taller</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().repairs_revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
             </div>
 
-            <!-- KPI: Ventas Exitosas -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-purple-100 dark:hover:border-purple-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
+            <!-- KPI: Ganancia Estimada -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-emerald-100 dark:hover:border-emerald-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-emerald-400 to-green-500 opacity-80"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
-                        <i class="fas fa-shopping-cart"></i>
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                        <i class="fas fa-hand-holding-usd"></i>
                     </div>
+                    <div class="badge badge-success text-[10px] text-white border-none font-bold">GANANCIA</div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Cant. Ventas</div>
-                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().sales }}</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ganancia Estimada</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().repairs_profit | currency:'ARS':'symbol':'1.0-0' }}</div>
             </div>
 
             <!-- KPI: Equipos Arreglados -->
@@ -89,7 +90,19 @@
                     </div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Equipos Fix.</div>
-                <div class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().devices_fixed }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().devices_fixed }}</div>
+            </div>
+
+            <!-- KPI: Pendientes -->
+            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-purple-100 dark:hover:border-purple-900 transition-all duration-300">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Pend. Aprobación</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().pending_approvals }}</div>
             </div>
 
         </div>
@@ -113,7 +126,7 @@
                             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-3xl p-4 border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-500/30 hover:shadow-md transition-all cursor-pointer group"
                                  (click)="goToBranch(branch.slug)">
                                 <div class="flex items-start justify-between mb-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                                    <div class="w-12 h-12 rounded-2xl bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                                         <i class="fas fa-store"></i>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -268,7 +281,7 @@
                     </a>
 
                     <a routerLink="/admin/products/approvals" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:border-violet-200 dark:hover:border-violet-500/30 hover:text-violet-600 dark:hover:text-violet-400 transition-all text-gray-600 dark:text-gray-300 group relative">
-                        @if (stats().pending_approvals > 0) {
+                        @if ((stats().pending_approvals ?? 0) > 0) {
                             <div class="absolute top-2 right-2 flex h-5 w-5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-5 w-5 bg-violet-500 text-white text-[10px] items-center justify-center font-black shadow-sm">

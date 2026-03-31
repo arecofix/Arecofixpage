@@ -21,7 +21,7 @@
   --color-hc-border: #ffffff;
 
   /* DaisyUI / Tailwind Theme Overrides - USE DYNAMIC VARS */
-  --color-primary: var(--color-brand-dark-blue-fav);
+  --color-primary: var(--primary-color, var(--color-brand-dark-blue-fav));
   --color-primary-content: #ffffff;
   --color-secondary: var(--color-brand-blue);
   --color-secondary-content: #ffffff;

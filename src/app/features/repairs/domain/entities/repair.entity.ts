@@ -59,6 +59,7 @@ export interface Repair {
     readonly branch_id?: string;
     readonly received_by?: string;
     readonly assigned_technician_id?: string;
+    readonly upsell_vidrio?: boolean;
     
     // Additional fields from form
     readonly checklist?: RepairChecklist;
@@ -102,6 +103,7 @@ export interface CreateRepairDto {
     received_by?: string;
     assigned_technician_id?: string;
     current_status_id?: number;
+    upsell_vidrio?: boolean;
 }
 
 /**
@@ -115,4 +117,5 @@ export interface UpdateRepairDto extends Partial<CreateRepairDto> {
     technician_notes?: string;
     completed_at?: string;
     parts?: RepairPart[];
+    upsell_vidrio?: boolean;
 }

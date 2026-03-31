@@ -12,6 +12,7 @@ import {
   IsLoadingComponent,
 } from '@app/shared/components/resource-status';
 import { PublicCategoryCard } from './components/';
+import { SeoService } from '@app/core/services/seo.service';
 
 @Component({
   selector: 'app-public-categories-home-page',
@@ -63,6 +64,47 @@ export class PublicCategoriesHomePage {
       (category) => !slugsToExclude.includes(category.slug.toLowerCase())
     );
   });
+
+  private seoService = inject(SeoService);
+
+  constructor() {
+    this.setSEO();
+  }
+
+  private setSEO() {
+    const description = 'Explorá nuestro catálogo de productos organizado por categorías: Repuestos, Herramientas, Celulares y más.';
+    const imageUrl = 'assets/img/branding/og-services.jpg';
+
+    this.seoService.setPageData({
+      title: 'Categorías de Productos | Arecofix',
+      description: description,
+      imageUrl: imageUrl,
+      type: 'website'
+    });
+
+    this.setWhatsAppOgTags(imageUrl, description, 'Categorías');
+  }
+
+  private setWhatsAppOgTags(imageUrl: string, description: string, name: string): void {
+     if (typeof document === 'undefined') return;
+     const meta = document.head;
+     const setOrCreate = (property: string, content: string) => {
+       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
+       if (!el) {
+         el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el);
+       }
+       el.setAttribute('content', content);
+     };
+     const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `https://arecofix.com.ar/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
+     setOrCreate('og:title', `${name} | Arecofix`);
+     setOrCreate('og:image', absoluteImageUrl);
+     setOrCreate('og:image:secure_url', absoluteImageUrl);
+     setOrCreate('og:image:width', '1200');
+     setOrCreate('og:image:height', '630');
+     setOrCreate('og:description', description);
+     setOrCreate('og:site_name', 'Arecofix');
+     setOrCreate('og:type', 'website');
+  }
 }
 
 export default PublicCategoriesHomePage;

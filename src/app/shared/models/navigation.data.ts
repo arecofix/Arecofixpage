@@ -289,6 +289,9 @@ export const THEME_STYLES: Record<string, { gradient: string; accent: string; bg
  */
 export const VIEW_ALL_LABELS: Record<string, string> = {
   tienda: 'Ver todos los productos',
+  'tienda-celulares': 'Ver todos los Celulares',
+  'tienda-repuestos': 'Ver todos los Repuestos',
+  'tienda-electronicos': 'Ver todo en Electrónica',
   servicios: 'Ver todos los servicios',
   academia: 'Ver toda la academia',
 };

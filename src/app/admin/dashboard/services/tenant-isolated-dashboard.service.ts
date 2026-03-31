@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/shared/services/tenant.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { AnalyticsRepository, DashboardStats } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 
@@ -107,11 +107,13 @@ export class TenantIsolatedDashboardService {
       revenue: Math.floor(globalStats.revenue * branchMultiplier),
       repairs_month: Math.floor(globalStats.repairs_month * branchMultiplier),
       repairs_revenue: Math.floor(globalStats.repairs_revenue * branchMultiplier),
+      repairs_profit: Math.floor(globalStats.repairs_profit * branchMultiplier),
       devices_fixed: Math.floor(globalStats.devices_fixed * branchMultiplier),
       pending_approvals: Math.floor((globalStats.pending_approvals || 0) * branchMultiplier),
       sales_chart: this.filterSalesChartByBranch(globalStats.sales_chart, branchMultiplier),
       products_chart: this.filterProductsChartByBranch(globalStats.products_chart, branchMultiplier),
       category_chart: this.filterCategoryChartByBranch(globalStats.category_chart, branchMultiplier),
+      profit_chart: this.filterProfitChartByBranch(globalStats.profit_chart, branchMultiplier),
       tenantId,
       isBranchAdmin: true,
       branchId,
@@ -153,6 +155,17 @@ export class TenantIsolatedDashboardService {
   }
 
   /**
+   * Filtra el gráfico de ganancias por sucursal
+   */
+  private filterProfitChartByBranch(profitChart: any[], multiplier: number): any[] {
+    if (!profitChart) return [];
+    return profitChart.map(item => ({
+      ...item,
+      total: Math.floor(item.total * multiplier)
+    }));
+  }
+
+  /**
    * Crea estadísticas vacías para cuando no hay datos
    */
   private createEmptyStats(
@@ -167,11 +180,13 @@ export class TenantIsolatedDashboardService {
       revenue: 0,
       repairs_month: 0,
       repairs_revenue: 0,
+      repairs_profit: 0,
       devices_fixed: 0,
       pending_approvals: 0, // Agregada propiedad faltante
       sales_chart: [],
       products_chart: [],
       category_chart: [],
+      profit_chart: [],
       tenantId,
       isBranchAdmin,
       branchId,

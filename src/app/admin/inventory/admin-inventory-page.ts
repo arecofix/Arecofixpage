@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { AdminProductService } from '../products/services/admin-product.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { SearchUtils } from '@app/shared/utils/search.utils';
 
 @Component({
     selector: 'app-admin-inventory-page',
@@ -25,7 +26,7 @@ export class AdminInventoryPage implements OnInit {
     // Filter & Sort
     categories = signal<any[]>([]);
     searchQuery = signal<string>('');
-    sortOrder = signal<'stock_asc' | 'stock_desc' | 'name_asc' | 'price_asc'>('stock_asc'); 
+    sortOrder = signal<'stock_asc' | 'stock_desc' | 'name_asc' | 'price_asc' | 'relevance'>('relevance'); 
     filterStatus = signal<'all' | 'low_stock' | 'out_of_stock'>('all');
     selectedCategoryId = signal<string>('all');
 
@@ -53,17 +54,23 @@ export class AdminInventoryPage implements OnInit {
 
         // 3. Filter by Search
         if (query) {
-            result = result.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                p.sku?.toLowerCase().includes(query) ||
-                p.barcode?.toLowerCase().includes(query)
-            );
+            result = result.filter(p => {
+                const searchScope = `${p.name} ${p.description || ''} ${p.sku || ''} ${p.barcode || ''}`;
+                return SearchUtils.matches(query, searchScope);
+            });
         }
 
         // 3. Sort
         const sort = this.sortOrder();
         return result.sort((a, b) => {
             switch (sort) {
+                case 'relevance': 
+                    if (query) {
+                        const scoreA = SearchUtils.getRelevanceScore(a.name, query);
+                        const scoreB = SearchUtils.getRelevanceScore(b.name, query);
+                        if (scoreA !== scoreB) return scoreB - scoreA;
+                    }
+                    return a.name.localeCompare(b.name);
                 case 'stock_asc': return a.stock - b.stock;
                 case 'stock_desc': return b.stock - a.stock;
                 case 'price_asc': return a.price - b.price;
@@ -110,7 +117,13 @@ export class AdminInventoryPage implements OnInit {
     async loadCategories() {
         try {
             const cats = await this.productService.getCategories();
-            this.categories.set(cats);
+            const mappedCats = cats.map(c => ({
+                ...c,
+                name: (c.name.toLowerCase() === 'smartphones' || c.name.toLowerCase() === 'smartphone') 
+                      ? 'Celulares' 
+                      : c.name
+            }));
+            this.categories.set(mappedCats);
         } catch (e) {
             console.error('Error loading categories', e);
         }

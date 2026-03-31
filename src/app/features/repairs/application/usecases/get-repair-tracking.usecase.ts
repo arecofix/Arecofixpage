@@ -11,9 +11,9 @@ import { Repair, RepairStatus } from '../../domain/entities/repair.entity';
 export class GetRepairTrackingUseCase {
   private repository = inject(RepairRepository);
 
-  execute(code: string): Observable<PublicRepairDto> {
+  execute(code: string): Observable<PublicRepairDto | null> {
     return this.repository.getByTrackingCode(code).pipe(
-      map(repair => this.mapToPublicDto(repair))
+      map(repair => repair ? this.mapToPublicDto(repair) : null)
     );
   }
 
@@ -42,7 +42,10 @@ export class GetRepairTrackingUseCase {
       repair_number: repair.repair_number,
       customer_name: repair.customer_name,
       technician_report: repair.technical_report || repair.technician_notes,
-      images: repair.images
+      images: repair.images,
+      upsell_vidrio: repair.upsell_vidrio,
+      imei: repair.imei,
+      checklist: repair.checklist
     };
   }
 

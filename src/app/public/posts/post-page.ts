@@ -114,6 +114,20 @@ export class PostPage implements OnInit, OnDestroy {
             if (post.meta_title) {
                 this.metaService.updateTag({ name: 'title', content: post.meta_title });
             }
+
+            // Open Graph (Social)
+            const postImage = post.image || 'assets/img/branding/og-services.jpg';
+            const absoluteImageUrl = postImage.startsWith('http') 
+                ? postImage 
+                : `${environment.baseUrl}/${postImage.startsWith('/') ? postImage.substring(1) : postImage}`;
+
+            this.metaService.updateTag({ property: 'og:title', content: post.title });
+            this.metaService.updateTag({ property: 'og:description', content: post.meta_description || post.content.substring(0, 160) });
+            this.metaService.updateTag({ property: 'og:image', content: absoluteImageUrl });
+            this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
+            this.metaService.updateTag({ property: 'og:image:height', content: '630' });
+            this.metaService.updateTag({ property: 'og:url', content: `${environment.baseUrl}/posts/${slug}` });
+            this.metaService.updateTag({ property: 'og:type', content: 'article' });
         }
     }
 

@@ -5,9 +5,11 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { DatabaseError } from '@app/core/errors/application.error';
 import { ProductRepository, ImportProductSummary, BulkPriceUpdate } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
+import { SearchUtils } from '@app/shared/utils/search.utils';
 
 
 @Injectable({
@@ -92,69 +94,18 @@ export class SupabaseProductRepository extends ProductRepository {
     if (max_price !== undefined) query = query.lte('price', max_price);
     
     if (params.q) {
-      // Búsqueda Humana: Mapeo de términos habituales a palabras técnicas o similares del rubro.
       const queryStr = params.q.toLowerCase().trim();
-      
-      const techSynonyms: Record<string, string[]> = {
-        // Pantallas y Módulos
-        'modulo': ['módulo', 'display', 'pantalla', 'tactil', 'touch', 'lcd', 'oled', 'amoled'],
-        'modulos': ['módulo', 'display', 'pantalla', 'tactil', 'touch', 'lcd', 'oled', 'amoled'],
-        'pantalla': ['módulo', 'display', 'modulo', 'lcd', 'touch'],
-        'pantallas': ['módulo', 'display', 'modulo', 'lcd', 'touch'],
-        'display': ['módulo', 'pantalla', 'modulo', 'lcd'],
-        'visor': ['vidrio', 'glass', 'cristal'],
-        'vidrio': ['visor', 'glass', 'cristal', 'templado'],
-        'glass': ['visor', 'vidrio', 'cristal'],
+      const terms = queryStr.split(/\s+/).filter(t => t.length > 1 || t === 'ic' || t === 'uv');
 
-        // Baterías y Energía
-        'bateria': ['batería', 'pila', 'battery'],
-        'baterias': ['batería', 'pila', 'battery'],
-        'pin': ['carga', 'conector', 'puerto', 'flex', 'zócalo', 'zocalo'],
-        'pines': ['carga', 'conector', 'puerto', 'flex', 'zócalo', 'zocalo'],
-        'cargador': ['fuente', 'trafo', 'transformador', 'cable'],
-        'cable': ['usb', 'datos', 'cargador'],
-
-        // Componentes internos y microelectrónica
-        'repuesto': ['módulo', 'pantalla', 'bateria', 'pin', 'flex', 'placa', 'ic', 'chip', 'microfono', 'parlante'],
-        'repuestos': ['módulo', 'pantalla', 'bateria', 'pin', 'flex', 'placa', 'ic', 'chip', 'microfono', 'parlante'],
-        'placa': ['mother', 'logica', 'mainboard', 'subplaca', 'pba'],
-        'flex': ['cinta', 'cable', 'fpc', 'flex', 'flexor'],
-        'microfono': ['mic', 'micrófono'],
-        'parlante': ['auricular', 'speaker', 'altavoz', 'buzzer', 'campana'],
-        'camara': ['cámara', 'lente'],
-
-        // Herramientas y Consumibles
-        'herramienta': ['destornillador', 'pinza', 'estacion', 'soldador', 'microscopio', 'multimetro', 'tester'],
-        'herramientas': ['destornillador', 'pinza', 'estacion', 'soldador', 'microscopio', 'multimetro', 'tester'],
-        'estaño': ['soldadura', 'solder', 'pasta'],
-        'pegamento': ['b7000', 't7000', 't8000', 'uv', 'cinta', 'adhesivo'],
-      };
-
-      // Separamos las palabras que el usuario buscó
-      const searchWords = queryStr.split(/\s+/);
-      const extendedWords = new Set<string>();
-
-      for (let word of searchWords) {
-        // Removemos acentos para cotejar en el diccionario
-        word = word.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      for (const term of terms) {
+        const normalizedTerm = SearchUtils.normalize(term);
+        const equivalents = SearchUtils.getEquivalents(term);
         
-        // Evitamos buscar palabras muy cortas (ej: "de", "el", "a") a menos que sea un producto exacto ("ic")
-        if (word.length <= 2 && word !== 'ic' && word !== 'uv') {
-            continue;
-        }
-
-        extendedWords.add(word); // Agregamos la palabra original depurada
+        // Match term or synonyms in NAME/SKU, but ONLY original term in description to avoid noise
+        const nameSkuClauses = equivalents.map(eq => `name.ilike.%${eq}%,sku.ilike.%${eq}%`).join(',');
+        const descClauses = `description.ilike.%${term}%,description.ilike.%${normalizedTerm}%`;
         
-        if (techSynonyms[word]) {
-            techSynonyms[word].forEach(syn => extendedWords.add(syn));
-        }
-      }
-      
-      // Creamos una cadena global de OR clauses. 
-      // Por cada palabra expandida (ej: modulo, pantalla, display) forzamos que pueda estar contenida en el nombre o descripción
-      if (extendedWords.size > 0) {
-          const orClauses = Array.from(extendedWords).map(w => `name.ilike.%${w}%,description.ilike.%${w}%,sku.ilike.%${w}%`);
-          query = query.or(orClauses.join(','));
+        query = query.or(`${nameSkuClauses},${descClauses}`); 
       }
     }
 
@@ -169,12 +120,21 @@ export class SupabaseProductRepository extends ProductRepository {
     return from(query as any).pipe(
       map((res: any) => {
         const { data, count, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
 
         const totalItems = count || 0;
         const pages = Math.max(1, Math.ceil(totalItems / _per_page));
 
-        const products = (data || []).map((p: any) => this._mapToEntity(p));
+        let products = (data || []).map((p: any) => this._mapToEntity(p));
+        
+        // Frontend Ranking: Sort results by relevance if searching
+        if (params.q) {
+          products = products.sort((a: Product, b: Product) => {
+              const scoreA = SearchUtils.getRelevanceScore(a.name, params.q!);
+              const scoreB = SearchUtils.getRelevanceScore(b.name, params.q!);
+              return scoreB - scoreA;
+          });
+        }
 
         return {
           first: 1,
@@ -200,7 +160,7 @@ export class SupabaseProductRepository extends ProductRepository {
     return from(this.applyTenantFilter(query) as any).pipe(
       map((res: any) => {
         const { data, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         return (data || [])
             .map((p: any) => this._mapToEntity(p))
             .filter((p: Product) => p.stock < threshold);
@@ -227,7 +187,7 @@ export class SupabaseProductRepository extends ProductRepository {
           .range(fromIdx, fromIdx + CHUNK - 1);
         
         const { data, error } = await (query as any);
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         
         const products = (data || []).map((p: any) => this._mapToEntity(p));
         allData = [...allData, ...products];
@@ -262,7 +222,7 @@ export class SupabaseProductRepository extends ProductRepository {
         // branch_id filter removed: column doesn't exist on 'products'. Mapping handles it.
         
         const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         
         const products = (data || []).map((p: any) => this._mapToEntity(p, branch_id));
         allData = [...allData, ...products];
@@ -279,8 +239,6 @@ export class SupabaseProductRepository extends ProductRepository {
     return from(fetchAll());
   }
 
-
-
   getById(id: string): Observable<Product | null> {
     let query = this.supabase.from('products')
         .select(`
@@ -295,7 +253,7 @@ export class SupabaseProductRepository extends ProductRepository {
     return from(filteredQuery as any).pipe(
       map((res: any) => {
         const { data, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         return data ? this._mapToEntity(data) : null;
       })
     );
@@ -317,7 +275,7 @@ export class SupabaseProductRepository extends ProductRepository {
         ).range(fromIdx, fromIdx + CHUNK - 1);
         
         const { data, error } = await (query as any);
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         
         const products = data || [];
         allData = [...allData, ...products];
@@ -385,7 +343,7 @@ export class SupabaseProductRepository extends ProductRepository {
     const filePath = `products/${Date.now()}-${file.name}`;
     const { data, error } = await this.supabase.storage.from('public-assets').upload(filePath, file);
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, error);
 
     const { data: publicUrl } = this.supabase.storage.from('public-assets').getPublicUrl(data.path);
     return publicUrl.publicUrl;
@@ -478,7 +436,7 @@ export class SupabaseProductRepository extends ProductRepository {
     ).pipe(
       switchMap(async (res: any) => {
         const { data, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         if (stock !== undefined) {
              await this.syncBranchStock(data.id, stock);
         }
@@ -505,7 +463,7 @@ export class SupabaseProductRepository extends ProductRepository {
     return from(filteredQuery as any).pipe(
       switchMap(async (res: any) => {
         const { data, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         if (stock !== undefined) {
             await this.syncBranchStock(id, stock);
         }
@@ -515,13 +473,13 @@ export class SupabaseProductRepository extends ProductRepository {
   }
 
   delete(id: string): Observable<void> {
-    let query = this.supabase.from('products').delete().eq('id', id);
+    let query = this.supabase.from('products').update({ deleted_at: new Date().toISOString() }).eq('id', id);
     let filteredQuery = this.applyTenantFilter(query);
 
     return from(filteredQuery as any).pipe(
       map((res: any) => {
         const { error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         return void 0;
       })
     );
@@ -549,7 +507,7 @@ export class SupabaseProductRepository extends ProductRepository {
     ).pipe(
       switchMap(async (res: any) => {
         const { data, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         
         for (const row of (data || [])) {
             if (row.stock !== undefined && row.stock !== null) {
@@ -587,7 +545,7 @@ export class SupabaseProductRepository extends ProductRepository {
         // Keep only known DB columns
         const cleanPayload: Record<string, any> = {};
         for (const key of Object.keys(rest)) {
-          if (DB_COLUMNS.has(key)) cleanPayload[key] = (rest as any)[key];
+          if (DB_COLUMNS.has(key)) cleanPayload[key] = (rest as any)[rest];
         }
         cleanPayload['updated_at'] = new Date().toISOString();
 
@@ -609,7 +567,7 @@ export class SupabaseProductRepository extends ProductRepository {
       map((results) => {
         const errors = results.filter((r: any) => r && r.error);
         if (errors.length > 0) {
-             throw new Error(`Failed to update ${errors.length} products`);
+             throw new DatabaseError(`Failed to update ${errors.length} products`);
         }
         return void 0;
       })
@@ -631,7 +589,7 @@ export class SupabaseProductRepository extends ProductRepository {
         .in('id', ids)
         .eq('tenant_id', tenantId);
         
-      if (error) throw error;
+      if (error) throw new DatabaseError(error.message, error);
     };
     
     return from(process()).pipe(map(() => void 0));
@@ -654,7 +612,7 @@ export class SupabaseProductRepository extends ProductRepository {
           .update({ deleted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
           .in('id', chunk)
           .eq('tenant_id', tenantId) as any);
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
       }
     };
     return from(processChunks()).pipe(map(() => void 0));
@@ -679,52 +637,30 @@ export class SupabaseProductRepository extends ProductRepository {
       supabaseQuery = supabaseQuery.eq('category_id', categoryId);
     }
 
-    // Advanced Fuzzy Search Logic:
-    // 1. Full Text Search for better ranking
-    // 2. Fallback to ILIKE with synonyms if FTS yields few results (handled by Postgres or here)
-    
-    // Using Postgres Full Text Search if available on the 'name' column
-    // For many languages/scenarios, we combine search terms with AND
-    const terms = queryStr.split(/\s+/).filter(t => t.length > 1);
-    const ftsQuery = terms.map(t => `'${t}':*`).join(' & ');
+    const terms = queryStr.split(/\s+/).filter(t => t.length > 1 || t === 'ic' || t === 'uv');
 
-    // We use a broader approach: name ILIKE or textSearch
-    // Supabase .or() with textsearch is not directly supported in the same way as ilike
-    // so we use the smart synonym logic but improved
-    
-    const synonyms: Record<string, string[]> = {
-        'modulo': ['módulo', 'display', 'pantalla', 'lcd', 'touch'],
-        'pin': ['carga', 'conector', 'puerto', 'zocalo'],
-        'bateria': ['batería', 'pila', 'battery'],
-        'vidrio': ['visor', 'glass', 'cristal'],
-        'placa': ['mother', 'logica', 'mainboard'],
-    };
-
-    const searchWords = new Set<string>();
-    terms.forEach(t => {
-        searchWords.add(t);
-        const normalized = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (synonyms[normalized]) {
-            synonyms[normalized].forEach(s => searchWords.add(s));
-        }
-    });
-
-    // Create OR clauses for each word in both name and description
-    const orClauses = Array.from(searchWords).map(w => `name.ilike.%${w}%,description.ilike.%${w}%,sku.ilike.%${w}%`);
-    supabaseQuery = supabaseQuery.or(orClauses.join(','));
+    for (const term of terms) {
+        const normalizedTerm = SearchUtils.normalize(term);
+        const equivalents = SearchUtils.getEquivalents(term);
+        
+        const nameSkuClauses = equivalents.map(eq => `name.ilike.%${eq}%,sku.ilike.%${eq}%`).join(',');
+        const descClauses = `description.ilike.%${term}%,description.ilike.%${normalizedTerm}%`;
+        
+        supabaseQuery = supabaseQuery.or(`${nameSkuClauses},${descClauses}`);
+    }
 
     return from(supabaseQuery as any).pipe(
       map((res: any) => {
         const { data, error } = res;
-        if (error) throw error;
+        if (error) throw new DatabaseError(error.message, error);
         
-        // Frontend Ranking: Sort results by how many search terms match
+        // Frontend Ranking: Sort results by relevance
         const products = (data || []).map((p: any) => this._mapToEntity(p));
         
         return products.sort((a: Product, b: Product) => {
-            const countA = terms.filter(t => a.name.toLowerCase().includes(t)).length;
-            const countB = terms.filter(t => b.name.toLowerCase().includes(t)).length;
-            return countB - countA; // Rank higher those with more matching terms
+            const scoreA = SearchUtils.getRelevanceScore(a.name, queryStr);
+            const scoreB = SearchUtils.getRelevanceScore(b.name, queryStr);
+            return scoreB - scoreA;
         });
       })
     );

@@ -14,7 +14,7 @@
     "generate-sitemap": "node scripts/generate-sitemap.mjs",
     "electron:dev": "ng build --configuration development --base-href ./ && electron .",
     "electron:build": "ng build --configuration production --base-href ./ && electron-builder build --windows",
-    "firebase:build": "npm run build && npm run generate-sitemap && node scripts/remove-preloads.mjs",
+    "firebase:build": "npm run generate-sitemap && npm run build && node scripts/remove-preloads.mjs",
     "firebase:deploy": "npm run firebase:build && firebase deploy --only hosting",
     "firebase:serve": "firebase serve --only hosting"
   },

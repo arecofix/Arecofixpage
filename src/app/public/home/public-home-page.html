@@ -14,7 +14,7 @@
             <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
             <span class="text-xs font-mono text-gray-300 tracking-wider uppercase">Open to New Projects</span>
           </div>
-          <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-[1.1] tracking-tight text-gradient">
+          <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-[1.1] tracking-tight text-gradient">
             {{ content.hero.title }}
           </h1>
           <p class="text-xl text-gray-700 dark:text-gray-400 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-light font-body">
@@ -122,7 +122,7 @@
             <h3 class="text-sm md:text-lg font-bold text-gray-900 dark:text-white mb-1 md:mb-2 leading-tight">{{ item.title }}</h3>
             <p class="text-xs md:text-sm text-gray-700 dark:text-gray-400 mb-3 md:mb-4 leading-relaxed">{{ item.description }}</p>
             <div class="flex flex-wrap justify-center gap-1 md:gap-2 mt-auto">
-              @for(feat of item.features; track feat) {
+              @for(feat of item.features; track $index) {
                 <span class="text-[10px] md:text-xs bg-gray-200 dark:bg-white/10 px-1.5 py-0.5 md:px-2 md:py-1 rounded text-gray-700 dark:text-gray-300 font-mono">{{ feat }}</span>
               }
             </div>
@@ -204,7 +204,7 @@
       <h2 class="text-4xl lg:text-5xl font-bold mb-6 max-w-3xl mx-auto font-heading">{{ content.remoteWork.title }}</h2>
       <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-body">{{ content.remoteWork.description }}</p>
       <div class="flex flex-wrap justify-center gap-4 mb-10">
-        @for(benefit of content.remoteWork.benefits; track benefit) {
+        @for(benefit of content.remoteWork.benefits; track $index) {
           <span class="flex items-center gap-2 bg-blue-800/30 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-400/30 text-sm">
             <i class="fas fa-check text-green-300"></i> {{ benefit }}
           </span>

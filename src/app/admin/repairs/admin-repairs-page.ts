@@ -37,7 +37,11 @@ export class AdminRepairsPage implements OnInit {
           repair.tracking_code?.toLowerCase().includes(term);
           
         const matchesType = type === 'all' || 
-          repair.device_model?.toLowerCase().includes(type.toLowerCase());
+          (repair.device_type?.toLowerCase()?.includes(type.toLowerCase())) ||
+          (type === 'smartphone' && (!repair.device_type || 
+                                     repair.device_type.toLowerCase().includes('celular') || 
+                                     repair.device_type.toLowerCase().includes('phone') ||
+                                     repair.device_type.toLowerCase().includes('móvil')));
           
         return matchesSearch && matchesType;
       })
@@ -74,6 +78,53 @@ export class AdminRepairsPage implements OnInit {
   inWorkshopCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 3 || r.current_status_id === 1).length);
   readyToPickupCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 5).length);
   pendingPartsCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 2).length);
+
+  // Profit Statistics
+  profitStats = computed(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    // Last month date calculation
+    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonth = lastMonthDate.getMonth();
+    const lastYear = lastMonthDate.getFullYear();
+
+    const stats = {
+      thisMonth: 0,
+      lastMonth: 0,
+      totalThisMonth: 0, // Revenue
+      totalLastMonth: 0  // Revenue
+    };
+
+    this.repairs().forEach(r => {
+      // Only count profit for completed or ready-to-pickup repairs
+      const isFinished = r.current_status_id === 5 || r.current_status_id === 6;
+      if (!isFinished) return;
+
+      const dateStr = r.completed_at || r.received_at;
+      if (!dateStr) return;
+      
+      const rDate = new Date(dateStr);
+      const rMonth = rDate.getMonth();
+      const rYear = rDate.getFullYear();
+      
+      // Calculate profit for this repair
+      const partsCost = (r.parts || []).reduce((acc, p) => acc + (p.cost_at_time || 0) * (p.quantity || 1), 0);
+      const repairProfit = (r.final_cost || r.estimated_cost || 0) - partsCost;
+      const revenue = (r.final_cost || r.estimated_cost || 0);
+
+      if (rMonth === currentMonth && rYear === currentYear) {
+        stats.thisMonth += repairProfit;
+        stats.totalThisMonth += revenue;
+      } else if (rMonth === lastMonth && rYear === lastYear) {
+        stats.lastMonth += repairProfit;
+        stats.totalLastMonth += revenue;
+      }
+    });
+
+    return stats;
+  });
 
   date = new Date();
 

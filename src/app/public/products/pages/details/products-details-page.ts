@@ -185,7 +185,7 @@ export class ProductsDetailsPage {
       });
 
       // Extra OG tags WhatsApp needs that SeoService doesn't set by default
-      this.setWhatsAppOgTags(absoluteImageUrl, productDescription);
+      this.setWhatsAppOgTags(absoluteImageUrl, productDescription, product.name);
 
       // ── JSON-LD Product Schema ──────────────────────────────────────────────
       this.injectProductSchema(product, absoluteImageUrl);
@@ -196,7 +196,7 @@ export class ProductsDetailsPage {
    * Injects extra Open Graph tags required for WhatsApp/Telegram link previews.
    * WhatsApp uses og:image, og:image:width, og:image:height, and og:image:type.
    */
-  private setWhatsAppOgTags(imageUrl: string, description: string): void {
+  private setWhatsAppOgTags(imageUrl: string, description: string, productName: string): void {
     const meta = this.document.head;
     const setOrCreate = (property: string, content: string) => {
       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
@@ -208,6 +208,7 @@ export class ProductsDetailsPage {
       el.setAttribute('content', content);
     };
 
+    setOrCreate('og:title', `${productName} | Arecofix`);
     setOrCreate('og:image', imageUrl);
     setOrCreate('og:image:secure_url', imageUrl);
     setOrCreate('og:image:width', '1200');
@@ -215,6 +216,7 @@ export class ProductsDetailsPage {
     setOrCreate('og:image:type', 'image/jpeg');
     setOrCreate('og:description', description);
     setOrCreate('og:site_name', 'Arecofix');
+    setOrCreate('og:type', 'product');
   }
 
   /**
@@ -334,14 +336,6 @@ export class ProductsDetailsPage {
       }
   }
 
-  searchQuery = '';
-  private router = inject(Router);
-
-  onSearch() {
-    if (this.searchQuery.trim()) {
-        this.router.navigate(['/products/all'], { queryParams: { q: this.searchQuery } });
-    }
-  }
 }
 
 export default ProductsDetailsPage;

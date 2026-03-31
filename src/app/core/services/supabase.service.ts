@@ -11,10 +11,51 @@ export class SupabaseService {
   private client: SupabaseClient;
 
   constructor() {
+    // Custom fetch with retry logic to handle ERR_NAME_NOT_RESOLVED and network drops
+    const customFetch = async (url: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
+      const MAX_RETRIES = 3;
+      const RETRY_DELAY = 1500;
+      let lastError: any;
+
+      for (let i = 0; i < MAX_RETRIES; i++) {
+        try {
+          // Si estamos offline, no intentamos
+          if (typeof navigator !== 'undefined' && !navigator.onLine && i === 0) {
+            throw new Error('No internet connection');
+          }
+          
+          const response = await fetch(url, options);
+          if (!response.ok && response.status >= 500) {
+              throw new Error(`Server Error: ${response.status}`);
+          }
+          return response;
+        } catch (error: any) {
+          lastError = error;
+          this.logger.warn(`Supabase fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, error.message);
+          
+          if (i < MAX_RETRIES - 1) {
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
+          }
+        }
+      }
+      
+      // Error Boundary fallback
+      this.logger.error('Supabase fetch critically failed after retries', lastError);
+      throw lastError;
+    };
+
     this.client = createClient(
       environment.supabaseUrl,
       environment.supabaseKey,
       {
+        global: {
+          fetch: customFetch
+        },
+        realtime: {
+          params: {
+            eventsPerSecond: 2,
+          },
+        },
         auth: {
           persistSession:
             typeof window !== 'undefined' && !!window.localStorage,
@@ -22,16 +63,12 @@ export class SupabaseService {
             typeof window !== 'undefined' && !!window.localStorage,
           detectSessionInUrl: typeof window !== 'undefined',
           lock: async (name: string, acquireTimeout: number, acquire: () => Promise<any>) => {
-            // Fix for "Acquiring an exclusive Navigator LockManager lock timed out"
-            // specifically in Facebook in-app browser or aggressive SSR hydration
             if (typeof navigator !== 'undefined' && navigator.locks) {
               try {
-                // Request the lock but force a quick bypass if it hangs
                 return await navigator.locks.request(name, { mode: 'exclusive', ifAvailable: true }, async (lock) => {
                   if (lock) {
                     return await acquire();
                   } else {
-                    // Lock wasn't instantly available, bypass gracefully
                     return await acquire();
                   }
                 });

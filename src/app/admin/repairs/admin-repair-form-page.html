@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white/50 dark:bg-gray-800/50 p-6 rounded-3xl backdrop-blur-lg border border-white max-sm:shadow-sm">
         <div>
             <div class="flex items-center gap-3 mb-1">
-                <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:bg-white dark:bg-gray-800/50 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all">
+                <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:bg-white shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <h1 class="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-emerald-600 to-teal-500 tracking-tight">
@@ -17,6 +17,11 @@
                         <i class="fas fa-barcode text-gray-400 mr-1"></i> {{ form().tracking_code }}
                     </span>
                     <span class="text-[10px] uppercase tracking-widest bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-lg border border-yellow-200 font-bold">Orden #{{ form().repair_number | number:'3.0-0' }}</span>
+                    @if(form().upsell_vidrio) {
+                        <span class="text-[10px] uppercase tracking-widest bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg border border-purple-200 font-bold flex items-center gap-1 shadow-sm">
+                            <i class="fas fa-star text-amber-500"></i> Vidrio Adicional
+                        </span>
+                    }
                 </div>
             }
         </div>
@@ -28,7 +33,7 @@
                     <i class="fab fa-whatsapp text-lg"></i> Notificar
                 </button>
              }
-             <button type="button" (click)="printOrder()" class="btn btn-outline bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:text-gray-900 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all" [disabled]="saving()">
+             <button type="button" (click)="printOrder()" class="btn btn-outline bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-200 hover:text-gray-900 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all" [disabled]="saving()">
                  <i class="fas fa-print"></i> PDF / Talón
              </button>
         </div>
@@ -70,7 +75,7 @@
                                         <i class="fas fa-search text-gray-400 group-focus-within/input:text-blue-500 transition-colors"></i>
                                     </div>
                                     <input type="text" [ngModel]="form().customer_name" (ngModelChange)="onSelectClient($event)" 
-                                        name="customer_name" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-700 dark:text-gray-200" list="repair-clients-list" placeholder="Seleccionar en cartera..." required autocomplete="off" />
+                                        name="customer_name" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" list="repair-clients-list" placeholder="Seleccionar en cartera..." required autocomplete="off" />
                                 </div>
                                 <datalist id="repair-clients-list">
                                     @for (client of clients; track client.id) {
@@ -84,7 +89,7 @@
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                         <i class="fab fa-whatsapp text-gray-400 group-focus-within/input:text-green-500 transition-colors"></i>
                                     </div>
-                                    <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:border-green-300 focus:ring-4 focus:ring-green-100 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="+54 9..." />
+                                    <input type="tel" [(ngModel)]="form().customer_phone" name="customer_phone" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="+54 9..." />
                                 </div>
                             </div>
                         </div>
@@ -104,7 +109,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div class="form-control">
                                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Modelo del Equipo</span></label>
-                                <input type="text" [(ngModel)]="form().device_model" name="device_model" class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 transition-all font-bold text-gray-800 dark:text-white" required placeholder="Ej: iPhone 13 Pro Max" />
+                                <input type="text" [(ngModel)]="form().device_model" name="device_model" class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white" required placeholder="Ej: iPhone 13 Pro Max" />
                             </div>
                             <div class="form-control">
                                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">IMEI o N° Serie</span></label>
@@ -112,14 +117,14 @@
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                         <i class="fas fa-barcode text-gray-400 group-focus-within/input:text-purple-500 transition-colors"></i>
                                     </div>
-                                    <input type="text" [(ngModel)]="form().imei" name="imei" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 transition-all font-mono text-gray-600 dark:text-gray-300 tracking-wider" placeholder="Opcional..." />
+                                    <input type="text" [(ngModel)]="form().imei" name="imei" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-mono text-gray-600 dark:text-gray-300 tracking-wider" placeholder="Opcional..." />
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-control mb-8">
                             <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Motivo de Ingreso / Fallas reportadas</span></label>
-                            <textarea [(ngModel)]="form().issue_description" name="issue_description" class="textarea textarea-bordered h-28 w-full rounded-2xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 transition-all text-gray-700 dark:text-gray-200 leading-relaxed resize-none" placeholder="El cliente indica que la pantalla no enciende, pero vibra al conectarlo al cargador..."></textarea>
+                            <textarea [(ngModel)]="form().issue_description" name="issue_description" class="textarea textarea-bordered h-28 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all text-gray-700 dark:text-gray-200 leading-relaxed resize-none" placeholder="El cliente indica que la pantalla no enciende, pero vibra al conectarlo al cargador..."></textarea>
                         </div>
 
                         <!-- Estado y Seguridad -->
@@ -142,31 +147,31 @@
                             
                             <div class="flex flex-wrap gap-2.5">
                                 <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2 "
-                                    [ngClass]="form().checklist.charger ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-300'">
+                                    [ngClass]="form().checklist.charger ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-gray-300'">
                                     <input type="checkbox" [(ngModel)]="form().checklist.charger" name="check_charger" class="hidden" />
                                     <i class="fas" [ngClass]="form().checklist.charger ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">Cargador</span>
                                 </label>
                                 
                                 <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
-                                    [ngClass]="form().checklist.battery ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-300'">
+                                    [ngClass]="form().checklist.battery ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-gray-300'">
                                     <input type="checkbox" [(ngModel)]="form().checklist.battery" name="check_battery" class="hidden" />
                                     <i class="fas" [ngClass]="form().checklist.battery ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">Batería extraíble</span>
                                 </label>
                                 
                                 <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
-                                    [ngClass]="form().checklist.chip ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-300'">
+                                    [ngClass]="form().checklist.chip ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-gray-300'">
                                     <input type="checkbox" [(ngModel)]="form().checklist.chip" name="check_chip" class="hidden" />
                                     <i class="fas" [ngClass]="form().checklist.chip ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">SIM / NanoSIM</span>
                                 </label>
                                 
                                 <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
-                                    [ngClass]="form().checklist.sd ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-300'">
+                                    [ngClass]="form().checklist.sd ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-gray-300'">
                                     <input type="checkbox" [(ngModel)]="form().checklist.sd" name="check_sd" class="hidden" />
                                     <i class="fas" [ngClass]="form().checklist.sd ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">MicroSD</span>
                                 </label>
                                 
                                 <label class="cursor-pointer select-none transition-all duration-200 border rounded-xl px-4 py-2 flex items-center gap-2"
-                                    [ngClass]="form().checklist.case ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-300'">
+                                    [ngClass]="form().checklist.case ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm scale-105' : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-gray-300'">
                                     <input type="checkbox" [(ngModel)]="form().checklist.case" name="check_case" class="hidden" />
                                     <i class="fas" [ngClass]="form().checklist.case ? 'fa-check-circle text-indigo-500' : 'fa-circle text-gray-300'"></i> <span class="font-medium text-sm">Funda</span>
                                 </label>
@@ -255,7 +260,7 @@
                              <div class="flex flex-col gap-4 mt-2">
                                 <div class="relative group/file">
                                     <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" [disabled]="uploadingImages()" />
-                                    <div class="w-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl py-6 bg-gray-50 dark:bg-gray-900 font-medium text-gray-500 dark:text-gray-400 group-hover/file:border-emerald-400 group-hover/file:bg-emerald-50 transition-colors">
+                                    <div class="w-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl py-6 bg-gray-50 dark:bg-gray-800/50 font-medium text-gray-500 dark:text-gray-400 group-hover/file:border-emerald-400 group-hover/file:bg-emerald-50 transition-colors">
                                          @if(uploadingImages()) {
                                              <span class="loading loading-spinner text-emerald-500"></span> <span class="ml-2 text-emerald-600">Subiendo a Cloud...</span>
                                          } @else {
@@ -299,7 +304,7 @@
                         <div class="form-control">
                             <label class="label pb-1.5"><span class="label-text font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest">Cambiar Estado</span></label>
                             <div class="relative">
-                                <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full rounded-xl bg-gray-50 dark:bg-gray-900 font-bold border-gray-200 dark:border-gray-700 focus:ring-4 focus:ring-blue-100 h-14 pl-12 text-sm appearance-none transition-all shadow-sm"
+                                <select [(ngModel)]="form().current_status_id" name="current_status_id" class="select select-bordered w-full rounded-xl bg-gray-50 dark:bg-gray-800/50 font-bold border-gray-200 dark:border-gray-700 focus:ring-4 focus:ring-blue-100 h-14 pl-12 text-sm appearance-none transition-all shadow-sm"
                                         [ngClass]="{
                                             'text-yellow-600': form().current_status_id === 1 || form().current_status_id === 2,
                                             'text-blue-600': form().current_status_id === 3,
@@ -403,11 +408,12 @@
         </form>
     }
 </div>
+</div>
 
 <!-- Modal Selección de Repuestos -->
 @if (showProductModal()) {
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm animate-fade-in px-4">
-    <div class="bg-white dark:bg-gray-800/50 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-slide-up border border-white relative">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-slide-up border border-white relative">
         <div class="bg-gray-50 dark:bg-gray-900 p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center relative">
             <h3 class="font-bold text-xl text-gray-800 dark:text-white flex items-center gap-3">
                 <i class="fas fa-box text-emerald-500 bg-emerald-100 w-10 h-10 rounded-full flex items-center justify-center"></i> 
@@ -422,17 +428,29 @@
             <div class="form-control mb-4">
                 <div class="relative">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" class="input input-bordered w-full pl-11 rounded-2xl bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 dark:bg-gray-800/50 focus:border-emerald-300 focus:ring-4 focus:ring-emerald-100 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="Buscar pantalla, pin de carga, batería..." />
+                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)" class="input input-bordered w-full pl-11 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="Buscar pantalla, pin de carga, batería..." />
+                    @if (searchingProducts()) {
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                            <span class="loading loading-spinner loading-xs text-emerald-500"></span>
+                        </div>
+                    }
                 </div>
             </div>
 
             <div class="max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-                @if (filteredProducts().length === 0) {
+                @if (!searchingProducts() && filteredProducts().length === 0) {
                     <div class="flex flex-col items-center justify-center py-10 opacity-50">
                         <i class="fas fa-dolly text-5xl mb-3 text-gray-300"></i>
-                        <p class="text-sm font-medium">Buscando en bodega...</p>
+                        <p class="text-sm font-medium">Buscando productos o sin resultados...</p>
                     </div>
                 }
+
+                @if (searchingProducts() && filteredProducts().length === 0) {
+                    <div class="flex flex-col items-center justify-center py-10 opacity-50">
+                         <span class="loading loading-dots loading-lg text-emerald-500"></span>
+                    </div>
+                }
+
                 @for (product of filteredProducts(); track product.id) {
                 <div class="flex justify-between items-center py-4 border-b border-gray-50 hover:bg-emerald-50/50 transition-colors px-3 rounded-xl group/item">
                     <div class="flex items-center gap-4">
@@ -467,4 +485,3 @@
     </div>
 </div>
 }
-

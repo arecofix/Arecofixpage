@@ -59,6 +59,9 @@ export class TrackingPage implements OnInit {
     repair = signal<PublicRepairDto | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    showUpsellModal = signal(false);
+    recommendedAccessories = signal<any[]>([]);
+    buyingAccessory = signal<string | null>(null);
 
     baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://arecofix.com.ar';
 
@@ -87,13 +90,25 @@ export class TrackingPage implements OnInit {
 
         this.getRepairTrackingUseCase.execute(code).subscribe({
             next: (repairData) => {
-                this.repair.set(repairData);
-                this.updateSeo(repairData);
+                if (repairData) {
+                    this.repair.set(repairData);
+                    this.updateSeo(repairData);
+                    this.error.set(null);
+                    
+                    if (!repairData.upsell_vidrio && !localStorage.getItem(`upsellDismissed_${code}`)) {
+                        setTimeout(() => this.showUpsellModal.set(true), 2500);
+                    }
+                    
+                    this.loadRecommendations(code);
+                } else {
+                    this.error.set('No se encontró ninguna reparación con este código.');
+                    this.repair.set(null);
+                }
                 this.loading.set(false);
             },
             error: (err) => {
                 this.logger.error('Error fetching repair:', err);
-                this.error.set('No se encontró ninguna reparación con este código o hubo un problema de conexión.');
+                this.error.set('Hubo un problema de conexión al buscar tu reparación.');
                 this.loading.set(false);
             }
         });
@@ -118,6 +133,29 @@ export class TrackingPage implements OnInit {
             imageUrl: imageUrl,
             type: 'article'
         });
+
+        this.setWhatsAppOgTags(imageUrl, `Tu equipo está en etapa de ${statusName}.`, `${statusName} - Tu ${r.device_model}`);
+    }
+
+    private setWhatsAppOgTags(imageUrl: string, description: string, title: string): void {
+        if (typeof document === 'undefined') return;
+        const meta = document.head;
+        const setOrCreate = (property: string, content: string) => {
+            let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
+            if (!el) {
+                el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+        };
+        const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `${window.location.host === 'localhost:4200' ? 'http://localhost:4200' : 'https://arecofix.com.ar'}/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
+        setOrCreate('og:title', `${title} | Arecofix`);
+        setOrCreate('og:image', absoluteImageUrl);
+        setOrCreate('og:image:secure_url', absoluteImageUrl);
+        setOrCreate('og:image:width', '1200');
+        setOrCreate('og:image:height', '630');
+        setOrCreate('og:description', description);
+        setOrCreate('og:site_name', 'Arecofix');
+        setOrCreate('og:type', 'article');
     }
 
     // Removed old calculation methods as they are now in the logic layer
@@ -246,6 +284,66 @@ export class TrackingPage implements OnInit {
     openImage(url: string) {
         if (typeof window !== 'undefined') {
             window.open(url, '_blank');
+        }
+    }
+
+    async acceptUpsell() {
+        if (!this.code) return;
+        try {
+            await this.trackingService.acceptUpsell(this.code);
+            this.repair.update(r => r ? { ...r, upsell_vidrio: true } : r);
+            this.showUpsellModal.set(false);
+            
+            const r = this.repair();
+            const identifier = r?.repair_number ? `#${r.repair_number}` : (r?.tracking_code || this.code);
+            const msg = encodeURIComponent(`Hola! Quiero incluir un vidrio templado con mi reparación del equipo ${identifier}`);
+            window.open(`https://wa.me/${this.whatsappNumber}?text=${msg}`, '_blank');
+        } catch (e) {
+            this.logger.error('Failed to accept upsell', e);
+        }
+    }
+
+    dismissUpsell() {
+        if (this.code) {
+            localStorage.setItem(`upsellDismissed_${this.code}`, 'true');
+        }
+        this.showUpsellModal.set(false);
+    }
+
+    async loadRecommendations(code: string) {
+        try {
+            const { data, error } = await this.trackingService.getRecommendedAccessories(code);
+            if (!error && data) {
+                this.recommendedAccessories.set(data as any[]);
+            }
+        } catch (e) {
+            this.logger.error('Failed to load recommendations', e);
+        }
+    }
+
+    async buyAccessory(product: any) {
+        if (!this.code) return;
+        
+        this.buyingAccessory.set(product.id);
+        
+        try {
+            const { error } = await this.trackingService.addAccessoryUpsell(this.code, product.id);
+            if (error) throw error;
+            
+            // Reload repair completely to get updated final_cost
+            await this.loadRepair();
+            
+            // Remove the product from recommendations visually or keep it? Let's keep it but they can just see final cost elevated.
+            const r = this.repair();
+            const identifier = r?.repair_number ? `#${r.repair_number}` : (r?.tracking_code || this.code);
+            const msg = encodeURIComponent(`Hola! Acabo de agregar a mi reparación (Orden ${identifier}) el accesorio: "${product.name}". ¡Gracias!`);
+            window.open(`https://wa.me/${this.whatsappNumber}?text=${msg}`, '_blank');
+            
+        } catch(e) {
+            this.logger.error('Failed to buy accessory', e);
+            alert('No pudimos procesar la solicitud en este momento. Inténtelo más tarde.');
+        } finally {
+            this.buyingAccessory.set(null);
         }
     }
 }

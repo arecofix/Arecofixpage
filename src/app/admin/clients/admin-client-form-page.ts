@@ -55,7 +55,15 @@ export class AdminClientFormPage implements OnInit {
     async save() {
         this.saving.set(true);
         this.error.set(null);
-        const payload = { ...this.form() };
+        const formValues = this.form();
+        const payload = { 
+            first_name: formValues.first_name,
+            last_name: formValues.last_name,
+            email: formValues.email || null,
+            phone: formValues.phone || null,
+            address: formValues.address || null,
+            dni: formValues.dni || null
+        };
 
         try {
             if (this.id) {

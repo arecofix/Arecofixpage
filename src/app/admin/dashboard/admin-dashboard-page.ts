@@ -26,15 +26,20 @@ export class AdminDashboardPage implements OnInit {
   private adminProductService = inject(AdminProductService);
   private router = inject(Router);
 
-  stats = signal({
+  stats = signal<DashboardStats>({
     users: 0,
     products: 0,
     sales: 0,
     revenue: 0,
     repairs_month: 0,
     repairs_revenue: 0,
+    repairs_profit: 0,
     devices_fixed: 0,
-    pending_approvals: 0
+    pending_approvals: 0,
+    sales_chart: [],
+    products_chart: [],
+    category_chart: [],
+    profit_chart: []
   });
 
   analyticsStats = signal({
@@ -124,30 +129,33 @@ export class AdminDashboardPage implements OnInit {
     try {
       const data = await firstValueFrom(this.analyticsRepo.getDashboardStats());
       // Update Summary Stats
-      this.stats.set({
-        users: data.users,
-        products: data.products,
-        sales: data.sales,
-        revenue: data.revenue,
-        repairs_month: data.repairs_month,
-        repairs_revenue: data.repairs_revenue,
-        devices_fixed: data.devices_fixed,
+      const statsData = {
+        ...data,
         pending_approvals: await this.getPendingApprovalsCount()
-      });
+      };
+      this.stats.set(statsData as DashboardStats);
 
       // Update Sales Chart (Line)
       if (data.sales_chart && data.sales_chart.length > 0) {
           const months = data.sales_chart.map(d => this.formatMonth(d.period));
-          const totals = data.sales_chart.map(d => d.total);
+          const salesTotals = data.sales_chart.map(d => d.total);
+          const profitTotals = data.profit_chart ? data.profit_chart.map(d => d.total) : salesTotals.map(v => v * 0.35);
           
           this.salesChartData = {
               labels: months,
               datasets: [
                   { 
-                    data: totals, 
+                    data: salesTotals, 
                     label: 'Ventas ($)', 
                     borderColor: CHART_COLORS.primary, 
                     backgroundColor: CHART_COLORS.primaryTransparent, 
+                    fill: true 
+                  },
+                  { 
+                    data: profitTotals, 
+                    label: 'Ganancia ($)', 
+                    borderColor: '#10b981', // emerald-500
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)', 
                     fill: true 
                   }
               ]

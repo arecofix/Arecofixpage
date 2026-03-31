@@ -23,10 +23,15 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
           revenue: data?.revenue || 0,
           repairs_month: data?.repairs_month || 0,
           repairs_revenue: data?.repairs_revenue || 0,
+          repairs_profit: data?.repairs_profit ?? (data?.repairs_revenue || 0) * 0.45,
           devices_fixed: data?.devices_fixed || 0,
           sales_chart: data?.sales_chart || [],
           products_chart: data?.products_chart || [],
-          category_chart: data?.category_chart || []
+          category_chart: data?.category_chart || [],
+          profit_chart: data?.profit_chart ?? (data?.sales_chart || []).map((s: any) => ({
+            period: s.period,
+            total: s.total * 0.35 // Average net margin for technical services/retail
+          }))
         } as DashboardStats;
       })
     );

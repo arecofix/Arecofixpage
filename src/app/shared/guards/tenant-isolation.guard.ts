@@ -1,49 +1,72 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { TenantService } from '../services/tenant.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TenantIsolationGuard implements CanActivate {
-  
-  constructor(
-    private tenantService: TenantService,
-    private router: Router
-  ) {}
+  private tenantService = inject(TenantService);
+  private router = inject(Router);
 
-  canActivate(
+  async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
-    const currentTenant = this.tenantService.getCurrentTenant();
-    const pathSegments = state.url.split('/').filter(segment => segment);
+  ): Promise<boolean> {
+    const url = state.url || '/';
     
-    // Detectar si la ruta pertenece a una sucursal específica
-    const potentialBranchSlug = pathSegments[0];
-    const branches = this.tenantService.getBranches();
-    const targetBranch = branches.find(branch => branch.slug === potentialBranchSlug);
+    // Log para depuración profunda (con prefijo único)
+    // console.debug(`[TenantGuard v2] Processing route: ${url}`);
     
-    if (targetBranch) {
-      // Si estamos navegando a una sucursal, asegurar que el tenant correcto esté activo
-      if (!this.tenantService.isCurrentTenant(targetBranch.id)) {
-        // Temporarily use console until structured logging is properly configured
-        console.log(`Switching to branch tenant: ${targetBranch.name}`);
-        this.tenantService.setCurrentTenant(targetBranch.id);
-        return true;
-      }
-    } else {
-      // Si no es una ruta de sucursal, asegurar que estamos en el tenant principal
-      if (!this.tenantService.isMainTenant()) {
-        console.log('Switching to main tenant');
-        this.tenantService.setCurrentTenant('central');
+    // 1. SIEMPRE permitir la raíz para evitar bucles infinitos de redirección
+    if (url === '/' || url === '') {
+      return true;
+    }
+
+    // 2. Obtener tenant actual
+    let currentTenant = this.tenantService.getCurrentTenant();
+    
+    // 3. Analizar segmentos de ruta
+    const pathSegments = url.split('/').filter(segment => segment);
+    const potentialBranchSlug = pathSegments[0]?.toLowerCase();
+    
+    const reservedSlugs = [
+      'admin', 'login', 'register', 'perfil', 'nosotros', 'contacto', 
+      'servicios', 'academy', 'checkout', 'posts', 'tracking', 'blog', 
+      'portfolio', 'productos', 'categories', 'repuestos', 'gsm', 'fixtecnicos', 'recursos'
+    ];
+
+    // 4. Verificación de Sucursal por Ruta
+    if (potentialBranchSlug && !reservedSlugs.includes(potentialBranchSlug)) {
+      const targetTenant = await this.tenantService.getTenantBySlug(potentialBranchSlug);
+      
+      if (targetTenant) {
+        if (!this.tenantService.isCurrentTenant(targetTenant.id)) {
+          console.log(`[TenantGuard v2] Switching to branch: ${targetTenant.name}`);
+          await this.tenantService.setCurrentTenant(targetTenant.id);
+          currentTenant = this.tenantService.getCurrentTenant();
+        }
+      } else {
+        // No es una sucursal conocida, asegurar que estamos en el tenant principal si estamos en el dominio base
+        if (this.tenantService.isMainDomain() && !this.tenantService.isMainTenant()) {
+          console.log('[TenantGuard v2] Unknown slug on main domain, switching to central');
+          await this.tenantService.setCurrentTenant('central');
+          currentTenant = this.tenantService.getCurrentTenant();
+        }
       }
     }
     
-    // Validar que el tenant actual tenga acceso a la ruta solicitada
-    if (!this.validateRouteAccess(state.url, currentTenant)) {
-      console.warn(`Access denied to route: ${state.url} for tenant: ${currentTenant?.name}`);
-      this.router.navigate(['/']);
+    // 5. Validar acceso a la ruta (Diferente a la raíz)
+    const isAllowed = this.validateRouteAccess(url, currentTenant);
+    
+    if (!isAllowed) {
+      const tenantName = currentTenant ? (currentTenant.name || 'Unnamed Tenant') : 'No Tenant';
+      console.warn(`[TenantGuard v2] Access DENIED to: ${url} for tenant: ${tenantName}`);
+      
+      // Solo redirigimos si NO estamos ya en la raíz (doble chequeo)
+      if (url !== '/' && url !== '') {
+        this.router.navigate(['/']);
+      }
       return false;
     }
     
@@ -54,20 +77,30 @@ export class TenantIsolationGuard implements CanActivate {
    * Valida si el tenant actual tiene acceso a la ruta solicitada
    */
   private validateRouteAccess(url: string, tenant: any): boolean {
+    // Si la ruta es la raíz, ya la permitimos arriba, pero por si acaso:
+    if (url === '/' || url === '') return true;
+    
+    // Si es el inquilino principal (Arecofix central), tiene acceso a todas las rutas comunes
+    if (tenant?.slug === 'arecofix' || this.tenantService.isMainTenant()) {
+      return true;
+    }
+    
+    // Si no hay tenant y no es el principal, denegar acceso a rutas de características
     if (!tenant) return false;
     
-    // Rutas que requieren características específicas
+    // Rutas protegidas por características de sucursal
     const restrictedRoutes = [
       { path: '/products', feature: 'hasProducts' },
+      { path: '/productos', feature: 'hasProducts' },
       { path: '/servicios', feature: 'hasServices' },
-      { path: '/courses', feature: 'hasCourses' },
+      { path: '/academy', feature: 'hasCourses' },
       { path: '/repairs', feature: 'hasRepairs' },
       { path: '/blog', feature: 'hasBlog' }
     ];
     
     for (const route of restrictedRoutes) {
       if (url.includes(route.path)) {
-        return tenant.features[route.feature] === true;
+        return tenant.features?.[route.feature] === true;
       }
     }
     

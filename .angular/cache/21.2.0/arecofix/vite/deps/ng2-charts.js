@@ -17,8 +17,8 @@ import {
   NgZone,
   ɵɵdefineInjectable
 } from "./chunk-IOOTUGLU.js";
-import "./chunk-DV4IX7KM.js";
 import "./chunk-IIO35NQM.js";
+import "./chunk-DV4IX7KM.js";
 import {
   BehaviorSubject,
   distinctUntilChanged

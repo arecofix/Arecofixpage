@@ -30,6 +30,7 @@ export class AdminRepairFormPage implements OnInit {
     
     // Initial form state matching entity structure
     initialFormState = {
+        customer_id: '', // New field for DB binding
         customer_name: '',
         customer_phone: '',
         device_model: '',
@@ -50,26 +51,66 @@ export class AdminRepairFormPage implements OnInit {
         },
         security_pin: '',
         security_pattern: '',
-        device_passcode: '', // New field
+        device_passcode: '',
         deposit_amount: 0,
         tracking_code: '',
         repair_number: 0,
         images: [] as string[],
-        technical_labor_cost: 0, // New field
-        technical_report: '', // New field
-        parts: [] as any[] // New field for RepairPart
+        technical_labor_cost: 0,
+        technical_report: '',
+        parts: [] as any[],
+        upsell_vidrio: false
     };
 
     form = signal({ ...this.initialFormState });
-    availableProducts = signal<any[]>([]); // To select parts from
     searchQuery = signal('');
-    filteredProducts = computed(() => {
-        const query = this.searchQuery().toLowerCase().trim();
-        const products = this.availableProducts();
-        if (!query) return products;
-        return products.filter(p => p.name.toLowerCase().includes(query));
-    });
+    searchingProducts = signal(false);
+    filteredProducts = signal<any[]>([]);
     showProductModal = signal(false);
+
+    // This will be triggered whenever searchQuery changes
+    onSearchChange(query: string) {
+        this.searchQuery.set(query);
+        if (query.trim().length >= 2) {
+            this.searchProducts(query);
+        } else if (query.trim().length === 0) {
+            this.loadInitialProducts();
+        }
+    }
+
+    private searchTimeout: any;
+    async searchProducts(query: string) {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+        this.searchTimeout = setTimeout(async () => {
+            this.searchingProducts.set(true);
+            try {
+                const response = await this.productService.getProductsPaginated({
+                    q: query.trim(),
+                    _per_page: 20
+                });
+                this.filteredProducts.set(response.data || []);
+            } catch (e) {
+                console.error('Error searching products', e);
+            } finally {
+                this.searchingProducts.set(false);
+            }
+        }, 400); // 400ms debounce
+    }
+
+    async loadInitialProducts() {
+        this.searchingProducts.set(true);
+        try {
+            const response = await this.productService.getProductsPaginated({
+                _per_page: 20
+            });
+            this.filteredProducts.set(response.data || []);
+        } catch (e) {
+            console.error('Error loading initial products', e);
+        } finally {
+            this.searchingProducts.set(false);
+        }
+    }
 
     loading = signal(true);
     saving = signal(false);
@@ -103,13 +144,12 @@ export class AdminRepairFormPage implements OnInit {
         if (client) {
             this.form.update(f => ({
                 ...f,
+                customer_id: client.id, // Set the actual ID for the DB
                 customer_name: client.displayName,
                 customer_phone: client.phone || f.customer_phone
             }));
-            // Optionally, we could store client.id to the payload explicitly,
-            // but the current schema uses customer_name heavily. We'll stick to the UI autocomplete.
         } else {
-            this.form.update(f => ({ ...f, customer_name: clientName }));
+            this.form.update(f => ({ ...f, customer_name: clientName, customer_id: '' }));
         }
     }
 
@@ -125,20 +165,14 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     async loadProducts() {
-        try {
-            const products = await this.productService.getProducts();
-            this.availableProducts.set(products);
-        } catch (e: unknown) {
-            console.error('Error loading products:', e);
-            this.error.set('Error al cargar repuestos sugeridos');
-        }
+        await this.loadInitialProducts();
     }
 
     async openProductModal() {
-        if (this.availableProducts().length === 0) {
-            await this.loadProducts();
-        }
         this.showProductModal.set(true);
+        if (this.filteredProducts().length === 0) {
+            await this.loadInitialProducts();
+        }
     }
 
     async onFileSelected(event: Event) {
@@ -232,6 +266,7 @@ export class AdminRepairFormPage implements OnInit {
             const data = await this.repairService.getById(this.id);
             if (data) {
                 this.form.set({
+                    customer_id: data.customer_id || '',
                     customer_name: data.customer_name || '',
                     customer_phone: data.customer_phone || '',
                     device_model: data.device_model || '',
@@ -253,7 +288,8 @@ export class AdminRepairFormPage implements OnInit {
                     images: data.images || [],
                     technical_labor_cost: data.technical_labor_cost || 0,
                     technical_report: data.technical_report || '',
-                    parts: data.parts || []
+                    parts: data.parts || [],
+                    upsell_vidrio: data.upsell_vidrio || false
                 });
             }
         } catch (e: unknown) {
@@ -295,7 +331,7 @@ export class AdminRepairFormPage implements OnInit {
         }
     }
 
-    printOrder() {
+    async printOrder() {
         const doc = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
@@ -305,6 +341,34 @@ export class AdminRepairFormPage implements OnInit {
         const formData = this.form();
         const companyData = this.company();
         const primaryColor = companyData?.branding_settings?.primary_color || '#16a34a';
+
+        // Convert logo URL to base64 for jsPDF
+        const getBase64ImageFromURL = (url: string) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.setAttribute('crossOrigin', 'anonymous');
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0);
+                    const dataURL = canvas.toDataURL('image/png');
+                    resolve(dataURL);
+                };
+                img.onerror = (error) => reject(error);
+                img.src = url;
+            });
+        };
+
+        let logoBase64 = '';
+        if (companyData?.logo_url) {
+            try {
+                logoBase64 = await getBase64ImageFromURL(companyData.logo_url) as string;
+            } catch (e) {
+                console.warn('Could not load company logo for PDF', e);
+            }
+        }
 
         // Helper string to hex color array
         const hexToRgb = (hex: string) => {
@@ -321,17 +385,30 @@ export class AdminRepairFormPage implements OnInit {
         doc.setFillColor(243, 244, 246);
         doc.rect(0, 0, 210, 45, 'F');
 
-        // Company Name
-        doc.setFontSize(24);
-        doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-        doc.text(companyData?.name || 'Arecofix', 15, 20);
+        // Company Name or Logo
+        if (logoBase64) {
+            doc.addImage(logoBase64, 'PNG', 15, 10, 30, 15);
+            doc.setFontSize(18);
+            doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
+            doc.text(companyData?.name || 'Arecofix', 48, 20);
+        } else {
+            doc.setFontSize(24);
+            doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
+            doc.text(companyData?.name || 'Arecofix', 15, 20);
+        }
 
         // Standard Text Color
         doc.setTextColor(55, 65, 81);
         
-        doc.setFontSize(10);
-        doc.text(companyData?.address || 'Dirección de la Sucursal', 15, 28);
-        doc.text(`Tel: ${companyData?.phone || 'Sin Teléfono'}`, 15, 34);
+        doc.setFontSize(9);
+        const contactY = logoBase64 ? 27 : 28;
+        doc.text(companyData?.address || companyData?.location || 'Dirección de la Sucursal', 15, contactY);
+        doc.text(`Tel: ${companyData?.phone || companyData?.contact_phone || 'Sin Teléfono'} | Email: ${companyData?.email || companyData?.contact_email || 'Sin Email'}`, 15, contactY + 5);
+        if (companyData?.tax_id) {
+            doc.text(`CUIT: ${companyData.tax_id}`, 15, contactY + 10);
+        } else if (companyData?.cuit) {
+            doc.text(`CUIT: ${companyData.cuit}`, 15, contactY + 10);
+        }
 
         // Ticket Info (Right side)
         doc.setFontSize(16);

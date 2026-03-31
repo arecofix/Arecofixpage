@@ -57,7 +57,11 @@ export class CategoryService {
     ).pipe(
       map(({ data, count, error }) => {
         if (error) throw error;
-        return this.processResponse(data || [], count, { _page, _per_page });
+        const normalizedData = (data || []).map(cat => ({
+          ...cat,
+          name: this.normalizeCategoryName(cat.name)
+        }));
+        return this.processResponse(normalizedData, count, { _page, _per_page });
       }),
       catchError((err) => {
         this.logger.error('Supabase Error:', err);
@@ -81,7 +85,11 @@ export class CategoryService {
     ).pipe(
       map(({ data, count, error }) => {
         if (error) throw error;
-        return this.processResponse(data || [], count, { _page, _per_page });
+        const normalizedData = (data || []).map(cat => ({
+          ...cat,
+          name: this.normalizeCategoryName(cat.name)
+        }));
+        return this.processResponse(normalizedData, count, { _page, _per_page });
       }),
       catchError((err) => {
         this.logger.error('Supabase Error:', err);
@@ -201,5 +209,11 @@ export class CategoryService {
 
   public update(id: string, category: Partial<iCategory>): Observable<iCategory> {
     return this.categoryRepo.update(id, category) as Observable<iCategory>;
+  }
+
+  private normalizeCategoryName(name: string): string {
+    const n = (name || '').trim().toLowerCase();
+    if (n === 'smartphones' || n === 'smartphone') return 'Celulares';
+    return name;
   }
 }

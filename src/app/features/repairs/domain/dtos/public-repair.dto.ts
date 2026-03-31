@@ -19,4 +19,13 @@ export interface PublicRepairDto {
     readonly customer_name?: string;
     readonly technician_report?: string;
     readonly images?: string[];
+    readonly upsell_vidrio?: boolean;
+    readonly imei?: string;
+    readonly checklist?: {
+        charger: boolean;
+        battery: boolean;
+        chip: boolean;
+        sd: boolean;
+        case: boolean;
+    };
 }
