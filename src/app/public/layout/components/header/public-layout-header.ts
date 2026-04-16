@@ -22,6 +22,8 @@ import { SearchService } from '@app/shared/services/search.service';
 import { AutoFocusDirective } from '@app/shared/directives/auto-focus.directive';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
+import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
+import { Category } from '@app/features/products/domain/entities/category.entity';
 import { NavItem } from '@app/shared/models/navigation.model';
 import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/models/navigation.data';
 import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
@@ -61,6 +63,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
   private productRepo = inject(ProductRepository);
+  private categoryRepo = inject(CategoryRepository);
 
   public user$ = this.authService.authState$.pipe(map((state) => state.user));
 
@@ -87,27 +90,17 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     this.navItems().filter((item) => !item.children || item.children.length === 0)
   );
 
-  // ── Search Logic ──────────────────────────────────
+  // ── Search Logic (OPTIMIZED: Server-side search) ──────────────────
   public searchQuery = signal('');
   public products = signal<Product[]>([]);
   public showResults = signal(false);
+  public isSearching = signal(false);
 
-  public filteredProducts = computed(() => {
-    const query = this.searchQuery().trim();
-    if (!query) return [];
-
-    return this.products()
-      .filter((p) => {
-        const searchScope = `${p.name} ${p.sku || ''} ${p.barcode || ''}`;
-        return SearchUtils.matches(query, searchScope);
-      })
-      .sort((a, b) => {
-          const scoreA = SearchUtils.getRelevanceScore(a.name, query);
-          const scoreB = SearchUtils.getRelevanceScore(b.name, query);
-          return scoreB - scoreA || a.name.localeCompare(b.name);
-      })
-      .slice(0, 10);
-  });
+  /**
+   * We no longer pre-load all products. Instead, we react to optimized search terms
+   * and query the database directly for the best matches.
+   */
+  public filteredProducts = this.products;
 
   // ── Mobile Menu ───────────────────────────────────
   public isMobileMenuOpen = signal(false);
@@ -190,9 +183,15 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     // Defer product loading to idle time — not needed until search
     if (isPlatformBrowser(this.platformId)) {
       if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(() => this.loadProducts(), { timeout: 4000 });
+        (window as any).requestIdleCallback(() => {
+          this.loadProducts();
+          this.loadDynamicCategories();
+        }, { timeout: 4000 });
       } else {
-        setTimeout(() => this.loadProducts(), 2000);
+        setTimeout(() => {
+          this.loadProducts();
+          this.loadDynamicCategories();
+        }, 2000);
       }
     }
 
@@ -207,11 +206,25 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
       })
     );
 
-    // Debounced search — react to optimized query changes
+    // Debounced search — fetch results from the server on demand
     this.subscriptions.add(
-      this.searchService.debouncedQuery$.subscribe((term) => {
+      this.searchService.debouncedQuery$.subscribe(async (term) => {
         this.searchQuery.set(term);
         this.showResults.set(!!term);
+        
+        if (term && term.length > 1) {
+          this.isSearching.set(true);
+          try {
+            const results = await firstValueFrom(this.productRepo.search(term));
+            this.products.set(results.slice(0, 10)); // Take top results
+          } catch (err) {
+            console.error('Search error:', err);
+          } finally {
+            this.isSearching.set(false);
+          }
+        } else {
+          this.products.set([]);
+        }
         this.cdr.markForCheck();
       })
     );
@@ -258,15 +271,50 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  // ── Search ────────────────────────────────────────
-  async loadProducts() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  /**
+   * DEPRECATED: We no longer load all products into memory.
+   * Search is now triggered on-demand via searchService.debouncedQuery$.
+   */
+  /**
+   * Fetches active categories from the database and injects them 
+   * into the 'Tienda' -> 'Todas las Categorías' navigation item.
+   */
+  async loadDynamicCategories() {
     try {
-      const data = await firstValueFrom(this.productRepo.findAvailable());
-      if (data) this.products.set(data);
-    } catch {
-      // Silent fail on SSR or network error
+      this.categoryRepo.getAll({ column: 'name', ascending: true }).subscribe(categories => {
+        if (!categories || categories.length === 0) return;
+
+        this.navItems.update(currentItems => {
+          // Clone high-level structure to avoid mutation issues
+          const newItems = [...currentItems];
+          const tienda = newItems.find(item => item.id === 'tienda');
+          
+          if (tienda && tienda.children) {
+            const todasCategorias = tienda.children.find(child => child.id === 'tienda-categorias');
+            
+            if (todasCategorias) {
+              // Convert DB categories to NavItems
+              todasCategorias.children = categories.map(cat => ({
+                id: `dynamic-cat-${cat.id}`,
+                label: cat.name,
+                path: `/productos/categoria/${cat.slug}`,
+                icon: 'fas fa-tag', // Default icon for dynamic categories
+                theme: 'tienda'
+              }));
+              
+              this.cdr.markForCheck();
+            }
+          }
+          return newItems;
+        });
+      });
+    } catch (err) {
+      console.error('Error loading dynamic categories:', err);
     }
+  }
+
+  async loadProducts() {
+    // No-op - loading on demand now
   }
 
   public onSearchInput(): void {
@@ -281,6 +329,33 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
       this.closeMobileMenu();
       this.router.navigate(['/productos'], { queryParams: { q: query, _page: 1 } });
     }
+  }
+
+  /**
+   * FIX: iOS Safari doesn't automatically "un-zoom" when an input is blurred.
+   * This trick temporarily toggles the viewport scale to force a reset.
+   */
+  public onSearchBlur(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // Check if it's likely a mobile device (touch support + small width)
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) return;
+
+    // We use a small timeout to allow any pending clicks (like selecting a product) to finish
+    setTimeout(() => {
+      const meta = document.querySelector('meta[name="viewport"]');
+      if (meta) {
+        const originalContent = meta.getAttribute('content');
+        // Force a specific scale briefly to reset any browser zoom
+        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+
+        // Restore to original after a tiny delay
+        setTimeout(() => {
+          meta.setAttribute('content', originalContent || 'width=device-width, initial-scale=1.0, viewport-fit=cover');
+        }, 300);
+      }
+    }, 150);
   }
 
   public selectProduct(product: Product) {

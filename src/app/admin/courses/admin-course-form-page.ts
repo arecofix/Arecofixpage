@@ -4,7 +4,8 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CoursesService, Module } from '@app/core/services/courses.service';
-import { AuthService } from '@app/core/services/auth.service';
+import { ProductMediaService } from '@app/admin/products/services/product-media.service';
+import { LoggerService } from '@app/core/services/logger.service';
 
 @Component({
   selector: 'app-admin-course-form-page',
@@ -308,8 +309,9 @@ export class AdminCourseFormPage implements OnInit {
   private coursesService = inject(CoursesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private auth = inject(AuthService);
+  private mediaService = inject(ProductMediaService);
   private cdr = inject(ChangeDetectorRef);
+  private logger = inject(LoggerService);
 
 
   form: FormGroup;
@@ -345,7 +347,7 @@ export class AdminCourseFormPage implements OnInit {
       id: [modData?.id || null],
       title: [modData?.title || '', Validators.required],
       description: [modData?.description || ''],
-      order: [modData?.order || this.modulesFormArray.length + 1]
+      order_index: [modData?.order_index || this.modulesFormArray.length + 1]
     });
     this.modulesFormArray.push(moduleGroup);
   }
@@ -378,34 +380,12 @@ export class AdminCourseFormPage implements OnInit {
     this.saving = true;
     this.cdr.markForCheck(); // Force update UI to show spinner
 
-    const supabase = this.auth.getSupabaseClient();
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `courses/${fileName}`;
-
     try {
-      // Create a timeout promise
-      const timeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Tiempo de espera agotado al subir la imagen')), 15000)
-      );
-
-      // Race between upload and timeout
-      const uploadPromise = supabase.storage
-        .from('public-assets')
-        .upload(filePath, file);
-      
-      const { data, error } = await Promise.race([uploadPromise, timeout]) as any;
-
-      if (error) throw error;
-
-      const { data: publicUrl } = supabase.storage
-        .from('public-assets')
-        .getPublicUrl(filePath);
-
-      this.form.patchValue({ image_url: publicUrl.publicUrl });
+      const publicUrl = await this.mediaService.uploadFile(file, 'courses');
+      this.form.patchValue({ image_url: publicUrl });
       this.cdr.markForCheck(); // Update preview
     } catch (error: any) {
-      console.error('Error uploading image:', error);
+      this.logger.error('Error uploading image', error);
       alert('Error al subir la imagen: ' + (error.message || error));
     } finally {
       this.saving = false;
@@ -417,32 +397,27 @@ export class AdminCourseFormPage implements OnInit {
 
   loadCourse(id: string) {
     this.coursesService.getCourseById(id).subscribe({
-      next: (response) => {
+      next: (response: { data: any, error: any }) => {
         if (response.data) {
           this.form.patchValue(response.data);
         }
       },
-      error: (err) => console.error('Error loading course', err)
+      error: (err: any) => this.logger.error('Error loading course', err)
     });
 
     this.coursesService.getModulesByCourseId(id).subscribe({
-      next: (res) => {
+      next: (res: { data: any[], error: any }) => {
         if (res.data && res.data.length > 0) {
             this.modulesFormArray.clear();
-            res.data.forEach(m => this.addModule(m));
+            res.data.forEach((m: any) => this.addModule(m));
         }
       },
-      error: (err) => console.error('Error loading modules', err)
+      error: (err: any) => this.logger.error('Error loading modules', err)
     });
   }
 
   async save() {
-    console.log('🚀 Save method called');
-    console.log('📋 Form valid:', !this.form.invalid);
-    console.log('📋 Form values:', this.form.value);
-    
     if (this.form.invalid) {
-      console.log('❌ Form is invalid');
       this.form.markAllAsTouched();
       alert('Por favor completa todos los campos requeridos');
       return;
@@ -451,51 +426,38 @@ export class AdminCourseFormPage implements OnInit {
     this.saving = true;
     const { modules, ...courseData } = this.form.value;
     
-    console.log('📚 Course data to save:', courseData);
-    console.log('📦 Modules to save:', modules);
+    this.logger.debug('Starting course save workflow', { isEditing: this.isEditing });
 
     try {
-      console.log('🔄 Starting course creation/update...');
-      
       let courseResult;
       if (this.isEditing && this.courseId) {
-        console.log('📝 Updating existing course:', this.courseId);
         courseResult = await this.coursesService.updateCourse(this.courseId, courseData).toPromise();
       } else {
-        console.log('➕ Creating new course');
         courseResult = await this.coursesService.createCourse(courseData).toPromise();
       }
 
-      console.log('📊 Course save result:', courseResult);
-
       if (courseResult?.error) {
-        console.error('❌ Course save error:', courseResult.error);
         throw new Error(courseResult.error.message || 'Error al guardar el curso');
       }
 
       const savedCourseId = courseResult?.data?.id || this.courseId;
-      console.log('✅ Course saved with ID:', savedCourseId);
       
       if (savedCourseId && modules && modules.length >= 0) {
-        console.log('📦 Saving modules...');
         try {
           await this.coursesService.saveModules(savedCourseId, modules).toPromise();
-          console.log('✅ Modules saved successfully');
         } catch (modErr: any) {
-          console.error('❌ Error saving modules:', modErr);
-          alert('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario. Error: ' + (modErr.message || modErr));
+          this.logger.warn('Failed to sync modules', modErr);
+          alert('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario.');
         }
       }
       
-      console.log('🏠 Redirecting to courses list');
       this.router.navigate(['/admin/courses']);
       
     } catch (err: any) {
-      console.error('💥 Save method error:', err);
+      this.logger.error('Save workflow failed', err);
       alert('Error al guardar: ' + err.message);
     } finally {
       this.saving = false;
-      console.log('✅ Save method completed, saving state reset');
     }
   }
 }

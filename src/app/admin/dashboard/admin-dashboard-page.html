@@ -35,9 +35,41 @@
     </div>
   
     @if (loading()) {
-        <div class="flex flex-col items-center justify-center py-20 animate-pulse">
-            <div class="w-16 h-16 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin mb-4"></div>
-            <span class="text-sm font-medium text-gray-500">Cargando métricas...</span>
+        <div class="animate-fade-in">
+            <!-- Header Skeleton -->
+            <div class="flex flex-col md:flex-row justify-between mb-8 gap-4">
+                <div class="space-y-2">
+                    <app-skeleton width="200px" height="2rem" borderRadius="rounded-xl"></app-skeleton>
+                    <app-skeleton width="300px" height="1rem"></app-skeleton>
+                </div>
+                <div class="flex gap-2">
+                    <app-skeleton width="120px" height="2.5rem" borderRadius="rounded-2xl"></app-skeleton>
+                    <app-skeleton width="120px" height="2.5rem" borderRadius="rounded-2xl"></app-skeleton>
+                </div>
+            </div>
+
+            <!-- KPIs Skeletons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                @for (i of [1,2,3,4,5]; track i) {
+                    <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-6 border border-gray-100 dark:border-gray-800">
+                        <app-skeleton width="40px" height="40px" borderRadius="rounded-2xl" class="mb-4"></app-skeleton>
+                        <app-skeleton width="60%" height="0.75rem" class="mb-2"></app-skeleton>
+                        <app-skeleton width="80%" height="1.5rem"></app-skeleton>
+                    </div>
+                }
+            </div>
+
+            <!-- Main Charts Skeletons -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800/50 rounded-4xl p-8 h-80 border border-gray-100 dark:border-gray-800">
+                    <app-skeleton width="150px" height="1.25rem" class="mb-6"></app-skeleton>
+                    <app-skeleton width="100%" height="200px" borderRadius="rounded-2xl"></app-skeleton>
+                </div>
+                <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-8 h-80 border border-gray-100 dark:border-gray-800">
+                    <app-skeleton width="150px" height="1.25rem" class="mb-6"></app-skeleton>
+                    <app-skeleton width="100%" height="200px" borderRadius="rounded-2xl"></app-skeleton>
+                </div>
+            </div>
         </div>
     } @else {
         
@@ -53,7 +85,7 @@
                     </div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ingresos Tienda</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().revenue | number:'1.0-0' }}</div>
             </div>
 
             <!-- KPI: Ingresos Taller -->
@@ -65,7 +97,7 @@
                     </div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ventas Taller</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().repairs_revenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_revenue | number:'1.0-0' }}</div>
             </div>
 
             <!-- KPI: Ganancia Estimada -->
@@ -78,7 +110,7 @@
                     <div class="badge badge-success text-[10px] text-white border-none font-bold">GANANCIA</div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ganancia Estimada</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().repairs_profit | currency:'ARS':'symbol':'1.0-0' }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_profit | number:'1.0-0' }}</div>
             </div>
 
             <!-- KPI: Equipos Arreglados -->
@@ -107,7 +139,123 @@
 
         </div>
 
-        <!-- Super Admin Branch Management Section -->
+        <!-- ── Sección Financiera: Ingresos Brutos vs Ganancia Real ────────── -->
+        <div class="mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 120ms;">
+            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
+
+                <!-- Header de sección -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <i class="fas fa-chart-line text-emerald-500"></i>
+                            Resumen Financiero
+                        </h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ingresos brutos, costos reales y ganancia neta del negocio</p>
+                    </div>
+                    <!-- Botones de descarga global -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button (click)="downloadCSV()"
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all">
+                            <i class="fas fa-file-csv"></i> Exportar CSV
+                        </button>
+                        <button (click)="downloadTotalPDF()"
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold text-sm border border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
+                            <i class="fas fa-file-pdf"></i> PDF Histórico
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPIs del mes actual -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-blue-50 dark:bg-blue-500/10 rounded-3xl p-4 border border-blue-100 dark:border-blue-500/20">
+                        <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Ingresos Brutos (este mes)</div>
+                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ stats().current_month_gross | number:'1.0-0' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ventas + Reparaciones cobradas</div>
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-500/10 rounded-3xl p-4 border border-red-100 dark:border-red-500/20">
+                        <div class="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Costos Reales (este mes)</div>
+                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ stats().current_month_cost | number:'1.0-0' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Repuestos usados + Costo productos</div>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-emerald-500/10 rounded-3xl p-4 border border-emerald-100 dark:border-emerald-500/20">
+                        <div class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1 flex items-center justify-between">
+                            Ganancia Real (este mes)
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600">{{ currentMonthMargin() }}%</span>
+                        </div>
+                        <div class="text-2xl font-black" [ngClass]="stats().current_month_profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
+                            $ {{ stats().current_month_profit | number:'1.0-0' }}
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ingresos brutos − costos reales</div>
+                    </div>
+                </div>
+
+                <!-- Totales históricos -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-700">
+                    <div class="text-center">
+                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Ingr. Brutos Histórico</div>
+                        <div class="text-xl font-black text-gray-800 dark:text-white">$ {{ stats().total_gross_revenue | number:'1.0-0' }}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Costos Histórico</div>
+                        <div class="text-xl font-black text-red-600 dark:text-red-400">− $ {{ stats().total_cost | number:'1.0-0' }}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-center gap-1">
+                            Ganancia Total Histórica
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 font-bold">{{ totalProfitMargin() }}%</span>
+                        </div>
+                        <div class="text-xl font-black text-emerald-600 dark:text-emerald-400">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
+                    </div>
+                </div>
+
+                <!-- Tabla de desglose mensual -->
+                @if (stats().monthly_breakdown.length > 0) {
+                    <div class="overflow-x-auto rounded-2xl border border-gray-100 dark:border-gray-700">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 dark:bg-gray-800/80">
+                                <tr>
+                                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Mes</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Ingresos Brutos</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">Taller</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">Tienda</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden md:table-cell">Costos</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Ganancia Neta</th>
+                                    <th class="text-center px-3 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">PDF</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (month of stats().monthly_breakdown; track month.period) {
+                                    <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                                        <td class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">{{ month.label }}</td>
+                                        <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">$ {{ month.gross_revenue | number:'1.0-0' }}</td>
+                                        <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-400 hidden sm:table-cell">$ {{ month.repairs_revenue | number:'1.0-0' }}</td>
+                                        <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-400 hidden sm:table-cell">$ {{ month.sales_revenue | number:'1.0-0' }}</td>
+                                        <td class="px-4 py-3 text-right text-red-500 dark:text-red-400 hidden md:table-cell">− $ {{ month.cost | number:'1.0-0' }}</td>
+                                        <td class="px-4 py-3 text-right font-black" [ngClass]="month.net_profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
+                                            $ {{ month.net_profit | number:'1.0-0' }}
+                                        </td>
+                                        <td class="px-3 py-3 text-center">
+                                            <button (click)="downloadMonthlyPDF(month)"
+                                                class="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-400 hover:text-blue-600 transition-all"
+                                                title="Descargar PDF de {{ month.label }}">
+                                                <i class="fas fa-download text-xs"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                } @else {
+                    <div class="text-center py-8 text-gray-400 dark:text-gray-500">
+                        <i class="fas fa-chart-bar text-3xl mb-2 opacity-30"></i>
+                        <p class="text-sm">Sin datos de ingresos registrados todavía.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+
         @if (isSuperAdmin() && branches().length > 0) {
             <div class="mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 150ms;">
                 <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
@@ -124,7 +272,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @for (branch of branches(); track branch.id) {
                             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-3xl p-4 border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-500/30 hover:shadow-md transition-all cursor-pointer group"
-                                 (click)="goToBranch(branch.slug)">
+                                 (click)="goToBranch(branch.id)">
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="w-12 h-12 rounded-2xl bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                                         <i class="fas fa-store"></i>
@@ -205,12 +353,18 @@
                         <i class="fas fa-chart-area text-blue-500"></i> Evolución de Ingresos
                     </h2>
                 </div>
-                <div class="h-64 sm:h-80 w-full relative">
-                    <canvas baseChart
-                        [data]="salesChartData"
-                        [options]="salesChartOptions"
-                        [type]="salesChartType">
-                    </canvas>
+                <div class="h-64 sm:h-80 w-full relative block">
+                    @defer (on viewport) {
+                        <canvas baseChart
+                            [data]="salesChartData"
+                            [options]="salesChartOptions"
+                            [type]="salesChartType">
+                        </canvas>
+                    } @placeholder {
+                        <div class="w-full h-full flex items-center justify-center bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl">
+                            <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -222,11 +376,17 @@
                     </h2>
                 </div>
                 <div class="h-56 sm:h-64 w-full flex-1 relative flex items-center justify-center">
-                    <canvas baseChart
-                        [data]="productsChartData"
-                        [options]="productsChartOptions"
-                        [type]="productsChartType">
-                    </canvas>
+                    @defer (on viewport) {
+                        <canvas baseChart
+                            [data]="productsChartData"
+                            [options]="productsChartOptions"
+                            [type]="productsChartType">
+                        </canvas>
+                    } @placeholder {
+                        <div class="w-full h-full">
+                            <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -241,11 +401,15 @@
                     <i class="fas fa-chart-pie text-fuchsia-500"></i> Ventas por Categoría
                 </h2>
                 <div class="h-56 sm:h-64 w-full flex justify-center items-center">
-                    <canvas baseChart
-                        [data]="categoryChartData"
-                        [options]="categoryChartOptions"
-                        [type]="categoryChartType">
-                    </canvas>
+                    @defer (on viewport) {
+                        <canvas baseChart
+                            [data]="categoryChartData"
+                            [options]="categoryChartOptions"
+                            [type]="categoryChartType">
+                        </canvas>
+                    } @placeholder {
+                        <div class="w-48 h-48 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
+                    }
                 </div>
             </div>
 

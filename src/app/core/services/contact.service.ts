@@ -60,4 +60,44 @@ export class ContactService {
             return { error: pgError };
         }
     }
+
+    async getMessages(): Promise<any[]> {
+        const { data, error } = await this.supabase
+            .from('contact_messages')
+            .select('*')
+            .eq('tenant_id', this.tenantService.getTenantId())
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            this.logger.error('Error fetching messages:', error);
+            throw error;
+        }
+        return data || [];
+    }
+
+    async markAsRead(id: string): Promise<void> {
+        const { error } = await this.supabase
+            .from('contact_messages')
+            .update({ is_read: true })
+            .eq('id', id)
+            .eq('tenant_id', this.tenantService.getTenantId());
+
+        if (error) {
+            this.logger.error('Error marking message as read:', error);
+            throw error;
+        }
+    }
+
+    async deleteMessage(id: string): Promise<void> {
+        const { error } = await this.supabase
+            .from('contact_messages')
+            .delete()
+            .eq('id', id)
+            .eq('tenant_id', this.tenantService.getTenantId());
+
+        if (error) {
+            this.logger.error('Error deleting message:', error);
+            throw error;
+        }
+    }
 }

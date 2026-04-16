@@ -159,6 +159,88 @@
       </div>
     </div>
 
+    <!-- *** INTELIGENCIA FINANCIERA ARECOFIX *** -->
+    <div class="financial-intelligence mt-12 mb-8" *ngIf="isBranchAdmin()">
+      <div class="flex items-center gap-3 mb-6">
+          <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
+              <i class="fas fa-brain text-xl"></i>
+          </div>
+          <div>
+              <h2 class="text-2xl font-bold text-slate-800 m-0">Inteligencia Financiera</h2>
+              <p class="text-slate-500 m-0 text-sm">Eliminando la Falsa Sensación de Riqueza</p>
+          </div>
+      </div>
+      
+      <div class="stats-grid">
+        <!-- Ingreso Bruto -->
+        <div class="stat-card border-l-4 border-blue-400">
+          <div class="stat-icon text-blue-500 bg-blue-50"><i class="fas fa-money-bill-wave"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value text-gray-700">{{ formatCurrency(financeService.grossIncome()) }}</h3>
+            <p class="stat-label">Ingreso Bruto (Total Acumulado)</p>
+          </div>
+        </div>
+        <!-- Costos Operativos -->
+        <div class="stat-card border-l-4 border-red-400">
+          <div class="stat-icon text-red-500 bg-red-50"><i class="fas fa-dolly"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value text-red-500">{{ formatCurrency(financeService.operativeCosts()) }}</h3>
+            <p class="stat-label">Costos Operativos Reales</p>
+          </div>
+        </div>
+        <!-- Margen Neto (Lo de verdad) -->
+        <div class="stat-card border-l-4 border-green-500 highlight" style="background: linear-gradient(to right, #f0fdf4, white);">
+          <div class="stat-icon text-green-600 bg-green-100"><i class="fas fa-piggy-bank"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value text-green-600 text-3xl">{{ formatCurrency(financeService.netMargin()) }}</h3>
+            <p class="stat-label font-bold text-green-700">Margen Libre (Ganancia Real)</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel de Estilo de Vida y Ahorro -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <!-- Gastos Hormiga -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <h3 class="text-lg font-bold text-slate-700 mb-2 border-b pb-2"><i class="fas fa-bug text-orange-400 mr-2"></i>Control de Descapitalización</h3>
+              <div class="flex justify-between items-center mb-2 mt-4">
+                  <span class="text-slate-600">Gastos Fijos Vitales</span>
+                  <span class="font-medium text-slate-800">{{ formatCurrency(financeService.fixedPersonalExpenses()) }}</span>
+              </div>
+              <div class="flex justify-between items-center bg-orange-50 p-2 rounded-lg">
+                  <span class="text-orange-700 font-medium">Gastos Hormiga / Ocio</span>
+                  <span class="font-bold text-orange-600">{{ formatCurrency(financeService.antExpenses()) }}</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-3 text-center">Identificando dinero que escapa del taller hacia fines no productivos.</p>
+          </div>
+
+          <!-- Meta del Terreno -->
+          <div class="bg-linear-to-br from-indigo-50 to-blue-50 rounded-xl shadow-sm border border-indigo-100 p-6 relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 opacity-10"><i class="fas fa-home text-8xl"></i></div>
+              <h3 class="text-lg font-bold text-indigo-900 mb-1 z-10 relative">Progreso: Meta de Inversión 🏡</h3>
+              <p class="text-sm text-indigo-600 mb-4">{{ financeService.investmentGoal().name }} - {{ financeService.investmentGoal().currency }} {{ formatCurrency(financeService.investmentGoal().targetMonto) }}</p>
+              
+              <div class="w-full bg-white rounded-full h-4 mb-2 shadow-inner border border-indigo-100 relative z-10">
+                <div class="bg-indigo-600 h-4 rounded-full transition-all duration-1000 ease-out" [style.width.%]="financeService.goalProgress()"></div>
+              </div>
+              <div class="flex justify-between text-xs font-semibold text-indigo-800 mb-4 z-10 relative">
+                  <span>{{ financeService.goalProgress() | number:'1.0-1' }}% completado</span>
+                  <span>Poder de Ahorro Neto: {{ formatCurrency(financeService.netSavingsPower()) }}</span>
+              </div>
+              
+              <div class="bg-white/60 p-3 rounded-lg border border-white/40 text-center z-10 relative" *ngIf="financeService.monthsToGoal() > 0 && financeService.goalProgress() < 100">
+                  <p class="text-sm text-indigo-900 mb-0">
+                    <i class="fas fa-calendar-check text-indigo-500 mr-1"></i> 
+                    Al ritmo actual, el objetivo se alcanza en <strong>{{ financeService.monthsToGoal() }} meses</strong>.
+                  </p>
+              </div>
+              <div class="bg-green-100 p-3 rounded-lg border border-green-200 text-center z-10 relative" *ngIf="financeService.goalProgress() >= 100">
+                  <p class="text-sm text-green-800 font-bold mb-0">¡Meta Alcanzada! 🎉</p>
+              </div>
+          </div>
+      </div>
+    </div>
+
     <!-- Gráficos deshabilitados temporalmente -->
 
     <!-- Estado Vacío (para Branch Admin sin datos) -->

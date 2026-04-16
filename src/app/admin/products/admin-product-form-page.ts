@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AdminProductService } from './services/admin-product.service';
 import { ProductImagesManagerComponent } from './components/product-images-manager/product-images-manager.component';
+import { NotificationService } from '@app/core/services/notification.service';
 
 @Component({
   selector: 'app-admin-product-form-page',
@@ -17,6 +18,7 @@ export class AdminProductFormPage implements OnInit {
   private router = inject(Router);
   private productService = inject(AdminProductService);
   private cdr = inject(ChangeDetectorRef);
+  private notificationService = inject(NotificationService);
 
   id: string | null = null;
   
@@ -36,6 +38,7 @@ export class AdminProductFormPage implements OnInit {
     is_global: true,
     branch_id: '',
     images: [] as string[],
+    unit_cost_at_time: 0,
   };
 
   // Resources
@@ -81,11 +84,13 @@ export class AdminProductFormPage implements OnInit {
             is_global: data.is_global ?? true,
             branch_id: data.branch_id || '',
             images: data.gallery_urls || (data.image_url ? [data.image_url] : []),
+            unit_cost_at_time: data.unit_cost_at_time || 0,
           };
         }
       }
     } catch (e: any) {
       this.error = e.message || 'Error al cargar datos';
+      this.notificationService.showError(this.error || '');
     } finally {
       this.loading = false;
       this.cdr.markForCheck();
@@ -138,6 +143,7 @@ export class AdminProductFormPage implements OnInit {
       is_global: formVal.is_global,
       branch_id: formVal.branch_id || null,
       image_url: formVal.images.length > 0 ? formVal.images[0] : null, // Main image
+      unit_cost_at_time: formVal.unit_cost_at_time || 0,
     };
 
     // Add optional fields only if they have values
@@ -152,12 +158,15 @@ export class AdminProductFormPage implements OnInit {
     try {
       if (this.id) {
         await this.productService.updateProduct(this.id, payload);
+        this.notificationService.showSuccess('Producto actualizado correctamente');
       } else {
         await this.productService.createProduct(payload);
+        this.notificationService.showSuccess('Producto creado correctamente');
       }
       this.router.navigate(['/admin/products']);
     } catch (e: any) {
       this.error = e.message || 'Error al guardar producto';
+      this.notificationService.showError(this.error || '');
       console.error('Save error:', e);
     } finally {
       this.saving = false;

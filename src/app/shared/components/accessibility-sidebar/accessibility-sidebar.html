@@ -1,9 +1,18 @@
+<!-- Overlay — bloquea scroll del body y cierra sidebar al tocar afuera -->
 <div
-  class="fixed right-0 top-24 h-[calc(100vh-6rem)] w-80 bg-gray-950/95 backdrop-blur-lg border-l-2 border-brand-blue/30 transform transition-transform duration-300 z-2000 overflow-y-auto rounded-l-xl shadow-2xl"
+  *ngIf="(preferencesService.sidebarOpen$ | async)"
+  class="fixed inset-0 z-1999 bg-black/40 backdrop-blur-[1px]"
+  (click)="preferencesService.closeSidebar()"
+  aria-hidden="true"
+></div>
+
+<!-- Panel principal -->
+<div
+  class="fixed right-0 top-0 h-dvh w-80 bg-gray-950/95 backdrop-blur-lg border-l-2 border-brand-blue/30 transform transition-transform duration-300 z-2000 flex flex-col rounded-l-xl shadow-2xl"
   [class.translate-x-full]="!(preferencesService.sidebarOpen$ | async)"
 >
-  <!-- Sidebar Header -->
-  <div class="sticky top-0 bg-gray-900/80 backdrop-blur border-b border-brand-blue/20 p-4">
+  <!-- Header fijo -->
+  <div class="shrink-0 bg-gray-900/80 backdrop-blur border-b border-brand-blue/20 p-4" style="padding-top: max(1rem, env(safe-area-inset-top));">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-bold text-white flex items-center gap-2">
         <svg class="w-5 h-5 text-brand-blue" fill="currentColor" viewBox="0 0 24 24">
@@ -23,9 +32,12 @@
     </div>
   </div>
 
-  <!-- Sidebar Content -->
-  <div class="p-4 space-y-6">
-    <!-- Language Section -->
+  <!-- Contenido scrollable — -webkit-overflow-scrolling para momentum iOS -->
+  <div
+    class="flex-1 overflow-y-auto overscroll-contain p-4 space-y-6"
+    style="-webkit-overflow-scrolling: touch; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));"
+  >
+    <!-- Idioma -->
     <div class="space-y-3">
       <label class="text-sm font-semibold text-gray-300 block">
         {{ (preferencesService.language$ | async) === 'es' ? 'Idioma' : 'Language' }}
@@ -34,25 +46,27 @@
         <button
           (click)="preferencesService.setLanguage('es')"
           [class.bg-brand-blue]="(preferencesService.language$ | async) === 'es'"
-          class="w-full px-3 py-2 rounded-lg text-white text-sm font-medium transition-all hover:bg-brand-blue/80"
           [class.bg-gray-700]="(preferencesService.language$ | async) !== 'es'"
+          class="w-full px-3 py-2 rounded-lg text-white font-bold text-sm transition-all hover:bg-brand-blue/80 ring-offset-gray-900 focus:ring-2 focus:ring-white"
           [attr.aria-pressed]="(preferencesService.language$ | async) === 'es'"
+          aria-label="Seleccionar idioma Español"
         >
           🇪🇸 Español
         </button>
         <button
           (click)="preferencesService.setLanguage('en')"
           [class.bg-brand-blue]="(preferencesService.language$ | async) === 'en'"
-          class="w-full px-3 py-2 rounded-lg text-white text-sm font-medium transition-all hover:bg-brand-blue/80"
           [class.bg-gray-700]="(preferencesService.language$ | async) !== 'en'"
+          class="w-full px-3 py-2 rounded-lg text-white font-bold text-sm transition-all hover:bg-brand-blue/80 ring-offset-gray-900 focus:ring-2 focus:ring-white"
           [attr.aria-pressed]="(preferencesService.language$ | async) === 'en'"
+          aria-label="Select English language"
         >
           🇺🇸 English
         </button>
       </div>
     </div>
 
-    <!-- Theme Section -->
+    <!-- Tema -->
     <div class="space-y-3">
       <label class="text-sm font-semibold text-gray-300 block">
         {{ (preferencesService.language$ | async) === 'es' ? 'Tema' : 'Theme' }}
@@ -73,7 +87,7 @@
       </div>
     </div>
 
-    <!-- Font Size Section -->
+    <!-- Tamaño de texto -->
     <div class="space-y-3">
       <label class="text-sm font-semibold text-gray-300 block">
         {{ (preferencesService.language$ | async) === 'es' ? 'Tamaño de Texto' : 'Text Size' }}
@@ -89,11 +103,9 @@
             <path d="M19 13H5v-2h14v2z"/>
           </svg>
         </button>
-
         <span class="text-sm font-semibold text-blue-300 px-3 py-2 bg-gray-800 rounded-lg min-w-12 text-center">
           {{ (preferencesService.fontSize$ | async) }}px
         </span>
-
         <button
           (click)="preferencesService.increaseFontSize()"
           [disabled]="(preferencesService.fontSize$ | async)! >= 24"
@@ -107,7 +119,7 @@
       </div>
     </div>
 
-    <!-- High Contrast Section -->
+    <!-- Alto contraste -->
     <div class="space-y-3">
       <label class="text-sm font-semibold text-gray-300 block">
         {{ (preferencesService.language$ | async) === 'es' ? 'Alto Contraste' : 'High Contrast' }}
@@ -122,13 +134,15 @@
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11z"/>
         </svg>
-        {{ (preferencesService.highContrast$ | async) ? ((preferencesService.language$ | async) === 'es' ? 'Activado' : 'Enabled') : ((preferencesService.language$ | async) === 'es' ? 'Desactivado' : 'Disabled') }}
+        {{ (preferencesService.highContrast$ | async)
+            ? ((preferencesService.language$ | async) === 'es' ? 'Activado' : 'Enabled')
+            : ((preferencesService.language$ | async) === 'es' ? 'Desactivado' : 'Disabled') }}
       </button>
     </div>
   </div>
 </div>
 
-<!-- Toggle Sidebar Button -->
+<!-- Botón toggle — visible cuando panel cerrado -->
 <button
   (click)="preferencesService.toggleSidebar()"
   class="fixed right-0 top-32 z-2000 p-3 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-l-lg transition-all shadow-lg cursor-pointer"

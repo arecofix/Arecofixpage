@@ -1,10 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
-import { ROLES } from '@app/core/constants/roles.constants';
+import { AdminUsersService } from './services/admin-users.service';
+import { AdminProductService } from '@app/admin/products/services/admin-product.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-admin-users-page',
@@ -13,8 +13,9 @@ import { ROLES } from '@app/core/constants/roles.constants';
     templateUrl: './admin-users-page.html',
 })
 export class AdminUsersPage implements OnInit {
-    private auth = inject(AuthService);
-    private tenantService = inject(TenantService);
+    private adminUsersService = inject(AdminUsersService);
+    private adminProductService = inject(AdminProductService);
+    
     public users = signal<UserProfile[]>([]);
     public branches = signal<any[]>([]);
     public loading = signal<boolean>(true);
@@ -25,59 +26,40 @@ export class AdminUsersPage implements OnInit {
     }
 
     async loadBranches() {
-        const supabase = this.auth.getSupabaseClient();
-        const tenantId = this.tenantService.getTenantId();
-        const { data, error } = await supabase
-            .from('branches')
-            .select('*')
-            .eq('tenant_id', tenantId)
-            .order('name');
-        
-        if (!error && data) {
+        try {
+            const data = await this.adminProductService.getBranches();
             this.branches.set(data);
+        } catch (error) {
+            console.error('Error loading branches', error);
         }
     }
 
     async loadUsers() {
         this.loading.set(true);
-        const supabase = this.auth.getSupabaseClient();
-        const tenantId = this.tenantService.getTenantId();
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('tenant_id', tenantId)
-            .order('created_at', { ascending: false });
-
-        if (!error && data) {
-            this.users.set(data as UserProfile[]);
+        try {
+            const data = await firstValueFrom(this.adminUsersService.getUsers());
+            this.users.set(data);
+        } catch (error) {
+            console.error('Error loading users', error);
+        } finally {
+            this.loading.set(false);
         }
-        this.loading.set(false);
     }
 
     async updateUserRole(user: UserProfile, newRole: string) {
-        const supabase = this.auth.getSupabaseClient();
-        const { error } = await supabase
-            .from('profiles')
-            .update({ role: newRole })
-            .eq('id', user.id);
-
-        if (!error) {
+        try {
+            await firstValueFrom(this.adminUsersService.updateRole(user.id!, newRole));
             user.role = newRole as any;
-        } else {
+        } catch (error: any) {
             alert('Error actualizando el rol: ' + error.message);
         }
     }
 
     async updateUserBranch(user: UserProfile, newBranchId: string) {
-        const supabase = this.auth.getSupabaseClient();
-        const { error } = await supabase
-            .from('profiles')
-            .update({ branch_id: newBranchId || null })
-            .eq('id', user.id);
-
-        if (!error) {
+        try {
+            await firstValueFrom(this.adminUsersService.updateBranch(user.id!, newBranchId));
             user.branch_id = newBranchId;
-        } else {
+        } catch (error: any) {
             alert('Error actualizando la sucursal: ' + error.message);
         }
     }

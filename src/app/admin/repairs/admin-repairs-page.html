@@ -1,248 +1,287 @@
 <!-- Admin Repairs List Layout -->
-<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans">
+<div class="py-4 sm:py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans">
     
     <!-- Header Minimalista -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 animate-fade-in-down">
-        <div>
-             <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
-                 <span class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                     <i class="fas fa-tools"></i>
-                 </span>
-                 Gestión de Laboratorio
-             </h1>
-             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">Administra el taller, reparaciones activas, garantías y estado de los equipos.</p>
-        </div>
-        
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-            <a routerLink="/admin/repairs/new" class="btn w-full sm:w-auto bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none rounded-2xl shadow-lg shadow-emerald-500/30 transform hover:-translate-y-0.5 transition-all">
-                <i class="fas fa-plus mr-1 opacity-80"></i> Nuevo Ingreso
-            </a>
-        </div>
-    </div>
-
-    <!-- Error State -->
-    @if (error()) {
-        <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-l-red-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-red-700 dark:text-red-400 mb-8 border border-red-100 dark:border-red-900">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-exclamation-triangle text-xl"></i>
-                <span class="font-medium font-sm">{{ error() }}</span>
+    <div class="px-4 sm:px-6 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center mb-8 md:mb-12 gap-6 animate-fade-in-down">
+            <div class="flex-1">
+                 <h1 class="text-xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+                     <span class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
+                         <i class="fas fa-tools"></i>
+                     </span>
+                     <span class="wrap-break-word">Gestión de Laboratorio</span>
+                 </h1>
+                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">Administra el taller y reparaciones.</p>
             </div>
-            <button (click)="loadRepairs()" class="btn btn-sm bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900 rounded-xl shadow-sm">
-                Reintentar
-            </button>
+            
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                <a routerLink="/admin/repairs/protocol" class="btn btn-md bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-2xl shadow-sm transform hover:-translate-y-0.5 transition-all text-sm h-auto py-3 whitespace-normal text-center leading-tight sm:px-4">
+                    <i class="fas fa-robot mr-1 opacity-80 shrink-0"></i> <span>Asistente Experto</span>
+                </a>
+                <a routerLink="/admin/repairs/new" class="btn btn-md bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none rounded-2xl shadow-lg shadow-emerald-500/30 transform hover:-translate-y-0.5 transition-all text-sm h-auto py-3 whitespace-normal text-center leading-tight sm:px-4">
+                    <i class="fas fa-plus mr-1 opacity-80 shrink-0"></i> <span>Nuevo Ingreso</span>
+                </a>
+            </div>
         </div>
-    }
 
-    <!-- BI Dashboard Entry Point -->
-    <div class="mb-8 w-full animate-fade-in-up" style="animation-delay: 100ms;">
-        <div class="bg-gray-900 rounded-4xl p-1 shadow-xl relative overflow-hidden group">
-            <div class="absolute -inset-1 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-            <div class="relative bg-gray-900 rounded-[calc(2rem-4px)] p-6 z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(99,102,241,0.3)]">
-                        <i class="fas fa-chart-pie"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-white tracking-wide">Inteligencia Financiera</h3>
-                        <p class="text-gray-400 text-sm font-medium mt-1">Análisis de rentabilidad real: Ingresos Brutos vs Costo de Insumos</p>
-                    </div>
+        <!-- Error State -->
+        @if (error()) {
+            <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-l-red-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-red-700 dark:text-red-400 mb-8 border border-red-100 dark:border-red-900">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                    <span class="font-medium font-sm">{{ error() }}</span>
                 </div>
-                <div class="flex items-center gap-6 w-full md:w-auto">
-                    <div class="hidden sm:block text-right">
-                        <div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">En Laboratorio</div>
-                        <div class="text-xl font-black text-emerald-400">{{ inWorkshopCount() }} <span class="text-xs text-gray-400 font-medium tracking-normal ml-1">equipos</span></div>
-                    </div>
-                    <a routerLink="/admin/repairs/stats" class="btn w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white border-none rounded-2xl shadow-[0_4px_20px_rgba(99,102,241,0.4)] flex items-center gap-2 transition-all">
-                        Ver Dashboard <i class="fas fa-arrow-right text-sm"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Controls Bar -->
-    <div class="flex flex-col lg:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-gray-100 dark:border-gray-700 items-center animate-fade-in-up" style="animation-delay: 200ms;">
-        <!-- Search -->
-        <div class="flex-1 w-full relative group">
-          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
-          <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-            placeholder="Buscar por cliente, teléfono o código de seguimiento..."
-            class="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-gray-800 dark:text-gray-200" />
-        </div>
-
-        <!-- Filter Dropdown -->
-        <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="w-full lg:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-300 cursor-pointer appearance-none">
-            <option value="all">📁 Ver Todos los Equipos</option>
-            <option value="smartphone">📱 Celulares</option>
-            <option value="pc">💻 PC / Desktop</option>
-            <option value="notebook">💻 Notebooks</option>
-            <option value="console">🎮 Consolas</option>
-            <option value="tablet">📱 Tablets</option>
-        </select>
-    </div>
-
-    <!-- Content Table / State -->
-    @if (loading()) {
-        <div class="flex flex-col justify-center items-center py-20 animate-pulse">
-            <span class="loading loading-spinner text-emerald-500 w-12 h-12 mb-4"></span>
-            <span class="text-sm font-medium text-gray-500">Sincronizando órdenes de taller...</span>
-        </div>
-    } @else if (mappedRepairs().length === 0) {
-        <div class="flex flex-col items-center justify-center py-24 animate-fade-in text-center px-4">
-            <div class="w-24 h-24 rounded-full bg-white dark:bg-gray-800 border-4 border-gray-50 dark:border-gray-900 shadow-xl flex items-center justify-center mb-6">
-                 <i class="fas fa-tools text-4xl text-gray-300 dark:text-gray-600"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Taller Despejado</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm">No hay reparaciones que coincidan con los filtros actuales en el laboratorio.</p>
-            @if (searchTerm() || filterType() !== 'all') {
-                <button (click)="searchTerm.set(''); filterType.set('all')" class="mt-6 btn bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 transition-all">
-                   <i class="fas fa-sync-alt mr-2 opacity-60"></i> Limpiar Búsqueda
+                <button (click)="loadRepairs()" class="btn btn-sm bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900 rounded-xl shadow-sm">
+                    Reintentar
                 </button>
-            }
+            </div>
+        }
+
+        <!-- BI Dashboard Entry Point -->
+        <div class="mb-6 w-full animate-fade-in-up" style="animation-delay: 100ms;">
+            <div class="bg-gray-900 rounded-3xl p-0.5 shadow-xl relative overflow-hidden group">
+                <div class="absolute -inset-1 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+                <div class="relative bg-gray-900 rounded-[calc(1.5rem-2px)] p-4 sm:p-6 z-10 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+                    <div class="flex items-center gap-4 w-full">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] shrink-0">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-base sm:text-xl font-bold text-white tracking-wide truncate">Inteligencia Financiera</h3>
+                            <p class="text-gray-400 text-[10px] sm:text-sm font-medium mt-0.5 line-clamp-1">Análisis de rentabilidad real</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 w-full md:w-auto mt-2 md:mt-0">
+                        <div class="hidden sm:block text-right">
+                            <div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">En Laboratorio</div>
+                            <div class="text-lg font-black text-emerald-400">{{ inWorkshopCount() }}</div>
+                        </div>
+                        <a routerLink="/admin/repairs/stats" class="btn btn-sm sm:btn-md flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-500 text-white border-none rounded-xl shadow-[0_4px_20px_rgba(99,102,241,0.4)] flex items-center gap-2 transition-all">
+                            Ver Dashboard <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-    } @else {
-        
-        <!-- Desktop Table (SaaS Style) -->
-        <div class="hidden md:block bg-white dark:bg-gray-800/50 rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 dark:border-gray-800 animate-fade-in-up" style="animation-delay: 300ms;">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10">
-                    <tr class="text-gray-400 dark:text-gray-500 font-bold text-[10px] tracking-widest uppercase">
-                        <th class="px-6 py-4 rounded-tl-4xl">Ticket / Tracking</th>
-                        <th class="px-6 py-4">Cliente Info</th>
-                        <th class="px-6 py-4">Equipo & Falla</th>
-                        <th class="px-6 py-4 text-center">Estado del Taller</th>
-                        <th class="px-6 py-4 text-right">Costos</th>
-                        <th class="px-6 py-4 text-right rounded-tr-4xl">Lab</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm divide-y divide-gray-50 dark:divide-gray-800/50">
-                    @for (repair of mappedRepairs(); track repair.id) {
-                    <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors group">
-                        <td class="px-6 py-4">
-                            <div class="flex flex-col gap-1.5">
-                                <span class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-500/20 inline-flex w-fit">#{{ repair.repair_number | number:'1.0-0' }}</span>
-                                <div class="font-mono text-[10px] font-medium text-gray-500 dark:text-gray-400 cursor-help" title="Código de seguimiento cliente">
-                                    {{ repair.tracking_code }}
-                                </div>
-                                <div class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mt-0.5">
-                                     <i class="far fa-calendar-alt opacity-70"></i> {{ repair.received_at | date:'dd MMM yyyy' }}
-                                </div>
+
+        <!-- Controls Bar -->
+        <div class="flex flex-col lg:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-gray-100 dark:border-gray-700 items-center animate-fade-in-up" style="animation-delay: 200ms;">
+            <!-- Search -->
+            <div class="flex-1 w-full relative group">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
+              <input type="text" [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)"
+                placeholder="Buscar por cliente, teléfono o código de seguimiento..."
+                class="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-gray-800 dark:text-gray-200" />
+            </div>
+
+            <!-- Filter Dropdown -->
+            <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="w-full lg:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-300 cursor-pointer appearance-none">
+                <option value="all">📁 Ver Todos los Equipos</option>
+                <option value="smartphone">📱 Celulares</option>
+                <option value="pc">💻 PC / Desktop</option>
+                <option value="notebook">💻 Notebooks</option>
+                <option value="console">🎮 Consolas</option>
+                <option value="tablet">📱 Tablets</option>
+            </select>
+        </div>
+
+        <!-- Content Area -->
+        @if (loading()) {
+            <div class="flex flex-col justify-center items-center py-20 animate-pulse">
+                <span class="loading loading-spinner text-emerald-500 w-12 h-12 mb-4"></span>
+                <span class="text-sm font-medium text-gray-500">Sincronizando órdenes de taller...</span>
+            </div>
+        } @else if (mappedRepairs().length === 0) {
+            <div class="flex flex-col items-center justify-center py-24 animate-fade-in text-center px-4">
+                <div class="w-24 h-24 rounded-full bg-white dark:bg-gray-800 border-4 border-gray-50 dark:border-gray-900 shadow-xl flex items-center justify-center mb-6">
+                    <i class="fas fa-tools text-4xl text-gray-300 dark:text-gray-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Taller Despejado</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm">No hay reparaciones que coincidan con los filtros actuales en el laboratorio.</p>
+                @if (searchTerm() || filterType() !== 'all') {
+                    <button (click)="searchTerm.set(''); filterType.set('all')" class="mt-6 btn bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 transition-all">
+                    <i class="fas fa-sync-alt mr-2 opacity-60"></i> Limpiar Búsqueda
+                    </button>
+                }
+            </div>
+        } @else {
+            
+            <!-- Desktop Virtual Scrolling (Modern SaaS Grid) -->
+            <div class="hidden md:flex flex-col bg-white dark:bg-gray-800/50 rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 dark:border-gray-800 animate-fade-in-up" style="animation-delay: 300ms;">
+                
+                <!-- Virtual Scroll Header -->
+                <div class="grid grid-cols-[1.5fr_1.5fr_2fr_1.5fr_1fr_0.5fr] bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500 font-bold text-[10px] tracking-widest uppercase px-6 py-4">
+                    <div>Ticket / Tracking</div>
+                    <div>Cliente Info</div>
+                    <div>Equipo & Falla</div>
+                    <div class="text-center">Estado del Taller</div>
+                    <div class="text-right">Costos</div>
+                    <div class="text-right">Lab</div>
+                </div>
+
+                <!-- Virtual Scroll Viewport -->
+                <cdk-virtual-scroll-viewport itemSize="100" class="h-[600px] repairs-viewport custom-scrollbar" (scrolledIndexChange)="onScroll($event)">
+                    <div *cdkVirtualFor="let repair of mappedRepairs()" class="grid grid-cols-[1.5fr_1.5fr_2fr_1.5fr_1fr_0.5fr] items-center px-6 py-4 hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors group border-b border-gray-50 dark:border-gray-800/50 text-sm h-[100px]">
+                        
+                        <!-- Ticket -->
+                        <div class="flex flex-col gap-1.5 min-w-0 pr-4">
+                            <span class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-500/20 inline-flex w-fit">#{{ repair.repair_number | number:'1.0-0' }}</span>
+                            <div class="font-mono text-[10px] font-medium text-gray-500 dark:text-gray-400 truncate" [title]="repair.tracking_code">
+                                {{ repair.tracking_code }}
                             </div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ repair.customer_name }}</div>
-                            <div class="text-[10px] text-gray-500 font-mono mt-0.5"><i class="fab fa-whatsapp text-emerald-500 mr-1"></i> {{ repair.customer_phone || 'Sin tel.' }}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <div class="text-[9px] text-gray-400 uppercase tracking-widest font-bold">
+                                {{ repair.received_at | date:'dd MMM yyyy' }}
+                            </div>
+                        </div>
+
+                        <!-- Cliente -->
+                        <div class="min-w-0 pr-4">
+                            <div class="font-bold text-gray-900 dark:text-white truncate">{{ repair.customer_name }}</div>
+                            <div class="text-[10px] text-gray-500 font-mono mt-1 truncate">
+                                <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> {{ repair.customer_phone || 'Sin tel.' }}
+                            </div>
+                        </div>
+
+                        <!-- Equipo -->
+                        <div class="min-w-0 pr-4">
+                            <div class="font-bold text-gray-900 dark:text-white flex items-center gap-2 truncate">
                                 <i class="fas fa-mobile-alt text-gray-400 dark:text-gray-500"></i> {{ repair.device_model }}
                             </div>
                             @if(repair.upsell_vidrio) {
-                                <span class="mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex w-fit items-center gap-1 shadow-[0_2px_10px_rgba(168,85,247,0.2)]">
-                                    <i class="fas fa-star text-amber-500"></i> Vidrio Adicional
+                                <span class="inline-flex mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 items-center gap-1 shadow-sm">
+                                    <i class="fas fa-star text-amber-500"></i> Vidrio
                                 </span>
                             }
-                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-[200px] truncate" [title]="repair.issue_description">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate" [title]="repair.issue_description">
                                  {{ repair.issue_description }}
                             </div>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex flex-col items-center gap-1.5">
-                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm"
-                                    [ngClass]="repair.ui.statusClass">
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="flex flex-col items-center gap-1.5 px-2">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-center w-full"
+                                [ngClass]="repair.ui.statusClass">
+                                {{ repair.ui.statusLabel }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold border flex items-center gap-1"
+                                  [ngClass]="repair.ui.warrantyClass">
+                                 <i class="fas fa-shield-alt opacity-70"></i> {{ repair.ui.warrantyLabel }}
+                            </span>
+                        </div>
+
+                        <!-- Finanzas -->
+                        <div class="text-right flex flex-col items-end pr-4">
+                             <div class="font-black text-gray-900 dark:text-white text-base tracking-tight">{{ (repair.final_cost || repair.estimated_cost) | currency:'ARS':'symbol':'1.0-0' }}</div>
+                             @if((repair.deposit_amount || 0) > 0) {
+                                 <div class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase mt-1">
+                                     Seña: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
+                                 </div>
+                             }
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="flex justify-end gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                            <a [routerLink]="['/admin/repairs', repair.id]" 
+                               class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center shadow-sm">
+                                <i class="fas fa-tools text-[10px]"></i>
+                            </a>
+                            <button (click)="deleteRepair(repair.id!)" 
+                                class="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center shadow-sm">
+                                <i class="fas fa-trash-alt text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </cdk-virtual-scroll-viewport>
+            </div>
+
+            <!-- Mobile Viewport (Simplified with infinite scroll detector) -->
+            <div class="md:hidden flex flex-col gap-4 animate-fade-in-up px-1" style="animation-delay: 300ms;">
+                <cdk-virtual-scroll-viewport itemSize="180" class="h-[70vh] mobile-viewport custom-scrollbar" (scrolledIndexChange)="onScroll($event)">
+                    <div *cdkVirtualFor="let repair of mappedRepairs()" class="p-2">
+                        <div class="bg-white dark:bg-gray-800/50 rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 mb-2">
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <div class="flex-1 flex flex-col gap-1 min-w-0">
+                                    <div class="inline-flex flex-wrap gap-1.5">
+                                       <span class="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-100 dark:border-emerald-500/20">#{{ repair.repair_number | number:'1.0-0' }}</span>
+                                       <span class="font-mono text-[9px] text-gray-500 border rounded px-1 flex items-center shrink-0"><i class="fas fa-barcode mr-1"></i> {{ repair.tracking_code.substring(0,6) }}</span>
+                                    </div>
+                                    <span class="font-black text-gray-900 dark:text-white text-base leading-tight mt-1 truncate">{{ repair.customer_name }}</span>
+                                </div>
+                                <div class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider backdrop-blur-sm text-center shadow-sm shrink-0 h-fit" [ngClass]="repair.ui.statusClass">
                                     {{ repair.ui.statusLabel }}
-                                </span>
-                                <span class="px-2 py-0.5 rounded text-[9px] font-bold border flex items-center gap-1"
-                                      [ngClass]="repair.ui.warrantyClass">
-                                     <i class="fas fa-shield-alt opacity-70"></i> {{ repair.ui.warrantyLabel }}
-                                </span>
+                                </div>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                             <div class="text-[9px] text-gray-400 uppercase tracking-wider font-bold -mb-0.5">Total Presup.</div>
-                             <div class="font-black text-gray-900 dark:text-white text-base tracking-tight mb-0.5">{{ (repair.final_cost || repair.estimated_cost) | currency:'ARS':'symbol':'1.0-0' }}</div>
-                             @if((repair.deposit_amount || 0) > 0) {
-                                 <div class="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase">
-                                     Seña: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
-                                 </div>
-                             } @else {
-                                <span class="empty-badge h-4"></span>
-                             }
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                <a [routerLink]="['/admin/repairs', repair.id]" 
-                                   class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center tooltip tooltip-left shadow-sm" data-tip="Abrir Ficha Taller">
-                                    <i class="fas fa-tools text-[10px]"></i>
-                                </a>
-                                <button (click)="deleteRepair(repair.id!)" 
-                                    class="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center tooltip tooltip-left shadow-sm" data-tip="Borrar Registro">
-                                    <i class="fas fa-trash-alt text-[10px]"></i>
-                                </button>
+    
+                            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 mb-3 border border-gray-100 dark:border-gray-800">
+                                <div class="flex items-center gap-2 mb-2 font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-1">
+                                    <i class="fas fa-mobile-alt text-gray-400"></i> {{ repair.device_model }}
+                                </div>
+                                @if(repair.upsell_vidrio) {
+                                    <div class="mb-2">
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 inline-flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-star text-amber-500"></i> Vidrio
+                                        </span>
+                                    </div>
+                                }
+                                <p class="text-[10px] text-gray-600 dark:text-gray-400 italic line-clamp-2 leading-relaxed border-l-2 border-emerald-500/30 pl-2">
+                                    "{{ repair.issue_description }}"
+                                </p>
                             </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+    
+                            <div class="flex justify-between items-end pt-2 border-t border-gray-100 dark:border-gray-800">
+                                <div>
+                                    <div class="text-[8px] text-gray-400 font-bold uppercase">Presupuesto</div>
+                                    <span class="text-lg font-black text-gray-900 dark:text-white tracking-tight">{{ (repair.final_cost || repair.estimated_cost) | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                </div>
+    
+                                <div class="flex gap-2">
+                                    <button (click)="deleteRepair(repair.id!)" class="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center shadow-sm">
+                                        <i class="fas fa-trash-alt text-xs"></i>
+                                    </button>
+                                    <a [routerLink]="['/admin/repairs', repair.id]" class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center shadow-sm">
+                                        <i class="fas fa-tools text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </cdk-virtual-scroll-viewport>
+            </div>
 
-        <!-- Mobile Cards (SaaS Style) -->
-        <div class="md:hidden grid grid-cols-1 gap-4 animate-fade-in-up" style="animation-delay: 300ms;">
-            @for (repair of mappedRepairs(); track repair.id) {
-                <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800">
-                     <div class="flex justify-between items-start mb-3">
-                         <div class="flex flex-col gap-1">
-                             <div class="inline-flex gap-2">
-                                <span class="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-500/20">#{{ repair.repair_number | number:'1.0-0' }}</span>
-                                <span class="font-mono text-[10px] text-gray-500 border rounded px-1 flex items-center"><i class="fas fa-barcode mr-1"></i> {{ repair.tracking_code.substring(0,8) }}</span>
-                             </div>
-                             <span class="font-black text-gray-900 dark:text-white text-lg leading-tight mt-1">{{ repair.customer_name }}</span>
-                         </div>
-                         <div class="px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider backdrop-blur-sm text-center shadow-sm" [ngClass]="repair.ui.statusClass">
-                             {{ repair.ui.statusLabel }}
-                         </div>
-                     </div>
-
-                     <div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-3 mb-4 border border-gray-100 dark:border-gray-800">
-                         <div class="flex items-center gap-2 mb-2 font-bold text-gray-800 dark:text-gray-200 text-sm">
-                             <i class="fas fa-mobile-alt text-gray-400"></i> {{ repair.device_model }}
-                         </div>
-                         @if(repair.upsell_vidrio) {
-                             <div class="mb-2">
-                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 inline-flex items-center gap-1 shadow-sm">
-                                     <i class="fas fa-star text-amber-500"></i> Vidrio Adicional
-                                 </span>
-                             </div>
-                         }
-                         <p class="text-[11px] text-gray-600 dark:text-gray-400 italic line-clamp-2 leading-relaxed border-l-2 border-emerald-500/30 pl-2">
-                             "{{ repair.issue_description }}"
-                         </p>
-                     </div>
-
-                     <div class="flex justify-between items-end pt-3 border-t border-gray-100 dark:border-gray-800 mt-2">
-                         <div>
-                             <div class="text-[9px] text-gray-400 font-bold uppercase mb-0.5">Presupuesto</div>
-                             <span class="text-xl font-black text-gray-900 dark:text-white tracking-tight">{{ (repair.final_cost || repair.estimated_cost) | currency:'ARS':'symbol':'1.0-0' }}</span>
-                             @if((repair.deposit_amount || 0) > 0) {
-                                 <div class="text-[9px] font-bold text-amber-500 dark:text-amber-400 uppercase mt-0.5">
-                                     Seña: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
-                                 </div>
-                             }
-                         </div>
-
-                         <div class="flex gap-2">
-                             <button (click)="deleteRepair(repair.id!)" class="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                                 <i class="fas fa-trash-alt text-sm"></i>
-                             </button>
-                             <a [routerLink]="['/admin/repairs', repair.id]" class="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm">
-                                 <i class="fas fa-tools text-sm"></i>
-                             </a>
-                         </div>
-                     </div>
+            <!-- Loading Indicator for Infinite Scroll -->
+            @if (loadingMore()) {
+                <div class="flex justify-center py-6 animate-fade-in">
+                    <div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-6 py-3 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <span class="loading loading-spinner loading-md text-emerald-500"></span>
+                        <span class="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-widest">Cargando más registros...</span>
+                    </div>
+                </div>
+            } @else if (!hasMore() && repairs().length > 0) {
+                <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-600 mt-4 mb-20">
+                    <div class="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700 mb-2"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Fin de los resultados</span>
                 </div>
             }
-        </div>
-    }
-
+        }
+    </div>
 </div>
+
+<style>
+    .repairs-viewport {
+        outline: none;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #1e293b;
+    }
+</style>

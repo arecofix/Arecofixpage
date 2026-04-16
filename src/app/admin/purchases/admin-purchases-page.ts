@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
 import { Purchase } from '@app/features/sales/domain/entities/purchase.entity';
+import { AdminPurchaseService } from './services/admin-purchase.service';
 
 @Component({
     selector: 'app-admin-purchases-page',
@@ -11,7 +11,7 @@ import { Purchase } from '@app/features/sales/domain/entities/purchase.entity';
     templateUrl: './admin-purchases-page.html',
 })
 export class AdminPurchasesPage implements OnInit {
-    private auth = inject(AuthService);
+    private purchaseService = inject(AdminPurchaseService);
     purchases = signal<Purchase[]>([]);
     loading = signal(true);
 
@@ -21,15 +21,13 @@ export class AdminPurchasesPage implements OnInit {
 
     async loadPurchases() {
         this.loading.set(true);
-        const supabase = this.auth.getSupabaseClient();
-        const { data, error } = await supabase
-            .from('purchases')
-            .select('*, suppliers(name)')
-            .order('created_at', { ascending: false });
-
-        if (data) {
+        try {
+            const data = await this.purchaseService.getPurchases();
             this.purchases.set(data);
+        } catch (error) {
+            console.error('Error loading purchases:', error);
+        } finally {
+            this.loading.set(false);
         }
-        this.loading.set(false);
     }
 }

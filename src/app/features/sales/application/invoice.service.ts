@@ -1,71 +1,44 @@
 import { inject, Injectable } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
-import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
 import { LoggerService } from '@app/core/services/logger.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import {
   CreateInvoiceDto,
   Invoice,
   InvoiceItem,
   InvoiceResult,
 } from '@app/features/sales/domain/entities/invoice.entity';
+import { InvoiceRepository } from '../domain/repositories/invoice.repository';
 
 /**
  * InvoiceService — Application Layer (Use Case)
  *
- * Centralizes ALL invoice generation logic regardless of origin:
- *   - Automatic: triggered by checkout() or order completion
- *   - Manual: triggered by the admin "Crear Factura Manual" flow
- *
- * Clean Architecture rule: controllers (components) MUST NOT call
- * Supabase directly for invoice creation. They call this service.
+ * Centralizes ALL invoice generation logic regardless of origin.
  */
 @Injectable({ providedIn: 'root' })
 export class InvoiceService {
-  private auth = inject(AuthService);
   private tenantService = inject(TenantService);
   private logger = inject(LoggerService);
-
-  // ─── Public Use Cases ──────────────────────────────────────────────────────
+  private repository = inject(InvoiceRepository);
 
   /**
    * UC-01: Generate Invoice
-   *
-   * Core business logic, shared between automatic and manual flows.
-   * - Validates that no duplicate exists for the given order_id
-   * - Calculates totals using the canonical formula
-   * - Persists to Supabase and returns the created invoice
-   *
-   * @param dto - The invoice data (origin distinguishes auto vs manual)
    */
   async generateInvoice(dto: CreateInvoiceDto): Promise<InvoiceResult> {
-    const supabase = this.auth.getSupabaseClient();
     const tenantId = this.tenantService.getTenantId();
 
     try {
       // ── Duplicate Guard ────────────────────────────────────────────────────
-      // Only check for duplicates when the invoice is tied to an order/sale.
-      // Manual invoices (no order_id) are always allowed.
       if (dto.order_id) {
-        const { data: existing } = await supabase
-          .from('invoices')
-          .select('id')
-          .eq('tenant_id', tenantId)
-          .eq('order_id', dto.order_id)
-          .maybeSingle();
-
+        const existing = await this.repository.getByOrderId(dto.order_id, tenantId);
         if (existing) {
           this.logger.warn(`[InvoiceService] Duplicate invoice blocked for order ${dto.order_id}`);
-          return { data: existing as unknown as Invoice, error: null, duplicate: true };
+          return { data: existing, error: null, duplicate: true };
         }
       }
 
       // ── Canonical Total Calculation ────────────────────────────────────────
-      // Single source of truth for all totals — same formula for auto & manual.
       const verifiedTotals = this.calculateTotals(dto.items ?? [], dto.discount ?? 0);
 
-      // For DTOs without items (legacy checkout path), trust the provided totals.
       const finalSubtotal = dto.items?.length ? verifiedTotals.subtotal : dto.subtotal;
       const finalTax     = dto.items?.length ? verifiedTotals.taxAmount : dto.tax_amount;
       const finalTotal   = dto.items?.length ? verifiedTotals.total     : dto.total_amount;
@@ -75,16 +48,13 @@ export class InvoiceService {
         tenant_id:       tenantId,
         order_id:        dto.order_id       ?? null,
         sale_id:         dto.sale_id        ?? null,
-        repair_id:       null,                          // repuestos: no aplica en este flujo
+        repair_id:       dto.repair_id      ?? null,
         customer_id:     dto.customer_id    ?? null,
         customer_name:   dto.customer_name  ?? 'Consumidor Final',
         customer_email:  dto.customer_email ?? null,
-        // invoice_number: auto-asignado por trigger trg_set_invoice_number
         type:            dto.type,
         origin:          dto.origin,
-        // subtotal: columna nueva (post-migración)
         subtotal:        finalSubtotal,
-        // net_amount: columna legacy — mismo valor que subtotal
         net_amount:      finalSubtotal,
         tax_amount:      finalTax,
         discount:        dto.discount ?? 0,
@@ -92,20 +62,13 @@ export class InvoiceService {
         items:           dto.items ?? [],
         notes:           dto.notes ?? null,
         issued_at:       dto.issued_at ?? new Date().toISOString(),
-        pdf_url:         null,
-        deleted_at:      null,
       };
 
-      const { data, error } = await supabase
-        .from('invoices')
-        .insert(payload)
-        .select()
-        .single();
+      const result = await this.repository.create(payload);
+      if (result.error) throw result.error;
 
-      if (error) throw error;
-
-      this.logger.info(`[InvoiceService] Invoice generated: ${data.id} (origin: ${dto.origin})`);
-      return { data: data as Invoice, error: null, duplicate: false };
+      this.logger.info(`[InvoiceService] Invoice generated: ${result.data?.id} (origin: ${dto.origin})`);
+      return { data: result.data, error: null, duplicate: false };
 
     } catch (err: any) {
       this.logger.error('[InvoiceService] generateInvoice failed', err);
@@ -115,66 +78,68 @@ export class InvoiceService {
 
   /**
    * UC-02: List Invoices
-   * Returns all invoices for the current tenant, ordered by date descending.
    */
-  async getAll(): Promise<Invoice[]> {
-    const supabase = this.auth.getSupabaseClient();
+  async getAll(limit: number = 20, offset: number = 0, searchTerm?: string): Promise<Invoice[]> {
     const tenantId = this.tenantService.getTenantId();
-
-    const { data, error } = await supabase
-      .from('invoices')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .order('issued_at', { ascending: false });
-
-    if (error) {
-      this.logger.error('[InvoiceService] getAll failed', error);
-      return [];
+    try {
+        return await this.repository.getAll({ limit, offset, tenantId, searchTerm });
+    } catch (error) {
+        this.logger.error('[InvoiceService] getAll failed', error);
+        return [];
     }
-    return (data ?? []) as Invoice[];
+  }
+
+  async getInvoicesCount(searchTerm?: string): Promise<number> {
+    const tenantId = this.tenantService.getTenantId();
+    try {
+        return await this.repository.getCount({ tenantId, searchTerm });
+    } catch (error) {
+        return 0;
+    }
+  }
+
+  async getById(id: string): Promise<Invoice | null> {
+    const tenantId = this.tenantService.getTenantId();
+    try {
+        return await this.repository.getById(id, tenantId);
+    } catch (error) {
+        return null;
+    }
   }
 
   /**
-   * UC-03: Get Invoice by ID
+   * UC-04: Get Invoice With Details
    */
-  async getById(id: string): Promise<Invoice | null> {
-    const supabase = this.auth.getSupabaseClient();
+  async getInvoiceWithDetails(id: string): Promise<{ invoice: Invoice | null, items: any[] }> {
+    const invoice = await this.getById(id);
+    if (!invoice) return { invoice: null, items: [] };
+
     const tenantId = this.tenantService.getTenantId();
+    let items: any[] = [];
 
-    const { data, error } = await supabase
-      .from('invoices')
-      .select('*')
-      .eq('id', id)
-      .eq('tenant_id', tenantId)
-      .maybeSingle();
+    try {
+        if (invoice.sale_id) {
+            items = await this.repository.getRelatedItems({ type: 'sale', id: invoice.sale_id, tenantId });
+        } else if (invoice.order_id) {
+            items = await this.repository.getRelatedItems({ type: 'order', id: invoice.order_id, tenantId });
+        } else {
+            items = (invoice as any).items || [];
+        }
+    } catch (error) {
+        this.logger.error('Error fetching invoice items', error);
+    }
 
-    if (error || !data) return null;
-    return data as Invoice;
+    return { invoice, items };
   }
 
   // ─── Domain Utilities (Pure Functions) ─────────────────────────────────────
 
-  /**
-   * Canonical total calculation — SINGLE SOURCE OF TRUTH.
-   * Used by both automatic checkout and manual invoice form.
-   *
-   * @param items    - Line items with individual tax_rate per item
-   * @param discount - Flat discount amount applied after subtotal
-   */
   calculateTotals(
-    items: Pick<import('@app/features/sales/domain/entities/invoice.entity').InvoiceItem, 'quantity' | 'unit_price' | 'tax_rate'>[],
+    items: Pick<InvoiceItem, 'quantity' | 'unit_price' | 'tax_rate'>[],
     discount: number = 0
   ): { subtotal: number; taxAmount: number; total: number } {
-    const subtotal = items.reduce(
-      (acc, item) => acc + item.quantity * item.unit_price,
-      0
-    );
-
-    const taxAmount = items.reduce(
-      (acc, item) => acc + item.quantity * item.unit_price * item.tax_rate,
-      0
-    );
-
+    const subtotal = items.reduce((acc, item) => acc + item.quantity * item.unit_price, 0);
+    const taxAmount = items.reduce((acc, item) => acc + item.quantity * item.unit_price * item.tax_rate, 0);
     const total = Math.max(0, subtotal + taxAmount - discount);
 
     return {
@@ -184,16 +149,7 @@ export class InvoiceService {
     };
   }
 
-  /**
-   * Builds an InvoiceItem from basic inputs (unit_price already includes tax for
-   * the "Excento / IVA incluido" model; set tax_rate to 0 in that case).
-   */
-  buildItem(
-    description: string,
-    quantity: number,
-    unitPrice: number,
-    taxRate: number = 0.21
-  ): InvoiceItem {
+  buildItem(description: string, quantity: number, unitPrice: number, taxRate: number = 0.21): InvoiceItem {
     const subtotal = quantity * unitPrice;
     const total    = subtotal * (1 + taxRate);
     return {

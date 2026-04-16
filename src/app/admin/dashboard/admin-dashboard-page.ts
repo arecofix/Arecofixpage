@@ -1,22 +1,29 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal, computed, effect, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
+import { CommonModule, DecimalPipe, CurrencyPipe } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
-import { environment } from '@env/environment';
-import { BaseChartDirective } from 'ng2-charts';
+import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { SkeletonComponent } from '@app/shared/components/skeleton/skeleton.component';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import { AnalyticsRepository, DashboardStats } from '@app/features/analytics/domain/repositories/analytics.repository';
+import { AnalyticsRepository, DashboardStats, MonthlyRevenue } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
-import { AnalyticsService } from '@app/core/services/analytics.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { AnalyticsService } from '@app/core/services/analytics.service';
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
-import { firstValueFrom } from 'rxjs';
+import { FinanceReportService } from '@app/features/analytics/application/services/finance-report.service';
+import { NumberUtils } from '@app/shared/utils/number.utils';
+import { Branch, BranchService } from '@app/core/services/branch.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, BaseChartDirective],
-  templateUrl: './admin-dashboard-page.html'
+  imports: [CommonModule, RouterLink, BaseChartDirective, SkeletonComponent],
+  templateUrl: './admin-dashboard-page.html',
+  providers: [provideCharts(withDefaultRegisterables())]
 })
 export class AdminDashboardPage implements OnInit {
   private analyticsRepo = inject(AnalyticsRepository);
@@ -24,6 +31,7 @@ export class AdminDashboardPage implements OnInit {
   private authService = inject(AuthService);
   private tenantService = inject(TenantService);
   private adminProductService = inject(AdminProductService);
+  private reportService = inject(FinanceReportService);
   private router = inject(Router);
 
   stats = signal<DashboardStats>({
@@ -35,218 +43,242 @@ export class AdminDashboardPage implements OnInit {
     repairs_revenue: 0,
     repairs_profit: 0,
     devices_fixed: 0,
-    pending_approvals: 0,
+    total_gross_revenue: 0,
+    total_cost: 0,
+    total_net_profit: 0,
+    current_month_gross: 0,
+    current_month_cost: 0,
+    current_month_profit: 0,
+    monthly_breakdown: [],
     sales_chart: [],
     products_chart: [],
     category_chart: [],
     profit_chart: []
   });
 
+  // Computed signals for performance
+  totalProfitMargin = computed(() => {
+    return NumberUtils.calculateMargin(this.stats().total_gross_revenue, this.stats().total_net_profit);
+  });
+
+  currentMonthMargin = computed(() => {
+    return NumberUtils.calculateMargin(this.stats().current_month_gross, this.stats().current_month_profit);
+  });
+
   analyticsStats = signal({
     enabled: false,
     sessionId: '',
     distinctId: '',
+    eventsCount: 0
   });
 
   loading = signal(true);
+  isSuperAdmin = signal(false);
+  pendingProductsCount = signal(0);
+  
+  private branchService = inject(BranchService);
 
-  // Branch Management for Super Admin
-  branches = signal<any[]>([]);
-  isSuperAdmin = this.authService.isSuperAdmin;
+  // Branches for SuperAdmin
+  branches = signal<Branch[]>([]);
 
-  // Sales over the Year Chart
+  // Chart Properties
+  public salesChartData?: ChartData<'line'>;
+  public salesChartType: ChartType = 'line';
   public salesChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: true, position: 'bottom' },
-      title: { display: true, text: 'Ventas del Año' }
+      legend: { display: false },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
+        padding: 12,
+        cornerRadius: 8,
+      }
+    },
+    scales: {
+      y: { display: false },
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9ca3af' } }
     }
   };
-  public salesChartType: ChartType = 'line';
-  public salesChartData: ChartData<'line'> = {
-    labels: [],
-    datasets: [
-      { 
-        data: [], 
-        label: 'Ventas ($)', 
-        borderColor: CHART_COLORS.primary, 
-        backgroundColor: CHART_COLORS.primaryTransparent, 
-        fill: true 
-      },
-    ]
-  };
 
-  // Top Products Chart
+  public productsChartData?: ChartData<'bar'>;
+  public productsChartType: ChartType = 'bar';
   public productsChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      title: { display: true, text: 'Productos Más Vendidos' }
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
     }
   };
-  public productsChartType: ChartType = 'bar';
-  public productsChartData: ChartData<'bar'> = {
-    labels: [],
-    datasets: [
-      { 
-        data: [], 
-        label: 'Unidades', 
-        backgroundColor: CHART_COLORS.palette
-      }
-    ]
-  };
 
-  // Sales by Category Chart
+  public categoryChartData?: ChartData<'doughnut'>;
+  public categoryChartType: ChartType = 'doughnut';
   public categoryChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: true, position: 'right' },
-      title: { display: true, text: 'Ventas por Categoría' }
-    }
-  };
-  public categoryChartType: ChartType = 'doughnut';
-  public categoryChartData: ChartData<'doughnut'> = {
-    labels: [],
-    datasets: [
-      { data: [], backgroundColor: CHART_COLORS.paletteAlt }
-    ]
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20, font: { size: 11 } } } },
+    // @ts-ignore
+    cutout: '70%'
   };
 
-  ngOnInit() {
-    this.loadStats();
-    this.loadAnalyticsInfo();
-    if (this.isSuperAdmin()) {
-      this.loadBranches();
-    }
-  }
+  private branchContextService = inject(BranchContextService);
+  private loadStats$ = new Subject<string | undefined>();
 
-  async loadStats() {
-    this.loading.set(true);
-    
-    try {
-      const data = await firstValueFrom(this.analyticsRepo.getDashboardStats());
-      // Update Summary Stats
-      const statsData = {
-        ...data,
-        pending_approvals: await this.getPendingApprovalsCount()
-      };
-      this.stats.set(statsData as DashboardStats);
-
-      // Update Sales Chart (Line)
-      if (data.sales_chart && data.sales_chart.length > 0) {
-          const months = data.sales_chart.map(d => this.formatMonth(d.period));
-          const salesTotals = data.sales_chart.map(d => d.total);
-          const profitTotals = data.profit_chart ? data.profit_chart.map(d => d.total) : salesTotals.map(v => v * 0.35);
-          
-          this.salesChartData = {
-              labels: months,
-              datasets: [
-                  { 
-                    data: salesTotals, 
-                    label: 'Ventas ($)', 
-                    borderColor: CHART_COLORS.primary, 
-                    backgroundColor: CHART_COLORS.primaryTransparent, 
-                    fill: true 
-                  },
-                  { 
-                    data: profitTotals, 
-                    label: 'Ganancia ($)', 
-                    borderColor: '#10b981', // emerald-500
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-                    fill: true 
-                  }
-              ]
-          };
+  constructor() {
+    // Escudo RxJS contra Race Conditions y Fugas de Memoria
+    this.loadStats$.pipe(
+      switchMap(branchId => {
+        this.loading.set(true);
+        return this.analyticsRepo.getDashboardStats(branchId).pipe(
+          catchError(err => {
+            console.error('Error loading dashboard stats:', err);
+            this.loading.set(false);
+            return [];
+          })
+        );
+      }),
+      takeUntilDestroyed() // Auto-muta con el fin de vida del componente
+    ).subscribe((stats: any) => {
+      if (stats && !Array.isArray(stats)) {
+        this.stats.set(stats);
+        this.prepareCharts(stats);
       }
-
-      // Update Products Chart (Bar)
-      if (data.products_chart && data.products_chart.length > 0) {
-          const productNames = data.products_chart.map(d => d.name);
-          const quantities = data.products_chart.map(d => d.quantity);
-
-          this.productsChartData = {
-              labels: productNames,
-              datasets: [
-                  { 
-                      data: quantities, 
-                      label: 'Unidades', 
-                      backgroundColor: CHART_COLORS.palette 
-                  }
-              ]
-          };
-      }
-
-      // Update Category Chart (Doughnut)
-      if (data.category_chart && data.category_chart.length > 0) {
-          const catNames = data.category_chart.map(d => d.name);
-          const catCounts = data.category_chart.map(d => d.count);
-
-          this.categoryChartData = {
-              labels: catNames,
-              datasets: [
-                  { 
-                      data: catCounts, 
-                      backgroundColor: CHART_COLORS.paletteAlt
-                  }
-              ]
-          };
-      }
-    } catch (error) {
-      console.error('Error loading dashboard stats:', error);
-    } finally {
       this.loading.set(false);
-    }
-  }
+    });
 
-  private formatMonth(yearMonth: string): string {
-      const [year, month] = yearMonth.split('-');
-      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-      return date.toLocaleDateString('es-ES', { month: 'short' }); // e.g. "ene", "feb"
-  }
-
-  async loadAnalyticsInfo() {
-    this.analyticsStats.set({
-      enabled: this.analyticsService.isEnabled(),
-      sessionId: this.analyticsService.getSessionId(),
-      distinctId: this.analyticsService.getDistinctId(),
+    // React to branch changes globally
+    effect(() => {
+      const branchId = this.branchContextService.currentBranchId();
+      this.loadStats$.next(branchId || undefined);
     });
   }
 
-  async getPendingApprovalsCount(): Promise<number> {
+  async ngOnInit() {
+    this.isSuperAdmin.set(this.authService.isSuperAdmin());
+    
+    if (this.isSuperAdmin()) {
+      await this.loadBranches();
+    }
+
+    // Initial load happens via the effect above
+
+    await this.loadPendingProductsCount();
+    
+    // Analytics monitor
+    this.analyticsStats.set({
+      enabled: this.analyticsService.isEnabled(),
+      sessionId: this.analyticsService.getSessionId() || 'N/A',
+      distinctId: (this.analyticsService as any).getDistinctId?.() || 'N/A',
+      eventsCount: 0
+    });
+  }
+
+  async loadBranches() {
     try {
-      const supabase = this.authService.getSupabaseClient();
-      const tenantId = this.tenantService.getTenantId();
-      const { count, error } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', false)
-        .eq('tenant_id', tenantId)
-        .not('branch_id', 'is', null);
-      
-      if (error) return 0;
-      return count || 0;
-    } catch {
-      return 0;
+      const data = await this.branchService.getAllAdminBranches();
+      this.branches.set(data || []);
+    } catch (e) {
+      console.error('Error loading branches:', e);
     }
   }
 
-  async loadBranches(): Promise<void> {
+  async loadStats(branchId?: string) {
+    this.loadStats$.next(branchId);
+  }
+
+  async loadPendingProductsCount() {
     try {
-      const branchesData = await this.adminProductService.getBranches();
-      this.branches.set(branchesData);
-    } catch (error) {
-      console.error('Error loading branches:', error);
+      const products = await this.adminProductService.getPendingApprovals();
+      this.pendingProductsCount.set(products?.length || 0);
+    } catch (e) {
+      console.error('Error loading pending products:', e);
     }
   }
 
-  goToBranch(branchSlug: string): void {
-    this.router.navigate([`/${branchSlug}/admin`]);
+  onBranchChange(event: any) {
+    const branchId = event.target.value;
+    const realBranchId = branchId === 'global' ? null : branchId;
+    this.branchContextService.setBranchId(realBranchId);
+  }
+
+  goToBranch(branchId?: string) {
+    if (!branchId) return;
+    const realBranchId = branchId === 'global' ? null : branchId;
+    this.branchContextService.setBranchId(realBranchId);
+  }
+
+  private prepareCharts(stats: DashboardStats) {
+    // Sales Chart
+    if (stats.sales_chart?.length > 0) {
+      this.salesChartData = {
+        labels: stats.sales_chart.map(s => s.period),
+        datasets: [{
+          data: stats.sales_chart.map(s => s.total),
+          label: 'Ventas',
+          borderColor: CHART_COLORS.primary,
+          backgroundColor: CHART_COLORS.primaryLight,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0
+        }]
+      };
+    }
+
+    // Category Chart
+    if (stats.category_chart?.length > 0) {
+      this.categoryChartData = {
+        labels: stats.category_chart.map(c => c.name),
+        datasets: [{
+          data: stats.category_chart.map(c => c.count),
+          backgroundColor: [
+            CHART_COLORS.primary,
+            CHART_COLORS.success,
+            CHART_COLORS.warning,
+            CHART_COLORS.error,
+            CHART_COLORS.info
+          ]
+        }]
+      };
+    }
+
+    // Products Chart
+    if (stats.products_chart?.length > 0) {
+      this.productsChartData = {
+        labels: stats.products_chart.map(p => p.name),
+        datasets: [{
+          data: stats.products_chart.map(p => p.quantity),
+          label: 'Unidades',
+          backgroundColor: CHART_COLORS.primary,
+          borderRadius: 8
+        }]
+      };
+    }
   }
 
   posthogStatus(): string {
     return this.analyticsStats().enabled ? 'Activo' : 'Inactivo';
+  }
+
+  formatCurrency(amount: number): string {
+    return NumberUtils.formatCurrency(amount);
+  }
+
+  // ── Report Generation (Delegated to Service) ──────────────────────────
+  downloadMonthlyPDF(month: MonthlyRevenue): void {
+    this.reportService.downloadMonthlyPDF(month);
+  }
+
+  downloadTotalPDF(): void {
+    this.reportService.downloadTotalPDF(this.stats(), this.totalProfitMargin());
+  }
+
+  downloadCSV(): void {
+    this.reportService.downloadCSV(this.stats(), this.totalProfitMargin());
   }
 }

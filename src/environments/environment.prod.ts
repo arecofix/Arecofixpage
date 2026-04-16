@@ -22,12 +22,11 @@ export const environment: Environment = {
   supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
   supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0', // Anon key
 
-  authRedirectUrl: 'https://arecofix.com.ar/#/login',
+  authRedirectUrl: 'https://arecofix.com.ar',
   enableProfileUpsert: false,
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
   // WhatsApp Configuration
-  whatsappToken: 'EAARLwIJnO30BQJVYYg23XHI8YlOxew5mmmNrQJT5ZCbKj27RmMxVPslyaTfYKnJA4P5JZCk80JwnzOgZCF0zR5ZC2gDRm6TidoX0jHVE9rp77QHcehimvSmZClobDmSZAGXVv7NyK5RGuSZBbh5Fie1ykDfxeGw7NZCR2DkJabcZB6odycEjRgeBjEMqA9587UPZAPzVoPZAquACqZA0et2Q0pWcZCYDX3gsZC2VY6tlJ86oM5o7AEmaKDbUtveRLRAAAZCaa77S2MOerzRZCP4c394xVYQVH0RVyf9j5plybQZDZD',
   whatsappPhoneNumberId: '322928504245092',
   whatsappBusinessAccountId: '368379263021902',
   whatsappAppId: '1209190100450173',
@@ -72,5 +71,15 @@ export const environment: Environment = {
     portfolio: {
       cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
     }
+  },
+  firebase: {
+    apiKey: "AIzaSyDyX9CdSDY8gGKetZZdcq1aOhEWMdqLWyI",
+    authDomain: "arecofix-20698.firebaseapp.com",
+    databaseURL: "https://arecofix-20698-default-rtdb.firebaseio.com",
+    projectId: "arecofix-20698",
+    storageBucket: "arecofix-20698.firebasestorage.app",
+    messagingSenderId: "106654865765",
+    appId: "1:106654865765:web:7dc07179d0f67536e2e98c",
+    measurementId: "G-812SLQ7KEJ"
   }
 };

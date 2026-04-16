@@ -51,6 +51,7 @@ export interface Product {
   tenant_id?: string;
   is_global?: boolean;
   deleted_at?: string | null;
+  branch_id?: string | null;
   // some properties kept for backwards compatibility in UI:
   regular_price?: number;
 }
@@ -69,4 +70,6 @@ export interface ProductsParams extends Partial<Product> {
   q?: string;
   ids?: string[];
   include_inactive?: boolean;
+  minimal?: boolean;
+  stock_status?: 'all' | 'low_stock' | 'out_of_stock';
 }

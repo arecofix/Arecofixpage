@@ -1,8 +1,11 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { AuthService } from './auth.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, firstValueFrom } from 'rxjs';
+import { TenantService } from './tenant.service';
+import { BranchRepository } from '../repositories/branch.repository';
+import { SUPABASE_CLIENT } from '../di/supabase-token';
+import { LoggerService } from './logger.service';
 
 export interface Branch {
   id: string;
@@ -11,6 +14,28 @@ export interface Branch {
   address: string;
   is_active: boolean;
   global_markup_percentage: number;
+  plan_id?: 'basic' | 'premium' | 'custom';
+  official_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  whatsapp_number?: string;
+  bank_info?: {
+    alias?: string;
+    cbu?: string;
+    bank?: string;
+  };
+  tax_id?: string;
+  branding_settings?: {
+    logo_url: string | null;
+    favicon_url: string | null;
+    primary_color: string;
+  };
+  modules_config?: {
+    dashboard: boolean;
+    repairs: boolean;
+    inventory: boolean;
+    customers: boolean;
+  };
 }
 
 @Injectable({
@@ -18,6 +43,61 @@ export interface Branch {
 })
 export class BranchService {
   private auth = inject(AuthService);
+  private tenantService = inject(TenantService);
+  private branchRepo = inject(BranchRepository);
+  private supabase = inject(SUPABASE_CLIENT);
+  private logger = inject(LoggerService);
+  
+  private _currentBranch = signal<Branch | null>(null);
+  public currentBranch = this._currentBranch.asReadonly();
+  public currentBranchId = computed(() => this._currentBranch()?.id || null);
+
+  // Simple runtime cache for branches by slug
+  private branchCache = new Map<string, Branch>();
+
+  /**
+   * Establece la sucursal activa en el contexto actual
+   */
+  setCurrentBranch(branch: Branch | null): void {
+    this._currentBranch.set(branch);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      if (branch) {
+        if (branch.slug) this.branchCache.set(branch.slug, branch);
+        localStorage.setItem('arecofix_current_branch_id', branch.id);
+      } else {
+        localStorage.removeItem('arecofix_current_branch_id');
+      }
+    }
+  }
+
+  /**
+   * Sets the active branch by its unique ID.
+   * If ID is null or 'global', it resets to the global context.
+   */
+  async setBranchById(id: string | null): Promise<void> {
+    if (!id || id === 'global') {
+      this.setCurrentBranch(null);
+      return;
+    }
+
+    if (this._currentBranch()?.id === id) return;
+
+    // Try to find in cache or repo
+    const branches = await firstValueFrom(this.branchRepo.getWhere('id', id));
+    if (branches && branches.length > 0) {
+      this.setCurrentBranch(branches[0] as Branch);
+    } else {
+      console.warn('[BranchService] Branch not found by ID:', id);
+      this.setCurrentBranch(null);
+    }
+  }
+
+  /**
+   * Obtiene el ID de la sucursal activa
+   */
+  getCurrentBranchId(): string | null {
+    return this._currentBranch()?.id || null;
+  }
 
   /**
    * Obtiene la información completa de una sucursal basándose en su slug
@@ -25,6 +105,11 @@ export class BranchService {
   async getBranchBySlug(slug: string): Promise<Branch | null> {
     if (!slug) return null;
     
+    // Check cache first
+    if (this.branchCache.has(slug)) {
+      return this.branchCache.get(slug)!;
+    }
+
     // Lista de palabras reservadas para evitar consultas innecesarias y errores 406
     const reservedSlugs = [
       'admin', 'login', 'register', 'perfil', 'nosotros', 'contacto', 
@@ -37,18 +122,16 @@ export class BranchService {
       return null;
     }
 
-    const supabase = this.auth.getSupabaseClient();
-    const { data: branch, error } = await supabase
-      .from('branches')
-      .select('*')
-      .eq('slug', slug)
-      .eq('is_active', true)
-      .maybeSingle();
-
-    if (error || !branch) {
+    // Delega al repositorio buscar de forma aislada
+    const branches = await firstValueFrom(this.branchRepo.getWhere('slug', slug));
+    
+    if (!branches || branches.length === 0 || !branches[0].is_active) {
       return null;
     }
-    return branch as Branch;
+
+    const branch = branches[0] as Branch;
+    this.branchCache.set(slug, branch);
+    return branch;
   }
 
   /**
@@ -56,19 +139,19 @@ export class BranchService {
    * reventa para aquellos productos globales que vengan de la central.
    */
   async getBranchCatalog(branchId: string, globalMarkup: number): Promise<Product[]> {
-    const supabase = this.auth.getSupabaseClient();
-    
-    // Consulta optimizada aprovechando RLS (que permite leer lo local y lo global)
-    // Para simplificar y asegurar performance, filtramos directamente.
-    const { data: products, error } = await supabase
+    // Consulta robusta con soporte para UUIDs y filtrado de catálogo activo.
+    const { data: products, error } = await this.supabase
       .from('products')
       .select('*')
       .eq('is_active', true)
-      .or(`branch_id.eq.${branchId},is_global.eq.true`);
+      .or(`branch_id.eq.${branchId},is_global.is.true`);
 
-    if (error || !products) {
+    if (error) {
+      console.error('[BranchService] Catalog error:', error);
       return [];
     }
+    
+    if (!products) return [];
 
     return this.applyMarkupMapping(products as Product[], branchId, globalMarkup);
   }
@@ -92,5 +175,61 @@ export class BranchService {
       }
       return product;
     });
+  }
+
+  // --- ADMIN SETTINGS METHODS ---
+
+  async getAllAdminBranches(): Promise<Branch[]> {
+    return (await firstValueFrom(this.branchRepo.getAll({ column: 'name' }))) as Branch[];
+  }
+
+  async addBranch(payload: Partial<Branch>, slug: string): Promise<void> {
+    await firstValueFrom(this.branchRepo.create({
+        name: payload.name,
+        address: payload.address,
+        slug: slug,
+        global_markup_percentage: payload.global_markup_percentage,
+        is_active: payload.is_active,
+        plan_id: payload.plan_id || 'basic',
+        official_name: payload.official_name || payload.name,
+        contact_email: payload.contact_email,
+        contact_phone: payload.contact_phone,
+        branding_settings: payload.branding_settings || {
+            logo_url: null,
+            favicon_url: null,
+            primary_color: '#3b82f6'
+        },
+        modules_config: payload.modules_config || {
+            dashboard: true,
+            repairs: false,
+            inventory: false,
+            customers: true
+        }
+    }));
+  }
+
+  async updateBranch(branch: Branch): Promise<void> {
+    await firstValueFrom(this.branchRepo.update(branch.id, {
+        name: branch.name,
+        address: branch.address,
+        slug: branch.slug,
+        global_markup_percentage: branch.global_markup_percentage,
+        is_active: branch.is_active,
+        plan_id: branch.plan_id,
+        official_name: branch.official_name,
+        contact_email: branch.contact_email,
+        contact_phone: branch.contact_phone,
+        tax_id: branch.tax_id,
+        branding_settings: branch.branding_settings,
+        modules_config: branch.modules_config
+    }));
+  }
+
+  async deleteBranch(id: string): Promise<void> {
+    await firstValueFrom(this.branchRepo.delete(id));
+  }
+
+  async toggleBranchStatus(branch: Branch): Promise<void> {
+    await firstValueFrom(this.branchRepo.update(branch.id, { is_active: !branch.is_active }));
   }
 }

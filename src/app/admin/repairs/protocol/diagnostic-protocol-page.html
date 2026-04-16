@@ -1,0 +1,121 @@
+<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans">
+    <div class="max-w-4xl mx-auto animate-fade-in-up">
+        
+        <!-- Header Minimalista -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                 <div class="flex items-center gap-3 mb-1">
+                     <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:bg-white shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all">
+                         <i class="fas fa-arrow-left"></i>
+                     </a>
+                     <h1 class="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600 tracking-tight flex items-center gap-3">
+                         <i class="fas fa-robot text-blue-500"></i> Protocolo Interactivo de Diagnóstico
+                     </h1>
+                 </div>
+                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium ml-12">
+                     Asistente experto (Arecofix) para técnicos. Encuentra la solución a las fallas más comunes.
+                 </p>
+            </div>
+            
+            @if (history().length > 1) {
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-outline btn-sm rounded-xl text-gray-500 dark:text-gray-400" (click)="goBack()">
+                        <i class="fas fa-undo-alt"></i> Atrás
+                    </button>
+                    <button class="btn btn-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 border-none rounded-xl" (click)="reset()">
+                        <i class="fas fa-sync-alt"></i> Reiniciar
+                    </button>
+                </div>
+            }
+        </div>
+
+        <!-- Miga de pan / Path recorrido -->
+        <div class="flex flex-wrap items-center gap-2 mb-8 ml-2">
+            @for (step of history(); track $index) {
+                <div class="flex items-center">
+                    <div class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg shadow-sm whitespace-nowrap">
+                        @if ($index === 0) {
+                            <i class="fas fa-home opacity-50 mr-1"></i> Inicio
+                        } @else {
+                            Paso {{ $index }}
+                        }
+                    </div>
+                    @if ($index < history().length - 1) {
+                        <i class="fas fa-chevron-right text-[10px] text-gray-300 mx-2"></i>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Pregunta Activa -->
+        @if (currentNode().question) {
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-gray-800/50 mb-8 animate-fade-in">
+                <div class="text-center mb-10">
+                    <div class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-2xl mx-auto mb-4 shadow-inner">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900 dark:text-white leading-tight">
+                        {{ currentNode().question }}
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @for (option of currentNode().options; track option.nextId) {
+                        <button class="btn h-auto min-h-16 py-4 justify-start font-bold text-left rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800 hover:border-blue-500 dark:hover:border-blue-400 group transition-all" (click)="selectOption(option.nextId)">
+                            <div class="w-10 h-10 rounded-xl mr-3 flex items-center justify-center transition-colors {{ option.colorClass || 'bg-white dark:bg-gray-700 text-gray-500 group-hover:text-blue-500 shadow-sm' }}">
+                                <i class="fas {{ option.icon || 'fa-arrow-right' }}"></i>
+                            </div>
+                            <span class="text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white whitespace-normal wrap-break-word">{{ option.text }}</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Solución Encontrada -->
+        @if (currentNode().solutionTitle) {
+            <div class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-xl border border-emerald-500/30 animate-fade-in relative group">
+                <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500 opacity-80"></div>
+                
+                <div class="p-8 md:p-10">
+                    <div class="flex items-start gap-5 mb-8">
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-3xl shadow-inner shrink-0">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-black tracking-widest uppercase text-emerald-500 mb-1">
+                                Diagnóstico Exitoso / Guía Generada
+                            </div>
+                            <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+                                {{ currentNode().solutionTitle }}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-50/50 dark:bg-emerald-900/10 rounded-2xl p-6 border border-emerald-100 dark:border-emerald-800/30">
+                        <h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Pasos a seguir por el profesional:</h3>
+                        
+                        <div class="space-y-4">
+                            @for (step of currentNode().solutionSteps; track $index) {
+                                <div class="flex gap-4">
+                                    <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                                        {{ $index + 1 }}
+                                    </div>
+                                    <p class="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+                                        {{ step }}
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button class="btn bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 rounded-xl px-8" (click)="reset()">
+                            <i class="fas fa-robot mr-2"></i> Nuevo Diagnóstico
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

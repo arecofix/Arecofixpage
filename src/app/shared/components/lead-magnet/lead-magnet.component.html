@@ -1,0 +1,107 @@
+<section class="lead-magnet-section">
+  <div class="container">
+    <div class="lead-magnet-wrapper">
+      
+      <!-- Left Side (Top on mobile): Information and mockup -->
+      <div class="lead-info">
+        <div class="badge-tag">¡Material Gratuito!</div>
+        <h2 class="title">Descargá la Guía Gratuita</h2>
+        <p class="subtitle">
+          Dominá la medición del <strong>Protocolo de Carga</strong> en 5 sencillos pasos y llevá tus diagnósticos al siguiente nivel. Exclusivo para técnicos y entusiastas.
+        </p>
+        
+        <div class="mockup-container">
+          <!-- Placeholder or actual Mockup Image -->
+          <div class="mockup-placeholder">
+            <img src="assets/img/academy/mockup-guia-pdf.png" alt="Guía de 5 pasos para medir el Protocolo de Carga" class="mockup-img" onerror="this.src='https://placehold.co/400x500/1e293b/ffffff?text=Mockup+Guía+PDF'">
+            <div class="decorative-blob"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side (Bottom on mobile): Form -->
+      <div class="lead-form-container">
+        
+        <!-- Form State: While not successfully downloaded -->
+        <ng-container *ngIf="!downloadSuccess; else successMessage">
+          <div class="form-card">
+            <div class="form-header">
+              <h3>Completá tus datos</h3>
+              <p>Y recibí acceso instantáneo al material.</p>
+            </div>
+            
+            <form [formGroup]="leadForm" (ngSubmit)="onSubmit()" class="form-body">
+              
+              <div class="form-group">
+                <label for="name">Nombre completo *</label>
+                <div class="input-wrapper">
+                  <i class="fi fi-rr-user input-icon"></i>
+                  <input type="text" id="name" formControlName="name" placeholder="Ej. Juan Pérez" [class.is-invalid]="leadForm.get('name')?.invalid && leadForm.get('name')?.touched">
+                </div>
+                <!-- Message when invalid -->
+                <span class="error-msg" *ngIf="leadForm.get('name')?.invalid && leadForm.get('name')?.touched">
+                  El nombre es obligatorio y debe tener al menos 2 caracteres.
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="whatsapp">WhatsApp *</label>
+                <div class="input-wrapper">
+                  <i class="fi fi-brands-whatsapp input-icon"></i>
+                  <input type="tel" id="whatsapp" formControlName="whatsapp" placeholder="Ej. 1123456789" [class.is-invalid]="leadForm.get('whatsapp')?.invalid && leadForm.get('whatsapp')?.touched">
+                </div>
+                <span class="error-msg" *ngIf="leadForm.get('whatsapp')?.invalid && leadForm.get('whatsapp')?.touched">
+                  Ingresá un número de WhatsApp válido (solo números, entre 10 y 15 dígitos).
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Correo Electrónico <span class="optional">(Opcional)</span></label>
+                <div class="input-wrapper">
+                  <i class="fi fi-rr-envelope input-icon"></i>
+                  <input type="email" id="email" formControlName="email" placeholder="Ej. correo@ejemplo.com" [class.is-invalid]="leadForm.get('email')?.invalid && leadForm.get('email')?.touched">
+                </div>
+                <span class="error-msg" *ngIf="leadForm.get('email')?.invalid && leadForm.get('email')?.touched">
+                  Ingresá un correo electrónico válido.
+                </span>
+              </div>
+
+              <button type="submit" class="submit-btn" [disabled]="leadForm.invalid || isDownloading">
+                <ng-container *ngIf="!isDownloading">
+                  Descargar Guía Ahora <i class="fi fi-rr-download btn-icon"></i>
+                </ng-container>
+                <ng-container *ngIf="isDownloading">
+                  <span class="spinner"></span> Procesando...
+                </ng-container>
+              </button>
+
+              <p class="privacy-note">
+                <i class="fi fi-rr-lock"></i> Tu información está segura. Nunca enviamos spam.
+              </p>
+            </form>
+          </div>
+        </ng-container>
+
+        <!-- Success State Message -->
+        <ng-template #successMessage>
+          <div class="success-card">
+            <div class="success-icon">
+              <i class="fi fi-rr-check-circle"></i>
+            </div>
+            <h3>¡Excelente!</h3>
+            <p>Tu guía se está descargando automáticamente.</p>
+            <div class="success-alert">
+              <i class="fi fi-brands-whatsapp"></i>
+              <p>Te contactaremos pronto por WhatsApp para invitarte a nuestras próximas clases y talleres de reparación.</p>
+            </div>
+            <!-- Botón opcional para forzar descarga si falló el popup -->
+            <button class="ghost-btn" (click)="onSubmit()">
+              ¿La descarga no inició? Hacé clic aquí
+            </button>
+          </div>
+        </ng-template>
+        
+      </div>
+    </div>
+  </div>
+</section>

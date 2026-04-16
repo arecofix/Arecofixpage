@@ -185,12 +185,12 @@ export class AdminCoursesPage implements OnInit {
   loadCourses() {
     this.loading.set(true);
     this.coursesService.getCourses().subscribe({
-      next: (response) => {
+      next: (response: { data: Course[], error: any }) => {
         this.courses.set(response.data || []);
         this.loading.set(false);
         this.cdr.markForCheck();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error loading courses', err);
         this.loading.set(false);
         this.cdr.markForCheck();
@@ -206,7 +206,7 @@ export class AdminCoursesPage implements OnInit {
         this.courses.update(current => current.filter(c => c.id !== course.id));
         this.cdr.markForCheck();
       },
-      error: (err) => alert('Error al eliminar el curso: ' + err.message)
+      error: (err: any) => alert('Error al eliminar el curso: ' + err.message)
     });
   }
 

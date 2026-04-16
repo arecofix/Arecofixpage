@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
+import { ContactService } from '@app/core/services/contact.service';
 import { Message } from '@app/features/customers/domain/entities/message.entity';
 
 @Component({
@@ -11,8 +10,7 @@ import { Message } from '@app/features/customers/domain/entities/message.entity'
   templateUrl: './admin-messages-page.html',
 })
 export class AdminMessagesPage implements OnInit {
-  private auth = inject(AuthService);
-  private tenantService = inject(TenantService);
+  private contactService = inject(ContactService);
   messages = signal<Message[]>([]);
   loading = signal(true);
 
@@ -22,47 +20,36 @@ export class AdminMessagesPage implements OnInit {
 
   async loadMessages() {
     this.loading.set(true);
-    const supabase = this.auth.getSupabaseClient();
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .select('*')
-      .eq('tenant_id', this.tenantService.getTenantId())
-      .order('created_at', { ascending: false });
-
-    if (data) {
+    try {
+      const data = await this.contactService.getMessages();
       this.messages.set(data);
+    } catch (error) {
+      console.error('Error loading messages', error);
+    } finally {
+      this.loading.set(false);
     }
-    this.loading.set(false);
   }
 
   async markAsRead(id: string) {
-    const supabase = this.auth.getSupabaseClient();
-    const { error } = await supabase
-      .from('contact_messages')
-      .update({ is_read: true })
-      .eq('id', id)
-      .eq('tenant_id', this.tenantService.getTenantId());
-
-    if (!error) {
+    try {
+      await this.contactService.markAsRead(id);
       this.messages.update(msgs =>
         msgs.map(m => m.id === id ? { ...m, is_read: true } : m)
       );
+    } catch (error) {
+      console.error('Error marking as read', error);
     }
   }
 
   async deleteMessage(id: string) {
     if (!confirm('¿Estás seguro de eliminar este mensaje?')) return;
 
-    const supabase = this.auth.getSupabaseClient();
-    const { error } = await supabase.from('contact_messages')
-      .delete()
-      .eq('id', id)
-      .eq('tenant_id', this.tenantService.getTenantId());
-
-    if (!error) {
+    try {
+      await this.contactService.deleteMessage(id);
       this.messages.update(msgs => msgs.filter(m => m.id !== id));
-    } else {
+    } catch (error) {
       alert('Error al eliminar el mensaje');
+      console.error('Error deleting message', error);
     }
   }
 }

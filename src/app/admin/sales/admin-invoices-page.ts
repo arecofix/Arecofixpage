@@ -9,8 +9,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
 import { NotificationService } from '@app/core/services/notification.service';
+import { LoggerService } from '@app/core/services/logger.service';
 import {
   Invoice,
   InvoiceItem,
@@ -51,11 +53,20 @@ const DEFAULT_ITEM: ManualItemRow = {
 export class AdminInvoicesPage implements OnInit {
   private invoiceService = inject(InvoiceService);
   private notificationService = inject(NotificationService);
+  private logger = inject(LoggerService);
 
   // ── Page State ──────────────────────────────────────────────────────────────
   invoices = signal<Invoice[]>([]);
   loading = signal(true);
   saving = signal(false);
+
+  // ── Pagination & Search State ───────────────────────────────────────────────
+  searchTerm = signal('');
+  pageOffset = signal(0);
+  pageSize = signal(20);
+  hasMore = signal(true);
+  loadingMore = signal(false);
+  private search$ = new Subject<string>();
 
   // ── Modal State ─────────────────────────────────────────────────────────────
   isModalOpen = signal(false);
@@ -76,32 +87,61 @@ export class AdminInvoicesPage implements OnInit {
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
   async ngOnInit() {
-    console.log('🚀 AdminInvoicesPage ngOnInit called');
-    console.log('📊 Initial isModalOpen state:', this.isModalOpen());
-    console.log('📝 Initial form state:', this.form());
-    
+    this.search$.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.searchTerm.set(term);
+      this.loadInvoices();
+    });
+
     await this.loadInvoices();
-    
-    console.log('✅ AdminInvoicesPage initialized');
   }
 
-  async loadInvoices() {
-    this.loading.set(true);
+  async loadInvoices(append = false) {
+    if (append) {
+      this.loadingMore.set(true);
+    } else {
+      this.loading.set(true);
+      this.pageOffset.set(0);
+      this.hasMore.set(true);
+    }
+
     try {
-      this.invoices.set(await this.invoiceService.getAll());
+      const data = await this.invoiceService.getAll(
+        this.pageSize(),
+        this.pageOffset(),
+        this.searchTerm()
+      );
+      
+      if (append) {
+        this.invoices.set([...this.invoices(), ...data]);
+      } else {
+        this.invoices.set(data);
+      }
+      
+      this.hasMore.set(data.length === this.pageSize());
     } catch (e) {
       this.notificationService.showError('Error al cargar comprobantes');
-      console.error(e);
+      this.logger.error('Failed to load invoices', e);
     } finally {
       this.loading.set(false);
+      this.loadingMore.set(false);
     }
+  }
+
+  loadMore() {
+    if (this.loading() || this.loadingMore() || !this.hasMore()) return;
+    this.pageOffset.update(v => v + this.pageSize());
+    this.loadInvoices(true);
+  }
+
+  onSearch(term: string) {
+    this.search$.next(term);
   }
 
   // ── Modal Controls ──────────────────────────────────────────────────────────
   openModal() {
-    console.log('🚀 openModal() called');
-    console.log('📊 Current isModalOpen state:', this.isModalOpen());
-    
     this.form.set({
       customerName: '',
       customerEmail: '',
@@ -111,9 +151,7 @@ export class AdminInvoicesPage implements OnInit {
       items: [{ ...DEFAULT_ITEM }],
     });
     
-    console.log('📝 Form reset completed');
     this.isModalOpen.set(true);
-    console.log('✅ isModalOpen set to true:', this.isModalOpen());
   }
 
   closeModal() {
@@ -164,45 +202,56 @@ export class AdminInvoicesPage implements OnInit {
     }
 
     this.saving.set(true);
+    this.logger.debug('Starting manual invoice generation', f);
 
-    // Build InvoiceItems using the service helper (single formula)
-    const items: InvoiceItem[] = f.items.map(row =>
-      this.invoiceService.buildItem(
-        row.description,
-        row.quantity,
-        row.unit_price,
-        row.tax_rate
-      )
-    );
+    try {
+      // Build InvoiceItems using the service helper (single formula)
+      const items: InvoiceItem[] = f.items.map(row =>
+        this.invoiceService.buildItem(
+          row.description,
+          row.quantity,
+          row.unit_price,
+          row.tax_rate
+        )
+      );
 
-    const { subtotal, taxAmount, total } = this.invoiceService.calculateTotals(
-      f.items,
-      f.discount
-    );
+      const { subtotal, taxAmount, total } = this.invoiceService.calculateTotals(
+        f.items,
+        f.discount
+      );
 
-    const result = await this.invoiceService.generateInvoice({
-      customer_name:  f.customerName || 'Consumidor Final',
-      customer_email: f.customerEmail || undefined,
-      type:           f.type,
-      origin:         'manual',
-      subtotal,
-      tax_amount:     taxAmount,
-      discount:       f.discount,
-      total_amount:   total,
-      items,
-      notes:          f.notes || undefined,
-    });
+      this.logger.debug('Calculated totals', { subtotal, taxAmount, total });
 
-    this.saving.set(false);
+      const result = await this.invoiceService.generateInvoice({
+        customer_name:  f.customerName || 'Consumidor Final',
+        customer_email: f.customerEmail || undefined,
+        type:           f.type,
+        origin:         'manual',
+        subtotal,
+        tax_amount:     taxAmount,
+        discount:       f.discount,
+        total_amount:   total,
+        items,
+        notes:          f.notes || undefined,
+      });
 
-    if (result.error) {
-      this.notificationService.showError('Error al generar la factura. Intentá de nuevo.');
-      return;
+      this.logger.debug('GenerateInvoice result', result);
+
+      if (result.error) {
+        this.logger.warn('Service returned error', result.error);
+        this.notificationService.showError('Error al generar la factura: ' + (result.error.message || 'Error desconocido'));
+        return;
+      }
+
+      this.notificationService.showSuccess('✅ Factura manual generada correctamente.');
+      this.closeModal();
+      await this.loadInvoices(); // Refresh list
+    } catch (error: any) {
+      this.logger.error('Catastrophic error in submitManualInvoice', error);
+      this.notificationService.showError('Ocurrió un error inesperado al procesar la factura.');
+    } finally {
+      this.saving.set(false);
     }
-
-    this.notificationService.showSuccess('✅ Factura manual generada correctamente.');
-    this.closeModal();
-    await this.loadInvoices(); // Refresh list
   }
 
   /** Track function for @for loops */

@@ -1,19 +1,19 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { OrderService } from '@app/core/services/order.service';
-import { Order, OrderWithItems } from '@app/shared/interfaces/order.interface';
+import { OrderService } from '@app/features/orders/application/services/order.service';
+import { Order } from '@app/features/orders/domain/entities/order.entity';
 import { CommonModule } from '@angular/common';
 import { OrderStatusPipe } from '@app/shared/pipes/order-status.pipe';
 import { StatusColorPipe } from '@app/shared/pipes/status-color.pipe';
 import { LoggerService } from '@app/core/services/logger.service';
-import { Pagination } from '@app/shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
     selector: 'app-admin-orders-page',
     standalone: true,
-    imports: [RouterLink, CommonModule, OrderStatusPipe, StatusColorPipe, Pagination, FormsModule],
+    imports: [RouterLink, CommonModule, OrderStatusPipe, StatusColorPipe, FormsModule, ScrollingModule],
     templateUrl: './admin-orders-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,7 +23,7 @@ export class AdminOrdersPage implements OnInit {
     private cdr = inject(ChangeDetectorRef);
 
     // Signals
-    orders = signal<OrderWithItems[]>([]);
+    orders = signal<Order[]>([]);
     loading = signal(true);
     error = signal<string | null>(null);
 
@@ -31,10 +31,6 @@ export class AdminOrdersPage implements OnInit {
     searchQuery = signal('');
     filterStatus = signal<'all' | 'pending' | 'paid' | 'completed' | 'cancelled'>('all');
     sortOrder = signal<'date_desc' | 'date_asc' | 'total_desc'>('date_desc');
-
-    // Pagination
-    currentPage = signal(1);
-    itemsPerPage = signal(10);
 
     // Computed: Filtered
     filteredOrders = computed(() => {
@@ -71,15 +67,7 @@ export class AdminOrdersPage implements OnInit {
         });
     });
 
-    // Computed: Paginated
-    paginatedOrders = computed(() => {
-        const all = this.filteredOrders();
-        const start = (this.currentPage() - 1) * this.itemsPerPage();
-        return all.slice(start, start + this.itemsPerPage());
-    });
 
-    // Computed: Total Pages
-    totalPages = computed(() => Math.ceil(this.filteredOrders().length / this.itemsPerPage()));
 
     // Computed: Stats
     stats = computed(() => {
@@ -109,21 +97,30 @@ export class AdminOrdersPage implements OnInit {
         }
     }
 
-    async toggleOrderStatus(order: OrderWithItems) {
+    async toggleOrderStatus(order: Order) {
         if (order.status !== 'pending' && order.status !== 'paid') return;
 
+        const previousStatus = order.status;
         const newStatus = order.status === 'pending' ? 'paid' : 'pending';
         
-        try {
-            const { error } = await this.orderService.updateOrderStatus(order.id!, newStatus);
-            if (error) throw error;
+        // 1. Optimistic Update (immediate UI feedback)
+        this.orders.update(current => 
+            current.map(o => o.id === order.id ? { ...o, status: newStatus } : o)
+        );
 
-            this.orders.update(current => 
-                current.map(o => o.id === order.id ? { ...o, status: newStatus } : o)
-            );
+        try {
+            // 2. Background server call
+            await firstValueFrom(this.orderService.updateOrderStatus(order.id!, newStatus));
+            this.logger.debug(`[OptimisticUI] Order ${order.id} status updated to ${newStatus}`);
         } catch (error: any) {
-            this.logger.error('Error updating status:', error);
-            alert('Error al actualizar el estado del pedido');
+            // 3. Rollback on failure
+            this.logger.error('Error updating status, rolling back...', error);
+            
+            this.orders.update(current => 
+                current.map(o => o.id === order.id ? { ...o, status: previousStatus } : o)
+            );
+            
+            alert('Error al actualizar el estado del pedido. Se ha revertido el cambio.');
         }
     }
     

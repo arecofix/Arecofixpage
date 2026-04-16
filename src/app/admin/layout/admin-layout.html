@@ -19,7 +19,7 @@
         @if (authService.isSuperAdmin()) {
           <div class="flex items-center gap-2 ml-4">
             <span class="text-xs uppercase opacity-50 font-bold">Sucursal:</span>
-            <select class="select select-sm select-bordered bg-base-100/50" (change)="onBranchSelected($event)">
+            <select class="select select-sm select-bordered bg-base-100/50" [value]="currentSelectedBranchId" (change)="onBranchSelected($event)">
               <option value="">🏠 Todas (Central)</option>
               @for (branch of branches(); track branch.id) {
                 <option [value]="branch.id">{{ branch.name }}</option>
@@ -87,7 +87,7 @@
     </div>
 
     <!-- Page Content -->
-    <main class="flex-1 p-6">
+    <main class="flex-1 p-3 sm:p-6">
       <router-outlet></router-outlet>
     </main>
   </div>
@@ -99,8 +99,8 @@
       <!-- Logo -->
       <li class="mb-6">
         <a class="flex items-center gap-3 px-2 hover:bg-transparent cursor-pointer" [routerLink]="['/']">
-          <img src="/assets/img/brands/logo/logo-normal.PNG" alt="Arecofix Logo" class="h-8 w-auto" height="32" />
-          <span class="text-xl font-bold text-white">Arecofix</span>
+          <img [src]="branchBranding().logo" [alt]="branchBranding().name + ' Logo'" class="h-8 w-auto" height="32" />
+          <span class="text-xl font-bold text-white">{{ branchBranding().name }}</span>
         </a>
       </li>
       <!-- Menu Items -->
@@ -108,11 +108,18 @@
       <li>
         @if (item.children) {
         <div class="flex items-center gap-1">
-          <a [routerLink]="item.path" routerLinkActive="bg-green-800 text-white"
-            class="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 hover:text-green-300 transition-colors">
-            <i class="fas {{item.icon}} w-5 text-center"></i>
-            <span class="font-medium">{{item.title}}</span>
-          </a>
+          @if (item.path !== '#') {
+            <a [routerLink]="item.path" routerLinkActive="bg-green-800 text-white"
+              class="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 hover:text-green-300 transition-colors">
+              <i class="fas {{item.icon}} w-5 text-center"></i>
+              <span class="font-medium">{{item.title}}</span>
+            </a>
+          } @else {
+            <div (click)="toggleMenu(item)" class="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 hover:text-green-300 transition-colors cursor-pointer select-none">
+              <i class="fas {{item.icon}} w-5 text-center"></i>
+              <span class="font-medium">{{item.title}}</span>
+            </div>
+          }
           <button (click)="toggleMenu(item)"
             class="px-3 py-3 rounded-lg hover:bg-gray-800 transition-colors text-green-400 hover:text-green-300">
             <i class="fas fa-chevron-down transition-transform duration-200" [class.rotate-180]="item.expanded"></i>

@@ -31,6 +31,7 @@ export interface Product {
     sku?: string;
     barcode?: string;
     currency?: 'ARS' | 'USD';
+    unit_cost_at_time?: number;
     created_at: string;
     updated_at: string;
     tenant_id?: string;
@@ -59,6 +60,7 @@ export interface CreateProductDto {
     sku?: string;
     barcode?: string;
     currency?: 'ARS' | 'USD';
+    unit_cost_at_time?: number;
 }
 
 /**

@@ -11,6 +11,7 @@ export interface Environment {
   posthogHost?: string;
   // WhatsApp Configuration (Optional as it might not be in all envs or handled differently)
   whatsappToken?: string;
+  metaMarketingToken?: string;
   whatsappPhoneNumberId?: string;
   whatsappBusinessAccountId?: string;
   whatsappAppId?: string;
@@ -56,5 +57,15 @@ export interface Environment {
     portfolio: {
       cv: string;
     };
+  };
+  firebase?: {
+    apiKey: string;
+    authDomain: string;
+    databaseURL: string;
+    projectId: string;
+    storageBucket: string;
+    messagingSenderId: string;
+    appId: string;
+    measurementId?: string;
   };
 }

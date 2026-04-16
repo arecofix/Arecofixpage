@@ -18,6 +18,11 @@
                             <p class="text-gray-500 font-medium tracking-wide mt-1">
                                 <i class="fas fa-map-marker-alt opacity-50 mr-1"></i> {{ branch()?.address || 'Sucursal Online' }}
                             </p>
+                            @if (branch()?.contact_phone || branch()?.whatsapp_number) {
+                                <p class="text-gray-500 font-medium tracking-wide mt-1 text-sm">
+                                    <i class="fas fa-phone opacity-50 mr-1"></i> {{ branch()?.whatsapp_number || branch()?.contact_phone }}
+                                </p>
+                            }
                         </div>
                     </div>
                 } @else {
@@ -44,54 +49,71 @@
                 }
             </div>
         } @else {
-            @if (products().length === 0) {
-                <div class="flex flex-col items-center justify-center py-24 text-center animate-fade-in opacity-80">
-                    <i class="fas fa-box-open text-6xl text-gray-300 dark:text-gray-600 mb-6"></i>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Catálogo Vacío</h3>
-                    <p class="text-gray-500 mt-2">Próximamente estaremos agregando nuestros productos.</p>
-                </div>
-            } @else {
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in-up">
-                    @for (product of products(); track product.id) {
-                        <!-- Product Card -->
-                        <div class="group bg-white dark:bg-gray-800/80 rounded-4xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative flex flex-col h-full overflow-hidden">
-                            
-                            <!-- Origin Badge -->
-                            @if(product.is_global && product.branch_id !== branch()?.id) {
-                                <div class="absolute top-4 left-4 z-10">
-                                    <span class="px-2.5 py-1 rounded-lg backdrop-blur-md bg-white/80 dark:bg-gray-900/80 text-[10px] uppercase font-black tracking-widest text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
-                                        <i class="fas fa-star mr-1 opacity-70"></i> Catálogo Central
-                                    </span>
-                                </div>
-                            }
-
-                            <!-- Image -->
-                            <div class="aspect-square bg-gray-50 dark:bg-gray-900 rounded-3xl mb-4 overflow-hidden relative">
-                                <img [src]="product.image_url || 'assets/img/no-image.png'" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            </div>
-
-                            <!-- Info -->
-                            <div class="flex flex-col flex-1 px-2">
-                                <div class="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">
-                                    {{ product.brand_id ? 'Marca ID: ' + (product.brand_id | slice:0:8) : 'General' }}
-                                </div>
-                                <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-tight mb-3 line-clamp-2" [title]="product.name">
-                                    {{ product.name }}
-                                </h3>
-
-                                <div class="mt-auto flex items-end justify-between">
-                                    <div class="flex flex-col">
-                                        <span class="text-xs text-gray-400 font-medium mb-0.5">Precio</span>
-                                        <span class="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-                                            {{ product.price | currency:product.currency:'symbol':'1.0-0' }}
+            @if (hasInventory()) {
+                @if (products().length === 0) {
+                    <div class="flex flex-col items-center justify-center py-24 text-center animate-fade-in opacity-80">
+                        <i class="fas fa-box-open text-6xl text-gray-300 dark:text-gray-600 mb-6"></i>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Catálogo Vacío</h3>
+                        <p class="text-gray-500 mt-2">Próximamente estaremos agregando nuestros productos.</p>
+                    </div>
+                } @else {
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in-up">
+                        @for (product of products(); track product.id) {
+                            <!-- Product Card -->
+                            <div class="group bg-white dark:bg-gray-800/80 rounded-4xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative flex flex-col h-full overflow-hidden">
+                                
+                                <!-- Origin Badge -->
+                                @if(product.is_global && product.branch_id !== branch()?.id) {
+                                    <div class="absolute top-4 left-4 z-10">
+                                        <span class="px-2.5 py-1 rounded-lg backdrop-blur-md bg-white/80 dark:bg-gray-900/80 text-[10px] uppercase font-black tracking-widest text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
+                                            <i class="fas fa-star mr-1 opacity-70"></i> Catálogo Central
                                         </span>
                                     </div>
-                                    <button class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white transition-colors flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
+                                }
+    
+                                <!-- Image -->
+                                <div class="aspect-square bg-gray-50 dark:bg-gray-900 rounded-3xl mb-4 overflow-hidden relative">
+                                    <img [src]="product.image_url || 'assets/img/no-image.png'" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                </div>
+    
+                                <!-- Info -->
+                                <div class="flex flex-col flex-1 px-2">
+                                    <div class="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">
+                                        {{ product.brand_id ? 'Marca ID: ' + (product.brand_id | slice:0:8) : 'General' }}
+                                    </div>
+                                    <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-tight mb-3 line-clamp-2" [title]="product.name">
+                                        {{ product.name }}
+                                    </h3>
+    
+                                    <div class="mt-auto flex items-end justify-between">
+                                        <div class="flex flex-col">
+                                            <span class="text-xs text-gray-400 font-medium mb-0.5">Precio</span>
+                                            <span class="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                                                {{ product.price | currency:product.currency:'symbol':'1.0-0' }}
+                                            </span>
+                                        </div>
+                                        <button class="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white transition-colors flex items-center justify-center">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
+                    </div>
+                }
+            } @else {
+                <div class="flex flex-col items-center justify-center py-20 text-center animate-fade-in bg-white dark:bg-gray-800/80 rounded-4xl p-8 border border-gray-100 dark:border-gray-800">
+                    <div class="w-24 h-24 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-6 text-blue-500">
+                        <i class="fas fa-info-circle text-4xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Bienvenidos a {{ branch()?.name }}</h2>
+                    <p class="text-gray-500 max-w-md mb-6">Esta sucursal actualmente no cuenta con un catálogo de productos en línea. Por favor contáctanos para más información a través de los canales de atención.</p>
+                    
+                    @if(hasRepairs()) {
+                        <p class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-4 tracking-wide uppercase">Servicios Técnicos Disponibles</p>
+                        <a routerLink="/contacto" class="btn btn-primary rounded-2xl px-8">Comunícate con nosotros</a>
+                    } @else {
+                        <a routerLink="/contacto" class="btn btn-primary rounded-2xl px-8">Contáctanos</a>
                     }
                 </div>
             }

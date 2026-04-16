@@ -241,6 +241,8 @@ export class ProductsByCategoryPage {
   public isMobileFiltersOpen = signal(false);
   public isQuickViewOpen = signal(false);
   public quickViewProduct = signal<Product | null>(null);
+  public availableColors = ['Negro', 'Blanco', 'Plata', 'Azul'];
+  public quickViewColor = signal<string>(this.availableColors[0]);
 
   // Methods
   toggleMobileFilters() {
@@ -249,6 +251,7 @@ export class ProductsByCategoryPage {
 
   openQuickView(product: Product) {
     this.quickViewProduct.set(product);
+    this.quickViewColor.set(this.availableColors[0]);
     this.isQuickViewOpen.set(true);
   }
 
@@ -258,7 +261,12 @@ export class ProductsByCategoryPage {
   }
 
   addToCart(product: Product) {
-      this.cartService.addToCart(product);
+      const productToAdd = { ...product };
+      // Append selected color
+      if (this.isQuickViewOpen()) {
+        productToAdd.name = `${product.name} (Color: ${this.quickViewColor()})`;
+      }
+      this.cartService.addToCart(productToAdd);
       this.closeQuickView();
   }
 
@@ -297,40 +305,6 @@ export class ProductsByCategoryPage {
       imageUrl: imageUrl,
       type: 'website'
     });
-    
-    // Extra OG tags for WhatsApp
-    this.setWhatsAppOgTags(imageUrl, description, category.name);
-  }
-
-  private setWhatsAppOgTags(imageUrl: string, description: string, categoryName: string): void {
-     // Check if we are in the browser
-     if (typeof document === 'undefined') return;
-
-     const meta = document.head;
-     const setOrCreate = (property: string, content: string) => {
-       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
-       if (!el) {
-         el = document.createElement('meta');
-         el.setAttribute('property', property);
-         document.head.appendChild(el);
-       }
-       el.setAttribute('content', content);
-     };
-
-     // Ensure absolute image URL
-     const absoluteImageUrl = imageUrl.startsWith('http') 
-        ? imageUrl 
-        : `https://arecofix.com.ar/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
-
-     setOrCreate('og:title', `${categoryName} | Arecofix`);
-     setOrCreate('og:image', absoluteImageUrl);
-     setOrCreate('og:image:secure_url', absoluteImageUrl);
-     setOrCreate('og:image:width', '1200');
-     setOrCreate('og:image:height', '630');
-     setOrCreate('og:image:type', 'image/jpeg');
-     setOrCreate('og:description', description);
-     setOrCreate('og:site_name', 'Arecofix');
-     setOrCreate('og:type', 'website');
   }
 }
 export default ProductsByCategoryPage;

@@ -8,13 +8,14 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '@app/shared/services/cart.service';
-import { OrderService } from '@app/core/services/order.service';
+import { OrderService } from '@app/features/orders/application/services/order.service';
 import { AuthService } from '@app/core/services/auth.service';
-import { Order, OrderItem } from '@app/shared/interfaces/order.interface';
+import { Order, OrderItem } from '@app/features/orders/domain/entities/order.entity';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ContactService } from '@app/core/services/contact.service';
 import { ProductService } from '@app/public/products/services/product.service';
 import { ProfileService } from '@app/core/services/profile.service';
+import { BranchService } from '@app/core/services/branch.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -34,6 +35,7 @@ export class CheckoutPage {
   fb = inject(FormBuilder);
   router = inject(Router);
   notificationService = inject(NotificationService);
+  branchService = inject(BranchService);
 
   checkoutForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
@@ -43,7 +45,8 @@ export class CheckoutPage {
       street: ['', [Validators.required]],
       number: ['', [Validators.required]],
       city: ['Marcos Paz', [Validators.required]],
-      neighborhood: ['']
+      neighborhood: [''],
+      postal_code: ['', [Validators.required, Validators.pattern('^[0-9]{4}$')]]
     }),
     notes: [''],
   });
@@ -66,7 +69,7 @@ export class CheckoutPage {
     const cartItems = this.cartService.cartItems();
     const total = this.cartService.totalPrice();
 
-    const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city}`;
+    const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city} (CP: ${formVal.address.postal_code})`;
 
     const order: Order = {
       customer_name: formVal.name,
@@ -80,6 +83,7 @@ export class CheckoutPage {
       total: total,
       notes: formVal.notes,
       user_id: this.authService.getCurrentUser()?.id,
+      branch_id: this.branchService.getCurrentBranchId() || undefined,
     };
 
     const orderItems: OrderItem[] = cartItems.map((item) => ({
@@ -92,14 +96,11 @@ export class CheckoutPage {
 
     try {
       // 1. Create Order
-      const { data, error } = await this.orderService.createOrder(
-        order,
-        orderItems
-      );
+      order.items = orderItems;
+      const data = await firstValueFrom(this.orderService.createOrder(order));
 
-      if (error) {
-        console.error('Order creation error:', error);
-        throw error;
+      if (!data) {
+        throw new Error('No se pudo crear la orden.');
       }
 
       // 2. Save Contact Message with Rich Details

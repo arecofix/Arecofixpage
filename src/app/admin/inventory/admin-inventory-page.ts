@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -33,85 +33,35 @@ export class AdminInventoryPage implements OnInit {
     // Pagination
     currentPage = signal<number>(1);
     itemsPerPage = signal<number>(15);
+    totalItems = signal<number>(0);
+    pagesCount = signal<number>(1);
 
-    // Computed: Filtered & Sorted
-    filteredProducts = computed(() => {
-        let result = this.products();
-        const query = this.searchQuery().toLowerCase();
-        const status = this.filterStatus();
+    pageValue = computed(() => {
+        return this.products().reduce((sum, p) => sum + (p.price * (p.stock || 0)), 0);
+    });
 
-        // 1. Filter by Status
-        if (status === 'low_stock') {
-            result = result.filter(p => p.stock > 0 && p.stock <= (p.min_stock_alert || 5)); 
-        } else if (status === 'out_of_stock') {
-            result = result.filter(p => p.stock === 0);
-        }
-
-        // 2. Filter by Category
-        if (this.selectedCategoryId() !== 'all') {
-            result = result.filter(p => p.category_id === this.selectedCategoryId());
-        }
-
-        // 3. Filter by Search
-        if (query) {
-            result = result.filter(p => {
-                const searchScope = `${p.name} ${p.description || ''} ${p.sku || ''} ${p.barcode || ''}`;
-                return SearchUtils.matches(query, searchScope);
-            });
-        }
-
-        // 3. Sort
-        const sort = this.sortOrder();
-        return result.sort((a, b) => {
-            switch (sort) {
-                case 'relevance': 
-                    if (query) {
-                        const scoreA = SearchUtils.getRelevanceScore(a.name, query);
-                        const scoreB = SearchUtils.getRelevanceScore(b.name, query);
-                        if (scoreA !== scoreB) return scoreB - scoreA;
-                    }
-                    return a.name.localeCompare(b.name);
-                case 'stock_asc': return a.stock - b.stock;
-                case 'stock_desc': return b.stock - a.stock;
-                case 'price_asc': return a.price - b.price;
-                case 'name_asc': default: return a.name.localeCompare(b.name);
-            }
+    constructor() {
+        // Reactive reload on filter change
+        effect(() => {
+            // Read values to trigger effect
+            const query = this.searchQuery();
+            const status = this.filterStatus();
+            const category = this.selectedCategoryId();
+            const sort = this.sortOrder();
+            const page = this.currentPage();
+            
+            // Reload
+            untracked(() => this.loadInventory());
         });
-    });
-
-    // Computed: Paginated Slice
-    paginatedProducts = computed(() => {
-        const all = this.filteredProducts();
-        const page = this.currentPage();
-        const perPage = this.itemsPerPage();
-        const start = (page - 1) * perPage;
-        return all.slice(start, start + perPage);
-    });
-
-    // Computed: Total Pages
-    totalPages = computed(() => {
-        return Math.ceil(this.filteredProducts().length / this.itemsPerPage());
-    });
-
-    // Computed: Stats
-    stats = computed(() => {
-        const all = this.products();
-        return {
-            total: all.length,
-            lowStock: all.filter(p => p.stock > 0 && p.stock <= (p.min_stock_alert || 5)).length,
-            outOfStock: all.filter(p => p.stock === 0).length,
-            totalValue: all.reduce((sum, p) => sum + (p.price * p.stock), 0)
-        };
-    });
+    }
 
     async ngOnInit() {
         this.route.queryParams.subscribe(params => {
             if (params['_page']) this.currentPage.set(Number(params['_page']));
+            if (params['q']) this.searchQuery.set(params['q']);
+            if (params['status']) this.filterStatus.set(params['status'] as any);
         });
-        await Promise.all([
-            this.loadInventory(),
-            this.loadCategories()
-        ]);
+        await this.loadCategories();
     }
 
     async loadCategories() {
@@ -132,13 +82,42 @@ export class AdminInventoryPage implements OnInit {
     async loadInventory() {
         this.loading.set(true);
         try {
-            const data = await this.productService.getProducts();
-            this.products.set(data);
+            const sortMap: Record<string, { sort: string, order: 'asc' | 'desc' }> = {
+                'stock_asc': { sort: 'stock', order: 'asc' },
+                'stock_desc': { sort: 'stock', order: 'desc' },
+                'price_asc': { sort: 'price', order: 'asc' },
+                'name_asc': { sort: 'name', order: 'asc' },
+                'relevance': { sort: 'name', order: 'asc' }
+            };
+
+            const currentSort = sortMap[this.sortOrder()] || sortMap['relevance'];
+
+            const params: any = {
+                _page: this.currentPage(),
+                _per_page: this.itemsPerPage(),
+                q: this.searchQuery(),
+                stock_status: this.filterStatus(),
+                _sort: currentSort.sort,
+                _order: currentSort.order
+            };
+
+            if (this.selectedCategoryId() !== 'all') {
+                params.category_id = this.selectedCategoryId();
+            }
+
+            const res = await this.productService.getProductsPaginated(params);
+            this.products.set(res.data as any[]);
+            this.totalItems.set(res.items);
+            this.pagesCount.set(res.pages);
         } catch (e: any) {
             this.error.set(e.message || 'Error al cargar inventario');
         } finally {
             this.loading.set(false);
         }
+    }
+
+    onPageChange(page: number) {
+        this.currentPage.set(page);
     }
 
     // Helpers

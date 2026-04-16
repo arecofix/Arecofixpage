@@ -75,9 +75,93 @@ export function app(): express.Express {
       res.header('Content-Type', 'application/xml');
       // Cache sitemap in CDN for 24 hours, but let browsers cache it for 1 hour
       res.set('Cache-Control', 'public, max-age=3600, s-maxage=86400');
-      res.send(xml);
+      return res.send(xml);
     } catch (e) {
-      res.status(500).end();
+      return res.status(500).end();
+    }
+  });
+
+  // Dynamic Meta Product Catalog Feed (CSV Format for Facebook/Instagram Sales)
+  server.get('/feed/meta.csv', async (req, res) => {
+    try {
+      if (!environment.supabaseUrl || !environment.supabaseKey) {
+        return res.status(500).send('Supabase configuration missing');
+      }
+
+      const baseUrl = environment.baseUrl || 'https://arecofix.com.ar';
+      const fetchOptions = {
+        headers: {
+          'apikey': environment.supabaseKey,
+          'Authorization': `Bearer ${environment.supabaseKey}`
+        }
+      };
+
+      // 1. Fetch Brands for mapping
+      const brandsRes = await fetch(`${environment.supabaseUrl}/rest/v1/brands?select=id,name`, fetchOptions);
+      const brands = brandsRes.ok ? await brandsRes.json() : [];
+      const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
+
+      // 2. Fetch Active Products
+      const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?select=id,name,description,price,currency,image_url,slug,stock,brand_id,is_active&is_active=eq.true&deleted_at=is.null&limit=15000`, fetchOptions);
+      if (!productsRes.ok) return res.status(500).send('Error fetching products');
+      
+      const products = await productsRes.json();
+      
+      // 3. Build CSV Content
+      const headers = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'quantity_to_sell_on_facebook', 'google_product_category'];
+      
+      const rows = products.map((p: any) => {
+        // Absolute Links
+        const productLink = `${baseUrl}/productos/${p.slug}`;
+        let imageLink = p.image_url || '';
+        if (imageLink && !imageLink.startsWith('http')) {
+          imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${imageLink}`;
+        }
+        
+        // Robust CSV Escape Helper (Force quotes for better parsing in Meta)
+        const quote = (val: any) => {
+          let str = val === null || val === undefined ? '' : String(val).trim();
+          // Escape existing quotes
+          str = str.replace(/"/g, '""').replace(/\n/g, ' ');
+          return `"${str}"`;
+        };
+
+        // Format price: Amount + ' ' + ISO Currency (e.g. 1500.00 ARS)
+        const priceValue = Number(p.price) || 0;
+        const currency = p.currency || 'ARS';
+        const formattedPrice = `${priceValue.toFixed(2)} ${currency}`;
+        
+        // Meta supported tokens for availability
+        const availability = (p.is_active && (p.stock > 0 || p.stock === null)) ? 'in stock' : 'out of stock';
+        
+        // Ensure we always have a title
+        const title = p.name || p.description || 'Producto sin nombre';
+
+        return [
+          quote(p.id),
+          quote(title),
+          quote(p.description || title),
+          quote(availability),
+          quote('new'), // condition
+          quote(formattedPrice),
+          quote(productLink),
+          quote(imageLink),
+          quote(brandMap.get(p.brand_id) || environment.appName),
+          quote(p.stock || 0),
+          quote('') // google_product_category (can be refined later)
+        ].join(',');
+      });
+
+      const quotedHeaders = headers.map(h => `"${h}"`).join(',');
+      const csvContent = '\ufeff' + [quotedHeaders, ...rows].join('\r\n');
+
+      res.header('Content-Type', 'text/csv; charset=utf-8');
+      res.header('Content-Disposition', 'attachment; filename=meta-catalog.csv');
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=60'); 
+      return res.send(csvContent);
+    } catch (e) {
+      console.error('Meta Feed Error:', e);
+      return res.status(500).send('Internal Server Error');
     }
   });
 

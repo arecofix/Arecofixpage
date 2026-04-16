@@ -20,8 +20,7 @@ export class CustomerService {
   }
 
   async create(data: any): Promise<UserProfile> {
-    const tenantId = this.tenantService.getTenantId()!;
-    return firstValueFrom(this.repository.createClient(data, tenantId));
+    return firstValueFrom(this.repository.createClient(data));
   }
 
   async update(id: string, data: any): Promise<UserProfile> {
@@ -30,5 +29,17 @@ export class CustomerService {
 
   async delete(id: string): Promise<void> {
     return firstValueFrom(this.repository.delete(id));
+  }
+
+  async searchClients(query: string, limit: number = 20): Promise<UserProfile[]> {
+    return firstValueFrom(this.repository.searchClients(query, limit));
+  }
+
+  async getRecentClients(limit: number = 20): Promise<UserProfile[]> {
+    return firstValueFrom(this.repository.getRecentClients(limit));
+  }
+
+  async getUnifiedClients(): Promise<any[]> {
+    return firstValueFrom(this.repository.getUnifiedClients());
   }
 }

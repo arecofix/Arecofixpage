@@ -102,7 +102,7 @@
 
                     <div class="flex items-center gap-4 mb-6">
                         <span class="text-3xl font-bold text-gray-900 dark:text-white">
-                            ${{ p.price | number:'1.0-0' }}
+                            {{ p.currency === 'USD' ? 'USD ' : '$' }}{{ p.price | number:'1.0-0' }}
                         </span>
                         @if ((p.stock ?? 0) > 0) {
                             <span class="badge badge-success gap-2">

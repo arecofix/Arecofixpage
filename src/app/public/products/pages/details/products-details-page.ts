@@ -5,8 +5,10 @@ import {
   inject,
   Injector,
   signal,
-  DOCUMENT
+  DOCUMENT,
+  DestroyRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of } from 'rxjs';
@@ -28,6 +30,10 @@ import { CartService } from '@app/shared/services/cart.service';
 import { FallbackService } from '@app/core/services/fallback.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { FavoritesService } from '@app/shared/services/favorites.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
+import { ProductReviewBaseRepository } from '@app/features/products/domain/repositories/product-review.repository';
+import { NotificationService } from '@app/core/services/notification.service';
 /*  */
 
 
@@ -56,6 +62,58 @@ export class ProductsDetailsPage {
   private fallbackService = inject(FallbackService);
   private seoService = inject(SeoService);
   private document = inject(DOCUMENT);
+  private authService = inject(AuthService);
+  private tenantService = inject(TenantService);
+  private notificationService = inject(NotificationService);
+  private reviewRepository = inject(ProductReviewBaseRepository);
+  private destroyRef = inject(DestroyRef);
+
+  // Reviews
+  reviews = signal<any[]>([]);
+  newReview = signal({ name: '', comment: '', rating: 5 });
+  isSubmittingReview = signal(false);
+
+
+  loadReviews(productId: string) {
+      this.reviewRepository.getByProductId(productId)
+         .then(data => {
+             if (data) this.reviews.set(data);
+         })
+         .catch(err => console.error("Error loading reviews:", err));
+  }
+
+  async submitReview() {
+      const product = this.product();
+      if (!product) return;
+      if (this.isSubmittingReview()) return;
+
+      const reviewData = this.newReview();
+      if (!reviewData.name || !reviewData.comment) {
+          this.notificationService.showWarning("Por favor completa tu nombre y comentario.");
+          return;
+      }
+
+      this.isSubmittingReview.set(true);
+      
+      const { error } = await this.reviewRepository.create({
+          tenant_id: this.tenantService.getTenantId(),
+          product_id: product.id,
+          user_name: reviewData.name,
+          comment: reviewData.comment,
+          rating: reviewData.rating
+      });
+
+      this.isSubmittingReview.set(false);
+
+      if (error) {
+          console.error("Error submitting review:", error);
+          this.notificationService.showError("Ocurrió un error al enviar el comentario.");
+      } else {
+          this.newReview.set({ name: '', comment: '', rating: 5 });
+          this.loadReviews(product.id);
+          this.notificationService.showSuccess("¡Gracias por tu comentario! Será revisado pronto.");
+      }
+  }
 
 
 
@@ -145,7 +203,7 @@ export class ProductsDetailsPage {
   selectedImage = signal<string | null>(null);
 
   constructor() {
-    toObservable(this.product, { injector: this.injector }).subscribe(product => {
+    toObservable(this.product, { injector: this.injector }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(product => {
       if (!product) return;
 
       // Initialize selected image on first load
@@ -153,14 +211,18 @@ export class ProductsDetailsPage {
         this.selectedImage.set(product.image_url || null);
       }
 
+      this.loadReviews(product.id);
+
       // ── SEO / Open Graph / WhatsApp ────────────────────────────────────────
-      // image_url from Supabase is already an absolute https:// URL.
-      // WhatsApp requires: og:image as absolute URL + width/height hints.
-      const absoluteImageUrl = product.image_url
-        ? (product.image_url.startsWith('http')
-            ? product.image_url
-            : `https://arecofix.com.ar${product.image_url}`)
-        : 'https://arecofix.com.ar/assets/img/branding/og-services.jpg';
+      let absoluteImageUrl = product.image_url || '';
+      
+      // Validation: Ensure we don't use detail pages OR non-images as OG images
+      const isRecursive = absoluteImageUrl.includes('/detalle/') || absoluteImageUrl.includes('/posts/');
+      const hasImageExt = /\.(jpg|jpeg|png|webp|gif|svg|ico)/i.test(absoluteImageUrl);
+
+      if (!absoluteImageUrl || isRecursive || (!absoluteImageUrl.startsWith('http') && !hasImageExt)) {
+        absoluteImageUrl = `assets/img/branding/og-services.jpg`;
+      }
 
       const productDescription = product.description
         ? product.description.slice(0, 155) + (product.description.length > 155 ? '...' : '')
@@ -183,40 +245,9 @@ export class ProductsDetailsPage {
         keywords: `repuesto, módulo, pantalla, repair, arecofix, ${nameKeywords}`,
         twitterCard: 'summary_large_image',
       });
-
-      // Extra OG tags WhatsApp needs that SeoService doesn't set by default
-      this.setWhatsAppOgTags(absoluteImageUrl, productDescription, product.name);
-
       // ── JSON-LD Product Schema ──────────────────────────────────────────────
       this.injectProductSchema(product, absoluteImageUrl);
     });
-  }
-
-  /**
-   * Injects extra Open Graph tags required for WhatsApp/Telegram link previews.
-   * WhatsApp uses og:image, og:image:width, og:image:height, and og:image:type.
-   */
-  private setWhatsAppOgTags(imageUrl: string, description: string, productName: string): void {
-    const meta = this.document.head;
-    const setOrCreate = (property: string, content: string) => {
-      let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
-      if (!el) {
-        el = this.document.createElement('meta');
-        el.setAttribute('property', property);
-        this.document.head.appendChild(el);
-      }
-      el.setAttribute('content', content);
-    };
-
-    setOrCreate('og:title', `${productName} | Arecofix`);
-    setOrCreate('og:image', imageUrl);
-    setOrCreate('og:image:secure_url', imageUrl);
-    setOrCreate('og:image:width', '1200');
-    setOrCreate('og:image:height', '630');
-    setOrCreate('og:image:type', 'image/jpeg');
-    setOrCreate('og:description', description);
-    setOrCreate('og:site_name', 'Arecofix');
-    setOrCreate('og:type', 'product');
   }
 
   /**

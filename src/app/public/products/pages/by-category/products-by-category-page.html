@@ -196,13 +196,35 @@
                 <div class="mb-auto">
                     <h3 class="font-black text-2xl md:text-3xl mb-2 text-gray-900 dark:text-white leading-tight">{{ p.name }}</h3>
                     <div class="flex items-baseline gap-3 mb-6">
-                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.price | currency }}</span>
+                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.currency === 'USD' ? 'USD ' : '$' }}{{ p.price | number:'1.0-0' }}</span>
                         @if(p.regular_price && p.regular_price > p.price) {
-                            <span class="text-lg text-gray-400 line-through">{{ p.regular_price | currency }}</span>
+                            <span class="text-lg text-gray-400 line-through">{{ p.currency === 'USD' ? 'USD ' : '$' }}{{ p.regular_price | number:'1.0-0' }}</span>
                         }
                     </div>
                 
                     <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{{ p.description || 'Sin descripción disponible.' }}</p>
+                    
+                    <!-- Color Selection inside Modal -->
+                    <div class="mb-6">
+                       <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Color del producto</h4>
+                       <div class="flex items-center space-x-2">
+                          @for(color of availableColors; track color) {
+                            <label class="relative flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
+                                   [ngClass]="quickViewColor() === color ? 'ring-2 ring-indigo-500' : ''">
+                              <input type="radio" name="quick-color" [value]="color" class="sr-only" (change)="quickViewColor.set(color)">
+                              <span class="px-3 py-1 text-xs font-medium rounded-md border"
+                                    [ngClass]="quickViewColor() === color ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'">
+                                {{ color }}
+                              </span>
+                            </label>
+                          }
+                       </div>
+                    </div>
+
+                    <a [routerLink]="['/productos/detalle', p.slug]" (click)="closeQuickView()" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 mb-6">
+                      ⭐ Ver todas las opiniones y detalles de este producto
+                      <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
                 </div>
                 
                 <button class="btn btn-primary btn-lg w-full rounded-2xl shadow-xl shadow-indigo-600/30 gap-3" (click)="addToCart(p)">

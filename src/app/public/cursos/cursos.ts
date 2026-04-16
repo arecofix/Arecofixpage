@@ -137,14 +137,14 @@ export class CursosComponent implements OnInit {
             timeout(5000),
             catchError(err => {
                 console.error('API Error:', err);
-                return of({ error: err, data: null });
+                return of({ data: null, error: err });
             })
         ).subscribe({
-            next: (res) => {
+            next: (res: { data: Course[] | null, error: any }) => {
                 const coursesData = res.data || this.getMockCourses(); // Fallback to mock
                 
                 // Enhance data if needed
-                const processedCourses = coursesData.map(c => ({
+                const processedCourses = coursesData.map((c: Course) => ({
                     ...c,
                     rating: c.rating || 4.9,
                     students: c.students || 150,
@@ -181,7 +181,7 @@ export class CursosComponent implements OnInit {
                 schedule: 'Sábados 10:00 - 13:00hs',
                 price: 45000,
                 image_url: 'assets/img/cursos/pro.webp',
-                level: 'Inicial / Intermedio',
+                level: 'Intermedio',
                 students: 230,
                 rating: 4.9
             },
@@ -207,7 +207,7 @@ export class CursosComponent implements OnInit {
                 schedule: 'Martes 19:00 - 21:00hs',
                 price: 42000,
                 image_url: 'assets/img/cursos/pc-repair.jpg', // Ensure this asset exists or use a generic one
-                level: 'Principiante',
+                level: 'Básico',
                 students: 60,
                 rating: 4.8
             }

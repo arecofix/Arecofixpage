@@ -16,47 +16,61 @@
             }
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
-                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
+                <label for="supplier-name" class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                <input id="supplier-name" type="text" [(ngModel)]="form().name" name="name"
+                    autocomplete="organization"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Tipo</label>
-                    <input type="text" [(ngModel)]="form().type" name="type" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    <label for="supplier-type" class="block text-sm font-medium text-base-content mb-1.5">Tipo</label>
+                    <input id="supplier-type" type="text" [(ngModel)]="form().type" name="type"
+                        autocomplete="off"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         placeholder="Ej: Mayorista, Fabricante">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Rubro</label>
-                    <input type="text" [(ngModel)]="form().rubro" name="rubro" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    <label for="supplier-rubro" class="block text-sm font-medium text-base-content mb-1.5">Rubro</label>
+                    <input id="supplier-rubro" type="text" [(ngModel)]="form().rubro" name="rubro"
+                        autocomplete="off"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         placeholder="Ej: Electrónica">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">CUIL/CUIT</label>
-                    <input type="text" [(ngModel)]="form().cuil" name="cuil" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <label for="supplier-cuil" class="block text-sm font-medium text-base-content mb-1.5">CUIL/CUIT</label>
+                    <input id="supplier-cuil" type="text" [(ngModel)]="form().cuil" name="cuil"
+                        autocomplete="off"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
-                    <input type="text" [(ngModel)]="form().phone" name="phone" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <label for="supplier-phone" class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
+                    <input id="supplier-phone" type="text" [(ngModel)]="form().phone" name="phone"
+                        autocomplete="tel"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                 </div>
             </div>
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Email</label>
-                <input type="email" [(ngModel)]="form().email" name="email" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                <label for="supplier-email" class="block text-sm font-medium text-base-content mb-1.5">Email</label>
+                <input id="supplier-email" type="email" [(ngModel)]="form().email" name="email"
+                    autocomplete="email"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
             </div>
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Dirección</label>
-                <input type="text" [(ngModel)]="form().address" name="address" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                <label for="supplier-address" class="block text-sm font-medium text-base-content mb-1.5">Dirección</label>
+                <input id="supplier-address" type="text" [(ngModel)]="form().address" name="address"
+                    autocomplete="street-address"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
             </div>
 
             <div class="mt-6">
-                <label class="flex items-center gap-3 p-3 bg-base-100 border border-base-200 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
-                    <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+                <label for="supplier-is_active" class="flex items-center gap-3 p-3 bg-base-100 border border-base-200 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
+                    <input id="supplier-is_active" type="checkbox" [(ngModel)]="form().is_active" name="is_active"
                         class="checkbox checkbox-primary h-5 w-5 rounded border-base-300">
                     <span class="font-medium text-gray-700">Activo</span>
                 </label>
@@ -73,4 +87,4 @@
             </button>
         </div>
     </form>
-</div>
+</div>

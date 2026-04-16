@@ -21,6 +21,8 @@ export class BranchStoreComponent implements OnInit {
   products = signal<Product[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
+  hasInventory = signal(true);
+  hasRepairs = signal(true);
 
   async ngOnInit() {
     this.route.paramMap.subscribe(async (params) => {
@@ -59,9 +61,21 @@ export class BranchStoreComponent implements OnInit {
       }
       this.branch.set(branchData);
 
-      // Cargar el catálogo con la lógica de pricing de la sucursal (reventa central + propios)
-      const catalog = await this.branchService.getBranchCatalog(branchData.id, branchData.global_markup_percentage);
-      this.products.set(catalog);
+      // Evaluar permisos y plan
+      const config = branchData.modules_config as any;
+      const canInventory = !config || config['inventory'] === undefined || config['inventory'] === true;
+      const canRepairs = !config || config['repairs'] === undefined || config['repairs'] === true;
+      
+      this.hasInventory.set(canInventory);
+      this.hasRepairs.set(canRepairs);
+
+      if (canInventory) {
+        // Cargar el catálogo con la lógica de pricing de la sucursal (reventa central + propios)
+        const catalog = await this.branchService.getBranchCatalog(branchData.id, branchData.global_markup_percentage);
+        this.products.set(catalog);
+      } else {
+        this.products.set([]);
+      }
     } catch (err: any) {
       this.error.set('Ocurrió un error cargando el catálogo: ' + err.message);
     } finally {

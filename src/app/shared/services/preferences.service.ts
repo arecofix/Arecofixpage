@@ -26,6 +26,9 @@ export class PreferencesService {
   private sidebarOpenSubject = new BehaviorSubject<boolean>(false);
   sidebarOpen$ = this.sidebarOpenSubject.asObservable();
 
+  private forcedLightSubject = new BehaviorSubject<boolean>(false);
+  forcedLight$ = this.forcedLightSubject.asObservable();
+
   readonly backgroundOptions = [
     { id: 'gradient-5', name: 'Dark Gray', class: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black', isDark: true },
     { id: 'gradient-1', name: 'Blue Gradient', class: 'bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900', isDark: true },
@@ -42,11 +45,23 @@ export class PreferencesService {
   }
 
   toggleSidebar(): void {
-    this.sidebarOpenSubject.next(!this.sidebarOpenSubject.value);
+    const newState = !this.sidebarOpenSubject.value;
+    this.sidebarOpenSubject.next(newState);
+    this.toggleBodyScroll(newState);
   }
 
   closeSidebar(): void {
     this.sidebarOpenSubject.next(false);
+    this.toggleBodyScroll(false);
+  }
+
+  private toggleBodyScroll(lock: boolean): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (lock) {
+      document.body.classList.add('overflow-hidden', 'touch-none');
+    } else {
+      document.body.classList.remove('overflow-hidden', 'touch-none');
+    }
   }
 
   setLanguage(lang: Language): void {
@@ -57,7 +72,18 @@ export class PreferencesService {
   setTheme(themeId: string): void {
     this.themeSubject.next(themeId);
     this.savePreference('portfolio-background', themeId);
-    this.applyTheme(themeId);
+    if (!this.forcedLightSubject.value) {
+      this.applyTheme(themeId);
+    }
+  }
+
+  setForceLight(force: boolean): void {
+    this.forcedLightSubject.next(force);
+    if (force) {
+      this.applyTheme('light');
+    } else {
+      this.applyTheme(this.themeSubject.value);
+    }
   }
 
   increaseFontSize(): void {

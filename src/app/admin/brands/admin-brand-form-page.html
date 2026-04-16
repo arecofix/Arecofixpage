@@ -16,19 +16,23 @@
             }
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
-                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
+                <label for="brand-name" class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                <input id="brand-name" type="text" [(ngModel)]="form().name" name="name"
+                    autocomplete="organization"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Slug (URL)</label>
-                <input type="text" [(ngModel)]="form().slug" name="slug" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                <label for="brand-slug" class="block text-sm font-medium text-base-content mb-1.5">Slug (URL)</label>
+                <input id="brand-slug" type="text" [(ngModel)]="form().slug" name="slug"
+                    autocomplete="off"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                     placeholder="Se genera automáticamente si se deja vacío">
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Logo</label>
-                <input type="file" (change)="onFileChange($event)"
+                <label for="brand-logo" class="block text-sm font-medium text-base-content mb-1.5">Logo</label>
+                <input id="brand-logo" type="file" (change)="onFileChange($event)"
                     class="file-input file-input-bordered file-input-primary w-full bg-base-100 text-base-content" accept="image/*">
                 @if (form().logo_url) {
                 <div class="mt-4">
@@ -39,8 +43,8 @@
             </div>
 
             <div class="mt-6">
-                <label class="flex items-center gap-3 p-3 bg-base-100 border border-base-300 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
-                    <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+                <label for="brand-is_active" class="flex items-center gap-3 p-3 bg-base-100 border border-base-300 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
+                    <input id="brand-is_active" type="checkbox" [(ngModel)]="form().is_active" name="is_active"
                         class="checkbox checkbox-primary h-5 w-5 rounded border-base-300">
                     <span class="font-medium text-base-content">Activo</span>
                 </label>
@@ -57,4 +61,4 @@
             </button>
         </div>
     </form>
-</div>
+</div>

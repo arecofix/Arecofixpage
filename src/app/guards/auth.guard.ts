@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { ROLES } from '@app/core/constants/roles.constants';
+import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 
 export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
@@ -41,8 +42,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
     
     // Super Admin por email o señal tiene acceso global
     if (authService.isSuperAdmin() || 
-        userEmail === 'ezequielenrico15@gmail.com' || 
-        (userRole && allowedRoles.includes(userRole))) {
+        (userProfile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(userEmail || '') || (userRole && allowedRoles.includes(userRole))))) {
       console.log('🔓 Auth access granted for user:', userEmail, 'role:', userRole);
       return true;
     }

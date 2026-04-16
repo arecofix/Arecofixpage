@@ -16,26 +16,26 @@
             }
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
-                <input type="text" [(ngModel)]="form().name" name="name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
+                <label for="cat-name" class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                <input id="cat-name" type="text" [(ngModel)]="form().name" name="name" autocomplete="off" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" required>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Slug (URL)</label>
-                <input type="text" [(ngModel)]="form().slug" name="slug" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                <label for="cat-slug" class="block text-sm font-medium text-base-content mb-1.5">Slug (URL)</label>
+                <input id="cat-slug" type="text" [(ngModel)]="form().slug" name="slug" autocomplete="off" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                     placeholder="Se genera automáticamente si se deja vacío">
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Descripción</label>
-                <textarea [(ngModel)]="form().description" name="description" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                <label for="cat-description" class="block text-sm font-medium text-base-content mb-1.5">Descripción</label>
+                <textarea id="cat-description" [(ngModel)]="form().description" name="description" autocomplete="off" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                     rows="4"></textarea>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Icono (Font Awesome)</label>
+                <label for="cat-image_url" class="block text-sm font-medium text-base-content mb-1.5">Icono (Font Awesome)</label>
                 <div class="flex gap-4">
-                    <input type="text" [(ngModel)]="form().image_url" name="image_url" class="flex-1 bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    <input id="cat-image_url" type="text" [(ngModel)]="form().image_url" name="image_url" autocomplete="off" class="flex-1 bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         placeholder="Ej: fas fa-mobile-alt">
                     <div class="w-12 h-10 flex items-center justify-center bg-base-200 rounded-lg border border-base-300">
                         @if (form().image_url) {
@@ -49,8 +49,8 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Tipo</label>
-                <select [(ngModel)]="form().type" name="type" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                <label for="cat-type" class="block text-sm font-medium text-base-content mb-1.5">Tipo</label>
+                <select id="cat-type" [(ngModel)]="form().type" name="type" autocomplete="off" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                     <option value="product">Producto</option>
                     <option value="course">Curso</option>
                     <option value="service">Servicio</option>
@@ -58,8 +58,8 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Categoría Padre</label>
-                <select [(ngModel)]="form().parent_id" name="parent_id" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                <label for="cat-parent_id" class="block text-sm font-medium text-base-content mb-1.5">Categoría Padre</label>
+                <select id="cat-parent_id" [(ngModel)]="form().parent_id" name="parent_id" autocomplete="off" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                     <option [ngValue]="null">Ninguna (Categoría Principal)</option>
                     @for (cat of categories(); track cat.id) {
                         @if (cat.id !== id) {
@@ -71,8 +71,8 @@
             </div>
 
             <div class="mt-6">
-                <label class="flex items-center gap-3 p-3 bg-base-100 border border-base-300 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
-                    <input type="checkbox" [(ngModel)]="form().is_active" name="is_active"
+                <label for="cat-is_active" class="flex items-center gap-3 p-3 bg-base-100 border border-base-300 rounded-lg hover:bg-base-200 transition-colors cursor-pointer w-fit">
+                    <input id="cat-is_active" type="checkbox" [(ngModel)]="form().is_active" name="is_active"
                         class="checkbox checkbox-primary h-5 w-5 rounded border-base-300">
                     <span class="font-medium text-base-content">Activo</span>
                 </label>

@@ -33,8 +33,17 @@ export class ThemeService implements OnDestroy {
   /** Whether OS currently prefers dark */
   readonly osDark = signal<boolean>(this.detectOsDark());
 
+  /** Override to force light mode (e.g. for admin section) */
+  readonly forceLight = signal<boolean>(false);
+
   /** The resolved theme that should be applied */
   readonly resolvedTheme = computed<'light' | 'dark'>(() => {
+    // Force light mode if flag is set OR if we are in the admin section
+    const currentUrl = isPlatformBrowser(this.platformId) ? window.location.pathname : '';
+    const isAdminPath = currentUrl.startsWith('/admin') || currentUrl.includes('/admin/');
+    
+    if (this.forceLight() || isAdminPath) return 'light';
+    
     const m = this.mode();
     if (m === 'system') return this.osDark() ? 'dark' : 'light';
     return m;
@@ -82,13 +91,13 @@ export class ThemeService implements OnDestroy {
   // ── Private Helpers ─────────────────────────────────
 
   private loadInitialMode(): ThemeMode {
-    if (!isPlatformBrowser(this.platformId)) return 'dark';
+    if (!isPlatformBrowser(this.platformId)) return 'light';
 
     const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) return stored;
 
-    // No stored preference → use 'system' to respect OS setting
-    return 'system';
+    // Default to 'light' per user request
+    return 'light';
   }
 
   private detectOsDark(): boolean {

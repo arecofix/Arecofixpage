@@ -87,6 +87,376 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a13-4g-oled</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-iphone-13-oled</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/iphone-15-pro-256-gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/placa-de-carga-de-samsung-galaxy-a13</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/placa-de-carga-de-motorola-e22-e32</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a07-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a07-128gb-cargador</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a26-256gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a35-6-128gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a35-8-128gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a36-256gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-s25-fe-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-s25-fe-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-s25-ultra-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-s25-ultra-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-s26-ultra-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-s26-ultra-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g05-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g06-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g15-128gb-slim</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g35-256gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g85-256gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g86-256gb-5g-slim</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-g86-256gb-5g</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-50-fusion-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-50-fusion-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-50-pro-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-60-fusion-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-60-pro-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-a5-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-15c-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-15c-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-poco-x8-pro-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-13-pro-plus-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-13-pro-plus-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-14-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-14-pro-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-15-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-15-pro-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-15-pro-5g-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/xiaomi-redmi-note-15-pro-plus-5g-512gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/hp-15-laptop-i7</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/dell-inspiron-15</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/asus-expertbook-b1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/asus-vivobook</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-macbook-neo-13</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/ps5-slim-1tb-digital</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/ps5-lectora-slim-1tb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/joystick-ps5</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/jbl-go-essential</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/jbl-flip-7</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/jbl-charge-6</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a04-128gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a71-128gb-usado-1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a51-128gb-usado-1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a24-128gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a50-64gb-usado-1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a71-128gb-usado-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a50-64gb-usado-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a10-32gb-usado-1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a71-128gb-usado-3</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a10s-32gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a22-128gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/lg-k10-2017-16gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/motorola-moto-e20-32gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a51-128gb-usado-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a10-32gb-usado-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a71-128gb-usado-4</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-iphone-17-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-iphone-17-pro-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-iphone-17-pro-max-256gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-iphone-6s-32gb-usado</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-iphone-15-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/apple-iphone-16-128gb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://arecofix.com.ar/productos/detalle/kit-de-mascara-y-luz-uv-mechanic-1512</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -1622,11 +1992,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/bateria-de-motorola-g32-g41-nc50-servipack</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-de-motorola-g7-power-oled</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -1713,11 +2078,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/bateria-de-motorola-moto-c-plus-hc60-calidad-original</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/bateria-de-motorola-g8-play-kg40-calidad-original</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3207,11 +3567,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-iphone-13-oled</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-de-iphone-13-oled-cm</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -3477,11 +3832,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a13-4g-oled</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a11-gold-edition</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -3537,11 +3887,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a17</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a22-4g-incell-cm</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -3588,11 +3933,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a36-oled-cm</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a8-plus</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3773,11 +4113,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-a32-oled-original-4mbg84</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-a31-gold-edition-21r73i</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -5442,11 +5777,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/placa-de-carga-de-motorola-e22-e32</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/placa-de-carga-de-motorola-e6-plus</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -5578,11 +5908,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/placa-de-carga-de-samsung-galaxy-a15</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/placa-de-carga-de-samsung-galaxy-a13</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -6797,11 +7122,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/iphone-8-plus</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a03-core-oled-cm</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -6998,11 +7318,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/placa-main-de-samsung-a30s</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/joystick-play-station-4</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -7338,11 +7653,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/bateria-de-samsung-galaxy-z-flip-4-calidad-original</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/iphone-x</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -8542,6 +8852,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://arecofix.com.ar/productos/detalle/bateria-de-samsung-galaxy-a13-calidad-original</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://arecofix.com.ar/productos/detalle/bateria-de-samsung-galaxy-a14-5g-servipack</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -8578,11 +8893,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/bateria-de-samsung-galaxy-a16-servipack</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/bateria-de-samsung-galaxy-a13-calidad-original</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -9692,11 +10002,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-motorola-g60s-g40-g51-oled-5avvp5</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/tapa-a20s-8mqydj</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -10323,11 +10628,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/tapa-a21s-swtwhg</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/tapa-a02-b8fn0m</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -11082,22 +11382,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-a06-oled-stmdxq</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-a10s-oled-835o6o</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-m12-v-127-oled-908eco</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/modulo-motorola-moto-e14-con-marco</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -11218,11 +11508,6 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/tapa-de-iphone-ip-15-pro-max</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arecofix.com.ar/productos/detalle/auriculares-p9-plus-max</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -12548,6 +12833,196 @@
   </url>
   <url>
     <loc>https://arecofix.com.ar/productos/detalle/tester-yaxun-9205a</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/samsung-galaxy-a52</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/joystick-play-station-4</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/iphone-x</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/iphone-8-plus</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/auriculares-p9-plus-max</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a17</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-de-samsung-galaxy-a8-plus</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-motorola-moto-e14-con-marco</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-a06-oled-stmdxq</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-samsung-a31-gold-edition-21r73i</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/modulo-motorola-g60s-g40-g51-oled-5avvp5</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/tapa-a02-b8fn0m</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/bateria-de-motorola-g8-play-kg40-calidad-original</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/detalle/bateria-de-motorola-g32-g41-nc50-servipack</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/posts/bienvenido-blog-arecofix</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Parlantes</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/repuestos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/cursos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/celulares</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/electronicos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Nuevos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/baterias</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/reacondicionados</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/accesorios</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Computacion</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Tablets</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/pines</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Placas_carga</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Consolas</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Notebooks</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/modulos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/repuestos/tools</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/flex</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/camaras</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/huellas</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/tapas</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/insumos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arecofix.com.ar/productos/categoria/Usados</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -2,40 +2,46 @@
     <h1 class="text-3xl font-bold mb-8 text-center text-primary">Finalizar Compra</h1>
 
     @if (orderSuccess()) {
-    <div class="card bg-base-100 shadow-xl text-center p-10 border border-base-200">
+    <div class="card bg-base-100 shadow-xl text-center p-10 border border-base-200 animate-fade-in">
         <div class="card-body items-center">
-            <div class="text-success text-6xl mb-4">
+            <div class="text-emerald-500 text-7xl mb-6">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h2 class="card-title text-2xl text-base-content mb-2">¡Orden Recibida!</h2>
-            <p class="text-base-content/80 mb-6">Gracias por tu compra. Para procesar el envío, por favor realiza el pago:</p>
+            <h2 class="card-title text-3xl font-black text-base-content mb-4 tracking-tight">¡Orden Recibida!</h2>
+            <p class="text-base-content/80 mb-8 max-w-md">Gracias por tu compra en <strong>{{ branchService.currentBranch()?.name || 'Arecofix' }}</strong>. Para procesar el envío, por favor realiza el pago:</p>
             
-            <div class="bg-base-200 p-6 rounded-xl w-full max-w-md mb-6 text-left border border-base-300">
-                <p class="font-bold text-base-content mb-2 border-b border-base-content/10 pb-2">Datos Bancarios:</p>
-                <div class="space-y-2">
-                    <p class="text-base-content/70 flex justify-between">
-                        <span>Alias:</span> 
-                        <span class="font-mono font-bold text-base-content select-all bg-base-100 px-2 rounded">areco.fix</span>
+            <div class="bg-gray-50 dark:bg-gray-900 p-8 rounded-3xl w-full max-w-md mb-8 text-left border border-gray-100 dark:border-gray-800 shadow-inner">
+                <p class="font-black text-gray-400 uppercase tracking-widest text-[10px] mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">Información de Pago</p>
+                <div class="space-y-4">
+                    <p class="text-base-content/70 flex justify-between items-center">
+                        <span class="font-medium">Alias:</span> 
+                        <span class="font-mono font-black text-lg text-emerald-600 dark:text-emerald-400 select-all bg-white dark:bg-gray-800 px-3 py-1 rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700">
+                            {{ branchService.currentBranch()?.bank_info?.alias || 'areco.fix' }}
+                        </span>
                     </p>
-                    <p class="text-base-content/70 flex justify-between">
-                        <span>CBU:</span> 
-                        <span class="font-mono font-bold text-base-content select-all bg-base-100 px-2 rounded">0000003100084531456958</span>
+                    <p class="text-base-content/70 flex justify-between items-center">
+                        <span class="font-medium">CBU:</span> 
+                        <span class="font-mono font-bold text-sm text-base-content select-all bg-white dark:bg-gray-800 px-3 py-1 rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700">
+                            {{ branchService.currentBranch()?.bank_info?.cbu || '0000003100084531456958' }}
+                        </span>
                     </p>
                 </div>
             </div>
 
-            <p class="text-sm mb-4 text-base-content/80">
+            <p class="text-sm mb-6 text-base-content/60">
                 Una vez realizado el pago, envía el comprobante al: <br>
-                <strong class="text-lg text-primary">+54 9 11 2596-0900</strong>
+                <strong class="text-xl text-primary font-black mt-2 block">
+                    {{ branchService.currentBranch()?.whatsapp_number || '+54 9 11 2596-0900' }}
+                </strong>
             </p>
 
             <div class="card-actions flex flex-col gap-3 w-full max-w-md">
-                <a [href]="'https://wa.me/5491125960900?text=Hola,%20hice%20un%20pedido%20a%20nombre%20de%20' + checkoutForm.get('name')?.value + '.%20Adjunto%20comprobante.'"
+                <a [href]="'https://wa.me/' + (branchService.currentBranch()?.whatsapp_number || '5491125960900').replace(' ', '').replace('+', '') + '?text=Hola,%20hice%20un%20pedido%20en%20' + (branchService.currentBranch()?.name || 'Arecofix') + '%20a%20nombre%20de%20' + checkoutForm.get('name')?.value + '.%20Adjunto%20comprobante.'"
                    target="_blank" 
-                   class="btn btn-success text-white w-full btn-lg">
+                   class="btn btn-success text-white w-full btn-lg rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition-transform">
                     <i class="fab fa-whatsapp text-xl mr-2"></i> Enviar Comprobante
                 </a>
-                <a routerLink="/" class="btn btn-ghost w-full">Volver al Inicio</a>
+                <a routerLink="/" class="btn btn-ghost w-full rounded-2xl">Volver al Inicio</a>
             </div>
         </div>
     </div>
@@ -57,11 +63,11 @@
                             class="w-16 h-16 object-cover rounded-lg border border-base-300" />
                         <div class="flex-1">
                             <h3 class="font-bold text-base-content">{{ item.product.name }}</h3>
-                            <p class="text-sm text-base-content/70">${{ item.product.price }} x {{ item.quantity }}</p>
+                            <p class="text-sm text-base-content/70">{{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ item.product.price }} x {{ item.quantity }}</p>
                         </div>
                         <div class="flex flex-col items-end gap-1">
                             <span class="font-bold text-base-content">
-                                ${{ (item.product.price * item.quantity).toFixed(2) }}
+                                {{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ (item.product.price * item.quantity).toFixed(2) }}
                             </span>
                             <button (click)="cartService.removeFromCart(item.product.id)" class="btn btn-ghost btn-xs text-error" aria-label="Eliminar">
                                 <i class="fas fa-trash-alt"></i>
@@ -136,7 +142,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="form-control w-full">
                                 <label class="label">
                                     <span class="label-text text-base-content">Barrio / Depto</span>
@@ -148,6 +154,15 @@
                                     <span class="label-text text-base-content">Ciudad</span>
                                 </label>
                                 <input type="text" formControlName="city" class="input input-bordered w-full bg-base-100 text-base-content" />
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-base-content font-bold">Cóg. Postal (CP)</span>
+                                </label>
+                                <input type="text" formControlName="postal_code" class="input input-bordered w-full bg-base-100 text-base-content font-mono" placeholder="Ej: 1727" maxlength="4" />
+                                @if (checkoutForm.get('address.postal_code')?.invalid && checkoutForm.get('address.postal_code')?.touched) {
+                                  <span class="text-error text-xs mt-1">CP inválido. Debe ser de 4 dígitos.</span>
+                                }
                             </div>
                         </div>
                     </div>

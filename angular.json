@@ -51,7 +51,7 @@
               "entry": "server.ts"
             },
             "prerender": {
-              "discoverRoutes": true,
+              "discoverRoutes": false,
               "routesFile": "routes.txt"
             },
             "tsConfig": "tsconfig.app.json",
@@ -71,7 +71,11 @@
               "qrcode",
               "raf",
               "rgbcolor",
-              "core-js"
+              "core-js",
+              "html2canvas",
+              "fflate",
+              "dompurify",
+              "canvg"
             ]
           },
           "configurations": {
@@ -79,7 +83,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": {
-                  "inlineCritical": false,
+                  "inlineCritical": true,
                   "minify": true
                 },
                 "fonts": {
@@ -129,11 +133,11 @@
               "buildTarget": "arecofix:build:production"
             },
             "development": {
-              "buildTarget": "arecofix:build:development"
+              "buildTarget": "arecofix:build:development",
+              "hmr": false
             }
           },
           "defaultConfiguration": "development"
-
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"

@@ -6,7 +6,7 @@
  */
 export type InvoiceType = 'A' | 'B' | 'C' | 'X'; // X = internal/manual ticket
 
-export type InvoiceOrigin = 'sale' | 'order' | 'manual';
+export type InvoiceOrigin = 'sale' | 'order' | 'manual' | 'repair';
 
 export interface InvoiceItem {
   description: string;
@@ -65,6 +65,7 @@ export interface CreateInvoiceDto {
   total_amount: number;
   items?: InvoiceItem[];
   notes?: string;
+  repair_id?: string;
   issued_at?: string;
 }
 

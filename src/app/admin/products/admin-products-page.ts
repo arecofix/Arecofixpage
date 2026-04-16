@@ -11,6 +11,9 @@ import { ImportResultModalComponent } from './components/import-result-modal/imp
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
+import { effect } from '@angular/core';
+import { BranchContextService } from '@app/core/services/branch-context.service';
+
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
@@ -22,6 +25,7 @@ export class AdminProductsPage implements OnInit {
   private productService = inject(AdminProductService);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private branchContextService = inject(BranchContextService);
   
   // Signals
   public products = signal<Product[]>([]);
@@ -56,6 +60,7 @@ export class AdminProductsPage implements OnInit {
   public savingStock = signal<boolean>(false);
 
   private searchSubject = new Subject<string>();
+  private router = inject(Router);
 
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
@@ -79,6 +84,14 @@ export class AdminProductsPage implements OnInit {
          queryParamsHandling: 'merge'
        });
     });
+
+    // React to branch changes globally
+    effect(() => {
+      const branchId = this.branchContextService.currentBranchId();
+      // Only reload if we are not in the middle of a query param change 
+      // which already triggers loadData
+      this.loadData();
+    });
   }
 
   // Computed properties
@@ -98,8 +111,6 @@ export class AdminProductsPage implements OnInit {
   });
 
   public selectedIdsList = computed(() => Array.from(this.selectedIds()));
-
-  private router = inject(Router);
 
   async ngOnInit() {
     // Initial load handled by constructor subscribe
@@ -140,11 +151,11 @@ export class AdminProductsPage implements OnInit {
           q: this.searchQuery(),
           category_id: this.selectedCategoryId() !== 'all' ? this.selectedCategoryId() : undefined,
           _sort: currentSort.column,
-          _order: currentSort.order,
+          _order: currentSort.order as 'asc' | 'desc',
           include_inactive: true
       });
 
-      this.products.set(response.data || []);
+      this.products.set(response.data as any[] || []);
       this.totalItems.set(response.items || 0);
 
     } catch (e: any) {
@@ -224,6 +235,14 @@ export class AdminProductsPage implements OnInit {
       await this.productService.exportProductsToCSV();
     } catch (e: any) {
       this.error.set('Error al exportar: ' + e.message);
+    }
+  }
+
+  async exportMetaCatalog() {
+    try {
+      await this.productService.exportToMetaCSV();
+    } catch (e: any) {
+      this.error.set('Error al exportar para Meta: ' + e.message);
     }
   }
 

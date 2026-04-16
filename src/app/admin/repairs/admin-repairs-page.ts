@@ -1,27 +1,51 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Repair } from '@app/features/repairs/domain/entities/repair.entity';
 import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
 import { RepairStatusUtils } from '@app/features/repairs/domain/utils/repair-status.utils';
+import { BranchContextService } from '@app/core/services/branch-context.service';
+
+
 
 @Component({
   selector: 'app-admin-repairs-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ScrollingModule],
   templateUrl: './admin-repairs-page.html',
 })
 export class AdminRepairsPage implements OnInit {
   private repairService = inject(AdminRepairService);
-  
+  private branchContextService = inject(BranchContextService);
+
+  constructor() {
+    // React to branch changes globally
+    effect(() => {
+      const branchId = this.branchContextService.currentBranchId();
+      this.loadRepairs();
+      this.loadSummary();
+    });
+  }
   repairs = signal<Repair[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
   
+  // Statistics and Summary
+  summary = signal<any>({ inWorkshop: 0, readyToPickup: 0, pendingParts: 0, thisMonthProfit: 0 });
+  
   // Search and Filter signals
   searchTerm = signal('');
   filterType = signal('all');
+  
+  // Pagination
+  pageOffset = signal(0);
+  pageSize = signal(25);
+  hasMore = signal(true);
+  loadingMore = signal(false);
+  
+  private searchTimeout?: any;
 
   // Mapped repairs with precalculated UI properties to avoid template function calls
   mappedRepairs = computed(() => {
@@ -30,12 +54,9 @@ export class AdminRepairsPage implements OnInit {
     
     return this.repairs()
       .filter(repair => {
-        const matchesSearch = 
-          repair.customer_name?.toLowerCase().includes(term) ||
-          repair.customer_phone?.toLowerCase().includes(term) ||
-          repair.device_model?.toLowerCase().includes(term) ||
-          repair.tracking_code?.toLowerCase().includes(term);
-          
+        // Basic type filtering still in-memory for immediate UX if needed, 
+        // but search is now server-side
+        const type = this.filterType();
         const matchesType = type === 'all' || 
           (repair.device_type?.toLowerCase()?.includes(type.toLowerCase())) ||
           (type === 'smartphone' && (!repair.device_type || 
@@ -43,7 +64,7 @@ export class AdminRepairsPage implements OnInit {
                                      repair.device_type.toLowerCase().includes('phone') ||
                                      repair.device_type.toLowerCase().includes('móvil')));
           
-        return matchesSearch && matchesType;
+        return matchesType;
       })
       .map(repair => {
         // Pre-calculate warranty status
@@ -74,87 +95,103 @@ export class AdminRepairsPage implements OnInit {
       });
   });
 
-  // Derived statistics to fix Angular template parsing limits with arrow functions
-  inWorkshopCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 3 || r.current_status_id === 1).length);
-  readyToPickupCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 5).length);
-  pendingPartsCount = computed(() => this.mappedRepairs().filter(r => r.current_status_id === 2).length);
+  // Derived statistics from Global Summary
+  inWorkshopCount = computed(() => this.summary().inWorkshop);
+  readyToPickupCount = computed(() => this.summary().readyToPickup);
+  pendingPartsCount = computed(() => this.summary().pendingParts);
 
-  // Profit Statistics
-  profitStats = computed(() => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    
-    // Last month date calculation
-    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonth = lastMonthDate.getMonth();
-    const lastYear = lastMonthDate.getFullYear();
-
-    const stats = {
-      thisMonth: 0,
-      lastMonth: 0,
-      totalThisMonth: 0, // Revenue
-      totalLastMonth: 0  // Revenue
-    };
-
-    this.repairs().forEach(r => {
-      // Only count profit for completed or ready-to-pickup repairs
-      const isFinished = r.current_status_id === 5 || r.current_status_id === 6;
-      if (!isFinished) return;
-
-      const dateStr = r.completed_at || r.received_at;
-      if (!dateStr) return;
-      
-      const rDate = new Date(dateStr);
-      const rMonth = rDate.getMonth();
-      const rYear = rDate.getFullYear();
-      
-      // Calculate profit for this repair
-      const partsCost = (r.parts || []).reduce((acc, p) => acc + (p.cost_at_time || 0) * (p.quantity || 1), 0);
-      const repairProfit = (r.final_cost || r.estimated_cost || 0) - partsCost;
-      const revenue = (r.final_cost || r.estimated_cost || 0);
-
-      if (rMonth === currentMonth && rYear === currentYear) {
-        stats.thisMonth += repairProfit;
-        stats.totalThisMonth += revenue;
-      } else if (rMonth === lastMonth && rYear === lastYear) {
-        stats.lastMonth += repairProfit;
-        stats.totalLastMonth += revenue;
-      }
-    });
-
-    return stats;
-  });
+  // Profit Statistics from Global Summary
+  thisMonthProfitGlobal = computed(() => this.summary().thisMonthProfit);
 
   date = new Date();
 
   async ngOnInit() {
-    await this.loadRepairs();
+    await Promise.all([
+      this.loadRepairs(),
+      this.loadSummary()
+    ]);
   }
 
-  async loadRepairs() {
-    this.loading.set(true);
+  async loadSummary() {
+    try {
+      const summary = await this.repairService.getWorkshopSummary();
+      this.summary.set(summary);
+    } catch (e) {
+      console.error('Error loading workshop summary', e);
+    }
+  }
+
+  async loadRepairs(append = false) {
+    if (append) {
+      this.loadingMore.set(true);
+    } else {
+      this.loading.set(true);
+      this.pageOffset.set(0);
+      this.hasMore.set(true);
+    }
+    
     this.error.set(null);
     try {
-      const data = await this.repairService.getAdminList();
-      this.repairs.set(data);
+      const data = await this.repairService.getAdminList(
+        this.pageSize(), 
+        this.pageOffset(), 
+        this.searchTerm()
+      );
+      
+      if (append) {
+        this.repairs.set([...this.repairs(), ...data]);
+      } else {
+        this.repairs.set(data);
+      }
+      
+      this.hasMore.set(data.length === this.pageSize());
     } catch (e: any) {
       this.error.set('Error al cargar las reparaciones: ' + e.message);
     } finally {
       this.loading.set(false);
+      this.loadingMore.set(false);
     }
+  }
+
+  loadMore() {
+    if (this.loading() || this.loadingMore() || !this.hasMore()) return;
+    this.pageOffset.update(v => v + this.pageSize());
+    this.loadRepairs(true);
+  }
+
+  onSearch(term: string) {
+    this.searchTerm.set(term);
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.loadRepairs();
+    }, 400);
   }
 
   async deleteRepair(id: string) {
     if (!confirm('¿Estás seguro de eliminar este registro de reparación?')) return;
 
+    const previousRepairs = this.repairs();
+    
+    // 1. Optimistic Update
+    this.repairs.update(current => current.filter(r => r.id !== id));
+
     try {
-      this.loading.set(true);
+      // 2. Server call
       await this.repairService.delete(id);
-      await this.loadRepairs();
+      // Optional: updated summary after deletion
+      this.loadSummary();
     } catch (e: any) {
+      // 3. Rollback
+      this.repairs.set(previousRepairs);
       alert('Error al eliminar la reparación: ' + e.message);
-      this.loading.set(false);
+    }
+  }
+
+  onScroll(index: number) {
+    const total = this.mappedRepairs().length;
+    // Trigger load more when we are 5 items away from current end
+    if (index >= total - 5 && this.hasMore() && !this.loadingMore() && !this.loading()) {
+      this.loadMore();
     }
   }
 }

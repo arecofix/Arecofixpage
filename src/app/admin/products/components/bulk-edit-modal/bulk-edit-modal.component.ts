@@ -137,9 +137,8 @@ export class BulkEditModalComponent implements OnChanges {
     let priceByIdMap = new Map<string, number>();
 
     if (needsFetch) {
-      const products = await this.productService.getProducts();
-      const relevant = products.filter(p => ids.includes(p.id));
-      relevant.forEach(p => {
+      const products = await this.productService.getProductsByIds(ids);
+      products.forEach(p => {
         stockByIdMap.set(p.id, p.stock ?? 0);
         priceByIdMap.set(p.id, p.price ?? 0);
       });
@@ -189,8 +188,10 @@ export class BulkEditModalComponent implements OnChanges {
   }
 
   close() {
-    if (this.isProcessing()) return;
+    // If it's processing, we still allow closing to prevent UI lock-in (eternally loading)
+    // although the background process might still be running in the service.
     this.isOpen.set(false);
+    this.isProcessing.set(false); 
     this.resetForm();
   }
 

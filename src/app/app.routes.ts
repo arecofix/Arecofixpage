@@ -19,6 +19,11 @@ export const routes: Routes = [
         loadChildren: () => import('@app/public/public.routes'),
     },
     {
+        title: 'Upgrade Requerido',
+        path: 'upgrade-required',
+        loadComponent: () => import('@app/shared/components/upgrade-required/upgrade-required.component').then(m => m.UpgradeRequiredComponent)
+    },
+    {
         path: '**',
         redirectTo: '',
     }

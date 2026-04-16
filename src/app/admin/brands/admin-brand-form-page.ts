@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { firstValueFrom } from 'rxjs';
+import { ProductMediaService } from '@app/admin/products/services/product-media.service';
 
 @Component({
     selector: 'app-admin-brand-form-page',
@@ -17,6 +18,7 @@ export class AdminBrandFormPage implements OnInit {
     private router = inject(Router);
     private auth = inject(AuthService);
     private brandRepo = inject(BrandRepository);
+    private mediaService = inject(ProductMediaService);
 
     id: string | null = null;
     form = signal({
@@ -54,15 +56,13 @@ export class AdminBrandFormPage implements OnInit {
     async onFileChange(event: any) {
         const file: File = event.target.files?.[0];
         if (!file) return;
-        const supabase = this.auth.getSupabaseClient();
-        const filePath = `brands/${Date.now()}-${file.name}`;
-        const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file);
-        if (error) {
+
+        try {
+            const publicUrl = await this.mediaService.uploadFile(file, 'brands');
+            this.form.update((f) => ({ ...f, logo_url: publicUrl }));
+        } catch (error: any) {
             this.error.set(error.message);
-            return;
         }
-        const { data: publicUrl } = supabase.storage.from('public-assets').getPublicUrl(data.path);
-        this.form.update((f) => ({ ...f, logo_url: publicUrl.publicUrl }));
     }
 
     async save() {

@@ -5,6 +5,7 @@ import { Category } from '@app/features/products/domain/entities/category.entity
 import { ProductRepository, BulkPriceUpdate, ImportProductSummary } from '@app/features/products/domain/repositories/product.repository';
 import { BrandRepository } from '@app/features/products/domain/repositories/brand.repository';
 import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
+import { BranchRepository } from '@app/core/repositories/branch.repository';
 import { AuthService } from '@app/core/services/auth.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { CsvService } from '@app/shared/services/csv.service';
@@ -12,6 +13,8 @@ import { StringUtils } from '@app/shared/utils/string.utils';
 import { firstValueFrom } from 'rxjs';
 import { ROLES } from '@app/core/constants/roles.constants';
 import { TenantService } from '@app/core/services/tenant.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
+import { environment } from '@env/environment';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
 export interface ImportReport {
@@ -40,9 +43,12 @@ interface CsvRow {
     brand_id?: string;
     image_url?: string;
     slug?: string;
+    unit_cost_at_time?: number;
     is_active?: boolean;
     is_featured?: boolean;
 }
+
+
 
 @Injectable({
     providedIn: 'root'
@@ -55,24 +61,39 @@ export class AdminProductService {
     private auth = inject(AuthService);
     private tenantService = inject(TenantService);
     private notificationService = inject(NotificationService);
+    private branchContextService = inject(BranchContextService);
+    private branchRepo = inject(BranchRepository);
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();
         if (user) {
             const profile = await this.auth.getUserProfile(user.id);
-            // Si es súper administrador o el dueño central, ve todos los productos omitiendo el filtro de sucursal
+            const contextBranchId = this.branchContextService.getBranchId();
+
+            // Si es súper administrador o el dueño central
             if (this.auth.isSuperAdmin() || profile?.role === ROLES.TENANT_OWNER) {
+                // Si hay una sucursal seleccionada en el contexto, filtramos por ella
+                if (contextBranchId) {
+                    return firstValueFrom(this.productRepo.getAll(contextBranchId));
+                }
+                // Si no, vemos todo
                 return firstValueFrom(this.productRepo.getAll());
             }
+            // Para empleados, siempre su sucursal
             return firstValueFrom(this.productRepo.getAll(profile?.branch_id));
         }
         return firstValueFrom(this.productRepo.getAll());
     }
 
-    async getProductsPaginated(params: any): Promise<any> {
+    async getProductsPaginated(params: import('@app/public/products/interfaces').ProductsParams): Promise<import('@app/public/products/interfaces').ProductsResponse> {
+        const contextBranchId = this.branchContextService.getBranchId();
+
         const enrichedParams = {
             ...params,
-            include_inactive: params.include_inactive ?? true
+            include_inactive: params.include_inactive ?? true,
+            // If superadmin has a branch selected, filter by it. 
+            // Note: repository findWithFilters needs to support this.
+            branch_id: params.branch_id || contextBranchId
         };
         return firstValueFrom(this.productRepo.findWithFilters(enrichedParams));
     }
@@ -89,15 +110,24 @@ export class AdminProductService {
         return firstValueFrom(this.categoryRepo.getAll());
     }
 
-    async getBranches(): Promise<any[]> {
-        const supabase = this.auth.getSupabaseClient();
-        const tenantId = this.tenantService.getTenantId();
-        const { data } = await supabase.from('branches')
-            .select('*')
-            .eq('tenant_id', tenantId)
-            .eq('is_active', true)
-            .order('name');
-        return data || [];
+    async getBranches(): Promise<{ id: string; name: string }[]> {
+        return firstValueFrom(this.branchRepo.getActiveBranches());
+    }
+
+    async getPendingApprovals(): Promise<Product[]> {
+        return firstValueFrom(this.productRepo.getPendingApprovals());
+    }
+
+    async approveProduct(id: string): Promise<void> {
+        await firstValueFrom(this.productRepo.approveProduct(id));
+    }
+
+    async rejectProduct(id: string): Promise<void> {
+        await firstValueFrom(this.productRepo.rejectProduct(id));
+    }
+
+    async getPendingApprovalsCount(): Promise<number> {
+        return firstValueFrom(this.productRepo.getPendingApprovalsCount());
     }
 
     async createProduct(payload: Partial<Product>): Promise<void> {
@@ -144,6 +174,12 @@ export class AdminProductService {
         await firstValueFrom(this.productRepo.update(id, payload));
     }
 
+    async getProductsByIds(ids: string[]): Promise<Product[]> {
+        if (!ids.length) return [];
+        const res = await firstValueFrom(this.productRepo.findWithFilters({ ids }));
+        return res.data as unknown as Product[];
+    }
+
     async uploadImage(file: File): Promise<string> {
         return this.productRepo.uploadImage(file);
     }
@@ -162,7 +198,60 @@ export class AdminProductService {
             'is_active', 'is_featured', 'sku', 'barcode'
         ];
 
-        this.csvService.exportToCsv(products as any, 'products_export', headers);
+        this.csvService.exportToCsv(products as any, 'products_export', headers as any);
+    }
+
+    /**
+     * Specialized export for Meta Product Catalog (Facebook/Instagram Shops)
+     * Solves issues with missing titles, links, prices and images.
+     */
+    async exportToMetaCSV(): Promise<void> {
+        const products = await this.getProducts();
+        if (!products.length) return;
+
+        // Load brands to map IDs to names
+        const brands = await this.getBrands();
+        const brandMap = new Map(brands.map(b => [b.id, b.name]));
+
+        const metaProducts = products.map(p => {
+            // Ensure absolute image URL
+            let imageLink = p.image_url || '';
+            if (imageLink && !imageLink.startsWith('http')) {
+                imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${imageLink}`;
+            }
+
+            // Ensure absolute product link
+            const productLink = `${environment.baseUrl}/productos/${p.slug}`;
+
+            // Format price: Amount + ' ' + ISO Currency (e.g. 1500.00 ARS)
+            const priceValue = Number(p.price) || 0;
+            const currency = p.currency || 'ARS';
+            const formattedPrice = `${priceValue.toFixed(2)} ${currency}`;
+
+            // Meta supported tokens for availability
+            const availability = (p.is_active && (p.stock > 0 || p.stock === null)) ? 'in stock' : 'out of stock';
+            
+            // Ensure we always have a title
+            const title = p.name || p.description || 'Producto sin nombre';
+
+            return {
+                id: p.id,
+                title: title,
+                description: (p.description || title).substring(0, 9000),
+                availability: availability,
+                condition: 'new',
+                price: formattedPrice,
+                link: productLink,
+                image_link: imageLink,
+                brand: brandMap.get(p.brand_id || '') || environment.appName,
+                quantity_to_sell_on_facebook: p.stock || 0,
+                google_product_category: ''
+            };
+        });
+
+        const headers = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'quantity_to_sell_on_facebook', 'google_product_category'];
+        
+        this.csvService.exportToCsv(metaProducts as any, `meta_catalog_${new Date().toISOString().split('T')[0]}`, headers as any);
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -184,7 +273,7 @@ export class AdminProductService {
                 let v = values[i]?.trim();
                 if (v === '' || v === undefined) {
                     raw[h] = null;
-                } else if (['price', 'stock', 'min_stock_alert'].includes(h)) {
+                } else if (['price', 'stock', 'min_stock_alert', 'unit_cost_at_time'].includes(h)) {
                     raw[h] = Number(v);
                 } else if (['is_active', 'is_featured'].includes(h)) {
                     raw[h] = v.toLowerCase() === 'true';
@@ -215,6 +304,7 @@ export class AdminProductService {
                 brand_id: raw['brand_id'] || undefined,
                 image_url: raw['image_url'] || undefined,
                 slug: raw['slug'] || undefined,
+                unit_cost_at_time: raw['unit_cost_at_time'] != null ? Number(raw['unit_cost_at_time']) : undefined,
                 is_active: raw['is_active'] != null ? Boolean(raw['is_active']) : true,
                 is_featured: raw['is_featured'] != null ? Boolean(raw['is_featured']) : false,
             } as CsvRow;
@@ -293,8 +383,8 @@ export class AdminProductService {
             }
         }
 
-        // Auto-create missing brands
-        for (const normName of brandNamesToCreate) {
+        // Auto-create missing brands in parallel
+        await Promise.all(Array.from(brandNamesToCreate).map(async (normName) => {
             try {
                 const displayName = normName.charAt(0).toUpperCase() + normName.slice(1);
                 const newBrand = await firstValueFrom(
@@ -306,10 +396,10 @@ export class AdminProductService {
             } catch (e: any) {
                 details.push(`⚠️ No se pudo crear la marca "${normName}": ${e.message ?? e}`);
             }
-        }
+        }));
 
-        // Auto-create missing categories
-        for (const normName of catNamesToCreate) {
+        // Auto-create missing categories in parallel
+        await Promise.all(Array.from(catNamesToCreate).map(async (normName) => {
             try {
                 const displayName = normName.charAt(0).toUpperCase() + normName.slice(1);
                 const newCat = await firstValueFrom(
@@ -321,7 +411,7 @@ export class AdminProductService {
             } catch (e: any) {
                 details.push(`⚠️ No se pudo crear la categoría "${normName}": ${e.message ?? e}`);
             }
-        }
+        }));
 
 
         // ── STEP 3: Classify ───────────────────────────────────────────────
@@ -396,6 +486,7 @@ export class AdminProductService {
                     category_id: catId || undefined,
                     brand_id: brandId || undefined,
                     image_url: row.image_url || undefined,
+                    unit_cost_at_time: row.unit_cost_at_time || 0,
                     is_active: row.is_active ?? true,
                     is_featured: row.is_featured ?? false,
                 });

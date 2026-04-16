@@ -12,6 +12,11 @@ export const ADMIN_REPAIRS_ROUTES: Routes = [
     loadComponent: () => import('./stats/repair-stats.component').then(m => m.AdminRepairStatsComponent)
   },
   {
+    path: 'protocol',
+    title: 'Protocolo de Diagnóstico',
+    loadComponent: () => import('./protocol/diagnostic-protocol-page').then(m => m.DiagnosticProtocolPage)
+  },
+  {
     path: 'new',
     title: 'Nueva Reparación',
     loadComponent: () => import('./admin-repair-form-page').then(m => m.AdminRepairFormPage)

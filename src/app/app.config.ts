@@ -7,12 +7,12 @@ import {
 } from '@angular/core';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { SupabaseService } from './core/services/supabase.service';
 import { SUPABASE_CLIENT } from './core/di/supabase-token';
-
+import { globalErrorInterceptor } from './core/interceptors/error.interceptor';
 import { ProductRepository } from './features/products/domain/repositories/product.repository';
 import { SupabaseProductRepository } from './features/products/infrastructure/repositories/supabase-product.repository';
 import { CategoryRepository } from './features/products/domain/repositories/category.repository';
@@ -25,6 +25,16 @@ import { AnalyticsRepository } from './features/analytics/domain/repositories/an
 import { SupabaseAnalyticsRepository } from './features/analytics/infrastructure/repositories/supabase-analytics.repository';
 import { UserProfileRepository } from './core/repositories/user-profile.repository';
 import { SupabaseUserProfileRepository } from './core/infrastructure/repositories/supabase-user-profile.repository';
+import { OrderRepository } from './features/orders/domain/repositories/order.repository';
+import { SupabaseOrderRepository } from './features/orders/infrastructure/repositories/supabase-order.repository';
+import { FinanceRepository } from './features/finance/domain/repositories/finance.repository';
+import { SupabaseFinanceRepository } from './features/finance/infrastructure/repositories/supabase-finance.repository';
+import { ProductReviewBaseRepository } from './features/products/domain/repositories/product-review.repository';
+import { SupabaseProductReviewRepository } from './features/products/infrastructure/repositories/supabase-product-review.repository';
+import { InvoiceRepository } from './features/sales/domain/repositories/invoice.repository';
+import { SupabaseInvoiceRepository } from './features/sales/infrastructure/repositories/supabase-invoice.repository';
+import { CourseRepository } from './features/courses/domain/repositories/course.repository';
+import { SupabaseCourseRepository } from './features/courses/infrastructure/repositories/supabase-course.repository';
 import { TenantService } from './core/services/tenant.service';
 
 export const appConfig: ApplicationConfig = {
@@ -58,7 +68,10 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled'
       })
     ),
-    provideHttpClient(withFetch()),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([globalErrorInterceptor])
+    ),
 
     // Repositories
     { provide: ProductRepository, useClass: SupabaseProductRepository },
@@ -67,5 +80,10 @@ export const appConfig: ApplicationConfig = {
     { provide: RepairRepository, useClass: SupabaseRepairRepository },
     { provide: AnalyticsRepository, useClass: SupabaseAnalyticsRepository },
     { provide: UserProfileRepository, useClass: SupabaseUserProfileRepository },
+    { provide: OrderRepository, useClass: SupabaseOrderRepository },
+    { provide: FinanceRepository, useClass: SupabaseFinanceRepository },
+    { provide: ProductReviewBaseRepository, useClass: SupabaseProductReviewRepository },
+    { provide: InvoiceRepository, useClass: SupabaseInvoiceRepository },
+    { provide: CourseRepository, useClass: SupabaseCourseRepository },
   ]
 };

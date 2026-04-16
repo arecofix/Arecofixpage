@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject, DestroyRef } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { GsmService, GsmTool, BrandService, DownloadItem } from './services/gsm.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SeoService } from '@app/core/services/seo.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { RouterLink } from '@angular/router';
 
@@ -15,24 +17,30 @@ import { RouterLink } from '@angular/router';
   styleUrl: './gsm.component.css',
 })
 export class GsmComponent implements OnInit, OnDestroy {
-
-  gsmTools: GsmTool[] = [];
-  brandServices: BrandService[] = [];
-  downloads: DownloadItem[] = [];
+  private destroyRef = inject(DestroyRef);
+  
+  gsmTools = signal<GsmTool[]>([]);
+  brandServices = signal<BrandService[]>([]);
+  downloads = signal<DownloadItem[]>([]);
 
   whatsappUrl = 'https://wa.me/541125960900?text=Hola,%20necesito%20ayuda%20con%20herramientas%20GSM';
+  telegramUrl = 'https://t.me/+541125960900';
 
   // Translations
   translations: any = {
     es: {
-      badge: 'Plataforma Profesional GSM',
-      title_sub: 'Herramientas & Licencias',
-      description: 'Plataforma integral para técnicos GSM, FRP y licencias digitales. Soluciones profesionales al alcance de un clic.',
-      btn_whatsapp: 'Soporte WhatsApp',
-      btn_tools: 'Ver Herramientas',
-      offer_badge: 'Oferta Activada',
-      offer_desc: 'Descuento exclusivo por tiempo limitado',
-      region: 'Región',
+      badge: 'Bypass iPhone Profesional',
+      title_sub: 'Bypass iCloud hasta iPhone 16 Pro Max',
+      description: 'La plataforma más potente para revendedores. Desbloqueos instantáneos, seguridad bancaria y soporte real. Bypass, FRP, F4, eliminación y cuentas bloqueadas para iPhone, iPad y más.',
+      btn_whatsapp: 'Consultar Oferta',
+      btn_tools: 'Herramientas GSM',
+      btn_telegram: 'CANAL TELEGRAM',
+      official_channel: 'NOVEDADES EN CANAL OFICIAL',
+      offer_badge: 'OFERTA POR TIEMPO LIMITADO',
+      offer_desc: 'Bypass Full para todos los modelos. iPhone 5s al 16 Pro Max.',
+      trust_badge: '100% GARANTIZADO',
+      trust_text: 'Recuperamos tu iPhone bloqueado de forma segura y permanente.',
+      region: 'Disponibilidad',
       mac_support: 'Podemos hacerlo en una MAC',
       btn_offer: 'Ver Oferta',
       calc_title: 'Conversor Rápido',
@@ -56,18 +64,34 @@ export class GsmComponent implements OnInit, OnDestroy {
       utility: 'Utilidad',
       days: 'Días',
       hours: 'Hs',
-      min: 'Min',
-      sec: 'Seg'
+      sec: 'Seg',
+      features_title: '¿Por qué elegir nuestra plataforma?',
+      feature_1_title: 'Soporte 24/7',
+      feature_1_desc: 'Estamos para ayudarte en cualquier momento del día.',
+      feature_2_title: 'Precios competitivos',
+      feature_2_desc: 'Las mejores tarifas para revendedores y mayoristas.',
+      feature_3_title: 'Desbloqueo Seguro',
+      feature_3_desc: 'Métodos 100% seguros sin riesgo para el dispositivo.',
+      step_1: 'Registrate',
+      step_1_desc: 'Creá tu cuenta de revendedor gratis.',
+      step_2: 'Cargá Saldo',
+      step_2_desc: 'Usá Alias, QR o USDT de forma instantánea.',
+      step_3: 'Hacé tu pedido',
+      step_3_desc: 'Seleccioná el servicio y enviá el IMEI/Serial.',
+      step_4: 'Resultado',
+      step_4_desc: 'Recibí la notificación y listo!'
     },
     en: {
-      badge: 'Professional GSM Platform',
-      title_sub: 'Tools & Licenses',
-      description: 'Comprehensive platform for GSM technicians, FRP, and digital licenses. Professional solutions just a click away.',
-      btn_whatsapp: 'WhatsApp Support',
-      btn_tools: 'View Tools',
-      offer_badge: 'Offer Activated',
-      offer_desc: 'Exclusive discount for a limited time',
-      region: 'Region',
+      badge: 'Professional iPhone Bypass',
+      title_sub: 'iCloud Bypass up to iPhone 16 Pro Max',
+      description: 'We have Bypass available for all iPhone models. Exclusive limited-time offer. If your iPhone has an iCloud account, we can solve it with a full guarantee.',
+      btn_whatsapp: 'Check Offer',
+      btn_tools: 'GSM Tools',
+      offer_badge: 'LIMITED TIME OFFER',
+      offer_desc: 'Full Bypass for all models. iPhone 5s to 16 Pro Max.',
+      trust_badge: '100% GUARANTEED',
+      trust_text: 'We recover your locked iPhone safely and permanently.',
+      region: 'Availability',
       mac_support: 'We can do it on a MAC',
       btn_offer: 'View Offer',
       calc_title: 'Quick Converter',
@@ -97,51 +121,73 @@ export class GsmComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    private titleService: Title,
-    private metaService: Meta,
     public preferencesService: PreferencesService,
-    private gsmService: GsmService
+    private gsmService: GsmService,
+    private seoService: SeoService
   ) { }
 
   // Calculator
-  usdtAmount: number | null = null;
-  usdtRate: number = 1240; // Example rate, could be dynamic
-  usdtTotal: number | null = null;
+  usdtAmount = signal<number | null>(null);
+  usdtRate = signal<number>(1240);
+  usdtTotal = signal<number | null>(null);
 
-  // Countdown
-  countdown = {
+  // Countdown logic fixed
+  countdown = signal({
     days: 5,
     hours: 9,
     minutes: 8,
     seconds: 19
-  };
+  });
   private countdownInterval: any;
 
-  ngOnInit(): void {
-    // SEO Optimization
-    this.titleService.setTitle('Herramientas GSM Profesionales - Licencias Digitales | ARECOFIX');
+  // New Offers Data
+  offers = signal([
+    { name: 'ChatGPT Plus - 1 Month - All Countrys', price: 0.6, type: 'Private Account' },
+    { name: 'ChatGPT Plus - 3 Months - All Countrys', price: 0.6, type: 'Private Account' },
+    { name: 'Cheetah Tool Pro - 3 Meses', price: 27.12, type: 'License' },
+    { name: 'Cheetah Tool Pro - 6 Meses', price: 39.12, type: 'License' },
+    { name: 'Cheetah Tool Pro - 12 Meses', price: 53.52, type: 'License' },
+    { name: 'Cheetah Tool - Recarga de Creditos', price: 0.85, type: 'Credits' },
+    { name: '⚡PROMO HFZ (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 5.04, type: 'Bypass' },
+    { name: '⚡PROMO iRemove (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 9, type: 'Bypass' },
+    { name: '⚡PROMO iRemoval Pro (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 7.8, type: 'Bypass' },
+    { name: '⚡PROMO Mina (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 7.2, type: 'Bypass' }
+  ]);
 
-    this.metaService.addTags([
-      { name: 'description', content: 'Plataforma integral para técnicos GSM con herramientas profesionales, licencias digitales, servicios FRP y descargas útiles. ARECOFIX - Tu socio en reparación de móviles.' },
-      { name: 'keywords', content: 'GSM, herramientas GSM, FRP, licencias digitales, reparación móviles, Octoplus, SigmaKey, UMT Pro, desbloqueo, flasheo, técnicos móviles' },
-      { name: 'author', content: 'ARECOFIX' },
-      { property: 'og:title', content: 'Herramientas GSM Profesionales | ARECOFIX' },
-      { property: 'og:description', content: 'Accede a las mejores herramientas GSM, licencias digitales y recursos para técnicos profesionales.' },
-      { property: 'og:type', content: 'website' },
-      { property: 'og:url', content: 'https://arecofix.com.ar/#/gsm' },
-      { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: 'Herramientas GSM Profesionales | ARECOFIX' },
-      { name: 'twitter:description', content: 'Plataforma integral para técnicos GSM con herramientas profesionales y licencias digitales.' }
-    ]);
+  ngOnInit(): void {
+    // SEO ...
+    this.seoService.setPageData({
+      title: 'Bypass iPhone iCloud hasta 16 Pro Max | Oferta Limitada | ARECOFIX',
+      description: '¿iPhone bloqueado con iCloud? Solución de Bypass profesional hasta iPhone 16 Pro Max. 100% remoto, seguro y garantizado. ¡Oferta por tiempo limitado para revendedores!',
+      imageUrl: '/assets/img/gsm/gsm-og-banner.png',
+      url: '/gsm',
+      keywords: 'bypass iphone, bypass icloud, desbloqueo icloud, iphone 16 prm bypass, bypass remoto, frp, gsm tools, arecofix',
+      type: 'website'
+    });
 
     this.loadData();
     this.startCountdown();
   }
 
   loadData() {
-    this.gsmService.getGsmTools().subscribe(data => this.gsmTools = data);
-    this.gsmService.getBrandServices().subscribe(data => this.brandServices = data);
-    this.gsmService.getDownloads().subscribe(data => this.downloads = data);
+    this.gsmService.getUsdtRate()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(rate => {
+        this.usdtRate.set(rate);
+        this.calculateUsdt(); // Re-calculate if amount was already entered
+      });
+
+    this.gsmService.getGsmTools()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => this.gsmTools.set(data));
+
+    this.gsmService.getBrandServices()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => this.brandServices.set(data));
+
+    this.gsmService.getDownloads()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => this.downloads.set(data));
   }
 
   ngOnDestroy() {
@@ -151,36 +197,41 @@ export class GsmComponent implements OnInit, OnDestroy {
   }
 
   calculateUsdt() {
-    if (this.usdtAmount) {
-      this.usdtTotal = this.usdtAmount * this.usdtRate;
+    const amount = this.usdtAmount();
+    if (amount) {
+      this.usdtTotal.set(amount * this.usdtRate());
     } else {
-      this.usdtTotal = null;
+      this.usdtTotal.set(null);
     }
   }
 
   startCountdown() {
     this.countdownInterval = setInterval(() => {
-      if (this.countdown.seconds > 0) {
-        this.countdown.seconds--;
-      } else {
-        this.countdown.seconds = 59;
-        if (this.countdown.minutes > 0) {
-          this.countdown.minutes--;
+      this.countdown.update((c: { days: number, hours: number, minutes: number, seconds: number }) => {
+        let { days, hours, minutes, seconds } = c;
+        if (seconds > 0) {
+          seconds--;
         } else {
-          this.countdown.minutes = 59;
-          if (this.countdown.hours > 0) {
-            this.countdown.hours--;
+          seconds = 59;
+          if (minutes > 0) {
+            minutes--;
           } else {
-            this.countdown.hours = 23;
-            if (this.countdown.days > 0) {
-              this.countdown.days--;
+            minutes = 59;
+            if (hours > 0) {
+              hours--;
             } else {
-              // Reset or stop
-              this.countdown = { days: 5, hours: 9, minutes: 8, seconds: 19 };
+              hours = 23;
+              if (days > 0) {
+                days--;
+              } else {
+                // Time up, reset for demo or stop
+                days = 5; hours = 9; minutes = 8; seconds = 19;
+              }
             }
           }
         }
-      }
+        return { days, hours, minutes, seconds };
+      });
     }, 1000);
   }
 }

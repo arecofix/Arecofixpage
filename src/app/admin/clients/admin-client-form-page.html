@@ -17,20 +17,28 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
-                    <input type="text" [(ngModel)]="form().first_name" name="first_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    <label for="client-first_name" class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                    <input id="client-first_name" type="text" [(ngModel)]="form().first_name" name="first_name"
+                        autocomplete="given-name"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
-                    <input type="text" [(ngModel)]="form().last_name" name="last_name" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    <label for="client-last_name" class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
+                    <input id="client-last_name" type="text" [(ngModel)]="form().last_name" name="last_name"
+                        autocomplete="family-name"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                         required>
                 </div>
             </div>
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Email (Opcional)</label>
-                <input type="email" [(ngModel)]="form().email" name="email" #emailModel="ngModel" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" [disabled]="!!id">
+                <label for="client-email" class="block text-sm font-medium text-base-content mb-1.5">Email (Opcional)</label>
+                <input id="client-email" type="email" [(ngModel)]="form().email" name="email" #emailModel="ngModel"
+                    autocomplete="email"
+                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
+                    [disabled]="!!id">
                 @if (emailModel.invalid && (emailModel.dirty || emailModel.touched)) {
                 <span class="text-xs text-error mt-1">Formato de correo electrónico inválido</span>
                 }
@@ -38,18 +46,24 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Celular</label>
-                    <input type="text" [(ngModel)]="form().phone" name="phone" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <label for="client-phone" class="block text-sm font-medium text-base-content mb-1.5">Celular</label>
+                    <input id="client-phone" type="text" [(ngModel)]="form().phone" name="phone"
+                        autocomplete="tel"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">DNI (Opcional)</label>
-                    <input type="text" [(ngModel)]="form().dni" name="dni" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                    <label for="client-dni" class="block text-sm font-medium text-base-content mb-1.5">DNI (Opcional)</label>
+                    <input id="client-dni" type="text" [(ngModel)]="form().dni" name="dni"
+                        autocomplete="off"
+                        class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                 </div>
             </div>
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Dirección (Opcional)</label>
-                <input type="text" [(ngModel)]="form().address" name="address" class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
+                <label for="client-address" class="block text-sm font-medium text-base-content mb-1.5">Dirección (Opcional)</label>
+                <input id="client-address" type="text" [(ngModel)]="form().address" name="address"
+                    autocomplete="street-address"
+                    class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
             </div>
         </div>
 
@@ -63,4 +77,4 @@
             </button>
         </div>
     </form>
-</div>
+</div>

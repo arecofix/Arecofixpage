@@ -2,13 +2,12 @@ import { Component, inject, OnInit, signal, computed, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { Product } from '@app/features/products/domain/entities/product.entity';
-import { FinanceService } from '@app/core/services/finance.service';
+import { FinanceService } from '@app/features/finance/application/services/finance.service';
 import { Location } from '@angular/common';
 import { AdminProductService } from '../products/services/admin-product.service';
+import { AdminPurchaseService } from './services/admin-purchase.service';
 
 @Component({
     selector: 'app-admin-purchase-form-page',
@@ -17,12 +16,10 @@ import { AdminProductService } from '../products/services/admin-product.service'
     templateUrl: './admin-purchase-form-page.html',
 })
 export class AdminPurchaseFormPage implements OnInit {
-    private auth = inject(AuthService);
     private router = inject(Router);
-    private tenantService = inject(TenantService);
     private productRepository = inject(ProductRepository);
-    private financeService = inject(FinanceService);
     private location = inject(Location);
+    private purchaseService = inject(AdminPurchaseService);
     private adminProductService = inject(AdminProductService);
 
     suppliers = signal<any[]>([]);
@@ -76,19 +73,7 @@ export class AdminPurchaseFormPage implements OnInit {
     total = computed(() => this.items().reduce((acc, item) => acc + (item.quantity * item.unit_cost), 0));
 
     async ngOnInit() {
-        const supabase = this.auth.getSupabaseClient();
-        const tenantId = this.tenantService.getTenantId();
-
-        this.productRepository.findAvailable().subscribe(products => {
-            this.products.set(products);
-        });
-
-        const { data: suppliersRes } = await supabase
-            .from('suppliers')
-            .select('*')
-            .eq('is_active', true)
-            .eq('tenant_id', tenantId);
-
+        const suppliersRes = await this.purchaseService.getSuppliers();
         if (suppliersRes) this.suppliers.set(suppliersRes);
 
         const branchesRes = await this.adminProductService.getBranches();
@@ -187,70 +172,8 @@ export class AdminPurchaseFormPage implements OnInit {
         }
 
         this.saving.set(true);
-        this.error.set(null);
-        const supabase = this.auth.getSupabaseClient();
-
         try {
-            const tenantId = this.tenantService.getTenantId();
-
-            // 1. Create Purchase
-            const { data: purchase, error: purchaseError } = await supabase
-                .from('purchases')
-                .insert({
-                    supplier_id: this.form().supplier_id,
-                    branch_id: this.form().branch_id || null,
-                    date: this.form().purchase_date,
-                    status: this.form().status,
-                    total_amount: this.total(),
-                    payment_method: this.form().payment_method,
-                    tenant_id: tenantId
-                })
-                .select()
-                .single();
-
-            if (purchaseError) throw purchaseError;
-
-            // 2. Create Purchase Items
-            const purchaseItems = this.items().map(item => ({
-                purchase_id: purchase.id,
-                product_id: item.product_id,
-                quantity: item.quantity,
-                unit_cost: item.unit_cost,
-                tenant_id: tenantId
-            }));
-
-            const { error: itemsError } = await supabase
-                .from('purchase_items')
-                .insert(purchaseItems);
-
-            if (itemsError) throw itemsError;
-
-            // 3. Update Stock handling branch natively via our repository patch previously created
-            if (this.form().status === 'received') {
-                for (const item of this.items()) {
-                    // Re-use standard repository bulk approach or the rpc if we manually mapped
-                    // The simplest is to use incrementing directly with our fix for products:
-                    const { data: currentProduct } = await supabase.from('products').select('stock').eq('id', item.product_id).eq('tenant_id', tenantId).single();
-                    if (currentProduct) {
-                         // This will implicitly trigger the DB updates via repository 
-                         this.productRepository.update(item.product_id, { stock: currentProduct.stock + item.quantity }).subscribe();
-                    }
-                }
-            }
-            
-            // 4. Record Cash Movement if applicable [USER-REQ]
-            if (this.form().payment_method === 'efectivo') {
-                await this.financeService.recordMovement({
-                    amount: this.total(),
-                    type: 'expense',
-                    category: 'purchase',
-                    branch_id: this.form().branch_id || null,
-                    payment_method: 'cash',
-                    reference_id: purchase.id,
-                    notes: `Compra a proveedor #${purchase.id.substring(0,8)}`
-                });
-            }
-
+            await this.purchaseService.createPurchase(this.form(), this.items(), this.total());
             this.router.navigate(['/admin/purchases']);
         } catch (e: any) {
             this.error.set(e.message);

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { DatabaseError } from '../errors/application.error';
 import { LoggerService } from './logger.service';
+import { TENANT_CONSTANTS } from '../constants/tenant.constants';
 
 /**
  * Interfaz base para un Tenant de Arecofix SaaS
@@ -34,6 +35,7 @@ export interface Tenant {
     hasBlog?: boolean;
   };
   currency: string;
+  usd_rate: number;
   tax_percentage: number;
   tax_id_name?: string;
   tax_id?: string;
@@ -91,11 +93,11 @@ export class TenantService {
       if (storedId) return storedId;
       
       // Fallback instead of throwing to avoid component init crash before resolveTenant finishes
-      return '00000000-0000-0000-0000-000000000000';
+      return TENANT_CONSTANTS.FALLBACK_ID;
     }
 
     // Fallback safe for SSR / SSG Prerendering
-    return '00000000-0000-0000-0000-000000000000';
+    return TENANT_CONSTANTS.FALLBACK_ID;
   }
 
   /**
@@ -160,11 +162,12 @@ export class TenantService {
             } else {
                 this.logger.warn('No active tenants found in database. Loading mock tenant.');
                 const defaultTenant: Tenant = {
-                    id: '00000000-0000-0000-0000-000000000000',
+                    id: TENANT_CONSTANTS.FALLBACK_ID,
                     name: 'Arecofix Dev Local',
                     slug: 'demo',
                     plan_type: 'basic',
                     currency: 'ARS',
+                    usd_rate: 1,
                     tax_percentage: 21,
                     branding_settings: {
                         primary_color: '#3b82f6'
@@ -230,7 +233,7 @@ export class TenantService {
   isMainTenant(): boolean {
     const current = this._currentTenant();
     return current?.slug === 'arecofix' || 
-           current?.id === '00000000-0000-0000-0000-000000000000' ||
+           current?.id === TENANT_CONSTANTS.FALLBACK_ID ||
            !current;
   }
 

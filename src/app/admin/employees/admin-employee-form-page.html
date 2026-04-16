@@ -18,7 +18,7 @@
             <!-- Selector de modo de creación (solo para nuevos empleados) -->
             @if (!id) {
             <div class="mb-6">
-                <label class="block text-sm font-medium text-base-content mb-3">Tipo de Creación</label>
+                <label for="emp-creation-mode" class="block text-sm font-medium text-base-content mb-3">Tipo de Creación</label>
                 <div class="flex gap-4">
                     <label class="cursor-pointer">
                         <input type="radio" name="creationMode" value="new" 
@@ -41,15 +41,16 @@
             <!-- Selector de usuarios existentes -->
             @if (!id && creationMode() === 'existing') {
             <div class="mb-6">
-                <label class="block text-sm font-medium text-base-content mb-1.5">
+                <label for="emp-existing-user" class="block text-sm font-medium text-base-content mb-1.5">
                     Seleccionar Usuario Existente
                     @if (loadingUsers()) {
                     <span class="loading loading-spinner loading-xs ml-2"></span>
                     }
                 </label>
-                <select [(ngModel)]="selectedUserIdValue" 
+                <select id="emp-existing-user" [(ngModel)]="selectedUserIdValue" 
                         (change)="onUserSelect($any($event.target).value)"
-                        name="selectedUser" 
+                        name="selectedUser"
+                        autocomplete="off"
                         class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40">
                     <option value="">-- Seleccione un usuario --</option>
                     @for (user of availableUsers(); track user.id) {
@@ -71,43 +72,48 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
-                    <input type="text" [(ngModel)]="form().first_name" name="first_name" 
+                    <label for="emp-first_name" class="block text-sm font-medium text-base-content mb-1.5">Nombre</label>
+                    <input id="emp-first_name" type="text" [(ngModel)]="form().first_name" name="first_name"
+                           autocomplete="given-name" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                            [disabled]="creationMode() === 'existing' && !!selectedUserId()"
                            required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
-                    <input type="text" [(ngModel)]="form().last_name" name="last_name" 
+                    <label for="emp-last_name" class="block text-sm font-medium text-base-content mb-1.5">Apellido</label>
+                    <input id="emp-last_name" type="text" [(ngModel)]="form().last_name" name="last_name"
+                           autocomplete="family-name" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                            [disabled]="creationMode() === 'existing' && !!selectedUserId()"
                            required>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">
+                    <label for="emp-email" class="block text-sm font-medium text-base-content mb-1.5">
                         Email (Requerido para inicio de sesión)
                         @if (creationMode() === 'existing' && selectedUserId()) {
                         <span class="text-xs text-base-content/60 ml-1">(No editable)</span>
                         }
                     </label>
-                    <input type="email" [(ngModel)]="form().email" name="email" 
+                    <input id="emp-email" type="email" [(ngModel)]="form().email" name="email"
+                           autocomplete="email" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                            [disabled]="!!id || (creationMode() === 'existing' && !!selectedUserId())"
                            required>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
-                    <input type="tel" [(ngModel)]="form().phone" name="phone" 
+                    <label for="emp-phone" class="block text-sm font-medium text-base-content mb-1.5">Teléfono</label>
+                    <input id="emp-phone" type="tel" [(ngModel)]="form().phone" name="phone"
+                           autocomplete="tel" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                            [disabled]="creationMode() === 'existing' && !!selectedUserId()">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Rol en el Sistema</label>
-                    <select [(ngModel)]="form().role" name="role" 
+                    <label for="emp-role" class="block text-sm font-medium text-base-content mb-1.5">Rol en el Sistema</label>
+                    <select id="emp-role" [(ngModel)]="form().role" name="role"
+                            autocomplete="off" 
                             class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40" 
                             required>
                         <option value="staff">Empleado / Técnico</option>
@@ -117,8 +123,9 @@
 
                 @if (!id && creationMode() === 'new') {
                 <div>
-                    <label class="block text-sm font-medium text-base-content mb-1.5">Contraseña</label>
-                    <input type="password" [(ngModel)]="form().password" name="password" 
+                    <label for="emp-password" class="block text-sm font-medium text-base-content mb-1.5">Contraseña</label>
+                    <input id="emp-password" type="password" [(ngModel)]="form().password" name="password"
+                           autocomplete="new-password" 
                            class="w-full bg-base-100 text-base-content border border-base-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out shadow-sm hover:border-base-content/40"
                            required minlength="6" placeholder="Mínimo 6 caracteres">
                 </div>
@@ -147,8 +154,8 @@
             }
 
             <div class="mt-4">
-                <label class="block text-sm font-medium text-base-content mb-1.5">Foto de Perfil</label>
-                <input type="file" (change)="onFileChange($event)"
+                <label for="emp-avatar" class="block text-sm font-medium text-base-content mb-1.5">Foto de Perfil</label>
+                <input id="emp-avatar" type="file" (change)="onFileChange($event)"
                        class="file-input file-input-bordered file-input-primary w-full bg-base-100 text-base-content" 
                        accept="image/*"
                        [disabled]="creationMode() === 'existing' && !!selectedUserId()">

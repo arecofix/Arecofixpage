@@ -1,29 +1,66 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, from, catchError, of, finalize } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 import { CompanyService } from '@app/core/services/company.service';
+import { BranchService } from '@app/core/services/branch.service';
 import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
 import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/repairs/domain/entities/repair.entity';
+import { PricingService } from '@app/core/services/pricing.service';
 import { environment } from '@env/environment';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { CustomerService } from '@app/features/customers/application/services/customer.service';
+import { NotificationService } from '@app/core/services/notification.service';
+import { RepairPdfService } from '@app/features/repairs/application/services/repair-pdf.service';
+import { TenantService } from '@app/core/services/tenant.service';
+import { RepairWorkflowService } from '@app/features/repairs/application/services/repair-workflow.service';
+import { RepairCalculatorService } from '@app/features/repairs/application/services/repair-calculator.service';
+
+import { RepairCustomerSectionComponent } from './components/repair-customer-section.component';
+import { RepairDeviceSectionComponent } from './components/repair-device-section.component';
+import { RepairPartsSectionComponent } from './components/repair-parts-section.component';
+import { RepairFinanceSectionComponent } from './components/repair-finance-section.component';
 
 @Component({
     selector: 'app-admin-repair-form-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [
+        CommonModule, 
+        FormsModule, 
+        ReactiveFormsModule,
+        RouterLink,
+        RepairCustomerSectionComponent,
+        RepairDeviceSectionComponent,
+        RepairPartsSectionComponent,
+        RepairFinanceSectionComponent
+    ],
     templateUrl: './admin-repair-form-page.html',
 })
 export class AdminRepairFormPage implements OnInit {
+    // Helper interface for UI
+    private clientView = (client: any) => ({
+        ...client,
+        displayName: client.full_name || `${client.first_name || ''} ${client.last_name || ''}`.trim() || client.email || 'Sin nombre'
+    });
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private companyService = inject(CompanyService);
+    private branchService = inject(BranchService);
     private repairService = inject(AdminRepairService);
     private productService = inject(AdminProductService);
     private auth = inject(AuthService);
+    private pricingService = inject(PricingService);
+    public tenantService = inject(TenantService);
+    private customerService = inject(CustomerService);
+    private notificationService = inject(NotificationService);
+    private repairPdfService = inject(RepairPdfService);
+    private fb = inject(FormBuilder);
+    private repairWorkflowService = inject(RepairWorkflowService);
+    private repairCalculator = inject(RepairCalculatorService);
+
+    repairForm!: FormGroup;
 
     id: string | null = null;
     date = new Date();
@@ -33,6 +70,8 @@ export class AdminRepairFormPage implements OnInit {
         customer_id: '', // New field for DB binding
         customer_name: '',
         customer_phone: '',
+        customer_email: '',
+        customer_dni: '',
         device_model: '',
         device_type: 'smartphone',
         device_brand: 'generic',
@@ -58,114 +97,163 @@ export class AdminRepairFormPage implements OnInit {
         images: [] as string[],
         technical_labor_cost: 0,
         technical_report: '',
-        parts: [] as any[],
+        parts: [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
         upsell_vidrio: false
     };
 
-    form = signal({ ...this.initialFormState });
+    // Keep some UI-only signals
+    showProductModal = signal(false);
     searchQuery = signal('');
+    parts = signal<import('../../features/repairs/domain/entities/repair.entity').RepairPart[]>([]);
+    images = signal<string[]>([]);
+
+    // Reactive search streams
+    private productSearch$ = new Subject<string>();
+    private clientSearch$ = new Subject<string>();
+
+    // This will be triggered whenever searchQuery changes from UI
+    onSearchChange(query: string) {
+        this.productSearch$.next(query);
+    }
+
+    private setupSearchStreams() {
+        // Product Search Stream
+        this.productSearch$.pipe(
+            debounceTime(400),
+            distinctUntilChanged(),
+            switchMap(query => {
+                const q = query.trim();
+                if (!q) {
+                    return from(this.productService.getProductsPaginated({ _per_page: 20 }));
+                }
+                if (q.length < 2) return of({ data: [] });
+                
+                this.searchingProducts.set(true);
+                return from(this.productService.getProductsPaginated({ q, _per_page: 20 })).pipe(
+                    catchError(err => {
+                        console.error('Error searching products', err);
+                        return of({ data: [] });
+                    }),
+                    finalize(() => this.searchingProducts.set(false))
+                );
+            })
+        ).subscribe(response => {
+            this.filteredProducts.set(response.data || []);
+            this.searchingProducts.set(false);
+        });
+
+        // Client Search Stream
+        this.clientSearch$.pipe(
+            debounceTime(500),
+            distinctUntilChanged(),
+            switchMap(query => {
+                const q = query.trim();
+                if (q.length < 2) return of([]);
+                
+                return from(this.customerService.searchClients(q)).pipe(
+                    catchError(err => {
+                        console.error('Error searching clients', err);
+                        return of([]);
+                    })
+                );
+            })
+        ).subscribe(data => {
+            if (data) {
+                this.clients = data.map((c: any) => this.clientView(c)) as any[];
+            }
+        });
+    }
+
     searchingProducts = signal(false);
     filteredProducts = signal<any[]>([]);
-    showProductModal = signal(false);
-
-    // This will be triggered whenever searchQuery changes
-    onSearchChange(query: string) {
-        this.searchQuery.set(query);
-        if (query.trim().length >= 2) {
-            this.searchProducts(query);
-        } else if (query.trim().length === 0) {
-            this.loadInitialProducts();
-        }
-    }
-
-    private searchTimeout: any;
-    async searchProducts(query: string) {
-        if (this.searchTimeout) clearTimeout(this.searchTimeout);
-
-        this.searchTimeout = setTimeout(async () => {
-            this.searchingProducts.set(true);
-            try {
-                const response = await this.productService.getProductsPaginated({
-                    q: query.trim(),
-                    _per_page: 20
-                });
-                this.filteredProducts.set(response.data || []);
-            } catch (e) {
-                console.error('Error searching products', e);
-            } finally {
-                this.searchingProducts.set(false);
-            }
-        }, 400); // 400ms debounce
-    }
 
     async loadInitialProducts() {
-        this.searchingProducts.set(true);
-        try {
-            const response = await this.productService.getProductsPaginated({
-                _per_page: 20
-            });
-            this.filteredProducts.set(response.data || []);
-        } catch (e) {
-            console.error('Error loading initial products', e);
-        } finally {
-            this.searchingProducts.set(false);
-        }
+        this.productSearch$.next('');
     }
 
     loading = signal(true);
     saving = signal(false);
     error = signal<string | null>(null);
-    company = signal<any>(null);
+    company = signal<any>(null); // Company settings are quite dynamic, can keep any or define interface
     uploadingImages = signal(false);
+    clients: any[] = [];
     
-    clients: any[] = []; // Store fetched clients
-    
-    async loadClients() {
+    async loadInitialClients() {
         try {
-            const { data, error } = await this.auth.getSupabaseClient()
-                .from('profiles')
-                .select('id, full_name, first_name, last_name, email, phone, address, dni')
-                .eq('role', 'user')
-                .limit(100);
-            
+            const data = await this.customerService.getRecentClients();
             if (data) {
-                this.clients = data.map((c: any) => ({
-                    ...c,
-                    displayName: c.full_name || `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email || 'Sin nombre'
-                }));
+                this.clients = data.map((c: any) => this.clientView(c)) as any[];
             }
         } catch (e) {
             console.error('Error loading clients', e);
         }
     }
 
+    private setupForm() {
+        this.repairForm = this.fb.group({
+            customer_id: [''],
+            customer_name: ['', [Validators.required, Validators.minLength(3)]],
+            customer_phone: ['', [Validators.required]],
+            customer_email: ['', [Validators.email]],
+            customer_dni: [''],
+            device_model: ['', [Validators.required]],
+            device_type: ['smartphone'],
+            device_brand: ['generic'],
+            imei: [''],
+            issue_description: ['', [Validators.required]],
+            current_status_id: [RepairStatus.PENDING_DIAGNOSIS],
+            estimated_cost: [0],
+            final_cost: [0],
+            technician_notes: [''],
+            checklist: this.fb.group({
+                charger: [false],
+                battery: [false],
+                chip: [false],
+                sd: [false],
+                case: [false]
+            }),
+            security_pin: [''],
+            security_pattern: [''],
+            device_passcode: [''],
+            deposit_amount: [0],
+            technical_labor_cost: [0],
+            technical_report: [''],
+            upsell_vidrio: [false],
+            tracking_code: [''],
+            repair_number: [0]
+        });
+    }
+
     onSelectClient(clientName: string) {
-        const client = this.clients.find(c => c.displayName === clientName);
+        this.clientSearch$.next(clientName);
+
+        const client = this.clients.find((c: any) => c.displayName === clientName) as any;
         if (client) {
-            this.form.update(f => ({
-                ...f,
-                customer_id: client.id, // Set the actual ID for the DB
+            this.repairForm.patchValue({
+                customer_id: client.id, 
                 customer_name: client.displayName,
-                customer_phone: client.phone || f.customer_phone
-            }));
+                customer_phone: client.phone,
+                customer_email: client.email,
+                customer_dni: client.dni
+            });
         } else {
-            this.form.update(f => ({ ...f, customer_name: clientName, customer_id: '' }));
+            this.repairForm.get('customer_name')?.setValue(clientName);
         }
     }
 
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
+        this.setupForm();
+        this.setupSearchStreams();
+        
         await Promise.all([
             this.loadCompanySettings(),
-            this.loadProducts(),
-            this.loadClients(),
+            this.loadInitialClients(),
             this.id ? this.loadRepair() : Promise.resolve()
         ]);
+        
+        this.loadInitialProducts();
         this.loading.set(false);
-    }
-
-    async loadProducts() {
-        await this.loadInitialProducts();
     }
 
     async openProductModal() {
@@ -192,14 +280,13 @@ export class AdminRepairFormPage implements OnInit {
                 }
             }
 
-            this.form.update(f => ({
-                ...f,
-                images: [...f.images, ...uploadedUrls]
-            }));
+            const currentImages = this.images();
+            this.images.set([...currentImages, ...uploadedUrls]);
+            this.notificationService.showSuccess('Imágenes subidas correctamente.');
         } catch (e: unknown) {
             console.error('Error uploading images:', e);
             const message = e instanceof Error ? e.message : 'Unknown error';
-            this.error.set('Error al subir imágenes: ' + message);
+            this.notificationService.showError('Error al subir imágenes: ' + message);
         } finally {
             this.uploadingImages.set(false);
             // Clear input
@@ -208,16 +295,13 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     removeImage(index: number) {
-        this.form.update(f => {
-            const newImages = [...f.images];
-            newImages.splice(index, 1);
-            return { ...f, images: newImages };
-        });
+        this.images.update(imgs => imgs.filter((_, i) => i !== index));
     }
 
     async loadCompanySettings() {
         try {
-            const data = await this.companyService.getSettings();
+            const branchId = this.branchService.getCurrentBranchId(); 
+            const data = await this.companyService.getSettings(branchId || undefined);
             if (data) {
                 this.company.set(data);
             }
@@ -227,36 +311,46 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     addPart(product: any) {
-        this.form.update(f => {
-            const parts = [...f.parts];
-            parts.push({
-                product_id: product.id,
-                name: product.name, // For UI display
-                quantity: 1,
-                unit_price_at_time: product.price,
-                cost_at_time: product.cost || 0 // Assuming product has cost
-            });
-            return { ...f, parts };
-        });
+        const newPart = this.repairCalculator.buildNewPart(product, this.id || '');
+        this.parts.update(p => [...p, newPart]);
         this.calculateFinalCost();
     }
 
     removePart(index: number) {
-        this.form.update(f => {
-            const parts = [...f.parts];
-            parts.splice(index, 1);
-            return { ...f, parts };
-        });
+        this.parts.update(p => p.filter((_, i) => i !== index));
         this.calculateFinalCost();
     }
 
+    updateFormField(field: string, value: any) {
+        this.repairForm.get(field)?.setValue(value);
+        if (field === 'technical_labor_cost') this.calculateFinalCost();
+    }
+
+    onPartsListChange(parts: any[]) {
+        this.parts.set(parts);
+        this.calculateFinalCost();
+    }
+
+    onLaborCostChange(value: number) {
+        this.updateFormField('technical_labor_cost', value);
+    }
+
     calculateFinalCost() {
-        this.form.update(f => {
-            const partsTotal = f.parts.reduce((acc, p) => acc + (p.unit_price_at_time * p.quantity), 0);
-            return {
-                ...f,
-                final_cost: (f.technical_labor_cost || 0) + partsTotal
-            };
+        const laborCost = Number(this.repairForm.get('technical_labor_cost')?.value) || 0;
+        
+        const result = this.repairCalculator.calculateFinancials(this.parts(), laborCost);
+
+        this.parts.set(result.updatedParts);
+        this.repairForm.patchValue({
+            final_cost: result.finalCost,
+            deposit_amount: result.suggestedDeposit
+        });
+    }
+
+    onEstimatedCostChange(value: number) {
+        this.repairForm.patchValue({
+            estimated_cost: value,
+            deposit_amount: Math.round(value * 0.5)
         });
     }
 
@@ -265,32 +359,36 @@ export class AdminRepairFormPage implements OnInit {
         try {
             const data = await this.repairService.getById(this.id);
             if (data) {
-                this.form.set({
-                    customer_id: data.customer_id || '',
-                    customer_name: data.customer_name || '',
-                    customer_phone: data.customer_phone || '',
-                    device_model: data.device_model || '',
-                    device_type: data.device_type || 'smartphone',
-                    device_brand: data.device_brand || 'generic',
-                    imei: data.imei || '',
-                    issue_description: data.issue_description || '',
+                this.repairForm.patchValue({
+                    customer_id: data.customer_id,
+                    customer_name: data.customer_name,
+                    customer_phone: data.customer_phone,
+                    device_model: data.device_model,
+                    device_type: data.device_type,
+                    device_brand: data.device_brand,
+                    imei: data.imei,
+                    issue_description: data.issue_description,
                     current_status_id: data.current_status_id,
-                    estimated_cost: data.estimated_cost || 0,
-                    final_cost: data.final_cost || 0,
-                    technician_notes: data.technician_notes || '',
-                    checklist: data.checklist || this.initialFormState.checklist,
-                    security_pin: data.security_pin || '',
-                    security_pattern: data.security_pattern || '',
-                    device_passcode: data.device_passcode || '',
-                    deposit_amount: data.deposit_amount || 0,
+                    estimated_cost: data.estimated_cost,
+                    final_cost: data.final_cost,
+                    technician_notes: data.technician_notes,
+                    security_pin: data.security_pin,
+                    security_pattern: data.security_pattern,
+                    device_passcode: data.device_passcode,
+                    deposit_amount: data.deposit_amount,
                     tracking_code: data.tracking_code,
-                    repair_number: data.repair_number || 0,
-                    images: data.images || [],
-                    technical_labor_cost: data.technical_labor_cost || 0,
-                    technical_report: data.technical_report || '',
-                    parts: data.parts || [],
-                    upsell_vidrio: data.upsell_vidrio || false
+                    repair_number: data.repair_number,
+                    technical_labor_cost: data.technical_labor_cost,
+                    technical_report: data.technical_report,
+                    upsell_vidrio: data.upsell_vidrio
                 });
+
+                if (data.checklist) {
+                    this.repairForm.get('checklist')?.patchValue(data.checklist);
+                }
+
+                this.parts.set(data.parts || []);
+                this.images.set(data.images || []);
             }
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : 'Unknown error';
@@ -299,32 +397,48 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     async save() {
+        if (this.repairForm.invalid) {
+            this.repairForm.markAllAsTouched();
+            this.notificationService.showError('Por favor, completa los campos obligatorios correctamente.');
+            return;
+        }
+
         this.saving.set(true);
         this.error.set(null);
         
         try {
-            const formData = this.form();
+            const formData = this.repairForm.getRawValue();
             
+            // Fix: ensure UUIDs are null not empty string to avoid DB errors
             const payload: any = {
                 ...formData,
-                parts: formData.parts.map((p: any) => ({
-                    product_id: p.product_id,
-                    quantity: p.quantity,
-                    unit_price_at_time: p.unit_price_at_time,
-                    cost_at_time: p.cost_at_time
-                }))
+                customer_id: formData.customer_id || null,
+                images: this.images(),
+                parts: this.parts()
             };
-
-
+            
             if (this.id) {
-                await this.repairService.update(this.id, payload);
+                await this.repairService.update(this.id, payload as UpdateRepairDto);
+                this.notificationService.showSuccess('✅ Reparación actualizada correctamente.');
             } else {
-                await this.repairService.create(payload);
+                const branchIdActual = this.branchService.getCurrentBranchId() || null;
+                
+                if (!branchIdActual) {
+                    throw new Error('No se pudo determinar la sucursal activa.');
+                }
+
+                await this.repairWorkflowService.processNewRepair(
+                    payload as CreateRepairDto, 
+                    payload.deposit_amount, 
+                    branchIdActual
+                );
+                this.notificationService.showSuccess('✅ Orden Creada, Inventario Descontado y Finanzas Asentadas.');
             }
             this.router.navigate(['/admin/repairs']);
         } catch (e: any) {
             console.error('Error saving repair:', e);
             const message = e.message || e.error_description || (e instanceof Error ? e.message : 'Unknown error');
+            this.notificationService.showError('Error al guardar: ' + message);
             this.error.set(message);
         } finally {
             this.saving.set(false);
@@ -332,211 +446,46 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     async printOrder() {
-        const doc = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
-
-        const formData = this.form();
-        const companyData = this.company();
-        const primaryColor = companyData?.branding_settings?.primary_color || '#16a34a';
-
-        // Convert logo URL to base64 for jsPDF
-        const getBase64ImageFromURL = (url: string) => {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.setAttribute('crossOrigin', 'anonymous');
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx?.drawImage(img, 0, 0);
-                    const dataURL = canvas.toDataURL('image/png');
-                    resolve(dataURL);
-                };
-                img.onerror = (error) => reject(error);
-                img.src = url;
-            });
-        };
-
-        let logoBase64 = '';
-        if (companyData?.logo_url) {
-            try {
-                logoBase64 = await getBase64ImageFromURL(companyData.logo_url) as string;
-            } catch (e) {
-                console.warn('Could not load company logo for PDF', e);
-            }
+        try {
+            this.notificationService.showInfo('Generando documento PDF...');
+            // Need a Repair typed object for the service
+            const repairData: any = {
+                ...this.repairForm.getRawValue(),
+                parts: this.parts(),
+                images: this.images(),
+                id: this.id || 'new'
+            };
+            await this.repairPdfService.generateOrderPdf(repairData, this.company());
+        } catch (e: any) {
+            console.error('PDF Error:', e);
+            this.notificationService.showError('Error al generar PDF: ' + e.message);
         }
-
-        // Helper string to hex color array
-        const hexToRgb = (hex: string) => {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? [
-                parseInt(result[1], 16),
-                parseInt(result[2], 16),
-                parseInt(result[3], 16)
-            ] : [22, 163, 74];
-        };
-        const colorArray = hexToRgb(primaryColor);
-
-        // Header Background
-        doc.setFillColor(243, 244, 246);
-        doc.rect(0, 0, 210, 45, 'F');
-
-        // Company Name or Logo
-        if (logoBase64) {
-            doc.addImage(logoBase64, 'PNG', 15, 10, 30, 15);
-            doc.setFontSize(18);
-            doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-            doc.text(companyData?.name || 'Arecofix', 48, 20);
-        } else {
-            doc.setFontSize(24);
-            doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-            doc.text(companyData?.name || 'Arecofix', 15, 20);
-        }
-
-        // Standard Text Color
-        doc.setTextColor(55, 65, 81);
-        
-        doc.setFontSize(9);
-        const contactY = logoBase64 ? 27 : 28;
-        doc.text(companyData?.address || companyData?.location || 'Dirección de la Sucursal', 15, contactY);
-        doc.text(`Tel: ${companyData?.phone || companyData?.contact_phone || 'Sin Teléfono'} | Email: ${companyData?.email || companyData?.contact_email || 'Sin Email'}`, 15, contactY + 5);
-        if (companyData?.tax_id) {
-            doc.text(`CUIT: ${companyData.tax_id}`, 15, contactY + 10);
-        } else if (companyData?.cuit) {
-            doc.text(`CUIT: ${companyData.cuit}`, 15, contactY + 10);
-        }
-
-        // Ticket Info (Right side)
-        doc.setFontSize(16);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`ORDEN TÉCNICA # ${formData.repair_number || 'S/N'}`, 120, 20);
-        
-        doc.setFontSize(10);
-        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 120, 28);
-        doc.text(`Código de Seguimiento:`, 120, 34);
-        doc.setFontSize(11);
-        doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-        doc.text(`${formData.tracking_code || '---'}`, 162, 34);
-
-        // Customer Details
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(12);
-        doc.text('Datos del Cliente', 15, 55);
-        doc.line(15, 57, 95, 57);
-        doc.setFontSize(10);
-        doc.text(`Nombre: ${formData.customer_name}`, 15, 65);
-        doc.text(`Teléfono: ${formData.customer_phone || 'No registrado'}`, 15, 72);
-
-        // Device Details
-        doc.setFontSize(12);
-        doc.text('Detalles del Equipo', 110, 55);
-        doc.line(110, 57, 195, 57);
-        doc.setFontSize(10);
-        doc.text(`Modelo: ${formData.device_model}`, 110, 65);
-        doc.text(`IMEI/Serie: ${formData.imei || 'Sin declarar'}`, 110, 72);
-        doc.text(`Tipo/Marca: ${formData.device_type} / ${formData.device_brand}`, 110, 79);
-
-        // Security & Checklist Box
-        doc.setDrawColor(200, 200, 200);
-        doc.setFillColor(249, 250, 251);
-        doc.roundedRect(15, 87, 180, 25, 3, 3, 'FD');
-        doc.text(`Seguridad - PIN: ${formData.security_pin || 'Ninguno'} | Patrón: ${formData.security_pattern || 'Ninguno'} | Passcode: ${formData.device_passcode || 'No'}`, 20, 95);
-        
-        const chk = formData.checklist;
-        doc.text(`Accesorios: [${chk.charger ? 'X' : ' '}] Cargador  [${chk.battery ? 'X' : ' '}] Batería  [${chk.chip ? 'X' : ' '}] Chip  [${chk.sd ? 'X' : ' '}] SD  [${chk.case ? 'X' : ' '}] Funda`, 20, 105);
-
-        // Reason / Fault
-        doc.setFontSize(12);
-        doc.text('Motivo de Ingreso / Falla Reportada', 15, 122);
-        doc.setFontSize(10);
-        const splitDescription = doc.splitTextToSize(formData.issue_description || 'Sin detalles.', 180);
-        doc.text(splitDescription, 15, 130);
-
-        // Generate Table for Parts
-        const defaultTableY = splitDescription.length * 5 + 135;
-        
-        const tableData = formData.parts.map(p => [
-            p.name,
-            p.quantity.toString(),
-            `$ ${p.unit_price_at_time.toLocaleString('es-AR')}`,
-            `$ ${(p.unit_price_at_time * p.quantity).toLocaleString('es-AR')}`
-        ]);
-
-        if (formData.technical_labor_cost > 0) {
-            tableData.push(['Mano de Obra Técnica', '1', `$ ${formData.technical_labor_cost.toLocaleString('es-AR')}`, `$ ${formData.technical_labor_cost.toLocaleString('es-AR')}`]);
-        }
-
-        if (tableData.length > 0) {
-            autoTable(doc, {
-                startY: defaultTableY,
-                head: [['Detalle', 'Cant', 'Precio Unitario', 'Subtotal']],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { fillColor: colorArray as [number, number, number] },
-                margin: { left: 15, right: 15 }
-            });
-        }
-
-        const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : defaultTableY + 10;
-
-        // Financial Totals
-        doc.setFontSize(11);
-        doc.text(`Presupuesto Inicial Estimado: $ ${formData.estimated_cost?.toLocaleString('es-AR') || '0'}`, 110, finalY + 10);
-        doc.text(`Seña / Adelanto Pagado: $ ${formData.deposit_amount?.toLocaleString('es-AR') || '0'}`, 110, finalY + 17);
-        
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`RESTANTE A ABONAR: $ ${(formData.final_cost - (formData.deposit_amount || 0)).toLocaleString('es-AR')}`, 110, finalY + 27);
-
-        // Signatures
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.line(25, finalY + 50, 85, finalY + 50);
-        doc.text('Firma y Aclaración Cliente', 33, finalY + 56);
-
-        doc.line(125, finalY + 50, 185, finalY + 50);
-        doc.text('Firma Técnico / Local', 135, finalY + 56);
-
-        // Terms and conditions
-        doc.setFontSize(7);
-        doc.setTextColor(100, 100, 100);
-        const terminos = 'Términos y Condiciones: Pasados los 30 días de notificada la reparación, la empresa cobrará resguardo diario. Pasados los 90 días el equipo se considerará abandonado perdiendo el cliente todo derecho a reclamo y pasando a ser propiedad del local para cubrir costos. Todo presupuesto no aceptado tiene cargo de revisión técnica. NO SE ENTREGAN EQUIPOS SIN ESTA ORDEN.';
-        doc.text(doc.splitTextToSize(terminos, 180), 15, 275);
-
-        // URL tracking (Footer)
-        doc.setFontSize(9);
-        doc.text(`Sigue el estado de tu equipo online en: ${window.location.origin}/#/tracking/${formData.tracking_code}`, 15, 290);
-
-        // Save PDF
-        doc.save(`Arecofix_Orden_${formData.repair_number || 'S-N'}_${formData.customer_name.replace(' ', '_')}.pdf`);
     }
 
     shareWhatsApp() {
-        if (!this.form().tracking_code) return;
+        const data = this.repairForm.getRawValue();
+        if (!data.tracking_code) return;
 
-        const customerName = this.form().customer_name;
-        const device = this.form().device_model;
+        const customerName = data.customer_name;
+        const device = data.device_model;
         const url = this.getTrackingUrl();
 
         let message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
 
-        if (this.form().current_status_id === RepairStatus.READY_FOR_PICKUP) {
+        if (data.current_status_id === RepairStatus.READY_FOR_PICKUP) {
             // Use configured Google Map Review URL
             const reviewLink = environment.contact.socialMedia.googleMaps;
             message = `Hola ${customerName}, su reparación del ${device} ya está lista. Agradecemos su reseña en el siguiente enlace: ${reviewLink}`;
         }
 
-        const whatsappUrl = `https://wa.me/${this.form().customer_phone}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${data.customer_phone}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, '_blank');
     }
 
     getTrackingUrl(): string {
-        if (!this.form().tracking_code) return '';
-        return `${window.location.origin}/#/tracking/${this.form().tracking_code}`;
+        const trackingCode = this.repairForm.get('tracking_code')?.value;
+        if (!trackingCode) return '';
+        return `${window.location.origin}/#/tracking/${trackingCode}`;
     }
 }

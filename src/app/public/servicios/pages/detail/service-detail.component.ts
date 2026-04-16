@@ -45,30 +45,8 @@ export class ServiceDetailComponent implements OnInit {
     this.seoService.setPageData({
       title: service.title,
       description: service.description,
-      imageUrl: service.image.startsWith('http') ? service.image : `https://arecofix.com.ar/${service.image}`
+      imageUrl: service.image
     });
-    this.setWhatsAppOgTags(service.image, service.description, service.title);
-  }
-
-  private setWhatsAppOgTags(imageUrl: string, description: string, serviceTitle: string): void {
-     if (typeof document === 'undefined') return;
-     const meta = document.head;
-     const setOrCreate = (property: string, content: string) => {
-       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
-       if (!el) {
-         el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el);
-       }
-       el.setAttribute('content', content);
-     };
-     const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `${window.location.origin}/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
-     setOrCreate('og:title', `${serviceTitle} | Arecofix`);
-     setOrCreate('og:image', absoluteImageUrl);
-     setOrCreate('og:image:secure_url', absoluteImageUrl);
-     setOrCreate('og:image:width', '1200');
-     setOrCreate('og:image:height', '630');
-     setOrCreate('og:description', description);
-     setOrCreate('og:site_name', 'Arecofix');
-     setOrCreate('og:type', 'article');
   }
 
   getWhatsAppLink(service: Service) {

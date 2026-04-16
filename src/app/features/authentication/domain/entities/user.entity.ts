@@ -29,6 +29,7 @@ export interface UserProfile {
     first_name?: string;
     last_name?: string;
     display_name?: string;
+    displayName?: string;
     full_name?: string;
     avatar_url?: string;
     bio?: string;

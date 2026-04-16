@@ -1,76 +1,132 @@
-/// <reference path="../deno.d.ts" />
+// @ts-ignore
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// @ts-ignore
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
 
-const WHATSAPP_API_URL = "https://graph.facebook.com/v22.0";
-// These should be set in Supabase Secrets
-// Run: supabase secrets set WHATSAPP_TOKEN=... WHATSAPP_PHONE_NUMBER_ID=...
-const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN")!;
-const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")!;
+declare const Deno: any;
 
-Deno.serve(async (req: Request) => {
-  // Handle CORS
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-      },
-      status: 200
-    });
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// DTO del cliente Angular
+interface MassMessagePayload {
+  targetType: 'suppliers' | 'clients';
+  messageTemplate: string;
+  templateLanguage: string; // Ej: 'es_AR'
+  variables?: string[];
+  testNumber?: string; // Para enviar prueba a 1 solo numero
+}
+
+serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { to, type, template, text } = await req.json();
+    const payload: MassMessagePayload = await req.json();
 
-    if (!to || !type) {
-      throw new Error("Missing required fields: to, type");
-    }
-
-    const url = `${WHATSAPP_API_URL}/${WHATSAPP_PHONE_NUMBER_ID}/messages`;
+    const WHATSAPP_TOKEN = Deno.env.get('WHATSAPP_API_TOKEN');
+    const WHATSAPP_PHONE_ID = Deno.env.get('WHATSAPP_PHONE_ID');
     
-    let body: any = {
-      messaging_product: "whatsapp",
-      to: to,
-      type: type,
-    };
-
-    if (type === "template") {
-      body.template = template;
-    } else if (type === "text") {
-      body.text = text;
+    if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID) {
+        throw new Error("Missing WhatsApp API Configuration in environment variables.");
     }
 
-    console.log("Sending WhatsApp message to:", to);
+    // Inicializar Supabase Client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    let recipients: string[] = [];
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("WhatsApp API Error:", data);
-      throw new Error(data.error?.message || "Failed to send WhatsApp message");
+    // Recolectar a quienes se les enviará
+    if (payload.testNumber) {
+        recipients.push(payload.testNumber);
+    } else if (payload.targetType === 'suppliers') {
+        const { data: suppliers, error } = await supabase.from('suppliers').select('phone').eq('is_active', true);
+        if (error) throw error;
+        recipients = suppliers.map((s: any) => s.phone).filter((p: any) => !!p);
+    } else {
+        const { data: clients, error } = await supabase.from('profiles').select('phone').eq('is_active', true).eq('role', 'user');
+        if (error) throw error;
+        recipients = clients.map((c: any) => c.phone).filter((p: any) => !!p);
     }
 
-    return new Response(JSON.stringify(data), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    if (recipients.length === 0) {
+        return new Response(JSON.stringify({ success: true, message: "No recipients found to send." }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+        });
+    }
+
+    const apiUrl = `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`;
+    
+    const results = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    // Enviar batch a Meta (Se procesan en serie o batches pequeños para no saturar API Rate Limits)
+    // Para gran escala usar una cola/queue nativa de Supabase, aquí ilustramos envío directo
+    for (const phone of recipients) {
+        // Limpiamos formato. WhatsApp API exige prefijo ej. 54 en Argentina sin +
+        const formatPhone = phone.replace(/\D/g, ''); 
+
+        const messageBody = {
+            messaging_product: "whatsapp",
+            to: formatPhone,
+            type: "template",
+            template: {
+                name: payload.messageTemplate,
+                language: {
+                    code: payload.templateLanguage
+                },
+                components: payload.variables ? [
+                  {
+                    type: "body",
+                    parameters: payload.variables.map((v: any) => ({ type: "text", text: v }))
+                  }
+                ] : []
+            }
+        };
+
+        try {
+            const apiResp = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(messageBody)
+            });
+
+            if (apiResp.ok) {
+                successCount++;
+                results.push({ phone: formatPhone, status: 'sent' });
+            } else {
+                errorCount++;
+                results.push({ phone: formatPhone, status: 'failed', error: await apiResp.json() });
+            }
+        } catch (e: any) {
+            errorCount++;
+            results.push({ phone: formatPhone, status: 'network_fail', error: e.toString() });
+        }
+    }
+
+    return new Response(JSON.stringify({ 
+        success: true, 
+        summary: { total: recipients.length, successful: successCount, failed: errorCount },
+        details: results
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
+
   } catch (error: any) {
-    console.error("Edge Function Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    })
   }
-});
+})

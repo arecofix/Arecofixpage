@@ -1,0 +1,56 @@
+<div class="min-h-screen transition-colors duration-300 pb-20"
+  [class.bg-gray-50]="(preferencesService.theme$ | async) === 'light'"
+  [class.bg-gray-900]="(preferencesService.theme$ | async) !== 'light'">
+  
+  <header class="bg-linear-to-r from-purple-700 to-purple-600 text-white py-12">
+     <div class="container mx-auto px-4">
+        <div class="text-sm breadcrumbs mb-4">
+           <ul>
+              <li><a routerLink="/gsm" class="hover:underline">GSM Platform</a></li>
+              <li class="font-bold">Licencias & Servidores</li>
+           </ul>
+        </div>
+        <h1 class="text-3xl font-black uppercase tracking-tight">🛠️ Licencias y Créditos de Servidor</h1>
+        <p class="text-purple-100 mt-2">Activaciones de software y créditos para las principales herramientas del mercado.</p>
+     </div>
+  </header>
+
+  <div class="container mx-auto px-4 -mt-8">
+     <div class="space-y-12">
+        @for (cat of getCategories(); track cat) {
+           <div>
+              <div class="flex items-center gap-3 mb-6">
+                 <div class="h-8 w-1 bg-purple-500 rounded-full"></div>
+                 <h2 class="text-lg font-black uppercase tracking-wide text-gray-700 dark:text-gray-300">{{ cat }}</h2>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                 @for (service of getServicesByCategory(cat); track service.name) {
+                    <div class="group relative p-5 rounded-2xl bg-white dark:bg-white/2 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:border-purple-500/30 transition-all duration-300 flex flex-col justify-between h-full">
+                       <div class="absolute top-3 right-3">
+                          <span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-500/20 text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                             {{ service.time }}
+                          </span>
+                       </div>
+                       
+                       <div>
+                          <div class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-4 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                             <i class="fas fa-server"></i>
+                          </div>
+                          <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100 mb-2">{{ service.name }}</h3>
+                       </div>
+
+                       <div class="mt-6 pt-4 border-t border-gray-50 dark:border-white/5 flex items-center justify-between">
+                          <div class="text-lg font-black text-green-600 dark:text-green-400">
+                             $ {{ service.price }} <span class="text-[10px] font-medium">USDT</span>
+                          </div>
+                          <button class="btn btn-xs btn-secondary font-bold">RECARGAR</button>
+                       </div>
+                    </div>
+                 }
+              </div>
+           </div>
+        }
+     </div>
+  </div>
+</div>

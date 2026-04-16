@@ -1,6 +1,11 @@
 export const CHART_COLORS = {
     primary: '#4f46e5',
+    primaryLight: 'rgba(79, 70, 229, 0.1)',
     primaryTransparent: 'rgba(79, 70, 229, 0.2)',
+    success: '#10b981',
+    info: '#3b82f6',
+    warning: '#f59e0b',
+    error: '#ef4444',
     red: '#ef4444',
     blue: '#3b82f6',
     green: '#10b981',

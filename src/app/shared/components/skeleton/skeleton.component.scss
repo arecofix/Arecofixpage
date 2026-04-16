@@ -1,0 +1,25 @@
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-pulse {
+  background: linear-gradient(
+    90deg, 
+    rgba(226, 232, 240, 0.5) 25%, 
+    rgba(241, 245, 249, 0.7) 50%, 
+    rgba(226, 232, 240, 0.5) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 2s infinite linear;
+}
+
+:host-context(.dark) .animate-pulse {
+  background: linear-gradient(
+    90deg, 
+    rgba(30, 41, 59, 0.5) 25%, 
+    rgba(51, 65, 85, 0.7) 50%, 
+    rgba(30, 41, 59, 0.5) 75%
+  );
+  background-size: 200% 100%;
+}

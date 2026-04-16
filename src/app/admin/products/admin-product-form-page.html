@@ -131,6 +131,18 @@
           <div class="card-body">
             <h3 class="card-title text-gray-500 mb-6 uppercase text-sm tracking-wider border-b pb-2">Configuración de Venta</h3>
             
+            <div class="form-control mb-4">
+              <label class="label font-semibold">Costo de Compra (Referencia)</label>
+              <div class="relative w-full">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
+                <input type="number" [(ngModel)]="formVal.unit_cost_at_time" name="unit_cost_at_time" 
+                  class="input input-bordered w-full pl-10 text-xl font-bold text-rose-500 bg-rose-50/20 dark:bg-rose-950/20" placeholder="0.00" min="0" />
+              </div>
+              <p class="text-[10px] text-gray-500 mt-1">Este valor se usará para calcular el margen de ganancia real en reparaciones y ventas.</p>
+            </div>
+
+            <div class="divider"></div>
+
             <div class="form-control mb-6">
               <label class="label font-semibold">Precio de Venta</label>
               <div class="flex gap-4">

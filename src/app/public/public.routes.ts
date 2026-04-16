@@ -12,14 +12,15 @@ export const publicRoutes: Routes = [
     canActivate: [TenantIsolationGuard],
     children: [
       {
-        title: 'Arecofix',
+        title: 'Software & Servicio Técnico en Marcos Paz | Arecofix',
         path: '',
         component: PublicHomePage,
         data: {
             seo: {
-                title: 'Arecofix',
-                description: 'Expertos en desarrollo de software a medida, aplicaciones móviles y transformación digital. Consultoría IT y servicio técnico especializado en Marcos Paz.',
-                imageUrl: 'assets/img/branding/og-services.jpg'
+                title: 'Software & Servicio Técnico en Marcos Paz | Arecofix',
+                description: 'Expertos en desarrollo de software, Apps y transformación digital. Servicio técnico especializado en celulares, notebooks y consolas en Marcos Paz.',
+                imageUrl: 'assets/img/branding/og-services.jpg',
+                keywords: 'software marcos paz, servicio tecnico celulares, desarrollo web argentina, reparacion de pc marcos paz, arecofix, tecnologia marcos paz'
             }
         }
       },
@@ -31,7 +32,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
             description: 'Arreglo de pantallas, baterías y pines de carga en el acto. Calidad garantizada en Marcos Paz.',
-            imageUrl: 'assets/img/branding/og-celulares.jpg',
+            imageUrl: 'assets/img/repair/tecnico.jpg',
             keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix',
             schema: {
               '@context': 'https://schema.org',
@@ -315,6 +316,22 @@ export const publicRoutes: Routes = [
             description: 'Noticias, guías y tutoriales sobre tecnología, reparaciones y desarrollo de software.',
             imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
             type: 'website'
+          }
+        }
+      },
+      {
+        title: 'Protocolo de Diagnóstico | Arecofix',
+        path: 'diagnostico',
+        loadComponent: () =>
+          import('@app/admin/repairs/protocol/diagnostic-protocol-page').then(
+            (m) => m.DiagnosticProtocolPage
+          ),
+        data: {
+          seo: {
+            title: 'Protocolo de Diagnóstico de Celulares | Arecofix',
+            description: 'Guía interactiva paso a paso para diagnosticar fallas en celulares. Detectá problemas de encendido, carga, audio, señal y software.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            keywords: 'diagnostico celulares, protocolo reparacion, fallas celular, no enciende, no carga, sin señal, reparacion moviles'
           }
         }
       },

@@ -1,9 +1,12 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, switchMap, catchError } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { TenantIsolatedDashboardService, TenantDashboardStats } from './services/tenant-isolated-dashboard.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { FinanceDashboardService } from '@app/features/finances/services/finance-dashboard.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -19,6 +22,7 @@ export class BranchDashboardComponent implements OnInit {
   private tenantService = inject(TenantService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  public financeService = inject(FinanceDashboardService);
 
   // Signals para el estado reactivo
   stats = signal<TenantDashboardStats>({
@@ -30,7 +34,14 @@ export class BranchDashboardComponent implements OnInit {
     repairs_revenue: 0,
     repairs_profit: 0,
     devices_fixed: 0,
-    pending_approvals: 0, // Agregada propiedad faltante
+    pending_approvals: 0,
+    total_gross_revenue: 0,
+    total_cost: 0,
+    total_net_profit: 0,
+    current_month_gross: 0,
+    current_month_cost: 0,
+    current_month_profit: 0,
+    monthly_breakdown: [],
     sales_chart: [],
     products_chart: [],
     category_chart: [],
@@ -42,6 +53,8 @@ export class BranchDashboardComponent implements OnInit {
 
   loading = signal(true);
   error = signal<string | null>(null);
+
+  private loadStats$ = new Subject<string | undefined>();
 
   // Computed properties para permisos
   isSuperAdmin = computed(() => this.authService.isSuperAdmin());
@@ -122,34 +135,31 @@ export class BranchDashboardComponent implements OnInit {
   //   ]
   // });
 
-  async ngOnInit() {
-    await this.validateAccess();
-    this.loadDashboardStats();
+  constructor() {
+    this.loadStats$.pipe(
+      switchMap(branchSlug => {
+        this.loading.set(true);
+        this.error.set(null);
+        return this.dashboardService.getDashboardStats(branchSlug).pipe(
+          catchError(err => {
+            console.error('Error loading dashboard stats:', err);
+            this.error.set('No se pudieron cargar las estadísticas. Por favor, intente nuevamente.');
+            this.loading.set(false);
+            return [];
+          })
+        );
+      }),
+      takeUntilDestroyed()
+    ).subscribe((stats: any) => {
+      if (stats && !Array.isArray(stats)) {
+        this.stats.set(stats);
+      }
+      this.loading.set(false);
+    });
   }
 
-  /**
-   * Valida que el usuario tenga acceso a este dashboard
-   */
-  private async validateAccess(): Promise<void> {
-    const branchSlug = this.route.snapshot.paramMap.get('branch-slug');
-    const currentProfile = this.authService.getCurrentProfile();
-    
-    if (!currentProfile) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    // Si es Super Admin, puede acceder a cualquier sucursal
-    if (this.authService.isSuperAdmin()) {
-      return;
-    }
-
-    // Si es Branch Admin, solo puede acceder a su propia sucursal
-    if (branchSlug && currentProfile.branch_id !== branchSlug) {
-      console.error('Acceso denegado: El usuario no tiene permiso para acceder a esta sucursal');
-      this.router.navigate(['/unauthorized']);
-      return;
-    }
+  async ngOnInit() {
+    this.loadDashboardStats();
   }
 
   /**
@@ -160,18 +170,13 @@ export class BranchDashboardComponent implements OnInit {
     this.error.set(null);
 
     const branchSlug = this.route.snapshot.paramMap.get('branch-slug');
-    
-    this.dashboardService.getDashboardStats(branchSlug || undefined).subscribe({
-      next: (stats) => {
-        this.stats.set(stats);
-        // this.updateCharts(stats); // Temporalmente deshabilitado
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading dashboard stats:', error);
-        this.error.set('No se pudieron cargar las estadísticas. Por favor, intente nuevamente.');
-        this.loading.set(false);
-      }
+    this.loadStats$.next(branchSlug || undefined);
+
+    // Cargar estadísticas de Inteligencia Financiera para el mes en curso
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    this.financeService.initializeBranches().then(() => {
+        this.financeService.loadMovements(startOfMonth, today);
     });
   }
 

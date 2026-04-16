@@ -134,7 +134,7 @@
 
         <!-- Footer Edit -->
         <div class="bg-gray-50 dark:bg-gray-700/50 p-4 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700">
-          <button class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button>
           <button class="btn btn-primary btn-sm px-8 shadow-lg shadow-primary/20"
             (click)="prepareExecute()"
             [disabled]="!hasEditChanges()">
@@ -162,7 +162,7 @@
         </div>
         <!-- Footer Delete -->
         <div class="bg-error/5 p-4 flex justify-end gap-3 border-t border-error/20">
-          <button class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button>
           <button class="btn btn-error btn-sm px-8"
             (click)="prepareExecute()">
             <i class="fas fa-trash-alt mr-2"></i> Confirmar eliminación
@@ -233,8 +233,8 @@
     }
 
   </div>
-  <form method="dialog" class="modal-backdrop bg-black/60 backdrop-blur-sm">
-    <button (click)="close()">close</button>
-  </form>
+  <div class="modal-backdrop bg-black/60 backdrop-blur-sm" (click)="close()">
+    <button type="button" class="hidden">close</button>
+  </div>
 </div>
 }

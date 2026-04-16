@@ -16,6 +16,8 @@ import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { App } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { NgZone } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { TENANT_CONSTANTS } from '../constants/tenant.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -78,23 +80,42 @@ export class AuthService {
   }
 
   private async initAuth() {
-    const {
-      data: { session },
-    } = await this.supabase.auth.getSession();
-    if (session) {
-      const profile = await this.ensureProfile(session);
-      this.authState.next({ session, user: session.user, profile });
-      if (profile?.email === 'ezequielenrico15@gmail.com' || profile?.role === 'super_admin') {
-        this.isSuperAdmin.set(true);
+    try {
+      const { data: { session }, error } = await this.supabase.auth.getSession();
+      
+      if (error) {
+        this.logger.error('Session retrieval error', error);
+        // If technical error like refresh token invalid, clear local session to allow clean state
+        if (error.message.includes('Refresh Token')) {
+           await this.supabase.auth.signOut();
+        }
       }
+
+      if (session) {
+        const profile = await this.ensureProfile(session);
+        this.authState.next({ session, user: session.user, profile });
+        if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
+          this.isSuperAdmin.set(true);
+        }
+      }
+    } catch (e) {
+      this.logger.error('Critical auth init failure', e);
     }
 
     this.supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
+        this.logger.info(`Auth Event: ${event}`);
+        
+        if (event === 'SIGNED_OUT') {
+           this.authState.next({ session: null, user: null, profile: null });
+           this.isSuperAdmin.set(false);
+           return;
+        }
+
         if (session) {
           const profile = await this.ensureProfile(session);
           this.authState.next({ session, user: session.user, profile });
-          if (profile?.email === 'ezequielenrico15@gmail.com' || profile?.role === 'super_admin') {
+          if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
             this.isSuperAdmin.set(true);
           }
         } else {
@@ -118,7 +139,7 @@ export class AuthService {
       // Profile row doesn't exist yet — auto-create it from auth metadata
       const meta = session.user.user_metadata || {};
       const tenantId = this.tenantService.getTenantId();
-      const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+      const isFallback = tenantId === TENANT_CONSTANTS.FALLBACK_ID;
 
       const payload: any = {
         id: session.user.id,
@@ -134,7 +155,7 @@ export class AuthService {
       };
 
       // 🚨 Configuración de Súper Admin Central (ezequielenrico15@gmail.com)
-      if (payload.email === 'ezequielenrico15@gmail.com') {
+      if (payload.email && TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(payload.email)) {
         payload.role = 'super_admin';
         this.isSuperAdmin.set(true);
       }
@@ -158,7 +179,7 @@ export class AuthService {
       this.logger.info(`Profile auto-created for user ${session.user.id}`);
       
       const createdProfile = data as UserProfile | null;
-      if (createdProfile?.email === 'ezequielenrico15@gmail.com' || createdProfile?.role === 'super_admin') {
+      if (createdProfile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(createdProfile.email || '') || createdProfile.role === 'super_admin')) {
         this.isSuperAdmin.set(true);
       }
       
@@ -210,46 +231,34 @@ export class AuthService {
   }
 
   // Social Logins
-  async signInWithGoogle(): Promise<any> {
+  private async signInWithProvider(provider: 'google' | 'facebook' | 'github'): Promise<any> {
+    const isNative = Capacitor.isNativePlatform();
+
     const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: { 
         redirectTo: environment.authRedirectUrl,
-        skipBrowserRedirect: true
+        skipBrowserRedirect: isNative
       },
     });
-    if (data?.url) {
-        await Browser.open({ url: data.url });
+
+    if (isNative && data?.url) {
+      await Browser.open({ url: data.url });
     }
+
     return { data, error };
+  }
+
+  async signInWithGoogle(): Promise<any> {
+    return this.signInWithProvider('google');
   }
 
   async signInWithFacebook(): Promise<any> {
-    const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: { 
-        redirectTo: environment.authRedirectUrl,
-        skipBrowserRedirect: true
-      },
-    });
-    if (data?.url) {
-        await Browser.open({ url: data.url });
-    }
-    return { data, error };
+    return this.signInWithProvider('facebook');
   }
 
   async signInWithGithub(): Promise<any> {
-    const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: { 
-        redirectTo: environment.authRedirectUrl,
-        skipBrowserRedirect: true
-      },
-    });
-    if (data?.url) {
-        await Browser.open({ url: data.url });
-    }
-    return { data, error };
+    return this.signInWithProvider('github');
   }
 
   async signIn(email: string, password: string): Promise<any> {

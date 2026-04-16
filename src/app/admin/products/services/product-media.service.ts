@@ -11,10 +11,13 @@ export class ProductMediaService {
   private readonly FOLDER = 'products';
 
   async uploadImage(file: File): Promise<string> {
-    // Sanitize filename to avoid weird character issues
+    return this.uploadFile(file, this.FOLDER);
+  }
+
+  async uploadFile(file: File, folder: string): Promise<string> {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-    const filePath = `${this.FOLDER}/${fileName}`;
+    const filePath = `${folder}/${fileName}`;
 
     const { data, error } = await this.supabase.storage
       .from(this.BUCKET)

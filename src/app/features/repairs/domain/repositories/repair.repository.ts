@@ -9,5 +9,6 @@ export abstract class RepairRepository {
     abstract delete(id: string): Observable<void>;
     abstract getByTrackingCode(code: string): Observable<Repair | null>;
     abstract uploadImage(file: File): Promise<string>;
-    abstract getAdminList(params: { branch_id?: string, limit?: number, offset?: number }): Observable<Repair[]>;
+    abstract getAdminList(params: { branch_id?: string, limit?: number, offset?: number, searchTerm?: string }): Observable<Repair[]>;
+    abstract getWorkshopSummary(branch_id?: string): Observable<any>;
 }

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/guards/auth.guard';
+import { moduleGuard } from '@app/guards/module.guard';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const adminRoutes: Routes = [
@@ -14,13 +15,18 @@ export const adminRoutes: Routes = [
     ],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
       {
         title: 'Dashboard',
         path: 'dashboard',
+        canActivate: [moduleGuard],
+        data: { module: 'dashboard' },
         loadComponent: () => import('@app/admin/dashboard/admin-dashboard-page').then(m => m.AdminDashboardPage)
       },
       {
         path: 'products',
+        canActivate: [moduleGuard],
+        data: { module: 'inventory' },
         loadChildren: () => import('@app/admin/products/admin-products.routes').then(m => m.ADMIN_PRODUCTS_ROUTES)
       },
       {
@@ -33,6 +39,8 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'clients',
+        canActivate: [moduleGuard],
+        data: { module: 'customers' },
         loadChildren: () => import('@app/admin/clients/admin-clients.routes').then(m => m.ADMIN_CLIENTS_ROUTES)
       },
       {
@@ -44,6 +52,10 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('@app/admin/company/admin-company.routes').then(m => m.ADMIN_COMPANY_ROUTES)
       },
       {
+        path: 'branches',
+        loadChildren: () => import('@app/admin/branches/admin-branches.routes').then(m => m.ADMIN_BRANCHES_ROUTES)
+      },
+      {
         path: 'employees',
         loadChildren: () => import('@app/admin/employees/admin-employees.routes').then(m => m.ADMIN_EMPLOYEES_ROUTES)
       },
@@ -53,6 +65,8 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'inventory',
+        canActivate: [moduleGuard],
+        data: { module: 'inventory' },
         loadChildren: () => import('@app/admin/inventory/admin-inventory.routes').then(m => m.ADMIN_INVENTORY_ROUTES)
       },
       {
@@ -77,6 +91,8 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'repairs',
+        canActivate: [moduleGuard],
+        data: { module: 'repairs' },
         loadChildren: () => import('@app/admin/repairs/admin-repairs.routes').then(m => m.ADMIN_REPAIRS_ROUTES)
       },
       {

@@ -3,7 +3,9 @@ import { inject } from '@angular/core';
 import { DatabaseError } from '../errors/application.error';
 import { LoggerService } from '../services/logger.service';
 import { TenantService } from '../services/tenant.service';
+import { SupabaseErrorHandlerService } from '../services/supabase-error-handler.service';
 import { Observable, from, map } from 'rxjs';
+import { TENANT_CONSTANTS } from '../constants/tenant.constants';
 
 /**
  * Base Repository (SaaS Architecture)
@@ -22,6 +24,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
 
     // Se inyecta al vuelo. Evita tener que pasarlo a mano en constructores hijos 
     protected tenantService = inject(TenantService);
+    protected errorHandler = inject(SupabaseErrorHandlerService);
 
     constructor(
         protected supabase: SupabaseClient,
@@ -37,7 +40,12 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
 
         if (!this.isGlobalTable) {
             const tenantId = this.tenantService.getTenantId();
-            enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+            // Si el tenantId es real, filtramos por él explícitamente.
+            // Si es el fallback (ceros), NO filtramos para permitir que el RLS 
+            // del servidor use get_my_tenant() de forma transparente.
+            if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+                enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+            }
         }
 
         if (this.useSoftDeletes) {
@@ -48,9 +56,20 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     }
 
     /**
+     * Aplica filtro de sucursal si se especifica un branchId.
+     * Útil para aislamiento de datos en dashboards y listados operativos.
+     */
+    protected applyBranchFilter(query: any, branchId?: string) {
+        if (branchId) {
+            return query.eq('branch_id', branchId);
+        }
+        return query;
+    }
+
+    /**
      * Find all records for the current Tenant
      */
-    getAll(orderBy?: { column: string; ascending?: boolean }): Observable<T[]> {
+    getAll(options?: any): Observable<T[]> {
         const fetchAll = async (): Promise<T[]> => {
             let allData: T[] = [];
             let fromIdx = 0;
@@ -61,15 +80,14 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
                 let query = this.supabase.from(this.tableName).select('*');
                 query = this.applyTenantFilter(query);
 
-                if (orderBy) {
-                    query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+                if (options && typeof options === 'object' && options.column) {
+                    query = query.order(options.column, { ascending: options.ascending ?? true });
                 }
 
                 const { data, error } = await (query.range(fromIdx, fromIdx + CHUNK - 1) as any);
 
                 if (error) {
-                    this.logger.error(`Error fetching all ${this.tableName}`, error);
-                    throw new DatabaseError(error.message, error);
+                    this.errorHandler.handleError(error, `getAll ${this.tableName}`);
                 }
 
                 const batch = (data as T[]) || [];
@@ -98,8 +116,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from((query as any).maybeSingle()).pipe(
             map(({ data, error }: any) => {
                 if (error) {
-                    this.logger.error(`Error fetching ${this.tableName} by ID`, error);
-                    throw new DatabaseError(error.message, error);
+                    this.errorHandler.handleError(error, `getById ${this.tableName}`);
                 }
                 return data as T | null; // null when row doesn't exist
             })
@@ -114,7 +131,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         
         // Si el tenantId es el fallback (ceros), preferimos NO enviarlo en el payload
         // para que la base de datos aplique el DEFAULT (public.get_my_tenant()).
-        const isFallback = tenantId === '00000000-0000-0000-0000-000000000000';
+        const isFallback = tenantId === TENANT_CONSTANTS.FALLBACK_ID;
 
         const payload = this.isGlobalTable 
             ? item 
@@ -129,8 +146,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         ).pipe(
             map(({ data, error }) => {
                 if (error) {
-                    this.logger.error(`Error creating ${this.tableName}`, error);
-                    throw new DatabaseError(error.message, error);
+                    this.errorHandler.handleError(error, `create ${this.tableName}`);
                 }
                 return data as T;
             })
@@ -152,8 +168,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query.select().single()).pipe(
             map(({ data, error }) => {
                 if (error) {
-                     this.logger.error(`Error updating ${this.tableName}`, error);
-                     throw new DatabaseError(error.message, error);
+                     this.errorHandler.handleError(error, `update ${this.tableName}`);
                 }
                 return data as T;
             })
@@ -170,8 +185,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query).pipe(
             map(({ error }) => {
                 if (error) {
-                    this.logger.error(`Error deleting ${this.tableName}`, error);
-                    throw new DatabaseError(error.message, error);
+                    this.errorHandler.handleError(error, `delete ${this.tableName}`);
                 }
             })
         );
@@ -185,26 +199,43 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         value: string | number | boolean | null,
         orderBy?: { column: string; ascending?: boolean }
     ): Observable<T[]> {
-        let query = this.supabase
-            .from(this.tableName)
-            .select('*')
-            .eq(column, value);
-        
-        query = this.applyTenantFilter(query);
+        const fetchAll = async (): Promise<T[]> => {
+            let allData: T[] = [];
+            let fromIdx = 0;
+            let hasMore = true;
+            const CHUNK = 1000;
 
-        if (orderBy) {
-            query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
-        }
+            while (hasMore) {
+                let query = this.supabase
+                    .from(this.tableName)
+                    .select('*')
+                    .eq(column, value);
+                
+                query = this.applyTenantFilter(query);
 
-        return from(query).pipe(
-            map(({ data, error }) => {
-                if (error) {
-                    this.logger.error(`Error fetching ${this.tableName} with filter`, error);
-                    throw new DatabaseError(error.message, error);
+                if (orderBy) {
+                    query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
                 }
-                return (data as T[]) || [];
-            })
-        );
+
+                const { data, error } = await (query.range(fromIdx, fromIdx + CHUNK - 1) as any);
+
+                if (error) {
+                    this.errorHandler.handleError(error, `getWhere ${this.tableName}`);
+                }
+
+                const batch = (data as T[]) || [];
+                allData = [...allData, ...batch];
+
+                if (batch.length < CHUNK) {
+                    hasMore = false;
+                } else {
+                    fromIdx += CHUNK;
+                }
+            }
+            return allData;
+        };
+
+        return from(fetchAll());
     }
 
     /**
@@ -220,8 +251,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query).pipe(
             map(({ count, error }) => {
                 if (error) {
-                    this.logger.error(`Error counting ${this.tableName}`, error);
-                    throw new DatabaseError(error.message, error);
+                    this.errorHandler.handleError(error, `count ${this.tableName}`);
                 }
                 return count || 0;
             })

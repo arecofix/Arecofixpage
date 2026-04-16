@@ -22,42 +22,42 @@
                 <!-- Basic Info -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
-                        <label class="label">
+                        <label for="comp-name" class="label">
                             <span class="label-text font-medium">Nombre de la Empresa</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-building text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().name" name="name" class="grow" required />
+                            <input id="comp-name" type="text" [(ngModel)]="form().name" name="name" autocomplete="organization" class="grow" required />
                         </label>
                     </div>
                     <div class="form-control">
-                        <label class="label">
+                        <label for="comp-owner_name" class="label">
                             <span class="label-text font-medium">Propietario</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-user text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().owner_name" name="owner_name" class="grow" />
+                            <input id="comp-owner_name" type="text" [(ngModel)]="form().owner_name" name="owner_name" autocomplete="name" class="grow" />
                         </label>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
-                        <label class="label">
+                        <label for="comp-tax_id" class="label">
                             <span class="label-text font-medium">{{ form().ruc }} (Número)</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-id-card text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().tax_id" name="tax_id" class="grow" placeholder="Ej: 20-12345678-9" />
+                            <input id="comp-tax_id" type="text" [(ngModel)]="form().tax_id" name="tax_id" autocomplete="off" class="grow" placeholder="Ej: 20-12345678-9" />
                         </label>
                     </div>
                     <div class="form-control">
-                        <label class="label">
+                        <label for="comp-address" class="label">
                             <span class="label-text font-medium">Dirección</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-map-marker-alt text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().address" name="address" class="grow" />
+                            <input id="comp-address" type="text" [(ngModel)]="form().address" name="address" autocomplete="street-address" class="grow" />
                         </label>
                     </div>
                 </div>
@@ -65,32 +65,32 @@
                 <!-- Contact Info -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
-                        <label class="label">
+                        <label for="comp-email" class="label">
                             <span class="label-text font-medium">Email</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-envelope text-gray-400"></i>
-                            <input type="email" [(ngModel)]="form().email" name="email" class="grow" />
+                            <input id="comp-email" type="email" [(ngModel)]="form().email" name="email" autocomplete="email" class="grow" />
                         </label>
                     </div>
                     <div class="form-control">
-                        <label class="label">
+                        <label for="comp-phone" class="label">
                             <span class="label-text font-medium">Teléfono</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-phone text-gray-400"></i>
-                            <input type="text" [(ngModel)]="form().phone" name="phone" class="grow" />
+                            <input id="comp-phone" type="text" [(ngModel)]="form().phone" name="phone" autocomplete="tel" class="grow" />
                         </label>
                     </div>
                 </div>
 
                 <div class="form-control">
-                    <label class="label">
+                    <label for="comp-location" class="label">
                         <span class="label-text font-medium">Ubicación</span>
                     </label>
                     <label class="input input-bordered flex items-center gap-2">
                         <i class="fas fa-globe text-gray-400"></i>
-                        <input type="text" [(ngModel)]="form().location" name="location" class="grow" 
+                        <input id="comp-location" type="text" [(ngModel)]="form().location" name="location" autocomplete="off" class="grow"
                             placeholder="Ej: Buenos Aires, Argentina" />
                     </label>
                 </div>
@@ -128,14 +128,26 @@
                         </label>
                     </div>
                     <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-medium">Moneda</span>
-                        </label>
-                        <select [(ngModel)]="form().currency" name="currency" class="select select-bordered w-full">
-                            <option value="ARS">ARS (Peso Argentino)</option>
-                            <option value="USD">USD (Dólar Estadounidense)</option>
-                        </select>
-                    </div>
+                  <label class="label font-bold text-gray-700 dark:text-gray-300">Moneda Base</label>
+                  <select [(ngModel)]="form().currency" name="currency" class="select select-bordered w-full">
+                    <option value="ARS">ARS - Peso Argentino</option>
+                    <option value="USD">USD - Dólar Estadounidense</option>
+                  </select>
+                </div>
+
+                <div class="form-control">
+                  <label class="label font-bold text-gray-700 dark:text-gray-300">
+                    <span class="flex items-center gap-2">
+                       <i class="fas fa-dollar-sign text-indigo-500"></i> Cotización Dólar (Hoy)
+                    </span>
+                  </label>
+                  <div class="relative group">
+                    <div class="absolute -inset-0.5 bg-linear-to-r from-blue-500 to-indigo-600 rounded-lg blur opacity-10 group-focus-within:opacity-30 transition"></div>
+                    <input type="number" [(ngModel)]="form().usd_rate" name="usd_rate" step="0.01"
+                      class="input input-bordered w-full font-bold text-indigo-600 dark:text-indigo-400 text-lg relative" placeholder="1.00" />
+                  </div>
+                  <p class="text-[10px] text-gray-400 mt-1">Este valor se usará para convertir precios de productos en USD al vender en ARS o calcular reparaciones.</p>
+                </div>
                 </div>
 
                 <div class="divider text-sm font-medium text-gray-500">Branding</div>
@@ -234,20 +246,20 @@
                 <h3 class="font-bold text-lg mb-4"><i class="fas fa-plus-circle text-primary mr-2"></i>Agregar Nueva Sucursal</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Nombre Sucursal</span></label>
-                        <input type="text" [(ngModel)]="newBranch().name" class="input input-bordered w-full" placeholder="Ej: Zona Centro" />
+                        <label for="branch-name" class="label"><span class="label-text">Nombre Sucursal</span></label>
+                        <input id="branch-name" type="text" [(ngModel)]="newBranch().name" name="branch_name" autocomplete="off" class="input input-bordered w-full" placeholder="Ej: Zona Centro" />
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Slug (URL)</span></label>
-                        <input type="text" [(ngModel)]="newBranch().slug" class="input input-bordered w-full font-mono text-xs" placeholder="zona-centro" />
+                        <label for="branch-slug" class="label"><span class="label-text">Slug (URL)</span></label>
+                        <input id="branch-slug" type="text" [(ngModel)]="newBranch().slug" name="branch_slug" autocomplete="off" class="input input-bordered w-full font-mono text-xs" placeholder="zona-centro" />
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Recargo Global (%)</span></label>
-                        <input type="number" [(ngModel)]="newBranch().global_markup_percentage" class="input input-bordered w-full" placeholder="0" />
+                        <label for="branch-markup" class="label"><span class="label-text">Recargo Global (%)</span></label>
+                        <input id="branch-markup" type="number" [(ngModel)]="newBranch().global_markup_percentage" name="branch_markup" autocomplete="off" class="input input-bordered w-full" placeholder="0" />
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Dirección (Opcional)</span></label>
-                        <input type="text" [(ngModel)]="newBranch().address" class="input input-bordered w-full" placeholder="Ej: San Martin 123" />
+                        <label for="branch-address" class="label"><span class="label-text">Dirección (Opcional)</span></label>
+                        <input id="branch-address" type="text" [(ngModel)]="newBranch().address" name="branch_address" autocomplete="off" class="input input-bordered w-full" placeholder="Ej: San Martin 123" />
                     </div>
                 </div>
                 <div class="mt-4 flex items-center justify-between">

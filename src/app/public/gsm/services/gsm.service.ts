@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { GSM_TOOLS, BRAND_SERVICES } from '@app/core/data/gsm.data';
 import { environment } from 'src/environments/environment';
 
@@ -31,6 +33,14 @@ export interface DownloadItem {
   providedIn: 'root'
 })
 export class GsmService {
+  private http = inject(HttpClient);
+
+  getUsdtRate(): Observable<number> {
+    return this.http.get<any>('https://dolarapi.com/v1/dolares/cripto').pipe(
+      map(res => res.compra || 1240),
+      catchError(() => of(1240))
+    );
+  }
 
   getGsmTools(): Observable<GsmTool[]> {
     return of(GSM_TOOLS);

@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Observable, map, of, Subject, switchMap, firstValueFrom } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 // import { IsEmptyComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
@@ -26,7 +26,7 @@ import { SeoService } from '@app/core/services/seo.service';
     styleUrl: './repuestos.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepuestosComponent implements OnInit {
+export class RepuestosComponent implements OnInit, OnDestroy {
     whatsappNumber = environment.contact.whatsappNumber;
     private router = inject(Router);
     private route = inject(ActivatedRoute);
@@ -47,6 +47,7 @@ export class RepuestosComponent implements OnInit {
 
     // Search Logic (Debounced navigation)
     private searchSubject = new Subject<string>();
+    private destroy$ = new Subject<void>();
 
     // UI Signals
     searchQuery = signal('');
@@ -114,7 +115,8 @@ export class RepuestosComponent implements OnInit {
         // Handle Search Debounce -> Update URL
         this.searchSubject.pipe(
             debounceTime(500),
-            distinctUntilChanged()
+            distinctUntilChanged(),
+            takeUntil(this.destroy$)
         ).subscribe(term => {
             this.router.navigate([], {
                 relativeTo: this.route,
@@ -124,12 +126,19 @@ export class RepuestosComponent implements OnInit {
         });
 
         // Sync Input with URL
-        this.route.queryParams.subscribe(params => {
-            this.routeParams.set(params);
-            if (params['search'] !== this.searchQuery()) {
-                this.searchQuery.set(params['search'] || '');
-            }
-        });
+        this.route.queryParams
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((params: any) => {
+                this.routeParams.set(params);
+                if (params['search'] !== this.searchQuery()) {
+                    this.searchQuery.set(params['search'] || '');
+                }
+            });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     // Resource Stream: Depends on Signals (CategoryIDs) and Route Params
@@ -234,7 +243,9 @@ export class RepuestosComponent implements OnInit {
     }
 
     async loadCategories() {
-        this.categoryService.getData({ _page: 1, _per_page: 500 }).subscribe(res => {
+        this.categoryService.getData({ _page: 1, _per_page: 500 })
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((res: any) => {
             const allCategories = res.data;
             this.categories.set(allCategories);
 
@@ -246,16 +257,16 @@ export class RepuestosComponent implements OnInit {
                 'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power'
             ];
             
-            const relevantCategories = allCategories.filter(c => 
+            const relevantCategories = allCategories.filter((c: any) => 
                 keywords.some(k => c.name.toLowerCase().includes(k) || c.slug.toLowerCase().includes(k))
             );
 
-            let repuestosCat = allCategories.find(c => c.slug.toLowerCase() === 'repuestos');
+            let repuestosCat = allCategories.find((c: any) => c.slug.toLowerCase() === 'repuestos');
             if (!repuestosCat && relevantCategories.length > 0) repuestosCat = relevantCategories[0];
 
             if (relevantCategories.length > 0) {
                 let allIds = new Set<string>();
-                relevantCategories.forEach(cat => {
+                relevantCategories.forEach((cat: any) => {
                     allIds.add(cat.id);
                     const treeIds = this.getAllChildIds(cat.id, allCategories);
                     treeIds.forEach(id => allIds.add(id));

@@ -1,9 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
 import { CompanyService } from '@app/core/services/company.service';
-import { TenantService } from '@app/core/services/tenant.service';
+import { InvoiceService } from '@app/features/sales/application/invoice.service';
 
 @Component({
     selector: 'app-admin-invoice-detail-page',
@@ -13,9 +12,8 @@ import { TenantService } from '@app/core/services/tenant.service';
 })
 export class AdminInvoiceDetailPage implements OnInit {
     private route = inject(ActivatedRoute);
-    private auth = inject(AuthService);
     private companyService = inject(CompanyService);
-    private tenantService = inject(TenantService);
+    private invoiceService = inject(InvoiceService);
 
     invoice = signal<any>(null);
     items = signal<any[]>([]);
@@ -26,7 +24,6 @@ export class AdminInvoiceDetailPage implements OnInit {
     
     async ngOnInit() {
         const id = this.route.snapshot.paramMap.get('id');
-        const supabase = this.auth.getSupabaseClient();
         
         try {
             // Fetch company settings
@@ -36,34 +33,12 @@ export class AdminInvoiceDetailPage implements OnInit {
             }
 
             if (id) {
-                // Fetch invoice
-                const { data: invoice, error: invoiceError } = await supabase
-                    .from('invoices')
-                    .select('*')
-                    .eq('id', id)
-                    .eq('tenant_id', this.tenantService.getTenantId())
-                    .single();
-
-                if (invoiceError) throw invoiceError;
-
-                if (invoice) {
-                    this.invoice.set(invoice);
-
-                    // Fetch items
-                    if (invoice.sale_id) {
-                        const { data: items, error: itemsError } = await supabase
-                            .from('sale_items')
-                            .select('*, products(name)')
-                            .eq('sale_id', invoice.sale_id)
-                            .eq('tenant_id', this.tenantService.getTenantId());
-                        
-                        if (itemsError) {
-                            console.error('Error fetching items:', itemsError);
-                            // Don't block page render on items error
-                        } else if (items) {
-                            this.items.set(items);
-                        }
-                    }
+                const result = await this.invoiceService.getInvoiceWithDetails(id);
+                if (result.invoice) {
+                    this.invoice.set(result.invoice);
+                    this.items.set(result.items);
+                } else {
+                    this.error.set('Factura no encontrada');
                 }
             }
         } catch (e: any) {

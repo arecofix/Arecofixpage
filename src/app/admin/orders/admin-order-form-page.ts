@@ -1,27 +1,33 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 
-import { OrderService } from '@app/core/services/order.service';
-import { Order, OrderItem, OrderWithItems } from '@app/shared/interfaces/order.interface';
+import { OrderService } from '@app/features/orders/application/services/order.service';
+import { Order, OrderItem } from '@app/features/orders/domain/entities/order.entity';
 import { AuthService } from '@app/core/services/auth.service';
 
 import { OrderNotificationService } from '@app/features/orders/services/order-notification.service'; // Import Ecommerce Notification service
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
+import { CustomerService } from '@app/features/customers/application/services/customer.service';
+import { PricingService } from '@app/core/services/pricing.service';
+import { OrderWorkflowService } from '@app/features/orders/application/services/order-workflow.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ProductOption {
     id: string;
     name: string;
     sku: string;
     price: number;
+    unit_cost_at_time: number;
     stock: number;
 }
 
 @Component({
     selector: 'app-admin-order-form-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, CurrencyPipe, DecimalPipe],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, CurrencyPipe, DecimalPipe],
     templateUrl: './admin-order-form-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,9 +36,16 @@ export class AdminOrderFormPage implements OnInit {
     private router = inject(Router);
     private orderService = inject(OrderService);
     private authService = inject(AuthService);
-    private orderNotificationService = inject(OrderNotificationService); // Inject Ecommerce Service
-    private productRepository = inject(ProductRepository); // Inject clean ProductRepository
+    private customerService = inject(CustomerService);
+    private productRepository = inject(ProductRepository);
+    private notificationService = inject(OrderNotificationService);
+    private pricingService = inject(PricingService);
+    private fb = inject(FormBuilder);
     private cdr = inject(ChangeDetectorRef);
+    private workflowService = inject(OrderWorkflowService);
+    private destroyRef = inject(DestroyRef);
+
+    orderForm!: FormGroup;
 
 
     id: string | null = null;
@@ -46,33 +59,43 @@ export class AdminOrderFormPage implements OnInit {
     clients: any[] = [];
 
     // Product autocomplete state
+    // Product autocomplete state
     productSearchQueries = signal<string[]>([]);
     showProductDropdowns = signal<boolean[]>([]);
 
-    form = signal<Order>({
-        customer_name: '',
-        customer_email: '',
-        customer_phone: '',
-        shipping_address: {
-            street: '',
-            number: '',
-            city: 'Marcos Paz',
-            neighborhood: ''
-        },
-        status: 'pending',
+    private setupForm() {
+        this.orderForm = this.fb.group({
+            customer_name: ['', [Validators.required]],
+            customer_email: ['', [Validators.email]],
+            customer_phone: ['', [Validators.required]],
+            shipping_address: this.fb.group({
+                street: ['', [Validators.required]],
+                number: ['', [Validators.required]],
+                city: ['Marcos Paz', [Validators.required]],
+                neighborhood: ['']
+            }),
+            status: ['pending'],
+            subtotal: [0],
+            tax: [0],
+            discount: [0],
+            total: [0],
+            payment_method: ['efectivo'],
+            notes: [''],
+            items: this.fb.array([])
+        });
 
-        subtotal: 0,
-        tax: 0,
-        discount: 0,
-        total: 0,
-        payment_method: 'efectivo',
-        notes: ''
-    });
+        // Listen for value changes to recalculate totals
+        this.orderForm.get('items')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.calculateTotals());
+        this.orderForm.get('discount')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.calculateTotals());
+    }
 
-    items = signal<OrderItem[]>([]);
+    get items() {
+        return this.orderForm.get('items') as FormArray;
+    }
 
     async ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id');
+        this.setupForm();
 
         // Parallel initial loading
         await Promise.all([
@@ -87,11 +110,7 @@ export class AdminOrderFormPage implements OnInit {
 
     async loadClients() {
         try {
-            const { data, error } = await this.authService.getSupabaseClient()
-                .from('profiles')
-                .select('id, full_name, first_name, last_name, email, phone, address')
-                .eq('role', 'user')
-                .limit(50);
+            const data = await this.customerService.getRecentClients(50);
             
             if (data) {
                 this.clients = data.map((c: any) => ({
@@ -107,33 +126,32 @@ export class AdminOrderFormPage implements OnInit {
     onSelectClient(clientName: string) {
         const client = this.clients.find(c => c.displayName === clientName);
         if (client) {
-            this.form.update(f => ({
-                ...f,
-                user_id: client.id,
+            this.orderForm.patchValue({
                 customer_name: client.displayName,
-                customer_email: client.email || f.customer_email,
-                customer_phone: client.phone || f.customer_phone,
-                shipping_address: typeof client.address === 'string' ? { ...f.shipping_address as any, street: client.address } : (client.address || f.shipping_address)
-            }));
+                customer_email: client.email,
+                customer_phone: client.phone,
+                shipping_address: typeof client.address === 'string' ? { street: client.address } : (client.address || {})
+            });
         } else {
-            this.form.update(f => ({ ...f, customer_name: clientName }));
+            this.orderForm.patchValue({ customer_name: clientName });
         }
     }
 
     async loadProducts() {
         return new Promise<void>((resolve) => {
             this.productRepository.findAvailable().subscribe({
-                next: (products) => {
-                    this.products = products.map(p => ({
+                next: (products: any[]) => {
+                    this.products = products.map((p: any) => ({
                         id: p.id,
                         name: p.name,
                         sku: p.sku || '',
                         price: p.price,
+                        unit_cost_at_time: p.unit_cost_at_time || 0,
                         stock: p.stock || 0
                     }));
                     resolve();
                 },
-                error: (err) => {
+                error: (err: any) => {
                     console.error('Error loading products', err);
                     resolve();
                 }
@@ -145,7 +163,8 @@ export class AdminOrderFormPage implements OnInit {
         if (!this.id) return;
 
         this.orderService.getOrderById(this.id).subscribe({
-            next: (order: OrderWithItems) => {
+            next: (order: Order | null) => {
+                if (!order) return;
                 let address = order.shipping_address;
                 if (typeof address === 'string') {
                     address = {
@@ -156,7 +175,7 @@ export class AdminOrderFormPage implements OnInit {
                     };
                 }
 
-                this.form.set({
+                this.orderForm.patchValue({
                     customer_name: order.customer_name,
                     customer_email: order.customer_email,
                     customer_phone: order.customer_phone,
@@ -169,7 +188,12 @@ export class AdminOrderFormPage implements OnInit {
                     payment_method: order.payment_method || 'efectivo',
                     notes: order.notes
                 });
-                this.items.set(order.items);
+
+                // Clear and repopulate items
+                this.items.clear();
+                (order.items || []).forEach(item => {
+                    this.items.push(this.createItemFormGroup(item));
+                });
 
                 this.originalStatus = order.status; // Capture original status
                 this.cdr.markForCheck();
@@ -182,141 +206,122 @@ export class AdminOrderFormPage implements OnInit {
         });
     }
 
+    createItemFormGroup(item?: OrderItem) {
+        return this.fb.group({
+            product_id: [item?.product_id || null],
+            product_name: [item?.product_name || '', [Validators.required]],
+            product_sku: [item?.product_sku || ''],
+            quantity: [item?.quantity || 1, [Validators.required, Validators.min(1)]],
+            unit_price: [item?.unit_price || 0, [Validators.required, Validators.min(0)]],
+            unit_cost_at_time: [item?.unit_cost_at_time || 0],
+            subtotal: [item?.subtotal || 0]
+        });
+    }
+
     addItem() {
-        this.items.update(items => [...items, {
-            product_name: '',
-            quantity: 1,
-            unit_price: 0,
-            subtotal: 0
-        }]);
+        this.items.push(this.createItemFormGroup());
         this.cdr.markForCheck();
     }
 
     removeItem(index: number) {
-        this.items.update(items => items.filter((_, i) => i !== index));
+        this.items.removeAt(index);
         this.calculateTotals();
     }
 
     onSearchProduct(index: number, nameQuery: string) {
         const product = this.products.find(p => p.name === nameQuery);
-        
-        this.items.update(items => {
-            const newItems = [...items];
-            if (product) {
-                newItems[index] = {
-                    ...newItems[index],
-                    product_id: product.id,
-                    product_name: product.name,
-                    product_sku: product.sku,
-                    unit_price: product.price,
-                    subtotal: product.price * newItems[index].quantity
-                };
-            } else {
-                newItems[index] = {
-                    ...newItems[index],
-                    product_id: undefined,
-                    product_name: nameQuery,
-                    product_sku: undefined
-                };
-            }
-            return newItems;
-        });
+        const itemGroup = this.items.at(index) as FormGroup;
+
+        if (product) {
+            itemGroup.patchValue({
+                product_id: product.id,
+                product_name: product.name,
+                product_sku: product.sku,
+                unit_price: product.price,
+                unit_cost_at_time: product.unit_cost_at_time,
+                subtotal: product.price * itemGroup.get('quantity')?.value
+            });
+        } else {
+            itemGroup.patchValue({
+                product_id: undefined,
+                product_name: nameQuery,
+                product_sku: undefined
+            });
+        }
         this.calculateTotals();
     }
 
     onUnitPriceChange(index: number) {
-        this.items.update(items => {
-            const newItems = [...items];
-            newItems[index].subtotal = newItems[index].unit_price * newItems[index].quantity;
-            return newItems;
-        });
-
+        const item = this.items.at(index);
+        item.get('subtotal')?.setValue(item.get('unit_price')?.value * item.get('quantity')?.value);
         this.calculateTotals();
     }
 
     onQuantityChange(index: number) {
-        this.items.update(items => {
-            const newItems = [...items];
-            newItems[index].subtotal = newItems[index].unit_price * newItems[index].quantity;
-            return newItems;
-        });
-
+        const item = this.items.at(index);
+        item.get('subtotal')?.setValue(item.get('unit_price')?.value * item.get('quantity')?.value);
         this.calculateTotals();
     }
 
     calculateTotals() {
-        const subtotal = this.items().reduce((sum, item) => sum + item.subtotal, 0);
-        const discount = this.form().discount || 0;
-        const taxRate = 0.21; // 21% IVA
-        const taxableAmount = subtotal - discount;
-        const tax = taxableAmount * taxRate;
-        const total = taxableAmount + tax;
+        const items = this.items.value as OrderItem[];
+        const subtotal = items.reduce((sum, item) => sum + (Number(item.subtotal) || 0), 0);
+        const discount = Number(this.orderForm.get('discount')?.value) || 0;
+        
+        const taxableAmount = Math.max(0, subtotal - discount);
+        const tax = this.pricingService.calculateTaxAmount(taxableAmount);
+        const total = this.pricingService.calculateFinalPrice(taxableAmount);
 
-        this.form.update(f => ({
-            ...f,
+        this.orderForm.patchValue({
             subtotal,
             tax,
             total
-        }));
+        }, { emitEvent: false }); // Avoid infinite loop
 
         this.cdr.markForCheck();
     }
 
     updateStatus(newStatus: Order['status']) {
-        this.form.update(f => ({ ...f, status: newStatus }));
+        this.orderForm.get('status')?.setValue(newStatus);
         this.cdr.markForCheck();
     }
 
     async save() {
-        console.log('🚀 Save method called');
-        
-        if (this.items().length === 0) {
-            console.log('❌ No items in order');
+        if (this.orderForm.invalid) {
+            this.orderForm.markAllAsTouched();
+            this.error = 'Por favor, completa los campos requeridos correctamente.';
+            this.cdr.markForCheck();
+            return;
+        }
+
+        if (this.items.length === 0) {
             this.error = 'Debes agregar al menos un producto';
             this.cdr.markForCheck();
             return;
         }
 
-        console.log('📋 Order items:', this.items());
-        console.log('📋 Order form:', this.form());
-
         this.saving = true;
         this.error = null;
 
         try {
-            console.log('🔄 Starting order creation...');
+            const orderToSave = this.orderForm.getRawValue();
             let result;
             
             if (this.id) {
-                console.log('📝 Updating existing order:', this.id);
-                result = await this.orderService.updateOrder(this.id, this.form(), this.items());
+                result = await firstValueFrom(this.orderService.updateOrder(this.id, orderToSave));
             } else {
-                console.log('➕ Creating new order');
-                result = await this.orderService.createOrder(this.form(), this.items());
+                result = await this.workflowService.processCheckout(orderToSave);
             }
-
-            console.log('📊 Order service result:', result);
-
-            const { error } = result;
-
-            if (error) {
-                console.error('❌ Order service error:', error);
-                throw error;
-            }
-
-            console.log('✅ Order created/updated successfully');
 
             // Check for status change and notify
-            if (this.id && this.originalStatus && this.form().status !== this.originalStatus) {
-                const orderData = this.form();
-                // Compile purchased products list for Ecommerce Notification
-                const productDetails = this.items().map(item => `${item.quantity}x ${item.product_name}`).join(', ');
+            if (this.id && this.originalStatus && orderToSave.status !== this.originalStatus) {
+                const productDetails = (orderToSave.items as OrderItem[]).map(item => `${item.quantity}x ${item.product_name}`).join(', ');
 
-                const link = this.orderNotificationService.generateWhatsAppLink(
-                    orderData.customer_phone || '',
-                    orderData.customer_name,
-                    orderData.status,
-                    result.data?.order_number || this.id.substring(0, 8).toUpperCase(), 
+                const link = this.notificationService.generateWhatsAppLink(
+                    orderToSave.customer_phone || '',
+                    orderToSave.customer_name,
+                    orderToSave.status,
+                    result?.order_number || this.id.substring(0, 8).toUpperCase(), 
                     productDetails
                 );
 
@@ -325,13 +330,12 @@ export class AdminOrderFormPage implements OnInit {
                 }
             }
 
-            console.log('🏠 Redirecting to orders list');
             this.router.navigate(['/admin/orders']);
             
         } catch (e: any) {
             console.error('💥 Save method error:', e);
             this.error = e.message || 'Error al guardar pedido';
-            this.saving = false; // Reset saving state on error
+            this.saving = false;
             this.cdr.markForCheck();
         }
     }
@@ -374,17 +378,14 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     selectProduct(index: number, product: ProductOption) {
-        this.items.update(items => {
-            const newItems = [...items];
-            newItems[index] = {
-                ...newItems[index],
-                product_id: product.id,
-                product_name: product.name,
-                product_sku: product.sku,
-                unit_price: product.price,
-                subtotal: product.price * newItems[index].quantity
-            };
-            return newItems;
+        const itemGroup = this.items.at(index) as FormGroup;
+        itemGroup.patchValue({
+            product_id: product.id,
+            product_name: product.name,
+            product_sku: product.sku,
+            unit_price: product.price,
+            unit_cost_at_time: product.unit_cost_at_time,
+            subtotal: product.price * itemGroup.get('quantity')?.value
         });
 
         // Hide dropdown and clear search

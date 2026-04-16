@@ -139,7 +139,7 @@ export class CourseDetailComponent implements OnInit {
         return this.coursesService.getCourseBySlug(slug);
       })
     ).subscribe({
-      next: (response) => {
+      next: (response: { data: Course | null, error: any }) => {
         if (response.error || !response.data) {
            this.error = 'Curso no encontrado';
            this.loading = false;
@@ -165,7 +165,7 @@ export class CourseDetailComponent implements OnInit {
           this.cd.detectChanges();
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error = 'Error al cargar el curso.';
         this.loading = false;
         this.cd.detectChanges();
@@ -176,12 +176,12 @@ export class CourseDetailComponent implements OnInit {
   loadModules(courseId: string) {
       this.loadingModules = true;
       this.coursesService.getModulesByCourseId(courseId).subscribe({
-          next: (res) => {
+          next: (res: { data: Module[], error: any }) => {
               this.modules = res.data || [];
               this.loadingModules = false;
               this.cd.detectChanges();
           },
-          error: (err) => {
+          error: (err: any) => {
               this.loadingModules = false;
               this.cd.detectChanges();
           }
@@ -257,28 +257,5 @@ export class CourseDetailComponent implements OnInit {
       imageUrl: imageUrl,
       type: 'article'
     });
-
-    this.setWhatsAppOgTags(imageUrl, description, course.title);
-  }
-
-  private setWhatsAppOgTags(imageUrl: string, description: string, courseTitle: string): void {
-     if (typeof document === 'undefined') return;
-     const meta = document.head;
-     const setOrCreate = (property: string, content: string) => {
-       let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
-       if (!el) {
-         el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el);
-       }
-       el.setAttribute('content', content);
-     };
-     const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `${window.location.host === 'localhost:4200' ? 'http://localhost:4200' : 'https://arecofix.com.ar'}/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
-     setOrCreate('og:title', `${courseTitle} | Arecofix Academy`);
-     setOrCreate('og:image', absoluteImageUrl);
-     setOrCreate('og:image:secure_url', absoluteImageUrl);
-     setOrCreate('og:image:width', '1200');
-     setOrCreate('og:image:height', '630');
-     setOrCreate('og:description', description);
-     setOrCreate('og:site_name', 'Arecofix Academy');
-     setOrCreate('og:type', 'article');
   }
 }

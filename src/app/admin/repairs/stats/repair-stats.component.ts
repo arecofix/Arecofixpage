@@ -1,7 +1,11 @@
-import { Component, inject, OnInit, signal, effect } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RepairStatsService, RepairStatsDto } from './repair-stats.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { CustomerService } from '@app/features/customers/application/services/customer.service';
+import { TenantService } from '@app/core/services/tenant.service';
+import { BranchService } from '@app/core/services/branch.service';
 
 @Component({
   selector: 'app-admin-repair-stats',
@@ -14,16 +18,22 @@ import { RepairStatsService, RepairStatsDto } from './repair-stats.service';
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                  <h2 class="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                     <span class="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                         <i class="fas fa-chart-pie"></i>
+                     <span class="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+                         <i class="fas fa-chart-line"></i>
                      </span>
                      Inteligencia Financiera
                  </h2>
-                 <p class="text-sm text-gray-500 mt-1">Análisis de rentabilidad real: Ingresos Brutos vs Costo de Insumos</p>
+                 <p class="text-sm text-gray-500 mt-1">Rentabilidad real de su taller: Mano de Obra vs Repuestos</p>
             </div>
-            
-            <div class="flex gap-2 w-full md:w-auto">
-                <select [ngModel]="period()" (ngModelChange)="period.set($event)" class="select select-bordered w-full md:w-auto rounded-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">
+                <button (click)="downloadClientsCsv()" [disabled]="downloadingCsv()" class="btn bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-indigo-600 hover:text-white text-gray-700 dark:text-gray-200 rounded-2xl shadow-sm transition-all h-auto min-h-12 font-bold px-6">
+                    @if(downloadingCsv()) {
+                        <span class="loading loading-spinner loading-sm"></span>
+                    } @else {
+                        <i class="fas fa-file-csv mr-2 text-lg"></i> Base Clientes (CSV)
+                    }
+                </button>
+                <select [ngModel]="period()" (ngModelChange)="period.set($event)" class="select select-bordered w-full md:w-auto rounded-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 font-bold focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 min-h-12">
                     <option value="this_month">Este Mes</option>
                     <option value="last_month">Mes Anterior</option>
                     <option value="all_time">Histórico Total</option>
@@ -33,8 +43,8 @@ import { RepairStatsService, RepairStatsDto } from './repair-stats.service';
 
         @if (loading()) {
             <div class="flex flex-col justify-center items-center py-20 animate-pulse">
-                <span class="loading loading-spinner text-indigo-500 w-12 h-12 mb-4"></span>
-                <span class="text-sm font-medium text-gray-500">Calculando rentabilidad cruzada...</span>
+                <span class="loading loading-spinner text-indigo-600 w-12 h-12 mb-4"></span>
+                <span class="text-sm font-medium text-gray-500">Compilando tablero contable...</span>
             </div>
         } @else if (error()) {
             <div class="alert alert-error shadow-sm rounded-2xl">
@@ -48,189 +58,203 @@ import { RepairStatsService, RepairStatsDto } from './repair-stats.service';
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 
                 <!-- Ingreso Bruto -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                     <div class="flex justify-between items-start mb-4">
-                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-500">Ingreso Bruto</div>
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fas fa-cash-register"></i></div>
+                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400">Ingresos Totales (Taller)</div>
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center"><i class="fas fa-cash-register"></i></div>
                     </div>
-                    <div class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ s.total_facturado | currency:'ARS':'symbol':'1.0-0' }}</div>
-                    <div class="text-xs text-gray-400 mt-2 font-medium">Facturación total al cliente</div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">{{ formatARS(s.total_facturado) }}</div>
+                    <div class="text-xs text-gray-500 mt-2 font-medium">Equipos cobrados en caja</div>
                 </div>
 
                 <!-- Costo de Insumos -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+                <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
                     <div class="flex justify-between items-start mb-4">
-                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-500">Costo Insumos</div>
-                        <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center"><i class="fas fa-box-open"></i></div>
+                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400">Costo Insumos</div>
+                        <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 flex items-center justify-center"><i class="fas fa-microchip"></i></div>
                     </div>
-                    <div class="text-3xl font-black text-rose-500 tracking-tight">-{{ s.costo_repuestos | currency:'ARS':'symbol':'1.0-0' }}</div>
-                    <div class="text-xs text-gray-400 mt-2 font-medium">Inversión en repuestos utilizados</div>
+                    <div class="text-3xl font-black text-rose-500 tracking-tighter">-{{ formatARS(s.costo_repuestos) }}</div>
+                    <div class="text-xs text-gray-500 mt-2 font-medium">Inversión en repuestos utilizados</div>
                 </div>
 
                 <!-- Ganancia Neta -->
-                <div class="bg-gray-900 rounded-3xl p-6 shadow-xl relative overflow-hidden group border border-emerald-900/50">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-                    <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                <div class="bg-gray-900 dark:bg-black rounded-3xl p-6 shadow-xl relative overflow-hidden border border-emerald-900/50">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
                     <div class="flex justify-between items-start mb-4">
-                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-400">Ganancia Neta (Profit)</div>
-                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fas fa-sack-dollar text-xl relative z-10"></i></div>
+                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-400 flex items-center gap-1">
+                            Ganancia Real (Técnica)
+                            <div class="tooltip tooltip-info" data-tip="Lógica validada: Solo servicio técnico">
+                                <i class="fas fa-info-circle text-indigo-400 cursor-help"></i>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fas fa-hand-holding-usd text-lg"></i></div>
                     </div>
-                    <div class="text-4xl font-black text-white tracking-tighter relative z-10">{{ s.ganancia_neta | currency:'ARS':'symbol':'1.0-0' }}</div>
-                    <div class="flex items-center gap-2 mt-2 relative z-10">
-                        <span class="text-xs text-emerald-400 font-bold bg-emerald-500/20 px-2 py-0.5 rounded-lg border border-emerald-500/30">
-                            Margen: {{ s.margen_porcentaje | number:'1.0-1' }}%
+                    <div class="text-4xl font-black text-white tracking-tighter">{{ formatARS(s.ganancia_neta) }}</div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs text-emerald-400 font-bold bg-emerald-500/20 px-2 py-0.5 rounded-lg">
+                            Margen: {{ s.margen_porcentaje | number:'1.0-0' }}%
                         </span>
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Líquido</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black italic">Neto Líquido</span>
                     </div>
                 </div>
 
                 <!-- Ticket Promedio -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-purple-500"></div>
+                <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
                     <div class="flex justify-between items-start mb-4">
-                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-500">Ticket Promedio Bruto</div>
-                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fas fa-receipt"></i></div>
+                        <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400">Ticket Promedio</div>
+                        <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 flex items-center justify-center"><i class="fas fa-receipt"></i></div>
                     </div>
-                    <div class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ s.ticket_promedio | currency:'ARS':'symbol':'1.0-0' }}</div>
-                    <div class="text-xs text-gray-400 mt-2 font-medium">Sobre {{ s.total_reparaciones }} equipos reparados</div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">{{ formatARS(s.ticket_promedio) }}</div>
+                    <div class="text-xs text-gray-500 mt-2 font-medium">Sobre {{ s.total_reparaciones }} reparaciones finalizadas</div>
                 </div>
-
             </div>
 
-            <!-- Nuevos KPIs de Taller Avanzados -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                
-                <!-- Productos y Servicios Vendidos (Venta Total) -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center relative overflow-hidden">
-                     <div class="absolute right-0 top-0 w-16 h-16 bg-blue-500/5 rounded-bl-full"></div>
-                     <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 mb-1">Venta Total Global</div>
-                     <div class="text-2xl font-black text-blue-600 dark:text-blue-400">{{ s.venta_total_global | currency:'ARS':'symbol':'1.0-0' }}</div>
-                     <div class="text-[10px] text-gray-400 mt-1 font-medium">Reparaciones + Ventas (Órdenes)</div>
-                </div>
-
-                <!-- Equipos Recibidos / Entregados -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center relative overflow-hidden">
-                     <div class="absolute right-0 top-0 w-16 h-16 bg-purple-500/5 rounded-bl-full"></div>
-                     <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 mb-1">Recibidos / Entregados</div>
-                     <div class="text-2xl font-black text-purple-600 dark:text-purple-400">
-                         {{ s.equipos_recibidos }} <span class="text-gray-300 dark:text-gray-600">/</span> {{ s.equipos_entregados }}
-                     </div>
-                     <div class="text-[10px] text-gray-400 mt-1 font-medium">Flujo de taller activo</div>
-                </div>
-
-                <!-- Garantías Efectivas -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center relative overflow-hidden">
-                     <div class="absolute right-0 top-0 w-16 h-16 bg-emerald-500/5 rounded-bl-full"></div>
-                     <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 mb-1">Garantías Efectivas</div>
-                     <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400">{{ s.garantias_efectivas }}</div>
-                     <div class="text-[10px] text-gray-400 mt-1 font-medium">Re-ingresos por garantía</div>
-                </div>
-
-                <!-- Equipos Espera Ingreso -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center relative overflow-hidden">
-                     <div class="absolute right-0 top-0 w-16 h-16 bg-amber-500/5 rounded-bl-full"></div>
-                     <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 mb-1">En Espera / Pendiente</div>
-                     <div class="text-2xl font-black text-amber-600 dark:text-amber-400">{{ s.equipos_espera }}</div>
-                     <div class="text-[10px] text-gray-400 mt-1 font-medium">Equipos sin diagnóstico o espera rep.</div>
-                </div>
-
-                <!-- Devoluciones -->
-                <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center relative overflow-hidden">
-                     <div class="absolute right-0 top-0 w-16 h-16 bg-rose-500/5 rounded-bl-full"></div>
-                     <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 mb-1">Devoluciones ( {{ s.devoluciones_cantidad }} )</div>
-                     <div class="text-2xl font-black text-rose-600 dark:text-rose-400">{{ s.devoluciones_monto | currency:'ARS':'symbol':'1.0-0' }}</div>
-                     <div class="text-[10px] text-gray-400 mt-1 font-medium">Capital devuelto total</div>
-                </div>
-
-            </div>
-
-            <!-- Panel Secundario -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Upsell Vidrio Métrica Especial -->
-                <div class="bg-indigo-50 dark:bg-indigo-900/10 rounded-3xl p-6 border border-indigo-100 dark:border-indigo-900/30 flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -right-6 -top-6 text-indigo-500/10 group-hover:text-indigo-500/20 transition-colors transform group-hover:rotate-12 duration-500">
-                        <i class="fas fa-mobile-alt text-9xl"></i>
+            <!-- Gráfico de Rendimiento Mensual -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 mb-8 overflow-hidden group">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                    <div>
+                        <h3 class="text-lg font-black text-gray-900 dark:text-white">Rendimiento Mensual</h3>
+                        <p class="text-xs text-gray-500">Comparativa histórica de ingresos vs. costos operativos</p>
                     </div>
-                    
-                    <div class="relative z-10">
-                        <div class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 px-3 py-1 rounded-lg border border-indigo-200 dark:border-indigo-800 mb-4">
-                            <i class="fas fa-star text-amber-500"></i>
-                            Rendimiento Estrategia Upsell
+                    <div class="flex items-center gap-5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-indigo-600"></span>
+                            <span class="text-[10px] font-black uppercase text-gray-500">Ingresos</span>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-tight">Venta Adicional de Vidrios Templados vía App</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <span class="text-[10px] font-black uppercase text-gray-500">Costos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Container with dynamic scaling -->
+                <div class="relative pt-8 pb-4">
+                    <!-- Grid Lines (Horizontal Background Axis) -->
+                    <div class="absolute inset-x-0 top-8 bottom-12 flex flex-col justify-between pointer-events-none px-2 md:px-6">
+                        <div class="border-t border-gray-300 dark:border-gray-600 w-full"></div>
+                        <div class="border-t border-gray-200 dark:border-gray-700/50 w-full"></div>
+                        <div class="border-t border-gray-200 dark:border-gray-700/50 w-full"></div>
+                        <div class="border-t border-gray-200 dark:border-gray-700/50 w-full"></div>
+                        <div class="border-t border-gray-400 dark:border-gray-500 w-full opacity-30"></div>
+                    </div>
+
+                    <div class="relative flex items-end justify-between h-64 md:h-80 gap-2 md:gap-8 px-2 md:px-6 z-10">
+                        @for(month of s.monthly_data.slice().reverse(); track month.mes) {
+                            <div class="flex-1 flex flex-col items-center group/bar relative">
+                                <!-- Bars Container -->
+                                <div class="w-full flex items-end justify-center gap-1.5 md:gap-3 h-full pb-2">
+                                    <!-- Revenue Bar -->
+                                    <div class="w-2.5 md:w-5 bg-indigo-600 rounded-t-lg transition-all duration-500 hover:brightness-110 shadow-lg shadow-indigo-600/20" 
+                                         [style.height.%]="getPercentage(month.ingreso, maxMonthlyValue())">
+                                        <div class="opacity-0 group-hover/bar:opacity-100 absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] py-1.5 px-3 rounded-xl font-bold whitespace-nowrap z-50 shadow-xl transition-all pointer-events-none">
+                                            Ingreso: {{ formatARS(month.ingreso) }}
+                                        </div>
+                                    </div>
+                                    <!-- Cost Bar -->
+                                    <div class="w-2.5 md:w-5 bg-rose-500 rounded-t-lg transition-all duration-500 hover:brightness-110 shadow-lg shadow-rose-500/20" 
+                                         [style.height.%]="getPercentage(month.costo, maxMonthlyValue())">
+                                         <div class="opacity-0 group-hover/bar:opacity-100 absolute -top-20 left-1/2 -translate-x-1/2 bg-rose-600 text-white text-[10px] py-1.5 px-3 rounded-xl font-bold whitespace-nowrap z-50 shadow-xl transition-all pointer-events-none">
+                                            Insumos: {{ formatARS(month.costo) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter">{{ month.label }}</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Secundario (Venta Global & Upsell) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <div class="bg-indigo-600 dark:bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden group">
+                     <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                     <div class="relative z-10">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-2">Ingresos Consolidados (Global)</div>
+                        <h3 class="text-4xl font-black mb-2">{{ formatARS(s.venta_total_global) }}</h3>
+                        <p class="text-xs text-indigo-100 font-medium">Facturación sumada de Taller + Tienda Online</p>
                         
-                        <div class="mt-6 flex flex-col gap-4">
+                        <div class="mt-8 flex items-center gap-10">
                             <div>
-                                <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Equipos con Vidrio</div>
-                                <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400">{{ s.reparaciones_vidrio }} <span class="text-base text-gray-400 font-medium tracking-normal">+{{(s.reparaciones_vidrio / (s.total_reparaciones || 1) * 100) | number:'1.0-0'}}% conversión</span></div>
+                                <div class="text-[10px] font-black uppercase text-indigo-300 mb-1">Equipos Entregados</div>
+                                <div class="text-2xl font-black">{{ s.equipos_entregados }}</div>
                             </div>
-                            
                             <div>
-                                <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Ingreso Extra Bruto (Estimado)</div>
-                                <div class="text-2xl font-black text-gray-900 dark:text-white">{{ s.ingreso_extra_vidrio | currency:'ARS':'symbol':'1.0-0' }}</div>
+                                <div class="text-[10px] font-black uppercase text-indigo-300 mb-1">Reparaciones con Vidrio</div>
+                                <div class="text-2xl font-black">{{ s.reparaciones_vidrio }} <span class="text-xs text-indigo-400 ml-1">+{{ s.ingreso_extra_vidrio | currency:'ARS':'symbol':'1.0-0' }}</span></div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                     </div>
+                 </div>
 
-                <!-- Tabla de Rendimiento Mensual Simple (Angular Native) -->
-                <div class="lg:col-span-2 bg-white dark:bg-gray-800/50 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
-                    <h3 class="text-[10px] font-black tracking-widest uppercase text-gray-500 mb-6 flex items-center gap-2">
-                         <i class="fas fa-chart-line text-emerald-500"></i> Ratio de Gastos sobre Ingresos (Por Mes)
+                 <!-- Recent Activity / Monthly Stats Table -->
+                 <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="fas fa-history text-indigo-600"></i> Historial de Rentabilidad
                     </h3>
-                    
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-[10px] uppercase font-bold tracking-widest text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                                    <th class="pb-3">Período</th>
-                                    <th class="pb-3 text-right text-blue-500">Ingreso Bruto</th>
-                                    <th class="pb-3 text-right text-rose-500">Costo Repuestos</th>
-                                    <th class="pb-3 text-right text-emerald-500">GANANCIA NETA</th>
+                            <thead class="text-[10px] uppercase font-black text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                                <tr>
+                                    <th class="pb-3 px-2">Período</th>
+                                    <th class="pb-3 text-right">Ingresos</th>
+                                    <th class="pb-3 text-right">Insumos</th>
+                                    <th class="pb-3 text-right">Ganancia</th>
                                     <th class="pb-3 text-right">Margen</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50 dark:divide-gray-800/40 text-sm font-medium">
-                                @for(month of s.monthly_data; track month.mes) {
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-default">
-                                        <td class="py-4 text-gray-900 dark:text-white font-bold">{{ month.mes }}</td>
-                                        <td class="py-4 text-right text-gray-700 dark:text-gray-300 font-mono">{{ month.ingreso | currency:'ARS':'symbol':'1.0-0' }}</td>
-                                        <td class="py-4 text-right text-rose-500 font-mono">-{{ month.costo | currency:'ARS':'symbol':'1.0-0' }}</td>
-                                        <td class="py-4 text-right text-emerald-600 dark:text-emerald-400 font-mono font-black">{{ month.ganancia | currency:'ARS':'symbol':'1.0-0' }}</td>
-                                        <td class="py-4 text-right text-gray-500 font-mono">
-                                            {{ (month.ganancia / (month.ingreso || 1) * 100) | number:'1.0-1' }}%
+                            <tbody class="text-xs font-bold text-gray-700 dark:text-gray-300">
+                                @for(m of s.monthly_data; track m.mes) {
+                                    <tr class="border-b border-gray-50 dark:border-gray-800/40 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                                        <td class="py-4 px-2 font-black text-gray-900 dark:text-white uppercase">{{ m.label }}</td>
+                                        <td class="py-4 text-right text-indigo-600">{{ formatARS(m.ingreso) }}</td>
+                                        <td class="py-4 text-right text-rose-500">-{{ formatARS(m.costo) }}</td>
+                                        <td class="py-4 text-right text-emerald-600">{{ formatARS(m.ganancia) }}</td>
+                                        <td class="py-4 text-right">
+                                            <span class="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px]">
+                                                {{ (m.ganancia / (m.ingreso || 1) * 100) | number:'1.0-0' }}%
+                                            </span>
                                         </td>
-                                    </tr>
-                                }
-                                @if(s.monthly_data.length === 0) {
-                                    <tr>
-                                        <td colspan="5" class="py-8 text-center text-gray-400 italic font-normal">No hay datos para estructurar este período</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
-                </div>
+                 </div>
             </div>
 
         }
     </div>
-  `
+  `,
+  styleUrl: './repair-stats.component.css'
 })
 export class AdminRepairStatsComponent implements OnInit {
     private statsService = inject(RepairStatsService);
+    private customerService = inject(CustomerService);
+    private auth = inject(AuthService);
+    private tenantService = inject(TenantService);
 
     period = signal('this_month');
     stats = signal<RepairStatsDto | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    downloadingCsv = signal(false);
+
+    // Computed to find the maximum value among all months to scale the chart bars relatively
+    maxMonthlyValue = computed(() => {
+        const data = this.stats()?.monthly_data || [];
+        if (data.length === 0) return 100;
+        return Math.max(...data.map(m => Math.max(m.ingreso, m.costo)));
+    });
 
     constructor() {
         effect(() => {
             const p = this.period();
-            this.loadStats(p); // Reload whenever the period changes
+            this.loadStats(p);
         });
     }
 
@@ -254,5 +278,77 @@ export class AdminRepairStatsComponent implements OnInit {
                 this.loading.set(false);
             }
         });
+    }
+
+    formatARS(amount: number): string {
+        if (amount === undefined || amount === null) return 'ARS 0';
+        const formatted = new Intl.NumberFormat('es-AR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+        return `ARS ${formatted}`;
+    }
+
+    getPercentage(value: number, total: number): number {
+        if (!total || !value) return 0;
+        const p = (value / total) * 100;
+        return p > 100 ? 100 : p;
+    }
+
+    async downloadClientsCsv() {
+        if (this.downloadingCsv()) return;
+        this.downloadingCsv.set(true);
+        try {
+            const supabase = this.auth.getSupabaseClient();
+            const tenantId = this.tenantService.getTenantId();
+            const profiles = await this.customerService.getAll();
+            const { data: repairs } = await supabase.from('repairs').select('customer_id, customer_name, customer_phone').eq('tenant_id', tenantId);
+            const { data: orders } = await supabase.from('orders').select('customer_name, customer_email, customer_phone').eq('tenant_id', tenantId);
+
+            const clientMap = new Map<string, any>();
+            profiles.forEach(p => {
+                const name = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
+                const key = (p.email || p.phone || name).toLowerCase().replace(/\s/g, '');
+                if (key) clientMap.set(key, { name, email: p.email, phone: p.phone, dni: p.dni, address: p.address });
+            });
+            (repairs || []).forEach(r => {
+                const key = (r.customer_phone || r.customer_name || '').toLowerCase().replace(/\s/g, '');
+                if (key && !clientMap.has(key)) clientMap.set(key, { name: r.customer_name, email: '', phone: r.customer_phone, dni: '', address: '' });
+            });
+            (orders || []).forEach(o => {
+                const key = (o.customer_email || o.customer_phone || o.customer_name || '').toLowerCase().replace(/\s/g, '');
+                if (key && !clientMap.has(key)) clientMap.set(key, { name: o.customer_name, email: o.customer_email, phone: o.customer_phone, dni: '', address: '' });
+            });
+
+            const data = Array.from(clientMap.values());
+            if (data.length === 0) {
+                alert('No hay clientes para exportar.');
+                return;
+            }
+
+            const headers = ['Nombre Completo', 'DNI', 'Teléfono', 'Email', 'Dirección'];
+            const rows = data.map((c: any) => [
+                `"${(c.name || '').replace(/"/g, '""')}"`,
+                `"${(c.dni || '').replace(/"/g, '""')}"`,
+                `"${(c.phone || '').replace(/"/g, '""')}"`,
+                `"${(c.email || '').replace(/"/g, '""')}"`,
+                `"${(c.address || '').replace(/"/g, '""')}"`
+            ].join(','));
+            
+            const csvContent = [headers.join(','), ...rows].join('\n');
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Arecofix_Master_Clientes_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e: any) {
+            console.error('Error descargando CSV:', e);
+            alert('Ocurrió un error al generar el CSV de clientes.');
+        } finally {
+            this.downloadingCsv.set(false);
+        }
     }
 }

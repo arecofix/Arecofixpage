@@ -63,7 +63,7 @@ export class TrackingPage implements OnInit {
     recommendedAccessories = signal<any[]>([]);
     buyingAccessory = signal<string | null>(null);
 
-    baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://arecofix.com.ar';
+    baseUrl = environment.baseUrl;
 
     qrCodeUrl = computed(() => {
         const r = this.repair();
@@ -133,29 +133,6 @@ export class TrackingPage implements OnInit {
             imageUrl: imageUrl,
             type: 'article'
         });
-
-        this.setWhatsAppOgTags(imageUrl, `Tu equipo está en etapa de ${statusName}.`, `${statusName} - Tu ${r.device_model}`);
-    }
-
-    private setWhatsAppOgTags(imageUrl: string, description: string, title: string): void {
-        if (typeof document === 'undefined') return;
-        const meta = document.head;
-        const setOrCreate = (property: string, content: string) => {
-            let el = meta.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
-            if (!el) {
-                el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el);
-            }
-            el.setAttribute('content', content);
-        };
-        const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `${window.location.host === 'localhost:4200' ? 'http://localhost:4200' : 'https://arecofix.com.ar'}/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
-        setOrCreate('og:title', `${title} | Arecofix`);
-        setOrCreate('og:image', absoluteImageUrl);
-        setOrCreate('og:image:secure_url', absoluteImageUrl);
-        setOrCreate('og:image:width', '1200');
-        setOrCreate('og:image:height', '630');
-        setOrCreate('og:description', description);
-        setOrCreate('og:site_name', 'Arecofix');
-        setOrCreate('og:type', 'article');
     }
 
     // Removed old calculation methods as they are now in the logic layer
@@ -312,7 +289,9 @@ export class TrackingPage implements OnInit {
 
     async loadRecommendations(code: string) {
         try {
-            const { data, error } = await this.trackingService.getRecommendedAccessories(code);
+            const r = this.repair();
+            const brand = r?.device_model ? r.device_model.split(' ')[0] : 'generic';
+            const { data, error } = await this.trackingService.getRecommendedAccessories(code, brand);
             if (!error && data) {
                 this.recommendedAccessories.set(data as any[]);
             }

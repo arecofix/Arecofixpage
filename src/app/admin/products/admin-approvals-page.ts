@@ -1,12 +1,9 @@
 import { Component, inject, OnInit, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '@app/core/services/auth.service';
-import { TenantService } from '@app/core/services/tenant.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
-import { BranchService } from '@app/core/services/branch.service';
 import { NotificationService } from '@app/core/services/notification.service';
-import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
+import { AdminProductService } from './services/admin-product.service';
 
 @Component({
   selector: 'app-admin-approvals-page',
@@ -16,9 +13,7 @@ import { ProductRepository } from '@app/features/products/domain/repositories/pr
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminApprovalsPage implements OnInit {
-  private auth = inject(AuthService);
-  private tenantService = inject(TenantService);
-  private productRepo = inject(ProductRepository);
+  private productService = inject(AdminProductService);
   private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -33,21 +28,8 @@ export class AdminApprovalsPage implements OnInit {
   async loadPending() {
     this.loading.set(true);
     try {
-      const supabase = this.auth.getSupabaseClient();
-      const tenantId = this.tenantService.getTenantId();
-
-      // Buscamos productos inactivos, que tengan un branch_id (creados por staff de sucursal)
-      const { data, error } = await supabase
-        .from('products')
-        .select(`*, branches(name)`)
-        .eq('is_active', false)
-        .eq('tenant_id', tenantId)
-        .not('branch_id', 'is', null)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      
-      this.pendingProducts.set(data as any[]);
+      const data = await this.productService.getPendingApprovals();
+      this.pendingProducts.set(data);
     } catch (err: any) {
       this.error.set(err.message);
     } finally {
@@ -60,16 +42,7 @@ export class AdminApprovalsPage implements OnInit {
     if(!confirm(`¿Aprobar el producto ${product.name} y agregarlo al catálogo activo?`)) return;
 
     try {
-      const supabase = this.auth.getSupabaseClient();
-      
-      // Aprueba, lo hace activo y lo hace global también para que la central lo ofrezca
-      const { error } = await supabase
-        .from('products')
-        .update({ is_active: true, is_global: true })
-        .eq('id', product.id);
-
-      if (error) throw error;
-      
+      await this.productService.approveProduct(product.id);
       this.notificationService.showSuccess(`Producto ${product.name} aprobado existosamente.`);
       await this.loadPending();
     } catch (err: any) {
@@ -81,15 +54,7 @@ export class AdminApprovalsPage implements OnInit {
     if(!confirm(`¿Rechazar (eliminar) la solicitud del producto ${product.name}?`)) return;
 
     try {
-      const supabase = this.auth.getSupabaseClient();
-      
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', product.id);
-
-      if (error) throw error;
-      
+      await this.productService.rejectProduct(product.id);
       this.notificationService.showInfo(`Producto ${product.name} rechazado.`);
       await this.loadPending();
     } catch (err: any) {

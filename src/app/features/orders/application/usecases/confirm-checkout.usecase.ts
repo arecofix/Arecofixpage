@@ -1,11 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, map, switchMap } from 'rxjs';
-import { Order, ProductoPedido } from '../../domain/entities/order.entity';
+import { Observable, map, switchMap, from } from 'rxjs';
+import { Order, OrderItem } from '../../domain/entities/order.entity';
 import { OrderRepository } from '../../domain/repositories/order.repository';
-import { MessageRepository } from '../../../messages/domain/repositories/message.repository'; // Cross-boundary import or shared
-import { CrmMessage } from '../../../messages/domain/entities/crm-message.entity';
-import { SupabaseOrderRepository } from '../../infrastructure/repositories/supabase-order.repository';
-import { SupabaseMessageRepository } from '../../../messages/infrastructure/repositories/supabase-message.repository';
+// Using a generic message interface or cross-dependency check
+import { MessageRepository } from '@app/features/messages/domain/repositories/message.repository';
+import { CrmMessage } from '@app/features/messages/domain/entities/crm-message.entity';
 
 // Basic Product Interface needed for Checkout
 interface CheckoutProduct {
@@ -23,12 +22,8 @@ interface CartItem {
   providedIn: 'root'
 })
 export class ConfirmCheckoutUseCase {
-  // Relaxing strict DI for simplicity in this specific "feature-sliced" like structure, 
-  // but ideally we'd use tokens for Repository Interfaces.
-  constructor(
-      private orderRepo: SupabaseOrderRepository, 
-      private messageRepo: SupabaseMessageRepository
-  ) {}
+  private orderRepo = inject(OrderRepository);
+  private messageRepo = inject(MessageRepository);
 
   execute(
       params: { 
@@ -38,8 +33,8 @@ export class ConfirmCheckoutUseCase {
       }
   ): Observable<Order> {
     
-    // 1. Prepare Order Entity
-    const orderItems: ProductoPedido[] = params.items.map(i => ({
+    // 1. Prepare Order Items
+    const orderItems: OrderItem[] = params.items.map(i => ({
         product_id: i.product.id,
         product_name: i.product.name,
         quantity: i.quantity,
@@ -47,34 +42,36 @@ export class ConfirmCheckoutUseCase {
         subtotal: i.product.price * i.quantity
     }));
 
-    const newOrder = new Order({
-        clienteInfo: {
-            name: params.customer.name,
-            email: params.customer.email,
-            phone: params.customer.phone,
-            address: params.customer.address
-        },
+    // 2. Prepare Order Object (Using interface directly)
+    const newOrder: Order = {
+        customer_name: params.customer.name,
+        customer_email: params.customer.email,
+        customer_phone: params.customer.phone,
+        shipping_address: params.customer.address,
         items: orderItems,
         total: params.total,
-        status: 'pending' // Requirement: Default Status
-    });
+        total_amount: params.total,
+        status: 'pending',
+        subtotal: params.total, // Simplified total=subtotal if no breakdown
+        tax: 0,
+        discount: 0
+    };
 
-    // 2. Prepare CRM Message Entity
-    const crmMessage = new CrmMessage({
+    // 3. Prepare CRM Message
+    const crmMessage: CrmMessage = {
         name: params.customer.name,
         email: params.customer.email,
         phone: params.customer.phone,
         address: params.customer.address,
         notes: `Pedido Web. Notas: ${params.customer.notes || '-'}`,
         date: new Date()
-    });
+    };
 
-    // 3. Execute both. Order is critical, Message is important but failure shouldn't necessarily block order (or maybe it should?)
-    // We will chain them.
+    // 4. Save both. Sequence: Order -> Message.
     return this.orderRepo.createOrder(newOrder).pipe(
         switchMap(createdOrder => {
-            return this.messageRepo.saveMessage(crmMessage).pipe(
-                map(() => createdOrder) // Return the order result
+            return from(this.messageRepo.saveMessage(crmMessage)).pipe(
+                map(() => createdOrder)
             );
         })
     );

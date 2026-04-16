@@ -9,13 +9,19 @@ import { LoggerService } from '@app/core/services/logger.service';
  * Category Repository
  * Handles all database operations for categories
  */
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+
+/**
+ * Category Repository
+ * Handles all database operations for categories
+ */
 @Injectable({ providedIn: 'root' })
 export class SupabaseCategoryRepository extends BaseRepository<Category> implements CategoryRepository {
     protected tableName = 'categories';
 
     constructor() {
-        const authService = inject(AuthService);
+        const supabase = inject(SUPABASE_CLIENT);
         const logger = inject(LoggerService);
-        super(authService.getSupabaseClient(), logger);
+        super(supabase, logger);
     }
 }

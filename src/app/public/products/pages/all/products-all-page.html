@@ -276,9 +276,9 @@
                     </div>
 
                     <div class="flex items-baseline gap-3 mb-6">
-                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.price | currency }}</span>
+                        <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{{ p.currency === 'USD' ? 'USD ' : '$' }}{{ p.price | number:'1.0-0' }}</span>
                         @if(p.regular_price && p.regular_price > p.price) {
-                            <span class="text-lg text-gray-400 line-through">{{ p.regular_price | currency }}</span>
+                            <span class="text-lg text-gray-400 line-through">{{ p.currency === 'USD' ? 'USD ' : '$' }}{{ p.regular_price | number:'1.0-0' }}</span>
                         }
                     </div>
                     

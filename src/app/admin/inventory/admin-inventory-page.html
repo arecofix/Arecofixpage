@@ -9,8 +9,11 @@
       <p class="text-sm text-gray-500 dark:text-gray-400">Monitorea niveles de stock y valor de inventario.</p>
     </div>
 
-    <div class="flex gap-2 w-full md:w-auto">
-      <a routerLink="/admin/purchases/new" class="btn btn-primary w-full md:w-auto shadow-lg shadow-primary/20">
+    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+      <a routerLink="/admin/products/new" class="btn btn-primary bg-linear-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white border-none rounded-xl shadow-lg shadow-green-500/20 w-full sm:w-auto">
+        <i class="fas fa-plus mr-2"></i> Nuevo Producto
+      </a>
+      <a routerLink="/admin/purchases/new" class="btn btn-outline border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 w-full sm:w-auto">
         <i class="fas fa-cart-plus mr-2"></i> Registrar Compra
       </a>
     </div>
@@ -23,30 +26,28 @@
         <div class="stat-figure text-primary">
           <i class="fas fa-cube text-3xl opacity-50"></i>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider">Total Items</div>
-        <div class="stat-value text-primary">{{ stats().total }}</div>
+        <div class="stat-title text-xs uppercase tracking-wider">Productos Totales</div>
+        <div class="stat-value text-primary">{{ totalItems() }}</div>
       </div>
     </div>
 
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
-      [class.border-error]="stats().outOfStock > 0">
+    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
       <div class="stat">
         <div class="stat-figure text-error">
           <i class="fas fa-exclamation-circle text-3xl opacity-50"></i>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider text-error">Agotados</div>
-        <div class="stat-value text-error">{{ stats().outOfStock }}</div>
+        <div class="stat-title text-xs uppercase tracking-wider text-error">En esta vista</div>
+        <div class="stat-value text-error">{{ products().length }}</div>
       </div>
     </div>
 
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
-      [class.border-warning]="stats().lowStock > 0">
+    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
       <div class="stat">
         <div class="stat-figure text-warning">
           <i class="fas fa-thermometer-quarter text-3xl opacity-50"></i>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider text-warning">Stock Bajo</div>
-        <div class="stat-value text-warning">{{ stats().lowStock }}</div>
+        <div class="stat-title text-xs uppercase tracking-wider text-warning">Página</div>
+        <div class="stat-value text-warning">{{ currentPage() }} / {{ pagesCount() }}</div>
       </div>
     </div>
 
@@ -55,9 +56,9 @@
         <div class="stat-figure text-success">
           <i class="fas fa-dollar-sign text-3xl opacity-50"></i>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider">Valor Total</div>
-        <div class="stat-value text-success text-2xl">{{ stats().totalValue | currency:'ARS':'symbol':'1.0-0' }}</div>
-        <div class="stat-desc">Estimado en precio venta</div>
+        <div class="stat-title text-xs uppercase tracking-wider">Valor Vista</div>
+        <div class="stat-value text-success text-2xl">{{ pageValue() | currency:'ARS':'symbol':'1.0-0' }}</div>
+        <div class="stat-desc">Subtotal de lo visualizado</div>
       </div>
     </div>
   </div>
@@ -122,7 +123,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (product of paginatedProducts(); track product.id) {
+                  @for (product of products(); track product.id) {
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                       <td>
                         <div class="flex items-center gap-4">
@@ -174,7 +175,7 @@
 
             <!-- Mobile Cards -->
             <div class="md:hidden grid grid-cols-1 gap-4">
-              @for (product of paginatedProducts(); track product.id) {
+              @for (product of products(); track product.id) {
                 <div class="card bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
                   <div class="card-body p-4 flex-row gap-4">
                     <div class="avatar">
@@ -204,14 +205,14 @@
             </div>
 
             <!-- Pagination -->
-            @if (filteredProducts().length > 0) {
+            @if (products().length > 0) {
               <div class="mt-8 flex justify-center pb-8">
-                <pagination [pages]="totalPages()" [currentPage]="currentPage()" />
+                <pagination [pages]="pagesCount()" [currentPage]="currentPage()" (pageChange)="onPageChange($any($event))" />
               </div>
             }
 
             <!-- Empty State -->
-            @if (filteredProducts().length === 0) {
+            @if (products().length === 0) {
               <div class="text-center py-20 opacity-50">
                 <i class="fas fa-search text-4xl mb-3"></i>
                 <p>No se encontraron productos con estos filtros.</p>

@@ -21,10 +21,14 @@ export interface RepairPart {
     product_id: string;
     quantity: number;
     unit_price_at_time: number;
+    unit_cost_at_time: number;
     cost_at_time: number;
     created_at?: string;
     // Helper fields for UI
     product_name?: string;
+    // UI Helpers
+    name?: string;
+    current_stock?: number;
 }
 
 /**
@@ -60,6 +64,7 @@ export interface Repair {
     readonly received_by?: string;
     readonly assigned_technician_id?: string;
     readonly upsell_vidrio?: boolean;
+    readonly costo_repuesto?: number;
     
     // Additional fields from form
     readonly checklist?: RepairChecklist;
@@ -104,6 +109,8 @@ export interface CreateRepairDto {
     assigned_technician_id?: string;
     current_status_id?: number;
     upsell_vidrio?: boolean;
+    costo_repuesto?: number;
+    parts?: RepairPart[];
 }
 
 /**
@@ -118,4 +125,5 @@ export interface UpdateRepairDto extends Partial<CreateRepairDto> {
     completed_at?: string;
     parts?: RepairPart[];
     upsell_vidrio?: boolean;
+    costo_repuesto?: number;
 }

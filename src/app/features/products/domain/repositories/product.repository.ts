@@ -44,4 +44,8 @@ export abstract class ProductRepository {
     abstract bulkUpdateCategory(ids: string[], categoryId: string): Observable<void>;
     abstract bulkDelete(ids: string[]): Observable<void>;
     abstract search(query: string, categoryId?: string): Observable<Product[]>;
+    abstract getPendingApprovals(): Observable<Product[]>;
+    abstract approveProduct(id: string): Observable<void>;
+    abstract rejectProduct(id: string): Observable<void>;
+    abstract getPendingApprovalsCount(): Observable<number>;
 }

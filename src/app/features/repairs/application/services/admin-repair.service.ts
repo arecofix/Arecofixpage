@@ -4,6 +4,8 @@ import { Repair, CreateRepairDto, UpdateRepairDto, RepairStatus, RepairPart } fr
 import { Observable, firstValueFrom } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
+import { CustomerService } from '@app/features/customers/application/services/customer.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +14,8 @@ export class AdminRepairService {
     private repository = inject(RepairRepository);
     private auth = inject(AuthService);
     private invoiceService = inject(InvoiceService);
+    private branchContextService = inject(BranchContextService);
+    private customerService = inject(CustomerService);
 
     // Status logic
     private readonly STATUS_DELIVERED = RepairStatus.DELIVERED;
@@ -21,14 +25,30 @@ export class AdminRepairService {
         return firstValueFrom(this.repository.getById(id));
     }
 
-    async getAdminList(limit?: number, offset?: number): Promise<Repair[]> {
+    async getAdminList(limit?: number, offset?: number, searchTerm?: string): Promise<Repair[]> {
+        const user = this.auth.getCurrentUser();
+        if (!user) throw new Error('Usuario no autenticado');
+ 
+        const profile = await this.auth.getUserProfile(user.id);
+        
+        // Priority: 
+        // 1. Global context from sidebar (SuperAdmins)
+        // 2. Fixed branch from profile (Staff)
+        const contextBranchId = this.branchContextService.getBranchId();
+        const branch_id = contextBranchId || profile?.branch_id;
+ 
+        return firstValueFrom(this.repository.getAdminList({ branch_id, limit, offset, searchTerm }));
+    }
+
+    async getWorkshopSummary(): Promise<any> {
         const user = this.auth.getCurrentUser();
         if (!user) throw new Error('Usuario no autenticado');
 
         const profile = await this.auth.getUserProfile(user.id);
-        const branch_id = profile?.branch_id;
+        const contextBranchId = this.branchContextService.getBranchId();
+        const branch_id = contextBranchId || profile?.branch_id;
 
-        return firstValueFrom(this.repository.getAdminList({ branch_id, limit, offset }));
+        return firstValueFrom(this.repository.getWorkshopSummary(branch_id));
     }
 
     async delete(id: string): Promise<void> {
@@ -42,8 +62,35 @@ export class AdminRepairService {
         const profile = await this.auth.getUserProfile(user.id);
         if (!profile) throw new Error('Perfil no encontrado');
 
+        let customerId = dto.customer_id;
+
+        // [LOGIC] Silent Client Creation
+        if (!customerId && dto.customer_name) {
+            try {
+                const nameParts = dto.customer_name.trim().split(' ');
+                const fn = nameParts[0] || '';
+                const ln = nameParts.slice(1).join(' ') || '';
+
+                const newClient = await this.customerService.create({
+                    first_name: fn,
+                    last_name: ln,
+                    email: (dto as any).customer_email || null,
+                    phone: dto.customer_phone || null,
+                    address: null,
+                    dni: (dto as any).customer_dni || null
+                });
+
+                if (newClient && newClient.id) {
+                    customerId = newClient.id;
+                }
+            } catch (clientErr) {
+                console.warn('[AdminRepairService] Failed to create client automatically:', clientErr);
+            }
+        }
+
         const payload: any = {
             ...dto,
+            customer_id: customerId,
             branch_id: profile.branch_id,
             received_by: user.id,
             assigned_technician_id: dto.assigned_technician_id || user.id,

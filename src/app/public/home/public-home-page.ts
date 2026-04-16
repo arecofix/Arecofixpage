@@ -11,6 +11,13 @@ import { environment } from '../../../environments/environment';
 import { ContactService } from '@app/core/services/contact.service';
 
 import { HOME_CONTENT, HomeContent, QuoteForm } from './public-home.content';
+import { HomeServicesComponent } from './components/home-services.component';
+import { HomeTechStackComponent } from './components/home-tech-stack.component';
+import { HomeMethodologyComponent } from './components/home-methodology.component';
+import { HomeIndustriesComponent } from './components/home-industries.component';
+import { HomePillarsComponent } from './components/home-pillars.component';
+import { HomeMetricsComponent } from './components/home-metrics.component';
+import { HomeRemoteWorkComponent } from './components/home-remote-work.component';
 
 @Component({
   selector: 'app-public-home-page',
@@ -19,7 +26,14 @@ import { HOME_CONTENT, HomeContent, QuoteForm } from './public-home.content';
     CommonModule, 
     RouterModule, 
     FormsModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    HomeServicesComponent,
+    HomeTechStackComponent,
+    HomeMethodologyComponent,
+    HomeIndustriesComponent,
+    HomePillarsComponent,
+    HomeMetricsComponent,
+    HomeRemoteWorkComponent
   ],
   templateUrl: './public-home-page.html',
   styles: `
