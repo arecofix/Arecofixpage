@@ -8,6 +8,7 @@ import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
 import { ImportResultModalComponent } from './components/import-result-modal/import-result-modal.component';
+import { MetaValidationModalComponent } from './components/meta-validation-modal/meta-validation-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
@@ -17,7 +18,7 @@ import { BranchContextService } from '@app/core/services/branch-context.service'
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent],
+  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent, MetaValidationModalComponent],
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -54,10 +55,16 @@ export class AdminProductsPage implements OnInit {
   public importReport = signal<ImportReport | null>(null);
   public showImportResult = signal<boolean>(false);
 
+  public savingStock = signal<boolean>(false);
+
+  // Meta validation
+  public validationResults = signal<{ id: string, name: string, issues: string[] }[]>([]);
+  public showValidationModal = signal<boolean>(false);
+  public validating = signal<boolean>(false);
+
   // Stock editing
   public editingStock = signal<string | null>(null);
   public tempStock = signal<number>(0);
-  public savingStock = signal<boolean>(false);
 
   private searchSubject = new Subject<string>();
   private router = inject(Router);
@@ -243,6 +250,21 @@ export class AdminProductsPage implements OnInit {
       await this.productService.exportToMetaCSV();
     } catch (e: any) {
       this.error.set('Error al exportar para Meta: ' + e.message);
+    }
+  }
+
+  async runMetaValidation() {
+    this.validating.set(true);
+    this.error.set(null);
+    try {
+      const results = await this.productService.validateProductsForMeta();
+      this.validationResults.set(results);
+      this.showValidationModal.set(true);
+    } catch (e: any) {
+      this.error.set('Error al validar: ' + e.message);
+    } finally {
+      this.validating.set(false);
+      this.cdr.detectChanges();
     }
   }
 

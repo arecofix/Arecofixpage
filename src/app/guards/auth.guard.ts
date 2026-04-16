@@ -4,6 +4,8 @@ import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { ROLES } from '@app/core/constants/roles.constants';
 import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
+import { filter, map, take, timeout, catchError } from 'rxjs/operators';
+import { of, firstValueFrom } from 'rxjs';
 
 export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
@@ -12,14 +14,24 @@ export const authGuard: CanActivateFn = async (route, state) => {
   console.log('🔍 authGuard - Checking access for:', state.url);
 
   try {
-    const session = await authService.getSession();
+    // Wait for the auth state to be fully initialized before making a decision
+    const authState = await firstValueFrom(
+      authService.authState$.pipe(
+        filter(state => state.isInitialized),
+        take(1),
+        timeout(5000), // Safety timeout
+        catchError(() => of({ session: null, user: null, profile: null, isInitialized: true }))
+      )
+    );
+
+    const session = authState.session;
     if (!session) {
       console.warn('🚫 authGuard: No session found, redirecting to login');
       router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
       return false;
     }
 
-    // Pure role-based access control
+    // Role-based access control
     const allowedRoles: string[] = [
       ROLES.ADMIN, 
       ROLES.STAFF, 
@@ -28,41 +40,34 @@ export const authGuard: CanActivateFn = async (route, state) => {
       ROLES.TECHNICIAN
     ];
 
-    // 1. Primary: check role from the profiles table
-    const userProfile = await authService.getUserProfile(session.user.id);
+    const userProfile = authState.profile;
     const userRole = userProfile?.role;
     const userEmail = userProfile?.email;
     
-    console.log('📋 authGuard - User profile:', {
+    console.log('📋 authGuard - Context:', {
       email: userEmail,
       role: userRole,
-      tenantId: userProfile?.tenant_id,
       isSuperAdmin: authService.isSuperAdmin()
     });
     
-    // Super Admin por email o señal tiene acceso global
+    // Super Admin access
     if (authService.isSuperAdmin() || 
         (userProfile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(userEmail || '') || (userRole && allowedRoles.includes(userRole))))) {
-      console.log('🔓 Auth access granted for user:', userEmail, 'role:', userRole);
       return true;
     }
 
-    // 2. Fallback: check Supabase auth metadata (useful when profile row doesn't exist yet)
-    const authUser = await authService.getUser();
-    const metaRole = authUser?.user_metadata?.['role'] ?? authUser?.app_metadata?.['role'];
+    // Supabase metadata fallback
+    const metaRole = authState.user?.user_metadata?.['role'] ?? authState.user?.app_metadata?.['role'];
     if (metaRole && allowedRoles.includes(metaRole)) {
-      console.log('🔓 Auth access granted via metadata for user:', authUser?.email);
       return true;
     }
 
-    // 3. Not authorized
-    console.warn('🚫 Auth access denied for user:', userEmail, 'role:', userRole);
+    console.warn('🚫 Auth access denied for user:', userEmail);
     router.navigate(['/']);
     return false;
   } catch (error) {
     console.error('❌ Error in authGuard:', error);
-    // Safety net: redirect to login on unexpected errors
-    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+    router.navigate(['/login']);
     return false;
   }
 };
@@ -71,8 +76,14 @@ export const noAuthGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const session = await authService.getSession();
-  if (session) {
+  const authState = await firstValueFrom(
+    authService.authState$.pipe(
+      filter(state => state.isInitialized),
+      take(1)
+    )
+  );
+
+  if (authState.session) {
     router.navigate(['/']);
     return false;
   }

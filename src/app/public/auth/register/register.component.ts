@@ -156,7 +156,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       }
 
       // Mensaje según el flujo: si no hay usuario inmediato, se envió Magic Link
-      if (!res.user) {
+      if (!res.data?.user) {
         this.success = 'Te enviamos un enlace de acceso por correo. Revisa tu bandeja de entrada para confirmar tu cuenta.';
       } else {
         this.success = '¡Cuenta creada exitosamente! Redirigiendo...';

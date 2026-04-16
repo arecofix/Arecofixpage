@@ -13,7 +13,8 @@ import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
 import { TenantService } from './tenant.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
-import { App } from '@capacitor/app';
+import { Branch } from '@app/shared/interfaces/branch.interface';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { NgZone } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
@@ -37,11 +38,16 @@ export class AuthService {
     session: Session | null;
     user: User | null;
     profile: UserProfile | null;
+    isInitialized: boolean;
   }>({
     session: null,
     user: null,
     profile: null,
+    isInitialized: false,
   });
+
+  private currentBranchSubject = new BehaviorSubject<Branch | null>(null);
+  public currentBranch$ = this.currentBranchSubject.asObservable();
 
   public authState$ = this.authState.asObservable();
 
@@ -58,7 +64,7 @@ export class AuthService {
   }
 
   private setupDeepLinks() {
-    App.addListener('appUrlOpen', (data: any) => {
+    App.addListener('appUrlOpen', (data: URLOpenListenerEvent) => {
       this.ngZone.run(async () => {
         const url = new URL(data.url);
         // Clean URL if it has fragments like #access_token
@@ -85,7 +91,6 @@ export class AuthService {
       
       if (error) {
         this.logger.error('Session retrieval error', error);
-        // If technical error like refresh token invalid, clear local session to allow clean state
         if (error.message.includes('Refresh Token')) {
            await this.supabase.auth.signOut();
         }
@@ -93,13 +98,22 @@ export class AuthService {
 
       if (session) {
         const profile = await this.ensureProfile(session);
-        this.authState.next({ session, user: session.user, profile });
+        
+        if (profile?.branch_id) {
+          await this.fetchBranchDetails(profile.branch_id);
+        }
+
+        this.authState.next({ session, user: session.user, profile, isInitialized: true });
+
         if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
           this.isSuperAdmin.set(true);
         }
+      } else {
+        this.authState.next({ ...this.authState.value, isInitialized: true });
       }
     } catch (e) {
       this.logger.error('Critical auth init failure', e);
+      this.authState.next({ ...this.authState.value, isInitialized: true });
     }
 
     this.supabase.auth.onAuthStateChange(
@@ -107,19 +121,29 @@ export class AuthService {
         this.logger.info(`Auth Event: ${event}`);
         
         if (event === 'SIGNED_OUT') {
-           this.authState.next({ session: null, user: null, profile: null });
+           this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
            this.isSuperAdmin.set(false);
+           this.currentBranchSubject.next(null);
            return;
         }
 
         if (session) {
           const profile = await this.ensureProfile(session);
-          this.authState.next({ session, user: session.user, profile });
+          
+          if (profile?.branch_id) {
+            await this.fetchBranchDetails(profile.branch_id);
+          } else {
+            this.currentBranchSubject.next(null);
+          }
+
+          this.authState.next({ session, user: session.user, profile, isInitialized: true });
+
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
             this.isSuperAdmin.set(true);
           }
         } else {
-          this.authState.next({ session: null, user: null, profile: null });
+          this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
+          this.currentBranchSubject.next(null);
           this.isSuperAdmin.set(false);
         }
       },
@@ -127,21 +151,59 @@ export class AuthService {
   }
 
   /**
+   * Fetches branch metadata for the assigned branch_id
+   */
+  private async fetchBranchDetails(branchId: string) {
+    try {
+      const { data, error } = await this.supabase
+        .from('branches')
+        .select('*')
+        .eq('id', branchId)
+        .maybeSingle();
+
+      if (error) throw error;
+      this.currentBranchSubject.next(data as Branch | null);
+    } catch (err) {
+      this.logger.error('Error fetching assigned branch details', err);
+      this.currentBranchSubject.next(null);
+    }
+  }
+
+  /**
+   * Refreshes the current profile and branch details
+   * Useful when an admin changes the user's branch in real-time
+   */
+  async refreshProfile() {
+    const user = this.getCurrentUser();
+    if (!user) return;
+
+    const profile = await this.profileService.getProfile(user.id);
+    if (profile) {
+      this.authState.next({ 
+        ...this.authState.value, 
+        profile 
+      });
+      if (profile.branch_id) {
+        await this.fetchBranchDetails(profile.branch_id);
+      } else {
+        this.currentBranchSubject.next(null);
+      }
+    }
+  }
+
+  /**
    * Ensures a profile row exists for the given session user.
-   * If no profile exists yet, creates one from auth user metadata.
-   * This permanently fixes the PGRST116 issue for new/OAuth users.
    */
   private async ensureProfile(session: Session): Promise<UserProfile | null> {
     try {
       const existingProfile = await this.profileService.getProfile(session.user.id);
       if (existingProfile) return existingProfile;
 
-      // Profile row doesn't exist yet — auto-create it from auth metadata
       const meta = session.user.user_metadata || {};
       const tenantId = this.tenantService.getTenantId();
       const isFallback = tenantId === TENANT_CONSTANTS.FALLBACK_ID;
 
-      const payload: any = {
+      const payload: Partial<UserProfile> = {
         id: session.user.id,
         email: session.user.email || meta['email'] || '',
         first_name: meta['first_name'] || meta['given_name'] || null,
@@ -154,15 +216,13 @@ export class AuthService {
         updated_at: new Date().toISOString(),
       };
 
-      // 🚨 Configuración de Súper Admin Central (ezequielenrico15@gmail.com)
       if (payload.email && TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(payload.email)) {
         payload.role = 'super_admin';
         this.isSuperAdmin.set(true);
       }
 
-      // Only include tenant_id if it is not the fallback placeholder
       if (!isFallback) {
-        payload['tenant_id'] = tenantId;
+        payload.tenant_id = tenantId;
       }
 
       const { data, error } = await this.supabase
@@ -231,7 +291,7 @@ export class AuthService {
   }
 
   // Social Logins
-  private async signInWithProvider(provider: 'google' | 'facebook' | 'github'): Promise<any> {
+  private async signInWithProvider(provider: 'google' | 'facebook' | 'github'): Promise<AuthResponse> {
     const isNative = Capacitor.isNativePlatform();
 
     const { data, error } = await this.supabase.auth.signInWithOAuth({
@@ -246,22 +306,23 @@ export class AuthService {
       await Browser.open({ url: data.url });
     }
 
-    return { data, error };
+    // Cast correctly according to Supabase v2 structure
+    return { data, error } as any as AuthResponse;
   }
 
-  async signInWithGoogle(): Promise<any> {
+  async signInWithGoogle(): Promise<AuthResponse> {
     return this.signInWithProvider('google');
   }
 
-  async signInWithFacebook(): Promise<any> {
+  async signInWithFacebook(): Promise<AuthResponse> {
     return this.signInWithProvider('facebook');
   }
 
-  async signInWithGithub(): Promise<any> {
+  async signInWithGithub(): Promise<AuthResponse> {
     return this.signInWithProvider('github');
   }
 
-  async signIn(email: string, password: string): Promise<any> {
+  async signIn(email: string, password: string): Promise<AuthResponse> {
     return this.supabase.auth.signInWithPassword({ email, password });
   }
 
@@ -269,7 +330,7 @@ export class AuthService {
     email: string,
     password: string,
     profileData: Partial<UserProfile>,
-  ): Promise<any> {
+  ): Promise<AuthResponse> {
     const tenantId = this.tenantService.getTenantId();
     this.logger.info(`Attempting signUp for ${email} with tenant: ${tenantId}`);
     
@@ -293,7 +354,6 @@ export class AuthService {
     }
   }
 
-  // Auth specific utilities
   async resetPassword(email: string): Promise<string | null> {
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
       redirectTo: environment.authRedirectUrl,

@@ -6,7 +6,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { TenantIsolatedDashboardService, TenantDashboardStats } from './services/tenant-isolated-dashboard.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
-import { FinanceDashboardService } from '@app/features/finances/services/finance-dashboard.service';
+import { FinanceDashboardService } from '@app/features/finance/application/services/finance-dashboard.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({

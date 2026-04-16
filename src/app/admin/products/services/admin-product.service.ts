@@ -14,6 +14,7 @@ import { firstValueFrom } from 'rxjs';
 import { ROLES } from '@app/core/constants/roles.constants';
 import { TenantService } from '@app/core/services/tenant.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
+import { Branch } from '@app/shared/interfaces/branch.interface';
 import { environment } from '@env/environment';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ export class AdminProductService {
         return firstValueFrom(this.categoryRepo.getAll());
     }
 
-    async getBranches(): Promise<{ id: string; name: string }[]> {
+    async getBranches(): Promise<Branch[]> {
         return firstValueFrom(this.branchRepo.getActiveBranches());
     }
 
@@ -217,7 +218,9 @@ export class AdminProductService {
             // Ensure absolute image URL
             let imageLink = p.image_url || '';
             if (imageLink && !imageLink.startsWith('http')) {
-                imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${imageLink}`;
+                // Ensure no double slash if imageLink starts with /
+                const cleanPath = imageLink.startsWith('/') ? imageLink.substring(1) : imageLink;
+                imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${cleanPath}`;
             }
 
             // Ensure absolute product link
@@ -252,6 +255,63 @@ export class AdminProductService {
         const headers = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'quantity_to_sell_on_facebook', 'google_product_category'];
         
         this.csvService.exportToCsv(metaProducts as any, `meta_catalog_${new Date().toISOString().split('T')[0]}`, headers as any);
+    }
+
+    /**
+     * Audit products for Meta Catalog compliance.
+     * Checks for mandatory fields: id, title, description, availability, condition, price, link, image_link, brand.
+     */
+    async validateProductsForMeta(): Promise<{ id: string, name: string, issues: string[] }[]> {
+        const products = await this.getProducts();
+        const brands = await this.getBrands();
+        const brandMap = new Map(brands.map(b => [b.id, b.name]));
+        
+        const report: { id: string, name: string, issues: string[] }[] = [];
+        const seenIds = new Set<string>();
+        const seenSkus = new Set<string>();
+
+        // First pass: collect duplicates
+        const duplicateIds = new Set<string>();
+        const duplicateSkus = new Set<string>();
+
+        for (const p of products) {
+            if (seenIds.has(p.id)) duplicateIds.add(p.id);
+            seenIds.add(p.id);
+
+            if (p.sku) {
+                const normSku = p.sku.trim().toLowerCase();
+                if (seenSkus.has(normSku)) duplicateSkus.add(normSku);
+                seenSkus.add(normSku);
+            }
+        }
+
+        for (const p of products) {
+            const issues: string[] = [];
+            
+            if (!p.name) issues.push('Falta Título (name)');
+            if (!p.description) issues.push('Falta Descripción');
+            if (p.price <= 0) issues.push('Precio debe ser mayor a 0');
+            if (!p.image_url) issues.push('Falta Imagen Principal');
+            if (!p.brand_id || !brandMap.has(p.brand_id)) issues.push('Falta Marca válida');
+            if (!p.slug) issues.push('Falta Slug para generar enlace');
+            
+            if (duplicateIds.has(p.id)) issues.push('ID Duplicado (Conflicto interno)');
+            if (p.sku && duplicateSkus.has(p.sku.trim().toLowerCase())) issues.push(`SKU Duplicado: ${p.sku}`);
+
+            // Meta image validation (Google/Meta requirement)
+            if (p.image_url && !p.image_url.startsWith('http')) {
+                // If it's a relative path, we check if it follows our pattern
+                if (p.image_url.includes(' ') || p.image_url.includes('?')) {
+                     issues.push('URL de imagen contiene caracteres inválidos');
+                }
+            }
+
+            if (issues.length > 0) {
+                report.push({ id: p.id, name: p.name || 'Sin Nombre', issues });
+            }
+        }
+
+        return report;
     }
 
     // ────────────────────────────────────────────────────────────────────────

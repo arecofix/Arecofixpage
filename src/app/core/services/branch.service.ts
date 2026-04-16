@@ -7,36 +7,8 @@ import { BranchRepository } from '../repositories/branch.repository';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { LoggerService } from './logger.service';
 
-export interface Branch {
-  id: string;
-  name: string;
-  slug: string;
-  address: string;
-  is_active: boolean;
-  global_markup_percentage: number;
-  plan_id?: 'basic' | 'premium' | 'custom';
-  official_name?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  whatsapp_number?: string;
-  bank_info?: {
-    alias?: string;
-    cbu?: string;
-    bank?: string;
-  };
-  tax_id?: string;
-  branding_settings?: {
-    logo_url: string | null;
-    favicon_url: string | null;
-    primary_color: string;
-  };
-  modules_config?: {
-    dashboard: boolean;
-    repairs: boolean;
-    inventory: boolean;
-    customers: boolean;
-  };
-}
+import { Branch } from '@app/shared/interfaces/branch.interface';
+export type { Branch };
 
 @Injectable({
   providedIn: 'root'

@@ -16,6 +16,13 @@
       <button (click)="exportMetaCatalog()" class="btn btn-outline btn-sm md:btn-md border-indigo-200 dark:border-indigo-900/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/30" [disabled]="loading() || importing()">
         <i class="fab fa-facebook mr-2 text-indigo-600"></i> Meta Catalog
       </button>
+      <button (click)="runMetaValidation()" class="btn btn-outline btn-sm md:btn-md hover:bg-slate-50 dark:hover:bg-slate-900" [disabled]="loading() || validating()">
+        @if (validating()) {
+          <span class="loading loading-spinner loading-xs mr-2"></span>
+        } @else {
+          <i class="fas fa-shield-check mr-2 text-green-500"></i> Auditoría Meta
+        }
+      </button>
       <button (click)="fileInput.click()" class="btn btn-outline btn-sm md:btn-md" [disabled]="loading() || importing()">
         @if (importing()) {
           <span class="loading loading-spinner loading-xs mr-2"></span> Importando…
@@ -341,4 +348,12 @@
                 [report]="importReport()!"
                 (close)="onImportResultClose()">
               </app-import-result-modal>
+            }
+
+            <!-- META VALIDATION MODAL -->
+            @if (showValidationModal()) {
+              <app-meta-validation-modal
+                [results]="validationResults()"
+                (close)="showValidationModal.set(false)">
+              </app-meta-validation-modal>
             }

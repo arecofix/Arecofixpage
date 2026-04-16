@@ -28,6 +28,7 @@ export class AdminLayout implements OnInit, OnDestroy {
 
   public branches = signal<Branch[]>([]);
   public currentBranchId = this.branchService.currentBranchId;
+  public currentAssignedBranch = signal<any | null>(null);
   public branchBranding = signal<{ logo: string | null, name: string }>({ 
     logo: '/assets/img/brands/logo/logo-normal.PNG', 
     name: 'Arecofix' 
@@ -143,6 +144,16 @@ export class AdminLayout implements OnInit, OnDestroy {
         }
       }
     }
+
+    // Listen to current assigned branch (SaaS isolation)
+    this.navigationSubscription.add(
+      this.authService.currentBranch$.subscribe(branch => {
+        this.currentAssignedBranch.set(branch);
+        if (branch && !this.authService.isSuperAdmin()) {
+          this.updateBranding(branch);
+        }
+      })
+    );
 
     // Auto-close accessibility sidebar and detect URL changes to keep context strictly synced
     this.navigationSubscription.add(

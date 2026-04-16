@@ -15,10 +15,21 @@
       <div class="flex-1 hidden lg:flex px-4 font-bold text-base-content items-center gap-4">
         <span>Panel de Administración</span>
         
+        <!-- Current Assigned Branch (SaaS) -->
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-base-200/50 rounded-xl border border-base-300/50">
+          <i class="fas fa-map-marker-alt text-primary text-xs"></i>
+          <span class="text-[10px] uppercase opacity-50 font-black tracking-tighter">Sucursal</span>
+          @if (currentAssignedBranch()) {
+            <span class="text-sm font-bold text-primary">{{ currentAssignedBranch().name }}</span>
+          } @else {
+            <span class="badge badge-ghost badge-sm font-medium opacity-50">No asignada</span>
+          }
+        </div>
+
         <!-- Súper Admin Branch Selector -->
         @if (authService.isSuperAdmin()) {
           <div class="flex items-center gap-2 ml-4">
-            <span class="text-xs uppercase opacity-50 font-bold">Sucursal:</span>
+            <span class="text-xs uppercase opacity-50 font-bold">Switch:</span>
             <select class="select select-sm select-bordered bg-base-100/50" [value]="currentSelectedBranchId" (change)="onBranchSelected($event)">
               <option value="">🏠 Todas (Central)</option>
               @for (branch of branches(); track branch.id) {

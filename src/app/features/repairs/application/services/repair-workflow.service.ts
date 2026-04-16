@@ -3,7 +3,6 @@ import { SupabaseRepairRepository } from '../../infrastructure/repositories/supa
 import { StockManagementService } from '@app/features/products/application/services/stock-management.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { CreateRepairDto, RepairPart } from '../../domain/entities/repair.entity';
-import { FinanceDashboardService } from '@app/features/finances/services/finance-dashboard.service';
 
 /**
  * CLEAN ARCHITECTURE - APPLICATION SERVICE
@@ -17,7 +16,6 @@ import { FinanceDashboardService } from '@app/features/finances/services/finance
 export class RepairWorkflowService {
   private repairRepo = inject(SupabaseRepairRepository);
   private stockService = inject(StockManagementService);
-  private financeService = inject(FinanceDashboardService);
   private tenantService = inject(TenantService);
 
   /**

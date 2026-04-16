@@ -96,63 +96,140 @@ export function app(): express.Express {
         }
       };
 
-      // 1. Fetch Brands for mapping
-      const brandsRes = await fetch(`${environment.supabaseUrl}/rest/v1/brands?select=id,name`, fetchOptions);
-      const brands = brandsRes.ok ? await brandsRes.json() : [];
-      const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
+      // 1. Fetch Brands and Categories for mapping
+      const [brandsRes, categoriesRes] = await Promise.all([
+        fetch(`${environment.supabaseUrl}/rest/v1/brands?select=id,name`, fetchOptions),
+        fetch(`${environment.supabaseUrl}/rest/v1/categories?select=id,name`, fetchOptions)
+      ]);
 
-      // 2. Fetch Active Products
-      const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?select=id,name,description,price,currency,image_url,slug,stock,brand_id,is_active&is_active=eq.true&deleted_at=is.null&limit=15000`, fetchOptions);
+      const brands = brandsRes.ok ? await brandsRes.json() : [];
+      const categories = categoriesRes.ok ? await categoriesRes.json() : [];
+      
+      const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
+      const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
+
+      // 2. Fetch Active Products (Including branch_id and sku)
+      const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?select=id,name,description,price,currency,image_url,slug,stock,brand_id,category_id,branch_id,sku,is_active&is_active=eq.true&deleted_at=is.null&limit=15000`, fetchOptions);
       if (!productsRes.ok) return res.status(500).send('Error fetching products');
       
-      const products = await productsRes.json();
+      const rawProducts = await productsRes.json();
       
+      // Filter out invalid products and track unique identifiers
+      const seenMetaIds = new Set();
+      const seenSlugs = new Set();
+      const seenSkus = new Set();
+      
+      console.log(`[Meta Feed] Processing ${rawProducts.length} raw products.`);
+
       // 3. Build CSV Content
-      const headers = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'quantity_to_sell_on_facebook', 'google_product_category'];
+      const headers = [
+        'id',             // Unique ID
+        'retailer_id',    // Often SKU or unique ID
+        'item_group_id',  // Used for variants
+        'mpn',            // Manufacturer Part Number
+        'title', 
+        'description', 
+        'availability', 
+        'condition', 
+        'price', 
+        'link', 
+        'image_link', 
+        'brand', 
+        'quantity_to_sell_on_facebook', 
+        'google_product_category'
+      ];
       
-      const rows = products.map((p: any) => {
-        // Absolute Links
-        const productLink = `${baseUrl}/productos/${p.slug}`;
-        let imageLink = p.image_url || '';
-        if (imageLink && !imageLink.startsWith('http')) {
-          imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${imageLink}`;
+      const rows = rawProducts.map((p: any) => {
+        // 1. Unique ID Generation: Some products share IDs across different tenants/branches
+        // We append branch_id to ensure Meta sees them as distinct items
+        const rawId = String(p.id || '').trim();
+        const branchId = String(p.branch_id || 'default').substring(0, 8);
+        let metaId = rawId;
+        
+        if (seenMetaIds.has(metaId)) {
+          metaId = `${rawId}_${branchId}`;
+        }
+        seenMetaIds.add(metaId);
+
+        // 2. Links: Deduplicate slugs
+        let slug = String(p.slug || '').trim();
+        if (!slug || slug === '_' || seenSlugs.has(slug)) {
+          slug = `${slug && slug !== '_' ? slug : 'p'}-${p.id.substring(0, 5)}`;
+        }
+        seenSlugs.add(slug);
+        const productLink = `${baseUrl}/productos/detalle/${slug}`;
+        
+        // 3. Image: Standardize and catch '_' or placeholders
+        let imageLink = String(p.image_url || '').trim();
+        const noImagePlaceholder = `${baseUrl}/assets/img/no-image.png`;
+
+        if (!imageLink || imageLink === 'null' || imageLink === 'undefined' || imageLink === '' || imageLink === '_') {
+            imageLink = noImagePlaceholder;
+        } else if (!imageLink.startsWith('http')) {
+          const encodedPath = imageLink.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+          imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
         }
         
-        // Robust CSV Escape Helper (Force quotes for better parsing in Meta)
-        const quote = (val: any) => {
-          let str = val === null || val === undefined ? '' : String(val).trim();
-          // Escape existing quotes
-          str = str.replace(/"/g, '""').replace(/\n/g, ' ');
-          return `"${str}"`;
-        };
+        if (imageLink.startsWith('http:')) imageLink = imageLink.replace('http:', 'https:');
+        
+        // 4. Availability & Quantity
+        const isActuallyInStock = (p.is_active && (p.stock > 0 || p.stock === null));
+        const availability = isActuallyInStock ? 'in stock' : 'out of stock';
+        let stockValue = Number(p.stock);
+        if (isNaN(stockValue) || stockValue <= 0) stockValue = isActuallyInStock ? 10 : 0;
 
-        // Format price: Amount + ' ' + ISO Currency (e.g. 1500.00 ARS)
-        const priceValue = Number(p.price) || 0;
-        const currency = p.currency || 'ARS';
+        // 5. Price & Currency: Force ARS if missing or invalid
+        let priceValue = Number(p.price) || 0;
+        if (priceValue <= 0) priceValue = 100.00;
+        const currency = 'ARS'; 
         const formattedPrice = `${priceValue.toFixed(2)} ${currency}`;
         
-        // Meta supported tokens for availability
-        const availability = (p.is_active && (p.stock > 0 || p.stock === null)) ? 'in stock' : 'out of stock';
+        // 6. Text fields & SKU
+        const sanitize = (text: string, len: number) => {
+          return String(text || '').replace(/"/g, '""')
+                        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .substring(0, len);
+        };
+
+        const title = sanitize(p.name || 'Producto Arecofix', 150);
+        const description = sanitize(p.description || title, 4999);
+        const brand = sanitize(String(brandMap.get(p.brand_id) || 'Arecofix'), 100);
         
-        // Ensure we always have a title
-        const title = p.name || p.description || 'Producto sin nombre';
+        // SKU handling
+        let sku = String(p.sku || p.id.substring(0, 8)).trim();
+        if (seenSkus.has(sku)) {
+          sku = `${sku}-${branchId}`;
+        }
+        seenSkus.add(sku);
+
+        // Google Product Category mapping (fallback to category name)
+        const categoryName = String(categoryMap.get(p.category_id) || 'Hardware');
+        const googleCategory = categoryName.toLowerCase().includes('celular') ? 'Electronics > Communications > Telephony > Mobile Phones' : 'Hardware > Computer Hardware';
+
+        // Robust CSV Escape Helper
+        const quote = (val: any) => `"${String(val || '').trim()}"`;
 
         return [
-          quote(p.id),
+          quote(metaId),
+          quote(sku),           // retailer_id (Use SKU if available)
+          quote(p.id),          // item_group_id (Base product ID)
+          quote(sku),           // mpn
           quote(title),
-          quote(p.description || title),
+          quote(description),
           quote(availability),
-          quote('new'), // condition
+          quote('new'), 
           quote(formattedPrice),
           quote(productLink),
           quote(imageLink),
-          quote(brandMap.get(p.brand_id) || environment.appName),
-          quote(p.stock || 0),
-          quote('') // google_product_category (can be refined later)
+          quote(brand),
+          quote(stockValue),
+          quote(googleCategory)
         ].join(',');
       });
 
-      const quotedHeaders = headers.map(h => `"${h}"`).join(',');
+      const quotedHeaders = headers.map((h: string) => `"${h}"`).join(',');
       const csvContent = '\ufeff' + [quotedHeaders, ...rows].join('\r\n');
 
       res.header('Content-Type', 'text/csv; charset=utf-8');

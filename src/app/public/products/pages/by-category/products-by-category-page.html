@@ -1,6 +1,6 @@
 <!-- Mobile Filter Drawer Wrapper -->
 <div class="drawer lg:drawer-open">
-  <input id="cat-filters-drawer" type="checkbox" class="drawer-toggle" />
+  <input #catFiltersDrawer id="cat-filters-drawer" type="checkbox" class="drawer-toggle" [checked]="isMobileFiltersOpen()" (change)="isMobileFiltersOpen.set(catFiltersDrawer.checked)" />
   
   <div class="drawer-content flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
     <!-- DYNAMIC HERO -->
@@ -121,7 +121,7 @@
     <aside class="menu p-6 w-80 min-h-full bg-white dark:bg-gray-800 text-base-content border-r border-gray-200 dark:border-gray-700">
         <div class="flex justify-between items-center mb-8">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">Filtros</h3>
-            <label for="cat-filters-drawer" class="btn btn-sm btn-circle btn-ghost cursor-pointer">✕</label>
+            <label for="cat-filters-drawer" class="btn btn-sm btn-circle btn-ghost cursor-pointer lg:hidden">✕</label>
         </div>
 
         <div class="space-y-8">
@@ -163,6 +163,7 @@
                                 <li>
                                     <a [routerLink]="['/productos/categoria', cat.slug]" 
                                        [class.active]="currentCategory()?.id === cat.id"
+                                       (click)="isMobileFiltersOpen.set(false)"
                                        class="block py-2 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm">
                                         {{ cat.name }}
                                     </a>

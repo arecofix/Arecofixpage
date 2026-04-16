@@ -1,35 +1,17 @@
 import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from './base.repository';
 import { LoggerService } from '../services/logger.service';
-import { AuthService } from '../services/auth.service';
 import { Observable, from, map } from 'rxjs';
-
-export interface BranchDbRecord {
-  id?: string;
-  tenant_id?: string;
-  name: string;
-  slug: string;
-  address: string;
-  is_active: boolean;
-  global_markup_percentage: number;
-  plan_id?: string;
-  official_name?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  tax_id?: string;
-  branding_settings?: any;
-  modules_config?: any;
-}
-
+import { Branch } from '@app/shared/interfaces/branch.interface';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BranchRepository extends BaseRepository<BranchDbRecord> {
+export class BranchRepository extends BaseRepository<Branch> {
   protected override tableName = 'branches';
   protected override isGlobalTable = false;
-  protected override useSoftDeletes = false; // Add if branches support it
+  protected override useSoftDeletes = false;
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);
@@ -37,17 +19,21 @@ export class BranchRepository extends BaseRepository<BranchDbRecord> {
     super(supabase, logger);
   }
 
-  getActiveBranches(): Observable<{ id: string; name: string }[]> {
-    let query = this.supabase
+  /**
+   * Returns all active branches for the current tenant.
+   */
+  getActiveBranches(): Observable<Branch[]> {
+    const query = this.supabase
       .from(this.tableName)
-      .select('id, name')
+      .select('*')
       .eq('is_active', true)
       .order('name');
     
-    return from(this.applyTenantFilter(query) as any).pipe(
-      map(({ data, error }: any) => {
+    return from(this.applyTenantFilter(query)).pipe(
+      map((res: any) => {
+        const { data, error } = res;
         if (error) this.errorHandler.handleError(error, 'getActiveBranches');
-        return (data || []) as { id: string; name: string }[];
+        return (data || []) as Branch[];
       })
     );
   }

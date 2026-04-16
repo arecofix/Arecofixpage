@@ -49,18 +49,23 @@
                         </select>
                     </td>
                     <td>
-                        <select class="select select-sm select-bordered w-full max-w-xs"
-                                [ngModel]="user.branch_id"
-                                (ngModelChange)="updateUserBranch(user, $event)"
-                                [disabled]="user.role === 'admin' || user.role === 'user'">
-                            <option [ngValue]="null">-- Sin Sucursal Asignada --</option>
-                            @for (branch of branches(); track branch.id) {
-                                <option [ngValue]="branch.id">{{ branch.name }}</option>
+                        <div class="flex items-center gap-2">
+                            @if(user.role === 'admin' || user.role === 'super_admin') {
+                                <span class="badge badge-ghost badge-sm opacity-50 px-3 py-2 font-bold uppercase tracking-tighter">Acceso Global</span>
+                            } @else {
+                                <div class="flex flex-col gap-1">
+                                    <span class="badge badge-sm font-bold p-2" 
+                                          [class.badge-primary]="user.branch_id" 
+                                          [class.badge-ghost]="!user.branch_id">
+                                        {{ getBranchName(user.branch_id) }}
+                                    </span>
+                                    <button class="btn btn-xs btn-outline btn-primary border-primary/30 hover:bg-primary hover:border-primary" 
+                                            (click)="openBranchModal(user)">
+                                        <i class="fas fa-edit text-[10px]"></i> {{ user.branch_id ? 'Cambiar' : 'Asignar' }}
+                                    </button>
+                                </div>
                             }
-                        </select>
-                        @if(user.role === 'admin') {
-                            <div class="text-[10px] text-gray-400 mt-1">Global (Todas las sucursales)</div>
-                        }
+                        </div>
                     </td>
                     <td class="text-sm opacity-70">{{ user.created_at | date:'shortDate' }}</td>
                 </tr>
@@ -70,3 +75,68 @@
         </table>
     </div>
 </div>
+
+<!-- Modal de Asignación de Sucursal -->
+<dialog class="modal" [class.modal-open]="selectedUserForBranch()">
+    <div class="modal-box bg-base-100 border border-base-300 shadow-2xl rounded-2xl p-0">
+        <div class="p-6 border-b border-base-200 flex justify-between items-center bg-base-200/30">
+            <div>
+                <h3 class="font-black text-xl text-primary uppercase">Asignar Sucursal</h3>
+                <p class="text-xs opacity-60">Selecciona el punto de venta para <strong>{{ selectedUserForBranch()?.first_name }} {{ selectedUserForBranch()?.last_name }}</strong></p>
+            </div>
+            <button class="btn btn-sm btn-circle btn-ghost" (click)="selectedUserForBranch.set(null)">✕</button>
+        </div>
+        
+        <div class="p-6 max-h-[60vh] overflow-y-auto">
+            <div class="grid grid-cols-1 gap-3">
+                <!-- Opción: Sin Sucursal -->
+                <button 
+                    class="btn btn-outline border-base-300 justify-between font-bold h-auto py-4 group hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                    [disabled]="isUpdating()"
+                    (click)="saveUserBranch(null)">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center group-hover:bg-red-100">
+                             <i class="fas fa-times-circle opacity-30 group-hover:opacity-100"></i>
+                        </div>
+                         <div class="text-left">
+                            <div class="text-sm">Quitar Asignación</div>
+                            <div class="text-[10px] opacity-50 font-medium">El usuario no pertenecerá a ninguna sucursal</div>
+                         </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-xs opacity-20"></i>
+                </button>
+
+                <!-- Listado de Sucursales -->
+                @for (branch of branches(); track branch.id) {
+                    <button 
+                        class="btn btn-outline border-base-300 justify-between font-bold h-auto py-4 group hover:bg-primary-50 hover:text-primary hover:border-primary/30"
+                        [class.bg-primary]="selectedUserForBranch()?.branch_id === branch.id"
+                        [disabled]="isUpdating()"
+                        (click)="saveUserBranch(branch.id)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20">
+                                 <i class="fas fa-store text-primary"></i>
+                            </div>
+                             <div class="text-left">
+                                <div class="text-sm">{{ branch.name }}</div>
+                                <div class="text-[10px] opacity-50 font-medium">{{ branch.address || 'Sin dirección' }}</div>
+                             </div>
+                        </div>
+                        @if (isUpdating() && selectedUserForBranch()?.branch_id === branch.id) {
+                            <span class="loading loading-spinner loading-xs"></span>
+                        } @else {
+                            <i class="fas fa-chevron-right text-xs opacity-20"></i>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+        
+        <div class="modal-action p-4 bg-base-200/30 rounded-b-2xl">
+            <button class="btn btn-ghost" (click)="selectedUserForBranch.set(null)">Cancelar</button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" (click)="selectedUserForBranch.set(null)">
+        <button>close</button>
+    </form>
+</dialog>

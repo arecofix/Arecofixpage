@@ -102,6 +102,7 @@ export class ProductsAllPage {
   });
 
   // UI States
+  isMobileFiltersOpen = signal(false);
   isQuickViewOpen = signal(false);
   quickViewProduct = signal<Product | null>(null);
 
@@ -140,6 +141,7 @@ export class ProductsAllPage {
       max_price: this.maxPriceInput(),
       _page: 1
     });
+    this.isMobileFiltersOpen.set(false);
   }
 
   setSort(sort: string, order: string = 'asc') {
