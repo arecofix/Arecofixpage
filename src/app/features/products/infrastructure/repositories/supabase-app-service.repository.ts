@@ -1,18 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { AppServiceEntity } from '../../domain/entities/app-service.entity';
-import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseAppServiceRepository extends BaseRepository<AppServiceEntity> {
-  protected tableName = 'services';
+  protected override tableName = 'services';
 
   constructor() {
-    const authService = inject(AuthService);
+    const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
-    super(authService.getSupabaseClient(), logger);
+    super(supabase, logger);
   }
 }

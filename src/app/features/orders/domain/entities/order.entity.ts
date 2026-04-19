@@ -1,4 +1,12 @@
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
+export type OrderStatus =
+  | 'pending'
+  | 'pending_payment'
+  | 'awaiting_verification'
+  | 'paid'
+  | 'preparing'
+  | 'shipped'
+  | 'completed'
+  | 'cancelled';
 
 export interface Address {
     street: string;
@@ -27,6 +35,8 @@ export interface OrderItem {
     created_at?: string;
 }
 
+export type PaymentMethod = 'digital' | 'cash' | 'bank_transfer';
+
 export interface Order {
     id?: string;
     order_number?: string;
@@ -41,7 +51,9 @@ export interface Order {
     discount: number;
     total: number;
     total_amount?: number;
-    payment_method?: string;
+    payment_method?: PaymentMethod | string;
+    payment_ticket_code?: string;
+    payment_proof_url?: string;
     notes?: string;
     invoice_url?: string;
     tenant_id?: string;

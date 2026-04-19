@@ -60,6 +60,35 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       this.initAuth();
       this.setupDeepLinks();
+      this.setupVisibilityListener();
+    }
+  }
+
+  /**
+   * Monitor tab visibility to wake up the session after long idle periods
+   */
+  private setupVisibilityListener() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible') {
+           this.logger.info('Tab became visible, checking session integrity...');
+           const session = this.getCurrentSession();
+           
+           if (session) {
+              const expiresAt = session.expires_at || 0;
+              const now = Math.floor(Date.now() / 1000);
+              
+              // If session expires in less than 5 minutes or is already expired
+              if (expiresAt - now < 300) {
+                 this.logger.info('Session nearing expiration or expired after dormant period, refreshing...');
+                 await this.refreshSession();
+              }
+           } else {
+             // Try to recover session if it was lost
+             await this.getSession();
+           }
+        }
+      });
     }
   }
 
@@ -366,5 +395,20 @@ export class AuthService {
       password: newPassword,
     });
     return error ? error.message : null;
+  }
+
+  /**
+   * Proactively refreshes the session to ensure a valid token for long operations.
+   */
+  async refreshSession(): Promise<Session | null> {
+    const { data: { session }, error } = await this.supabase.auth.refreshSession();
+    if (error) {
+      this.logger.error('Error refreshing session', error);
+      return null;
+    }
+    if (session) {
+      this.authState.next({ ...this.authState.value, session, user: session.user });
+    }
+    return session;
   }
 }

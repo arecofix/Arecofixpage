@@ -9,6 +9,48 @@
 
     <title>Arecofix</title>
     <base href="/" />
+    <!-- Global Noise Suppressor (EXECUTE FIRST) -->
+    <script>
+      (function() {
+        'use strict';
+        const noise = [
+          'cross-origin-opener-policy', 'attribution-reporting', 'browsing-topics', 
+          'fbevents.js', 'google-analytics', 'googletagmanager', 'doubleclick', 
+          'facebook', 'gtm', 'gtag', 'user-agent-client-hints', 'permissions-policy', 
+          'unrecognized feature', 'private-state-token', 'join-ad-interest-group', 
+          'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
+          'attribution-reporting', 'fbevents'
+        ];
+        const isNoise = (args) => {
+          const msg = args.map(a => { 
+            try { return typeof a === 'string' ? a : JSON.stringify(a); } 
+            catch(e) { return String(a); } 
+          }).join(' ').toLowerCase();
+          return noise.some(n => msg.includes(n));
+        };
+        const _err = console.error, _wrn = console.warn, _log = console.log;
+        console.error = (...a) => { if (!isNoise(a)) _err.apply(console, a); };
+        console.warn = (...a) => { if (!isNoise(a)) _wrn.apply(console, a); };
+        console.log = (...a) => { if (!isNoise(a)) _log.apply(console, a); };
+        
+        // Catch-all for browser-level logs that might not go through console.warn/error directly
+        const _debug = console.debug;
+        console.debug = (...a) => { if (!isNoise(a)) _debug.apply(console, a); };
+
+        window.addEventListener('error', (e) => { 
+          if (isNoise([e.message, e.filename])) { 
+            e.stopImmediatePropagation(); 
+            e.preventDefault(); 
+          } 
+        }, true);
+        window.addEventListener('unhandledrejection', (e) => { 
+          if (isNoise([String(e.reason)])) { 
+            e.stopImmediatePropagation(); 
+            e.preventDefault(); 
+          } 
+        }, true);
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Arecofix" />
@@ -58,58 +100,9 @@
     </noscript>
     <!-- Security & Policy Headers -->
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
 
-    <!-- Error Silencing Strategy (Third-party noise reduction) -->
-    <script>
-      (function() {
-        'use strict';
-        const originalError = console.error;
-        const originalWarn = console.warn;
-        
-        function isThirdPartyNoise(args) {
-          const fullMsg = args.map(arg => {
-            try {
-              if (typeof arg === 'string') return arg;
-              if (arg instanceof Error) return arg.message + ' ' + arg.stack;
-              return JSON.stringify(arg);
-            } catch (e) { return String(arg); }
-          }).join(' ').toLowerCase();
 
-          return [
-            'cross-origin-opener-policy', 'attribution-reporting', 'browsing-topics',
-            'fbevents.js', 'postmessage', 'google-analytics', 'googletagmanager',
-            'doubleclick', 'facebook', 'gtm', 'gtag', 'user-agent-client-hints',
-            'permissions-policy', 'unrecognized feature'
-          ].some(pattern => fullMsg.includes(pattern));
-        }
-        
-        console.error = function(...args) {
-          if (isThirdPartyNoise(args)) return;
-          return originalError.apply(console, args);
-        };
-        
-        console.warn = function(...args) {
-          if (isThirdPartyNoise(args)) return;
-          return originalWarn.apply(console, args);
-        };
-
-        window.addEventListener('error', function(event) {
-          const msg = (event.message || '').toLowerCase();
-          if (isThirdPartyNoise([msg, event.filename, event.error])) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-          }
-        }, true);
-
-        window.addEventListener('unhandledrejection', function(event) {
-          const reason = event.reason ? String(event.reason).toLowerCase() : '';
-          if (isThirdPartyNoise([reason])) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-          }
-        }, true);
-      })();
-    </script>
 
     <!-- Analytics Assets (GTAG & Facebook Pixel) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED"></script>

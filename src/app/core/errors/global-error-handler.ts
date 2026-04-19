@@ -21,7 +21,15 @@ export class GlobalErrorHandler implements ErrorHandler {
     private logger = inject(LoggerService);
     private notification = inject(NotificationService);
 
-    handleError(error: Error | HttpErrorResponse): void {
+    handleError(error: any): void {
+        const errorString = String(error?.message || error || '').toLowerCase();
+        
+        // 1. Detect Chunk Loading Errors (Common after new deploys in idle sessions)
+        if (errorString.includes('loading chunk') || errorString.includes('failed to fetch dynamically imported module') || errorString.includes('loading css chunk')) {
+            this.handleChunkError();
+            return;
+        }
+
         // Log the error
         this.logger.error('Unhandled error occurred', error);
 
@@ -33,6 +41,23 @@ export class GlobalErrorHandler implements ErrorHandler {
         } else {
             this.handleUnknownError(error);
         }
+    }
+
+    /**
+     * Handles fatal chunk loading errors by forcing a clean reload
+     */
+    private handleChunkError(): void {
+        this.logger.warn('Chunk loading error detected. Forcing application reload...');
+        
+        const message = 'Se ha detectado una nueva versión de la aplicación. Cargando actualizaciones...';
+        this.notification.showInfo(message);
+        
+        // Wait a bit for the notification to be seen before reloading
+        setTimeout(() => {
+            if (typeof window !== 'undefined') {
+                window.location.reload();
+            }
+        }, 1500);
     }
 
     /**

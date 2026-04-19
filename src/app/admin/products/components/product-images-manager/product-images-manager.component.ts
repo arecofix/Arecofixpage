@@ -1,12 +1,18 @@
 import { Component, ChangeDetectionStrategy, signal, inject, model, output } from '@angular/core';
-
+import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ProductMediaService } from '../../services/product-media.service';
+
+export interface ProductMedia {
+  url: string;
+  color?: string;
+  order?: number;
+}
 
 @Component({
   selector: 'app-product-images-manager',
   standalone: true,
-  imports: [DragDropModule],
+  imports: [DragDropModule, FormsModule],
   templateUrl: './product-images-manager.component.html',
   styles: [`
     .cdk-drag-preview {
@@ -32,18 +38,32 @@ export class ProductImagesManagerComponent {
   private mediaService = inject(ProductMediaService);
 
   // Models
-  images = model<string[]>([]);
+  images = model<ProductMedia[]>([]);
   uploading = model<boolean>(false);
   
   // Outputs
   onError = output<string>();
+
+  // Colors
+  availableColors = [
+    { name: 'Negro', class: 'bg-black' },
+    { name: 'Blanco', class: 'bg-white text-black border border-gray-200' },
+    { name: 'Gris', class: 'bg-gray-500' },
+    { name: 'Plata', class: 'bg-slate-300 text-black' },
+    { name: 'Azul', class: 'bg-blue-600' },
+    { name: 'Rojo', class: 'bg-red-600' },
+    { name: 'Verde', class: 'bg-green-600' },
+    { name: 'Dorado', class: 'bg-yellow-500' },
+    { name: 'Rosa', class: 'bg-pink-400' },
+    { name: 'Púrpura', class: 'bg-purple-600' }
+  ];
 
   // State
   isCameraOpen = signal(false);
   stream = signal<MediaStream | null>(null);
   
   // Drag & Drop
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<ProductMedia[]>) {
     const currentImages = [...this.images()];
     moveItemInArray(currentImages, event.previousIndex, event.currentIndex);
     this.images.set(currentImages);
@@ -60,13 +80,22 @@ export class ProductImagesManagerComponent {
     try {
       const uploadPromises = files.map(file => this.mediaService.uploadImage(file));
       const urls = await Promise.all(uploadPromises);
-      this.images.update(imgs => [...imgs, ...urls]);
+      const newMedia: ProductMedia[] = urls.map(url => ({ url, color: '' }));
+      this.images.update(imgs => [...imgs, ...newMedia]);
     } catch (e: any) {
       this.onError.emit(e.message || 'Error al subir imagen');
     } finally {
       this.uploading.set(false);
       input.value = ''; // Reset input
     }
+  }
+
+  setImageColor(index: number, color: string) {
+    this.images.update(imgs => {
+      const newImgs = [...imgs];
+      newImgs[index] = { ...newImgs[index], color };
+      return newImgs;
+    });
   }
 
   removeImage(index: number) {
@@ -131,7 +160,7 @@ export class ProductImagesManagerComponent {
       this.uploading.set(true);
       try {
         const url = await this.mediaService.uploadImage(file);
-        this.images.update(imgs => [...imgs, url]);
+        this.images.update(imgs => [...imgs, { url, color: '' }]);
         this.stopCamera(); // Convert logic: maybe keep open? For now close it.
       } catch (e: any) {
         this.onError.emit(e.message);

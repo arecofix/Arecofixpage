@@ -48,4 +48,5 @@ export abstract class ProductRepository {
     abstract approveProduct(id: string): Observable<void>;
     abstract rejectProduct(id: string): Observable<void>;
     abstract getPendingApprovalsCount(): Observable<number>;
+    abstract getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }>;
 }

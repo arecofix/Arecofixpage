@@ -16,6 +16,8 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { environment } from '@env/environment';
+import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
+import { NotificationBaseRepository } from '../../../features/messages/domain/repositories/notification.repository';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
 export interface ImportReport {
@@ -49,8 +51,6 @@ interface CsvRow {
     is_featured?: boolean;
 }
 
-
-
 @Injectable({
     providedIn: 'root'
 })
@@ -64,6 +64,7 @@ export class AdminProductService {
     private notificationService = inject(NotificationService);
     private branchContextService = inject(BranchContextService);
     private branchRepo = inject(BranchRepository);
+    private notificationRepo = inject(NotificationBaseRepository);
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();
@@ -86,14 +87,12 @@ export class AdminProductService {
         return firstValueFrom(this.productRepo.getAll());
     }
 
-    async getProductsPaginated(params: import('@app/public/products/interfaces').ProductsParams): Promise<import('@app/public/products/interfaces').ProductsResponse> {
+    async getProductsPaginated(params: ProductsParams): Promise<ProductsResponse> {
         const contextBranchId = this.branchContextService.getBranchId();
 
         const enrichedParams = {
             ...params,
             include_inactive: params.include_inactive ?? true,
-            // If superadmin has a branch selected, filter by it. 
-            // Note: repository findWithFilters needs to support this.
             branch_id: params.branch_id || contextBranchId
         };
         return firstValueFrom(this.productRepo.findWithFilters(enrichedParams));
@@ -136,16 +135,16 @@ export class AdminProductService {
         if (user) {
             const profile = await this.auth.getUserProfile(user.id);
             if (profile && profile.role === ROLES.STAFF) {
-                // Si es empleado, se aprueba manual por el dueño. Queda vinculado a la sucursal inactivo.
+                // Staff-created products require manual approval
                 payload.is_active = false;
                 payload.is_global = false;
                 payload.branch_id = profile.branch_id;
                 
-                // Dispara solicitud al administrador/dueño para revisión
-                const supabase = this.auth.getSupabaseClient();
+                // Trigger approval request for admins
                 const tenantId = profile.tenant_id || this.tenantService.getTenantId();
 
-                // Buscar a los administradores del tenant para notificar
+                // Get admins for this tenant to notify them
+                const supabase = this.auth.getSupabaseClient();
                 const { data: admins } = await supabase
                     .from('profiles')
                     .select('id')
@@ -153,7 +152,7 @@ export class AdminProductService {
                     .eq('tenant_id', tenantId);
 
                 if (admins && admins.length > 0) {
-                    const noficationsToInsert = admins.map(a => ({
+                    const notifications = (admins as any[]).map(a => ({
                         tenant_id: tenantId,
                         user_id: a.id,
                         title: 'Nuevo Producto (Requiere Revisión)',
@@ -161,10 +160,9 @@ export class AdminProductService {
                         type: 'warning',
                         link: '/admin/products'
                     }));
-                    await supabase.from('notifications').insert(noficationsToInsert);
+                    await this.notificationRepo.createMany(notifications as any);
                 }
             } else if (profile && (profile.role === ROLES.ADMIN || profile.role === ROLES.TENANT_OWNER)) {
-                // Admin que crea define por defecto como global y sin branch fija, o puede definir a cuál va.
                 if (payload.is_global === undefined) payload.is_global = true; 
             }
         }
@@ -202,10 +200,6 @@ export class AdminProductService {
         this.csvService.exportToCsv(products as any, 'products_export', headers as any);
     }
 
-    /**
-     * Specialized export for Meta Product Catalog (Facebook/Instagram Shops)
-     * Solves issues with missing titles, links, prices and images.
-     */
     async exportToMetaCSV(): Promise<void> {
         const products = await this.getProducts();
         if (!products.length) return;
@@ -257,10 +251,6 @@ export class AdminProductService {
         this.csvService.exportToCsv(metaProducts as any, `meta_catalog_${new Date().toISOString().split('T')[0]}`, headers as any);
     }
 
-    /**
-     * Audit products for Meta Catalog compliance.
-     * Checks for mandatory fields: id, title, description, availability, condition, price, link, image_link, brand.
-     */
     async validateProductsForMeta(): Promise<{ id: string, name: string, issues: string[] }[]> {
         const products = await this.getProducts();
         const brands = await this.getBrands();
@@ -314,19 +304,7 @@ export class AdminProductService {
         return report;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // SMART IMPORT
-    // ────────────────────────────────────────────────────────────────────────
-
-    /**
-     * Intelligent CSV import that:
-     * 1. Parses and validates the CSV
-     * 2. Fetches all existing products (lean projection for speed)
-     * 3. Classifies each CSV row as: UPDATE (price only) | RENAME+UPDATE | INSERT (new)
-     * 4. Never overwrites images, descriptions, categories or other data on existing products
-     */
     async importProductsFromCSV(file: File): Promise<ImportReport> {
-        // ── STEP 1: Parse CSV ──────────────────────────────────────────────
         const parseResult = await this.csvService.parse<CsvRow>(file, (values, headers) => {
             const raw: Record<string, any> = {};
             headers.forEach((h: string, i: number) => {
@@ -342,14 +320,12 @@ export class AdminProductService {
                 }
             });
 
-            // must have at least a name and a non-negative price
             const name = (raw['name'] as string)?.trim();
             const price = raw['price'];
             if (!name || price === null || price === undefined || isNaN(Number(price))) {
                 return null;
             }
 
-            // clean up sentinel IDs
             const id = raw['id'] && raw['id'] !== 'new' && raw['id'] !== '' ? raw['id'] : undefined;
 
             return {
@@ -370,7 +346,6 @@ export class AdminProductService {
             } as CsvRow;
         });
 
-
         const csvRows: CsvRow[] = parseResult.data as CsvRow[];
         const skipped = parseResult.errors;
 
@@ -378,17 +353,15 @@ export class AdminProductService {
             return { inserted: 0, priceUpdated: 0, renamed: 0, skipped, details: ['No se encontraron filas válidas en el CSV.'] };
         }
 
-        // ── STEP 2: Load existing metadata ──────────────────────────────
         const [existing, brands, categories] = await Promise.all([
             firstValueFrom(this.productRepo.getAllForImport()),
             this.getBrands(),
             this.getCategories()
         ]);
 
-        // Build fast lookup indexes
         const byId   = new Map<string, ImportProductSummary>();
         const bySku  = new Map<string, ImportProductSummary>();
-        const byName = new Map<string, ImportProductSummary>(); // normalised name → product
+        const byName = new Map<string, ImportProductSummary>(); 
         const bySlug = new Set<string>();
 
         for (const p of existing) {
@@ -398,29 +371,22 @@ export class AdminProductService {
             bySlug.add(p.slug);
         }
 
-        // Metadata lookups (mutable: we'll add auto-created entries)
-        const brandByName = new Map<string, string>();   // normalised name → brand id
-        const brandById   = new Set<string>();             // known brand UUIDs
+        const brandByName = new Map<string, string>();   
+        const brandById   = new Set<string>();             
         brands.forEach(b => { brandByName.set(this._normaliseName(b.name), b.id); brandById.add(b.id); });
 
-        const catByName = new Map<string, string>();      // normalised name → category id
-        const catById   = new Set<string>();               // known category UUIDs
+        const catByName = new Map<string, string>();      
+        const catById   = new Set<string>();               
         categories.forEach(c => { catByName.set(this._normaliseName(c.name), c.id); catById.add(c.id); });
 
-        // ── STEP 2b: Collect all brand/category names from CSV and auto-create missing ones ──
         const details: string[] = [];
         const brandNamesToCreate = new Set<string>();
         const catNamesToCreate = new Set<string>();
 
         for (const row of csvRows) {
-            // Brand: if provided and either NOT a UUID or a UUID that doesn't exist in DB
             if (row.brand_id) {
                 if (this._isUuid(row.brand_id)) {
-                    // UUID that doesn't exist in DB → treat the CSV value as a problem; strip it
-                    // (We cannot reliably create a brand from a UUID string)
-                    if (!brandById.has(row.brand_id)) {
-                        // Mark as needing strip — handled in STEP 3
-                    }
+                    if (!brandById.has(row.brand_id)) { }
                 } else {
                     const normName = this._normaliseName(row.brand_id);
                     if (!brandByName.has(normName)) {
@@ -428,12 +394,9 @@ export class AdminProductService {
                     }
                 }
             }
-            // Category: same logic
             if (row.category_id) {
                 if (this._isUuid(row.category_id)) {
-                    if (!catById.has(row.category_id)) {
-                        // invalid UUID → strip in STEP 3
-                    }
+                    if (!catById.has(row.category_id)) { }
                 } else {
                     const normName = this._normaliseName(row.category_id);
                     if (!catByName.has(normName)) {
@@ -443,7 +406,6 @@ export class AdminProductService {
             }
         }
 
-        // Auto-create missing brands in parallel
         await Promise.all(Array.from(brandNamesToCreate).map(async (normName) => {
             try {
                 const displayName = normName.charAt(0).toUpperCase() + normName.slice(1);
@@ -458,7 +420,6 @@ export class AdminProductService {
             }
         }));
 
-        // Auto-create missing categories in parallel
         await Promise.all(Array.from(catNamesToCreate).map(async (normName) => {
             try {
                 const displayName = normName.charAt(0).toUpperCase() + normName.slice(1);
@@ -473,18 +434,14 @@ export class AdminProductService {
             }
         }));
 
-
-        // ── STEP 3: Classify ───────────────────────────────────────────────
-        const priceUpdates: BulkPriceUpdate[] = [];   // existing – price only (±name fix)
-        const toInsert: Partial<Product>[] = [];       // truly new products
+        const priceUpdates: BulkPriceUpdate[] = [];   
+        const toInsert: Partial<Product>[] = [];       
         const usedSlugsInBatch = new Set<string>();
 
         for (const row of csvRows) {
             const found = this._findExisting(row, byId, bySku, byName);
 
             if (found) {
-                // Product EXISTS → only update fields allowed
-                // Cap price to avoid numeric overflow (e.g. numeric(10,2))
                 const safePrice = Math.min(row.price, 99999999.99);
                 const update: BulkPriceUpdate = { id: found.id, price: safePrice };
 
@@ -494,26 +451,18 @@ export class AdminProductService {
 
                 priceUpdates.push(update);
             } else {
-                // Product does NOT EXIST → prepare for insertion
-                
-                // Resolve Brand ID — 3-way check:
-                // 1. If it's a valid UUID that exists in DB → use it directly
-                // 2. If it's a name (or unknown UUID) → look up by normalised name
-                // 3. Still not found → strip it (null) to avoid FK violation
                 let brandId: string | undefined = undefined;
                 if (row.brand_id) {
                     if (this._isUuid(row.brand_id) && brandById.has(row.brand_id)) {
                         brandId = row.brand_id;
                     } else {
-                        // Try by name (covers both plain names and unrecognised UUIDs treated as strings)
                         const norm = this._isUuid(row.brand_id)
-                            ? undefined  // unknown UUID — can't resolve as name, strip
+                            ? undefined  
                             : brandByName.get(this._normaliseName(row.brand_id));
                         brandId = norm;
                     }
                 }
 
-                // Resolve Category ID — same 3-way logic
                 let catId: string | undefined = undefined;
                 if (row.category_id) {
                     if (this._isUuid(row.category_id) && catById.has(row.category_id)) {
@@ -526,7 +475,6 @@ export class AdminProductService {
                     }
                 }
 
-                // Ensure unique slug
                 let baseSlug = row.slug || StringUtils.slugify(row.name);
                 let slug = baseSlug;
                 let counter = 1;
@@ -553,12 +501,10 @@ export class AdminProductService {
             }
         }
 
-        // ── STEP 4: Execute ────────────────────────────────────────────────
         let priceUpdated = 0;
         let renamed = 0;
         let inserted = 0;
 
-        // 4a. Bulk price updates
         if (priceUpdates.length > 0) {
             try {
                 const { updated, errors: updateErrors } = await firstValueFrom(
@@ -575,7 +521,6 @@ export class AdminProductService {
             }
         }
 
-        // 4b. Bulk inserts in batches of 100
         if (toInsert.length > 0) {
             const INSERT_CHUNK = 100;
             for (let i = 0; i < toInsert.length; i += INSERT_CHUNK) {
@@ -584,12 +529,11 @@ export class AdminProductService {
                     const upserted = await firstValueFrom(this.productRepo.upsertMany(chunk));
                     inserted += (upserted || []).length;
                 } catch (e: any) {
-                    console.error('Batch error:', e);
                     let errorMsg = e.message;
                     if (errorMsg.includes('products_brand_id_fkey')) {
-                        errorMsg = 'Marca no encontrada (el ID o nombre no coincide)';
+                        errorMsg = 'Marca no encontrada';
                     } else if (errorMsg.includes('numeric field overflow')) {
-                        errorMsg = 'Número demasiado grande (precio o stock excede el límite)';
+                        errorMsg = 'Número demasiado grande';
                     } else if (errorMsg.includes('duplicate key')) {
                         errorMsg = 'Nombre o SKU ya existe';
                     }
@@ -600,17 +544,12 @@ export class AdminProductService {
         }
 
         if (skipped > 0) {
-            details.push(`⛔ ${skipped} filas omitidas (datos inválidos o mal formateados).`);
+            details.push(`⛔ ${skipped} filas omitidas.`);
         }
 
         return { inserted, priceUpdated, renamed, skipped, details };
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ────────────────────────────────────────────────────────────────────────
-
-    /** Try to match a CSV row to an existing product by ID → SKU → Name */
     private _findExisting(
         row: CsvRow,
         byId: Map<string, ImportProductSummary>,
@@ -626,15 +565,10 @@ export class AdminProductService {
         return byName.get(normName) ?? null;
     }
 
-    /** Normalise a product name for comparison: lowercase, trim, collapse spaces */
     private _normaliseName(name: string): string {
         return (name || '').toLowerCase().trim().replace(/\s+/g, ' ');
     }
 
-    /**
-     * Returns true if a product name is a generic "repuesto" marker.
-     * Covers: "Repuesto", "repuesto", "Repuesto Generic", "Repuesto Samsung", etc.
-     */
     private _isGenericRepuesto(name: string): boolean {
         const n = (name || '').trim().toLowerCase();
         return n === 'repuesto' || n.startsWith('repuesto ') || n.endsWith(' repuesto');
@@ -645,11 +579,6 @@ export class AdminProductService {
         return uuidRegex.test(text);
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Bulk operations (used by BulkEditModal)
-    // ────────────────────────────────────────────────────────────────────────
-
-    /** Build minimal clean payloads so only REAL DB columns reach Supabase */
     async bulkCustomUpdate(updates: Array<{ id: string; payload: Record<string, any> }>): Promise<void> {
         const products = updates.map(u => ({ id: u.id, ...u.payload }));
         await firstValueFrom(this.productRepo.updateMany(products));
@@ -663,17 +592,15 @@ export class AdminProductService {
         await firstValueFrom(this.productRepo.bulkUpdateCategory(ids, categoryId));
     }
 
+    async getInventorySummary(branchId?: string) {
+        return firstValueFrom(this.productRepo.getInventorySummary(branchId || this.branchContextService.getBranchId() || undefined));
+    }
+
     async bulkIncreasePrice(ids: string[], percentage: number): Promise<void> {
         const response = await firstValueFrom(this.productRepo.findWithFilters({ ids: ids }));
         const products = response.data;
-
         if (!products || products.length === 0) return;
-
-        const updates = products.map(p => ({
-            id: p.id,
-            price: Math.round(p.price * (1 + percentage / 100))
-        }));
-
+        const updates = products.map(p => ({ id: p.id, price: Math.round(p.price * (1 + percentage / 100)) }));
         await firstValueFrom(this.productRepo.updateMany(updates));
     }
 }

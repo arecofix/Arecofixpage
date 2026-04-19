@@ -23,10 +23,6 @@
             {
               "key": "Cache-Control",
               "value": "no-cache, no-store, must-revalidate"
-            },
-            {
-              "key": "Permissions-Policy",
-              "value": "attribution-reporting=(), run-ad-auction=(), join-ad-interest-group=(), browsing-topics=()"
             }
           ]
         },
@@ -73,10 +69,6 @@
             {
               "key": "Cache-Control",
               "value": "no-cache, no-store, must-revalidate"
-            },
-            {
-              "key": "Permissions-Policy",
-              "value": "attribution-reporting=(), run-ad-auction=(), join-ad-interest-group=(), browsing-topics=()"
             }
           ]
         },

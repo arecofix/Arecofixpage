@@ -20,6 +20,13 @@ export class CustomerService {
   }
 
   async create(data: any): Promise<UserProfile> {
+    // 1. Intentar encontrar cliente existente para evitar error 409 Conflict
+    const existing = await firstValueFrom(this.repository.findByEmailOrPhone(data.email, data.phone));
+    if (existing) {
+      return existing;
+    }
+
+    // 2. Si no existe, crear uno nuevo
     return firstValueFrom(this.repository.createClient(data));
   }
 
@@ -33,6 +40,10 @@ export class CustomerService {
 
   async searchClients(query: string, limit: number = 20): Promise<UserProfile[]> {
     return firstValueFrom(this.repository.searchClients(query, limit));
+  }
+
+  findByEmailOrPhone(email?: string, phone?: string): Promise<UserProfile | null> {
+    return firstValueFrom(this.repository.findByEmailOrPhone(email, phone));
   }
 
   async getRecentClients(limit: number = 20): Promise<UserProfile[]> {

@@ -27,6 +27,28 @@ export class BranchService {
   // Simple runtime cache for branches by slug
   private branchCache = new Map<string, Branch>();
 
+  constructor() {
+    this.hydrateFromStorage();
+  }
+
+  /**
+   * Carga la sucursal guardada en persistencia local
+   */
+  private async hydrateFromStorage() {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+
+    const savedId = localStorage.getItem('arecofix_current_branch_id');
+    if (savedId && savedId !== 'global') {
+      try {
+        // We do it asynchronously to not block constructor, but set signal asap
+        await this.setBranchById(savedId);
+        console.log('[BranchService] Context hydrated from storage:', this._currentBranch()?.name);
+      } catch (e) {
+        console.warn('[BranchService] Hydration failed:', e);
+      }
+    }
+  }
+
   /**
    * Establece la sucursal activa en el contexto actual
    */
@@ -69,6 +91,33 @@ export class BranchService {
    */
   getCurrentBranchId(): string | null {
     return this._currentBranch()?.id || null;
+  }
+
+  /**
+   * Resolves the most appropriate branch ID for an operation.
+   * Priority: Active Context > Provided Profile > Global Profile Context > SuperAdmin Central Fallback.
+   */
+  async resolveEffectiveBranchId(inputProfile?: any): Promise<string | null> {
+    // 1. Check current active signal context
+    const contextId = this.currentBranchId();
+    if (contextId) return contextId;
+
+    // 2. Check provided or global user profile assignment
+    const profile = inputProfile || this.auth.getCurrentProfile();
+    if (profile?.branch_id) return profile.branch_id;
+
+    // 3. SuperAdmin Fallback to Central Branch
+    if (this.auth.isSuperAdmin()) {
+      try {
+        const branches = await this.getAllAdminBranches();
+        const central = branches.find(b => b.name?.toLowerCase().includes('central')) || branches[0];
+        return central?.id || null;
+      } catch (err) {
+        this.logger.error('[BranchService] Failed to resolve fallback branch', err);
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -156,6 +205,13 @@ export class BranchService {
   }
 
   async addBranch(payload: Partial<Branch>, slug: string): Promise<void> {
+    const branding = payload.branding_settings || {
+        logo_url: null,
+        favicon_url: null,
+        primary_color: '#3b82f6',
+        owner_name: ''
+    };
+
     await firstValueFrom(this.branchRepo.create({
         name: payload.name,
         address: payload.address,
@@ -166,11 +222,10 @@ export class BranchService {
         official_name: payload.official_name || payload.name,
         contact_email: payload.contact_email,
         contact_phone: payload.contact_phone,
-        branding_settings: payload.branding_settings || {
-            logo_url: null,
-            favicon_url: null,
-            primary_color: '#3b82f6'
-        },
+        whatsapp_number: payload.whatsapp_number,
+        tax_id: payload.tax_id,
+        bank_info: payload.bank_info || {},
+        branding_settings: branding,
         modules_config: payload.modules_config || {
             dashboard: true,
             repairs: false,
@@ -191,9 +246,11 @@ export class BranchService {
         official_name: branch.official_name,
         contact_email: branch.contact_email,
         contact_phone: branch.contact_phone,
+        whatsapp_number: branch.whatsapp_number,
         tax_id: branch.tax_id,
         branding_settings: branch.branding_settings,
-        modules_config: branch.modules_config
+        modules_config: branch.modules_config,
+        bank_info: branch.bank_info
     }));
   }
 
@@ -203,5 +260,9 @@ export class BranchService {
 
   async toggleBranchStatus(branch: Branch): Promise<void> {
     await firstValueFrom(this.branchRepo.update(branch.id, { is_active: !branch.is_active }));
+  }
+
+  async uploadLogo(file: File): Promise<string> {
+    return this.branchRepo.uploadLogo(file);
   }
 }

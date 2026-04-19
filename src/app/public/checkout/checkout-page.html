@@ -1,191 +1,444 @@
-<div class="checkout-page-container container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-3xl font-bold mb-8 text-center text-primary">Finalizar Compra</h1>
+<div class="checkout-root">
 
-    @if (orderSuccess()) {
-    <div class="card bg-base-100 shadow-xl text-center p-10 border border-base-200 animate-fade-in">
-        <div class="card-body items-center">
-            <div class="text-emerald-500 text-7xl mb-6">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2 class="card-title text-3xl font-black text-base-content mb-4 tracking-tight">¡Orden Recibida!</h2>
-            <p class="text-base-content/80 mb-8 max-w-md">Gracias por tu compra en <strong>{{ branchService.currentBranch()?.name || 'Arecofix' }}</strong>. Para procesar el envío, por favor realiza el pago:</p>
-            
-            <div class="bg-gray-50 dark:bg-gray-900 p-8 rounded-3xl w-full max-w-md mb-8 text-left border border-gray-100 dark:border-gray-800 shadow-inner">
-                <p class="font-black text-gray-400 uppercase tracking-widest text-[10px] mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">Información de Pago</p>
-                <div class="space-y-4">
-                    <p class="text-base-content/70 flex justify-between items-center">
-                        <span class="font-medium">Alias:</span> 
-                        <span class="font-mono font-black text-lg text-emerald-600 dark:text-emerald-400 select-all bg-white dark:bg-gray-800 px-3 py-1 rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700">
-                            {{ branchService.currentBranch()?.bank_info?.alias || 'areco.fix' }}
-                        </span>
-                    </p>
-                    <p class="text-base-content/70 flex justify-between items-center">
-                        <span class="font-medium">CBU:</span> 
-                        <span class="font-mono font-bold text-sm text-base-content select-all bg-white dark:bg-gray-800 px-3 py-1 rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700">
-                            {{ branchService.currentBranch()?.bank_info?.cbu || '0000003100084531456958' }}
-                        </span>
-                    </p>
-                </div>
-            </div>
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: FORM + CART SUMMARY
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === 'form') {
+  <div class="checkout-layout">
 
-            <p class="text-sm mb-6 text-base-content/60">
-                Una vez realizado el pago, envía el comprobante al: <br>
-                <strong class="text-xl text-primary font-black mt-2 block">
-                    {{ branchService.currentBranch()?.whatsapp_number || '+54 9 11 2596-0900' }}
-                </strong>
-            </p>
+    <!-- LEFT: Cart Summary -->
+    <aside class="cart-panel">
+      <div class="panel-header">
+        <span class="panel-icon">🛒</span>
+        <h2>Tu pedido</h2>
+      </div>
 
-            <div class="card-actions flex flex-col gap-3 w-full max-w-md">
-                <a [href]="'https://wa.me/' + (branchService.currentBranch()?.whatsapp_number || '5491125960900').replace(' ', '').replace('+', '') + '?text=Hola,%20hice%20un%20pedido%20en%20' + (branchService.currentBranch()?.name || 'Arecofix') + '%20a%20nombre%20de%20' + checkoutForm.get('name')?.value + '.%20Adjunto%20comprobante.'"
-                   target="_blank" 
-                   class="btn btn-success text-white w-full btn-lg rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition-transform">
-                    <i class="fab fa-whatsapp text-xl mr-2"></i> Enviar Comprobante
-                </a>
-                <a routerLink="/" class="btn btn-ghost w-full rounded-2xl">Volver al Inicio</a>
-            </div>
+      @if (cartService.cartItems().length === 0) {
+        <div class="empty-cart">
+          <span class="empty-icon">📦</span>
+          <p>Tu carrito está vacío</p>
+          <a routerLink="/products/featured" class="link-btn">Ir a comprar →</a>
         </div>
+      } @else {
+        <ul class="cart-items">
+          @for (item of cartService.cartItems(); track item.product.id) {
+            <li class="cart-item">
+              <img
+                [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.png'"
+                class="item-thumb"
+                [alt]="item.product.name"
+              />
+              <div class="item-info">
+                <span class="item-name">{{ item.product.name }}</span>
+                <span class="item-qty">×{{ item.quantity }}</span>
+              </div>
+              <div class="item-price-col">
+                <span class="item-price">
+                  {{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ (item.product.price * item.quantity).toFixed(2) }}
+                </span>
+                <button
+                  (click)="cartService.removeFromCart(item.product.id)"
+                  class="remove-btn"
+                  aria-label="Eliminar"
+                >✕</button>
+              </div>
+            </li>
+          }
+        </ul>
+
+        <div class="cart-total">
+          <span>Total</span>
+          <strong>${{ cartService.totalPrice().toFixed(2) }}</strong>
+        </div>
+
+        <div class="stock-badge">
+          <span class="dot"></span>
+          Unidad disponible en depósito central
+        </div>
+      }
+    </aside>
+
+    <!-- RIGHT: Customer Form -->
+    <section class="form-panel">
+      <div class="panel-header">
+        <span class="panel-icon">📋</span>
+        <h2>Tus datos de entrega</h2>
+      </div>
+
+      <form [formGroup]="checkoutForm" (ngSubmit)="goToPaymentMethod()" class="checkout-form">
+
+        <div class="field-row">
+          <div class="field">
+            <label for="checkout-name">Nombre completo *</label>
+            <input id="checkout-name" type="text" formControlName="name" placeholder="Juan Pérez"
+              [class.error]="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" />
+            @if (checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched) {
+              <span class="field-error">El nombre es requerido</span>
+            }
+          </div>
+        </div>
+
+        <div class="field-row two-col">
+          <div class="field">
+            <label for="checkout-email">Email *</label>
+            <input id="checkout-email" type="email" formControlName="email" placeholder="email@ejemplo.com"
+              [class.error]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" />
+            @if (checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched) {
+              <span class="field-error">Email inválido</span>
+            }
+          </div>
+          <div class="field">
+            <label for="checkout-phone">Teléfono *</label>
+            <input id="checkout-phone" type="tel" formControlName="phone" placeholder="+54 9 11..."
+              [class.error]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" />
+            @if (checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched) {
+              <span class="field-error">Teléfono requerido</span>
+            }
+          </div>
+        </div>
+
+        <div formGroupName="address" class="address-group">
+          <p class="group-label">Dirección de entrega</p>
+          <div class="field-row two-col">
+            <div class="field">
+              <label for="checkout-street">Calle *</label>
+              <input id="checkout-street" type="text" formControlName="street" placeholder="Av. San Martín" />
+            </div>
+            <div class="field">
+              <label for="checkout-number">Número *</label>
+              <input id="checkout-number" type="text" formControlName="number" placeholder="1234" />
+            </div>
+          </div>
+          <div class="field-row three-col">
+            <div class="field">
+              <label for="checkout-neighborhood">Barrio / Dpto</label>
+              <input id="checkout-neighborhood" type="text" formControlName="neighborhood" placeholder="Opcional" />
+            </div>
+            <div class="field">
+              <label for="checkout-city">Ciudad *</label>
+              <input id="checkout-city" type="text" formControlName="city" />
+            </div>
+            <div class="field">
+              <label for="checkout-cp">Código Postal *</label>
+              <input id="checkout-cp" type="text" formControlName="postal_code" placeholder="1727" maxlength="4" class="mono" />
+              @if (checkoutForm.get('address.postal_code')?.invalid && checkoutForm.get('address.postal_code')?.touched) {
+                <span class="field-error">CP de 4 dígitos</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="checkout-notes">Notas adicionales</label>
+          <textarea id="checkout-notes" formControlName="notes" rows="3" placeholder="Instrucciones de entrega, referencias, etc."></textarea>
+        </div>
+
+        <button
+          id="btn-go-payment"
+          type="submit"
+          class="btn-primary"
+          [disabled]="cartService.cartItems().length === 0"
+        >
+          Continuar con el pago →
+        </button>
+
+      </form>
+    </section>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: PAYMENT METHOD SELECTION
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === 'payment_method') {
+  <div class="centered-step">
+
+    <!-- Reservation timer -->
+    <div class="reservation-banner">
+      <div class="reservation-icon">🔒</div>
+      <div class="reservation-text">
+        <strong>Reservando unidad en depósito central...</strong>
+        <span>Su lugar en la fila está asegurado por</span>
+      </div>
+      <div class="countdown-block">
+        <span class="countdown-display">{{ countdownDisplay() }}</span>
+        <span class="countdown-label">minutos</span>
+        <div class="countdown-bar">
+          <div class="countdown-fill" [style.width.%]="countdownPct()"></div>
+        </div>
+      </div>
     </div>
-    } @else {
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Cart Summary -->
-        <div class="card bg-base-100 shadow-xl h-fit border border-base-200">
-            <div class="card-body">
-                <h2 class="card-title mb-4 text-base-content">Resumen del Carrito</h2>
 
-                @if (cartService.cartItems().length === 0) {
-                <p class="text-base-content">Tu carrito está vacío.</p>
-                <a routerLink="/products/featured" class="btn btn-link px-0">Ir a comprar</a>
-                } @else {
-                <div class="space-y-4">
-                    @for (item of cartService.cartItems(); track item.product.id) {
-                    <div class="flex gap-4 items-center p-2 hover:bg-base-200 rounded-lg transition-colors">
-                        <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.png'"
-                            class="w-16 h-16 object-cover rounded-lg border border-base-300" />
-                        <div class="flex-1">
-                            <h3 class="font-bold text-base-content">{{ item.product.name }}</h3>
-                            <p class="text-sm text-base-content/70">{{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ item.product.price }} x {{ item.quantity }}</p>
-                        </div>
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="font-bold text-base-content">
-                                {{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ (item.product.price * item.quantity).toFixed(2) }}
-                            </span>
-                            <button (click)="cartService.removeFromCart(item.product.id)" class="btn btn-ghost btn-xs text-error" aria-label="Eliminar">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                    }
-                </div>
+    <!-- Order recap -->
+    <div class="order-recap">
+      <span class="recap-items">{{ cartService.cartItems().length }} artículo(s)</span>
+      <span class="recap-total">${{ cartService.totalPrice().toFixed(2) }}</span>
+    </div>
 
-                <div class="divider"></div>
+    <!-- Payment method cards -->
+    <h2 class="step-title">¿Cómo querés pagar?</h2>
 
-                <div class="flex justify-between text-xl font-bold text-base-content">
-                    <span>Total</span>
-                    <span>${{ cartService.totalPrice().toFixed(2) }}</span>
-                </div>
-                }
-            </div>
+    <div class="method-cards">
+
+      <!-- Option A: Digital -->
+      <button
+        id="method-digital"
+        class="method-card"
+        [class.selected]="selectedMethod() === 'digital'"
+        (click)="selectMethod('digital')"
+        type="button"
+      >
+        <span class="method-badge recommended">Recomendado</span>
+        <div class="method-icon">💳</div>
+        <div class="method-info">
+          <strong>Pago Digital / Tarjeta de Débito</strong>
+          <p>Acreditación instantánea. Validación Bancaria Inmediata.</p>
+          <ul class="method-features">
+            <li>✓ Sin comisiones extra</li>
+            <li>✓ Orden procesada al instante</li>
+            <li>✓ Confirmación por email</li>
+          </ul>
         </div>
+        <div class="method-check" [class.visible]="selectedMethod() === 'digital'">✓</div>
+      </button>
 
-        <!-- Customer Form -->
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body">
-                <h2 class="card-title mb-4 text-base-content">Datos del Cliente</h2>
-
-                <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()" class="space-y-4">
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text text-base-content">Nombre Completo</span>
-                        </label>
-                        <input type="text" formControlName="name" class="input input-bordered w-full bg-base-100 text-base-content"
-                            [class.input-error]="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" />
-                        @if (checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched) {
-                        <span class="text-error text-xs mt-1">El nombre es requerido</span>
-                        }
-                    </div>
-
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text text-base-content">Email</span>
-                        </label>
-                        <input type="email" formControlName="email" class="input input-bordered w-full bg-base-100 text-base-content"
-                            [class.input-error]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" />
-                        @if (checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched) {
-                        <span class="text-error text-xs mt-1">Email inválido</span>
-                        }
-                    </div>
-
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text text-base-content">Teléfono</span>
-                        </label>
-                        <input type="tel" formControlName="phone" class="input input-bordered w-full bg-base-100 text-base-content"
-                            [class.input-error]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" />
-                        @if (checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched) {
-                        <span class="text-error text-xs mt-1">El teléfono es requerido</span>
-                        }
-                    </div>
-
-                    <div formGroupName="address" class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-base-content">Calle</span>
-                                </label>
-                                <input type="text" formControlName="street" class="input input-bordered w-full bg-base-100 text-base-content" />
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-base-content">Número</span>
-                                </label>
-                                <input type="text" formControlName="number" class="input input-bordered w-full bg-base-100 text-base-content" />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-base-content">Barrio / Depto</span>
-                                </label>
-                                <input type="text" formControlName="neighborhood" class="input input-bordered w-full bg-base-100 text-base-content" placeholder="Opcional" />
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-base-content">Ciudad</span>
-                                </label>
-                                <input type="text" formControlName="city" class="input input-bordered w-full bg-base-100 text-base-content" />
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-base-content font-bold">Cóg. Postal (CP)</span>
-                                </label>
-                                <input type="text" formControlName="postal_code" class="input input-bordered w-full bg-base-100 text-base-content font-mono" placeholder="Ej: 1727" maxlength="4" />
-                                @if (checkoutForm.get('address.postal_code')?.invalid && checkoutForm.get('address.postal_code')?.touched) {
-                                  <span class="text-error text-xs mt-1">CP inválido. Debe ser de 4 dígitos.</span>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text text-base-content">Notas (Opcional)</span>
-                        </label>
-                        <textarea formControlName="notes" class="textarea textarea-bordered w-full bg-base-100 text-base-content"></textarea>
-                    </div>
-
-                    <div class="mt-6 checkout-action-buttons">
-                        <button type="submit" class="checkout-submit-btn btn btn-primary btn-block btn-lg"
-                            [disabled]="isProcessing() || cartService.cartItems().length === 0">
-                            @if (isProcessing()) {
-                            <span class="loading loading-spinner"></span>
-                            }
-                            Finalizar Compra
-                        </button>
-                    </div>
-                </form>
-            </div>
+      <!-- Option B: Cash -->
+      <button
+        id="method-cash"
+        class="method-card"
+        [class.selected]="selectedMethod() === 'cash'"
+        (click)="selectMethod('cash')"
+        type="button"
+      >
+        <div class="method-icon">🏪</div>
+        <div class="method-info">
+          <strong>Efectivo en Puntos de Cobro</strong>
+          <p>Rapipago · Pago Fácil · Red Link</p>
+          <ul class="method-features">
+            <li>✓ Más de 5.000 puntos en todo el país</li>
+            <li>✓ Ticket de pago generado al instante</li>
+            <li>✓ Válido por 24 horas</li>
+          </ul>
         </div>
+        <div class="method-check" [class.visible]="selectedMethod() === 'cash'">✓</div>
+      </button>
+
+    </div>
+
+    <!-- Confirm button -->
+    <button
+      id="btn-finalize-order"
+      class="btn-primary"
+      (click)="placeOrder()"
+      [disabled]="!selectedMethod() || isProcessing()"
+    >
+      @if (isProcessing()) {
+        <span class="spinner"></span> Reservando stock...
+      } @else {
+        Finalizar Pedido →
+      }
+    </button>
+
+    <button class="btn-ghost" (click)="step.set('form')" type="button">← Volver</button>
+
+    <p class="security-note">🔐 Tu información está protegida con encriptación de 256 bits</p>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: PENDING PAYMENT
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === 'pending_payment') {
+  <div class="centered-step">
+
+    <div class="success-header">
+      <div class="pulse-icon">📦</div>
+      <h1>¡Pedido Registrado!</h1>
+      <p class="order-num">#{{ currentOrder()?.order_number }}</p>
+      <p class="success-sub">
+        Su unidad está <strong>separada en nuestro depósito central</strong>.<br/>
+        Para liberar el despacho, completá el pago a continuación.
+      </p>
+    </div>
+
+    <!-- Polling indicator: if already paid -->
+    @if (orderStatus() === 'awaiting_verification' || orderStatus() === 'paid' || orderStatus() === 'preparing') {
+    <div class="status-ribbon paid">
+      @if (orderStatus() === 'paid' || orderStatus() === 'preparing') {
+        ✅ ¡Pago confirmado! Tu pedido entró en fase de preparación.
+      } @else {
+        🕐 Comprobante recibido. Verificando pago...
+      }
     </div>
     }
+
+    <!-- DIGITAL payment instructions -->
+    @if (selectedMethod() === 'digital') {
+    <div class="payment-block digital-block">
+      <h3>Instrucciones de Validación Bancaria Inmediata</h3>
+      <div class="alias-box">
+        <div class="alias-row">
+          <span class="alias-label">Alias</span>
+          <span class="alias-value mono">{{ branchService.currentBranch()?.bank_info?.alias || 'areco.fix' }}</span>
+          <button class="copy-btn" (click)="$event.preventDefault()"
+            onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim()); this.textContent='¡Copiado!'">
+            📋
+          </button>
+        </div>
+        <div class="alias-row">
+          <span class="alias-label">Validación Bancaria</span>
+          <span class="alias-value mono small">{{ branchService.currentBranch()?.bank_info?.cbu || '0000003100084531456958' }}</span>
+          <button class="copy-btn" (click)="$event.preventDefault()"
+            onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim()); this.textContent='¡Copiado!'">
+            📋
+          </button>
+        </div>
+        <div class="total-row">
+          <span>Total a transferir</span>
+          <strong>${{ currentOrder()?.total?.toFixed(2) }}</strong>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- CASH: Official payment ticket -->
+    @if (selectedMethod() === 'cash' && paymentTicket()) {
+    <div class="ticket-wrapper">
+      <div class="ticket" id="payment-ticket">
+
+        <div class="ticket-header">
+          <div class="ticket-logo">
+            <span class="logo-af">AF</span>
+            <div>
+              <strong>ARECOFIX</strong>
+              <small>Ticket Oficial de Pago</small>
+            </div>
+          </div>
+          <div class="ticket-order">
+            <span>Orden</span>
+            <strong>#{{ currentOrder()?.order_number }}</strong>
+          </div>
+        </div>
+
+        <div class="ticket-divider"><span>✦ ✦ ✦</span></div>
+
+        <!-- Barcode visual (CSS-only) -->
+        <div class="barcode-container">
+          <div class="barcode">
+            @for (b of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]; track b) {
+              <div class="bar" [class.wide]="b % 5 === 0"></div>
+            }
+          </div>
+          <p class="barcode-code mono">{{ formatTicketCode(paymentTicket()!.ticketCode) }}</p>
+        </div>
+
+        <div class="ticket-divider"><span>✦ ✦ ✦</span></div>
+
+        <div class="ticket-amount">
+          <span>Total a abonar</span>
+          <strong class="amount-big">${{ paymentTicket()!.total.toFixed(2) }}</strong>
+        </div>
+
+        <div class="ticket-instructions">
+          <p>Diríjase a cualquier sucursal de <strong>Rapipago</strong> o <strong>Pago Fácil</strong> con este código. Una vez abonado, el sistema <strong>liberará su pedido del depósito automáticamente</strong>.</p>
+          <div class="ticket-logos">
+            <span class="pay-logo rapipago">Rapipago</span>
+            <span class="pay-logo pagofacil">Pago Fácil</span>
+          </div>
+        </div>
+
+        <div class="ticket-footer">
+          <span>Vence:</span>
+          <strong>{{ paymentTicket()!.expiresAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Proof of payment upload -->
+    <div class="proof-section">
+      <h3>¿Ya realizaste el pago?</h3>
+      <p>Subí tu comprobante directamente aquí y validaremos en minutos.</p>
+
+      <div class="upload-area" [class.has-file]="proofFile()">
+        <input
+          type="file"
+          id="proof-upload"
+          (change)="onProofFileSelected($event)"
+          accept="image/*,application/pdf"
+          class="file-input"
+        />
+        <label for="proof-upload" class="upload-label">
+          @if (proofPreviewUrl()) {
+            <img [src]="proofPreviewUrl()" class="proof-preview" alt="Comprobante" />
+          } @else if (proofFile()) {
+            <span class="upload-icon">📄</span>
+            <span>{{ proofFile()!.name }}</span>
+          } @else {
+            <span class="upload-icon">📎</span>
+            <span>Tocá para subir comprobante</span>
+            <small>JPG, PNG o PDF · Máx. 10 MB</small>
+          }
+        </label>
+      </div>
+
+      @if (proofFile()) {
+      <button
+        id="btn-submit-proof"
+        class="btn-primary"
+        (click)="submitProof()"
+        [disabled]="isUploadingProof()"
+      >
+        @if (isUploadingProof()) {
+          <span class="spinner"></span> Enviando comprobante...
+        } @else {
+          ✓ Ya realicé mi pago — Enviar comprobante
+        }
+      </button>
+      }
+    </div>
+
+    <!-- WhatsApp fallback -->
+    <div class="whatsapp-fallback">
+      <p>¿Preferís enviar el comprobante por WhatsApp?</p>
+      <a [href]="whatsappUrl" target="_blank" class="btn-whatsapp">
+        <span>💬</span> Enviar por WhatsApp
+      </a>
+    </div>
+
+    <p class="polling-note">🔄 Estado de tu pedido actualizándose automáticamente...</p>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: AWAITING VERIFICATION
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === 'awaiting_verification') {
+  <div class="centered-step">
+    <div class="status-card verification">
+      <div class="status-icon">🕐</div>
+      <h1>¡Comprobante recibido!</h1>
+      <p>
+        Tu pago está en proceso de verificación. Esto toma entre <strong>5 y 30 minutos</strong>.
+        Te notificaremos por email cuando esté confirmado.
+      </p>
+      <div class="steps-timeline">
+        <div class="tl-step done">✓ Pedido registrado</div>
+        <div class="tl-step done">✓ Comprobante recibido</div>
+        <div class="tl-step active">⏳ Verificando pago</div>
+        <div class="tl-step pending">🔒 Preparación y despacho</div>
+      </div>
+
+      @if (orderStatus() === 'paid' || orderStatus() === 'preparing') {
+        <div class="status-ribbon paid">
+          ✅ ¡Pago validado! Entrando en fase de preparación...
+        </div>
+      }
+
+      <a routerLink="/" class="btn-ghost">Volver al inicio</a>
+      <p class="polling-note">🔄 Estado actualizándose en tiempo real</p>
+    </div>
+  </div>
+  }
+
 </div>

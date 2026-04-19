@@ -1,6 +1,8 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 export type Language = 'en' | 'es';
 export type Theme = 'gradient-1' | 'gradient-5'; // Add more as needed
@@ -10,6 +12,8 @@ export type Theme = 'gradient-1' | 'gradient-5'; // Add more as needed
 })
 export class PreferencesService {
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
+  private lastWasAdmin = false;
   
   private languageSubject = new BehaviorSubject<Language>('es');
   language$ = this.languageSubject.asObservable();
@@ -30,13 +34,36 @@ export class PreferencesService {
   forcedLight$ = this.forcedLightSubject.asObservable();
 
   readonly backgroundOptions = [
-    { id: 'gradient-5', name: 'Dark Gray', class: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black', isDark: true },
-    { id: 'gradient-1', name: 'Blue Gradient', class: 'bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900', isDark: true },
-    { id: 'light', name: 'Light Mode', class: 'bg-gray-50', isDark: false }
+    { id: 'system', name: 'Sistema (Auto)', class: 'bg-gray-100 dark:bg-gray-800', isDark: false },
+    { id: 'light', name: 'Modo Claro', class: 'bg-gray-50', isDark: false },
+    { id: 'gradient-5', name: 'Modo Oscuro', class: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black', isDark: true }
   ];
 
   constructor() {
     this.loadPreferences();
+    this.initAdminThemeListener();
+  }
+
+  private initAdminThemeListener(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      const url = (event as NavigationEnd).urlAfterRedirects;
+      const isAdminPath = url.startsWith('/admin') || url.includes('/admin/');
+      
+      if (isAdminPath && !this.lastWasAdmin) {
+        // Al ingresar al admin, forzar tema light por defecto si no es el actual
+        if (this.themeSubject.value !== 'light') {
+          this.setTheme('light');
+        }
+      } else if (!isAdminPath && this.lastWasAdmin) {
+        // Al salir del admin, volver al tema del sistema por defecto
+        this.setTheme('system');
+      }
+      this.lastWasAdmin = isAdminPath;
+    });
   }
 
   getBackgroundClass(themeId: string): string {
@@ -138,12 +165,13 @@ export class PreferencesService {
     if (savedLanguage) {
       this.languageSubject.next(savedLanguage);
     }
-    if (savedBackground) {
+    if (savedBackground && this.backgroundOptions.find(o => o.id === savedBackground)) {
       this.themeSubject.next(savedBackground);
       this.applyTheme(savedBackground);
     } else {
-      // Default to first theme (Dark Gray)
-      this.applyTheme(this.backgroundOptions[0].id);
+      // Default to first theme (System)
+      this.themeSubject.next('system');
+      this.applyTheme('system');
     }
     if (savedFontSize) {
       this.fontSizeSubject.next(parseInt(savedFontSize, 10));
@@ -160,17 +188,26 @@ export class PreferencesService {
       return;
     }
 
+    if (themeId === 'system') {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.setThemeDOM(isDark);
+      return;
+    }
+
     const theme = this.backgroundOptions.find(t => t.id === themeId) || this.backgroundOptions[0];
-    
+    this.setThemeDOM(theme.isDark);
+  }
+
+  private setThemeDOM(isDark: boolean): void {
     // Toggle .dark class for Tailwind @custom-variant
-    if (theme.isDark) {
+    if (isDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
 
     // Set data-theme for DaisyUI (and semantic colors)
-    const daisyTheme = theme.isDark ? 'dark' : 'light';
+    const daisyTheme = isDark ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', daisyTheme);
   }
 

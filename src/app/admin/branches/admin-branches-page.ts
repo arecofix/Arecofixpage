@@ -12,7 +12,7 @@ import { TenantService } from '@app/core/services/tenant.service';
     templateUrl: './admin-branches-page.html',
 })
 export class AdminBranchesPage implements OnInit {
-    private branchService = inject(BranchService);
+    public branchService = inject(BranchService);
     private tenantService = inject(TenantService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
@@ -26,13 +26,32 @@ export class AdminBranchesPage implements OnInit {
     // Form states
     showForm = signal(false);
     isEditing = signal(false);
+    currentTab = signal<'general' | 'branding' | 'contact' | 'financial'>('general');
+    uploadingLogo = signal(false);
+
     currentForm = signal<Partial<Branch>>({
         name: '',
         address: '',
         slug: '',
+        official_name: '',
+        contact_email: '',
+        contact_phone: '',
+        whatsapp_number: '',
+        tax_id: '',
         global_markup_percentage: 0,
         is_active: true,
         plan_id: 'basic',
+        branding_settings: {
+            logo_url: null,
+            favicon_url: null,
+            primary_color: '#3b82f6',
+            owner_name: ''
+        },
+        bank_info: {
+            alias: '',
+            cbu: '',
+            bank: ''
+        },
         modules_config: {
             dashboard: true,
             repairs: false,
@@ -40,6 +59,28 @@ export class AdminBranchesPage implements OnInit {
             customers: true
         }
     });
+
+    async onLogoSelected(event: any) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        this.uploadingLogo.set(true);
+        try {
+            const url = await this.branchService.uploadLogo(file);
+            const form = this.currentForm();
+            this.currentForm.set({
+                ...form,
+                branding_settings: {
+                    ...(form.branding_settings || { logo_url: null, favicon_url: null, primary_color: '#3b82f6' }),
+                    logo_url: url
+                }
+            });
+        } catch (e: any) {
+            this.error.set('Error al subir logo: ' + e.message);
+        } finally {
+            this.uploadingLogo.set(false);
+        }
+    }
 
     async ngOnInit() {
         await this.loadBranches();
@@ -50,6 +91,12 @@ export class AdminBranchesPage implements OnInit {
         try {
             const data = await this.branchService.getAllAdminBranches();
             this.branches.set(data || []);
+
+            // Auto-open specific branch if we are in its context
+            const activeBranch = this.branchService.currentBranch();
+            if (activeBranch) {
+                this.openEditForm(activeBranch);
+            }
         } catch (e: any) {
             this.error.set(e.message);
         } finally {
@@ -60,13 +107,30 @@ export class AdminBranchesPage implements OnInit {
 
     openCreateForm() {
         this.isEditing.set(false);
+        this.currentTab.set('general');
         this.currentForm.set({
             name: '',
             address: '',
             slug: '',
+            official_name: '',
+            contact_email: '',
+            contact_phone: '',
+            whatsapp_number: '',
+            tax_id: '',
             global_markup_percentage: 0,
             is_active: true,
             plan_id: 'basic',
+            branding_settings: {
+                logo_url: null,
+                favicon_url: null,
+                primary_color: '#3b82f6',
+                owner_name: ''
+            },
+            bank_info: {
+                alias: '',
+                cbu: '',
+                bank: ''
+            },
             modules_config: {
                 dashboard: true,
                 repairs: false,
@@ -79,14 +143,30 @@ export class AdminBranchesPage implements OnInit {
 
     openEditForm(branch: Branch) {
         this.isEditing.set(true);
-        // Ensure modules_config exists
+        this.currentTab.set('general');
+        // Ensure nested objects exist
         const modules = branch.modules_config || {
             dashboard: true,
             repairs: branch.plan_id === 'premium',
             inventory: branch.plan_id === 'premium',
             customers: true
         };
-        this.currentForm.set({ ...branch, modules_config: { ...modules } });
+        const branding = branch.branding_settings || {
+            logo_url: null,
+            favicon_url: null,
+            primary_color: '#4f46e5'
+        };
+        const bank = branch.bank_info || {
+            alias: '',
+            cbu: '',
+            bank: ''
+        };
+        this.currentForm.set({ 
+            ...branch, 
+            modules_config: { ...modules },
+            branding_settings: { ...branding },
+            bank_info: { ...bank }
+        });
         this.showForm.set(true);
     }
 

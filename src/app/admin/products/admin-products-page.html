@@ -153,7 +153,7 @@
                       <div class="flex items-center gap-4">
                         <div class="avatar">
                           <div class="mask mask-squircle w-12 h-12 bg-gray-100 dark:bg-gray-700">
-                            <img [src]="product.image_url || 'assets/img/no-image.png'" [alt]="product.name" class="object-cover" />
+                            <img [src]="product.image_url || 'assets/img/no-image.png'" [alt]="product.name" class="object-contain p-0.5" />
                           </div>
                         </div>
                         <div>
@@ -267,7 +267,7 @@
 
                         <!-- Image -->
                         <div class="avatar rounded-xl w-20 h-20 bg-gray-100 shrink-0">
-                          <img [src]="product.image_url || 'assets/img/no-image.png'" class="object-cover rounded-xl" />
+                          <img [src]="product.image_url || 'assets/img/no-image.png'" class="object-contain rounded-xl p-0.5" />
                         </div>
 
                         <!-- Content -->

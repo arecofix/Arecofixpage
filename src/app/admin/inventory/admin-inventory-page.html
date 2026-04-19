@@ -20,47 +20,50 @@
   </div>
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
       <div class="stat">
         <div class="stat-figure text-primary">
-          <i class="fas fa-cube text-3xl opacity-50"></i>
+          <i class="fas fa-boxes text-3xl opacity-20"></i>
         </div>
         <div class="stat-title text-xs uppercase tracking-wider">Productos Totales</div>
-        <div class="stat-value text-primary">{{ totalItems() }}</div>
+        <div class="stat-value text-primary">{{ inventorySummary().totalItems }}</div>
+        <div class="stat-desc">En toda la sucursal</div>
       </div>
     </div>
 
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-      <div class="stat">
-        <div class="stat-figure text-error">
-          <i class="fas fa-exclamation-circle text-3xl opacity-50"></i>
-        </div>
-        <div class="stat-title text-xs uppercase tracking-wider text-error">En esta vista</div>
-        <div class="stat-value text-error">{{ products().length }}</div>
-      </div>
-    </div>
-
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-      <div class="stat">
-        <div class="stat-figure text-warning">
-          <i class="fas fa-thermometer-quarter text-3xl opacity-50"></i>
-        </div>
-        <div class="stat-title text-xs uppercase tracking-wider text-warning">Página</div>
-        <div class="stat-value text-warning">{{ currentPage() }} / {{ pagesCount() }}</div>
-      </div>
-    </div>
-
-    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
       <div class="stat">
         <div class="stat-figure text-success">
-          <i class="fas fa-dollar-sign text-3xl opacity-50"></i>
+          <i class="fas fa-dollar-sign text-3xl opacity-20"></i>
         </div>
-        <div class="stat-title text-xs uppercase tracking-wider">Valor Vista</div>
-        <div class="stat-value text-success text-2xl">{{ pageValue() | currency:'ARS':'symbol':'1.0-0' }}</div>
-        <div class="stat-desc">Subtotal de lo visualizado</div>
+        <div class="stat-title text-xs uppercase tracking-wider">Valor de Inventario</div>
+        <div class="stat-value text-success text-2xl">$ {{ inventorySummary().totalValue | number:'1.0-0' }}</div>
+        <div class="stat-desc">Stock x Precio Venta</div>
       </div>
     </div>
+
+    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div class="stat">
+        <div class="stat-figure text-warning">
+          <i class="fas fa-exclamation-triangle text-3xl opacity-20"></i>
+        </div>
+        <div class="stat-title text-xs uppercase tracking-wider text-warning">Bajo Stock</div>
+        <div class="stat-value text-warning">{{ inventorySummary().lowStockCount }}</div>
+        <div class="stat-desc">Requieren reposición</div>
+      </div>
+    </div>
+
+    <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="stat">
+          <div class="stat-figure text-info">
+            <i class="fas fa-file-invoice text-3xl opacity-20"></i>
+          </div>
+          <div class="stat-title text-xs uppercase tracking-wider">Página Actual</div>
+          <div class="stat-value text-info text-2xl">{{ currentPage() }} / {{ pagesCount() }}</div>
+          <div class="stat-desc">{{ products().length }} items visibles</div>
+        </div>
+      </div>
   </div>
 
   <!-- Controls Bar -->

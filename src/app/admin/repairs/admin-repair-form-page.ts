@@ -177,6 +177,12 @@ export class AdminRepairFormPage implements OnInit {
     company = signal<any>(null); // Company settings are quite dynamic, can keep any or define interface
     uploadingImages = signal(false);
     clients: any[] = [];
+
+    public missingBranch = computed(() => {
+        // SuperAdmins are never 'missing' a branch (fall back to Central)
+        if (this.auth.isSuperAdmin()) return false; 
+        return !this.branchService.currentBranchId();
+    });
     
     async loadInitialClients() {
         try {
@@ -397,47 +403,87 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     async save() {
-        if (this.repairForm.invalid) {
-            this.repairForm.markAllAsTouched();
-            this.notificationService.showError('Por favor, completa los campos obligatorios correctamente.');
-            return;
-        }
-
+        console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
         this.saving.set(true);
         this.error.set(null);
-        
+
         try {
-            const formData = this.repairForm.getRawValue();
+            // 1. Resolve branch ID with centralized logic
+            console.log('📍 [AdminRepairForm] Resolviendo sucursal...');
+            const branchIdActual = await this.branchService.resolveEffectiveBranchId();
             
-            // Fix: ensure UUIDs are null not empty string to avoid DB errors
-            const payload: any = {
+            if (!branchIdActual) {
+                console.error('❌ [AdminRepairForm] No se detectó sucursal activa');
+                const errorMsg = 'Sucursal no detectada. Selecciona una en el panel superior.';
+                this.notificationService.showError('❌ ' + errorMsg);
+                this.error.set(errorMsg);
+                this.saving.set(false);
+                return;
+            }
+            console.log('✅ [AdminRepairForm] Sucursal resuelta:', branchIdActual);
+
+            // 2. Validate form
+            if (this.repairForm.invalid) {
+                const invalidFields: string[] = [];
+                const controls = this.repairForm.controls;
+                for (const name in controls) {
+                    if (controls[name].invalid) {
+                        invalidFields.push(`${name}: ${JSON.stringify(controls[name].errors)}`);
+                    }
+                }
+                console.warn('⚠️ [AdminRepairForm] Campos inválidos detected:', invalidFields);
+                this.repairForm.markAllAsTouched();
+                
+                let firstError = 'Por favor, completa los campos obligatorios.';
+                const nameControl = this.repairForm.get('customer_name');
+                
+                if (nameControl?.invalid) {
+                    if (nameControl.errors?.['required']) firstError = 'El nombre del cliente es obligatorio.';
+                    else if (nameControl.errors?.['minlength']) firstError = `El nombre es demasiado corto (mínimo ${nameControl.errors?.['minlength'].requiredLength} letras).`;
+                    else firstError = 'Revisa el nombre del cliente.';
+                }
+                else if (this.repairForm.get('customer_phone')?.invalid) firstError = 'El teléfono es obligatorio.';
+                else if (this.repairForm.get('device_model')?.invalid) firstError = 'El modelo del equipo es obligatorio.';
+                else if (this.repairForm.get('issue_description')?.invalid) firstError = 'La falla es obligatoria.';
+                
+                this.notificationService.showError('⚠️ ' + firstError);
+                this.saving.set(false);
+                return;
+            }
+
+            // 3. Prepare payload
+            console.log('📦 [AdminRepairForm] Preparando datos...');
+            const formData = this.repairForm.getRawValue();
+            const payload = {
                 ...formData,
                 customer_id: formData.customer_id || null,
                 images: this.images(),
-                parts: this.parts()
+                parts: this.parts(),
+                branch_id: branchIdActual
             };
             
+            console.log('📤 [AdminRepairForm] Enviando a servicio...', this.id ? 'UPDATE' : 'CREATE');
+            
             if (this.id) {
-                await this.repairService.update(this.id, payload as UpdateRepairDto);
+                await this.repairService.update(this.id, payload as any);
                 this.notificationService.showSuccess('✅ Reparación actualizada correctamente.');
             } else {
-                const branchIdActual = this.branchService.getCurrentBranchId() || null;
+                await this.repairService.create(payload as CreateRepairDto);
+                this.notificationService.showSuccess('✅ Orden Creada exitosamente.');
                 
-                if (!branchIdActual) {
-                    throw new Error('No se pudo determinar la sucursal activa.');
+                try {
+                    console.log('📄 [AdminRepairForm] Generando comprobante...');
+                    await this.printOrder();
+                } catch (pdfErr) {
+                    console.error('Error generando PDF automático:', pdfErr);
                 }
-
-                await this.repairWorkflowService.processNewRepair(
-                    payload as CreateRepairDto, 
-                    payload.deposit_amount, 
-                    branchIdActual
-                );
-                this.notificationService.showSuccess('✅ Orden Creada, Inventario Descontado y Finanzas Asentadas.');
             }
+
+            console.log('🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...');
             this.router.navigate(['/admin/repairs']);
         } catch (e: any) {
-            console.error('Error saving repair:', e);
-            const message = e.message || e.error_description || (e instanceof Error ? e.message : 'Unknown error');
+            console.error('💥 [AdminRepairForm] Error crítico en save():', e);
+            const message = e.message || (e.error?.message) || 'Error desconocido al procesar la solicitud.';
             this.notificationService.showError('Error al guardar: ' + message);
             this.error.set(message);
         } finally {

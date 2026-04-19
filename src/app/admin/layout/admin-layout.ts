@@ -1,238 +1,298 @@
-import { Component, inject, OnInit, OnDestroy, effect, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
-import { Subscription, filter } from 'rxjs';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
-import { NotificationService, AppNotification } from '@app/core/services/notification.service';
-import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
+import { BranchService } from '@app/core/services/branch.service';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { UserProfile } from '@app/shared/interfaces/user.interface';
+import { Branch } from '@app/shared/interfaces/branch.interface';
 import { PreferencesService } from '@app/shared/services/preferences.service';
-import { BranchService, Branch } from '@app/core/services/branch.service';
-import { signal } from '@angular/core';
-import { ThemeService } from '@app/core/services/theme.service';
-import { BranchContextService } from '@app/core/services/branch-context.service';
+import { NotificationService } from '@app/core/services/notification.service';
+import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+interface MenuItem {
+  title: string;
+  path?: string;
+  icon: string;
+  expanded?: boolean;
+  children?: MenuItem[];
+  module?: string;
+}
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AccessibilitySidebarComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    AccessibilitySidebarComponent
+  ],
   templateUrl: './admin-layout.html',
 })
 export class AdminLayout implements OnInit, OnDestroy {
   public authService = inject(AuthService);
-  private router = inject(Router);
-  private branchService = inject(BranchService);
-  public preferencesService = inject(PreferencesService);
+  public branchService = inject(BranchService);
   public notificationService = inject(NotificationService);
-  private themeService = inject(ThemeService);
-  private branchContextService = inject(BranchContextService);
-
-  public branches = signal<Branch[]>([]);
-  public currentBranchId = this.branchService.currentBranchId;
-  public currentAssignedBranch = signal<any | null>(null);
-  public branchBranding = signal<{ logo: string | null, name: string }>({ 
-    logo: '/assets/img/brands/logo/logo-normal.PNG', 
-    name: 'Arecofix' 
-  });
-
-  menuItems: any[] = [];
-  
+  private router = inject(Router);
+  public preferencesService = inject(PreferencesService);
   private cdr = inject(ChangeDetectorRef);
 
-  get currentSelectedBranchId() {
-    return this.branchService.currentBranch()?.id || '';
-  }
+  // Convert observables to signals for easier template usage and type safety
+  public highContrast = toSignal(this.preferencesService.highContrast$, { initialValue: false });
+  public fontSize = toSignal(this.preferencesService.fontSize$, { initialValue: 16 });
 
-  constructor() {
-    effect(() => {
-      const branch = this.branchService.currentBranch();
-      const config = branch?.modules_config as any;
-      const basePrefix = branch?.slug ? `/${branch.slug}/admin` : '/admin';
-      
-      const hasAccess = (modName?: string) => {
-        if (!modName) return true;
-        if (!config) return true;
-        return config[modName] === undefined || config[modName] === true;
-      };
-
-      const baseItems = [
-        { title: 'Dashboard', path: `${basePrefix}/dashboard`, icon: 'fa-chart-line', module: 'dashboard' },
-        {
-          title: 'Productos',
-          path: `${basePrefix}/products`,
-          icon: 'fa-box',
-          expanded: false,
-          module: 'inventory',
-          children: [
-            { title: 'Categorías', path: `${basePrefix}/categories`, icon: 'fa-tags', module: 'inventory' },
-            { title: 'Marcas', path: `${basePrefix}/brands`, icon: 'fa-copyright', module: 'inventory' },
-            { title: 'Inventario', path: `${basePrefix}/inventory`, icon: 'fa-warehouse', module: 'inventory' },
-            { title: 'Ventas', path: `${basePrefix}/sales`, icon: 'fa-cash-register', module: 'inventory' },
-            { title: 'Compras', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag', module: 'inventory' },
-            { title: 'Pedidos', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart', module: 'inventory' },
-          ]
-        },
-        { title: 'Clientes', path: `${basePrefix}/clients`, icon: 'fa-users', module: 'customers' },
-        {
-          title: 'Empresa',
-          path: `${basePrefix}/company`,
-          icon: 'fa-building',
-          expanded: false,
-          children: [
-            { title: 'Empleados', path: `${basePrefix}/employees`, icon: 'fa-id-card' },
-            { title: 'Sucursales', path: `${basePrefix}/branches`, icon: 'fa-map-marker-alt' },
-            { title: 'Proveedores', path: `${basePrefix}/suppliers`, icon: 'fa-truck' },
-            { title: 'Facturación', path: `${basePrefix}/sales/invoices`, icon: 'fa-file-invoice-dollar' },
-          ]
-        },
-        { title: 'Cursos', path: `${basePrefix}/courses`, icon: 'fa-graduation-cap' },
-        { title: 'Servicios', path: `${basePrefix}/services`, icon: 'fa-tools' },
-        { title: 'Taller', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
-        { title: 'Usuarios', path: `${basePrefix}/users`, icon: 'fa-user-cog' },
-        { title: 'Mensajes', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
-        { title: 'Entradas', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
-      ];
-
-      this.menuItems = baseItems.filter(item => {
-        // Evaluate parent access
-        const parentHasAccess = hasAccess(item.module);
-        
-        if (item.children) {
-          // Filter accessible children
-          item.children = item.children.filter(child => hasAccess((child as any).module));
-          // If parent is allowed OR any child is allowed
-          return parentHasAccess || item.children.length > 0;
-        }
-        
-        return parentHasAccess;
-      });
-      
-      // Force UI update since menuItems is not a signal
-      this.cdr.markForCheck();
-    });
-  }
-
-  toggleMenu(item: any) {
-    if (item.children) {
-      item.expanded = !item.expanded;
-    }
-  }
+  navigationItems: MenuItem[] = [];
+  branches = signal<Branch[]>([]);
+  currentBranchId = signal<string | null>(null);
+  currentAssignedBranch = signal<Branch | null>(null);
+  userProfile = signal<UserProfile | null>(null);
+  branchBranding = signal<{ logo: string; name: string }>({
+    logo: '/assets/img/brands/logo/logo-normal.PNG',
+    name: 'Arecofix'
+  });
 
   private navigationSubscription = new Subscription();
 
   async ngOnInit() {
-    this.themeService.forceLight.set(true);
-    this.preferencesService.setForceLight(true);
-    await this.notificationService.loadNotifications();
-    this.notificationService.subscribeToRealtime();
+    // Escuchar la sucursal actual desde el servicio de autenticación
+    this.navigationSubscription.add(
+      this.authService.currentBranch$.subscribe((branch: Branch | null) => {
+        this.currentBranchId.set(branch?.id || null);
+        this.updateBranchMenu(branch);
+      })
+    );
+
+    // Escuchar cambios en el estado de autenticación (perfil, usuario)
+    this.navigationSubscription.add(
+      this.authService.authState$.subscribe(state => {
+        this.userProfile.set(state.profile);
+      })
+    );
 
     if (this.authService.isSuperAdmin()) {
       await this.loadAllBranches();
-
-      // Check current route for branchSlug
-      const urlSegments = this.router.url.split('/');
-      // Expected: /:branchSlug/admin/...
-      if (urlSegments.length > 1) {
-        const potentialSlug = urlSegments[1];
-        const branches = this.branches();
-        const branch = branches.find(b => b.slug === potentialSlug);
-        if (branch) {
-          this.branchService.setCurrentBranch(branch); // This will update currentBranchId signal automatically
-          this.updateBranding(branch);
-        } else if (potentialSlug === 'admin') {
-           this.branchService.setCurrentBranch(null);
-           this.branchBranding.set({ logo: '/assets/img/brands/logo/logo-normal.PNG', name: 'Arecofix' });
-        }
-      }
     }
 
-    // Listen to current assigned branch (SaaS isolation)
+    // Inicializar notificaciones
+    this.notificationService.loadNotifications();
+    this.notificationService.subscribeToRealtime();
+
     this.navigationSubscription.add(
-      this.authService.currentBranch$.subscribe(branch => {
+      this.authService.currentBranch$.subscribe((branch: Branch | null) => {
         this.currentAssignedBranch.set(branch);
-        if (branch && !this.authService.isSuperAdmin()) {
-          this.updateBranding(branch);
+        if (branch) {
+          if (!this.authService.isSuperAdmin()) {
+             this.updateBranding(branch);
+             this.branchService.setCurrentBranch(branch);
+          } else {
+            const currentSelectedId = this.branchService.getCurrentBranchId();
+            if (!currentSelectedId) {
+               this.branchService.setCurrentBranch(branch);
+               this.updateBranding(branch);
+            }
+          }
         }
       })
     );
 
-    // Auto-close accessibility sidebar and detect URL changes to keep context strictly synced
     this.navigationSubscription.add(
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: any) => {
         this.preferencesService.closeSidebar();
-        
-        // Safely infer Global vs Branch from URL dynamically since Component isn't reliably destroyed
         const urlString = event.urlAfterRedirects || event.url;
-        // The URL string often starts with a '/', so splitting by '/' makes urlSegments[1] the first path part.
         const urlSegments = urlString.split('/');
-        if (urlSegments.length > 1 && urlSegments[1] === 'admin') {
+        if (urlSegments.length === 2 && urlSegments[1] === 'admin') {
            if (this.branchService.getCurrentBranchId() !== null) {
-             console.log('🔄 Router detected Global /admin scope. Enforcing Global Branch cache reset.');
              this.branchService.setCurrentBranch(null);
-             this.branchBranding.set({ logo: '/assets/img/brands/logo/logo-normal.PNG', name: 'Arecofix' });
+             this.updateBranding(null);
            }
         }
       })
     );
   }
 
-  async loadAllBranches() {
-    const supabase = this.authService.getSupabaseClient();
-    const { data } = await supabase.from('branches').select('*').eq('is_active', true);
-    if (data) {
-      this.branches.set(data);
-    }
-  }
+  updateBranchMenu(branch: Branch | null) {
+    const basePrefix = branch?.slug ? `/${branch.slug}/admin` : '/admin';
+    const config = (this.authService as any).getTenantConfig?.() || {};
+    
+    const hasAccess = (modName?: string) => {
+      if (!modName) return true;
+      if (!config) return true;
+      return config[modName] === undefined || config[modName] === true;
+    };
 
-  onBranchSelected(event: any) {
-    const branchId = event.target.value;
-    this.branchService.setBranchById(branchId);
-    
-    if (!branchId || branchId === 'global') {
-      this.branchService.setCurrentBranch(null);
-      this.router.navigate(['/admin/dashboard']);
-      return;
-    }
-    
-    // Find the branch slug to navigate to the correct admin URL
-    const selectedBranch = this.branches().find(branch => branch.id === branchId);
-    
-    if (selectedBranch && selectedBranch.slug) {
-      console.log(' Navigating to branch admin:', selectedBranch.slug);
-      this.updateBranding(selectedBranch);
-      this.router.navigate([`/${selectedBranch.slug}/admin/dashboard`]);
+    const companyChildren: MenuItem[] = [];
+    if (!branch) {
+      companyChildren.push({ title: 'Gestión Red de Sucursales', path: '/admin/branches', icon: 'fa-sitemap' });
     } else {
-      console.warn(' Branch not found or missing slug:', branchId);
-      this.branchBranding.set({ logo: '/assets/img/brands/logo/logo-normal.PNG', name: 'Arecofix' });
+      companyChildren.push({ title: 'Identidad de Empresa', path: `${basePrefix}/branches`, icon: 'fa-id-badge' });
+    }
+    companyChildren.push(
+      { title: 'Gestión de Staff', path: `${basePrefix}/employees`, icon: 'fa-id-card' },
+      { title: 'Proveedores & Contactos', path: `${basePrefix}/suppliers`, icon: 'fa-truck' },
+      { title: 'Control de Usuarios', path: `${basePrefix}/users`, icon: 'fa-user-cog' }
+    );
+
+    const baseItems: MenuItem[] = [
+      { title: 'Panel de Control', path: `${basePrefix}/dashboard`, icon: 'fa-chart-line', module: 'dashboard' },
+      { 
+        title: 'Inventario & Catálogo', 
+        path: `${basePrefix}/products`,
+        icon: 'fa-cubes', 
+        module: 'inventory',
+        expanded: true,
+        children: [
+          { title: 'Catálogo Maestro', path: `${basePrefix}/products`, icon: 'fa-barcode' },
+          { title: 'Stock & Almacén', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
+          { title: 'Audit Catálogo Meta', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
+          { title: 'Categorías de Venta', path: `${basePrefix}/categories`, icon: 'fa-tags' },
+          { title: 'Marcas / Fabricantes', path: `${basePrefix}/brands`, icon: 'fa-copyright' },
+        ]
+      },
+      { 
+        title: 'Ventas & Operaciones', 
+        path: `${basePrefix}/sales`,
+        icon: 'fa-cash-register', 
+        module: 'inventory',
+        expanded: false,
+        children: [
+          { title: 'Terminal de Venta', path: `${basePrefix}/sales`, icon: 'fa-plus-circle' },
+          { title: 'Pedidos & E-commerce', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart' },
+          { title: 'Historial de Facturación', path: `${basePrefix}/sales/invoices`, icon: 'fa-file-invoice-dollar' },
+          { title: 'Egresos / Compras', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag' },
+        ]
+      },
+      { title: 'Servicio Técnico', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
+      { title: 'Gestión de Clientes', path: `${basePrefix}/clients`, icon: 'fa-users', module: 'customers' },
+      {
+        title: 'Configuración Empresa',
+        icon: 'fa-building',
+        expanded: false,
+        children: companyChildren
+      },
+      { 
+        title: 'Marketing & Contenido', 
+        icon: 'fa-bullhorn', 
+        expanded: false, 
+        children: [
+          { title: 'Servicios Web', path: `${basePrefix}/services`, icon: 'fa-tools' },
+          { title: 'Blog & Noticias', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
+          { title: 'Mensajes Recibidos', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
+        ]
+      },
+      { title: 'Academia Arecofix', path: `${basePrefix}/courses`, icon: 'fa-graduation-cap' },
+    ];
+
+    const planId = (branch?.plan_id || 'basic').toLowerCase();
+    const isBasicBranch = branch !== null && (planId === 'basic' || planId === 'free' || planId === 'standard');
+
+    this.navigationItems = baseItems
+      .filter(item => {
+        if (isBasicBranch) {
+          if (['Academia Arecofix', 'Marketing & Contenido'].includes(item.title)) return false;
+        }
+        return hasAccess(item.module);
+      })
+      .map(item => {
+        if (!item.children) return item;
+
+        const filteredChildren = item.children.filter(child => {
+          if (isBasicBranch) {
+            if (['Gestión Red de Sucursales', 'Proveedores & Contactos'].includes(child.title)) return false;
+          }
+          return hasAccess(child.module);
+        });
+
+        return { ...item, children: filteredChildren };
+      })
+      .filter(item => !item.children || item.children.length > 0);
+
+    this.cdr.markForCheck();
+  }
+
+  trackByMenu(index: number, item: MenuItem) {
+    return item.title + index;
+  }
+
+  isSuperAdmin() {
+    return this.authService.isSuperAdmin();
+  }
+
+  logout() {
+    this.authService.signOut();
+  }
+
+  async handleNotificationClick(notif: any) {
+    await this.notificationService.markAsRead(notif.id);
+    if (notif.payload?.route) {
+      this.router.navigate([notif.payload.route]);
     }
   }
 
-  private updateBranding(branch: Branch) {
-    this.branchBranding.set({
-      logo: branch.branding_settings?.logo_url || '/assets/img/brands/logo/logo-normal.PNG',
-      name: branch.official_name || branch.name || 'Arecofix'
-    });
+  async loadAllBranches() {
+    const data = await this.branchService.getAllAdminBranches();
+    this.branches.set(data);
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy() {
-    this.themeService.forceLight.set(false);
-    this.preferencesService.setForceLight(false);
-    this.notificationService.unsubscribe();
     this.navigationSubscription.unsubscribe();
+    this.notificationService.unsubscribe();
   }
 
-  handleNotificationClick(notif: AppNotification) {
-    if (!notif.is_read) {
-      this.notificationService.markAsRead(notif.id);
+  onBranchSelected(event: Event) {
+    const branchId = (event.target as HTMLSelectElement).value;
+    if (!branchId) {
+      this.branchService.setCurrentBranch(null);
+      this.updateBranding(null);
+      this.router.navigate(['/admin']);
+      return;
     }
-    if (notif.link) {
-      this.router.navigateByUrl(notif.link);
+    const branch = this.branches().find(b => b.id === branchId);
+    if (branch) {
+      this.branchService.setCurrentBranch(branch);
+      this.updateBranding(branch);
+      this.router.navigate([`/${branch.slug}/admin`]);
     }
   }
 
-  async logout() {
-    await this.authService.signOut();
-    this.router.navigate(['/login']);
+  onParentClick(item: MenuItem) {
+    item.expanded = !item.expanded;
+    if (item.path) {
+      this.router.navigate([item.path]);
+    }
+    this.cdr.markForCheck();
+  }
+
+  private updateBranding(branch: Branch | null) {
+    if (!branch) {
+      this.branchBranding.set({
+        logo: '/assets/img/brands/logo/logo-normal.PNG',
+        name: 'ARECOFIX CENTRAL'
+      });
+      document.documentElement.style.removeProperty('--primary-branch-color');
+      return;
+    }
+
+    const branding = branch.branding_settings as any;
+    this.branchBranding.set({
+      logo: branding?.logo_url || '/assets/img/brands/logo/logo-normal.PNG',
+      name: branch.name
+    });
+
+    if (branding?.primary_color) {
+      document.documentElement.style.setProperty('--primary-branch-color', branding.primary_color);
+    } else {
+      document.documentElement.style.removeProperty('--primary-branch-color');
+    }
+  }
+
+  toggleSidebar() {
+    this.preferencesService.toggleSidebar();
   }
 }

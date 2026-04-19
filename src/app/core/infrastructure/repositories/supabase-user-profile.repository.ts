@@ -10,7 +10,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
   providedIn: 'root'
 })
 export class SupabaseUserProfileRepository extends BaseRepository<UserProfile> implements UserProfileRepository {
-  protected tableName = 'profiles';
+  protected override tableName = 'profiles';
   
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);

@@ -109,6 +109,7 @@ export interface CreateRepairDto {
     assigned_technician_id?: string;
     current_status_id?: number;
     upsell_vidrio?: boolean;
+    tracking_code?: string;
     costo_repuesto?: number;
     parts?: RepairPart[];
 }

@@ -74,22 +74,22 @@ export class StockManagementService {
 
   /**
    * Deducts stock atomically for a repair or sale.
-   * Uses an increment/decrement approach.
+   * Uses a server-side RPC to ensure data integrity.
    */
   async deductStock(productId: string, branchId: string, quantityToDeduct: number): Promise<void> {
-    // In a premium implementation, this would be an RPC call to ensure atomicity
-    // For now, we fetch current, then update (not truly atomic but better than scattered logic)
-    const { data, error } = await this.supabase
-      .from('product_stock_per_branch')
-      .select('quantity')
-      .eq('product_id', productId)
-      .eq('branch_id', branchId)
-      .maybeSingle();
+    const tenantId = this.tenantService.getTenantId();
+    const cleanTenantId = tenantId === TENANT_CONSTANTS.FALLBACK_ID ? null : tenantId;
 
-    if (error) throw new DatabaseError(error.message, error);
+    const { error } = await this.supabase.rpc('deduct_product_stock_v3', {
+      p_product_id: productId,
+      p_branch_id: branchId,
+      p_quantity_to_deduct: quantityToDeduct,
+      p_tenant_id: cleanTenantId
+    });
 
-    const currentQuantity = data?.quantity || 0;
-    const newQuantity = Math.max(0, currentQuantity - quantityToDeduct);
-    await this.updateStock(productId, branchId, newQuantity);
+    if (error) {
+       console.error('[StockManagementService] RPC Failed:', error);
+       throw new DatabaseError(error.message, error);
+    }
   }
 }

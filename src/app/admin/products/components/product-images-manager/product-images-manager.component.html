@@ -49,7 +49,7 @@
           
           <!-- Drag Handle / Image -->
           <figure class="aspect-square relative overflow-hidden bg-gray-100 dark:bg-gray-800">
-             <img [src]="img" class="w-full h-full object-cover pointer-events-none select-none" />
+             <img [src]="img.url" class="w-full h-full object-contain pointer-events-none select-none p-2" />
              
              <!-- Main Image Badge -->
              @if (i === 0) {
@@ -62,13 +62,39 @@
                </div>
              }
 
-             <!-- Actions Overlay -->
-             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <button type="button" (click)="removeImage(i)" class="btn btn-circle btn-error btn-sm text-white shadow-lg pointer-events-auto">
+          <!-- Actions & Color Overlay -->
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-2">
+             
+             <!-- Color Selector Dropdown -->
+             <div class="dropdown dropdown-top dropdown-center w-full">
+               <div tabindex="0" role="button" class="btn btn-xs w-full bg-white/90 text-black border-none hover:bg-white transition-colors truncate">
+                 <i class="fas fa-palette mr-1"></i> {{ img.color || 'Color...' }}
+               </div>
+               <ul tabindex="0" class="dropdown-content z-20 menu p-2 shadow-2xl bg-base-100 rounded-box w-40 grid grid-cols-2 gap-1 mb-2">
+                 @for(color of availableColors; track color.name) {
+                   <li>
+                     <a (click)="setImageColor(i, color.name)" class="p-2 justify-center" [title]="color.name">
+                       <div class="w-6 h-6 rounded-full shadow-inner" [class]="color.class"></div>
+                     </a>
+                   </li>
+                 }
+               </ul>
+             </div>
+
+             <div class="flex gap-2">
+                <button type="button" (click)="removeImage(i)" class="btn btn-circle btn-error btn-xs text-white shadow-lg pointer-events-auto">
                   <i class="fas fa-trash-alt"></i>
                 </button>
              </div>
-          </figure>
+          </div>
+
+          <!-- Color Badge (Visible) -->
+          @if (img.color) {
+            <div class="absolute bottom-2 right-2 badge badge-sm bg-black/60 text-white border-none backdrop-blur-sm px-2 py-3">
+               {{ img.color }}
+            </div>
+          }
+       </figure>
 
           <!-- Custom Placeholder when dragging -->
           <div *cdkDragPlaceholder class="bg-gray-200 dark:bg-gray-700 rounded-xl border-2 border-dashed border-gray-400 opacity-50 flex items-center justify-center">

@@ -15,7 +15,7 @@ import { environment } from '../../../environments/environment';
 // Components
 import { ProductCard } from '@app/public/products/components';
 import { Pagination } from '@app/shared/components/pagination';
-import { IsErrorComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
+import { IsErrorComponent } from '@app/shared/components/resource-status';
 
 @Component({
     selector: 'app-cursos',
@@ -26,8 +26,7 @@ import { IsErrorComponent, IsLoadingComponent } from '@app/shared/components/res
         FormsModule,
         ProductCard, 
         Pagination,
-        IsErrorComponent, 
-        IsLoadingComponent
+        IsErrorComponent
     ],
     templateUrl: './cursos.html',
     styles: [],

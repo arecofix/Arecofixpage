@@ -1,21 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
-import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { Observable, from, map } from 'rxjs';
 import { DatabaseError } from '@app/core/errors/application.error';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseEmployeeRepository extends BaseRepository<UserProfile> {
-  protected tableName = 'profiles';
+  protected override tableName = 'profiles';
 
   constructor() {
-    const authService = inject(AuthService);
+    const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
-    super(authService.getSupabaseClient(), logger);
+    super(supabase, logger);
   }
 
   createEmployee(item: any, tenantId: string): Observable<UserProfile> {

@@ -15,13 +15,14 @@ export interface Product {
     id: string;
     name: string;
     slug: string;
-    description: string;
+    description?: string;
     price: number;
     sale_price?: number;
     category_id: string;
     brand_id?: string;
     image_url?: string;
     gallery_urls?: string[];
+    media_metadata?: Array<{ url: string; color?: string; order?: number }>;
     is_featured: boolean;
     is_active: boolean;
     is_global?: boolean;
@@ -48,7 +49,7 @@ export interface Product {
 export interface CreateProductDto {
     name: string;
     slug: string;
-    description: string;
+    description?: string;
     price: number;
     category_id: string;
     brand_id?: string;

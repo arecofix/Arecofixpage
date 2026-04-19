@@ -5,6 +5,8 @@ import { Observable, from, map } from 'rxjs';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 
+import { SupabaseStorageService } from '../services/supabase-storage.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -13,10 +15,16 @@ export class BranchRepository extends BaseRepository<Branch> {
   protected override isGlobalTable = false;
   protected override useSoftDeletes = false;
 
+  private storageService = inject(SupabaseStorageService);
+
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
     super(supabase, logger);
+  }
+
+  async uploadLogo(file: File): Promise<string> {
+    return this.storageService.uploadFile(file, 'branches', 'public-assets');
   }
 
   /**

@@ -1,6 +1,26 @@
 import { Product } from '../../domain/entities/product.entity';
 
 export class ProductMapper {
+  private static sanitizeImageUrl(url: any): string {
+    if (!url) return '';
+    if (typeof url === 'string') {
+        // Check if it's a stringified JSON object
+        if (url.trim().startsWith('{')) {
+            try {
+                const parsed = JSON.parse(url);
+                return parsed.url || '';
+            } catch {
+                return url;
+            }
+        }
+        return url;
+    }
+    if (typeof url === 'object' && url.url) {
+        return url.url;
+    }
+    return String(url);
+  }
+
   static mapFromDb(p: any, branchId?: string): Product {
     const isFeatured = Boolean(p['featured'] ?? p['is_featured'] ?? false);
     let displayedStock = 0;
@@ -15,14 +35,20 @@ export class ProductMapper {
        displayedStock = Number(p['stock'] || 0);
     }
 
+    const rawGallery = p['gallery_urls'] || (p['image_url'] ? [p['image_url']] : []);
+    const sanitizedGallery = Array.isArray(rawGallery) 
+        ? rawGallery.map(img => this.sanitizeImageUrl(img))
+        : [this.sanitizeImageUrl(rawGallery)];
+
     return {
           id: p['id'] as string,
           name: p['name'] as string,
           slug: p['slug'] as string,
           description: p['description'] as string,
           price: Number(p['price']),
-          image_url: p['image_url'] as string,
-          gallery_urls: p['gallery_urls'] || (p['image_url'] ? [p['image_url']] : []),
+          image_url: this.sanitizeImageUrl(p['image_url']),
+          gallery_urls: sanitizedGallery,
+          media_metadata: p['media_metadata'] || [],
           category_id: p['category_id'] as string,
           brand_id: p['brand_id'] as string,
           stock: displayedStock,

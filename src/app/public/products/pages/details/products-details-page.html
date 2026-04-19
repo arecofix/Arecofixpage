@@ -43,7 +43,7 @@
                           [class.ring-2]="selectedImage() === img"
                           [class.ring-indigo-500]="selectedImage() === img"
                           (click)="selectImage(img)">
-                          <img [ngSrc]="img" [alt]="item.name" class="object-cover object-center pointer-events-none" fill />
+                          <img [ngSrc]="img" [alt]="item.name" class="object-contain object-center pointer-events-none p-1" fill />
                        </button>
                       }
                   </div>

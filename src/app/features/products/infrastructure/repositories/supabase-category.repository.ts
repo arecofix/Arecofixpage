@@ -17,7 +17,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
  */
 @Injectable({ providedIn: 'root' })
 export class SupabaseCategoryRepository extends BaseRepository<Category> implements CategoryRepository {
-    protected tableName = 'categories';
+    protected override tableName = 'categories';
 
     constructor() {
         const supabase = inject(SUPABASE_CLIENT);

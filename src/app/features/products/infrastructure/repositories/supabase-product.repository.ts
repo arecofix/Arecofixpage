@@ -15,6 +15,7 @@ import { SupabaseErrorHandlerService } from '@app/core/services/supabase-error-h
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
+import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -58,6 +59,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     let selectFields = `
       id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
+      media_metadata,
       branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert),
       branches(name)
     `;
@@ -85,7 +87,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     }
     
     if (brand_id) query = query.eq('brand_id', brand_id);
-    if (branch_id) query = query.eq('branch_id', branch_id);
+    if (branch_id) {
+        query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
+    }
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
     if (id) query = query.eq('id', id);
@@ -105,15 +109,14 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     }
     
     if (params.q) {
-      const queryStr = params.q.toLowerCase().trim();
-      const terms = queryStr.split(/\s+/).filter(t => t.length > 1);
-
-      for (const term of terms) {
-        const normalizedTerm = SearchUtils.normalize(term);
-        const equivalents = SearchUtils.getEquivalents(term);
-        const nameSkuClauses = equivalents.map(eq => `name.ilike.%${eq}%,sku.ilike.%${eq}%`).join(',');
-        const descClauses = `description.ilike.%${term}%,description.ilike.%${normalizedTerm}%`;
-        query = query.or(`${nameSkuClauses},${descClauses}`); 
+      const queryStr = params.q.trim();
+      if (queryStr) {
+        // Use PostgreSQL Full Text Search for better performance and ranking
+        // This requires 'search_tsv' column in the database
+        query = query.textSearch('search_tsv', queryStr, { 
+          config: 'spanish', 
+          type: 'websearch' 
+        });
       }
     }
 
@@ -148,14 +151,17 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   findLowStock(threshold: number = 5): Observable<Product[]> {
-    let query = this.supabase.from('products')
-        .select(`
-          id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
-          is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, 
-          branch_stock:product_stock_per_branch(quantity, branch_id)
-        `);
+    const selectFields = `
+      id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, 
+      branch_stock:product_stock_per_branch(quantity, branch_id)
+    `;
 
-    return from(this.applyTenantFilter(query) as any).pipe(
+    const query = this.applyTenantFilter(
+      this.supabase.from(this.tableName).select(selectFields)
+    );
+
+    return from(query as any).pipe(
       map((res: any) => {
         const { data, error } = res;
         if (error) this.errorHandler.handleError(error, 'findLowStock');
@@ -255,10 +261,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     return from(processUpdates());
   }
 
+  private storageService = inject(SupabaseStorageService);
+
   async uploadImage(file: File): Promise<string> {
-    const filePath = `products/${Date.now()}-${file.name}`;
-    const { data } = await this.supabase.storage.from('public-assets').upload(filePath, file);
-    return data ? this.supabase.storage.from('public-assets').getPublicUrl(data.path).data.publicUrl : '';
+    return this.storageService.uploadFile(file, 'products', 'public-assets', { context: 'LegacyProductUpload' });
   }
 
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
@@ -289,39 +295,84 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   search(query: string, categoryId?: string): Observable<Product[]> {
-    const queryStr = query.toLowerCase().trim();
+    const queryStr = query.trim();
     if (!queryStr) return of([]);
 
-    let supabaseQuery = this.applyTenantFilter(this.supabase.from('products').select('*')).eq('is_active', true);
-    if (categoryId) supabaseQuery = supabaseQuery.eq('category_id', categoryId);
-
-    const terms = queryStr.split(/\s+/).filter(t => t.length > 1);
-    for (const term of terms) {
-        const norm = SearchUtils.normalize(term);
-        supabaseQuery = supabaseQuery.or(`name.ilike.%${term}%,sku.ilike.%${term}%,description.ilike.%${norm}%`);
+    let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'))
+      .eq('is_active', true);
+    
+    if (categoryId) {
+      supabaseQuery = supabaseQuery.eq('category_id', categoryId);
     }
 
+    // Use PostgreSQL Full Text Search for high-performance search
+    supabaseQuery = supabaseQuery.textSearch('search_tsv', queryStr, { 
+      config: 'spanish', 
+      type: 'websearch' 
+    });
+
     return from(supabaseQuery as any).pipe(
-      map(({ data }: any) => (data || []).map((p: any) => ProductMapper.mapFromDb(p)))
+      map(({ data, error }: any) => {
+        if (error) this.errorHandler.handleError(error, 'search');
+        return (data || []).map((p: any) => ProductMapper.mapFromDb(p));
+      })
     );
   }
 
   getPendingApprovals(): Observable<Product[]> {
-    let query = this.supabase.from('products').select(`*, branches(name)`).eq('is_active', false).not('branch_id', 'is', null);
-    return from(this.applyTenantFilter(query) as any).pipe(map(({ data }: any) => (data || []).map((p: any) => ProductMapper.mapFromDb(p))));
+    let query = this.applyTenantFilter(
+      this.supabase.from(this.tableName)
+        .select(`*, branches(name)`)
+        .eq('is_active', false)
+        .not('branch_id', 'is', null)
+    );
+    return from(query as any).pipe(map(({ data }: any) => (data || []).map((p: any) => ProductMapper.mapFromDb(p))));
   }
 
   approveProduct(id: string): Observable<void> {
-    return from(this.supabase.from('products').update({ is_active: true, is_global: true }).eq('id', id)).pipe(map(() => void 0));
+    const query = this.applyTenantFilter(this.supabase.from(this.tableName).update({ is_active: true, is_global: true }))
+      .eq('id', id);
+    return from(query).pipe(map(() => void 0));
   }
 
   rejectProduct(id: string): Observable<void> {
-    return from(this.supabase.from('products').delete().eq('id', id)).pipe(map(() => void 0));
+    const query = this.applyTenantFilter(this.supabase.from(this.tableName).delete())
+      .eq('id', id);
+    return from(query).pipe(map(() => void 0));
   }
 
   getPendingApprovalsCount(): Observable<number> {
-    let query = this.supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', false).not('branch_id', 'is', null);
-    return from(this.applyTenantFilter(query) as any).pipe(map(({ count }: any) => count || 0));
+    let query = this.applyTenantFilter(
+      this.supabase.from(this.tableName)
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', false)
+        .not('branch_id', 'is', null)
+    );
+    return from(query as any).pipe(map(({ count }: any) => count || 0));
+  }
+
+  getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }> {
+    const fetchSummary = async () => {
+        // We select all items with stock > 0 for calculation or just all active items.
+        // For performance in large catalogs, a specialized RPC would be better, 
+        // but let's use a select with aggregations if possible or a simple sum logic.
+        let query = this.supabase.from(this.tableName)
+            .select('price, stock');
+        
+        query = this.applyTenantFilter(query);
+        if (branch_id) query = query.eq('branch_id', branch_id);
+
+        const { data, error } = await (query as any);
+        if (error) throw error;
+
+        const results = data || [];
+        const totalItems = results.length;
+        const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
+        const lowStockCount = results.filter((p: any) => p.stock > 0 && p.stock <= 5).length;
+
+        return { totalItems, totalValue, lowStockCount };
+    };
+    return from(fetchSummary());
   }
 }
 

@@ -20,6 +20,7 @@ export interface Branch {
     logo_url: string | null;
     favicon_url: string | null;
     primary_color: string;
+    owner_name?: string;
   };
   modules_config?: {
     dashboard: boolean;

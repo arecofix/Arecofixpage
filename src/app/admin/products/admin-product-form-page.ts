@@ -37,7 +37,7 @@ export class AdminProductFormPage implements OnInit {
     is_active: true,
     is_global: true,
     branch_id: '',
-    images: [] as string[],
+    images: [] as any[], // Now holds { url: string, color?: string }
     unit_cost_at_time: 0,
   };
 
@@ -83,7 +83,9 @@ export class AdminProductFormPage implements OnInit {
             is_active: data.is_active ?? true,
             is_global: data.is_global ?? true,
             branch_id: data.branch_id || '',
-            images: data.gallery_urls || (data.image_url ? [data.image_url] : []),
+            images: data.media_metadata && data.media_metadata.length > 0 
+                    ? data.media_metadata 
+                    : (data.gallery_urls || (data.image_url ? [data.image_url] : [])).map(url => ({ url, color: '' })),
             unit_cost_at_time: data.unit_cost_at_time || 0,
           };
         }
@@ -142,7 +144,7 @@ export class AdminProductFormPage implements OnInit {
       is_active: formVal.is_active,
       is_global: formVal.is_global,
       branch_id: formVal.branch_id || null,
-      image_url: formVal.images.length > 0 ? formVal.images[0] : null, // Main image
+      image_url: formVal.images.length > 0 ? formVal.images[0].url : null, // Main image
       unit_cost_at_time: formVal.unit_cost_at_time || 0,
     };
 
@@ -150,9 +152,13 @@ export class AdminProductFormPage implements OnInit {
     if (formVal.sku) payload.sku = formVal.sku;
     if (formVal.barcode) payload.barcode = formVal.barcode;
     
-    // Store gallery_urls only if the column exists (check if we're updating and it works)
+    // Store gallery_urls and media_metadata
     if (Array.isArray(formVal.images) && formVal.images.length > 0) {
-      payload.gallery_urls = formVal.images;
+      payload.gallery_urls = formVal.images.map(img => img.url);
+      payload.media_metadata = formVal.images;
+    } else {
+      payload.gallery_urls = [];
+      payload.media_metadata = [];
     }
 
     try {

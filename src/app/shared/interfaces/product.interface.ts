@@ -72,4 +72,5 @@ export interface ProductsParams extends Partial<Product> {
   include_inactive?: boolean;
   minimal?: boolean;
   stock_status?: 'all' | 'low_stock' | 'out_of_stock';
+  is_paginated?: boolean;
 }

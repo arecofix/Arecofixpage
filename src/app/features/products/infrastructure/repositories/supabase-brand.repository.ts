@@ -5,17 +5,19 @@ import { BrandRepository } from '../../domain/repositories/brand.repository';
 import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+
 /**
  * Brand Repository
  * Handles all database operations for brands
  */
 @Injectable({ providedIn: 'root' })
 export class SupabaseBrandRepository extends BaseRepository<Brand> implements BrandRepository {
-    protected tableName = 'brands';
+    protected override tableName = 'brands';
 
     constructor() {
-        const authService = inject(AuthService);
+        const supabase = inject(SUPABASE_CLIENT);
         const logger = inject(LoggerService);
-        super(authService.getSupabaseClient(), logger);
+        super(supabase, logger);
     }
 }

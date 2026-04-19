@@ -35,10 +35,7 @@ export class AdminInventoryPage implements OnInit {
     itemsPerPage = signal<number>(15);
     totalItems = signal<number>(0);
     pagesCount = signal<number>(1);
-
-    pageValue = computed(() => {
-        return this.products().reduce((sum, p) => sum + (p.price * (p.stock || 0)), 0);
-    });
+    inventorySummary = signal({ totalItems: 0, totalValue: 0, lowStockCount: 0 });
 
     constructor() {
         // Reactive reload on filter change
@@ -51,7 +48,10 @@ export class AdminInventoryPage implements OnInit {
             const page = this.currentPage();
             
             // Reload
-            untracked(() => this.loadInventory());
+            untracked(() => {
+                this.loadInventory();
+                this.loadSummary();
+            });
         });
     }
 
@@ -76,6 +76,15 @@ export class AdminInventoryPage implements OnInit {
             this.categories.set(mappedCats);
         } catch (e) {
             console.error('Error loading categories', e);
+        }
+    }
+
+    async loadSummary() {
+        try {
+            const summary = await this.productService.getInventorySummary();
+            this.inventorySummary.set(summary);
+        } catch (e) {
+            console.error('Error loading inventory summary', e);
         }
     }
 

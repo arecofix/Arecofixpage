@@ -302,7 +302,7 @@ export class AdminRepairStatsComponent implements OnInit {
             const supabase = this.auth.getSupabaseClient();
             const tenantId = this.tenantService.getTenantId();
             const profiles = await this.customerService.getAll();
-            const { data: repairs } = await supabase.from('repairs').select('customer_id, customer_name, customer_phone').eq('tenant_id', tenantId);
+            const { data: repairs } = await supabase.from('repairs').select('client_id, customer_name, customer_phone').eq('tenant_id', tenantId);
             const { data: orders } = await supabase.from('orders').select('customer_name, customer_email, customer_phone').eq('tenant_id', tenantId);
 
             const clientMap = new Map<string, any>();

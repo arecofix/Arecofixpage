@@ -1,5 +1,7 @@
 import { Injectable, inject, PLATFORM_ID, signal, computed, effect, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -24,8 +26,10 @@ const STORAGE_KEY = 'arecofix-theme-mode';
 })
 export class ThemeService implements OnDestroy {
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
   private mediaQuery: MediaQueryList | null = null;
   private mediaListener: ((e: MediaQueryListEvent) => void) | null = null;
+  private lastWasAdmin = false;
 
   /** Raw user preference: 'light' | 'dark' | 'system' */
   readonly mode = signal<ThemeMode>(this.loadInitialMode());
@@ -36,13 +40,8 @@ export class ThemeService implements OnDestroy {
   /** Override to force light mode (e.g. for admin section) */
   readonly forceLight = signal<boolean>(false);
 
-  /** The resolved theme that should be applied */
   readonly resolvedTheme = computed<'light' | 'dark'>(() => {
-    // Force light mode if flag is set OR if we are in the admin section
-    const currentUrl = isPlatformBrowser(this.platformId) ? window.location.pathname : '';
-    const isAdminPath = currentUrl.startsWith('/admin') || currentUrl.includes('/admin/');
-    
-    if (this.forceLight() || isAdminPath) return 'light';
+    if (this.forceLight()) return 'light';
     
     const m = this.mode();
     if (m === 'system') return this.osDark() ? 'dark' : 'light';
@@ -58,6 +57,23 @@ export class ThemeService implements OnDestroy {
       this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       this.mediaListener = (e: MediaQueryListEvent) => this.osDark.set(e.matches);
       this.mediaQuery.addEventListener('change', this.mediaListener);
+
+      // Listen for route changes to set default light theme in admin
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe((event: any) => {
+        const url = (event as NavigationEnd).urlAfterRedirects;
+        const isAdminPath = url.startsWith('/admin') || url.includes('/admin/');
+        
+        if (isAdminPath && !this.lastWasAdmin) {
+          // Entering admin section - default to light
+          this.setMode('light');
+        } else if (!isAdminPath && this.lastWasAdmin) {
+          // Leaving admin section - return to system default
+          this.setMode('system');
+        }
+        this.lastWasAdmin = isAdminPath;
+      });
     }
 
     // React to resolved theme changes → apply DOM class + persist
@@ -91,13 +107,13 @@ export class ThemeService implements OnDestroy {
   // ── Private Helpers ─────────────────────────────────
 
   private loadInitialMode(): ThemeMode {
-    if (!isPlatformBrowser(this.platformId)) return 'light';
+    if (!isPlatformBrowser(this.platformId)) return 'system';
 
     const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) return stored;
 
-    // Default to 'light' per user request
-    return 'light';
+    // Default to 'system' per user request (outside admin)
+    return 'system';
   }
 
   private detectOsDark(): boolean {

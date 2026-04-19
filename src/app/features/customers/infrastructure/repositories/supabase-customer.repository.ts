@@ -9,7 +9,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
   providedIn: 'root'
 })
 export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
-  protected tableName = 'profiles';
+  protected override tableName = 'clients'; // Main table for counter/repair customers
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);
@@ -22,35 +22,50 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
     return from(
       this.supabase.rpc('create_client', {
         p_first_name: item.first_name,
-        p_last_name: item.last_name,
-        p_email: item.email,
-        p_phone: item.phone,
-        p_address: item.address,
-        p_dni: item.dni,
+        p_last_name: item.last_name || '',
+        p_email: item.email || '',
+        p_phone: item.phone || '',
+        p_address: item.address || '',
+        p_dni: item.dni || '',
         p_tenant_id: tenantId
       })
     ).pipe(
       map(({ data, error }: any) => {
         if (error) {
-          this.logger.error(`Error creating client via RPC`, error);
-          this.errorHandler.handleError(error, 'createClient RPC');
+          throw error;
         }
         return data as unknown as UserProfile;
       })
     );
   }
 
-  searchClients(query: string, limit: number = 20): Observable<UserProfile[]> {
-    const dbQuery = this.applyTenantFilter(
-      this.supabase
-        .from(this.tableName)
-        .select('id, full_name, first_name, last_name, email, phone, address, dni')
-    )
-      .eq('role', 'user')
-      .or(`full_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%`)
-      .limit(limit);
+  findByEmailOrPhone(email?: string, phone?: string): Observable<UserProfile | null> {
+    if (!email && !phone) return from(Promise.resolve(null));
+    
+    let query = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'));
+    
+    if (email && phone) {
+      query = query.or(`email.eq.${email},phone.eq.${phone}`);
+    } else if (email) {
+      query = query.eq('email', email);
+    } else {
+      query = query.eq('phone', phone);
+    }
 
-    return from(dbQuery as any).pipe(
+    return from(query.maybeSingle() as Promise<any>).pipe(
+      map((res) => res.data as UserProfile | null)
+    );
+  }
+
+  searchClients(query: string, limit: number = 20): Observable<UserProfile[]> {
+    const tenantId = this.tenantService.getTenantId();
+    return from(
+      this.supabase.rpc('search_unified_customers', {
+        p_query: query,
+        p_tenant_id: tenantId,
+        p_limit: limit
+      })
+    ).pipe(
       map(({ data, error }: any) => {
         if (error) this.errorHandler.handleError(error, 'searchClients');
         return data as UserProfile[];
@@ -61,10 +76,9 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   getRecentClients(limit: number = 20): Observable<UserProfile[]> {
     const dbQuery = this.applyTenantFilter(
       this.supabase
-        .from(this.tableName)
-        .select('id, full_name, first_name, last_name, email, phone, address, dni')
+        .from('unified_customers')
+        .select('*')
     )
-      .eq('role', 'user')
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -79,7 +93,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   getUnifiedClients(): Observable<any[]> {
     const tenantId = this.tenantService.getTenantId();
     return from(
-      this.supabase.rpc('get_unified_clients', {
+      this.supabase.rpc('get_unified_clients_list', {
         p_tenant_id: tenantId
       })
     ).pipe(

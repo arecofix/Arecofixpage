@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { CashMovement } from '../../domain/entities/cash-movement.entity';
 import { FinanceRepository } from '../../domain/repositories/finance.repository';
-import { AuthService } from '@app/core/services/auth.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { Observable, from, map, firstValueFrom } from 'rxjs';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +13,9 @@ export class SupabaseFinanceRepository extends BaseRepository<CashMovement> impl
   protected override tableName = 'cash_movements';
 
   constructor() {
-    const authService = inject(AuthService);
+    const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
-    super(authService.getSupabaseClient(), logger);
+    super(supabase, logger);
   }
 
   async recordMovement(movement: CashMovement): Promise<CashMovement> {

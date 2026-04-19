@@ -1,23 +1,25 @@
 <div class="px-3 md:px-6 py-8 min-h-screen bg-gray-50 dark:bg-slate-900">
-    <!-- Search result header or Title -->
+    <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6 animate-fade-in">
         <div>
             <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                 <span class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
-                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas" [class]="branchService.currentBranch() ? 'fa-building' : 'fa-map-marker-alt'"></i>
                 </span>
-                Gestión de Sucursales
+                {{ branchService.currentBranch() ? 'Perfil de Sucursal' : 'Gestión de Sucursales' }}
             </h1>
             <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium">
-                Administra los diferentes puntos de venta y sus configuraciones específicas.
+                {{ branchService.currentBranch() ? 'Personaliza la identidad y configuración de esta ubicación.' : 'Administra los diferentes puntos de venta y sus configuraciones específicas.' }}
             </p>
         </div>
 
-        <button (click)="openCreateForm()" 
-            class="group flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0 w-full md:w-auto justify-center">
-            <i class="fas fa-plus group-hover:rotate-90 transition-transform"></i>
-            Nueva Sucursal
-        </button>
+        @if (!branchService.currentBranch() && !showForm()) {
+            <button (click)="openCreateForm()" 
+                class="group flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0 w-full md:w-auto justify-center">
+                <i class="fas fa-plus group-hover:rotate-90 transition-transform"></i>
+                Nueva Sucursal
+            </button>
+        }
     </div>
 
     <!-- Alert Messages -->
@@ -35,286 +37,174 @@
         </div>
     }
 
-    <!-- Branches Grid -->
-    @if (loading()) {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (i of [1,2,3]; track i) {
-                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 animate-pulse">
-                    <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-2xl mb-4"></div>
-                    <div class="h-6 w-3/4 bg-slate-200 dark:bg-slate-700 rounded-lg mb-2"></div>
-                    <div class="h-4 w-1/2 bg-slate-100 dark:bg-slate-700/50 rounded-lg mb-6"></div>
-                    <div class="h-10 w-full bg-slate-100 dark:bg-slate-700/50 rounded-xl"></div>
-                </div>
-            }
-        </div>
-    } @else {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @for (branch of branches(); track branch.id) {
-                <div class="group relative bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_20px_50px_rgb(0,0,0,0.25)] transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                    
-                    <!-- Decoración de fondo -->
-                    <div class="absolute -right-8 -top-8 w-32 h-32 bg-indigo-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-
-                    <!-- Header de Card -->
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="w-16 h-16 rounded-3xl bg-linear-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-500">
-                            <i class="fas fa-store"></i>
-                        </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <div [class]="branch.is_active ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'" 
-                                 class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full" [class]="branch.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'"></span>
-                                {{ branch.is_active ? 'Activa' : 'Inactiva' }}
+    <!-- Branches List (Global Context) -->
+    @if (!showForm()) {
+        @if (loading()) {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @for (i of [1,2,3]; track i) {
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 animate-pulse">
+                        <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-2xl mb-4"></div>
+                        <div class="h-6 w-3/4 bg-slate-200 dark:bg-slate-700 rounded-lg mb-2"></div>
+                        <div class="h-4 w-1/2 bg-slate-100 dark:bg-slate-700/50 rounded-lg mb-6"></div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @for (branch of branches(); track branch.id) {
+                    <div class="group relative bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgb(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-2 overflow-hidden">
+                        <div class="flex justify-between items-start mb-6">
+                            @if (branch.branding_settings?.logo_url) {
+                                <img [src]="branch.branding_settings!.logo_url" class="w-16 h-16 rounded-3xl object-contain bg-white shadow-lg border border-slate-50">
+                            } @else {
+                                <div class="w-16 h-16 rounded-3xl bg-linear-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white text-2xl shadow-lg">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                            }
+                            <div class="flex flex-col items-end gap-2">
+                                <div [class]="branch.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'" class="px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                                    {{ branch.is_active ? 'Activa' : 'Inactiva' }}
+                                </div>
+                                <div [class]="branch.plan_id === 'premium' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'" class="px-3 py-1 rounded-full text-[9px] font-black uppercase">
+                                    {{ branch.plan_id }}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Información -->
-                    <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {{ branch.name }}
-                    </h3>
-                    
-                    <div class="space-y-3 mb-8">
-                        @if (branch.address) {
-                            <p class="text-sm text-slate-500 dark:text-slate-400 flex items-start gap-2 leading-relaxed">
-                                <i class="fas fa-map-marked-alt mt-1 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
-                                {{ branch.address }}
-                            </p>
-                        }
-                        <p class="text-xs font-mono py-1 px-3 bg-slate-50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 rounded-lg w-fit border border-slate-100 dark:border-slate-800">
-                            /{{ branch.slug }}
-                        </p>
-                    </div>
+                        <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2">{{ branch.name }}</h3>
+                        <p class="text-sm text-slate-500 mb-6">{{ branch.address }}</p>
 
-                    <!-- Acciones -->
-                    <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-700/50">
-                        <button (click)="manageBranch(branch.slug)" 
-                                class="col-span-2 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-slate-900 dark:bg-indigo-600 hover:bg-black dark:hover:bg-indigo-700 text-white font-bold transition-all shadow-xl hover:shadow-indigo-500/20 mb-2">
-                            <i class="fas fa-solar-panel"></i>
-                            Administrar Panel
-                        </button>
-                        
-                        <button (click)="openEditForm(branch)" 
-                                class="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition-colors">
-                            <i class="fas fa-pen-nib text-xs"></i>
-                            Editar
-                        </button>
-                        
-                        <div class="dropdown dropdown-top dropdown-end">
-                            <button tabindex="0" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-500 hover:text-rose-600 transition-all">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul tabindex="0" class="dropdown-content z-1 menu p-2 shadow-2xl bg-white dark:bg-slate-800 rounded-2xl w-52 mb-2 border border-slate-100 dark:border-slate-700">
-                                <li>
-                                    <button (click)="toggleStatus(branch)" class="flex items-center gap-3 py-3 font-bold text-sm">
-                                        <i class="fas" [class]="branch.is_active ? 'fa-pause-circle text-amber-500' : 'fa-play-circle text-emerald-500'"></i>
-                                        {{ branch.is_active ? 'Pausar Sucursal' : 'Activar Sucursal' }}
-                                    </button>
-                                </li>
-                                <li>
-                                    <button (click)="deleteBranch(branch.id)" class="flex items-center gap-3 py-3 text-rose-600 dark:text-rose-400 font-bold text-sm">
-                                        <i class="fas fa-trash-alt"></i>
-                                        Eliminar Definitivamente
-                                    </button>
-                                </li>
-                            </ul>
+                        <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-700/50">
+                            <button (click)="manageBranch(branch.slug)" class="col-span-2 btn btn-neutral rounded-2xl">Administrar Panel</button>
+                            <button (click)="openEditForm(branch)" class="btn btn-ghost bg-slate-50 dark:bg-slate-800 rounded-2xl">Editar</button>
+                            <button (click)="deleteBranch(branch.id)" class="btn btn-ghost text-rose-600 rounded-2xl">Borrar</button>
                         </div>
                     </div>
-                </div>
-            } @empty {
-                <div class="col-span-full py-20 bg-white dark:bg-slate-800 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center">
-                    <div class="w-24 h-24 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mb-6">
-                        <i class="fas fa-store-slash text-4xl text-slate-200 dark:text-slate-700"></i>
-                    </div>
-                    <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2">No hay sucursales todavía</h3>
-                    <p class="text-slate-500 dark:text-slate-400 max-w-xs mb-8">Comienza creando tu primera sucursal para expandir tu negocio.</p>
-                    <button (click)="openCreateForm()" class="btn btn-primary rounded-2xl px-8 font-black">Crear Sucursal Ahora</button>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        }
     }
 
-    <!-- Modal Form (Side drawer style) -->
+    <!-- Profile/Form View (Integrated) -->
     @if (showForm()) {
-        <div class="fixed inset-0 z-50 flex justify-end">
-            <!-- Overlay -->
-            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in" (click)="cancelForm()"></div>
+        <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 md:p-12 border border-slate-100 dark:border-slate-700 shadow-xl animate-fade-in relative">
             
-            <!-- Sidebar -->
-            <div class="relative w-full max-w-xl bg-white dark:bg-slate-900 h-full shadow-2xl p-8 md:p-12 overflow-y-auto animate-slide-in-right">
-                <div class="flex justify-between items-center mb-10">
-                    <h2 class="text-3xl font-black text-slate-900 dark:text-white">
-                        {{ isEditing() ? 'Editar Sucursal' : 'Nueva Sucursal' }}
-                    </h2>
-                    <button (click)="cancelForm()" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            @if (!branchService.currentBranch()) {
+                <button (click)="cancelForm()" class="absolute right-8 top-8 w-12 h-12 rounded-full shadow-sm bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            }
 
-                <div class="space-y-8">
-                    <!-- Nombre -->
-                    <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pl-1">Nombre de la Sucursal</label>
-                        <input type="text" [(ngModel)]="currentForm().name" 
-                            placeholder="Ej: Arecofix Larrea"
-                            class="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-800 rounded-2xl p-4 font-bold text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-hidden">
-                    </div>
+            <div class="flex border-b border-slate-100 dark:border-slate-800 mb-10 overflow-x-auto no-scrollbar">
+                <button (click)="currentTab.set('general')" [class]="currentTab() === 'general' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'" class="px-8 py-5 font-black border-b-4 text-sm whitespace-nowrap uppercase tracking-widest transition-all">General</button>
+                <button (click)="currentTab.set('branding')" [class]="currentTab() === 'branding' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'" class="px-8 py-5 font-black border-b-4 text-sm whitespace-nowrap uppercase tracking-widest transition-all">Identidad</button>
+                <button (click)="currentTab.set('contact')" [class]="currentTab() === 'contact' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'" class="px-8 py-5 font-black border-b-4 text-sm whitespace-nowrap uppercase tracking-widest transition-all">Contacto</button>
+                <button (click)="currentTab.set('financial')" [class]="currentTab() === 'financial' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'" class="px-8 py-5 font-black border-b-4 text-sm whitespace-nowrap uppercase tracking-widest transition-all">Financiero</button>
+            </div>
 
-                    <!-- Slug (Optional) -->
-                    <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pl-1">Slug (URL personalizada)</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">/</span>
-                            <input type="text" [(ngModel)]="currentForm().slug" 
-                                placeholder="arecofix-larrea"
-                                class="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-800 rounded-2xl p-4 pl-8 font-bold text-slate-900 dark:text-white focus:border-indigo-500 transition-all outline-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <!-- Inputs based on currentTab -->
+                @if (currentTab() === 'general') {
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Nombre Comercial</label>
+                            <input type="text" [(ngModel)]="currentForm().name" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
                         </div>
-                        <p class="text-[10px] text-slate-400 italic px-1">Si se deja vacío, se generará automáticamente desde el nombre.</p>
-                    </div>
-
-                    <!-- Dirección -->
-                    <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pl-1">Dirección Física</label>
-                        <textarea [(ngModel)]="currentForm().address" 
-                            rows="3"
-                            placeholder="Calle 123, Ciudad, Provincia"
-                            class="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-800 rounded-2xl p-4 font-bold text-slate-900 dark:text-white focus:border-indigo-500 transition-all outline-hidden"></textarea>
-                    </div>
-
-                    <!-- Markup -->
-                    <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pl-1">Margen de Reventa Global (%)</label>
-                        <div class="relative">
-                            <input type="number" [(ngModel)]="currentForm().global_markup_percentage" 
-                                class="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-800 rounded-2xl p-4 font-bold text-slate-900 dark:text-white focus:border-indigo-500 transition-all outline-hidden">
-                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-black">%</span>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Razón Social</label>
+                            <input type="text" [(ngModel)]="currentForm().official_name" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
                         </div>
-                        <p class="text-[10px] text-slate-400 italic px-1">Porcentaje extra que se sumará automáticamente a los productos globales de la central en esta sucursal.</p>
-                    </div>
-
-                    <!-- Plan Selector -->
-                    <div class="space-y-3">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pl-1">Plan Contratado</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <button type="button" (click)="onPlanChange('basic')"
-                                [class]="currentForm().plan_id === 'basic' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-500 border-slate-100 dark:border-slate-800'"
-                                class="p-4 rounded-2xl border-2 font-bold transition-all text-sm">
-                                Básico
-                            </button>
-                            <button type="button" (click)="onPlanChange('premium')"
-                                [class]="currentForm().plan_id === 'premium' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-500 border-slate-100 dark:border-slate-800'"
-                                class="p-4 rounded-2xl border-2 font-bold transition-all text-sm">
-                                Premium
-                            </button>
-                            <button type="button" (click)="currentForm().plan_id = 'custom'"
-                                [class]="currentForm().plan_id === 'custom' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-500 border-slate-100 dark:border-slate-800'"
-                                class="p-4 rounded-2xl border-2 font-bold transition-all text-sm">
-                                Custom
-                            </button>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Dirección Física</label>
+                            <input type="text" [(ngModel)]="currentForm().address" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
                         </div>
                     </div>
+                    <div class="space-y-6">
+                        <div class="bg-indigo-50 dark:bg-indigo-900/10 p-6 rounded-4xl border border-indigo-100 dark:border-indigo-800">
+                            <h4 class="font-black text-indigo-900 dark:text-indigo-400 uppercase text-xs tracking-widest mb-4">Plan Actual</h4>
+                            <select [ngModel]="currentForm().plan_id" (ngModelChange)="onPlanChange($event)" class="w-full p-4 rounded-xl bg-white dark:bg-slate-900 border-none font-bold shadow-sm">
+                                <option value="basic">Plan Básico (Dashboard + Clientes)</option>
+                                <option value="premium">Plan Premium (Taller + Inventario + Ventas)</option>
+                            </select>
+                        </div>
+                    </div>
+                }
 
-                    <!-- Module Configuration -->
-                    @if (currentForm().modules_config) {
-                        <div class="space-y-4">
-                            <label class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pl-1">Módulos Disponibles</label>
-                            
-                            <div class="grid grid-cols-1 gap-2">
-                                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-chart-line text-indigo-500"></i>
-                                        <div>
-                                            <p class="font-bold text-sm text-slate-900 dark:text-white">Ventas / Dashboard</p>
-                                            <p class="text-[10px] text-slate-500">Acceso a estadísticas generales.</p>
-                                        </div>
-                                    </div>
-                                    <input type="checkbox" [(ngModel)]="currentForm().modules_config!.dashboard" class="toggle toggle-sm toggle-indigo">
-                                </div>
-
-                                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-tools text-indigo-500"></i>
-                                        <div>
-                                            <p class="font-bold text-sm text-slate-900 dark:text-white">Taller / Reparaciones</p>
-                                            <p class="text-[10px] text-slate-500">Gestión de ingresos y estados.</p>
-                                        </div>
-                                    </div>
-                                    <input type="checkbox" [(ngModel)]="currentForm().modules_config!.repairs" class="toggle toggle-sm toggle-indigo">
-                                </div>
-
-                                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-boxes text-indigo-500"></i>
-                                        <div>
-                                            <p class="font-bold text-sm text-slate-900 dark:text-white">Inventario / Productos</p>
-                                            <p class="text-[10px] text-slate-500">Control de stock y proveedores.</p>
-                                        </div>
-                                    </div>
-                                    <input type="checkbox" [(ngModel)]="currentForm().modules_config!.inventory" class="toggle toggle-sm toggle-indigo">
-                                </div>
-
-                                <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-users text-indigo-500"></i>
-                                        <div>
-                                            <p class="font-bold text-sm text-slate-900 dark:text-white">Clientes</p>
-                                            <p class="text-[10px] text-slate-500">Base de datos de contacto.</p>
-                                        </div>
-                                    </div>
-                                    <input type="checkbox" [(ngModel)]="currentForm().modules_config!.customers" class="toggle toggle-sm toggle-indigo">
-                                </div>
+                @if (currentTab() === 'branding') {
+                    <div class="space-y-6">
+                        <div class="p-8 rounded-4xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center text-center">
+                            @if (currentForm().branding_settings?.logo_url) {
+                                <img [src]="currentForm().branding_settings!.logo_url" class="h-32 w-32 object-contain mb-4 bg-white rounded-2xl shadow-sm">
+                            }
+                            <label class="btn btn-neutral rounded-xl px-8 cursor-pointer">
+                                {{ uploadingLogo() ? 'Subiendo...' : 'Cambiar Logo' }}
+                                <input type="file" class="hidden" (change)="onLogoSelected($event)" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Color de Marca</label>
+                            <div class="flex gap-4 items-center">
+                                <input type="color" [(ngModel)]="currentForm().branding_settings!.primary_color" class="h-14 w-14 rounded-xl cursor-pointer bg-transparent border-none">
+                                <span class="font-mono font-bold text-slate-600">{{ currentForm().branding_settings!.primary_color }}</span>
                             </div>
                         </div>
-                    }
-
-                    <!-- Status toggle -->
-                    <div class="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800">
-                        <div>
-                            <p class="font-black text-slate-900 dark:text-white">Estado de la Sucursal</p>
-                            <p class="text-xs text-slate-500">Define si la sucursal está operativa.</p>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Nombre del Propietario</label>
+                            <input type="text" [(ngModel)]="currentForm().branding_settings!.owner_name" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
                         </div>
-                        <input type="checkbox" [(ngModel)]="currentForm().is_active" class="toggle toggle-indigo">
                     </div>
+                }
 
-                    <div class="pt-10 flex gap-4">
-                        <button (click)="cancelForm()" 
-                            class="flex-1 px-6 py-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-50 transition-all">
-                            Cancelar
-                        </button>
-                        <button (click)="saveBranch()" [disabled]="saving()"
-                            class="flex-2 px-6 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black transition-all shadow-xl shadow-indigo-500/25 disabled:opacity-50">
-                            @if (saving()) {
-                                <span class="loading loading-spinner"></span>
-                            } @else {
-                                {{ isEditing() ? 'Guardar Cambios' : 'Crear Sucursal' }}
-                            }
-                        </button>
+                @if (currentTab() === 'contact') {
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Email de Contacto</label>
+                            <input type="email" [(ngModel)]="currentForm().contact_email" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Teléfono Local</label>
+                            <input type="text" [(ngModel)]="currentForm().contact_phone" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
+                        </div>
                     </div>
-                </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-emerald-500 tracking-widest ml-1">WhatsApp de Atención</label>
+                            <input type="text" [(ngModel)]="currentForm().whatsapp_number" class="w-full p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/10 border-2 border-transparent focus:border-emerald-500 outline-hidden font-bold text-emerald-700 transition-all">
+                        </div>
+                    </div>
+                }
+
+                @if (currentTab() === 'financial') {
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">CUIT / Identificación Fiscal</label>
+                            <input type="text" [(ngModel)]="currentForm().tax_id" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
+                        </div>
+                        <div class="space-y-2">
+                             <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banco</label>
+                             <input type="text" [(ngModel)]="currentForm().bank_info!.bank" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Alias / CBU</label>
+                            <input type="text" [(ngModel)]="currentForm().bank_info!.alias" placeholder="ALIAS" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-bold transition-all mb-2">
+                            <input type="text" [(ngModel)]="currentForm().bank_info!.cbu" placeholder="CBU" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-indigo-500 outline-hidden font-mono transition-all">
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4">
+                @if (!branchService.currentBranch()) {
+                    <button (click)="cancelForm()" class="px-8 py-4 rounded-2xl font-black text-slate-500 hover:bg-slate-100 transition-all">Descartar</button>
+                }
+                <button (click)="saveBranch()" [disabled]="saving()" class="px-12 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-xl shadow-indigo-500/20 transition-all active:scale-95">
+                    {{ saving() ? 'Guardando...' : 'Aplicar Cambios' }}
+                </button>
             </div>
         </div>
     }
 </div>
-
-<style>
-    .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-    .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-    .animate-slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes slideInRight {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
-    }
-
-    @keyframes shake {
-        10%, 90% { transform: translate3d(-1px, 0, 0); }
-        20%, 80% { transform: translate3d(2px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-        40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
-</style>

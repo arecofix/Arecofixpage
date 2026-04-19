@@ -49,7 +49,16 @@
             <p class="text-emerald-600 mt-6 font-medium tracking-wide animate-pulse">Escaneando sistema...</p>
         </div>
     } @else {
-        
+        @if (missingBranch() && !id) {
+            <div class="alert alert-warning shadow-lg mb-8 rounded-3xl border-none bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+                <div class="flex flex-col">
+                    <span class="font-bold">Sucursal no detectada</span>
+                    <span class="text-sm">Para dar de alta un equipo debes seleccionar una sucursal activa en el panel superior.</span>
+                </div>
+            </div>
+        }
+
         <form [formGroup]="repairForm" (ngSubmit)="save()" class="space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
@@ -131,7 +140,7 @@
                         }
 
                         <button type="submit" class="btn btn-lg bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all text-lg"
-                            [disabled]="saving() || repairForm.invalid">
+                            [disabled]="saving()">
                             @if (saving()) {
                                 <span class="loading loading-spinner text-white opacity-80"></span> Guardando...
                             } @else {

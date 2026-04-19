@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -14,6 +14,7 @@ import { Pagination } from '@app/shared/components/pagination/pagination';
 import { FinanceService } from '@app/features/finance/application/services/finance.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { NotificationService } from '@app/core/services/notification.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 interface CartItem extends Product {
     quantity: number;
@@ -34,6 +35,8 @@ export class AdminSalesPage implements OnInit {
     private financeService = inject(FinanceService);
     public tenantService = inject(TenantService);
     private notificationService = inject(NotificationService);
+
+    private branchContextService = inject(BranchContextService);
 
     // Data Signals
     products = signal<Product[]>([]);
@@ -62,17 +65,15 @@ export class AdminSalesPage implements OnInit {
         );
     });
 
-    // Computed: Paginated Products
+    // ... (paginatedProducts, totalPages remain same)
     paginatedProducts = computed(() => {
         const all = this.filteredProducts();
         const start = (this.currentPage() - 1) * this.itemsPerPage();
         return all.slice(start, start + this.itemsPerPage());
     });
 
-    // Computed: Total Pages
     totalPages = computed(() => Math.ceil(this.filteredProducts().length / this.itemsPerPage()));
 
-    // Computed: Cart Totals (Convert USD prices to base currency if needed)
     cartSubtotal = computed(() => {
         const rate = this.tenantService.currentTenant()?.usd_rate || 1;
         return this.cart().reduce((acc, item) => {
@@ -87,9 +88,12 @@ export class AdminSalesPage implements OnInit {
         // Reset pagination on search
         effect(() => {
             this.searchQuery();
-            // Optional: reset to page 1 on search
-            // We should only do this if it's an actual user search interaction, 
-            // but the effect trigger is enough for now. The URL will still govern the current page via route subscription.
+        });
+
+        // RE-LOAD products on branch change!
+        effect(() => {
+            this.branchContextService.getBranchId();
+            untracked(() => this.loadProducts());
         });
     }
 
@@ -100,15 +104,19 @@ export class AdminSalesPage implements OnInit {
             const page = params['_page'] ? parseInt(params['_page'], 10) : 1;
             this.currentPage.set(page || 1);
         });
-
-        await this.loadProducts();
     }
 
     async loadProducts() {
         this.loading.set(true);
-        this.productRepository.findAvailable().subscribe({
-            next: (data) => {
-                this.products.set(data);
+        const branch_id = this.branchContextService.getBranchId() || undefined;
+
+        // Use any to bypass strict ProductsParams check if interface hasn't updated in memory
+        this.productRepository.findWithFilters({ 
+            branch_id, 
+            is_paginated: false 
+        } as any).subscribe({
+            next: (res: any) => {
+                this.products.set(res.data || []);
                 this.loading.set(false);
             },
             error: (err) => {
@@ -122,17 +130,14 @@ export class AdminSalesPage implements OnInit {
         this.cart.update(items => {
             const existing = items.find(i => i.id === product.id);
             if (existing) {
-                // Check stock limit
                 if (existing.quantity >= product.stock) {
-                    // Optional: Show toast "Stock limit reached"
+                    this.notificationService.showWarning(`Stock insuficiente para ${product.name}`);
                     return items;
                 }
                 return items.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
             }
             return [...items, { ...product, quantity: 1 }];
         });
-        
-        // On mobile, maybe hint cart updated?
     }
 
     removeFromCart(productId: string) {
@@ -158,7 +163,10 @@ export class AdminSalesPage implements OnInit {
                     const stock = product?.stock || 0;
                     const newQty = i.quantity + change;
 
-                    if (newQty > stock) return i; // Prevent exceeding stock
+                    if (newQty > stock) {
+                         this.notificationService.showWarning(`Solo quedan ${stock} unidades.`);
+                         return i;
+                    }
                     return newQty > 0 ? { ...i, quantity: newQty } : i;
                 }
                 return i;
@@ -171,7 +179,9 @@ export class AdminSalesPage implements OnInit {
         this.processing.set(true);
 
         try {
-            // 1. Create Order (acting as a Sale) - The DB Trigger sync_order_items_stock will handle stock decrements!
+            const branch_id = this.branchContextService.getBranchId() || undefined;
+
+            // 1. Create Order
             const order: Order = {
                 customer_name: this.customerName() || 'Consumidor Final',
                 customer_email: undefined,
@@ -179,7 +189,9 @@ export class AdminSalesPage implements OnInit {
                 subtotal: this.cartSubtotal(),
                 tax: 0,
                 discount: this.discount(),
-                total: this.finalTotal()
+                total: this.finalTotal(),
+                branch_id: branch_id, // CRITICAL: Assign the branch!
+                payment_method: this.paymentMethod()
             };
 
             const rate = this.tenantService.currentTenant()?.usd_rate || 1;
@@ -200,7 +212,7 @@ export class AdminSalesPage implements OnInit {
             const createdOrder = await firstValueFrom(this.orderService.createOrder(order));
             if (!createdOrder) throw new Error('Order creation failed');
 
-            // 2. Generate Invoice via InvoiceService (duplicate guard + canonical totals)
+            // 2. Generate Invoice
             const invoiceResult = await this.invoiceService.generateInvoice({
                 order_id:      createdOrder.id,
                 customer_name: this.customerName() || 'Consumidor Final',
@@ -219,7 +231,7 @@ export class AdminSalesPage implements OnInit {
                 this.notificationService.showSuccess('✅ Venta procesada correctamente.');
             }
 
-            // 4. Record Cash Movement [USER-REQ]
+            // 4. Record Cash Movement
             if (this.paymentMethod() === 'efectivo' && createdOrder?.id) {
                 await this.financeService.recordMovement({
                     amount: this.finalTotal(),
@@ -227,7 +239,8 @@ export class AdminSalesPage implements OnInit {
                     category: 'sale',
                     payment_method: 'cash',
                     reference_id: createdOrder.id,
-                    notes: `Venta POS - Ticket #${createdOrder.id.substring(0,8)}`
+                    notes: `Venta POS - Ticket #${createdOrder.id.substring(0,8)}`,
+                    branch_id: branch_id // Also attribute movement to branch
                 });
             }
 

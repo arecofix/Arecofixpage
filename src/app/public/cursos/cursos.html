@@ -1,52 +1,60 @@
-<!-- Hero Section -->
-<section class="relative bg-gray-900 text-white py-20 lg:py-32 overflow-hidden">
-    <!-- Background Gradient & Shapes -->
-    <div class="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 z-0"></div>
-    <div class="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-blue-900/20 to-transparent z-0"></div>
-    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-green-500/10 rounded-full blur-3xl z-0"></div>
+<!-- Hero Section: Premium Academy Brand -->
+<section class="relative bg-[#0f172a] text-white py-16 lg:py-32 overflow-hidden border-b border-white/5">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.15)_0%,transparent_50%)]"></div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-0 left-10 w-72 h-72 bg-emerald-500/5 rounded-full blur-[80px]"></div>
+    </div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-3xl mx-auto text-center">
-            <span class="inline-block py-1 px-3 rounded-full bg-blue-500/20 text-blue-300 text-sm font-bold tracking-wide uppercase mb-6 border border-blue-500/30">
-                Arecofix Academy
-            </span>
-            <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
-                Dominá la Tecnología<br />
-                <span class="text-transparent bg-clip-text bg-linear-to-r from-green-400 to-blue-500">
-                    Construí tu Futuro
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8 animate-fade-in">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Arecofix Academy • Capacitación Profesional
+            </div>
+            
+            <h1 class="text-4xl md:text-7xl font-black mb-8 tracking-tight leading-[1.1]">
+                Aprendé un Oficio que <br class="hidden md:block" />
+                <span class="text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-indigo-400 to-emerald-400">
+                    Construye tu Futuro
                 </span>
             </h1>
-            <p class="text-xl text-gray-300 mb-10 leading-relaxed">
-                Formate como técnico profesional en reparación de celulares y tecnología. 
-                Cursos prácticos, certificación oficial y las mejores herramientas del mercado.
+            
+            <p class="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Formate como técnico profesional con clases 100% prácticas. 
+                Programas diseñados para que salgas al mercado con herramientas reales y certificación oficial.
             </p>
             
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <a routerLink="." fragment="cursos-list" 
-                   class="btn btn-primary btn-lg rounded-full px-8 shadow-lg shadow-blue-500/30 hover:-translate-y-1 transition-all">
-                    Ver Cursos Disponibles
+                   class="w-full sm:w-auto btn bg-blue-600 hover:bg-blue-500 border-none text-white btn-lg rounded-2xl px-10 shadow-2xl shadow-blue-500/20 transition-all hover:-translate-y-1">
+                    Ver Capacitaciones
                 </a>
                 <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20info%20sobre%20cursos'" 
                    target="_blank"
-                   class="btn btn-outline btn-lg text-white border-white/30 hover:bg-white hover:text-gray-900 rounded-full px-8">
-                    <i class="fa-brands fa-whatsapp mr-2"></i> Consultar Ahora
+                   class="w-full sm:w-auto btn btn-ghost btn-lg text-slate-300 hover:text-white hover:bg-white/5 rounded-2xl px-8 border border-white/10">
+                    <i class="fa-brands fa-whatsapp mr-2 text-xl"></i> Consultar WhatsApp
                 </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Stats / Benefits Section -->
-<section class="py-16 bg-white dark:bg-gray-800 -mt-10 relative z-20 rounded-t-[3rem]">
+<!-- Why Choose Us / Value Proposition -->
+<section class="py-12 bg-[#0f172a] relative z-20">
     <div class="container mx-auto px-4">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @for (benefit of benefits(); track benefit.title) {
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover-lift group">
-                    <div [class]="'w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-2xl mb-3 md:mb-6 transition-transform group-hover:scale-110 ' + benefit.color">
+                <div class="group bg-slate-900/50 backdrop-blur-xl p-8 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all duration-500">
+                    <div [class]="'w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg ' + benefit.color">
                         <i [class]="benefit.icon"></i>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3 leading-tight">{{ benefit.title }}</h3>
-                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-xs md:text-sm">
+                    <h3 class="text-lg font-bold text-white mb-3">{{ benefit.title }}</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
                         {{ benefit.description }}
                     </p>
                 </div>
@@ -55,145 +63,145 @@
     </div>
 </section>
 
-<!-- Courses List Section -->
-<section id="cursos-list" class="py-20 bg-gray-50 dark:bg-gray-900">
+<!-- Featured Courses Section -->
+<section id="cursos-list" class="py-24 bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
     <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Nuestros Cursos</h2>
-            <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
-                Elegí la capacitación que impulsará tu carrera profesional.
+        <div class="flex flex-col items-center text-center mb-20">
+            <h2 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">Capacitaciones Disponibles</h2>
+            <div class="w-20 h-1.5 bg-blue-600 rounded-full mb-6"></div>
+            <p class="text-slate-600 dark:text-slate-400 max-w-2xl text-lg">
+                Elegí el camino que transformará tu realidad económica. Cursos intensivos con cupos limitados.
             </p>
         </div>
 
         @if (isLoadingCourses()) {
-            <div class="flex justify-center py-20">
-                <span class="loading loading-spinner loading-lg text-primary"></span>
+            <div class="flex flex-col items-center justify-center py-32 space-y-4">
+                <span class="loading loading-spinner loading-lg text-blue-600"></span>
+                <p class="text-slate-500 font-medium animate-pulse">Cargando academia...</p>
             </div>
         } @else {
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Fix: Responsive Grid - grid-cols-1 on Mobile -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 @for (course of courses(); track course.id) {
-                    <a [routerLink]="['/academy', course.slug]" 
-                       class="relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col h-full group card-modern hover-lift no-underline ring-1 ring-transparent hover:ring-blue-500/30">
+                    <div class="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-white/5 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                         
-                        <!-- Image Container with Hover Zoom & Overlay -->
-                        <div class="relative h-48 sm:h-56 overflow-hidden bg-slate-900">
-                            <!-- Overlay gradient to ensure text readability -->
-                            <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent z-10 opacity-90 group-hover:opacity-60 transition-opacity duration-500"></div>
+                        <!-- Premium Course Header (Image + Badges) -->
+                        <div class="relative h-64 overflow-hidden">
+                            <div class="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/20 to-transparent z-10"></div>
                             
-                            <!-- Image -->
+                            <!-- Main Image with Ken Burns Effect on Hover -->
                             <img [src]="course.image_url" [alt]="course.title" 
-                                 class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out">
+                                 class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
                             
-                            <!-- Level Badge -->
-                            <div class="absolute top-4 right-4 z-20">
-                                <span class="badge badge-primary font-bold py-2 px-4 shadow-xl text-xs tracking-widest border-none bg-blue-600/90 backdrop-blur-md text-white uppercase rounded-full">
+                            <!-- Badges -->
+                            <div class="absolute top-6 left-6 z-20 flex flex-wrap gap-2">
+                                <span class="bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg">
                                     {{ course.level }}
+                                </span>
+                                <span class="bg-black/40 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-white/20">
+                                    <i class="fas fa-users mr-1"></i> {{ course.students }}+ Alumnos
                                 </span>
                             </div>
 
-                            <!-- Interactive Play/Expand Icon on Hover -->
-                            <div class="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                                <div class="w-14 h-14 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white shadow-2xl transform scale-50 group-hover:scale-100 transition-all duration-500 ease-out delay-75">
-                                    <i class="fas fa-play ml-1 text-xl"></i>
+                            <!-- Floating Price Tag -->
+                            <div class="absolute bottom-6 right-6 z-20">
+                                <div class="bg-emerald-500 text-white font-black px-4 py-2 rounded-2xl shadow-xl transform group-hover:scale-110 transition-transform">
+                                    <span class="text-[10px] block font-bold opacity-80 uppercase leading-none mb-1">Desde</span>
+                                    <span class="text-xl leading-none">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Content Body -->
-                        <div class="p-6 sm:p-8 flex flex-col grow bg-white dark:bg-slate-800 relative z-20">
-                            <h3 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mb-3 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-tight line-clamp-2">
+                        <!-- Course Body -->
+                        <div class="p-8 flex flex-col grow">
+                            <div class="mb-4 flex items-center gap-2 text-blue-500 dark:text-blue-400 text-xs font-bold uppercase tracking-widest">
+                                <i class="fas fa-microchip"></i>
+                                <span>Tecnología & Oficios</span>
+                            </div>
+                            
+                            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
                                 {{ course.title }}
                             </h3>
-                            <p class="text-gray-600 dark:text-slate-300 mb-6 text-sm sm:text-base leading-relaxed grow line-clamp-3">
+                            
+                            <p class="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed line-clamp-3">
                                 {{ course.description }}
                             </p>
 
-                            <!-- Modern Meta Info Blocks -->
-                            <div class="flex flex-col gap-3 mb-6">
-                                <div class="flex items-center gap-3 text-sm text-gray-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 group/meta hover:bg-white dark:hover:bg-slate-800 hover:border-blue-100 dark:hover:border-blue-900/50 transition-colors">
-                                    <div class="w-8 h-8 rounded-lg bg-blue-100/50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover/meta:scale-110 transition-transform">
-                                        <i class="fas fa-clock"></i>
-                                    </div>
-                                    <div class="flex flex-col leading-tight">
-                                        <span class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">Duración</span>
-                                        <span class="font-semibold">{{ course.duration }}</span>
-                                    </div>
+                            <!-- Course Specs Grid -->
+                            <div class="grid grid-cols-2 gap-3 mb-8">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                                    <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Duración</span>
+                                    <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                        <i class="fas fa-clock text-blue-500"></i> {{ course.duration }}
+                                    </span>
                                 </div>
-                                <div class="flex items-center gap-3 text-sm text-gray-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 group/meta hover:bg-white dark:hover:bg-slate-800 hover:border-green-100 dark:hover:border-green-900/50 transition-colors">
-                                    <div class="w-8 h-8 rounded-lg bg-green-100/50 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0 group-hover/meta:scale-110 transition-transform">
-                                        <i class="fas fa-calendar-alt"></i>
-                                    </div>
-                                    <div class="flex flex-col leading-tight">
-                                        <span class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">Modalidad</span>
-                                        <span class="font-semibold whitespace-normal">{{ course.schedule }}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Professional Price Footer & CTA -->
-                            <div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-700 flex flex-col gap-4">
-                                <div class="flex items-end justify-between">
-                                    <div class="flex flex-col">
-                                        <span class="text-[11px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
-                                            <i class="fas fa-shield-alt text-blue-500"></i> Inversión Mensual
-                                        </span>
-                                        <span class="text-3xl font-black text-gray-900 dark:text-white leading-none tracking-tight">
-                                            {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div class="w-full relative overflow-hidden btn border-none bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-12 flex items-center justify-center transition-all duration-300 shadow-lg shadow-blue-500/20 group/btn">
-                                    <span class="relative z-10 font-bold tracking-wide flex items-center gap-2 text-sm sm:text-base">
-                                        Ver Programa Completo
-                                        <i class="fas fa-arrow-right transform group-hover/btn:translate-x-1 transition-transform"></i>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                                    <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Modalidad</span>
+                                    <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 leading-tight">
+                                        <i class="fas fa-calendar text-emerald-500"></i> {{ course.schedule }}
                                     </span>
                                 </div>
                             </div>
+
+                            <!-- CTA Section -->
+                            <div class="mt-auto flex flex-col gap-3">
+                                <a [routerLink]="['/academy', course.slug]" 
+                                   class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none text-white rounded-2xl h-14 font-black tracking-wide shadow-lg shadow-blue-500/20">
+                                    Ver Programa Completo
+                                </a>
+                                <button (click)="openRegistration(course)" 
+                                        class="btn btn-ghost text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl h-14 font-bold">
+                                    Inscribirme Ahora
+                                </button>
+                            </div>
                         </div>
-                    </a>
+                    </div>
                 }
             </div>
         }
     </div>
 </section>
 
-<!-- Additional Products / Kits Section -->
-<section class="py-20 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+<!-- Tools & Supplies Integration (Professional Kits) -->
+<section class="py-24 bg-white dark:bg-[#0f172a] border-t border-slate-100 dark:border-white/5">
     <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-6 text-center md:text-left">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Kit de Herramientas</h2>
-                <p class="text-gray-600 dark:text-gray-400">Todo lo que necesitás para empezar tu taller profesional.</p>
+        <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8">
+            <div class="text-center md:text-left max-w-xl">
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">Materiales y Herramientas</h2>
+                <div class="w-16 h-1.5 bg-emerald-500 rounded-full mb-6 mx-auto md:mx-0"></div>
+                <p class="text-slate-600 dark:text-slate-400">Todo lo que necesitás para equipar tu primer laboratorio o taller profesional con precios especiales para alumnos.</p>
             </div>
             
-            <div class="flex gap-2">
+            <div class="flex gap-3 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-slate-200 dark:border-white/10">
                 <select [ngModel]="sort()" (ngModelChange)="sort.set($event)" 
-                        class="select select-bordered select-sm w-36 dark:bg-gray-700">
-                    <option value="created_at">Nuevos</option>
-                    <option value="price">Precio</option>
+                        class="select select-ghost select-sm w-36 font-bold text-xs uppercase tracking-widest outline-none border-none focus:outline-none">
+                    <option value="created_at">Más Recientes</option>
+                    <option value="price">Por Precio</option>
                 </select>
+                <div class="w-px h-8 bg-slate-200 dark:bg-white/10"></div>
                 <select [ngModel]="order()" (ngModelChange)="order.set($event)" 
-                        class="select select-bordered select-sm w-36 dark:bg-gray-700">
-                    <option value="asc">Menor Precio</option>
-                    <option value="desc">Mayor Precio</option>
+                        class="select select-ghost select-sm w-36 font-bold text-xs uppercase tracking-widest outline-none border-none focus:outline-none">
+                    <option value="asc">Menor a Mayor</option>
+                    <option value="desc">Mayor a Menor</option>
                 </select>
             </div>
         </div>
 
         @if (productsRs.isLoading()) {
-            <is-loading />
+            <div class="flex justify-center py-20">
+                <span class="loading loading-spinner loading-lg text-emerald-500"></span>
+            </div>
         } @else if (productsRs.error()) {
             <is-error />
         } @else if (productsRs.hasValue()) {
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @for (product of productsRs.value().data; track product.id) {
-                    <product-card [product]="product" />
+                    <product-card [product]="product" class="animate-fade-in" />
                 }
             </div>
             
             @if (paginationData(); as pager) {
-                <div class="mt-12 flex justify-center">
+                <div class="mt-16 flex justify-center">
                     <pagination [pages]="pager.pages" 
                                [currentPage]="paginationService.currentPage()" />
                 </div>
@@ -202,86 +210,103 @@
     </div>
 </section>
 
-
-<!-- Registration Modal -->
+<!-- Professional Modal Refactor -->
 @if (isRegistrationOpen()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in"
          (click)="closeRegistration()">
         
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100 border border-gray-100 dark:border-gray-700"
+        <div class="bg-white dark:bg-slate-900 rounded-4xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-xl overflow-hidden transform transition-all scale-100 border border-slate-200 dark:border-white/10"
              (click)="$event.stopPropagation()">
             
-            <!-- Modal Header -->
-            <div class="bg-primary px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white">Inscripción</h3>
-                <button (click)="closeRegistration()" class="text-white/80 hover:text-white transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
+            <!-- Floating Close Button -->
+            <button (click)="closeRegistration()" class="absolute top-6 right-6 z-30 w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:text-red-500 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
 
-            <!-- Modal Body -->
-            <div class="p-6 md:p-8">
-                @if (selectedCourse()) {
-                    <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
-                        <p class="text-xs text-blue-600 dark:text-blue-300 font-bold uppercase tracking-wider mb-1">Estás aplicando a:</p>
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ selectedCourse()?.title }}</h4>
-                    </div>
-                }
+            <!-- Modal Content Wrapper -->
+            <div class="relative">
+                <!-- Visual Accent -->
+                <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 p-8 flex items-end">
+                    <h3 class="text-2xl font-black text-white">Solicitud de Cupo</h3>
+                </div>
 
-                @if (registrationSuccess()) {
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">¡Solicitud Recibida!</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mb-6">
-                            Gracias por tu interés. Un asesor te contactará por WhatsApp para confirmar tu vacante y coordinar el pago.
-                        </p>
-                        <button (click)="closeRegistration()" class="btn btn-outline w-full rounded-xl">
-                            Entendido
-                        </button>
-                    </div>
-                } @else {
-                    <form (ngSubmit)="submitRegistration()" class="space-y-4">
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">Nombre Completo</span></label>
-                            <input type="text" [(ngModel)]="registrationForm.full_name" name="full_name" 
-                                   class="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary" 
-                                   placeholder="Ej: Juan Pérez" required />
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">WhatsApp</span></label>
-                            <input type="tel" [(ngModel)]="registrationForm.phone" name="phone" 
-                                   class="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary" 
-                                   placeholder="Ej: 11 1234 5678" required />
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">Correo Electrónico</span></label>
-                            <input type="email" [(ngModel)]="registrationForm.email" name="email" 
-                                   class="input input-bordered w-full rounded-xl focus:outline-none focus:border-primary" 
-                                   placeholder="tu@email.com" required />
-                        </div>
-                        
-                        @if (registrationError()) {
-                            <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
-                                {{ registrationError() }}
+                <div class="p-8">
+                    @if (selectedCourse()) {
+                        <div class="mb-8 flex items-start gap-4 bg-blue-50 dark:bg-blue-500/10 p-5 rounded-2xl border border-blue-100 dark:border-blue-500/20">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 self-center">
+                                <i class="fas fa-graduation-cap text-xl"></i>
                             </div>
-                        }
+                            <div>
+                                <p class="text-[10px] text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest mb-1">Capacitación Seleccionada:</p>
+                                <h4 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">{{ selectedCourse()?.title }}</h4>
+                            </div>
+                        </div>
+                    }
 
-                        <button type="submit" [disabled]="isRegistering()" 
-                                class="btn btn-primary w-full rounded-xl mt-4 text-lg">
-                            @if (isRegistering()) {
-                                <span class="loading loading-spinner loading-sm"></span> Enviando...
-                            } @else {
-                                Enviar Solicitud
+                    @if (registrationSuccess()) {
+                        <div class="text-center py-10 space-y-6">
+                            <div class="relative mx-auto w-24 h-24">
+                                <div class="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+                                <div class="relative w-24 h-24 bg-emerald-500 text-white rounded-full flex items-center justify-center text-4xl shadow-xl">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-2xl font-black text-slate-900 dark:text-white">¡Reserva Enviada!</h3>
+                            <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                                Recibimos tu interés correctamente. En breve te contactaremos por WhatsApp para finalizar tu inscripción y coordinar el ingreso.
+                            </p>
+                            <button (click)="closeRegistration()" class="w-full btn btn-primary bg-emerald-500 hover:bg-emerald-600 border-none h-14 rounded-2xl text-white font-bold">
+                                Excelente, aguardo el mensaje
+                            </button>
+                        </div>
+                    } @else {
+                        <form (ngSubmit)="submitRegistration()" class="space-y-5">
+                            <div class="form-control">
+                                <label class="label"><span class="label-text-alt uppercase font-black tracking-widest text-slate-500">Nombre y Apellido</span></label>
+                                <input type="text" [(ngModel)]="registrationForm.full_name" name="full_name" 
+                                       class="input input-bordered w-full rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-white/5 h-14 focus:ring-2 focus:ring-blue-500 transition-all" 
+                                       placeholder="Ej: Ezequiel Enrico" required />
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label"><span class="label-text-alt uppercase font-black tracking-widest text-slate-500">WhatsApp</span></label>
+                                    <input type="tel" [(ngModel)]="registrationForm.phone" name="phone" 
+                                           class="input input-bordered w-full rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-white/5 h-14 focus:ring-2 focus:ring-blue-500 transition-all" 
+                                           placeholder="+54 9 11 ..." required />
+                                </div>
+                                <div class="form-control">
+                                    <label class="label"><span class="label-text-alt uppercase font-black tracking-widest text-slate-500">Email</span></label>
+                                    <input type="email" [(ngModel)]="registrationForm.email" name="email" 
+                                           class="input input-bordered w-full rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-white/5 h-14 focus:ring-2 focus:ring-blue-500 transition-all" 
+                                           placeholder="tu@email.com" required />
+                                </div>
+                            </div>
+                            
+                            @if (registrationError()) {
+                                <div class="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm flex gap-3">
+                                    <i class="fas fa-exclamation-circle mt-0.5"></i>
+                                    <span>{{ registrationError() }}</span>
+                                </div>
                             }
-                        </button>
-                    </form>
-                }
-            </div>
 
+                            <div class="pt-4">
+                                <button type="submit" [disabled]="isRegistering()" 
+                                        class="w-full btn btn-primary bg-blue-600 hover:bg-blue-700 border-none h-16 rounded-2xl text-white font-black text-lg shadow-xl shadow-blue-500/20 transition-all active:scale-95">
+                                    @if (isRegistering()) {
+                                        <span class="loading loading-spinner"></span>
+                                    } @else {
+                                        Confirmar Interés <i class="fas fa-paper-plane ml-2"></i>
+                                    }
+                                </button>
+                                <p class="text-center text-[10px] text-slate-400 mt-4 px-8 leading-tight">
+                                    Al enviar este formulario, un asesor de la academia se pondrá en contacto contigo para validar disponibilidad y formas de pago.
+                                </p>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
         </div>
     </div>
-}
+}

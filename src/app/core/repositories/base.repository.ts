@@ -34,15 +34,33 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         if (!this.isGlobalTable) {
             const tenantId = this.tenantService.getTenantId();
             if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
-                enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+                if (enhancedQuery && typeof enhancedQuery.eq === 'function') {
+                    enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+                } else if (enhancedQuery) {
+                    console.warn(`[BaseRepository] applyTenantFilter: .eq() missing on query for ${this.tableName}`);
+                }
             }
         }
 
         if (this.useSoftDeletes) {
-            enhancedQuery = enhancedQuery.is('deleted_at', null);
+            if (enhancedQuery && typeof enhancedQuery.is === 'function') {
+                enhancedQuery = enhancedQuery.is('deleted_at', null);
+            }
         }
 
         return enhancedQuery;
+    }
+
+    /**
+     * Adds tenant_id to a payload for inserts/upserts if not a global table.
+     */
+    protected sanitizePayload(item: any): any {
+        if (this.isGlobalTable) return { ...item };
+        
+        const tenantId = this.tenantService.getTenantId();
+        if (tenantId === TENANT_CONSTANTS.FALLBACK_ID) return { ...item };
+        
+        return { ...item, tenant_id: tenantId };
     }
 
     /**
@@ -50,7 +68,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
      */
     private async fetchPaginated(
         queryBuilder: () => any,
-        options?: { column?: string; ascending?: boolean }
+        options?: { column?: string; ascending?: boolean; select?: string }
     ): Promise<T[]> {
         let allData: T[] = [];
         let fromIdx = 0;
@@ -84,9 +102,9 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return allData;
     }
 
-    getAll(options?: { column?: string; ascending?: boolean }): Observable<T[]> {
+    getAll(options?: { column?: string; ascending?: boolean; select?: string }): Observable<T[]> {
         return from(this.fetchPaginated(
-            () => this.supabase.from(this.tableName).select('*'),
+            () => this.supabase.from(this.tableName).select(options?.select || '*'),
             options
         ));
     }
@@ -106,12 +124,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     }
 
     create(item: Partial<T>): Observable<T> {
-        const tenantId = this.tenantService.getTenantId();
-        const isFallback = tenantId === TENANT_CONSTANTS.FALLBACK_ID;
-
-        const payload = this.isGlobalTable 
-            ? { ...item } 
-            : (isFallback ? { ...item } : { ...item, tenant_id: tenantId });
+        const payload = this.sanitizePayload(item);
 
         return from(
             this.supabase
