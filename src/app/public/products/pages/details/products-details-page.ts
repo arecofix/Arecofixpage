@@ -34,6 +34,7 @@ import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { ProductReviewBaseRepository } from '@app/features/products/domain/repositories/product-review.repository';
 import { NotificationService } from '@app/core/services/notification.service';
+import { ProductStrategicService } from '@app/core/services/product-strategic.service';
 /*  */
 
 
@@ -67,6 +68,10 @@ export class ProductsDetailsPage {
   private notificationService = inject(NotificationService);
   private reviewRepository = inject(ProductReviewBaseRepository);
   private destroyRef = inject(DestroyRef);
+  private strategicService = inject(ProductStrategicService);
+
+  // UI Constants
+  starRating = [1, 2, 3, 4, 5];
 
   // Reviews
   reviews = signal<any[]>([]);
@@ -199,29 +204,25 @@ export class ProductsDetailsPage {
     return data.data[0];
   });
 
-  isWholesaleAuthorized = computed(() => {
-    const profile = this.authService.getCurrentProfile();
-    if (!profile) return false;
-    const allowedRoles = ['gremio', 'tecnico', 'admin', 'super_admin'];
-    const r = profile.role?.toLowerCase() || '';
-    return allowedRoles.includes(r);
-  });
-
-  isRepuesto = computed(() => {
+  // Strategic Computeds
+  showPriceAndBuy = computed(() => {
       const p = this.product();
-      if (!p) return false;
-      const lower = p.name.toLowerCase();
-      return lower.includes('repuesto') || lower.includes('módulo') || lower.includes('modulo') || 
-             lower.includes('pantalla') || lower.includes('batería') || lower.includes('bateria') ||
-             lower.includes('cámara') || lower.includes('camara') || lower.includes('pin de carga') ||
-             lower.includes('flex') || lower.includes('tapa');
+      return p ? this.strategicService.canViewPriceAndBuy(p) : false;
   });
 
-  canViewPriceAndBuy = computed(() => {
-      if (this.isRepuesto()) {
-          return this.isWholesaleAuthorized();
-      }
-      return true; // Si no es repuesto, todos pueden ver y comprar
+  showWholesaleGate = computed(() => {
+      const p = this.product();
+      return p ? this.strategicService.shouldShowWholesaleGate(p) : false;
+  });
+
+  valueProposition = computed(() => {
+      const p = this.product();
+      return p ? this.strategicService.getValueProposition(p) : '';
+  });
+
+  showWishlist = computed(() => {
+      const p = this.product();
+      return p ? this.strategicService.canShowWishlist(p) : false;
   });
 
   // Signal for the currently selected image to display

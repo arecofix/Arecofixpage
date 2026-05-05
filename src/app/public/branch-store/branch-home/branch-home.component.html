@@ -1,0 +1,144 @@
+<ng-container *ngIf="branch()">
+
+  <!-- ======================================================
+       SECCIÓN HERO
+       ====================================================== -->
+  <section class="bh-hero" id="hero">
+    <div class="bh-hero__bg-pattern"></div>
+    <div class="bh-hero__inner">
+      <p class="bh-hero__eyebrow">{{ branch()?.official_name || branch()?.name }}</p>
+      <h1 class="bh-hero__title">{{ landing().hero_title }}</h1>
+      <p class="bh-hero__body">{{ landing().hero_subtitle }}</p>
+      <button class="bh-hero__cta" (click)="contactAnchor.scrollIntoView({ behavior: 'smooth' })">
+        {{ landing().hero_cta_label || 'Contactanos' }}
+      </button>
+    </div>
+
+    <!-- Highlights / Badges -->
+    <div class="bh-highlights" *ngIf="highlights.length">
+      <div class="bh-highlight" *ngFor="let h of highlights">
+        <span class="bh-highlight__icon">{{ h.icon }}</span>
+        <span class="bh-highlight__label">{{ h.label }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       SECCIÓN QUIÉNES SOMOS
+       ====================================================== -->
+  <section class="bh-about" id="quienes-somos" *ngIf="landing().has_about">
+    <div class="bh-about__inner">
+      <div class="bh-about__text">
+        <span class="bh-section-tag">Quiénes somos</span>
+        <h2 class="bh-about__title">{{ landing().about_title }}</h2>
+        <p class="bh-about__body">{{ landing().about_text }}</p>
+      </div>
+      <div class="bh-about__visual">
+        <div class="bh-about__card-stack">
+          <div class="bh-about__card" *ngFor="let h of highlights">
+            <span>{{ h.icon }}</span>
+            <p>{{ h.label }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       SECCIÓN SERVICIOS
+       ====================================================== -->
+  <section class="bh-services" id="servicios" *ngIf="landing().has_services">
+    <div class="bh-services__inner">
+      <span class="bh-section-tag">Lo que hacemos</span>
+      <h2 class="bh-services__title">Nuestros Servicios</h2>
+      <p class="bh-services__sub">Soluciones integrales para tu hogar o negocio. Consultá sin compromiso.</p>
+
+      <div class="bh-services__grid">
+        <div class="bh-service-card" *ngFor="let card of serviceCards">
+          <div class="bh-service-card__icon">{{ card.icon }}</div>
+          <h3 class="bh-service-card__title">{{ card.title }}</h3>
+          <p class="bh-service-card__desc">{{ card.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       SECCIÓN CATÁLOGO DE PRODUCTOS (condicional)
+       ====================================================== -->
+  <section class="bh-catalog" id="catalogo" *ngIf="landing().has_catalog">
+    <div class="bh-catalog__inner">
+      <span class="bh-section-tag">Productos</span>
+      <h2 class="bh-catalog__title">Nuestro Catálogo</h2>
+      <p class="bh-catalog__sub">{{ totalProducts() }} productos disponibles</p>
+
+      <!-- Loading -->
+      <div *ngIf="loading()" class="bh-loading">
+        <div class="bh-spinner"></div>
+      </div>
+
+      <!-- Grid -->
+      <div *ngIf="!loading() && products().length > 0" class="bh-product-grid">
+        <div class="bh-product-card" *ngFor="let p of products()">
+          <div class="bh-product-card__img-wrap">
+            <img [src]="p.image_url || 'assets/img/placeholder.png'" [alt]="p.name" loading="lazy">
+            <span class="bh-product-card__global-badge" *ngIf="p.is_global">Global</span>
+          </div>
+          <div class="bh-product-card__body">
+            <h3>{{ p.name }}</h3>
+            <p class="bh-product-card__price">
+              {{ (p.sale_price || p.price) | currency:'ARS':'symbol-narrow':'1.0-0' }}
+            </p>
+            <button class="bh-product-card__btn">Ver detalle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading() && products().length === 0" class="bh-empty">
+        <p>No hay productos disponibles por el momento.</p>
+      </div>
+
+      <!-- Paginación -->
+      <div class="bh-pagination" *ngIf="totalPages() > 1 && !loading()">
+        <button [disabled]="currentPage() === 1" (click)="prevPage()">‹ Anterior</button>
+        <span>{{ currentPage() }} / {{ totalPages() }}</span>
+        <button [disabled]="currentPage() === totalPages()" (click)="nextPage()">Siguiente ›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       SECCIÓN CONTACTO (antes del footer del layout)
+       ====================================================== -->
+  <section class="bh-contact" id="contacto-section" #contactAnchor>
+    <div class="bh-contact__inner">
+      <span class="bh-section-tag bh-section-tag--light">Contacto</span>
+      <h2 class="bh-contact__title">
+        {{ landing().contact_title || '¡Queremos ayudarte!' }}
+      </h2>
+      <p class="bh-contact__sub">
+        {{ landing().contact_subtitle }}
+      </p>
+      <div class="bh-contact__ctas">
+        <a *ngIf="branch()?.whatsapp_number"
+           [href]="'https://wa.me/' + branch()?.whatsapp_number"
+           target="_blank" rel="noopener"
+           class="bh-contact__wsp">
+          💬 Escribinos por WhatsApp
+        </a>
+        <a *ngIf="branch()?.contact_email"
+           [href]="'mailto:' + branch()?.contact_email"
+           class="bh-contact__email">
+          ✉️ Enviarnos un Email
+        </a>
+        <a *ngIf="branch()?.contact_phone"
+           [href]="'tel:' + branch()?.contact_phone"
+           class="bh-contact__phone">
+          📞 {{ branch()?.contact_phone }}
+        </a>
+      </div>
+    </div>
+  </section>
+
+</ng-container>

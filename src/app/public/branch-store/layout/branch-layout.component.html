@@ -1,0 +1,84 @@
+<div class="branch-autonomous-store"
+     *ngIf="branchData; else loadingTpl"
+     [style.--bp]="primaryColor">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="bl-nav">
+    <div class="bl-nav__inner">
+      <!-- Brand -->
+      <a class="bl-nav__brand" (click)="scrollTo('hero')" role="button">
+        <img *ngIf="logoUrl; else txtLogo" [src]="logoUrl" [alt]="branchData.name" class="bl-nav__logo">
+        <ng-template #txtLogo>
+          <span class="bl-nav__name">{{ branchData.official_name || branchData.name }}</span>
+        </ng-template>
+      </a>
+
+      <!-- Desktop links -->
+      <div class="bl-nav__links">
+        <a (click)="scrollTo('hero')">Inicio</a>
+        <a *ngIf="hasAbout"    (click)="scrollTo('quienes-somos')">Quiénes somos</a>
+        <a *ngIf="hasServices" (click)="scrollTo('servicios')">Servicios</a>
+        <a *ngIf="hasCatalog"  (click)="scrollTo('catalogo')">Productos</a>
+        <a (click)="scrollTo('contacto')" class="bl-nav__cta-link">Contacto</a>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button class="bl-nav__hamburger" (click)="toggleMenu()" [class.open]="menuOpen" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="bl-nav__mobile" [class.visible]="menuOpen">
+      <a (click)="scrollTo('hero')">Inicio</a>
+      <a *ngIf="hasAbout"    (click)="scrollTo('quienes-somos')">Quiénes somos</a>
+      <a *ngIf="hasServices" (click)="scrollTo('servicios')">Servicios</a>
+      <a *ngIf="hasCatalog"  (click)="scrollTo('catalogo')">Productos</a>
+      <a (click)="scrollTo('contacto')">Contacto</a>
+    </div>
+  </nav>
+
+  <!-- ROUTER OUTLET — renderiza branch-home y sus secciones -->
+  <main class="bl-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bl-footer" id="contacto">
+    <div class="bl-footer__inner">
+      <div class="bl-footer__col">
+        <h3 class="bl-footer__brand">{{ branchData.official_name || branchData.name }}</h3>
+        <p *ngIf="branchData.address">📍 {{ branchData.address }}</p>
+        <p *ngIf="branchData.contact_phone">📞 {{ branchData.contact_phone }}</p>
+        <p *ngIf="branchData.contact_email">✉️ {{ branchData.contact_email }}</p>
+      </div>
+
+      <div class="bl-footer__col bl-footer__ctas">
+        <p class="bl-footer__subtitle">
+          {{ resolvedConfig()?.contact_subtitle || '¿Tenés preguntas? No dudes en contactarnos.' }}
+        </p>
+        <a *ngIf="branchData.whatsapp_number"
+           [href]="'https://wa.me/' + branchData.whatsapp_number"
+           target="_blank" rel="noopener"
+           class="bl-footer__wsp-btn">
+          💬 Escribinos por WhatsApp
+        </a>
+        <a *ngIf="branchData.contact_email"
+           [href]="'mailto:' + branchData.contact_email"
+           class="bl-footer__email-btn">
+          ✉️ Enviarnos un Email
+        </a>
+      </div>
+    </div>
+
+    <div class="bl-footer__bottom">
+      <p>© {{ branchData.name }} · Potenciado por <strong>Arecofix</strong></p>
+    </div>
+  </footer>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="bl-skeleton">
+    <div class="bl-skeleton__spinner"></div>
+  </div>
+</ng-template>

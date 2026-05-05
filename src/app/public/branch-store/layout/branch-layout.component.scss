@@ -1,0 +1,270 @@
+// CSS Custom property inyectada desde el componente (color primario de la sucursal)
+// Uso: var(--bp)  — branch primary
+
+.branch-autonomous-store {
+  --bp: #3b82f6; // fallback — sobreescrito por [style.--bp]
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================
+   NAVBAR
+   ============================ */
+.bl-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__brand {
+    cursor: pointer;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  &__logo {
+    max-height: 44px;
+    object-fit: contain;
+  }
+
+  &__name {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--bp);
+    letter-spacing: -0.5px;
+  }
+
+  &__links {
+    display: none;
+    gap: 0.25rem;
+
+    @media (min-width: 768px) {
+      display: flex;
+      align-items: center;
+    }
+
+    a {
+      cursor: pointer;
+      padding: 0.5rem 0.9rem;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      text-decoration: none;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+
+      &:hover {
+        color: var(--bp);
+        background: color-mix(in srgb, var(--bp) 8%, transparent);
+      }
+    }
+  }
+
+  // Botón de Contacto en el Navbar (resaltado)
+  &__cta-link {
+    background: var(--bp) !important;
+    color: white !important;
+    padding: 0.5rem 1.1rem !important;
+    border-radius: 9999px !important;
+
+    &:hover {
+      opacity: 0.9;
+      background: var(--bp) !important;
+    }
+  }
+
+  // Hamburger
+  &__hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+
+    @media (min-width: 768px) { display: none; }
+
+    span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #334155;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    &.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    &.open span:nth-child(2) { opacity: 0; }
+    &.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  }
+
+  // Mobile menu dropdown
+  &__mobile {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.2s;
+    background: white;
+    border-top: 1px solid rgba(0,0,0,0.05);
+
+    @media (min-width: 768px) { display: none; }
+
+    &.visible {
+      max-height: 400px;
+      padding: 1rem 0 1.25rem;
+    }
+
+    a {
+      display: block;
+      cursor: pointer;
+      padding: 0.75rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #334155;
+      text-decoration: none;
+      transition: color 0.15s;
+
+      &:hover { color: var(--bp); }
+    }
+  }
+}
+
+/* ============================
+   MAIN CONTENT
+   ============================ */
+.bl-main {
+  flex: 1;
+}
+
+/* ============================
+   FOOTER / SECCIÓN CONTACTO
+   ============================ */
+.bl-footer {
+  background: #0f172a;
+  color: #cbd5e1;
+  padding: 4rem 1.5rem 0;
+
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--bp);
+    margin: 0 0 1.25rem;
+  }
+
+  p {
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+
+  &__ctas {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  &__subtitle {
+    color: #94a3b8;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__wsp-btn,
+  &__email-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    width: fit-content;
+  }
+
+  &__wsp-btn {
+    background: #25d366;
+    color: white;
+    box-shadow: 0 4px 14px rgba(37,211,102,0.35);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37,211,102,0.45);
+    }
+  }
+
+  &__email-btn {
+    background: var(--bp);
+    color: white;
+
+    &:hover { opacity: 0.9; transform: translateY(-2px); }
+  }
+
+  &__bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 1.5rem 0;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #475569;
+
+    strong { color: var(--bp); }
+  }
+}
+
+/* ============================
+   LOADING SKELETON
+   ============================ */
+.bl-skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f8fafc;
+
+  &__spinner {
+    width: 52px;
+    height: 52px;
+    border: 4px solid rgba(0,0,0,0.08);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: blSpin 0.9s linear infinite;
+  }
+}
+
+@keyframes blSpin { to { transform: rotate(360deg); } }

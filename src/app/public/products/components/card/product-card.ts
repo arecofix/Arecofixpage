@@ -5,6 +5,7 @@ import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
 import { FavoritesService } from '@app/shared/services/favorites.service';
 import { AuthService } from '@app/core/services/auth.service';
+import { ProductStrategicService } from '@app/core/services/product-strategic.service';
 
 @Component({
   selector: 'product-card',
@@ -34,33 +35,15 @@ export class ProductCard {
   quickView = output<Product>();
   private cartService = inject(CartService);
   private favoritesService = inject(FavoritesService);
-  private authService = inject(AuthService);
+  private strategicService = inject(ProductStrategicService);
 
   isFavorite = computed(() => this.favoritesService.isFavorite(this.product().id));
 
-  isWholesaleAuthorized = computed(() => {
-    const profile = this.authService.getCurrentProfile();
-    if (!profile) return false;
-    const allowed = ['gremio', 'tecnico', 'admin', 'super_admin'];
-    const r = profile.role?.toLowerCase() || '';
-    return allowed.includes(r);
-  });
-
-  isRepuesto = computed(() => {
-      const lower = this.product().name.toLowerCase();
-      // Includes common categories and keywords for spare parts
-      return lower.includes('repuesto') || lower.includes('módulo') || lower.includes('modulo') || 
-             lower.includes('pantalla') || lower.includes('batería') || lower.includes('bateria') ||
-             lower.includes('cámara') || lower.includes('camara') || lower.includes('pin de carga') ||
-             lower.includes('flex') || lower.includes('tapa');
-  });
-
-  canViewPriceAndBuy = computed(() => {
-      if (this.isRepuesto()) {
-          return this.isWholesaleAuthorized();
-      }
-      return true; // if not a repuesto, anyone can see and buy
-  });
+  // Strategic Computeds
+  showPriceAndBuy = computed(() => this.strategicService.canViewPriceAndBuy(this.product()));
+  showWholesaleGate = computed(() => this.strategicService.shouldShowWholesaleGate(this.product()));
+  showWishlist = computed(() => this.strategicService.canShowWishlist(this.product()));
+  valueProposition = computed(() => this.strategicService.getValueProposition(this.product()));
 
   toggleFav(event: Event) {
     event.preventDefault();
