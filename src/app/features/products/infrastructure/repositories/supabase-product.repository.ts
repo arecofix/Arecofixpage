@@ -89,6 +89,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     if (brand_id) query = query.eq('brand_id', brand_id);
     if (branch_id) {
         query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
+    } else {
+        query = query.or(`branch_id.is.null,is_global.is.true`);
     }
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
