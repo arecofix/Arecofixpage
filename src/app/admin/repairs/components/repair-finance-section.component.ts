@@ -77,11 +77,9 @@ import { FormsModule } from '@angular/forms';
                     
                     <div class="border-t border-gray-700/50 my-2 shadow-[0_-1px_0_rgba(255,255,255,0.05)]"></div>
 
-                    <div>
-                        <div class="flex justify-between items-end mb-1">
-                             <span class="text-gray-400 text-sm">Costo Subtotal</span>
-                             <span class="text-gray-300 font-mono font-medium">{{ finalCost() | currency:'ARS':'symbol':'1.0-0' }}</span>
-                        </div>
+                    <div class="form-control">
+                        <label class="label pb-1"><span class="label-text text-gray-400 text-[10px] uppercase tracking-widest font-bold">Costo Final / Subtotal ($)</span></label>
+                        <input type="number" [ngModel]="finalCost()" (ngModelChange)="onFinalCostChange.emit($event)" name="final_cost" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
                     </div>
 
                     <div class="form-control mt-4">
@@ -115,5 +113,6 @@ export class RepairFinanceSectionComponent {
   onStatusChange = output<number>();
   onEstimatedCostChange = output<number>();
   onLaborCostChange = output<number>();
+  onFinalCostChange = output<number>();
   onDepositChange = output<number>();
 }

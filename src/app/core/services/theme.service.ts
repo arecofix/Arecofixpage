@@ -38,9 +38,10 @@ export class ThemeService implements OnDestroy {
   readonly osDark = signal<boolean>(this.detectOsDark());
 
   /** Override to force light mode (e.g. for admin section) */
-  readonly forceLight = signal<boolean>(false);
+  readonly forceLight = signal<boolean>(this.detectInitialForceLight());
 
   readonly resolvedTheme = computed<'light' | 'dark'>(() => {
+    // If we are in a section that forces light mode (like admin), ignore user preference
     if (this.forceLight()) return 'light';
     
     const m = this.mode();
@@ -58,20 +59,18 @@ export class ThemeService implements OnDestroy {
       this.mediaListener = (e: MediaQueryListEvent) => this.osDark.set(e.matches);
       this.mediaQuery.addEventListener('change', this.mediaListener);
 
-      // Listen for route changes to set default light theme in admin
+      // Initialize lastWasAdmin based on current state
+      this.lastWasAdmin = this.forceLight();
+
+      // Listen for route changes to set forceLight for admin section
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: any) => {
         const url = (event as NavigationEnd).urlAfterRedirects;
         const isAdminPath = url.startsWith('/admin') || url.includes('/admin/');
         
-        if (isAdminPath && !this.lastWasAdmin) {
-          // Entering admin section - default to light
-          this.setMode('light');
-        } else if (!isAdminPath && this.lastWasAdmin) {
-          // Leaving admin section - return to system default
-          this.setMode('system');
-        }
+        // We update forceLight signal without touching the user's persisted 'mode'
+        this.forceLight.set(isAdminPath);
         this.lastWasAdmin = isAdminPath;
       });
     }
@@ -106,13 +105,19 @@ export class ThemeService implements OnDestroy {
 
   // ── Private Helpers ─────────────────────────────────
 
+  private detectInitialForceLight(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const path = window.location.pathname;
+    return path.startsWith('/admin') || path.includes('/admin/');
+  }
+
   private loadInitialMode(): ThemeMode {
     if (!isPlatformBrowser(this.platformId)) return 'system';
 
     const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) return stored;
 
-    // Default to 'system' per user request (outside admin)
+    // Default to 'system' per user request
     return 'system';
   }
 

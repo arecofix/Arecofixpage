@@ -5,6 +5,7 @@ import { Course, CourseModule, StudentEnrollment } from '@app/features/courses/d
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
 import { LoggerService } from './logger.service';
 import { TenantService } from './tenant.service';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
 export type { Course, CourseModule as Module, StudentEnrollment };
 
@@ -15,6 +16,7 @@ export class CoursesService {
     private repository = inject(CourseRepository);
     private logger = inject(LoggerService);
     private tenantService = inject(TenantService);
+    private supabase = inject(SUPABASE_CLIENT);
 
     getCourses(): Observable<{ data: Course[], error: any }> {
         return from(this.repository.getAll()).pipe(
@@ -109,7 +111,24 @@ export class CoursesService {
                 created_at: new Date().toISOString()
             };
             
+            // 1. Save to technical enrollments table
             const result = await this.repository.enrollStudent(enrollment);
+
+            // 2. Also send to contact_messages to show in Admin Message panel
+            try {
+                await this.supabase.from('contact_messages').insert({
+                    name: data.full_name,
+                    email: data.email,
+                    phone: data.phone,
+                    subject: 'Nueva Inscripción a Curso',
+                    message: `Se ha registrado una nueva inscripción.\nCurso: ${data.course_title || 'N/A'}\nEmail: ${data.email}\nTel: ${data.phone}`,
+                    is_read: false,
+                    tenant_id: this.tenantService.getTenantId()
+                });
+            } catch (msgErr) {
+                this.logger.error('Failed to create secondary contact message for enrollment', msgErr);
+            }
+
             return { data: result, error: null };
         } catch (error) {
             this.logger.error('Error registering student', error);

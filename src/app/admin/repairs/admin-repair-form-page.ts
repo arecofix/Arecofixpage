@@ -360,6 +360,13 @@ export class AdminRepairFormPage implements OnInit {
         });
     }
 
+    onFinalCostChange(value: number) {
+        this.repairForm.patchValue({
+            final_cost: value,
+            deposit_amount: Math.round(value * 0.5)
+        });
+    }
+
     async loadRepair() {
         if (!this.id) return;
         try {

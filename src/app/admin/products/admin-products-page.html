@@ -23,6 +23,11 @@
           <i class="fas fa-shield-check mr-2 text-green-500"></i> Auditoría Meta
         }
       </button>
+
+      <button (click)="isMarketingModalOpen.set(true)" class="btn btn-outline btn-sm md:btn-md border-pink-200 hover:bg-pink-50 text-pink-600 dark:border-pink-900/50 dark:hover:bg-pink-900/30 shadow-sm" [disabled]="loading() || importing()">
+        <i class="fas fa-bullhorn mr-2"></i> Automatización & URLs
+      </button>
+
       <button (click)="fileInput.click()" class="btn btn-outline btn-sm md:btn-md" [disabled]="loading() || importing()">
         @if (importing()) {
           <span class="loading loading-spinner loading-xs mr-2"></span> Importando…
@@ -357,3 +362,40 @@
                 (close)="showValidationModal.set(false)">
               </app-meta-validation-modal>
             }
+
+            <!-- MARKETING URLs MODAL -->
+            @if (isMarketingModalOpen()) {
+              <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl max-w-lg w-full animate-fade-in">
+                  <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-4 mb-4">
+                     <h3 class="font-bold text-xl"><i class="fas fa-bullhorn text-pink-500 mr-2"></i> Enlaces de Automatización</h3>
+                     <button (click)="isMarketingModalOpen.set(false)" class="btn btn-sm btn-ghost btn-circle"><i class="fas fa-times"></i></button>
+                  </div>
+                  
+                  <div class="space-y-6">
+                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <div class="font-bold flex items-center gap-2 mb-2"><i class="fab fa-facebook text-indigo-600 text-xl"></i> Meta Commerce API</div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Usa este enlace de feed en tu <strong>Business Manager</strong> para automatizar el catálogo.</p>
+                        <div class="flex items-center gap-2">
+                            <input readonly [value]="'https://arecofix.com.ar/feed/meta.csv'" #metaInput class="input input-sm input-bordered w-full font-mono text-sm dark:bg-gray-800" />
+                            <button class="btn btn-sm btn-primary shrink-0" (click)="copyToClipboard(metaInput.value)">Copiar</button>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                           <i class="fas fa-tag text-emerald-500 mr-1"></i> Contiene la etiqueta <code>custom_label_0</code> ("Repuestos" o "Equipos") para que puedas <strong>segmentar tu publicidad</strong>.
+                        </div>
+                     </div>
+
+                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <div class="font-bold flex items-center gap-2 mb-2"><i class="fab fa-google text-red-500 text-xl"></i> Google Merchant Center</div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Enlace RSS/XML homologado para subir tus productos o repuestos automáticamente a Google Shopping.</p>
+                        <div class="flex items-center gap-2">
+                            <input readonly [value]="'https://arecofix.com.ar/feed/google-merchant.xml'" #googleInput class="input input-sm input-bordered w-full font-mono text-sm dark:bg-gray-800" />
+                            <button class="btn btn-sm btn-primary shrink-0" (click)="copyToClipboard(googleInput.value)">Copiar</button>
+                        </div>
+                     </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+

@@ -229,6 +229,7 @@ export class CourseDetailComponent implements OnInit {
       try {
           const response = await this.coursesService.registerStudent({
                 course_id: this.course.id,
+                course_title: this.course.title,
                 ...this.registrationForm
           });
           

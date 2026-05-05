@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ContactService, CreateMessageDto } from '@app/core/services/contact.service';
 
 @Component({
   selector: 'app-zona-norte-contacto',
@@ -40,29 +41,50 @@ export class ZonaNorteContactoComponent {
     'Otro servicio'
   ];
 
+  private contactService = inject(ContactService);
+  enviando = false;
+
   constructor() { }
 
-  enviarFormulario() {
+  async enviarFormulario() {
     // Validación básica
     if (!this.formulario.nombre || !this.formulario.telefono || !this.formulario.email || !this.formulario.mensaje) {
       alert('Por favor, completa todos los campos obligatorios.');
       return;
     }
 
-    // Aquí iría la lógica real de envío
-    console.log('Formulario enviado:', this.formulario);
-    
-    // Simulación de envío exitoso
-    alert('¡Consulta enviada con éxito! Nos contactaremos a la brevedad.');
-    
-    // Limpiar formulario
-    this.formulario = {
-      nombre: '',
-      telefono: '',
-      email: '',
-      tipoServicio: '',
-      mensaje: ''
-    };
+    this.enviando = true;
+
+    try {
+        const msg: CreateMessageDto = {
+            name: this.formulario.nombre,
+            email: this.formulario.email,
+            phone: this.formulario.telefono,
+            subject: `Consulta Zona Norte: ${this.formulario.tipoServicio || 'General'}`,
+            message: this.formulario.mensaje
+        };
+
+        const { error } = await this.contactService.createMessage(msg);
+
+        if (error) {
+            console.error('Error enviando formulario:', error);
+            alert('Hubo un problema al enviar el mensaje. Intenta luego o por WhatsApp.');
+        } else {
+            alert('¡Consulta enviada con éxito! Nos contactaremos a la brevedad.');
+            this.formulario = {
+              nombre: '',
+              telefono: '',
+              email: '',
+              tipoServicio: '',
+              mensaje: ''
+            };
+        }
+    } catch (e) {
+        console.error('Excepción enviando formulario:', e);
+        alert('Hubo un error. Por favor comuníquese por WhatsApp.');
+    } finally {
+        this.enviando = false;
+    }
   }
 
   contactarWhatsApp(mensaje?: string) {

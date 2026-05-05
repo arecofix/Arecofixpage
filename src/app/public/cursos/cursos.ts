@@ -240,6 +240,7 @@ export class CursosComponent implements OnInit {
         try {
             const response = await this.coursesService.registerStudent({
                 course_id: this.selectedCourse()!.id,
+                course_title: this.selectedCourse()!.title,
                 ...form
             });
 

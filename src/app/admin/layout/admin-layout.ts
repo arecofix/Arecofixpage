@@ -223,8 +223,9 @@ export class AdminLayout implements OnInit, OnDestroy {
     return this.authService.isSuperAdmin();
   }
 
-  logout() {
-    this.authService.signOut();
+  async logout() {
+    await this.authService.signOut();
+    this.router.navigate(['/']);
   }
 
   async handleNotificationClick(notif: any) {

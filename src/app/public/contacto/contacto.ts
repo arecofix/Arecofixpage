@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { PreferencesService } from '../../shared/services/preferences.service';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ContactService, CreateMessageDto } from '@app/core/services/contact.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { environment } from '../../../environments/environment';
@@ -22,7 +22,7 @@ import { CONTACTO_CONTENT, ContactoContent } from './contacto.content';
 })
 export class ContactoComponent implements OnInit {
     private fb = inject(FormBuilder);
-    private http = inject(HttpClient);
+    private contactService = inject(ContactService);
     public preferencesService = inject(PreferencesService);
     private seoService = inject(SeoService);
 
@@ -69,18 +69,27 @@ export class ContactoComponent implements OnInit {
 
         const formData = this.contactForm.value;
 
-        // Formspree endpoint
-        this.http.post('https://formspree.io/f/mpwrwebv', formData).subscribe({
-            next: () => {
-                this.isLoading = false;
+        const msg: CreateMessageDto = {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            subject: formData.subject,
+            message: formData.message
+        };
+
+        this.contactService.createMessage(msg).then(({ error }) => {
+            this.isLoading = false;
+            if (error) {
+                console.error('Error sending form:', error);
+                this.showError = true;
+            } else {
                 this.showSuccess = true;
                 this.contactForm.reset();
-            },
-            error: (err) => {
-                console.error('Error sending form:', err);
-                this.isLoading = false;
-                this.showError = true;
             }
+        }).catch(err => {
+            console.error('Error sending form:', err);
+            this.isLoading = false;
+            this.showError = true;
         });
     }
 }

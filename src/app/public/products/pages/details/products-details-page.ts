@@ -199,6 +199,31 @@ export class ProductsDetailsPage {
     return data.data[0];
   });
 
+  isWholesaleAuthorized = computed(() => {
+    const profile = this.authService.getCurrentProfile();
+    if (!profile) return false;
+    const allowedRoles = ['gremio', 'tecnico', 'admin', 'super_admin'];
+    const r = profile.role?.toLowerCase() || '';
+    return allowedRoles.includes(r);
+  });
+
+  isRepuesto = computed(() => {
+      const p = this.product();
+      if (!p) return false;
+      const lower = p.name.toLowerCase();
+      return lower.includes('repuesto') || lower.includes('módulo') || lower.includes('modulo') || 
+             lower.includes('pantalla') || lower.includes('batería') || lower.includes('bateria') ||
+             lower.includes('cámara') || lower.includes('camara') || lower.includes('pin de carga') ||
+             lower.includes('flex') || lower.includes('tapa');
+  });
+
+  canViewPriceAndBuy = computed(() => {
+      if (this.isRepuesto()) {
+          return this.isWholesaleAuthorized();
+      }
+      return true; // Si no es repuesto, todos pueden ver y comprar
+  });
+
   // Signal for the currently selected image to display
   selectedImage = signal<string | null>(null);
 

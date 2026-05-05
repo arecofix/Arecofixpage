@@ -1,8 +1,24 @@
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-green-600">Proveedores</h1>
-    <a routerLink="/admin/suppliers/new" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i> Nuevo Proveedor
-    </a>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4 sticky top-0 z-30 bg-base-100/95 backdrop-blur-sm border-b border-base-200 px-4 mb-6">
+    <div>
+        <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-600 to-emerald-400">
+            Directorio de Proveedores
+        </h1>
+        <p class="text-sm text-base-content/70 hidden md:block">Gestiona tu red de abastecimiento y logística.</p>
+    </div>
+
+    <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+        @if (selectedSupplierIds().size > 0) {
+            <button (click)="isMessageModalOpen.set(true)" class="btn bg-green-500 hover:bg-green-600 text-white border-none shadow-lg animate-fade-in">
+                <i class="fab fa-whatsapp mr-2 text-lg"></i> Msj a {{ selectedSupplierIds().size }}
+            </button>
+        }
+        <button (click)="openTracker()" class="btn btn-outline border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400">
+            <i class="fas fa-truck-fast mr-2"></i> Tracking Andreani
+        </button>
+        <a routerLink="/admin/suppliers/new" class="btn bg-green-600 hover:bg-green-700 text-white border-none shadow-lg">
+            <i class="fas fa-plus mr-2"></i> Nuevo Proveedor
+        </a>
+    </div>
 </div>
 
 <div class="bg-base-100 rounded-lg shadow overflow-hidden text-base-content">
@@ -10,6 +26,11 @@
         <table class="table w-full">
             <thead>
                 <tr class="text-base-content">
+                    <th class="w-12">
+                        <input type="checkbox" class="checkbox checkbox-sm" 
+                            [checked]="selectedSupplierIds().size > 0 && selectedSupplierIds().size === suppliers().length"
+                            (change)="toggleAll($event)">
+                    </th>
                     <th>Nombre</th>
                     <th>Rubro / Tipo</th>
                     <th>Contacto</th>
@@ -20,15 +41,27 @@
             <tbody>
                 @if (loading()) {
                 <tr>
-                    <td colspan="5" class="text-center py-4">Cargando...</td>
+                    <td colspan="6" class="text-center py-4">Cargando...</td>
                 </tr>
                 } @else if (suppliers().length === 0) {
                 <tr>
-                    <td colspan="5" class="text-center py-4">No hay proveedores registrados.</td>
+                    <td colspan="6" class="text-center py-4">No hay proveedores registrados.</td>
                 </tr>
                 } @else {
                 @for (supplier of suppliers(); track supplier.id) {
-                <tr>
+                <tr [class.bg-base-200]="selectedSupplierIds().has(supplier.id)">
+                    <td>
+                        <!-- Sólo permiten checkboxes si tienen un teléfono para enviar Whatsapp -->
+                        @if (supplier.phone) {
+                            <input type="checkbox" class="checkbox checkbox-sm" 
+                                [checked]="selectedSupplierIds().has(supplier.id)"
+                                (change)="toggleSupplier(supplier.id)">
+                        } @else {
+                            <div class="tooltip tooltip-right" data-tip="Sin teléfono">
+                                <i class="fas fa-exclamation-triangle text-warning text-xs"></i>
+                            </div>
+                        }
+                    </td>
                     <td>
                         <div class="font-bold">{{ supplier.name }}</div>
                         <div class="text-sm opacity-50">{{ supplier.cuil }}</div>
@@ -59,3 +92,107 @@
         </table>
     </div>
 </div>
+
+<!-- ANDREANI TRACKING MODAL -->
+@if (isTrackingModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="bg-base-100 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in border border-base-200">
+      
+      <!-- Header -->
+      <div class="bg-blue-600 py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center text-white">
+            <i class="fas fa-truck-fast text-2xl mr-3"></i>
+            <div>
+                <h3 class="font-bold text-lg leading-none">Logística Andreani</h3>
+                <p class="text-xs opacity-80 mt-1">Seguimiento de Compras y Repuestos</p>
+            </div>
+        </div>
+        <button (click)="isTrackingModalOpen.set(false)" class="btn btn-sm btn-ghost btn-circle text-white hover:bg-white/20">
+            <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Body -->
+      <div class="p-6 space-y-6">
+         <div class="form-control">
+             <label class="label mb-1">
+                 <span class="label-text font-bold text-base-content/80">Código de Seguimiento</span>
+             </label>
+             <div class="relative">
+                 <input type="text" #trackingInput class="input input-bordered w-full pl-10 bg-base-200/50 uppercase font-mono text-lg tracking-widest text-center focus:border-blue-500" placeholder="Ej: 300012345JP">
+                 <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50"></i>
+             </div>
+             <p class="text-[10px] sm:text-xs text-base-content/50 mt-2 text-center">Ingresa los 10 a 11 dígitos alfanuméricos proporcionados por Andreani.</p>
+         </div>
+
+         <div class="flex gap-3 pt-2">
+             <button (click)="isTrackingModalOpen.set(false)" class="btn btn-ghost flex-1">Cerrar</button>
+             <button (click)="trackAndreani(trackingInput.value)" class="btn bg-blue-600 hover:bg-blue-700 text-white flex-1 border-none shadow-md">
+                 <i class="fas fa-search"></i> Rastrear Envío
+             </button>
+         </div>
+
+         <!-- Result Actions -->
+         @if (trackingUrl()) {
+            <div class="mt-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 flex flex-col items-center text-center">
+                <i class="fas fa-check-circle text-blue-500 text-3xl mb-2"></i>
+                <h4 class="font-bold text-base-content mb-1">Redirección Lista</h4>
+                <p class="text-xs text-base-content/70 mb-4">El portal oficial de seguimiento de Andreani se abrirá a continuación para el código <strong class="text-blue-600 dark:text-blue-400">{{ andreaniTrackingCode() }}</strong>.</p>
+                <a [href]="trackingUrl()" target="_blank" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none w-full shadow-lg">
+                    Ir al Rastreo Oficial <i class="fas fa-external-link-alt ml-1"></i>
+                </a>
+            </div>
+         }
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- MSS BULK MESSAGING MODAL -->
+@if (isMessageModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="bg-base-100 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in border border-base-200">
+      
+      <!-- Header -->
+      <div class="bg-green-600 py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center text-white">
+            <i class="fab fa-whatsapp text-2xl mr-3"></i>
+            <div>
+                <h3 class="font-bold text-lg leading-none">Mensajería Masiva (MSS)</h3>
+                <p class="text-xs opacity-80 mt-1">Enviarás un mensaje a {{ selectedSupplierIds().size }} proveedores</p>
+            </div>
+        </div>
+        <button (click)="isMessageModalOpen.set(false)" class="btn btn-sm btn-ghost btn-circle text-white hover:bg-white/20">
+            <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+         <div class="alert alert-info shadow-none bg-blue-50 text-blue-900 border-blue-200 text-xs">
+            <i class="fas fa-info-circle text-blue-500"></i>
+            <span>Se abrirá una pestaña de WhatsApp Web por cada proveedor. Si el navegador bloquea las pestañas, deberás permitir los "pop-ups". Puedes usar la variable <code>{{ '{' }}nombre{{ '}' }}</code> en el texto.</span>
+         </div>
+
+         <div class="form-control">
+             <label class="label mb-1">
+                 <span class="label-text font-bold text-base-content">Mensaje a enviar</span>
+             </label>
+             <textarea 
+                  [(ngModel)]="bulkMessage"
+                  class="textarea textarea-bordered w-full h-32 focus:border-green-500 font-sans leading-relaxed" 
+                  placeholder="Escribe tu mensaje de cotización aquí..."></textarea>
+         </div>
+
+         <div class="flex gap-3 pt-4">
+             <button (click)="isMessageModalOpen.set(false)" class="btn btn-ghost flex-1">Cancelar</button>
+             <button (click)="sendBulkMessages()" class="btn bg-green-600 hover:bg-green-700 text-white flex-1 border-none shadow-md">
+                 <i class="fas fa-paper-plane mr-1"></i> Iniciar Envío ({{ selectedSupplierIds().size }})
+             </button>
+         </div>
+      </div>
+
+    </div>
+  </div>
+}

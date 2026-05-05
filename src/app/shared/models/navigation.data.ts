@@ -101,6 +101,13 @@ export const NAVIGATION_ITEMS: NavItem[] = [
             theme: 'tienda',
           },
           {
+            id: 'tienda-repuestos-camaras',
+            label: 'Cámaras',
+            path: '/productos/categoria/camaras',
+            icon: 'fas fa-camera',
+            theme: 'tienda',
+          },
+          {
             id: 'tienda-repuestos-tapas',
             label: 'Tapas & Biseles',
             path: '/productos/categoria/repuestos/tapas',
@@ -157,13 +164,6 @@ export const NAVIGATION_ITEMS: NavItem[] = [
             label: 'Parlantes & Audio',
             path: '/productos/categoria/Parlantes',
             icon: 'fas fa-volume-up',
-            theme: 'tienda',
-          },
-          {
-            id: 'tienda-electronicos-camaras',
-            label: 'Cámaras',
-            path: '/productos/categoria/camaras',
-            icon: 'fas fa-camera',
             theme: 'tienda',
           },
         ],

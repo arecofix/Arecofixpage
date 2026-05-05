@@ -37,6 +37,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [true],
     });
   }
 
@@ -75,7 +76,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.form.invalid) return;
     
     this.loading = true;
-    const { email, password } = this.form.value as { email: string; password: string };
+    const { email, password, rememberMe } = this.form.value;
+    
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('supabase-remember-me', rememberMe ? 'true' : 'false');
+    }
     
     try {
       const res = await this.authService.signIn(email, password);
@@ -101,6 +106,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.error = '';
     this.success = '';
     this.socialLoading['google'] = true;
+    
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('supabase-remember-me', this.form.value.rememberMe ? 'true' : 'false');
+    }
     
     try {
       const res = await this.authService.signInWithGoogle();
@@ -129,6 +138,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.success = '';
     this.socialLoading['facebook'] = true;
     
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('supabase-remember-me', this.form.value.rememberMe ? 'true' : 'false');
+    }
+    
     try {
       const res = await this.authService.signInWithFacebook();
       this.socialLoading['facebook'] = false;
@@ -153,6 +166,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.error = '';
     this.success = '';
     this.socialLoading['github'] = true;
+    
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('supabase-remember-me', this.form.value.rememberMe ? 'true' : 'false');
+    }
     
     try {
       const res = await this.authService.signInWithGithub();

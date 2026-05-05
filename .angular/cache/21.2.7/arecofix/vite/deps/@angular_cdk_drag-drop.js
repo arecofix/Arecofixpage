@@ -51,11 +51,11 @@ import {
   ɵɵdefineInjectable,
   ɵɵdefineInjector
 } from "./chunk-AAE6VXL2.js";
-import "./chunk-IIO35NQM.js";
 import {
   animationFrameScheduler,
   merge
 } from "./chunk-DV4IX7KM.js";
+import "./chunk-IIO35NQM.js";
 import {
   BehaviorSubject,
   Observable,

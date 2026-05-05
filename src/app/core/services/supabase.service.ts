@@ -57,10 +57,33 @@ export class SupabaseService {
           },
         },
         auth: {
-          persistSession:
-            typeof window !== 'undefined' && !!window.localStorage,
-          autoRefreshToken:
-            typeof window !== 'undefined' && !!window.localStorage,
+          storage: {
+            getItem: (key) => {
+              if (typeof window === 'undefined') return null;
+              const rememberMe = localStorage.getItem('supabase-remember-me') === 'true';
+              if (rememberMe) return localStorage.getItem(key);
+              // Fallback to local storage if it was previously set, but we prefer session
+              return sessionStorage.getItem(key) || localStorage.getItem(key);
+            },
+            setItem: (key, value) => {
+              if (typeof window === 'undefined') return;
+              const rememberMe = localStorage.getItem('supabase-remember-me') === 'true';
+              if (rememberMe) {
+                 localStorage.setItem(key, value);
+                 sessionStorage.removeItem(key);
+              } else {
+                 sessionStorage.setItem(key, value);
+                 localStorage.removeItem(key);
+              }
+            },
+            removeItem: (key) => {
+              if (typeof window === 'undefined') return;
+              localStorage.removeItem(key);
+              sessionStorage.removeItem(key);
+            }
+          },
+          persistSession: typeof window !== 'undefined',
+          autoRefreshToken: typeof window !== 'undefined',
           detectSessionInUrl: typeof window !== 'undefined',
           lock: async (name: string, acquireTimeout: number, acquire: () => Promise<any>) => {
             if (typeof navigator !== 'undefined' && navigator.locks) {

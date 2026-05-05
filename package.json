@@ -62,7 +62,7 @@
     "express": "^4.21.2",
     "facebook-nodejs-business-sdk": "^24.0.1",
     "firebase": "^12.11.0",
-    "firebase-admin": "^13.8.0",
+    "firebase-admin": "^10.3.0",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "ng2-charts": "^8.0.0",

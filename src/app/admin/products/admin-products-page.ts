@@ -62,6 +62,9 @@ export class AdminProductsPage implements OnInit {
   public showValidationModal = signal<boolean>(false);
   public validating = signal<boolean>(false);
 
+  // Marketing & Automation URLs
+  public isMarketingModalOpen = signal<boolean>(false);
+
   // Stock editing
   public editingStock = signal<string | null>(null);
   public tempStock = signal<number>(0);
@@ -265,6 +268,13 @@ export class AdminProductsPage implements OnInit {
     } finally {
       this.validating.set(false);
       this.cdr.detectChanges();
+    }
+  }
+
+  copyToClipboard(val: string) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(val);
+      alert('URL copiada al portapapeles');
     }
   }
 

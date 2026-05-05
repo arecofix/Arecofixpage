@@ -136,7 +136,8 @@ export function app(): express.Express {
         'image_link', 
         'brand', 
         'quantity_to_sell_on_facebook', 
-        'google_product_category'
+        'google_product_category',
+        'custom_label_0'
       ];
       
       const rows = rawProducts.map((p: any) => {
@@ -204,12 +205,16 @@ export function app(): express.Express {
         }
         seenSkus.add(sku);
 
-        // Google Product Category mapping (fallback to category name)
+        // Category mapping
         const categoryName = String(categoryMap.get(p.category_id) || 'Hardware');
         const googleCategory = categoryName.toLowerCase().includes('celular') ? 'Electronics > Communications > Telephony > Mobile Phones' : 'Hardware > Computer Hardware';
 
         // Robust CSV Escape Helper
         const quote = (val: any) => `"${String(val || '').trim()}"`;
+
+        // Meta Custom Label for Segmentation (Repuestos vs Equipos)
+        const isRepuesto = categoryName.toLowerCase().includes('repuesto') || categoryName.toLowerCase().includes('módulo') || categoryName.toLowerCase().includes('pantalla') || title.toLowerCase().includes('repuesto');
+        const customLabel0 = isRepuesto ? 'Repuestos' : 'Equipos Principales';
 
         return [
           quote(metaId),
@@ -225,7 +230,8 @@ export function app(): express.Express {
           quote(imageLink),
           quote(brand),
           quote(stockValue),
-          quote(googleCategory)
+          quote(googleCategory),
+          quote(customLabel0)
         ].join(',');
       });
 
@@ -238,6 +244,101 @@ export function app(): express.Express {
       return res.send(csvContent);
     } catch (e) {
       console.error('Meta Feed Error:', e);
+      return res.status(500).send('Internal Server Error');
+    }
+  });
+
+  // Dynamic Google Merchant Center Feed (XML Format)
+  server.get('/feed/google-merchant.xml', async (req, res) => {
+    try {
+      if (!environment.supabaseUrl || !environment.supabaseKey) {
+        return res.status(500).send('Supabase configuration missing');
+      }
+
+      const baseUrl = environment.baseUrl || 'https://arecofix.com.ar';
+      const fetchOptions = {
+        headers: {
+          'apikey': environment.supabaseKey,
+          'Authorization': `Bearer ${environment.supabaseKey}`
+        }
+      };
+
+      const [brandsRes, categoriesRes, productsRes] = await Promise.all([
+        fetch(`${environment.supabaseUrl}/rest/v1/brands?select=id,name`, fetchOptions),
+        fetch(`${environment.supabaseUrl}/rest/v1/categories?select=id,name`, fetchOptions),
+        fetch(`${environment.supabaseUrl}/rest/v1/products?select=id,name,description,price,currency,image_url,slug,stock,brand_id,category_id,branch_id,sku,is_active&is_active=eq.true&deleted_at=is.null&limit=15000`, fetchOptions)
+      ]);
+
+      const brands = brandsRes.ok ? await brandsRes.json() : [];
+      const categories = categoriesRes.ok ? await categoriesRes.json() : [];
+      const rawProducts = productsRes.ok ? await productsRes.json() : [];
+      
+      const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
+      const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
+
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <title>Arecofix Catálogo</title>
+    <link>${baseUrl}</link>
+    <description>Catálogo de productos de Arecofix - Equipos y Repuestos</description>\n`;
+
+      const seenSlugs = new Set();
+
+      rawProducts.forEach((p: any) => {
+        let slug = String(p.slug || '').trim();
+        if (!slug || slug === '_' || seenSlugs.has(slug)) {
+          slug = `${slug && slug !== '_' ? slug : 'p'}-${p.id.substring(0, 5)}`;
+        }
+        seenSlugs.add(slug);
+        const productLink = `${baseUrl}/productos/detalle/${slug}`;
+
+        let imageLink = String(p.image_url || '').trim();
+        const noImagePlaceholder = `${baseUrl}/assets/img/no-image.png`;
+        if (!imageLink || imageLink === 'null' || imageLink === '_') imageLink = noImagePlaceholder;
+        else if (!imageLink.startsWith('http')) imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${imageLink.split('/').map((s: string) => encodeURIComponent(s)).join('/')}`;
+        if (imageLink.startsWith('http:')) imageLink = imageLink.replace('http:', 'https:');
+
+        let priceValue = Number(p.price) || 0;
+        if (priceValue <= 0) priceValue = 100.00;
+        const formattedPrice = `${priceValue.toFixed(2)} ARS`;
+
+        const isActuallyInStock = (p.is_active && (p.stock > 0 || p.stock === null));
+        const availability = isActuallyInStock ? 'in_stock' : 'out_of_stock';
+        
+        const title = String(p.name || 'Producto').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const description = String(p.description || title).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 4999);
+        const brand = String(brandMap.get(p.brand_id) || 'Arecofix').replace(/&/g, '&amp;');
+        const categoryName = String(categoryMap.get(p.category_id) || 'Hardware');
+        const googleCategory = categoryName.toLowerCase().includes('celular') ? 'Electronics &gt; Communications &gt; Telephony &gt; Mobile Phones' : 'Hardware &gt; Computer Hardware';
+
+        // Segmentation tags for marketing
+        const isRepuesto = categoryName.toLowerCase().includes('repuesto') || categoryName.toLowerCase().includes('módulo') || categoryName.toLowerCase().includes('pantalla') || title.toLowerCase().includes('repuesto');
+        const customLabel0 = isRepuesto ? 'Repuestos' : 'Equipos';
+
+        xml += `    <item>
+      <g:id>${p.id}</g:id>
+      <g:title>${title}</g:title>
+      <g:description>${description}</g:description>
+      <g:link>${productLink}</g:link>
+      <g:image_link>${imageLink}</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>${availability}</g:availability>
+      <g:price>${formattedPrice}</g:price>
+      <g:brand>${brand}</g:brand>
+      <g:google_product_category>${googleCategory}</g:google_product_category>
+      <g:custom_label_0>${customLabel0}</g:custom_label_0>
+      <g:mpn>${p.sku || p.id.substring(0, 8)}</g:mpn>
+    </item>\n`;
+      });
+
+      xml += `  </channel>\n</rss>`;
+
+      res.header('Content-Type', 'application/xml; charset=utf-8');
+      res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600'); 
+      return res.send(xml);
+    } catch (e) {
+      console.error('Google Merchant Feed Error:', e);
       return res.status(500).send('Internal Server Error');
     }
   });

@@ -1,7 +1,7 @@
 <div class="bg-base-100 min-h-screen font-sans">
   <!-- HERO SECTION -->
   <section
-    class="relative min-h-[65vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden"
+    class="relative min-h-[65vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden dark"
   >
     <!-- Optimized Background Image (WebP) -->
     <div class="absolute inset-0 z-0">
@@ -27,7 +27,7 @@
     >
       <div class="md:w-1/2 text-left pt-20">
         <span
-          class="inline-block py-1 px-3 rounded-full bg-primary/20 border border-primary/50 text-focus text-sm font-bold tracking-wide uppercase mb-6 animate-fade-in-up backdrop-blur-sm"
+          class="inline-block py-1.5 px-4 rounded-full bg-white/10 border border-white/20 text-white text-xs md:text-sm font-bold tracking-widest uppercase mb-6 animate-fade-in-up backdrop-blur-md shadow-xl"
         >
           En Marcos Paz, Merlo y Zona Oeste
         </span>
@@ -160,7 +160,7 @@
     ✦ Estilo  : Minimalista, tipografía limpia, gap generoso
   -->
   <section
-    class="hidden md:block py-20 bg-white dark:bg-gray-900"
+    class="hidden md:block py-20 bg-base-100"
     aria-label="Información sobre el servicio"
   >
     <div class="container mx-auto px-6 lg:px-8 max-w-6xl">
@@ -655,7 +655,7 @@
   </section>
 
   <!-- BLOG CONTENT INTEGRATION: "Why Us" / Differentiators -->
-  <section class="py-20 bg-white dark:bg-gray-900">
+  <section class="py-20 bg-base-100">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         @for (item of whyUs; track item.title) {
@@ -670,10 +670,10 @@
             >
               <i [class]="item.icon"></i>
             </div>
-            <h3 class="text-xl font-bold mb-2 dark:text-white">
+            <h3 class="text-xl font-bold mb-2 text-base-content">
               {{ item.title }}
             </h3>
-            <p class="text-gray-500 dark:text-gray-400">
+            <p class="text-base-content/60">
               {{ item.desc }}
             </p>
           </div>
