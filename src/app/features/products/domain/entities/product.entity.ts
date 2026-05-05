@@ -37,6 +37,9 @@ export interface Product {
     updated_at: string;
     tenant_id?: string;
     deleted_at?: string;
+    // strategic fields for UI
+    discount_percentage?: number;
+    category_name?: string;
     
     // Relations
     branch_stock?: ProductStockPerBranch[];

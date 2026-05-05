@@ -29,7 +29,6 @@
   background: linear-gradient(135deg, #0f0c29 0%, #1a1b2e 50%, #0d1117 100%);
   color: var(--co-text);
   position: relative;
-  z-index: 100000;
   padding: 24px 16px 80px;
   box-sizing: border-box;
 }
@@ -307,7 +306,6 @@
   box-shadow: 0 4px 20px rgba(108,99,255,0.4);
   margin-top: 8px;
   position: relative;
-  z-index: 100002;
 }
 
 .btn-primary:hover:not(:disabled) {

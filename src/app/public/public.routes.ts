@@ -3,8 +3,20 @@ import { TenantIsolationGuard } from '@app/shared/guards/tenant-isolation.guard'
 import { PublicLayout } from '@app/public/layout/public-layout';
 import { PublicHomePage } from './home/public-home-page';
 import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
+import { BranchResolver } from '@app/core/resolvers/branch.resolver';
 
 export const publicRoutes: Routes = [
+  {
+    matcher: branchSlugMatcher,
+    loadComponent: () => import('@app/public/branch-store/layout/branch-layout.component').then(m => m.BranchLayoutComponent),
+    resolve: { branchData: BranchResolver },
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@app/public/branch-store/branch-home/branch-home.component').then(m => m.BranchHomeComponent)
+      }
+    ]
+  },
   {
     title: 'Arecofix',
     path: '',
@@ -454,11 +466,6 @@ export const publicRoutes: Routes = [
             }
           }
         ]
-      },
-      {
-        title: 'Tienda de Sucursal',
-        matcher: branchSlugMatcher,
-        loadComponent: () => import('@app/public/branch-store/branch-store.component').then(m => m.BranchStoreComponent),
       },
     ],
   },

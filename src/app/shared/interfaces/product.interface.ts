@@ -52,6 +52,10 @@ export interface Product {
   is_global?: boolean;
   deleted_at?: string | null;
   branch_id?: string | null;
+  // properties for strategic UI and joins:
+  category_name?: string | null;
+  discount_percentage?: number | null;
+  category?: { id: string; name: string; slug: string } | null;
   // some properties kept for backwards compatibility in UI:
   regular_price?: number;
 }
