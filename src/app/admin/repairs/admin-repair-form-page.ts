@@ -363,6 +363,7 @@ export class AdminRepairFormPage implements OnInit {
     onFinalCostChange(value: number) {
         this.repairForm.patchValue({
             final_cost: value,
+            technical_labor_cost: Math.round(value * 0.5),
             deposit_amount: Math.round(value * 0.5)
         });
     }
