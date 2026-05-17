@@ -16,6 +16,7 @@ export class AnalyticsService {
     private isBrowser = isPlatformBrowser(this.platformId);
     private firebaseApp: any;
     private firebaseAnalytics: any;
+    private posthogInitialized = false;
 
     constructor() {
         if (this.isBrowser) {
@@ -27,6 +28,14 @@ export class AnalyticsService {
         }
     }
 
+    private isPlaceholder(key: string | undefined | null): boolean {
+        if (!key) return true;
+        const normalized = key.toUpperCase();
+        return normalized.includes('PLACEHOLDER') || 
+               normalized.includes('YOUR_') || 
+               normalized === 'TODO';
+    }
+
     private setupRouterTracking() {
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
@@ -36,7 +45,7 @@ export class AnalyticsService {
     }
 
     private initPostHog() {
-        if (environment.posthogKey && environment.posthogKey.indexOf('PLACEHOLDER') === -1) {
+        if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey)) {
             try {
                 posthog.init(environment.posthogKey as string, {
                     api_host: environment.posthogHost || 'https://us.i.posthog.com',
@@ -45,21 +54,22 @@ export class AnalyticsService {
                     capture_pageview: true,
                     persistence: 'localStorage+cookie'
                 });
+                this.posthogInitialized = true;
             } catch (err) {
-                console.error('PostHog initialization failed', err);
+                console.warn('PostHog initialization deferred (potentially blocked by client/ad-blocker)', err);
             }
         }
     }
 
     private initFirebase() {
-        if (environment.firebase?.apiKey) {
+        if (environment.firebase?.apiKey && !this.isPlaceholder(environment.firebase.apiKey)) {
             try {
                 this.firebaseApp = !getApps().length ? initializeApp(environment.firebase) : getApp();
-                if (environment.firebase.measurementId) {
+                if (environment.firebase.measurementId && !this.isPlaceholder(environment.firebase.measurementId)) {
                     this.firebaseAnalytics = getAnalytics(this.firebaseApp);
                 }
             } catch (err) {
-                console.error('Firebase initialization failed', err);
+                console.warn('Firebase analytics initialization deferred', err);
             }
         }
     }
@@ -76,10 +86,14 @@ export class AnalyticsService {
 
     identify(userId: string, properties: Record<string, unknown> = {}) {
         if (this.isBrowser) {
-            if (environment.posthogKey) posthog.identify(userId, properties);
+            if (this.posthogInitialized) {
+                try { posthog.identify(userId, properties); } catch (e) {}
+            }
             if (this.firebaseAnalytics) {
-                setUserId(this.firebaseAnalytics, userId);
-                setUserProperties(this.firebaseAnalytics, properties);
+                try {
+                    setUserId(this.firebaseAnalytics, userId);
+                    setUserProperties(this.firebaseAnalytics, properties);
+                } catch (e) {}
             }
             if ((window as any).gtag) {
                 (window as any).gtag('set', 'user_properties', properties);
@@ -89,10 +103,12 @@ export class AnalyticsService {
 
     capture(eventName: string, properties: Record<string, unknown> = {}) {
         if (this.isBrowser) {
-            if (environment.posthogKey) posthog.capture(eventName, properties);
+            if (this.posthogInitialized) {
+                try { posthog.capture(eventName, properties); } catch (e) {}
+            }
             
             if (this.firebaseAnalytics) {
-                logEvent(this.firebaseAnalytics, eventName, properties);
+                try { logEvent(this.firebaseAnalytics, eventName, properties); } catch (e) {}
             }
             
             if ((window as any).gtag) {
@@ -118,9 +134,11 @@ export class AnalyticsService {
 
     reset() {
         if (this.isBrowser) {
-            if (environment.posthogKey) posthog.reset();
+            if (this.posthogInitialized) {
+                try { posthog.reset(); } catch (e) {}
+            }
             if (this.firebaseAnalytics) {
-                setUserId(this.firebaseAnalytics, null);
+                try { setUserId(this.firebaseAnalytics, null); } catch (e) {}
             }
         }
     }
@@ -130,10 +148,10 @@ export class AnalyticsService {
     }
 
     getDistinctId(): string {
-        return this.isBrowser ? posthog.get_distinct_id() : '';
+        return this.isBrowser && this.posthogInitialized ? posthog.get_distinct_id() : '';
     }
 
     getSessionId(): string {
-        return this.isBrowser ? posthog.get_session_id() : '';
+        return this.isBrowser && this.posthogInitialized ? posthog.get_session_id() : '';
     }
 }
