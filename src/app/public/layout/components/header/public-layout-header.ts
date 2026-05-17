@@ -281,32 +281,39 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
    */
   async loadDynamicCategories() {
     try {
-      this.categoryRepo.getAll({ column: 'name', ascending: true }).subscribe(categories => {
-        if (!categories || categories.length === 0) return;
+      this.categoryRepo.getAll({ column: 'name', ascending: true }).subscribe({
+        next: (categories) => {
+          if (!categories || categories.length === 0) return;
 
-        this.navItems.update(currentItems => {
-          // Clone high-level structure to avoid mutation issues
-          const newItems = [...currentItems];
-          const tienda = newItems.find(item => item.id === 'tienda');
-          
-          if (tienda && tienda.children) {
-            const todasCategorias = tienda.children.find(child => child.id === 'tienda-categorias');
+          this.navItems.update(currentItems => {
+            // Clone high-level structure to avoid mutation issues
+            const newItems = [...currentItems];
+            const tienda = newItems.find(item => item.id === 'tienda');
             
-            if (todasCategorias) {
-              // Convert DB categories to NavItems
-              todasCategorias.children = categories.map(cat => ({
-                id: `dynamic-cat-${cat.id}`,
-                label: cat.name,
-                path: `/productos/categoria/${cat.slug}`,
-                icon: 'fas fa-tag', // Default icon for dynamic categories
-                theme: 'tienda'
-              }));
+            if (tienda && tienda.children) {
+              const todasCategorias = tienda.children.find(child => child.id === 'tienda-categorias');
               
-              this.cdr.markForCheck();
+              if (todasCategorias) {
+                // Convert DB categories to NavItems
+                todasCategorias.children = categories.map(cat => ({
+                  id: `dynamic-cat-${cat.id}`,
+                  label: cat.name,
+                  path: `/productos/categoria/${cat.slug}`,
+                  icon: 'fas fa-tag', // Default icon for dynamic categories
+                  theme: 'tienda'
+                }));
+                
+                this.cdr.markForCheck();
+              }
             }
-          }
-          return newItems;
-        });
+            return newItems;
+          });
+        },
+        error: (err) => {
+          // Gracefully log developer warning and mark CD
+          console.warn('[PublicLayoutHeader] Dynamic categories loading deferred (database read RLS policy restricted/auth dependent).', err);
+          this.cdr.markForCheck();
+        }
       });
     } catch (err) {
       console.error('Error loading dynamic categories:', err);

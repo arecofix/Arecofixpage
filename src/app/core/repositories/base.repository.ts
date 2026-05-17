@@ -16,6 +16,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     
     protected isGlobalTable: boolean = false;
     protected useSoftDeletes: boolean = false;
+    protected suppressAuthNotifications: boolean = false;
 
     protected tenantService = inject(TenantService);
     protected errorHandler = inject(SupabaseErrorHandlerService);
@@ -86,7 +87,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
             const { data, error } = await query.range(fromIdx, fromIdx + CHUNK - 1);
 
             if (error) {
-                this.errorHandler.handleError(error, `PaginatedFetch ${this.tableName}`);
+                this.errorHandler.handleError(error, `PaginatedFetch ${this.tableName}`, this.suppressAuthNotifications);
                 throw error;
             }
 
@@ -116,7 +117,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query.maybeSingle()).pipe(
             map(({ data, error }) => {
                 if (error) {
-                    this.errorHandler.handleError(error, `getById ${this.tableName}`);
+                    this.errorHandler.handleError(error, `getById ${this.tableName}`, this.suppressAuthNotifications);
                 }
                 return data as T | null;
             })
@@ -135,7 +136,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         ).pipe(
             map(({ data, error }) => {
                 if (error) {
-                    this.errorHandler.handleError(error, `create ${this.tableName}`);
+                    this.errorHandler.handleError(error, `create ${this.tableName}`, this.suppressAuthNotifications);
                 }
                 return data as T;
             })
@@ -153,7 +154,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query.select().single()).pipe(
             map(({ data, error }) => {
                 if (error) {
-                    this.errorHandler.handleError(error, `update ${this.tableName}`);
+                    this.errorHandler.handleError(error, `update ${this.tableName}`, this.suppressAuthNotifications);
                 }
                 return data as T;
             })
@@ -167,7 +168,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query).pipe(
             map(({ error }) => {
                 if (error) {
-                    this.errorHandler.handleError(error, `delete ${this.tableName}`);
+                    this.errorHandler.handleError(error, `delete ${this.tableName}`, this.suppressAuthNotifications);
                 }
             })
         );
@@ -194,7 +195,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(query).pipe(
             map(({ count, error }) => {
                 if (error) {
-                    this.errorHandler.handleError(error, `count ${this.tableName}`);
+                    this.errorHandler.handleError(error, `count ${this.tableName}`, this.suppressAuthNotifications);
                 }
                 return count || 0;
             })
