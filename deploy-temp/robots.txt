@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# URLs and Sitemap
-Sitemap: https://arecofix.com.ar/sitemap.xml
