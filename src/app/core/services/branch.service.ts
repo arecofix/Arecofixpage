@@ -37,6 +37,15 @@ export class BranchService {
   private async hydrateFromStorage() {
     if (typeof window === 'undefined' || !window.localStorage) return;
 
+    // Si estamos cargando directamente la URL de Sede Central, ignoramos la hidratación del caché
+    const path = window.location.pathname;
+    const pathSegments = path.split('/').filter(s => s);
+    if (pathSegments.length > 0 && pathSegments[0] === 'admin') {
+      console.log('[BranchService] Sede Central URL detected on initialization, bypassing localStorage hydration.');
+      this.setCurrentBranch(null);
+      return;
+    }
+
     const savedId = localStorage.getItem('arecofix_current_branch_id');
     if (savedId && savedId !== 'global') {
       try {

@@ -10,7 +10,7 @@ import { Branch } from '@app/shared/interfaces/branch.interface';
 import { PreferencesService } from '@app/shared/services/preferences.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 
 interface MenuItem {
   title: string;
@@ -44,10 +44,11 @@ export class AdminLayout implements OnInit, OnDestroy {
   // Convert observables to signals for easier template usage and type safety
   public highContrast = toSignal(this.preferencesService.highContrast$, { initialValue: false });
   public fontSize = toSignal(this.preferencesService.fontSize$, { initialValue: 16 });
+  private branchChanged$ = toObservable(this.branchService.currentBranch);
 
   navigationItems: MenuItem[] = [];
   branches = signal<Branch[]>([]);
-  currentBranchId = signal<string | null>(null);
+  currentBranchId = this.branchService.currentBranchId;
   currentAssignedBranch = signal<Branch | null>(null);
   userProfile = signal<UserProfile | null>(null);
   branchBranding = signal<{ logo: string; name: string }>({
@@ -58,11 +59,12 @@ export class AdminLayout implements OnInit, OnDestroy {
   private navigationSubscription = new Subscription();
 
   async ngOnInit() {
-    // Escuchar la sucursal actual desde el servicio de autenticación
+    // 1. Escuchar la sucursal activa actual desde BranchService de forma reactiva y dinámica
     this.navigationSubscription.add(
-      this.authService.currentBranch$.subscribe((branch: Branch | null) => {
-        this.currentBranchId.set(branch?.id || null);
+      this.branchChanged$.subscribe((branch: Branch | null) => {
+        console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
         this.updateBranchMenu(branch);
+        this.updateBranding(branch);
       })
     );
 
@@ -81,18 +83,18 @@ export class AdminLayout implements OnInit, OnDestroy {
     this.notificationService.loadNotifications();
     this.notificationService.subscribeToRealtime();
 
+    // 2. Escuchar la sucursal asignada del perfil para inicializar el contexto correcto en el primer arranque
     this.navigationSubscription.add(
-      this.authService.currentBranch$.subscribe((branch: Branch | null) => {
-        this.currentAssignedBranch.set(branch);
-        if (branch) {
+      this.authService.currentBranch$.subscribe((assignedBranch: Branch | null) => {
+        this.currentAssignedBranch.set(assignedBranch);
+        if (assignedBranch) {
           if (!this.authService.isSuperAdmin()) {
-             this.updateBranding(branch);
-             this.branchService.setCurrentBranch(branch);
+             this.branchService.setCurrentBranch(assignedBranch);
           } else {
             const currentSelectedId = this.branchService.getCurrentBranchId();
             if (!currentSelectedId) {
-               this.branchService.setCurrentBranch(branch);
-               this.updateBranding(branch);
+               this.branchService.setCurrentBranch(assignedBranch);
+
             }
           }
         }
@@ -105,9 +107,15 @@ export class AdminLayout implements OnInit, OnDestroy {
       ).subscribe((event: any) => {
         this.preferencesService.closeSidebar();
         const urlString = event.urlAfterRedirects || event.url;
-        const urlSegments = urlString.split('/');
-        if (urlSegments.length === 2 && urlSegments[1] === 'admin') {
+        // Split and filter out empty segments to handle leading slashes cleanly
+        const urlSegments = urlString.split('/').filter((s: string) => s);
+        
+        // Sede Central detect: first path segment is 'admin' (e.g., /admin/dashboard)
+        const isSedeCentralUrl = urlSegments.length > 0 && urlSegments[0] === 'admin';
+
+        if (isSedeCentralUrl) {
            if (this.branchService.getCurrentBranchId() !== null) {
+             console.log('[AdminLayout NavigationEnd] Sede Central detected. Resetting active branch to Central (null)');
              this.branchService.setCurrentBranch(null);
              this.updateBranding(null);
            }
