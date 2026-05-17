@@ -584,3 +584,48 @@ details > summary::-webkit-details-marker {
   }
 }
 
+/* --- SAFARI SCROLL FIX --- */
+/* Fix for iOS Safari scroll getting stuck/bouncy behavior.
+   This is common with overflow-x-auto elements and carousels. */
+.overflow-x-auto,
+[class*="overflow-x"],
+.carousel,
+.scrollable-container {
+  /* Enable smooth scrolling momentum on iOS */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevent overscroll bounce from causing layout shift */
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+}
+
+/* Prevent scroll chaining on nested scrollable elements */
+.overflow-x-auto .overflow-x-auto {
+  overscroll-behavior-x: none;
+}
+
+/* Ensure touch events work correctly on iOS */
+@supports (touch-action: manipulation) {
+  .overflow-x-auto,
+  [class*="overflow-x"] {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+}
+
+/* Additional Safari-specific fixes for smooth scrolling */
+@supports (-webkit-touch-callout: none) {
+  /* iOS specific */
+  .overflow-x-auto,
+  [class*="overflow-x"],
+  .carousel {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  
+  /* Enable momentum scrolling */
+  .overflow-x-auto * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+

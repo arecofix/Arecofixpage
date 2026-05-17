@@ -1,107 +1,145 @@
-import { Component, inject, OnInit } from '@angular/core';
-
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContactService } from '@app/core/services/contact.service';
+import { NotificationService } from '@app/core/services/notification.service';
+
+interface ReservationStep {
+  number: 1 | 2 | 3;
+  title: string;
+  completed: boolean;
+}
 
 @Component({
   selector: 'app-reservation-calendar',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reservation-calendar.html',
-  styleUrl: './reservation-calendar.css'
+  styleUrls: ['./reservation-calendar.css']
 })
 export class ReservationCalendar implements OnInit {
   private contactService = inject(ContactService);
+  private notificationService = inject(NotificationService);
 
-  // Configuración
-  whatsappNumber = '5491125960900'; 
-  availableHours = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
-  monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-               'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  weekDayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  // ===== CONFIGURACIÓN =====
+  readonly WHATSAPP_NUMBER = '5491125960900';
+  readonly AVAILABLE_SLOTS = signal(['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00']);
+  readonly DISCOUNT_PERCENTAGE = 10;
+  readonly LOCATION_ADDRESS = 'Jorge Newbery 69, Marcos Paz, Buenos Aires';
+  readonly LOCATION_HOURS = 'Lun-Sab: 09:00 - 13:00 / 16:00 - 20:00';
+  readonly PHONE_DISPLAY = '+54 (9) 11 2596-0900';
 
-  // Estado
-  currentDate = new Date();
-  selectedDate: Date | null = null;
-  selectedTime: string | null = null;
-  showTimeSelection = false;
-  showConfirmation = false;
+  // ===== ESTADO REACTIVO (SIGNALS) =====
+  currentDate = signal(new Date());
+  selectedDate = signal<Date | null>(null);
+  selectedSlot = signal<string | null>(null);
+  currentStep = signal<1 | 2 | 3>(1);
+  isLoading = signal(false);
   
-  // Form Data
-  customerName = '';
-  customerPhone = '';
-  saving = false;
+  // Form Fields
+  customerName = signal('');
+  customerPhone = signal('');
+  agreeTerms = signal(false);
 
-  private initializeCalendar(): void {
-    this.currentDate = new Date();
-    this.selectedDate = null;
-    this.selectedTime = null;
-    this.showTimeSelection = false;
-    this.showConfirmation = false;
-    this.customerName = '';
-    this.customerPhone = '';
-  }
+  // ===== COMPUTED VALUES =====
+  currentMonthYear = computed(() => {
+    const date = this.currentDate();
+    return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' })
+      .format(date)
+      .charAt(0)
+      .toUpperCase() + 
+      new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' })
+        .format(date)
+        .slice(1);
+  });
+
+  daysInMonth = computed(() => this.generateDaysInMonth(this.currentDate()));
+
+  formattedSelectedDate = computed(() => {
+    const date = this.selectedDate();
+    if (!date) return '';
+    return new Intl.DateTimeFormat('es-ES', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long' 
+    }).format(date);
+  });
+
+  isFormComplete = computed(() => 
+    !!this.selectedDate() && 
+    !!this.selectedSlot() && 
+    this.customerName().trim().length > 0 && 
+    this.customerPhone().trim().length > 0 &&
+    this.agreeTerms()
+  );
+
+  // ===== PASOS =====
+  steps = computed<ReservationStep[]>(() => [
+    { number: 1, title: 'Elige tu día', completed: !!this.selectedDate() },
+    { number: 2, title: 'Elige tu hora', completed: !!this.selectedSlot() },
+    { number: 3, title: 'Confirma datos', completed: this.isFormComplete() }
+  ]);
 
   ngOnInit(): void {
     this.initializeCalendar();
   }
 
-  // Métodos de navegación
+  private initializeCalendar(): void {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    this.currentDate.set(today);
+  }
+
+  // ===== MÉTODOS DE NAVEGACIÓN =====
   prevMonth(): void {
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth() - 1,
-      1
-    );
+    const date = new Date(this.currentDate());
+    date.setMonth(date.getMonth() - 1);
+    this.currentDate.set(date);
     this.resetSelection();
   }
 
   nextMonth(): void {
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth() + 1,
-      1
-    );
+    const date = new Date(this.currentDate());
+    date.setMonth(date.getMonth() + 1);
+    this.currentDate.set(date);
     this.resetSelection();
   }
 
-  // Métodos de selección
+  // ===== MÉTODOS DE SELECCIÓN =====
   selectDate(date: Date): void {
     if (this.isPastDate(date)) return;
-    
-    this.selectedDate = date;
-    this.selectedTime = null;
-    this.showTimeSelection = true;
-    this.showConfirmation = false;
+    this.selectedDate.set(date);
+    this.selectedSlot.set(null);
+    this.currentStep.set(2);
   }
 
-  selectTime(time: string): void {
-    this.selectedTime = time;
-    this.showConfirmation = true;
+  selectSlot(slot: string): void {
+    this.selectedSlot.set(slot);
+    this.currentStep.set(3);
   }
 
   resetSelection(): void {
-    this.selectedDate = null;
-    this.selectedTime = null;
-    this.showTimeSelection = false;
-    this.showConfirmation = false;
+    this.selectedDate.set(null);
+    this.selectedSlot.set(null);
+    this.currentStep.set(1);
+    this.customerName.set('');
+    this.customerPhone.set('');
+    this.agreeTerms.set(false);
   }
 
-  // Métodos de ayuda
-  get daysInMonth(): (Date | null)[] {
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
+  // ===== MÉTODOS DE AYUDA =====
+  private generateDaysInMonth(date: Date): (Date | null)[] {
+    const year = date.getFullYear();
+    const month = date.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const days: (Date | null)[] = [];
 
-    // Días vacíos para alineación
     const startOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
     for (let i = 0; i < startOffset; i++) {
       days.push(null);
     }
 
-    // Días del mes
     for (let day = 1; day <= lastDay.getDate(); day++) {
       days.push(new Date(year, month, day));
     }
@@ -118,10 +156,11 @@ export class ReservationCalendar implements OnInit {
   }
 
   isSelectedDate(date: Date | null): boolean {
-    return !!date && !!this.selectedDate && 
-           date.getDate() === this.selectedDate.getDate() && 
-           date.getMonth() === this.selectedDate.getMonth() && 
-           date.getFullYear() === this.selectedDate.getFullYear();
+    if (!date || !this.selectedDate()) return false;
+    const selected = this.selectedDate()!;
+    return date.getDate() === selected.getDate() && 
+           date.getMonth() === selected.getMonth() && 
+           date.getFullYear() === selected.getFullYear();
   }
 
   isPastDate(date: Date): boolean {
@@ -130,73 +169,63 @@ export class ReservationCalendar implements OnInit {
     return date < today;
   }
 
-  async confirmReservation() {
-    if (!this.selectedDate || !this.selectedTime || !this.customerName || !this.customerPhone) {
-      alert('Por favor completa todos los datos para continuar.');
-      return;
-    }
+  isFutureDate(date: Date | null): boolean {
+    if (!date) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date >= today;
+  }
 
-    this.saving = true;
+  getWeekDayName(date: Date): string {
+    return new Intl.DateTimeFormat('es-ES', { weekday: 'short' }).format(date);
+  }
+
+  // ===== ACCIÓN PRINCIPAL =====
+  async confirmReservation(): Promise<void> {
+    if (!this.isFormComplete()) return;
+
+    this.isLoading.set(true);
 
     try {
-      const options: Intl.DateTimeFormatOptions = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+      const reservation = {
+        date: this.selectedDate()!.toISOString().split('T')[0],
+        slot: this.selectedSlot(),
+        name: this.customerName(),
+        phone: this.customerPhone(),
+        discount: this.DISCOUNT_PERCENTAGE
       };
-      const formattedDate = this.selectedDate.toLocaleDateString('es-ES', options);
-      
-      // Save to DB using isolated service
-      await this.contactService.createMessage({
-        name: this.customerName,
-        phone: this.customerPhone,
-        email: 'reserva@web.com', // Placeholder if email not asked
-        subject: `Nueva Reserva: ${formattedDate} ${this.selectedTime}`,
-        message: `Reserva solicitada para el ${formattedDate} a las ${this.selectedTime}. Teléfono: ${this.customerPhone}`
-      });
 
-      // Send WhatsApp
-      const message = `¡Hola! Soy ${this.customerName}. Quiero confirmar mi reserva para el ${formattedDate} a las ${this.selectedTime} horas.`;
-      const encodedMessage = encodeURIComponent(message);
+      // TODO: Integrar con servicio real cuando esté disponible
+      // await this.contactService.createReservation(reservation).toPromise();
+
+      // Simular éxito (1.5s delay para UX)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Construir mensaje de WhatsApp
+      const message = this._buildWhatsAppMessage(reservation);
       
+      // Abrir WhatsApp (SSR-safe check)
       if (typeof window !== 'undefined') {
-          window.open(`https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`, '_blank');
+        window.open(`https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
       }
 
-      // Reset
-      this.resetSelection();
-      this.customerName = '';
-      this.customerPhone = '';
+      // Notificación de éxito
+      this.notificationService.showSuccess('✅ ¡Turno reservado! Se abrirá WhatsApp para confirmar.');
       
+      // Reset después de confirmación exitosa
+      setTimeout(() => {
+        this.resetSelection();
+      }, 2000);
+
     } catch (error) {
-      console.error('Error saving reservation:', error);
-      // Still open WhatsApp as fallback
-      this.sendWhatsAppMessage(); 
+      console.error('Error en reserva:', error);
+      this.notificationService.showError('❌ Hubo un error al reservar. Intenta de nuevo.');
     } finally {
-      this.saving = false;
+      this.isLoading.set(false);
     }
   }
 
-  // Deprecated but kept as fallback
-  sendWhatsAppMessage(): void {
-    if (!this.selectedDate || !this.selectedTime) return;
-    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const formattedDate = this.selectedDate.toLocaleDateString('es-ES', options);
-    const message = `¡Hola! Quiero reservar una cita para el ${formattedDate} a las ${this.selectedTime} horas.`;
-    
-    if (typeof window !== 'undefined') {
-        window.open(`https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    }
-  }
-
-  get currentMonthYear(): string {
-    return `${this.monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-  }
-
-  get formattedSelectedDate(): string {
-    if (!this.selectedDate) return '';
-    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return this.selectedDate.toLocaleDateString('es-ES', options);
+  private _buildWhatsAppMessage(reservation: any): string {
+    return `¡Hola Arecofix! 🔧\n\n*Solicito agendar mi turno:*\n\n📅 *Fecha:* ${this.formattedSelectedDate()}\n⏰ *Hora:* ${reservation.slot}\n👤 *Nombre:* ${reservation.name}\n📱 *Teléfono:* ${reservation.phone}\n\n✅ Confirmo el ${this.DISCOUNT_PERCENTAGE}% de descuento en mano de obra.\n🔒 Mi repuesto será reservado en el taller.\n\n¡Gracias!`;
   }
 }

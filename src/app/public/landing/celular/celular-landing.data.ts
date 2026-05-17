@@ -285,15 +285,15 @@ export const RELATED_SERVICES = [
             title: 'Garantía Real (30-90 días)',
             desc: 'Te damos un comprobante escrito. Si algo falla, respondemos sin vueltas.',
             icon: 'fas fa-shield-alt',
-            color: 'text-green-600',
-            bg: 'bg-green-100'
+            color: 'text-sky-600',
+            bg: 'bg-sky-100'
         },
         {
             title: 'Laboratorio Propio',
             desc: 'Tu equipo no "viaja" a otros lados. Se repara acá, con nuestras herramientas.',
             icon: 'fas fa-microscope',
-            color: 'text-green-600',
-            bg: 'bg-green-100'
+            color: 'text-sky-600',
+            bg: 'bg-sky-100'
         }
     ];
     
