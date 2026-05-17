@@ -15,7 +15,7 @@ export class SupabaseErrorHandlerService {
    * Standardized handling for Supabase/Postgrest errors.
    * Logs the error, notifies the user, and throws a DatabaseError.
    */
-  handleError(error: PostgrestError | Error | any, context: string): never {
+  handleError(error: PostgrestError | Error | any, context: string, suppressNotification: boolean = false): never {
     const message = error?.message || 'Ocurrió un error inesperado en la base de datos.';
     const details = error?.details || '';
     const code = error?.code || '';
@@ -36,8 +36,10 @@ export class SupabaseErrorHandlerService {
       userMessage = 'Error de conexión. Verifica tu internet.';
     }
 
-    // Notify user
-    this.notification.showError(userMessage);
+    // Notify user if not suppressed
+    if (!suppressNotification) {
+      this.notification.showError(userMessage);
+    }
 
     // Throw standard application error
     throw new DatabaseError(userMessage, error);

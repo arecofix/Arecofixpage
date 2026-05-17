@@ -24,6 +24,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   protected override tableName = 'products';
   protected override isGlobalTable = false;
   protected override useSoftDeletes = true;
+  protected override suppressAuthNotifications = true;
 
   private stockService = inject(StockManagementService);
 

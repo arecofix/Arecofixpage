@@ -9,6 +9,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 })
 export class SupabaseAppServiceRepository extends BaseRepository<AppServiceEntity> {
   protected override tableName = 'services';
+  protected override suppressAuthNotifications = true;
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);
