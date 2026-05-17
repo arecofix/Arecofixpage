@@ -1,5 +1,5 @@
 export type MovementType = 'income' | 'expense';
-export type MovementCategory = 'sale' | 'purchase' | 'repair' | 'adjustment' | 'draw';
+export type MovementCategory = 'sale' | 'purchase' | 'repair' | 'adjustment' | 'draw' | 'beca' | 'sueldo_externo' | 'gasto_fijo' | 'gasto_hormiga' | 'inversion' | 'otros';
 
 export interface CashMovement {
   id?: string;
