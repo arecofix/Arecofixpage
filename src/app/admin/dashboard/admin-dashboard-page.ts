@@ -1,7 +1,6 @@
-import { Component, inject, OnInit, signal, computed, effect, DestroyRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject, OnInit, OnDestroy, signal, computed, effect, DestroyRef } from '@angular/core';
 import { Subject } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { switchMap, catchError, takeUntil } from 'rxjs/operators';
 import { CommonModule, DecimalPipe, CurrencyPipe } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -17,15 +16,19 @@ import { FinanceReportService } from '@app/features/analytics/application/servic
 import { NumberUtils } from '@app/shared/utils/number.utils';
 import { Branch, BranchService } from '@app/core/services/branch.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
+import { FormsModule } from '@angular/forms';
+import { FinanceService } from '@app/features/finance/application/services/finance.service';
+import { NotificationService } from '@app/core/services/notification.service';
 
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, BaseChartDirective, SkeletonComponent],
+  imports: [CommonModule, RouterLink, BaseChartDirective, SkeletonComponent, FormsModule],
   templateUrl: './admin-dashboard-page.html',
   providers: [provideCharts(withDefaultRegisterables())]
 })
-export class AdminDashboardPage implements OnInit {
+export class AdminDashboardPage implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   private analyticsRepo = inject(AnalyticsRepository);
   private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
@@ -33,6 +36,42 @@ export class AdminDashboardPage implements OnInit {
   private adminProductService = inject(AdminProductService);
   private reportService = inject(FinanceReportService);
   private router = inject(Router);
+  private financeService = inject(FinanceService);
+  private notificationService = inject(NotificationService);
+
+  showFinanceModal = signal(false);
+  financeForm = signal({
+    type: 'expense' as 'income' | 'expense',
+    amount: 0,
+    category: 'gasto_fijo' as any,
+    payment_method: 'cash',
+    notes: ''
+  });
+  savingFinance = signal(false);
+
+  availableCategories = computed(() => {
+    const type = this.financeForm().type;
+    if (type === 'income') {
+      return [
+        { value: 'sale', label: '🛒 Ventas de Tienda' },
+        { value: 'repair', label: '🛠️ Reparación / Taller' },
+        { value: 'sueldo_externo', label: '💼 Inyección Capital / Sueldo Externo' },
+        { value: 'beca', label: '🎓 Becas / Subsidios' },
+        { value: 'adjustment', label: '📊 Ajuste de Caja (Ingreso)' },
+        { value: 'otros', label: '➕ Otros Ingresos' }
+      ];
+    } else {
+      return [
+        { value: 'purchase', label: '📦 Compra de Repuestos / Insumos' },
+        { value: 'gasto_fijo', label: '🏠 Gastos Fijos (Alquiler, Luz, Internet)' },
+        { value: 'gasto_hormiga', label: '☕ Gastos Hormiga (Café, Limpieza)' },
+        { value: 'inversion', label: '📈 Inversión (Herramientas, Marketing)' },
+        { value: 'draw', label: '💸 Retiro de Socios / Socias' },
+        { value: 'adjustment', label: '📊 Ajuste de Caja (Egreso)' },
+        { value: 'otros', label: '➖ Otros Egresos' }
+      ];
+    }
+  });
 
   stats = signal<DashboardStats>({
     users: 0,
@@ -169,7 +208,7 @@ export class AdminDashboardPage implements OnInit {
           })
         );
       }),
-      takeUntilDestroyed() // Auto-muta con el fin de vida del componente
+      takeUntil(this.destroy$)
     ).subscribe((stats: any) => {
       if (stats && !Array.isArray(stats)) {
         this.stats.set(stats);
@@ -310,5 +349,71 @@ export class AdminDashboardPage implements OnInit {
 
   downloadCSV(): void {
     this.reportService.downloadCSV(this.stats(), this.totalProfitMargin());
+  }
+
+  // ── Inteligencia Financiera Personal: Registro Manual de Ingresos/Gastos ──
+  openFinanceModal() {
+    this.financeForm.set({
+      type: 'expense',
+      amount: 0,
+      category: 'gasto_fijo',
+      payment_method: 'cash',
+      notes: ''
+    });
+    this.showFinanceModal.set(true);
+  }
+
+  changeFinanceType(type: 'income' | 'expense') {
+    this.financeForm.update(form => ({
+      ...form,
+      type,
+      category: type === 'income' ? 'sale' : 'gasto_fijo'
+    }));
+  }
+
+  updateFinanceField(field: string, value: any) {
+    this.financeForm.update(form => ({
+      ...form,
+      [field]: value
+    }));
+  }
+
+  async saveManualMovement() {
+    const form = this.financeForm();
+    if (!form.amount || form.amount <= 0) {
+      this.notificationService.showError('El monto debe ser mayor que 0');
+      return;
+    }
+
+    this.savingFinance.set(true);
+    try {
+      const activeBranchId = this.branchContextService.currentBranchId();
+      
+      const payload = {
+        amount: form.amount,
+        type: form.type,
+        category: form.category,
+        payment_method: form.payment_method,
+        notes: form.notes || null,
+        branch_id: activeBranchId || null
+      };
+
+      await this.financeService.recordMovement(payload as any);
+      this.notificationService.showSuccess('¡Movimiento financiero registrado!');
+      this.showFinanceModal.set(false);
+      
+      // Forzar recarga del dashboard
+      this.loadStats$.next(activeBranchId || undefined);
+    } catch (e: any) {
+      console.error('Error saving manual finance movement:', e);
+      this.notificationService.showError('Error al guardar: ' + e.message);
+    } finally {
+      this.savingFinance.set(false);
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

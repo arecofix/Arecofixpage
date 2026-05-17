@@ -167,6 +167,12 @@
                             </div>
                         </div>
 
+                        <!-- Inteligencia Financiera: Registro Manual de Ingresos/Gastos -->
+                        <button (click)="openFinanceModal()"
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md shadow-violet-500/20 hover:shadow-violet-500/40 transition-all">
+                            <i class="fas fa-coins"></i> Registrar Gasto/Ingreso
+                        </button>
+
                         <!-- Botones de descarga global -->
                         <button (click)="downloadCSV()"
                             class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all">
@@ -543,3 +549,105 @@
         </div>
     }
 </div>
+
+<!-- Modal Registro Manual Inteligencia Financiera -->
+@if (showFinanceModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-md animate-fade-in px-4">
+    <div class="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-lg overflow-hidden animate-slide-up border border-white/10 relative">
+        <!-- Encabezado con degradado moderno -->
+        <div class="bg-linear-to-r from-violet-600 to-indigo-600 p-6 text-white flex justify-between items-center relative overflow-hidden">
+            <!-- Círculos de luz decorativos -->
+            <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-white/10 blur-xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-24 h-24 rounded-full bg-white/10 blur-lg"></div>
+
+            <h3 class="font-extrabold text-xl flex items-center gap-3 relative z-10">
+                <i class="fas fa-coins text-yellow-300 text-2xl animate-bounce"></i> 
+                Inteligencia Financiera
+            </h3>
+            <button type="button" class="btn btn-sm btn-circle bg-white/10 hover:bg-white/20 text-white border-none shadow-none focus:outline-none relative z-10" (click)="showFinanceModal.set(false)">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        
+        <form (ngSubmit)="saveManualMovement()" class="p-6 sm:p-8 space-y-6">
+            <!-- Selector Tipo de Movimiento (Ingreso / Egreso) -->
+            <div>
+                <label class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 block">Tipo de Movimiento</label>
+                <div class="grid grid-cols-2 gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
+                    <button type="button" (click)="changeFinanceType('expense')"
+                        [class]="financeForm().type === 'expense' 
+                            ? 'py-3 rounded-xl font-bold text-sm bg-red-500 text-white shadow-md shadow-red-500/20 transition-all border-none'
+                            : 'py-3 rounded-xl font-bold text-sm text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 border-none bg-transparent transition-all'"
+                        class="flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-down-long"></i> Egreso / Gasto
+                    </button>
+                    <button type="button" (click)="changeFinanceType('income')"
+                        [class]="financeForm().type === 'income' 
+                            ? 'py-3 rounded-xl font-bold text-sm bg-emerald-500 text-white shadow-md shadow-emerald-500/20 transition-all border-none'
+                            : 'py-3 rounded-xl font-bold text-sm text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 border-none bg-transparent transition-all'"
+                        class="flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-up-long"></i> Ingreso / Caja
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fila: Monto -->
+            <div class="form-control">
+                <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Monto del Movimiento ($)</span></label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xl font-bold" [ngClass]="financeForm().type === 'income' ? 'text-emerald-500' : 'text-red-500'">$</span>
+                    <input type="number" [ngModel]="financeForm().amount" (ngModelChange)="updateFinanceField('amount', $event)" name="amount" required min="1"
+                        class="input input-bordered w-full pl-10 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white focus:bg-white dark:focus:bg-gray-800 focus:border-violet-500 font-mono text-xl font-black shadow-inner transition-all h-14" placeholder="0.00" />
+                </div>
+            </div>
+
+            <!-- Fila: Categoría y Método de Pago -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Categoría</span></label>
+                    <select [ngModel]="financeForm().category" (ngModelChange)="updateFinanceField('category', $event)" name="category" required
+                        class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold focus:border-violet-500 shadow-sm transition-all h-12">
+                        @for (cat of availableCategories(); track cat.value) {
+                            <option [value]="cat.value">{{ cat.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-control">
+                    <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Método de Pago</span></label>
+                    <select [ngModel]="financeForm().payment_method" (ngModelChange)="updateFinanceField('payment_method', $event)" name="payment_method" required
+                        class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold focus:border-violet-500 shadow-sm transition-all h-12">
+                        <option value="cash">💵 Efectivo</option>
+                        <option value="transfer">🏦 Transferencia Bancaria</option>
+                        <option value="credit_card">💳 Tarjeta de Crédito</option>
+                        <option value="debit_card">💳 Tarjeta de Débito</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Fila: Notas descriptivas -->
+            <div class="form-control">
+                <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Notas / Concepto descriptivo</span></label>
+                <textarea [ngModel]="financeForm().notes" (ngModelChange)="updateFinanceField('notes', $event)" name="notes" rows="2"
+                    class="textarea textarea-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium focus:border-violet-500 shadow-sm transition-all text-sm" placeholder="Ej: Compra de café para taller, Pago de publicidad de Meta Pixel..."></textarea>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <button type="button" class="btn bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 border-none rounded-2xl flex-1 font-bold h-12 transition-all" (click)="showFinanceModal.set(false)" [disabled]="savingFinance()">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                    [class]="financeForm().type === 'income' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-red-600 hover:bg-red-700 shadow-red-500/20'"
+                    class="btn text-white border-none rounded-2xl flex-1 font-bold h-12 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all" [disabled]="savingFinance()">
+                    @if (savingFinance()) {
+                        <span class="loading loading-spinner text-white opacity-80"></span> Guardando...
+                    } @else {
+                        <i class="fas fa-save mr-1 opacity-80"></i> Registrar
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
