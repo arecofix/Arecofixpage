@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
@@ -10,7 +10,7 @@ import { Branch } from '@app/shared/interfaces/branch.interface';
 import { PreferencesService } from '@app/shared/services/preferences.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
-import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 interface MenuItem {
   title: string;
@@ -44,7 +44,6 @@ export class AdminLayout implements OnInit, OnDestroy {
   // Convert observables to signals for easier template usage and type safety
   public highContrast = toSignal(this.preferencesService.highContrast$, { initialValue: false });
   public fontSize = toSignal(this.preferencesService.fontSize$, { initialValue: 16 });
-  private branchChanged$ = toObservable(this.branchService.currentBranch);
 
   navigationItems: MenuItem[] = [];
   branches = signal<Branch[]>([]);
@@ -58,15 +57,16 @@ export class AdminLayout implements OnInit, OnDestroy {
 
   private navigationSubscription = new Subscription();
 
+  constructor() {
+    effect(() => {
+      const branch = this.branchService.currentBranch();
+      console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
+      this.updateBranchMenu(branch);
+      this.updateBranding(branch);
+    });
+  }
+
   async ngOnInit() {
-    // 1. Escuchar la sucursal activa actual desde BranchService de forma reactiva y dinámica
-    this.navigationSubscription.add(
-      this.branchChanged$.subscribe((branch: Branch | null) => {
-        console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
-        this.updateBranchMenu(branch);
-        this.updateBranding(branch);
-      })
-    );
 
     // Escuchar cambios en el estado de autenticación (perfil, usuario)
     this.navigationSubscription.add(
