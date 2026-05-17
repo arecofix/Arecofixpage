@@ -51,7 +51,7 @@ export class ConfirmCheckoutUseCase {
         items: orderItems,
         total: params.total,
         total_amount: params.total,
-        status: 'pending',
+        status: 'pending_payment',
         subtotal: params.total, // Simplified total=subtotal if no breakdown
         tax: 0,
         discount: 0

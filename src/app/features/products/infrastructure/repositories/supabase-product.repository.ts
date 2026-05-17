@@ -296,11 +296,11 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   bulkUpdateCategory(ids: string[], categoryId: string): Observable<void> {
-    return from(this.supabase.from('products').update({ category_id: categoryId }).in('id', ids)).pipe(map(() => void 0));
+    return this.bulkUpdateByIds(ids, { category_id: categoryId } as Partial<Product>);
   }
 
   bulkDelete(ids: string[]): Observable<void> {
-    return from(this.supabase.from('products').update({ deleted_at: new Date().toISOString() }).in('id', ids)).pipe(map(() => void 0));
+    return this.bulkSoftDeleteByIds(ids);
   }
 
   search(query: string, categoryId?: string): Observable<Product[]> {

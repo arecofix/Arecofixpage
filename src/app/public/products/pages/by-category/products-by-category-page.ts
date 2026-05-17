@@ -8,10 +8,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, switchMap, of, tap, Subject } from 'rxjs';
+import { combineLatest, map, switchMap, of, tap, Subject, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, catchError } from 'rxjs/operators';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { SeoService } from '@app/core/services/seo.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 import {
   IsErrorComponent,
@@ -52,6 +53,7 @@ export class ProductsByCategoryPage {
   public paginationService: PaginationService = inject(PaginationService);
   public cartService: CartService = inject(CartService);
   private seoService: SeoService = inject(SeoService);
+  private tenantService = inject(TenantService);
 
   public currentCategory = signal<iCategory | null>(null);
   /** Stores the full ancestor chain (root → ... → current) for hierarchical breadcrumbs */
@@ -61,8 +63,20 @@ export class ProductsByCategoryPage {
   minPriceInput = signal<number | null>(null);
   maxPriceInput = signal<number | null>(null);
 
+  // Crear observables en el contexto de inyección correcto (field initializer)
+  private tenant$ = toObservable(this.tenantService.currentTenant);
+  private routeParams$ = combineLatest([
+    this.route.params.pipe(map(({ categorySlug }) => categorySlug as string)),
+    this.route.queryParams,
+  ]);
+
   categoriesListRs = rxResource({
-    stream: () => this.categoryService.getFeaturedData()
+    stream: () => this.tenant$.pipe(
+      switchMap(tenant => {
+        if (!tenant) return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
+        return this.categoryService.getFeaturedData();
+      })
+    )
   });
 
   /**
@@ -104,14 +118,6 @@ export class ProductsByCategoryPage {
   searchQuery = signal('');
   private searchSubject = new Subject<string>();
 
-  constructor() {
-    this.searchSubject.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    ).subscribe(q => {
-      this.updateQueryParams({ q: q || null, _page: 1 });
-    });
-  }
 
   // Helper for updating query params (DRY)
   updateQueryParams(newParams: Record<string, string | number | null>) {
@@ -145,13 +151,36 @@ export class ProductsByCategoryPage {
       return [...new Set(ids)];
   }
 
+  constructor() {
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(q => {
+      this.updateQueryParams({ q: q || null, _page: 1 });
+    });
+
+    // Subscribe to route changes to sync signals
+    this.routeParams$.pipe(
+      tap(([slugPath, queryParams]) => {
+        if (this.searchQuery() !== (queryParams['q'] || '')) this.searchQuery.set(queryParams['q'] || '');
+        if (this.minPriceInput() === null && queryParams['min_price']) this.minPriceInput.set(+queryParams['min_price']);
+        if (this.maxPriceInput() === null && queryParams['max_price']) this.maxPriceInput.set(+queryParams['max_price']);
+      })
+    ).subscribe();
+  }
+
   productsRs = rxResource({
     stream: () =>
-      combineLatest([
-        this.route.params.pipe(map(({ categorySlug }) => categorySlug as string)),
-        this.route.queryParams,
-      ]).pipe(
-        switchMap(([slugPath, params]) => {
+      combineLatest([this.routeParams$, this.tenant$]).pipe(
+        switchMap(([routeParams, tenant]) => {
+          const [slugPath, queryParams] = routeParams;
+          
+          if (!tenant) {
+            return of({
+              first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [],
+            });
+          }
+
           /**
            * Support for hierarchical URL paths.
            * e.g. slugPath = 'repuestos/modulos' → leaf slug = 'modulos'
@@ -198,17 +227,12 @@ export class ProductsByCategoryPage {
                 allCategories as iCategory[]
               );
 
-              const currentPage = +params['_page'] || 1;
-              const _sort = params['_sort'];
-              const _order = params['_order'] as 'asc' | 'desc';
-              const min_price = params['min_price'] ? +params['min_price'] : undefined;
-              const max_price = params['max_price'] ? +params['max_price'] : undefined;
-              const q = params['q'] || undefined;
-
-              // Sync local filter signals with URL params
-              if (this.searchQuery() !== (q || '')) this.searchQuery.set(q || '');
-              if (this.minPriceInput() === null && min_price) this.minPriceInput.set(min_price);
-              if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
+              const currentPage = +queryParams['_page'] || 1;
+              const _sort = queryParams['_sort'];
+              const _order = queryParams['_order'] as 'asc' | 'desc';
+              const min_price = queryParams['min_price'] ? +queryParams['min_price'] : undefined;
+              const max_price = queryParams['max_price'] ? +queryParams['max_price'] : undefined;
+              const q = queryParams['q'] || undefined;
 
               return this.productService.getData({
                 category_ids: targetCategoryIds,
@@ -225,7 +249,6 @@ export class ProductsByCategoryPage {
         })
       ),
   });
-
 
   // Computed para extraer datos de paginación de forma reactiva
   paginationData = computed<iPagination | null>(() => {

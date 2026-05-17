@@ -74,10 +74,11 @@ export class TenantService {
    * Útil para usar en APP_INITIALIZER.
    */
   async init(): Promise<void> {
+    let hostname = 'arecofix.com.ar';
     if (isPlatformBrowser(this.platformId)) {
-      const hostname = window.location.hostname;
-      await this.resolveTenantByHostname(hostname);
+      hostname = window.location.hostname;
     }
+    await this.resolveTenantByHostname(hostname);
   }
 
   /**

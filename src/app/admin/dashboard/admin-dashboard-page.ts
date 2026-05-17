@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { switchMap, catchError, takeUntil } from 'rxjs/operators';
 import { CommonModule, DecimalPipe, CurrencyPipe } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
-import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { SkeletonComponent } from '@app/shared/components/skeleton/skeleton.component';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { AnalyticsRepository, DashboardStats, MonthlyRevenue } from '@app/features/analytics/domain/repositories/analytics.repository';
@@ -25,7 +25,6 @@ import { NotificationService } from '@app/core/services/notification.service';
   standalone: true,
   imports: [CommonModule, RouterLink, BaseChartDirective, SkeletonComponent, FormsModule],
   templateUrl: './admin-dashboard-page.html',
-  providers: [provideCharts(withDefaultRegisterables())]
 })
 export class AdminDashboardPage implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
