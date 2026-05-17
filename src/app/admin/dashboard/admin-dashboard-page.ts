@@ -56,14 +56,40 @@ export class AdminDashboardPage implements OnInit {
     profit_chart: []
   });
 
-  // Computed signals for performance
   totalProfitMargin = computed(() => {
     return NumberUtils.calculateMargin(this.stats().total_gross_revenue, this.stats().total_net_profit);
   });
 
-  currentMonthMargin = computed(() => {
-    return NumberUtils.calculateMargin(this.stats().current_month_gross, this.stats().current_month_profit);
+  selectedPeriod = signal<string>(this.getCurrentPeriod());
+
+  selectedMonthData = computed(() => {
+    const period = this.selectedPeriod();
+    const breakdown = this.stats().monthly_breakdown || [];
+    return breakdown.find(m => m.period === period) || {
+      period: period,
+      label: 'Mes Seleccionado',
+      gross_revenue: 0,
+      cost: 0,
+      net_profit: 0,
+      repairs_revenue: 0,
+      sales_revenue: 0,
+      repairs_cost: 0,
+      sales_cost: 0
+    } as MonthlyRevenue;
   });
+
+  selectedMonthGross = computed(() => this.selectedMonthData().gross_revenue);
+  selectedMonthCost = computed(() => this.selectedMonthData().cost);
+  selectedMonthProfit = computed(() => this.selectedMonthData().net_profit);
+
+  currentMonthMargin = computed(() => {
+    return NumberUtils.calculateMargin(this.selectedMonthGross(), this.selectedMonthProfit());
+  });
+
+  private getCurrentPeriod(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
 
   analyticsStats = signal({
     enabled: false,
@@ -205,6 +231,10 @@ export class AdminDashboardPage implements OnInit {
     const branchId = event.target.value;
     const realBranchId = branchId === 'global' ? null : branchId;
     this.branchContextService.setBranchId(realBranchId);
+  }
+
+  onPeriodChange(event: any) {
+    this.selectedPeriod.set(event.target.value);
   }
 
   goToBranch(branchId?: string) {

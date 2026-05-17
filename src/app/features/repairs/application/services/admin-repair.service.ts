@@ -50,7 +50,7 @@ export class AdminRepairService {
         return firstValueFrom(this.repository.getAdminList({ branch_id, includeOrphans: isCentral, limit, offset, searchTerm }));
     }
 
-    async getWorkshopSummary(): Promise<any> {
+    async getWorkshopSummary(month?: number, year?: number): Promise<any> {
         const user = this.auth.getCurrentUser();
         if (!user) throw new Error('Usuario no autenticado');
 
@@ -60,7 +60,7 @@ export class AdminRepairService {
 
         const isCentral = await this.isCentralBranch(branch_id);
 
-        return firstValueFrom(this.repository.getWorkshopSummary(branch_id, isCentral));
+        return firstValueFrom(this.repository.getWorkshopSummary(branch_id, isCentral, month, year));
     }
 
     private async isCentralBranch(branchId: string | undefined | null): Promise<boolean> {

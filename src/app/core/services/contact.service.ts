@@ -55,7 +55,16 @@ export class ContactService {
                 details: '',
                 hint: '',
                 code: 'UNKNOWN',
-                name: 'PostgrestError'
+                name: 'PostgrestError',
+                toJSON: function() {
+                    return {
+                        name: this.name,
+                        message: this.message,
+                        details: this.details,
+                        hint: this.hint,
+                        code: this.code
+                    };
+                }
             };
             return { error: pgError };
         }

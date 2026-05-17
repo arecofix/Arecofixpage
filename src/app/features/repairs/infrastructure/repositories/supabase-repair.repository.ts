@@ -412,19 +412,22 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
 
 
-    getWorkshopSummary(branch_id?: string, includeOrphans?: boolean): Observable<any> {
-        return from(this.internalGetWorkshopSummary(branch_id, includeOrphans));
+    getWorkshopSummary(branch_id?: string, includeOrphans?: boolean, month?: number, year?: number): Observable<any> {
+        return from(this.internalGetWorkshopSummary(branch_id, includeOrphans, month, year));
     }
 
-    private async internalGetWorkshopSummary(branch_id?: string, includeOrphans?: boolean): Promise<any> {
+    private async internalGetWorkshopSummary(branch_id?: string, includeOrphans?: boolean, month?: number, year?: number): Promise<any> {
         const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const y = year ?? now.getFullYear();
+        const m = month ?? now.getMonth();
+        const startOfMonth = new Date(y, m, 1).toISOString();
+        const endOfMonth = new Date(y, m + 1, 0, 23, 59, 59, 999).toISOString();
 
         try {
             // Use parallel queries for better performance
             const [countsRes, profitRes] = await Promise.all([
-                this.getRepairCounts(branch_id, includeOrphans),
-                this.getMonthProfit(branch_id, startOfMonth, includeOrphans)
+                this.getRepairCounts(branch_id, includeOrphans, startOfMonth, endOfMonth),
+                this.getMonthProfit(branch_id, startOfMonth, endOfMonth, includeOrphans)
             ]);
 
             return {
@@ -437,14 +440,14 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         }
     }
 
-    private async getRepairCounts(branch_id?: string, includeOrphans?: boolean) {
+    private async getRepairCounts(branch_id?: string, includeOrphans?: boolean, startOfMonth?: string, endOfMonth?: string) {
         // Status keys: 1=Recibido, 2=En Presupuesto, 5=Listo, 6=Entregado
         // We want: 
         // - In Workshop: status < 5
         // - Ready: status == 5
         // - Pending Parts: status == 2 (assuming 2 is pending parts as per previous logic)
 
-        let baseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select('current_status_id'));
+        let baseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select('current_status_id, created_at'));
         
         if (branch_id) {
             if (includeOrphans) {
@@ -452,6 +455,10 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             } else {
                 baseQuery = baseQuery.eq('branch_id', branch_id);
             }
+        }
+        
+        if (startOfMonth && endOfMonth) {
+            baseQuery = baseQuery.gte('created_at', startOfMonth).lte('created_at', endOfMonth);
         }
 
         const { data, error } = await (baseQuery as any);
@@ -465,11 +472,12 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         };
     }
 
-    private async getMonthProfit(branch_id: string | undefined, startOfMonth: string, includeOrphans?: boolean): Promise<number> {
+    private async getMonthProfit(branch_id: string | undefined, startOfMonth: string, endOfMonth: string, includeOrphans?: boolean): Promise<number> {
         let profitQuery = this.supabase.from(this.tableName)
             .select('final_cost, costo_repuesto')
             .eq('current_status_id', 6) // DELIVERED
-            .gte('completed_at', startOfMonth);
+            .gte('completed_at', startOfMonth)
+            .lte('completed_at', endOfMonth);
             
         profitQuery = this.applyTenantFilter(profitQuery);
         if (branch_id) {

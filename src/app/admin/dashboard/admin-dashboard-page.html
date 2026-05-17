@@ -150,42 +150,65 @@
                             <i class="fas fa-chart-line text-emerald-500"></i>
                             Resumen Financiero
                         </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ingresos brutos, costos reales y ganancia neta del negocio</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ingresos brutos, costos reales y ganancia neta</p>
                     </div>
-                    <!-- Botones de descarga global -->
+                    
                     <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Selector de Mes -->
+                        <div class="relative min-w-[140px]">
+                            <select (change)="onPeriodChange($event)" [value]="selectedPeriod()"
+                                class="w-full appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all cursor-pointer">
+                                @for (month of stats().monthly_breakdown; track month.period) {
+                                    <option [value]="month.period">{{ month.label }}</option>
+                                }
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+
+                        <!-- Botones de descarga global -->
                         <button (click)="downloadCSV()"
                             class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all">
-                            <i class="fas fa-file-csv"></i> Exportar CSV
+                            <i class="fas fa-file-csv"></i> CSV
                         </button>
                         <button (click)="downloadTotalPDF()"
                             class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold text-sm border border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
-                            <i class="fas fa-file-pdf"></i> PDF Histórico
+                            <i class="fas fa-file-pdf"></i> PDF
                         </button>
                     </div>
                 </div>
 
-                <!-- KPIs del mes actual -->
+                <!-- KPIs del mes seleccionado -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                     <div class="bg-blue-50 dark:bg-blue-500/10 rounded-3xl p-4 border border-blue-100 dark:border-blue-500/20">
-                        <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Ingresos Brutos (este mes)</div>
-                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ stats().current_month_gross | number:'1.0-0' }}</div>
+                        <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Ingresos Brutos ({{ selectedMonthData().label }})</div>
+                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ selectedMonthGross() | number:'1.0-0' }}</div>
                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ventas + Reparaciones cobradas</div>
                     </div>
                     <div class="bg-red-50 dark:bg-red-500/10 rounded-3xl p-4 border border-red-100 dark:border-red-500/20">
-                        <div class="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Costos Reales (este mes)</div>
-                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ stats().current_month_cost | number:'1.0-0' }}</div>
+                        <div class="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Costos Reales ({{ selectedMonthData().label }})</div>
+                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ selectedMonthCost() | number:'1.0-0' }}</div>
                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Repuestos usados + Costo productos</div>
                     </div>
                     <div class="bg-emerald-50 dark:bg-emerald-500/10 rounded-3xl p-4 border border-emerald-100 dark:border-emerald-500/20">
                         <div class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1 flex items-center justify-between">
-                            Ganancia Real (este mes)
+                            Ganancia Neta ({{ selectedMonthData().label }})
                             <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600">{{ currentMonthMargin() }}%</span>
                         </div>
-                        <div class="text-2xl font-black" [ngClass]="stats().current_month_profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
-                            $ {{ stats().current_month_profit | number:'1.0-0' }}
+                        <div class="text-2xl font-black" [ngClass]="selectedMonthProfit() >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
+                            $ {{ selectedMonthProfit() | number:'1.0-0' }}
                         </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ingresos brutos − costos reales</div>
+                        <div class="flex flex-col gap-1 mt-2 pt-2 border-t border-emerald-200 dark:border-emerald-500/20">
+                            <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                                <span><i class="fas fa-store mr-1 text-purple-500"></i> 50% Taller:</span>
+                                <span class="font-bold">${{ (selectedMonthProfit() * 0.5) | number:'1.0-0' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                                <span><i class="fas fa-user-cog mr-1 text-blue-500"></i> 50% Técnico:</span>
+                                <span class="font-bold">${{ (selectedMonthProfit() * 0.5) | number:'1.0-0' }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -204,7 +227,12 @@
                             Ganancia Total Histórica
                             <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 font-bold">{{ totalProfitMargin() }}%</span>
                         </div>
-                        <div class="text-xl font-black text-emerald-600 dark:text-emerald-400">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
+                        <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 mb-2">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
+                        <div class="flex justify-center gap-3 text-[10px] sm:text-xs">
+                            <span class="text-gray-500 dark:text-gray-400">Taller: <b class="text-gray-700 dark:text-gray-300">${{ (stats().total_net_profit * 0.5) | number:'1.0-0' }}</b></span>
+                            <span class="text-gray-300 dark:text-gray-600">|</span>
+                            <span class="text-gray-500 dark:text-gray-400">Técnico: <b class="text-gray-700 dark:text-gray-300">${{ (stats().total_net_profit * 0.5) | number:'1.0-0' }}</b></span>
+                        </div>
                     </div>
                 </div>
 
