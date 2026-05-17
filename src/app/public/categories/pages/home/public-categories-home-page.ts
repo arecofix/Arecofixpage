@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, switchMap } from 'rxjs';
+import { combineLatest, map, switchMap, of } from 'rxjs';
 
 /*  */
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
@@ -13,6 +13,7 @@ import {
 } from '@app/shared/components/resource-status';
 import { PublicCategoryCard } from './components/';
 import { SeoService } from '@app/core/services/seo.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
   selector: 'app-public-categories-home-page',
@@ -31,18 +32,22 @@ export class PublicCategoriesHomePage {
   private route: ActivatedRoute = inject(ActivatedRoute);
   public paginationService: PaginationService = inject(PaginationService);
   private categoryService: CategoryService = inject(CategoryService);
+  private tenantService = inject(TenantService);
+  private tenant$ = toObservable(this.tenantService.currentTenant);
 
   categoriesRs = rxResource({
     stream: () =>
       combineLatest([
         this.route.queryParams.pipe(map((params) => +params['_page'] || 1)),
+        this.tenant$,
       ]).pipe(
-        switchMap(([currentPage]) =>
-          this.categoryService.getData({
+        switchMap(([currentPage, tenant]) => {
+          if (!tenant) return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
+          return this.categoryService.getData({
             _page: currentPage,
             _per_page: 5,
-          })
-        )
+          });
+        })
       ),
   });
 

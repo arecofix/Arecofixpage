@@ -47,7 +47,6 @@ export class InvoiceService {
       const payload = {
         tenant_id:       tenantId,
         order_id:        dto.order_id       ?? null,
-        sale_id:         dto.sale_id        ?? null,
         repair_id:       dto.repair_id      ?? null,
         customer_id:     dto.customer_id    ?? null,
         customer_name:   dto.customer_name  ?? 'Consumidor Final',
@@ -118,12 +117,16 @@ export class InvoiceService {
     let items: any[] = [];
 
     try {
-        if (invoice.sale_id) {
-            items = await this.repository.getRelatedItems({ type: 'sale', id: invoice.sale_id, tenantId });
-        } else if (invoice.order_id) {
-            items = await this.repository.getRelatedItems({ type: 'order', id: invoice.order_id, tenantId });
+        const referenceId = invoice.order_id ?? invoice.repair_id;
+        if (referenceId) {
+            items = await this.repository.getLineItems({
+                origin: invoice.origin,
+                referenceId,
+                tenantId,
+                embeddedItems: invoice.items,
+            });
         } else {
-            items = (invoice as any).items || [];
+            items = invoice.items ?? [];
         }
     } catch (error) {
         this.logger.error('Error fetching invoice items', error);

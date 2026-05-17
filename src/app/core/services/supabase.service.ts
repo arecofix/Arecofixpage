@@ -143,6 +143,51 @@ export class SupabaseService {
         },
       },
     );
+
+    // Handle auth state changes and clean up invalid refresh tokens
+    if (typeof window !== 'undefined') {
+      this.client.auth.onAuthStateChange((event, session) => {
+        this.logger.info(`Auth Event: ${event}`, session ? 'Session exists' : 'No session');
+        
+        // If initial session fails or refresh token is invalid, clean up storage
+        if (event === 'INITIAL_SESSION') {
+          // Check if we have a session but it might be invalid
+          if (session) {
+            // Session exists, let it proceed
+            return;
+          }
+        }
+        
+        // If token refresh fails, sign out cleanly to allow public navigation
+        if (event === 'TOKEN_REFRESHED') {
+          if (!session) {
+            this.logger.warn('Token refresh failed, signing out to allow public navigation');
+            this.client.auth.signOut().catch(err => {
+              this.logger.error('Error signing out after failed refresh', err);
+            });
+          }
+        }
+        
+        // Handle SIGNED_OUT event to ensure clean state
+        if (event === 'SIGNED_OUT') {
+          this.logger.info('User signed out, storage cleaned');
+        }
+      });
+
+      // Listen for unhandled promise rejections related to auth errors
+      window.addEventListener('unhandledrejection', (event) => {
+        const errorMessage = String(event.reason);
+        if (errorMessage.includes('Invalid Refresh Token') || 
+            errorMessage.includes('Refresh Token Not Found') ||
+            errorMessage.includes('400') && errorMessage.includes('refresh_token')) {
+          this.logger.warn('Detected invalid refresh token in unhandled rejection, cleaning storage');
+          event.preventDefault();
+          this.client.auth.signOut().catch(err => {
+            this.logger.error('Error signing out after invalid token detection', err);
+          });
+        }
+      });
+    }
   }
 
   getClient(): SupabaseClient {

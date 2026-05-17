@@ -1,21 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { getOrderStatusLabel } from '@app/features/orders/domain/value-objects/order-status.vo';
 
 @Pipe({
   name: 'orderStatus',
-  standalone: true
+  standalone: true,
 })
 export class OrderStatusPipe implements PipeTransform {
-
   transform(value: string | undefined | null): string {
-    if (!value) return '';
-    
-    const texts: Record<string, string> = {
-        pending: 'A Pagar',
-        processing: 'Abonado',
-        completed: 'Completado',
-        cancelled: 'Cancelado'
-    };
-
-    return texts[value] || value;
+    return getOrderStatusLabel(value);
   }
 }

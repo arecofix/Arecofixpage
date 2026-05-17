@@ -7,10 +7,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { combineLatest, map, switchMap, Subject } from 'rxjs';
+import { combineLatest, map, switchMap, Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TenantService } from '@app/core/services/tenant.service';
 
 import {
   IsErrorComponent,
@@ -49,6 +50,10 @@ export class ProductsFeaturedPage {
   public cartService: CartService = inject(CartService);
 
   private router = inject(Router);
+  private tenantService = inject(TenantService);
+
+  // Create observable in injection context (field initializer)
+  private tenant$ = toObservable(this.tenantService.currentTenant);
 
    // Search Signal and Subject
   searchQuery = signal('');
@@ -99,9 +104,15 @@ export class ProductsFeaturedPage {
     stream: () =>
       combineLatest([
         this.route.params.pipe(map(({ categorySlug }) => categorySlug)),
-        this.route.queryParams
+        this.route.queryParams,
+        this.tenant$
       ]).pipe(
-        switchMap(([slug, params]) => {
+        switchMap(([slug, params, tenant]) => {
+           if (!tenant) {
+             return of({
+               first: 1, prev: undefined, next: undefined, last: 1, pages: 1, items: 0, data: [],
+             });
+           }
            const currentPage = +params['_page'] || 1;
            const q = params['q'] || undefined;
 

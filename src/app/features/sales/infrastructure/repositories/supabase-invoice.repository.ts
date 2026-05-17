@@ -1,12 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { InvoiceRepository } from '../../domain/repositories/invoice.repository';
-import { Invoice } from '../../domain/entities/invoice.entity';
+import { Invoice, InvoiceOrigin } from '../../domain/entities/invoice.entity';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class SupabaseInvoiceRepository extends InvoiceRepository {
   private supabase = inject(SUPABASE_CLIENT);
 
@@ -24,7 +21,9 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
       .range(params.offset, params.offset + params.limit - 1);
 
     if (params.searchTerm) {
-      query = query.or(`customer_name.ilike.%${params.searchTerm}%,notes.ilike.%${params.searchTerm}%`);
+      query = query.or(
+        `customer_name.ilike.%${params.searchTerm}%,notes.ilike.%${params.searchTerm}%`
+      );
     }
 
     const { data, error } = await query;
@@ -32,17 +31,16 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
     return (data || []) as Invoice[];
   }
 
-  async getCount(params: {
-    tenantId: string;
-    searchTerm?: string;
-  }): Promise<number> {
+  async getCount(params: { tenantId: string; searchTerm?: string }): Promise<number> {
     let query = this.supabase
       .from('invoices')
       .select('*', { count: 'exact', head: true })
       .eq('tenant_id', params.tenantId);
 
     if (params.searchTerm) {
-      query = query.or(`customer_name.ilike.%${params.searchTerm}%,notes.ilike.%${params.searchTerm}%`);
+      query = query.or(
+        `customer_name.ilike.%${params.searchTerm}%,notes.ilike.%${params.searchTerm}%`
+      );
     }
 
     const { count, error } = await query;
@@ -59,7 +57,7 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
       .maybeSingle();
 
     if (error) throw error;
-    return data as Invoice;
+    return data as Invoice | null;
   }
 
   async getByOrderId(orderId: string, tenantId: string): Promise<Invoice | null> {
@@ -69,38 +67,48 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
       .eq('tenant_id', tenantId)
       .eq('order_id', orderId)
       .maybeSingle();
-    
+
     if (error) throw error;
-    return data as Invoice;
+    return data as Invoice | null;
   }
 
-  async create(invoice: any): Promise<{ data: Invoice | null; error: any }> {
-    const { data, error } = await this.supabase
-      .from('invoices')
-      .insert(invoice)
-      .select()
-      .single();
-    
+  async create(invoice: Record<string, unknown>): Promise<{ data: Invoice | null; error: unknown }> {
+    const { data, error } = await this.supabase.from('invoices').insert(invoice).select().single();
     return { data: data as Invoice, error };
   }
 
-  async getRelatedItems(params: {
-    type: 'sale' | 'order' | 'repair';
-    id: string;
+  async getLineItems(params: {
+    origin: InvoiceOrigin;
+    referenceId: string;
     tenantId: string;
-  }): Promise<any[]> {
-    const table = params.type === 'sale' ? 'sale_items' : 
-                  params.type === 'order' ? 'order_items' : null;
-    
-    if (!table) return [];
+    embeddedItems?: Invoice['items'];
+  }): Promise<unknown[]> {
+    if (params.origin === 'manual' || params.origin === 'sale') {
+      return params.embeddedItems ?? [];
+    }
 
-    const { data, error } = await this.supabase
-      .from(table)
-      .select('*, products(name)')
-      .eq(`${params.type}_id`, params.id)
-      .eq('tenant_id', params.tenantId);
+    if (params.origin === 'order') {
+      const { data, error } = await this.supabase
+        .from('order_items')
+        .select('*, products(name)')
+        .eq('order_id', params.referenceId)
+        .eq('tenant_id', params.tenantId);
 
-    if (error) throw error;
-    return data || [];
+      if (error) throw error;
+      return data || [];
+    }
+
+    if (params.origin === 'repair') {
+      const { data, error } = await this.supabase
+        .from('repair_parts_used')
+        .select('*, products(name)')
+        .eq('repair_id', params.referenceId)
+        .eq('tenant_id', params.tenantId);
+
+      if (error) throw error;
+      return data || [];
+    }
+
+    return params.embeddedItems ?? [];
   }
 }

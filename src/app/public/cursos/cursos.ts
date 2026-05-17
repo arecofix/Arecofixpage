@@ -1,9 +1,9 @@
-import { Component, OnInit, computed, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, computed, signal, inject, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { switchMap, timeout, catchError, of } from 'rxjs';
+import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, timeout, catchError, of, combineLatest } from 'rxjs';
 
 import { SeoService } from '@app/core/services/seo.service';
 import { CoursesService, Course } from '@app/core/services/courses.service';
@@ -11,6 +11,7 @@ import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
 import { PaginationService, iPagination } from '@app/shared/components/pagination';
 import { environment } from '../../../environments/environment';
+import { TenantService } from '@app/core/services/tenant.service';
 
 // Components
 import { ProductCard } from '@app/public/products/components';
@@ -37,7 +38,10 @@ export class CursosComponent implements OnInit {
     private coursesService = inject(CoursesService);
     private categoryService = inject(CategoryService);
     private productService = inject(ProductService);
+    private tenantService = inject(TenantService);
+    private destroyRef = inject(DestroyRef);
     public paginationService = inject(PaginationService);
+    private tenant$ = toObservable(this.tenantService.currentTenant);
 
     whatsappNumber = environment.contact.whatsappNumber;
     
@@ -93,9 +97,17 @@ export class CursosComponent implements OnInit {
             const sort = this.sort();
             const order = this.order();
 
-            return this.categoryService.getDataBySlug('repuestos/tools').pipe(
+            return combineLatest([
+                this.tenant$,
+            ]).pipe(
+                switchMap(([tenant]) => {
+                    if (!tenant) return of({ data: [], meta: { total: 0 } });
+                    return this.categoryService.getDataBySlug('repuestos/tools');
+                }),
                 switchMap(category => {
-                    if (!category.data?.[0]?.id) return of({ data: [], meta: { total: 0 } });
+                    if (!category || !('data' in category) || !category.data?.[0]?.id) {
+                        return of({ data: [], meta: { total: 0 } });
+                    }
                     
                     return this.productService.getData({
                         category_id: category.data[0].id,
@@ -119,7 +131,13 @@ export class CursosComponent implements OnInit {
 
     ngOnInit() {
         this.setSEO();
-        this.loadCourses();
+        this.tenant$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(tenant => {
+                if (tenant) {
+                    this.loadCourses();
+                }
+            });
     }
 
     setSEO() {

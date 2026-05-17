@@ -201,4 +201,25 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
             })
         );
     }
+
+    /** Bulk update scoped to current tenant (avoids cross-tenant writes). */
+    bulkUpdateByIds(ids: string[], payload: Partial<T>): Observable<void> {
+        if (!ids.length) return from(Promise.resolve());
+
+        let query = this.supabase.from(this.tableName).update(payload as any).in('id', ids);
+        query = this.applyTenantFilter(query);
+
+        return from(query).pipe(
+            map(({ error }) => {
+                if (error) {
+                    this.errorHandler.handleError(error, `bulkUpdate ${this.tableName}`, this.suppressAuthNotifications);
+                }
+            })
+        );
+    }
+
+    /** Soft-delete many rows (sets deleted_at) with tenant scope. */
+    bulkSoftDeleteByIds(ids: string[]): Observable<void> {
+        return this.bulkUpdateByIds(ids, { deleted_at: new Date().toISOString() } as unknown as Partial<T>);
+    }
 }

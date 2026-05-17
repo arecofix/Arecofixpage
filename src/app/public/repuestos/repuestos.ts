@@ -2,7 +2,7 @@ import { Component, inject, OnInit, OnDestroy, signal, computed, ChangeDetection
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { Observable, map, of, Subject, switchMap, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 // import { IsEmptyComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
@@ -17,6 +17,7 @@ import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { environment } from '../../../environments/environment';
 import { CartService } from '@app/shared/services/cart.service';
 import { SeoService } from '@app/core/services/seo.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
     selector: 'app-repuestos',
@@ -35,7 +36,11 @@ export class RepuestosComponent implements OnInit, OnDestroy {
     private brandRepo = inject(BrandRepository);
     private cartService = inject(CartService);
     private seoService = inject(SeoService);
+    private tenantService = inject(TenantService);
     public paginationService = inject(PaginationService);
+
+    // Create observable in injection context (field initializer)
+    private tenant$ = toObservable(this.tenantService.currentTenant);
 
     // Initial Data State
     categories = signal<iCategory[]>([]);
@@ -207,8 +212,15 @@ export class RepuestosComponent implements OnInit, OnDestroy {
             description: 'Encontrá todos los repuestos para tu celular: Módulos, Pantallas, Baterías, Pines de Carga y Herramientas. Envíos a todo el país.',
             imageUrl: 'assets/img/hero-illustration.svg'
         });
-        await this.loadCategories();
-        await this.loadBrands();
+        
+        this.tenant$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(async (tenant) => {
+                if (tenant) {
+                    await this.loadCategories();
+                    await this.loadBrands();
+                }
+            });
     }
 
     onSearch(term: string) {

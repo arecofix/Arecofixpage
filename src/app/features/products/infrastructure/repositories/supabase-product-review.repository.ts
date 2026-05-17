@@ -1,18 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-import { AuthService } from '@app/core/services/auth.service';
 import { ProductReview, ProductReviewBaseRepository } from '../../domain/repositories/product-review.repository';
+import { TenantScopedQueryService } from '@app/core/infrastructure/supabase/tenant-scoped-query.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class SupabaseProductReviewRepository extends ProductReviewBaseRepository {
-  private authService = inject(AuthService);
+  private scoped = inject(TenantScopedQueryService);
 
   async getByProductId(productId: string): Promise<ProductReview[]> {
-    const supabase = this.authService.getSupabaseClient();
-    const { data, error } = await supabase
-      .from('product_reviews')
-      .select('*')
+    const { data, error } = await this.scoped
+      .withTenantScope(this.scoped.from('product_reviews').select('*'))
       .eq('product_id', productId)
       .order('created_at', { ascending: false });
 
@@ -20,12 +16,11 @@ export class SupabaseProductReviewRepository extends ProductReviewBaseRepository
     return data || [];
   }
 
-  async create(review: ProductReview): Promise<{ error: any }> {
-    const supabase = this.authService.getSupabaseClient();
-    const { error } = await supabase
+  async create(review: ProductReview): Promise<{ error: unknown }> {
+    const { error } = await this.scoped
       .from('product_reviews')
-      .insert(review);
-    
+      .insert(this.scoped.withTenant({ ...review }));
+
     return { error };
   }
 }

@@ -4,14 +4,14 @@ import {
   computed,
   inject,
   signal,
-  effect
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, combineLatest, of } from 'rxjs';
+import { TenantService } from '@app/core/services/tenant.service';
 
 import { IsErrorComponent } from '@app/shared/components/resource-status';
 import { ProductService } from '@app/public/products/services';
@@ -42,6 +42,8 @@ export class ProductsAllPage {
   private productService: ProductService = inject(ProductService);
   public paginationService: PaginationService = inject(PaginationService);
   public cartService: CartService = inject(CartService);
+  private tenantService = inject(TenantService);
+  private tenant$ = toObservable(this.tenantService.currentTenant);
 
   // Search Signal and Subject for debounce
   searchQuery = signal('');
@@ -67,8 +69,16 @@ export class ProductsAllPage {
   }
 
   productsRs = rxResource({
-    stream: () => this.route.queryParams.pipe(
-      switchMap(params => {
+    stream: () => combineLatest([
+      this.route.queryParams,
+      this.tenant$,
+    ]).pipe(
+      switchMap(([params, tenant]) => {
+        if (!tenant) {
+          return of({
+            first: 1, prev: undefined, next: undefined, last: 1, pages: 1, items: 0, data: [],
+          });
+        }
         const currentPage = +params['_page'] || 1;
         const _sort = params['_sort'];
         const _order = params['_order'] as 'asc' | 'desc';

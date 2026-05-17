@@ -2,7 +2,9 @@ import { Injectable, inject, signal } from '@angular/core';
 import { OrderService } from './order.service';
 import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
-import { OrderStatus } from '../../domain/entities/order.entity';
+import { OrderStatus, TERMINAL_ORDER_STATUSES } from '../../domain/entities/order.entity';
+import { TenantService } from '@app/core/services/tenant.service';
+import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 import { interval, Subscription, firstValueFrom } from 'rxjs';
 
 export interface PaymentTicket {
@@ -20,6 +22,7 @@ export class PaymentService {
   private orderService    = inject(OrderService);
   private storageService  = inject(SupabaseStorageService);
   private supabase        = inject(SUPABASE_CLIENT);
+  private tenantService   = inject(TenantService);
 
   /** Signals for reactive UI updates */
   orderStatus = signal<OrderStatus | null>(null);
@@ -62,7 +65,7 @@ export class PaymentService {
       this.proofUploadUrl.set(url);
 
       // Transition order to AWAITING_VERIFICATION + save proof URL in one patch
-      await this.supabase
+      let query = this.supabase
         .from('orders')
         .update({
           status: 'awaiting_verification',
@@ -70,6 +73,12 @@ export class PaymentService {
           updated_at: new Date().toISOString(),
         })
         .eq('id', orderId);
+
+      const tenantId = this.tenantService.getTenantId();
+      if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+        query = query.eq('tenant_id', tenantId);
+      }
+      await query;
 
       // Also update the reactive status signal
       this.orderStatus.set('awaiting_verification');
@@ -91,8 +100,7 @@ export class PaymentService {
         const order = await firstValueFrom(this.orderService.getOrderById(orderId));
         if (order) {
           this.orderStatus.set(order.status);
-          const terminalStates: OrderStatus[] = ['paid', 'completed', 'cancelled', 'shipped', 'preparing'];
-          if (terminalStates.includes(order.status)) {
+          if (TERMINAL_ORDER_STATUSES.includes(order.status)) {
             this.stopPolling();
           }
         }
