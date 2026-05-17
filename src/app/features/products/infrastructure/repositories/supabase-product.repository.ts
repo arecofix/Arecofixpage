@@ -68,6 +68,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       selectFields += ', gallery_urls';
     }
 
+    // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET para buscar/listar):
+    // GET https://<TU_SUPABASE_URL>/rest/v1/products?select=...
     let baseQuery = this.supabase
       .from('products')
       .select(selectFields, { count: 'exact' });
@@ -252,6 +254,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       let updated = 0;
       let errors = 0;
       for (const item of updates) {
+        // 👇 EQUIVALENTE A POSTMAN (PETICIÓN PATCH/PUT para actualizar datos):
+        // PATCH https://<TU_SUPABASE_URL>/rest/v1/products?id=eq.<id>
         const { error } = await this.supabase
           .from('products')
           .update({ price: item.price, name: item.newName, updated_at: new Date().toISOString() })
@@ -271,6 +275,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
     const dataToUpsert = products.map(p => ({ ...p, tenant_id: this.tenantService.getTenantId(), updated_at: new Date().toISOString() }));
+    // 👇 EQUIVALENTE A POSTMAN (PETICIÓN POST para crear/upsert):
+    // POST https://<TU_SUPABASE_URL>/rest/v1/products
     return from((this.supabase.from('products').upsert(dataToUpsert).select() as any)).pipe(
       map(({ data, error }: any) => {
         if (error) this.errorHandler.handleError(error, 'upsertMany');
@@ -338,6 +344,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   rejectProduct(id: string): Observable<void> {
+    // 👇 EQUIVALENTE A POSTMAN (PETICIÓN DELETE para eliminar/rechazar):
+    // DELETE https://<TU_SUPABASE_URL>/rest/v1/products?id=eq.<id>
     const query = this.applyTenantFilter(this.supabase.from(this.tableName).delete())
       .eq('id', id);
     return from(query).pipe(map(() => void 0));

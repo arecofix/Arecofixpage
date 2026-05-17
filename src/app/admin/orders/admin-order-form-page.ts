@@ -13,6 +13,7 @@ import { ProductRepository } from '@app/features/products/domain/repositories/pr
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
 import { PricingService } from '@app/core/services/pricing.service';
 import { OrderWorkflowService } from '@app/features/orders/application/services/order-workflow.service';
+import { BranchService } from '@app/core/services/branch.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ProductOption {
@@ -29,7 +30,7 @@ interface ProductOption {
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, CurrencyPipe, DecimalPipe],
     templateUrl: './admin-order-form-page.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AdminOrderFormPage implements OnInit {
     private route = inject(ActivatedRoute);
@@ -43,6 +44,7 @@ export class AdminOrderFormPage implements OnInit {
     private fb = inject(FormBuilder);
     private cdr = inject(ChangeDetectorRef);
     private workflowService = inject(OrderWorkflowService);
+    private branchService = inject(BranchService);
     private destroyRef = inject(DestroyRef);
 
     orderForm!: FormGroup;
@@ -55,8 +57,8 @@ export class AdminOrderFormPage implements OnInit {
     private originalStatus: string | null = null; // Store original status
 
 
-    products: ProductOption[] = [];
-    clients: any[] = [];
+    products = signal<ProductOption[]>([]);
+    clients = signal<any[]>([]);
 
     // Product autocomplete state
     // Product autocomplete state
@@ -66,12 +68,12 @@ export class AdminOrderFormPage implements OnInit {
     private setupForm() {
         this.orderForm = this.fb.group({
             customer_name: ['', [Validators.required]],
-            customer_email: ['', [Validators.email]],
+            customer_email: [''],
             customer_phone: ['', [Validators.required]],
             shipping_address: this.fb.group({
-                street: ['', [Validators.required]],
-                number: ['', [Validators.required]],
-                city: ['Marcos Paz', [Validators.required]],
+                street: [''],
+                number: [''],
+                city: ['Marcos Paz'],
                 neighborhood: ['']
             }),
             status: ['pending'],
@@ -113,10 +115,10 @@ export class AdminOrderFormPage implements OnInit {
             const data = await this.customerService.getRecentClients(50);
             
             if (data) {
-                this.clients = data.map((c: any) => ({
+                this.clients.set(data.map((c: any) => ({
                     ...c,
                     displayName: c.full_name || `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email
-                }));
+                })));
             }
         } catch (e) {
             console.error('Error loading clients', e);
@@ -124,7 +126,7 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     onSelectClient(clientName: string) {
-        const client = this.clients.find(c => c.displayName === clientName);
+        const client = this.clients().find(c => c.displayName === clientName);
         if (client) {
             this.orderForm.patchValue({
                 customer_name: client.displayName,
@@ -132,8 +134,6 @@ export class AdminOrderFormPage implements OnInit {
                 customer_phone: client.phone,
                 shipping_address: typeof client.address === 'string' ? { street: client.address } : (client.address || {})
             });
-        } else {
-            this.orderForm.patchValue({ customer_name: clientName });
         }
     }
 
@@ -141,14 +141,14 @@ export class AdminOrderFormPage implements OnInit {
         return new Promise<void>((resolve) => {
             this.productRepository.findAvailable().subscribe({
                 next: (products: any[]) => {
-                    this.products = products.map((p: any) => ({
+                    this.products.set(products.map((p: any) => ({
                         id: p.id,
                         name: p.name,
                         sku: p.sku || '',
                         price: p.price,
                         unit_cost_at_time: p.unit_cost_at_time || 0,
                         stock: p.stock || 0
-                    }));
+                    })));
                     resolve();
                 },
                 error: (err: any) => {
@@ -229,7 +229,7 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     onSearchProduct(index: number, nameQuery: string) {
-        const product = this.products.find(p => p.name === nameQuery);
+        const product = this.products().find(p => p.name === nameQuery);
         const itemGroup = this.items.at(index) as FormGroup;
 
         if (product) {
@@ -287,24 +287,41 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     async save() {
+        console.log('[AdminOrderForm] SAVE BUTTON CLICKED');
+        
+        console.log('[AdminOrderForm] Starting save process...');
+        console.log('[AdminOrderForm] Form status:', this.orderForm.status);
+        
         if (this.orderForm.invalid) {
+            console.warn('[AdminOrderForm] Form is invalid:', this.getFormValidationErrors());
             this.orderForm.markAllAsTouched();
-            this.error = 'Por favor, completa los campos requeridos correctamente.';
+            this.error = 'El formulario contiene errores. Por favor, revisa los campos marcados en rojo.';
             this.cdr.markForCheck();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
         if (this.items.length === 0) {
-            this.error = 'Debes agregar al menos un producto';
+            this.error = 'Debes agregar al menos un producto al pedido.';
             this.cdr.markForCheck();
             return;
         }
 
         this.saving = true;
         this.error = null;
+        this.cdr.markForCheck();
 
         try {
             const orderToSave = this.orderForm.getRawValue();
+            
+            // Critical: Ensure branch context for data isolation
+            if (!orderToSave.branch_id) {
+                const effectiveId = await this.branchService.resolveEffectiveBranchId();
+                if (effectiveId) {
+                    orderToSave.branch_id = effectiveId;
+                }
+            }
+
             let result;
             
             if (this.id) {
@@ -364,9 +381,9 @@ export class AdminOrderFormPage implements OnInit {
 
     getFilteredProducts(index: number): ProductOption[] {
         const query = this.productSearchQueries()[index] || '';
-        if (!query) return this.products;
+        if (!query) return this.products();
         
-        return this.products.filter(product => 
+        return this.products().filter(product => 
             product.name.toLowerCase().includes(query) ||
             product.sku.toLowerCase().includes(query) ||
             product.price.toString().includes(query)
@@ -400,4 +417,38 @@ export class AdminOrderFormPage implements OnInit {
         this.calculateTotals();
     }
 
+    // Helper to debug form errors
+    private getFormValidationErrors() {
+        const errors: any = {};
+        Object.keys(this.orderForm.controls).forEach(key => {
+            const control = this.orderForm.get(key);
+            const controlErrors = control?.errors;
+            if (controlErrors != null) {
+                errors[key] = controlErrors;
+            }
+            if (control instanceof FormGroup) {
+                const groupErrors: any = {};
+                Object.keys(control.controls).forEach(k => {
+                    const err = control.get(k)?.errors;
+                    if (err) groupErrors[k] = err;
+                });
+                if (Object.keys(groupErrors).length > 0) {
+                    errors[key] = groupErrors;
+                }
+            }
+            if (control instanceof FormArray) {
+                control.controls.forEach((group, i) => {
+                    const groupErrors: any = {};
+                    Object.keys((group as FormGroup).controls).forEach(k => {
+                        const err = group.get(k)?.errors;
+                        if (err) groupErrors[k] = err;
+                    });
+                    if (Object.keys(groupErrors).length > 0) {
+                        errors[`item_${i}`] = groupErrors;
+                    }
+                });
+            }
+        });
+        return errors;
+    }
 }

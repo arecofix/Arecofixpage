@@ -18,19 +18,20 @@
         </div>
         
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <button type="button" (click)="save()" [disabled]="saving || orderForm.invalid" class="btn w-full sm:w-auto bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none rounded-2xl shadow-lg shadow-emerald-500/30 transform hover:-translate-y-0.5 transition-all">
-                 @if (saving) {
-                    <span class="loading loading-spinner loading-xs mr-2"></span> Guardando...
-                 } @else {
-                    <i class="fas fa-save mr-1 opacity-80"></i> Guardar
-                 }
-            </button>
+            <!-- Botón movido al final del resumen para mejor flujo -->
         </div>
     </div>
 
     <!-- Form Container -->
     <div class="max-w-5xl mx-auto animate-fade-in-up" style="animation-delay: 100ms;">
         <form [formGroup]="orderForm" (ngSubmit)="save()" class="space-y-6">
+            
+            @if (error) {
+            <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 p-4 rounded-r-xl flex items-center gap-3 animate-fade-in text-red-700 dark:text-red-400">
+                <i class="fas fa-exclamation-circle text-xl"></i>
+                <span class="font-medium text-sm">{{ error }}</span>
+            </div>
+            }
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Content (Left, 2 cols wide) -->
@@ -49,16 +50,16 @@
                                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
                                     <input type="text" 
                                         formControlName="customer_name"
-                                        (ngModelChange)="onSelectClient($event)"
+                                        (input)="onSelectClient($any($event.target).value)"
                                         class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-gray-800 dark:text-gray-200"
                                         list="clients-list"
                                         placeholder="Buscar por nombre o escribir uno nuevo..."
                                         required />
                                     <datalist id="clients-list">
-                                        @for (client of clients; track client.id) {
-                                            <option [value]="client.displayName">{{ client.email }}</option>
-                                        }
-                                    </datalist>
+                                         @for (client of clients(); track client.id) {
+                                             <option [value]="client.displayName">{{ client.email }}</option>
+                                         }
+                                     </datalist>
                                 </div>
                             </div>
 
@@ -126,8 +127,7 @@
                                       <div class="flex-1 w-full sm:w-auto relative">
                                           <input type="text"
                                             formControlName="product_name"
-                                            (ngModelChange)="onSearchProduct(idx, $event)"
-                                            (input)="onProductInput(idx, $any($event.target).value)"
+                                            (input)="onProductInput(idx, $any($event.target).value); onSearchProduct(idx, $any($event.target).value)"
                                             (focus)="onProductFocus(idx)"
                                             (blur)="onProductBlur(idx)"
                                             class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-fuchsia-500/20 focus:border-fuchsia-500 transition-all text-gray-800 dark:text-white"
@@ -158,7 +158,7 @@
                                       </div>
                                       
                                       <div class="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-                                          <input type="number" formControlName="quantity" (ngModelChange)="onQuantityChange(idx)"
+                                          <input type="number" formControlName="quantity" (change)="onQuantityChange(idx)"
                                             min="1"
                                             class="w-20 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-sm font-bold focus:ring-2 focus:ring-fuchsia-500/20 focus:border-fuchsia-500 transition-all text-gray-800 dark:text-white" />
                                             
@@ -166,7 +166,7 @@
                                           
                                           <div class="relative w-28">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                                            <input type="number" formControlName="unit_price" (ngModelChange)="onUnitPriceChange(idx)"
+                                            <input type="number" formControlName="unit_price" (change)="onUnitPriceChange(idx)"
                                                 min="0" step="0.01"
                                                 class="w-full pl-6 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-right text-sm font-bold focus:ring-2 focus:ring-fuchsia-500/20 focus:border-fuchsia-500 transition-all text-gray-800 dark:text-white" />
                                           </div>
@@ -201,7 +201,7 @@
                         <div class="space-y-5">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Estado del Pedido</label>
-                                <select formControlName="status" (ngModelChange)="updateStatus($event)" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 dark:text-white cursor-pointer appearance-none">
+                                <select formControlName="status" (change)="updateStatus($any($event.target).value)" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 dark:text-white cursor-pointer appearance-none">
                                     <option value="pending">⏳ Pendiente</option>
                                     <option value="paid">✅ Pagado</option>
                                     <option value="shipped">🚚 Enviado</option>
@@ -238,7 +238,7 @@
                                      <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Aplicar Descuento</label>
                                      <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                                        <input type="number" formControlName="discount" (ngModelChange)="calculateTotals()"
+                                        <input type="number" formControlName="discount" (change)="calculateTotals()"
                                             min="0" step="0.01" class="w-full bg-gray-900 border border-gray-600 rounded-xl py-2 pl-7 pr-3 text-white focus:outline-none focus:border-blue-500 font-bold text-right transition-colors" placeholder="0.00" />
                                      </div>
                                 </div>
@@ -268,6 +268,19 @@
                                         </div>
                                     </div>
                                 </div>
+                             </div>
+                             
+                             <!-- Action Button inside Receipt -->
+                             <div class="mt-6 relative z-50">
+                                 <button type="button" (mousedown)="save()" (click)="save(); $event.stopPropagation()" [disabled]="saving" 
+                                     class="btn w-full bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-2xl shadow-lg shadow-emerald-500/20 py-4 h-auto text-lg font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95"
+                                     style="border: 4px solid #10b981 !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);">
+                                     @if (saving) {
+                                         <span class="loading loading-spinner loading-md"></span>
+                                     } @else {
+                                         <i class="fas fa-check-circle mr-2"></i> FINALIZAR PEDIDO
+                                     }
+                                 </button>
                              </div>
                          </div>
                     </div>

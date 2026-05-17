@@ -25,10 +25,13 @@ import { ContactService } from '@app/core/services/contact.service';
 import { ProductService } from '@app/public/products/services/product.service';
 import { ProfileService } from '@app/core/services/profile.service';
 import { BranchService } from '@app/core/services/branch.service';
-import { firstValueFrom } from 'rxjs';
+import { ShippingService, ShippingQuote } from '@app/features/orders/application/services/shipping.service';
+import { GetnetService } from '@app/features/orders/application/services/getnet.service';
+import { Product } from '@app/features/products/domain/entities/product.entity';
+import { firstValueFrom, debounceTime, distinctUntilChanged } from 'rxjs';
 
-type CheckoutStep = 'form' | 'payment_method' | 'pending_payment' | 'awaiting_verification' | 'paid';
-type PaymentMethodChoice = 'digital' | 'cash';
+type CheckoutStep = 'form' | 'payment_method' | 'pending_payment' | 'awaiting_verification' | 'paid' | 'getnet_redirect';
+type PaymentMethodChoice = 'digital' | 'cash' | 'credit_card';
 
 @Component({
   selector: 'app-checkout-page',
@@ -49,6 +52,8 @@ export class CheckoutPage implements OnInit, OnDestroy {
   router          = inject(Router);
   notificationService = inject(NotificationService);
   branchService   = inject(BranchService);
+  shippingService = inject(ShippingService);
+  getnetService   = inject(GetnetService);
 
   // ── Form ───────────────────────────────────────────────
   checkoutForm: FormGroup = this.fb.group({
@@ -73,6 +78,12 @@ export class CheckoutPage implements OnInit, OnDestroy {
   paymentTicket      = signal<PaymentTicket | null>(null);
   proofFile          = signal<File | null>(null);
   proofPreviewUrl    = signal<string | null>(null);
+  shippingQuote      = signal<ShippingQuote | null>(null);
+  isCalculatingShipping = signal<boolean>(false);
+  getnetPaymentUrl   = signal<string | null>(null);
+  
+  // Cross-selling
+  recommendedProducts = signal<Product[]>([]);
 
   // ── Reservation countdown (15 min = 900 s) ─────────────
   reservationSeconds = signal(900);
@@ -97,6 +108,54 @@ export class CheckoutPage implements OnInit, OnDestroy {
     if (user?.email) {
       this.checkoutForm.patchValue({ email: user.email });
     }
+
+    // Subscribe to postal code changes to calculate shipping
+    this.checkoutForm.get('address.postal_code')?.valueChanges.pipe(
+      debounceTime(800),
+      distinctUntilChanged()
+    ).subscribe(cp => {
+      if (cp && cp.length === 4) {
+        this.calculateShipping(cp);
+      } else {
+        this.shippingQuote.set(null);
+      }
+    });
+
+    // Check initial value if exists
+    const initialCp = this.checkoutForm.get('address.postal_code')?.value;
+    if (initialCp && initialCp.length === 4) {
+      this.calculateShipping(initialCp);
+    }
+
+    // Load cross-selling items
+    this.productService.getData({ _page: 1 }).subscribe(res => {
+      // Filter out items already in the cart
+      const inCartIds = this.cartService.cartItems().map(i => i.product.id);
+      const suggestions = (res.data || []).filter(p => !inCartIds.includes(p.id)).slice(0, 3);
+      this.recommendedProducts.set(suggestions as any);
+    });
+  }
+
+  addRecommendedToCart(product: Product) {
+    this.cartService.addToCart(product);
+    this.notificationService.showSuccess(`${product.name} agregado al pedido.`);
+    // Remove from suggestions
+    this.recommendedProducts.update(list => list.filter(p => p.id !== product.id));
+  }
+
+  private calculateShipping(cp: string) {
+    this.isCalculatingShipping.set(true);
+    const cartTotal = this.cartService.totalPrice();
+    this.shippingService.calculateShipping(cp, cartTotal).subscribe({
+      next: (quote) => {
+        this.shippingQuote.set(quote);
+        this.isCalculatingShipping.set(false);
+      },
+      error: () => {
+        this.shippingQuote.set(null);
+        this.isCalculatingShipping.set(false);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -135,7 +194,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
     const formVal    = this.checkoutForm.getRawValue();
     const cartItems  = this.cartService.cartItems();
-    const total      = this.cartService.totalPrice();
+    const subtotal   = this.cartService.totalPrice();
+    const shippingCost = this.shippingQuote()?.cost || 0;
+    const total      = subtotal + shippingCost;
 
     const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city} (CP: ${formVal.address.postal_code})`;
 
@@ -145,10 +206,11 @@ export class CheckoutPage implements OnInit, OnDestroy {
       customer_phone:   formVal.phone,
       shipping_address: formVal.address,
       status:           'pending_payment',
-      subtotal:         total,
+      subtotal:         subtotal,
       tax:              0,
       discount:         0,
       total,
+      total_amount:     total,
       payment_method:   method,
       notes:            formVal.notes,
       user_id:          this.authService.getCurrentUser()?.id,
@@ -182,7 +244,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
         email:   formVal.email,
         phone:   formVal.phone,
         subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
-        message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : 'Efectivo (Rapipago/PagoFácil)'}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
+        message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : (method === 'credit_card' ? 'Tarjeta (Getnet)' : 'Efectivo (Rapipago/PagoFácil)')}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
       }).catch((e: any) => console.warn('Contact message error (non-fatal):', e));
 
       if (method === 'cash') {
@@ -193,6 +255,11 @@ export class CheckoutPage implements OnInit, OnDestroy {
         );
         this.paymentTicket.set(ticket);
         this.step.set('pending_payment');
+      } else if (method === 'credit_card') {
+        // GETNET INTEGRATION
+        const intent = await firstValueFrom(this.getnetService.createPaymentIntent(created.id!, total, formVal.name));
+        this.getnetPaymentUrl.set(intent.paymentUrl);
+        this.step.set('getnet_redirect');
       } else {
         // Digital: show instructions to complete payment externally
         this.step.set('pending_payment');

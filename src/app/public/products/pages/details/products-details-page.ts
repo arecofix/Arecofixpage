@@ -35,6 +35,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { ProductReviewBaseRepository } from '@app/features/products/domain/repositories/product-review.repository';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ProductStrategicService } from '@app/core/services/product-strategic.service';
+import { ShippingService, ShippingQuote } from '@app/features/orders/application/services/shipping.service';
 /*  */
 
 
@@ -69,6 +70,7 @@ export class ProductsDetailsPage {
   private reviewRepository = inject(ProductReviewBaseRepository);
   private destroyRef = inject(DestroyRef);
   private strategicService = inject(ProductStrategicService);
+  private shippingService = inject(ShippingService);
 
   // UI Constants
   starRating = [1, 2, 3, 4, 5];
@@ -78,6 +80,43 @@ export class ProductsDetailsPage {
   newReview = signal({ name: '', comment: '', rating: 5 });
   isSubmittingReview = signal(false);
 
+  // Auth-aware review: auto-detect logged-in user for reviews
+  isLoggedIn = computed(() => !!this.authService.getCurrentUser());
+  
+  currentUserName = computed(() => {
+    const profile = this.authService.getCurrentProfile();
+    if (profile) {
+      return profile.full_name || profile.display_name || 
+             [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
+             profile.email?.split('@')[0] || '';
+    }
+    return '';
+  });
+
+
+  // Shipping Calculator
+  postalCode = signal('');
+  shippingQuote = signal<ShippingQuote | null>(null);
+  isCalculatingShipping = signal(false);
+
+  calculateShipping() {
+    const cp = this.postalCode();
+    const product = this.product();
+    
+    if (cp && cp.length === 4 && product) {
+      this.isCalculatingShipping.set(true);
+      this.shippingService.calculateShipping(cp, product.price).subscribe({
+        next: (quote) => {
+          this.shippingQuote.set(quote);
+          this.isCalculatingShipping.set(false);
+        },
+        error: () => {
+          this.shippingQuote.set(null);
+          this.isCalculatingShipping.set(false);
+        }
+      });
+    }
+  }
 
   loadReviews(productId: string) {
       this.reviewRepository.getByProductId(productId)
@@ -93,7 +132,10 @@ export class ProductsDetailsPage {
       if (this.isSubmittingReview()) return;
 
       const reviewData = this.newReview();
-      if (!reviewData.name || !reviewData.comment) {
+      // Use authenticated user name if available, otherwise use the form input
+      const userName = this.isLoggedIn() ? this.currentUserName() : reviewData.name;
+      
+      if (!userName || !reviewData.comment) {
           this.notificationService.showWarning("Por favor completa tu nombre y comentario.");
           return;
       }
@@ -103,7 +145,7 @@ export class ProductsDetailsPage {
       const { error } = await this.reviewRepository.create({
           tenant_id: this.tenantService.getTenantId(),
           product_id: product.id,
-          user_name: reviewData.name,
+          user_name: userName,
           comment: reviewData.comment,
           rating: reviewData.rating
       });
@@ -244,9 +286,8 @@ export class ProductsDetailsPage {
       
       // Validation: Ensure we don't use detail pages OR non-images as OG images
       const isRecursive = absoluteImageUrl.includes('/detalle/') || absoluteImageUrl.includes('/posts/');
-      const hasImageExt = /\.(jpg|jpeg|png|webp|gif|svg|ico)/i.test(absoluteImageUrl);
 
-      if (!absoluteImageUrl || isRecursive || (!absoluteImageUrl.startsWith('http') && !hasImageExt)) {
+      if (!absoluteImageUrl || isRecursive) {
         absoluteImageUrl = `assets/img/branding/og-services.jpg`;
       }
 

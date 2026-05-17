@@ -163,12 +163,10 @@ export class SeoService {
     // --- Critical Validation: Prevent Recursive or Broken URLs ---
     // 1. Never use the same URL for page and image (Facebook Crawler error)
     // 2. Never use dynamic routes as images (prevents HTML-as-image error)
-    // 3. Ensure extensions are likely image extensions
     const normalize = (u: string) => u.toLowerCase().replace(/\/$/, '');
     const isDynamic = finalImageUrl.includes('/detalle/') || finalImageUrl.includes('/posts/') || finalImageUrl.includes('/tracking/');
-    const hasImageExt = /\.(jpg|jpeg|png|webp|gif|svg|ico)/i.test(finalImageUrl);
     
-    if (normalize(finalImageUrl) === normalize(finalUrl) || isDynamic || !hasImageExt) {
+    if (normalize(finalImageUrl) === normalize(finalUrl) || isDynamic) {
         if (isPlatformServer(this.platformId)) {
           console.warn(`[SEO] Warning: Invalid Image URL detected: ${finalImageUrl}. Falling back to default branding.`);
         }

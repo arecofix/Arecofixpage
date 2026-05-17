@@ -19,7 +19,7 @@
           'facebook', 'gtm', 'gtag', 'user-agent-client-hints', 'permissions-policy', 
           'unrecognized feature', 'private-state-token', 'join-ad-interest-group', 
           'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
-          'attribution-reporting', 'fbevents'
+          'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq'
         ];
         const isNoise = (args) => {
           const msg = args.map(a => { 
@@ -49,6 +49,15 @@
             e.preventDefault(); 
           } 
         }, true);
+
+        // Suppress specific library noise that bypasses standard listeners
+        if (window.console) {
+            const _err = console.error;
+            console.error = function() {
+                if (isNoise(Array.from(arguments))) return;
+                _err.apply(console, arguments);
+            };
+        }
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -99,8 +108,9 @@
       />
     </noscript>
     <!-- Security & Policy Headers -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), attribution-reporting=(*)" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
 
 
 

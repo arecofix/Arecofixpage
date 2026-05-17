@@ -107,6 +107,8 @@ export class TenantService {
     // console.debug(`Resolving tenant for hostname: ${hostname}`);
     try {
       // 1. Buscamos primero si el negocio configuró un Custom Domain (Ej: mibau.com.ar)
+      // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET):
+      // GET https://<TU_SUPABASE_URL>/rest/v1/tenants?select=*&custom_domain=eq.<hostname>&is_active=eq.true
       let { data, error } = await this.supabase
         .from('tenants')
         .select('*')
@@ -116,7 +118,7 @@ export class TenantService {
 
       if (error) {
         this.logger.error(`Database error resolving custom domain: ${error.message}`, error);
-        throw new DatabaseError(error.message, error);
+        // Do not throw, allow fallback mechanism below to handle offline/missing credentials
       }
 
       // 2. Si no es dominio custom, asumimos subdominio (Ej: mitienda.arecofix.com.ar)
@@ -138,7 +140,7 @@ export class TenantService {
 
         if (slugError) {
            this.logger.error(`Database error resolving slug ${slugToSearch}: ${slugError.message}`, slugError);
-           throw new DatabaseError(slugError.message, slugError);
+           // Do not throw, proceed to fallback
         }
 
         if (slugData) {

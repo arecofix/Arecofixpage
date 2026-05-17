@@ -26,11 +26,11 @@ export const environment: Environment = {
   // Analytics Configuration Removed
 
   // WhatsApp Configuration
-  whatsappToken: 'EAARLwIJnO30BQJVYYg23XHI8YlOxew5mmmNrQJT5ZCbKj27RmMxVPslyaTfYKnJA4P5JZCk80JwnzOgZCF0zR5ZC2gDRm6TidoX0jHVE9rp77QHcehimvSmZClobDmSZAGXVv7NyK5RGuSZBbh5Fie1ykDfxeGw7NZCR2DkJabcZB6odycEjRgeBjEMqA9587UPZAPzVoPZAquACqZA0et2Q0pWcZCYDX3gsZC2VY6tlJ86oM5o7AEmaKDbUtveRLRAAAZCaa77S2MOerzRZCP4c394xVYQVH0RVyf9j5plybQZDZD',
-  metaMarketingToken: 'EAARLwIJnO30BREkyWb8kskqnhZAkkZCrD11Rp28ZAjOqSKZBL6YFu0ynij4dwcYgDqxSv5XAEFPkXBC1ZApvgFTZCPPv0syoXNguZB8IqZAelKOqnacADPNGykO3l4P3h0wYZBzHmT8RTCBxUGSxqkXB20tfoD9X8triw62SrbtVtBxDS2zykcmEsoOXc4kRYoJ3qDHu97ZB0w',
-  whatsappPhoneNumberId: '322928504245092',
-  whatsappBusinessAccountId: '368379263021902',
-  whatsappAppId: '1209190100450173',
+  whatsappToken: 'YOUR_WHATSAPP_TOKEN',
+  metaMarketingToken: 'YOUR_META_MARKETING_TOKEN',
+  whatsappPhoneNumberId: 'YOUR_WHATSAPP_PHONE_NUMBER_ID',
+  whatsappBusinessAccountId: 'YOUR_WHATSAPP_BUSINESS_ACCOUNT_ID',
+  whatsappAppId: 'YOUR_WHATSAPP_APP_ID',
   whatsappApiUrl: 'https://graph.facebook.com/v22.0',
 
   // Contact Information

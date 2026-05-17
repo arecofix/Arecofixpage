@@ -9,6 +9,7 @@ import { environment } from './src/environments/environment';
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
+  server.disable('x-powered-by'); // Prevent backend stack leakage
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
@@ -17,12 +18,6 @@ export function app(): express.Express {
 
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
-
-  // Serve static files from /browser
-  server.use(express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: false
-  }));
 
   // Dynamic Sitemap optimized for Google Search Console
   server.get('/sitemap.xml', async (req, res) => {
@@ -342,6 +337,12 @@ export function app(): express.Express {
       return res.status(500).send('Internal Server Error');
     }
   });
+
+  // Serve static files from /browser AFTER dynamic routes
+  server.use(express.static(browserDistFolder, {
+    maxAge: '1y',
+    index: false
+  }));
 
   // All regular routes use the Angular Engine
   server.get(/(.*)/, (req, res, next) => {

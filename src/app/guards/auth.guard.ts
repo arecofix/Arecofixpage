@@ -79,7 +79,9 @@ export const noAuthGuard: CanActivateFn = async (route, state) => {
   const authState = await firstValueFrom(
     authService.authState$.pipe(
       filter(state => state.isInitialized),
-      take(1)
+      take(1),
+      timeout(5000),
+      catchError(() => of({ session: null, user: null, profile: null, isInitialized: true }))
     )
   );
 

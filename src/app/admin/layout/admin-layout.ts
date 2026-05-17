@@ -147,7 +147,7 @@ export class AdminLayout implements OnInit, OnDestroy {
         module: 'inventory',
         expanded: true,
         children: [
-          { title: 'Catálogo Maestro', path: `${basePrefix}/products`, icon: 'fa-barcode' },
+          { title: 'Gestión de Productos', path: `${basePrefix}/products`, icon: 'fa-barcode' },
           { title: 'Stock & Almacén', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
           { title: 'Audit Catálogo Meta', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
           { title: 'Categorías de Venta', path: `${basePrefix}/categories`, icon: 'fa-tags' },
