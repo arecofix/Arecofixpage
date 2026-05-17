@@ -125,8 +125,8 @@ export class TenantService {
       if (!data) {
         const extractSubdomain = hostname.split('.')[0];
         
-        // En localhost o dominio principal, buscamos un tenant base
-        const slugToSearch = (hostname.includes('localhost') || hostname === 'arecofix.com.ar' || hostname === 'www.arecofix.com.ar') 
+        // En localhost, dominios principales o subdominios por defecto de Firebase, buscamos el tenant base
+        const slugToSearch = this.isMainDomain() 
           ? 'arecofix' 
           : extractSubdomain;
 
