@@ -24,12 +24,12 @@ export const environment: Environment = {
 
   authRedirectUrl: 'https://arecofix.com.ar',
   enableProfileUpsert: false,
-  posthogKey: 'YOUR_POSTHOG_KEY',
+  posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
   // WhatsApp Configuration
-  whatsappPhoneNumberId: 'YOUR_WHATSAPP_PHONE_NUMBER_ID',
-  whatsappBusinessAccountId: 'YOUR_WHATSAPP_BUSINESS_ACCOUNT_ID',
-  whatsappAppId: 'YOUR_WHATSAPP_APP_ID',
+  whatsappPhoneNumberId: '322928504245092',
+  whatsappBusinessAccountId: '368379263021902',
+  whatsappAppId: '1209190100450173',
   whatsappApiUrl: 'https://graph.facebook.com/v22.0',
 
   // Contact Information
@@ -73,13 +73,13 @@ export const environment: Environment = {
     }
   },
   firebase: {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
-    databaseURL: "YOUR_FIREBASE_DATABASE_URL",
-    projectId: "YOUR_FIREBASE_PROJECT_ID",
-    storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-    appId: "YOUR_FIREBASE_APP_ID",
-    measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
+    apiKey: "AIzaSyDyX9CdSDY8gGKetZZdcq1aOhEWMdqLWyI",
+    authDomain: "arecofix-20698.firebaseapp.com",
+    databaseURL: "https://arecofix-20698-default-rtdb.firebaseio.com",
+    projectId: "arecofix-20698",
+    storageBucket: "arecofix-20698.firebasestorage.app",
+    messagingSenderId: "106654865765",
+    appId: "1:106654865765:web:7dc07179d0f67536e2e98c",
+    measurementId: "G-812SLQ7KEJ"
   }
 };
