@@ -64,7 +64,11 @@ export class CategoryService {
         return this.processResponse(normalizedData, count, { _page, _per_page });
       }),
       catchError((err) => {
-        this.logger.error('Supabase Error:', err);
+        if (err?.code === '42501') {
+          this.logger.warn('Supabase categories query deferred (RLS restriction):', err.message);
+        } else {
+          this.logger.error('Supabase Error:', err);
+        }
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
       })
     );
@@ -92,7 +96,11 @@ export class CategoryService {
         return this.processResponse(normalizedData, count, { _page, _per_page });
       }),
       catchError((err) => {
-        this.logger.error('Supabase Error:', err);
+        if (err?.code === '42501') {
+          this.logger.warn('Supabase featured categories query deferred (RLS restriction):', err.message);
+        } else {
+          this.logger.error('Supabase Error:', err);
+        }
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
       })
     );
@@ -119,7 +127,11 @@ export class CategoryService {
     ).pipe(
       switchMap(({ data, error }) => {
         if (error) {
-          this.logger.error('Supabase Error (exact slug):', error);
+          if (error.code === '42501') {
+            this.logger.warn('Supabase exact slug categories query deferred (RLS restriction):', error.message);
+          } else {
+            this.logger.error('Supabase Error (exact slug):', error);
+          }
           return of({ data: [] as iCategory[], error });
         }
         if (data && data.length > 0) {
@@ -151,7 +163,11 @@ export class CategoryService {
         return this.processResponse(data || [], data?.length ?? 0, { _page: 1, _per_page: 1 });
       }),
       catchError((err) => {
-        this.logger.error('Supabase Error (slug lookup):', err);
+        if (err?.code === '42501') {
+          this.logger.warn('Supabase slug lookup categories query deferred (RLS restriction):', err.message);
+        } else {
+          this.logger.error('Supabase Error (slug lookup):', err);
+        }
         return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
       })
     );

@@ -21,7 +21,11 @@ export class SupabaseErrorHandlerService {
     const code = error?.code || '';
 
     // Log for developers
-    this.logger.error(`[SupabaseError][${context}] ${message}`, { code, details, error });
+    if (suppressNotification) {
+      this.logger.warn(`[SupabaseError][${context}] (Suppressed) ${message}`, { code, details });
+    } else {
+      this.logger.error(`[SupabaseError][${context}] ${message}`, { code, details, error });
+    }
 
     // User-friendly message mapping
     let userMessage = 'No se pudo completar la operación.';
