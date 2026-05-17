@@ -9,7 +9,8 @@ export const branchSlugMatcher: UrlMatcher = (segments: UrlSegment[], group: Url
   const reservedSlugs = [
     'admin', 'login', 'register', 'perfil', 'nosotros', 'contacto', 
     'servicios', 'academy', 'checkout', 'posts', 'tracking', 'blog', 
-    'portfolio', 'productos', 'categories', 'repuestos', 'gsm', 'fixtecnicos', 'recursos'
+    'portfolio', 'productos', 'categories', 'repuestos', 'gsm', 'fixtecnicos', 'recursos',
+    'celular', 'diagnostico', 'privacy', 'terms', 'sitemap', 'zona-norte'
   ];
 
   const slug = segments[0].path.toLowerCase();
