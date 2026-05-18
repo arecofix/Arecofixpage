@@ -7,6 +7,20 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+## 📸 Capturas
+
+<p align="center">
+  <img src="public/assets/img/readme/gestiondesucursales.png" alt="Gestión de sucursales" width="320" />
+  <img src="public/assets/img/readme/1.png" alt="Vista 1" width="320" />
+  <img src="public/assets/img/readme/2-1.png" alt="Vista 2" width="320" />
+</p>
+
+<p align="center">
+  <img src="public/assets/img/readme/4.png" alt="Vista 4" width="320" />
+  <img src="public/assets/img/readme/5.png" alt="Vista 5" width="320" />
+  <img src="public/assets/img/readme/6.png" alt="Vista 6" width="320" />
+</p>
+
 ---
 
 ## 📋 Descripción
