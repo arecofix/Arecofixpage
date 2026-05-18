@@ -1,68 +1,253 @@
-<div class="container mx-auto p-6">
+<div class="min-h-screen bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+  
+  <!-- ================= ESTADO: CARGANDO ================= -->
   @if (loading) {
-    <div class="alert alert-info">Cargando perfil...</div>
+    <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div class="w-12 h-12 border-4 border-slate-700 border-t-amber-500 rounded-full animate-spin"></div>
+      <p class="text-slate-400 font-medium animate-pulse">Cargando tu información de forma segura...</p>
+    </div>
   }
 
+  <!-- ================= ESTADO: NO LOGUEADO ================= -->
   @if (!loading && !isLoggedIn) {
-    <div class="text-center space-y-4">
-      <h1 class="text-2xl font-bold">No estás logueado</h1>
-      <p class="text-gray-600">Para ver tu perfil, por favor inicia sesión o regístrate.</p>
-      <div class="flex gap-4 justify-center">
-        <a routerLink="/login" class="btn btn-primary">Iniciar sesion</a>
-        <a routerLink="/register" class="btn btn-secondary">Registrarse</a>
+    <div class="max-w-md mx-auto mt-12 bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
+      <!-- Glow background -->
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <div class="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-700 shadow-inner">
+          <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h1 class="text-2xl font-extrabold text-white mb-2">Accedé a tu cuenta</h1>
+        <p class="text-slate-400 text-sm mb-8 leading-relaxed">
+          Iniciá sesión para gestionar tus reparaciones, ver tus <strong class="text-amber-400">Puntos Acumulados</strong> y acceder a descuentos exclusivos.
+        </p>
+        <div class="flex flex-col gap-3">
+          <a routerLink="/login" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-amber-500/20">
+            Iniciar Sesión
+          </a>
+          <a routerLink="/register" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition-all">
+            Crear una cuenta gratis
+          </a>
+        </div>
       </div>
     </div>
   }
 
+  <!-- ================= ESTADO: LOGUEADO (DASHBOARD) ================= -->
   @if (!loading && isLoggedIn) {
-    <h1 class="text-2xl font-bold mb-4">Mi Perfil</h1>
-    @if (error) {
-      <div class="alert alert-error mb-4">{{ error }}</div>
-    }
-    @if (success) {
-      <div class="alert alert-success mb-4">{{ success }}</div>
-    }
-    <form [formGroup]="form" (ngSubmit)="updateProfile()" class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium">Nombre</label>
-          <input type="text" formControlName="first_name" class="input input-bordered w-full" [readonly]="!isEditing" />
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- COLUMNA IZQUIERDA: WIDGETS DE GAMIFICACIÓN Y RECOMPENSAS -->
+      <div class="lg:col-span-4 space-y-6">
+        
+        <!-- Tarjeta de Resumen de Perfil -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex items-center gap-4">
+          <div class="relative">
+            <!-- Si no hay avatar, muestra inicial o ícono genérico. Puedes bindear el src al form -->
+            <img [src]="form.get('avatar_url')?.value || 'assets/default-avatar.png'" alt="Avatar" class="w-16 h-16 rounded-full object-cover border-2 border-slate-700 bg-slate-800" onerror="this.src='https://ui-avatars.com/api/?name=User&background=1e293b&color=fbbf24'">
+            <span class="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+          </div>
+          <div>
+            <h2 class="text-white font-bold text-lg leading-tight">
+              {{ form.get('first_name')?.value || 'Usuario' }}
+            </h2>
+            <p class="text-slate-400 text-xs mt-1">Miembro verificado ✅</p>
+          </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium">Apellido</label>
-          <input type="text" formControlName="last_name" class="input input-bordered w-full" [readonly]="!isEditing" />
+
+        <!-- Widget: Puntos Acumulados -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <svg class="w-24 h-24 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              </span>
+              <h3 class="text-slate-300 font-bold text-sm uppercase tracking-wider">Tus Puntos</h3>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-4xl font-extrabold text-white tracking-tight">1,250</span>
+              <span class="text-amber-500 font-semibold text-sm">pts</span>
+            </div>
+            <p class="text-slate-400 text-xs mt-3">Utilizalos para obtener repuestos o accesorios gratis en el taller.</p>
+          </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium">Email</label>
-          <input type="email" formControlName="email" class="input input-bordered w-full" readonly />
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Teléfono</label>
-          <input type="text" formControlName="phone" class="input input-bordered w-full" [readonly]="!isEditing" />
-        </div>
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium">Biografía</label>
-          <textarea formControlName="bio" rows="4" class="textarea textarea-bordered w-full" [readonly]="!isEditing"></textarea>
-        </div>
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium">Avatar URL</label>
-          <input type="text" formControlName="avatar_url" class="input input-bordered w-full" [readonly]="!isEditing" />
+
+        <!-- Widget: Referidos (Incentivo 15% OFF) -->
+        <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-2xl p-6 shadow-lg shadow-emerald-500/20 text-white relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1">
+          <div class="absolute -right-4 -bottom-4 opacity-20 group-hover:scale-110 transition-transform">
+            <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clip-rule="evenodd"></path>
+              <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z"></path>
+            </svg>
+          </div>
+          <div class="relative z-10">
+            <span class="inline-block px-2.5 py-1 bg-white/20 rounded-full text-xs font-bold backdrop-blur-sm mb-3">
+              GANA UN 15% OFF
+            </span>
+            <h3 class="text-xl font-bold mb-1">Invitá a un amigo</h3>
+            <p class="text-emerald-50 text-sm leading-relaxed opacity-90 mb-4">
+              Compartí tu código. Si tu amigo repara su equipo con nosotros, tu próxima reparación tiene 15% de descuento directo.
+            </p>
+            <button class="bg-white text-emerald-700 font-bold px-4 py-2 rounded-lg text-sm shadow-md hover:bg-slate-50 transition-colors">
+              Obtener mi código
+            </button>
+          </div>
         </div>
       </div>
-      <div class="flex gap-3 mt-4">
-        @if (!saving) {
-          <button type="button" class="btn" (click)="toggleEditMode()">
-            {{ isEditing ? 'Cancelar' : 'Editar perfil' }}
-          </button>
-        }
-        <button type="submit" class="btn btn-primary" [disabled]="saving || !isEditing">
-          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-        </button>
-        <button type="button" class="btn btn-ghost" (click)="resetForm()" [disabled]="saving || !isEditing">Resetear</button>
-        @if (!saving) {
-          <button type="button" class="btn btn-outline" (click)="handleLogout()">Cerrar sesión</button>
-        }
+
+      <!-- COLUMNA DERECHA: CONFIGURACIÓN Y DATOS SEGUROS -->
+      <div class="lg:col-span-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+          
+          <!-- Header del Formulario y Sello de Seguridad -->
+          <div class="border-b border-slate-800 p-6 sm:px-8 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-white">Configuración de la Cuenta</h2>
+              <p class="text-slate-400 text-sm mt-1">Mantené tu información actualizada para un mejor servicio.</p>
+            </div>
+            
+            <div class="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="text-emerald-400 text-xs font-semibold">Datos Encriptados</span>
+            </div>
+          </div>
+
+          <!-- Alertas -->
+          <div class="px-6 sm:px-8 pt-6">
+            @if (error) {
+              <div class="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-center gap-2">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                {{ error }}
+              </div>
+            }
+            @if (success) {
+              <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-sm flex items-center gap-2">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                {{ success }}
+              </div>
+            }
+          </div>
+
+          <!-- Formulario -->
+          <form [formGroup]="form" (ngSubmit)="updateProfile()" class="p-6 sm:px-8 pb-8 space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Nombre -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nombre</label>
+                <input type="text" formControlName="first_name" 
+                  [class]="'w-full px-4 py-3 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-1 ' + 
+                  (!isEditing ? 'bg-slate-900/50 border-slate-800 text-slate-400 cursor-not-allowed' : 'bg-slate-950 border-slate-700 text-white focus:border-amber-500 focus:ring-amber-500')" 
+                  [readonly]="!isEditing" />
+              </div>
+              
+              <!-- Apellido -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Apellido</label>
+                <input type="text" formControlName="last_name" 
+                  [class]="'w-full px-4 py-3 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-1 ' + 
+                  (!isEditing ? 'bg-slate-900/50 border-slate-800 text-slate-400 cursor-not-allowed' : 'bg-slate-950 border-slate-700 text-white focus:border-amber-500 focus:ring-amber-500')" 
+                  [readonly]="!isEditing" />
+              </div>
+
+              <!-- Email (Siempre Readonly) -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label>
+                <div class="relative">
+                  <input type="email" formControlName="email" readonly 
+                    class="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl text-sm text-slate-500 cursor-not-allowed" />
+                  <svg class="w-4 h-4 text-slate-600 absolute right-4 top-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                </div>
+              </div>
+
+              <!-- Teléfono -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">WhatsApp / Teléfono</label>
+                <input type="text" formControlName="phone" 
+                  [class]="'w-full px-4 py-3 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-1 ' + 
+                  (!isEditing ? 'bg-slate-900/50 border-slate-800 text-slate-400 cursor-not-allowed' : 'bg-slate-950 border-slate-700 text-white focus:border-amber-500 focus:ring-amber-500')" 
+                  [readonly]="!isEditing" />
+              </div>
+
+              <!-- Avatar URL -->
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">URL Foto de Perfil</label>
+                <input type="text" formControlName="avatar_url" placeholder="https://..."
+                  [class]="'w-full px-4 py-3 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-1 ' + 
+                  (!isEditing ? 'bg-slate-900/50 border-slate-800 text-slate-400 cursor-not-allowed' : 'bg-slate-950 border-slate-700 text-white focus:border-amber-500 focus:ring-amber-500')" 
+                  [readonly]="!isEditing" />
+              </div>
+
+              <!-- Biografía -->
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Biografía / Notas</label>
+                <textarea formControlName="bio" rows="3" placeholder="Contanos algo sobre vos o dejá notas sobre tus equipos..."
+                  [class]="'w-full px-4 py-3 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-1 resize-none ' + 
+                  (!isEditing ? 'bg-slate-900/50 border-slate-800 text-slate-400 cursor-not-allowed' : 'bg-slate-950 border-slate-700 text-white focus:border-amber-500 focus:ring-amber-500')" 
+                  [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+
+            <!-- Botonera de Acciones -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-slate-800">
+              
+              <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+                <!-- Botón Principal (Editar / Cancelar) -->
+                @if (!saving) {
+                  <button type="button" (click)="toggleEditMode()"
+                    [class]="'px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex-1 sm:flex-none ' + 
+                    (isEditing ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700')">
+                    {{ isEditing ? 'Cancelar Edición' : 'Editar Datos' }}
+                  </button>
+                }
+
+                <!-- Botón Guardar (Solo visible/activo si está editando) -->
+                @if (isEditing || saving) {
+                  <button type="submit" [disabled]="saving || !form.valid"
+                    class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none flex items-center justify-center gap-2">
+                    @if (saving) {
+                      <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Guardando...
+                    } @else {
+                      Guardar Cambios
+                    }
+                  </button>
+                }
+
+                <!-- Botón Limpiar -->
+                @if (isEditing && !saving) {
+                  <button type="button" (click)="resetForm()" class="px-4 py-2.5 text-slate-400 hover:text-white text-sm font-medium transition-colors">
+                    Deshacer
+                  </button>
+                }
+              </div>
+
+              <!-- Botón Cerrar Sesión -->
+              @if (!saving && !isEditing) {
+                <button type="button" (click)="handleLogout()" 
+                  class="px-6 py-2.5 w-full sm:w-auto border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                  Cerrar Sesión
+                </button>
+              }
+            </div>
+            
+          </form>
+        </div>
       </div>
-    </form>
+    </div>
   }
 </div>

@@ -417,10 +417,10 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
     },
     es: {
       hero: {
-        title: 'Consultoría IT Global & Desarrollo de Inteligencia Artificial',
-        subtitle: 'Transformamos empresas en Argentina, LatAm, USA y Europa con Software a Medida, Agentes de IA y Arquitecturas Cloud Escalables. Tu socio tecnológico estratégico.',
-        ctaPrimary: 'Consultar Proyecto IA',
-        ctaSecondary: 'Ver Portfolio'
+        title: 'Consultoría IT. Tecnología a medida que resuelve los problemas de tu negocio.',
+        subtitle: 'Desarrollamos plataformas a medida e integramos inteligencia artificial para empresas de todo el mundo, Tu socio tecnológico global para modernizar tus operaciones de forma rápida y segura. Escalabilidad y seguridad garantizadas, sin complicaciones técnicas.',
+        ctaPrimary: 'Agendar una asesoría gratuita',
+        ctaSecondary: 'Descubrir cómo pueden ayudarme'
       },
       businessPillars: {
         title: 'Ecosistema Tecnológico',
@@ -428,18 +428,18 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
         items: [
           {
             title: 'Laboratorio de Electrónica',
-            description: 'Servicio técnico especializado en microelectrónica y recuperación de dispositivos en Marcos Paz (Sede Argentina).',
+            description: 'Servicio técnico Especialistas en Microelectrónica en Marcos Paz. Recuperamos la vida de tu equipo y tu información cuando otros te dicen que no tiene arreglo.',
             icon: 'fas fa-microchip',
-            image: 'assets/img/services/repair-illustration.webp',
-            cta: 'Ir al Laboratorio',
+            image: 'assets/img/cursos/medicion.png',
+            cta: 'Solicitar un presupuesto',
             link: '/celular',
             colorClass: 'blue'
           },
           {
             title: 'Arecofix Academy',
-            description: 'Formación de talento IT de exportación. Cursos de programación y técnica.',
+            description: 'Preparate para la industria tecnológica con capacitación de alto nivel. Cursos prácticos de desarrollo de software, programación y distintos oficios.',
             icon: 'fas fa-graduation-cap',
-            image: 'assets/img/services/academy-illustration.webp',
+            image: 'assets/img/cursos/clase1.webp',
             cta: 'Ver Academia',
             link: '/academy',
             colorClass: 'green'
@@ -487,10 +487,10 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
       faq: {
         title: 'Preguntas Frecuentes',
         items: [
-          { question: '¿Trabajan para el exterior?', answer: 'Sí, somos una consultora remota con clientes en USA, España y toda Latinoamérica.' },
-          { question: '¿Hacen desarrollo de IA?', answer: 'Sí, desarrollamos chatbots inteligentes, sistemas de predicción y automatización con IA.' },
+          { question: '¿Trabajan para el exterior?', answer: 'Ayudamos a empresas de EE. UU., España y Latinoamérica a optimizar sus procesos y potenciar su crecimiento mediante soluciones tecnológicas efectivas. Trabajamos de forma 100% remota.' },
+          { question: '¿Hacen desarrollo de IA?', answer: 'Desarrollamos soluciones de IA que transforman negocios. Nos especializamos en chatbots inteligentes que optimizan la atención, sistemas de predicción que mejoran la toma de decisiones y automatizaciones eficientes. Actualmente, lideramos la creación de un asistente inteligente para la gestión académica de la Universidad Nacional del Oeste.' },
           { question: '¿Qué garantía ofrecen?', answer: 'Todos nuestros desarrollos cuentan con garantía de código y soporte post-implementación.' },
-          { question: '¿Siguen reparando hardware?', answer: 'Sí, mantenemos nuestro laboratorio de hardware de alta complejidad en Argentina.' }
+          { question: 'Cómo pasaron de arreglar computadoras a crear Inteligencia Artificial?', answer: 'Sí, mantenemos nuestro laboratorio de electronica de alta complejidad en Argentina.' }
         ]
       },
       services: {
