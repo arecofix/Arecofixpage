@@ -7,19 +7,18 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+## � Arecofix es un software listo para vender
+Arecofix combina tienda de repuestos, gestión de talleres, administración de sucursales y academia técnica en una sola plataforma. Está pensado para convertir visitantes en clientes y ofrecer una experiencia profesional para negocios de reparación.
+
 ## 📸 Capturas
 
-<p align="center">
-  <img src="public/assets/img/readme/gestiondesucursales.png" alt="Gestión de sucursales" width="320" />
-  <img src="public/assets/img/readme/1.png" alt="Vista 1" width="320" />
-  <img src="public/assets/img/readme/2-1.png" alt="Vista 2" width="320" />
-</p>
+| Gestión de sucursales | Dashboard operativo | Detalle de servicio |
+|---|---|---|
+| ![Gestión de sucursales](./public/assets/img/readme/gestiondesucursales.png) | ![Vista 1](./public/assets/img/readme/1.png) | ![Vista 2](./public/assets/img/readme/2-1.png) |
 
-<p align="center">
-  <img src="public/assets/img/readme/4.png" alt="Vista 4" width="320" />
-  <img src="public/assets/img/readme/5.png" alt="Vista 5" width="320" />
-  <img src="public/assets/img/readme/6.png" alt="Vista 6" width="320" />
-</p>
+| Catálogo de repuestos | Academia y cursos | Vista móvil |
+|---|---|---|
+| ![Vista 4](./public/assets/img/readme/4.png) | ![Vista 5](./public/assets/img/readme/5.png) | ![Vista 6](./public/assets/img/readme/6.png) |
 
 ---
 
