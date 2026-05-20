@@ -14,7 +14,7 @@ export class AdminPostService {
     async getPosts(): Promise<Post[]> {
         const { data, error } = await this.supabase
             .from('blog_posts')
-            .select('*')
+            .select('id, title, slug, summary, content, featured_image, image, image_url, created_at, updated_at, is_active, author_id, tags, view_count, is_featured, category_id')
             .eq('tenant_id', this.tenantService.getTenantId())
             .order('created_at', { ascending: false });
 
@@ -25,7 +25,7 @@ export class AdminPostService {
     async getPost(id: string): Promise<Post | null> {
         const { data, error } = await (this.supabase
             .from('blog_posts')
-            .select('*')
+            .select('id, title, slug, summary, content, featured_image, image, image_url, created_at, updated_at, is_active, author_id, tags, view_count, is_featured, category_id')
             .eq('id', id)
             .eq('tenant_id', this.tenantService.getTenantId()) as any)
             .maybeSingle();

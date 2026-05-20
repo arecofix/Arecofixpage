@@ -203,14 +203,14 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     return from(fetchAll());
   }
 
-  override getAll(params?: any): Observable<Product[]> {
+    override getAll(params?: any): Observable<Product[]> {
     const branch_id = typeof params === 'string' ? params : undefined;
     const fetchAll = async (): Promise<Product[]> => {
       let allData: Product[] = [];
       let fromIdx = 0;
       let hasMore = true;
       const CHUNK = 1000;
-      const select = `*, branch_stock:product_stock_per_branch(quantity, branch_id)`;
+      const select = `id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id)`;
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
@@ -307,7 +307,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const queryStr = query.trim();
     if (!queryStr) return of([]);
 
-    let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'))
+    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id, media_metadata, gallery_urls';
+    let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true);
     
     if (categoryId) {
@@ -329,9 +330,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   getPendingApprovals(): Observable<Product[]> {
+    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id, media_metadata, gallery_urls, branches(name)';
     let query = this.applyTenantFilter(
       this.supabase.from(this.tableName)
-        .select(`*, branches(name)`)
+        .select(selectFields)
         .eq('is_active', false)
         .not('branch_id', 'is', null)
     );
