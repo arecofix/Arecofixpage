@@ -58,15 +58,14 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const end = start + _per_page - 1;
 
     let selectFields = `
-      id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
-      media_metadata,
       branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert),
       branches(name)
     `;
 
     if (!minimal) {
-      selectFields += ', gallery_urls';
+      selectFields += ', description, media_metadata, gallery_urls';
     }
 
     // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET para buscar/listar):
@@ -157,7 +156,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   findLowStock(threshold: number = 5): Observable<Product[]> {
     const selectFields = `
-      id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, 
       branch_stock:product_stock_per_branch(quantity, branch_id)
     `;
@@ -204,16 +203,39 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   override getAll(params?: any): Observable<Product[]> {
-    const branch_id = typeof params === 'string' ? params : undefined;
+    const branch_id = typeof params === 'string' ? params : (params?.branch_id);
+    const page = params?.page;
+    const pageSize = params?.pageSize;
+
     const fetchAll = async (): Promise<Product[]> => {
       let allData: Product[] = [];
       let fromIdx = 0;
       let hasMore = true;
-      const CHUNK = 1000;
-      const select = `*, branch_stock:product_stock_per_branch(quantity, branch_id)`;
+      const CHUNK = pageSize || 1000;
+      
+      const select = `
+        id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+        is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
+        branch_stock:product_stock_per_branch(quantity, branch_id)
+      `;
+
+      if (page !== undefined && pageSize !== undefined) {
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize - 1;
+        let query = this.applyTenantFilter(this.supabase.from('products').select(select));
+        if (branch_id) {
+          query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
+        }
+        const { data, error } = await (query.order('created_at', { ascending: false }).range(start, end) as any);
+        if (error) this.errorHandler.handleError(error, 'getAll (Products) Paginated');
+        return (data || []).map((p: any) => ProductMapper.mapFromDb(p, branch_id));
+      }
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
+        if (branch_id) {
+          query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
+        }
         const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
         if (error) this.errorHandler.handleError(error, 'getAll (Products)');
         
@@ -307,7 +329,11 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const queryStr = query.trim();
     if (!queryStr) return of([]);
 
-    let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'))
+    const selectFields = `
+      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id
+    `;
+    let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true);
     
     if (categoryId) {
@@ -329,9 +355,14 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   getPendingApprovals(): Observable<Product[]> {
+    const selectFields = `
+      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
+      branches(name)
+    `;
     let query = this.applyTenantFilter(
       this.supabase.from(this.tableName)
-        .select(`*, branches(name)`)
+        .select(selectFields)
         .eq('is_active', false)
         .not('branch_id', 'is', null)
     );

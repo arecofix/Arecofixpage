@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, inject, output, computed } from '@angular/core';
-import { DecimalPipe, NgOptimizedImage } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Product } from '../../interfaces';
 import { CartService } from '@app/shared/services/cart.service';
@@ -10,7 +10,7 @@ import { ProductStrategicService } from '@app/core/services/product-strategic.se
 @Component({
   selector: 'product-card',
   standalone: true,
-  imports: [RouterModule, DecimalPipe, NgOptimizedImage],
+  imports: [RouterModule, CurrencyPipe, NgOptimizedImage],
   templateUrl: './product-card.html',
   styles: `
     .line-clamp-2 {

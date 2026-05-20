@@ -177,10 +177,11 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     getWhere(
         column: string,
         value: string | number | boolean | null,
-        orderBy?: { column: string; ascending?: boolean }
+        orderBy?: { column: string; ascending?: boolean },
+        select: string = '*'
     ): Observable<T[]> {
         return from(this.fetchPaginated(
-            () => this.supabase.from(this.tableName).select('*').eq(column, value),
+            () => this.supabase.from(this.tableName).select(select).eq(column, value),
             orderBy
         ));
     }

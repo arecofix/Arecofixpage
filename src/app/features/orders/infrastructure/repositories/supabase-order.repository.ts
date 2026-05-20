@@ -61,9 +61,23 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     return { ...order, id: orderId, order_number: orderNumber };
   }
 
-  getOrders(): Observable<Order[]> {
-    const query = this.applyTenantFilter(this.supabase.from(this.tableName).select('*, items:order_items(*)'))
+  getOrders(params?: { page?: number; pageSize?: number }): Observable<Order[]> {
+    const page = params?.page;
+    const pageSize = params?.pageSize;
+    const selectFields = `
+      id, order_number, customer_name, customer_email, customer_phone, 
+      status, subtotal, tax, discount, total, total_amount, payment_method, 
+      branch_id, user_id, created_at, updated_at
+    `;
+
+    let query = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .order('created_at', { ascending: false });
+
+    if (page !== undefined && pageSize !== undefined) {
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize - 1;
+      query = query.range(start, end);
+    }
 
     return from(query as any).pipe(
       map(({ data, error }: any) => {

@@ -7,8 +7,9 @@
       content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; worker-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com https://*.firebaseapp.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.google.com.ar https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com https://stats.g.doubleclick.net https://dolarapi.com;"
     />
 
-    <title>Arecofix</title>
+    <title>Arecofix - Servicio Técnico de Celulares, Notebooks y Consolas</title>
     <base href="/" />
+    <link rel="canonical" href="https://arecofix.com.ar/" />
     <!-- Global Noise Suppressor (EXECUTE FIRST) -->
     <script>
       (function() {
@@ -58,6 +59,39 @@
                 _err.apply(console, arguments);
             };
         }
+
+        // Mock FeaturePolicy to prevent 'attribution-reporting' unrecognized feature warnings
+        try {
+          if (document.featurePolicy) {
+            if (typeof document.featurePolicy.allowsFeature === 'function') {
+              const origAllows = document.featurePolicy.allowsFeature;
+              document.featurePolicy.allowsFeature = function(f) {
+                if (f === 'attribution-reporting') return false;
+                try { return origAllows.call(this, f); } catch(e) { return false; }
+              };
+            }
+            if (typeof document.featurePolicy.features === 'function') {
+              const origFeatures = document.featurePolicy.features;
+              document.featurePolicy.features = function() {
+                try {
+                  return origFeatures.call(this).filter(f => f !== 'attribution-reporting');
+                } catch(e) {
+                  return [];
+                }
+              };
+            }
+            if (typeof document.featurePolicy.allowedFeatures === 'function') {
+              const origAllowed = document.featurePolicy.allowedFeatures;
+              document.featurePolicy.allowedFeatures = function() {
+                try {
+                  return origAllowed.call(this).filter(f => f !== 'attribution-reporting');
+                } catch(e) {
+                  return [];
+                }
+              };
+            }
+          }
+        } catch (e) {}
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -87,7 +121,6 @@
     <link rel="manifest" href="site.webmanifest" />
 
     <!-- Preconnect to critical origins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co" />
 
@@ -114,29 +147,36 @@
 
 
 
-    <!-- Analytics Assets (GTAG & Facebook Pixel) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED"></script>
+    <!-- Analytics Assets (GTAG & Facebook Pixel) - Deferred for performance -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-N7DQDV8MED', { 'send_page_view': false }); 
-    </script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          // GTAG
+          var gtagScript = document.createElement('script');
+          gtagScript.async = true;
+          gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED";
+          document.head.appendChild(gtagScript);
 
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1304105440826069');
-      fbq('track', 'PageView');
-    </script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', 'G-N7DQDV8MED', { 'send_page_view': false }); 
 
+          // Meta Pixel Code
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '1304105440826069');
+          fbq('track', 'PageView');
+        }, 1500);
+      });
+    </script>
     <!-- End Meta Pixel Code -->
   </head>
 

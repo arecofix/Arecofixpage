@@ -6,6 +6,7 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
+import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,6 +15,8 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     protected override tableName = 'repairs';
     protected override isGlobalTable = false;
     protected override useSoftDeletes = true;
+
+    private storageService = inject(SupabaseStorageService);
 
     constructor() {
         const supabase = inject(SUPABASE_CLIENT);
@@ -220,7 +223,10 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         
         let query = this.supabase.from(this.tableName)
             .select(`
-                *,
+                id, tracking_code, client_id, customer_name, customer_phone, device_type, device_brand, device_model, 
+                imei, repair_number, issue_description, current_status_id, estimated_cost, final_cost, 
+                deposit_amount, technical_labor_cost, technician_notes, completed_at, created_at, updated_at,
+                branch_id, tenant_id, received_by, assigned_technician_id,
                 client:clients(id, full_name, phone),
                 assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, full_name),
                 status:repair_status_types(id, name, color, icon)
@@ -250,21 +256,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     }
 
     async uploadImage(file: File): Promise<string> {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `repairs/${fileName}`;
-
-        const { error: uploadError } = await this.supabase.storage
-            .from('repair-images')
-            .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data } = this.supabase.storage
-            .from('repair-images')
-            .getPublicUrl(filePath);
-
-        return data.publicUrl;
+        return this.storageService.uploadFile(file, 'repairs', 'repair-images');
     }
 
     private async logStatusChange(repairId: string, statusId: number, notes?: string): Promise<void> {
