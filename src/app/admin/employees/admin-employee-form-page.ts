@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { EmployeeService } from '@app/features/customers/application/services/employee.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
 
 interface AvailableUser {
     id: string;
@@ -28,6 +29,7 @@ export class AdminEmployeeFormPage implements OnInit {
     private auth = inject(AuthService);
     private employeeService = inject(EmployeeService);
     private tenantService = inject(TenantService);
+    private storageService = inject(SupabaseStorageService);
 
     id: string | null = null;
     form = signal({
@@ -160,15 +162,12 @@ export class AdminEmployeeFormPage implements OnInit {
     async onFileChange(event: any) {
         const file: File = event.target.files?.[0];
         if (!file) return;
-        const supabase = this.auth.getSupabaseClient();
-        const filePath = `avatars/${Date.now()}-${file.name}`;
-        const { data, error } = await supabase.storage.from('public-assets').upload(filePath, file);
-        if (error) {
-            this.error.set(error.message);
-            return;
+        try {
+            const publicUrl = await this.storageService.uploadFile(file, 'avatars');
+            this.form.update((f) => ({ ...f, avatar_url: publicUrl }));
+        } catch (error: any) {
+            this.error.set(error.message || 'Error al subir la imagen.');
         }
-        const { data: publicUrl } = supabase.storage.from('public-assets').getPublicUrl(data.path);
-        this.form.update((f) => ({ ...f, avatar_url: publicUrl.publicUrl }));
     }
 
     async save() {

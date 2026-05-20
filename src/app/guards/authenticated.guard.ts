@@ -1,6 +1,8 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
+import { filter, take, timeout, catchError } from 'rxjs/operators';
+import { of, firstValueFrom } from 'rxjs';
 
 /**
  * Simple guard that only requires the user to be authenticated, 
@@ -11,7 +13,16 @@ export const authenticatedGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
 
   try {
-    const session = await authService.getSession();
+    const authState = await firstValueFrom(
+      authService.authState$.pipe(
+        filter(s => s.isInitialized),
+        take(1),
+        timeout(5000), // Safety timeout
+        catchError(() => of({ session: null, user: null, profile: null, isInitialized: true }))
+      )
+    );
+
+    const session = authState.session;
     
     if (session) {
       return true;

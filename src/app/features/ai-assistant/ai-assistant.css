@@ -1,3 +1,19 @@
+:host {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  isolation: isolate;
+}
+
+.ai-assistant-interactive {
+  pointer-events: auto;
+}
+
 @keyframes slide-up {
   from {
     opacity: 0;

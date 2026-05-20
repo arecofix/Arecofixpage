@@ -267,7 +267,7 @@ export class AdminRepairService {
         if (phone.length < 10) return;
 
         const baseUrl = window.location.origin;
-        const trackingUrl = `${baseUrl}/#/tracking/${repair.tracking_code}`;
+        const trackingUrl = `${baseUrl}/tracking/${repair.tracking_code}`;
         let message = '';
 
         switch (event) {

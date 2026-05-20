@@ -16,9 +16,14 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
     tenantId: string;
     searchTerm?: string;
   }): Promise<Invoice[]> {
+    const selectFields = `
+      id, invoice_number, order_id, repair_id, customer_name, customer_email, 
+      issued_at, subtotal, discount, tenant_id,
+      type, origin, tax_amount, total_amount
+    `;
     let query = this.supabase
       .from('invoices')
-      .select('*')
+      .select(selectFields)
       .eq('tenant_id', params.tenantId)
       .order('issued_at', { ascending: false })
       .range(params.offset, params.offset + params.limit - 1);
@@ -29,7 +34,7 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
 
     const { data, error } = await query;
     if (error) throw error;
-    return (data || []) as Invoice[];
+    return (data || []) as unknown as Invoice[];
   }
 
   async getCount(params: {

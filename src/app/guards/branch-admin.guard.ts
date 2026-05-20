@@ -4,6 +4,8 @@ import { AuthService } from '@app/core/services/auth.service';
 import { BranchService } from '@app/core/services/branch.service';
 import { ROLES } from '@app/core/constants/roles.constants';
 import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
+import { filter, take, timeout, catchError } from 'rxjs/operators';
+import { of, firstValueFrom } from 'rxjs';
 
 /**
  * Guard para proteger rutas administrativas de sucursales (ej: /larrea/admin)
@@ -19,15 +21,23 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
   console.log('🔍 branchAdminGuard - Checking access for:', state.url);
   
   try {
-    const session = await authService.getSession();
+    const authState = await firstValueFrom(
+      authService.authState$.pipe(
+        filter(s => s.isInitialized),
+        take(1),
+        timeout(5000), // Safety timeout
+        catchError(() => of({ session: null, user: null, profile: null, isInitialized: true }))
+      )
+    );
+
+    const session = authState.session;
     if (!session) {
       console.warn('🚫 No session found, redirecting to login');
       router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
       return false;
     }
 
-    const userId = session.user.id;
-    const userProfile = await authService.getUserProfile(userId);
+    const userProfile = authState.profile;
     
     if (!userProfile) {
       console.warn('🚫 No user profile found, redirecting to home');

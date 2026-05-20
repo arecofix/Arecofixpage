@@ -9,6 +9,8 @@ import { BranchService } from '@app/core/services/branch.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { BranchContextService } from '@app/core/services/branch-context.service';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { firstValueFrom } from 'rxjs';
 
 // ---------------------------------------------------------------------------
 // HELPERS: Detectar el tipo de sucursal y elegir defaults apropiados
@@ -171,6 +173,7 @@ export class BranchHomeComponent implements OnInit {
   private branchService = inject(BranchService);
   private supabase      = inject(SUPABASE_CLIENT);
   private branchCtx     = inject(BranchContextService);
+  private gsmService    = inject(GsmService);
 
   branch   = signal<Branch | null>(null);
   landing  = signal<BranchLandingConfig>({} as BranchLandingConfig);
@@ -253,7 +256,18 @@ export class BranchHomeComponent implements OnInit {
         branch.global_markup_percentage ?? 0
       );
 
-      this.products.set(withMarkup);
+      const rate = await firstValueFrom(this.gsmService.getUsdtRate());
+      const mapped = withMarkup.map(p => {
+        if (p.currency === 'USD') {
+          return {
+            ...p,
+            convertedPrice: p.price * rate
+          } as any;
+        }
+        return p;
+      });
+
+      this.products.set(mapped);
       this.totalProducts.set(count ?? 0);
       this.totalPages.set(Math.ceil((count ?? 0) / this.pageSize));
     } catch (err) {

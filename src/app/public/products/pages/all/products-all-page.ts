@@ -20,6 +20,7 @@ import { Pagination, PaginationService, iPagination } from '@app/shared/componen
 import { ProductCard } from '@app/public/products/components';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '@app/public/products/interfaces';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 @Component({
   selector: 'app-products-all-page',
@@ -42,6 +43,12 @@ export class ProductsAllPage {
   private productService: ProductService = inject(ProductService);
   public paginationService: PaginationService = inject(PaginationService);
   public cartService: CartService = inject(CartService);
+  private gsmService: GsmService = inject(GsmService);
+
+  // Exchange rate resource
+  usdRate = rxResource({
+    stream: () => this.gsmService.getUsdtRate()
+  });
 
   // Search Signal and Subject for debounce
   searchQuery = signal('');
@@ -92,6 +99,21 @@ export class ProductsAllPage {
         });
       })
     )
+  });
+
+  displayProducts = computed<Product[]>(() => {
+    const res = this.productsRs.value();
+    if (!res || !res.data) return [];
+    const rate = this.usdRate.value() || 1240;
+    return res.data.map(p => {
+      if (p.currency === 'USD') {
+        return {
+          ...p,
+          convertedPrice: p.price * rate
+        };
+      }
+      return p;
+    });
   });
 
   paginationData = computed<iPagination | null>(() => {

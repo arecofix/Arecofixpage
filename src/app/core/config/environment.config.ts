@@ -82,7 +82,7 @@ export function createEnvironmentConfig(
         supabaseUrl: overrides.supabaseUrl || '',
         supabaseKey: overrides.supabaseKey || '',
         authRedirectUrl: overrides.authRedirectUrl ||
-            (production ? 'https://arecofix.com.ar/#/login' : 'http://localhost:4200/#/login'),
+            (production ? 'https://arecofix.com.ar/login' : 'http://localhost:4200/login'),
         enableProfileUpsert: false,
         posthogKey: overrides.posthogKey || '',
         posthogHost: overrides.posthogHost || 'https://us.i.posthog.com',
