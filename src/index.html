@@ -114,30 +114,35 @@
 
 
 
-    <!-- Analytics Assets (GTAG & Facebook Pixel) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED"></script>
+    <!-- Analytics Assets (GTAG & Facebook Pixel) - Deferred for performance -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-N7DQDV8MED', { 'send_page_view': false }); 
-    </script>
+      setTimeout(function() {
+        // GTAG Load
+        var gtagScript = document.createElement('script');
+        gtagScript.async = true;
+        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
+        document.head.appendChild(gtagScript);
 
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1304105440826069');
-      fbq('track', 'PageView');
-    </script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag; // Export to window
+        gtag('js', new Date());
+        gtag('config', 'G-N7DQDV8MED', { 'send_page_view': false }); 
 
-    <!-- End Meta Pixel Code -->
+        // Meta Pixel Code
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1304105440826069');
+        fbq('track', 'PageView');
+      }, 3500); // Delay load by 3.5s to free up main thread
+    </script>
+    <!-- End Deferred Meta Pixel & GTAG Code -->
   </head>
 
   <body>

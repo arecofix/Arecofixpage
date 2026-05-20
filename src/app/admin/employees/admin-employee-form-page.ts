@@ -106,7 +106,7 @@ export class AdminEmployeeFormPage implements OnInit {
             const supabase = this.auth.getSupabaseClient();
             const { data, error } = await supabase
                 .from('available_users_for_employee')
-                .select('*')
+                .select('id, email, first_name, last_name, phone, avatar_url, created_at')
                 .order('created_at', { ascending: false });
 
             if (error) {

@@ -110,8 +110,8 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         ));
     }
 
-    getById(id: string): Observable<T | null> {
-        let query = this.supabase.from(this.tableName).select('*').eq('id', id);
+    getById(id: string, options?: { select?: string }): Observable<T | null> {
+        let query = this.supabase.from(this.tableName).select(options?.select || '*').eq('id', id);
         query = this.applyTenantFilter(query);
 
         return from(query.maybeSingle()).pipe(
@@ -177,11 +177,11 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     getWhere(
         column: string,
         value: string | number | boolean | null,
-        orderBy?: { column: string; ascending?: boolean }
+        options?: { column?: string; ascending?: boolean; select?: string }
     ): Observable<T[]> {
         return from(this.fetchPaginated(
-            () => this.supabase.from(this.tableName).select('*').eq(column, value),
-            orderBy
+            () => this.supabase.from(this.tableName).select(options?.select || '*').eq(column, value),
+            options
         ));
     }
 

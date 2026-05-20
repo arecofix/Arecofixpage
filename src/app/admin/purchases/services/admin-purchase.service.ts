@@ -18,19 +18,19 @@ export class AdminPurchaseService {
     const tenantId = this.tenantService.getTenantId();
     const { data, error } = await this.supabase
       .from('purchases')
-      .select('*, suppliers(name)')
+      .select('id, supplier_id, branch_id, date, status, total_amount, payment_method, created_at, updated_at, suppliers(name)')
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as Purchase[];
+    return (data as unknown) as Purchase[];
   }
 
   async getSuppliers(): Promise<any[]> {
     const tenantId = this.tenantService.getTenantId();
     const { data, error } = await this.supabase
       .from('suppliers')
-      .select('*')
+      .select('id, name, email, phone, contact_person, address, tax_id, is_active')
       .eq('is_active', true)
       .eq('tenant_id', tenantId);
 
