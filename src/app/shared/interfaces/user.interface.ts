@@ -29,4 +29,6 @@ export interface UserProfile {
   role?: UserRole;
   tenant_id?: string;
   branch_id?: string;
+  notes?: string | null;
+  is_guest?: boolean | null;
 }

@@ -221,7 +221,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         let query = this.supabase.from(this.tableName)
             .select(`
                 *,
-                client:clients(id, full_name, phone),
+                client:profiles(id, full_name, phone),
                 assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, full_name),
                 status:repair_status_types(id, name, color, icon)
             `)

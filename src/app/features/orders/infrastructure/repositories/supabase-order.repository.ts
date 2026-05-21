@@ -132,4 +132,32 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     };
     return from(this.update(orderId, payload as any)).pipe(map(() => void 0));
   }
+
+  getActiveCart(userId?: string, sessionId?: string): Observable<Order | null> {
+    if (!userId && !sessionId) {
+      return from(Promise.resolve(null));
+    }
+
+    let query = this.supabase
+      .from(this.tableName)
+      .select('*, items:order_items(*, product:products(id, name, slug, price, currency, image_url))')
+      .eq('status', 'cart');
+
+    if (userId) {
+      query = query.eq('user_id', userId);
+    } else {
+      query = query.eq('session_id', sessionId!);
+    }
+
+    query = this.applyTenantFilter(query);
+
+    return from((query as any).maybeSingle()).pipe(
+      map(({ data, error }: any) => {
+        if (error) {
+          this.errorHandler.handleError(error, 'getActiveCart');
+        }
+        return data ? OrderMapper.toDomain(data) : null;
+      })
+    );
+  }
 }

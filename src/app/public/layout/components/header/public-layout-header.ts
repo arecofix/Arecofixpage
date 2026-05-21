@@ -32,6 +32,8 @@ import { SearchUtils } from '@app/shared/utils/search.utils';
 import { map } from 'rxjs/operators';
 import { Subscription, firstValueFrom } from 'rxjs';
 
+import { NavigationStateService } from '@app/core/services/navigation-state.service';
+
 @Component({
   selector: 'public-layout-header',
   imports: [
@@ -59,6 +61,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   public cartService = inject(CartService);
   public themeService = inject(ThemeService);
   public searchService = inject(SearchService);
+  public navState = inject(NavigationStateService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
@@ -103,17 +106,17 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   public filteredProducts = this.products;
 
   // ── Mobile Menu ───────────────────────────────────
-  public isMobileMenuOpen = signal(false);
+  public isMobileMenuOpen = this.navState.isMobileMenuOpen;
 
   toggleMobileMenu() {
-    this.isMobileMenuOpen.update((v) => !v);
-    if (!this.isMobileMenuOpen()) {
+    this.navState.toggleMobileMenu();
+    if (!this.navState.isMobileMenuOpen()) {
       this.searchFocusRequested.set(false);
     }
   }
 
   closeMobileMenu() {
-    this.isMobileMenuOpen.set(false);
+    this.navState.closeMobileMenu();
     this.searchFocusRequested.set(false);
   }
 
@@ -123,7 +126,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
    */
   openMobileSearch(): void {
     this.searchFocusRequested.set(true);
-    this.isMobileMenuOpen.set(true);
+    this.navState.openMobileMenu();
     this.searchService.requestSearchFocus();
   }
 
@@ -200,7 +203,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
       this.searchService.focusRequested$.subscribe(() => {
         if (!this.isMobileMenuOpen()) {
           this.searchFocusRequested.set(true);
-          this.isMobileMenuOpen.set(true);
+          this.navState.openMobileMenu();
           this.cdr.markForCheck();
         }
       })

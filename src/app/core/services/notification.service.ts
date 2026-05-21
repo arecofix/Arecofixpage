@@ -11,6 +11,10 @@ export interface AppNotification {
   link?: string;
   is_read: boolean;
   created_at: string;
+  scope: 'user' | 'admin';
+  payload?: any;
+  user_id?: string | null;
+  tenant_id?: string;
 }
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
@@ -120,17 +124,42 @@ export class NotificationService {
     // ============================================
     //         DB BELL NOTIFICATIONS METHODS
     // ============================================
+    private getUserScope(): 'admin' | 'user' {
+        const profile = this.auth.getCurrentProfile();
+        if (!profile) {
+            const user = this.auth.getCurrentUser();
+            const metaRole = user?.user_metadata?.['role'] ?? user?.app_metadata?.['role'];
+            const adminRoles = ['super_admin', 'tenant_owner', 'technician', 'staff', 'admin'];
+            if (metaRole && adminRoles.includes(metaRole)) {
+                return 'admin';
+            }
+            return 'user';
+        }
+        
+        const adminRoles = ['super_admin', 'tenant_owner', 'technician', 'staff', 'admin'];
+        const isUserAdmin = adminRoles.includes(profile.role || '') || this.auth.isSuperAdmin();
+        return isUserAdmin ? 'admin' : 'user';
+    }
+
     async loadNotifications() {
         const user = this.auth.getCurrentUser();
         if (!user) return;
 
-        const { data, error } = await this.supabase
+        const scope = this.getUserScope();
+        let query = this.supabase
             .from('notifications')
             .select('*')
-            .eq('user_id', user.id)
-            .eq('tenant_id', this.tenantService.getTenantId())
-            .order('created_at', { ascending: false })
-            .limit(50);
+            .eq('tenant_id', this.tenantService.getTenantId());
+
+        if (scope === 'admin') {
+            query = query.eq('scope', 'admin');
+        } else {
+            query = query.eq('scope', 'user').eq('user_id', user.id);
+        }
+
+        query = query.order('created_at', { ascending: false }).limit(50);
+
+        const { data, error } = await query;
 
         if (!error && data) {
             this._dbNotifications.set(data as AppNotification[]);
@@ -156,11 +185,20 @@ export class NotificationService {
         const user = this.auth.getCurrentUser();
         if (!user) return;
 
-        const { error } = await this.supabase
+        const scope = this.getUserScope();
+        let query = this.supabase
             .from('notifications')
             .update({ is_read: true })
-            .eq('user_id', user.id)
-            .eq('is_read', false);
+            .eq('is_read', false)
+            .eq('tenant_id', this.tenantService.getTenantId());
+
+        if (scope === 'admin') {
+            query = query.eq('scope', 'admin');
+        } else {
+            query = query.eq('scope', 'user').eq('user_id', user.id);
+        }
+
+        const { error } = await query;
 
         if (!error) {
             this._dbNotifications.update(nots => 
@@ -174,6 +212,15 @@ export class NotificationService {
         const user = this.auth.getCurrentUser();
         if (!user) return;
 
+        const scope = this.getUserScope();
+        
+        this.unsubscribe();
+
+        let filterStr = `scope=eq.${scope}`;
+        if (scope === 'user') {
+            filterStr = `user_id=eq.${user.id}`;
+        }
+
         this.realtimeChannel = this.supabase
             .channel('public:notifications')
             .on('postgres_changes', 
@@ -181,14 +228,15 @@ export class NotificationService {
                     event: 'INSERT', 
                     schema: 'public', 
                     table: 'notifications',
-                    filter: `user_id=eq.${user.id}`
+                    filter: filterStr
                 }, 
                 (payload: any) => {
                     const newNotif = payload.new as AppNotification;
+                    if (newNotif.tenant_id !== this.tenantService.getTenantId()) return;
+
                     this._dbNotifications.update(nots => [newNotif, ...nots]);
                     this._unreadCount.update(count => count + 1);
                     
-                    // Show a toast when a new DB notification triggers!
                     this.showInfo(newNotif.title + ' - ' + newNotif.message);
                 }
             )

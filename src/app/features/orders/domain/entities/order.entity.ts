@@ -39,6 +39,7 @@ export interface OrderItem {
   subtotal: number;
   tenant_id?: string;
   created_at?: string;
+  product?: any;
 }
 
 export type PaymentMethod = 'digital' | 'cash' | 'bank_transfer';
@@ -47,6 +48,7 @@ export interface Order {
   id?: string;
   order_number?: string;
   user_id?: string;
+  session_id?: string;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;

@@ -12,6 +12,38 @@
                 <span class="loading loading-ring loading-lg text-primary"></span>
                 <p class="mt-4 text-xs font-bold text-neutral-400 uppercase animate-pulse">Consultando Satélite...</p>
             </div>
+            } @else if (isLookupMode()) {
+            <div class="p-8 sm:p-10 text-center animate-fade-in">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-6">
+                    <i class="fas fa-search text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-neutral-800 mb-2">Seguimiento de Reparación</h2>
+                <p class="text-sm text-neutral-400 mb-8 font-medium max-w-sm mx-auto leading-relaxed">
+                    Ingresá el código de seguimiento (ej: AF-123) provisto en tu talón para conocer el estado actual de tu dispositivo en tiempo real.
+                </p>
+                <form (submit)="onSearchCode($event)" class="space-y-4 max-w-md mx-auto">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400">
+                            <i class="fas fa-barcode text-lg"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            [ngModel]="searchCodeInput()"
+                            (ngModelChange)="searchCodeInput.set($event)"
+                            [ngModelOptions]="{standalone: true}"
+                            placeholder="Ej: AF-123" 
+                            class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-200 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 rounded-2xl text-base font-bold text-neutral-800 placeholder-neutral-300 outline-none transition-all duration-300 min-h-[48px]"
+                        />
+                    </div>
+                    <button 
+                        type="submit" 
+                        [disabled]="!searchCodeInput().trim()"
+                        class="w-full btn btn-primary py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] transition-all duration-300 min-h-[48px]"
+                    >
+                        Consultar Estado <i class="fas fa-chevron-right ml-2 text-xs"></i>
+                    </button>
+                </form>
+            </div>
             } @else if (error()) {
             <div class="p-12 text-center">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-rose-50 text-rose-500 rounded-full mb-6">

@@ -1,10 +1,12 @@
 import { Order, OrderItem } from '../../domain/entities/order.entity';
 import { normalizeOrderStatus, OrderStatus } from '../../domain/value-objects/order-status.vo';
+import { ProductMapper } from '@app/features/products/infrastructure/mappers/product.mapper';
 
 export interface OrderRow {
   id?: string;
   order_number?: string;
   user_id?: string | null;
+  session_id?: string | null;
   customer_name?: string;
   customer_email?: string | null;
   customer_phone?: string | null;
@@ -32,6 +34,7 @@ export class OrderMapper {
       id: row.id,
       order_number: row.order_number,
       user_id: row.user_id ?? undefined,
+      session_id: row.session_id ?? undefined,
       customer_name: row.customer_name ?? '',
       customer_email: row.customer_email ?? undefined,
       customer_phone: row.customer_phone ?? undefined,
@@ -50,7 +53,10 @@ export class OrderMapper {
       branch_id: row.branch_id ?? undefined,
       created_at: row.created_at,
       updated_at: row.updated_at,
-      items: row.items,
+      items: row.items?.map(item => ({
+        ...item,
+        product: item.product ? ProductMapper.mapFromDb(item.product) : undefined
+      })),
     };
   }
 
@@ -59,6 +65,7 @@ export class OrderMapper {
       id: order.id,
       order_number: order.order_number,
       user_id: order.user_id ?? null,
+      session_id: order.session_id ?? null,
       customer_name: order.customer_name,
       customer_email: order.customer_email ?? null,
       customer_phone: order.customer_phone ?? null,

@@ -1,0 +1,47 @@
+<div class="min-h-[400px]">
+  @if (isLoading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+      @for(i of [1,2,3,4,5,6]; track i) {
+        <div class="animate-pulse bg-gray-200 dark:bg-gray-800 rounded-3xl h-[400px] w-full"></div>
+      }
+    </div>
+  }
+
+  @if (error) {
+    <is-error [message]="error?.message || 'Error al cargar productos'" />
+  }
+
+  @if (!isLoading && !error) {
+    @if (totalItems === 0) {
+      <div class="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
+        <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-search text-4xl text-gray-300 dark:text-gray-600"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No encontramos lo que buscas</h3>
+        <p class="text-gray-500 dark:text-gray-400 max-w-md">
+          Intenta con otros términos, verifica la ortografía o elimina los filtros aplicados.
+        </p>
+        <button (click)="onClearFilters()" class="btn btn-link text-indigo-600 dark:text-indigo-400 mt-4 font-bold">
+          Limpiar búsqueda
+        </button>
+      </div>
+    } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-8">
+        @for (product of products; track product.id; let i = $index) {
+          <product-card 
+            [product]="product" 
+            [isPriority]="i < 2" 
+            (quickView)="onQuickView($event)"
+            class="h-full"
+          ></product-card>
+        }
+      </div>
+
+      @if (pages > 1) {
+        <div class="mt-16 flex justify-center">
+          <pagination [pages]="pages" [currentPage]="currentPage"></pagination>
+        </div>
+      }
+    }
+  }
+</div>

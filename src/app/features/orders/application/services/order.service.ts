@@ -28,4 +28,8 @@ export class OrderService {
   updateOrderStatus(orderId: string, status: OrderStatus): Observable<void> {
     return this.repository.updateOrderStatus(orderId, status);
   }
+
+  getActiveCart(userId?: string, sessionId?: string): Observable<Order | null> {
+    return this.repository.getActiveCart(userId, sessionId);
+  }
 }

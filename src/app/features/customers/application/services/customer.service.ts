@@ -12,7 +12,7 @@ export class CustomerService {
   private tenantService = inject(TenantService);
 
   async getAll(): Promise<UserProfile[]> {
-    return firstValueFrom(this.repository.getWhere('role', 'user', { column: 'created_at', ascending: false }));
+    return this.getRecentClients(1000);
   }
 
   async getById(id: string): Promise<UserProfile | null> {

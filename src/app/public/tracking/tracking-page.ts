@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { TrackingService } from './services/tracking.service';
 import { Repair, RepairStatus } from '../../features/repairs/domain/entities/repair.entity';
@@ -13,7 +14,7 @@ import { PublicRepairDto } from '../../features/repairs/domain/dtos/public-repai
 @Component({
     selector: 'app-tracking-page',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, FormsModule],
     templateUrl: './tracking-page.html',
     styles: [`
         @media print {
@@ -47,6 +48,7 @@ import { PublicRepairDto } from '../../features/repairs/domain/dtos/public-repai
 })
 export class TrackingPage implements OnInit {
     private route = inject(ActivatedRoute);
+    private router = inject(Router);
     private trackingService = inject(TrackingService);
     private logger = inject(LoggerService);
     private seoService = inject(SeoService);
@@ -63,6 +65,10 @@ export class TrackingPage implements OnInit {
     recommendedAccessories = signal<any[]>([]);
     buyingAccessory = signal<string | null>(null);
 
+    // Lookup Mode properties
+    isLookupMode = signal(false);
+    searchCodeInput = signal('');
+
     baseUrl = environment.baseUrl;
 
     qrCodeUrl = computed(() => {
@@ -72,16 +78,21 @@ export class TrackingPage implements OnInit {
         return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(trackingUrl)}`;
     });
 
-    // No longer needed as mapping is in UseCase
-
-    async ngOnInit() {
-        this.code = this.route.snapshot.paramMap.get('code');
-        if (this.code) {
-            await this.loadRepair();
-        } else {
-            this.error.set('Código de seguimiento no válido.');
-            this.loading.set(false);
-        }
+    ngOnInit() {
+        this.route.paramMap.subscribe(async (params) => {
+            this.code = params.get('code');
+            if (this.code && this.code !== 'consulta') {
+                this.isLookupMode.set(false);
+                this.loading.set(true);
+                this.error.set(null);
+                await this.loadRepair();
+            } else {
+                this.isLookupMode.set(true);
+                this.loading.set(false);
+                this.error.set(null);
+                this.repair.set(null);
+            }
+        });
     }
 
     async loadRepair() {
@@ -112,6 +123,14 @@ export class TrackingPage implements OnInit {
                 this.loading.set(false);
             }
         });
+    }
+
+    onSearchCode(event: Event) {
+        event.preventDefault();
+        const code = this.searchCodeInput().trim().toUpperCase();
+        if (code) {
+            this.router.navigate(['/tracking', code]);
+        }
     }
 
     private async updateSeo(r: PublicRepairDto) {

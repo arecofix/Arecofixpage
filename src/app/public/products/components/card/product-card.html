@@ -2,22 +2,24 @@
   
   <!-- Image Container -->
   <div class="relative aspect-4/3 overflow-hidden bg-gray-50/50 dark:bg-gray-700/30 p-4 flex items-center justify-center group-hover:bg-gray-100/50 dark:group-hover:bg-gray-700/50 transition-colors duration-500">
-    @if (isPriority()) {
-      <img 
-        [ngSrc]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
-        [alt]="product().name"
-        fill
-        priority
-        class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-out p-4" 
-      />
-    } @else {
-      <img 
-        [ngSrc]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
-        [alt]="product().name"
-        fill
-        class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-out p-4" 
-      />
-    }
+    <a [routerLink]="['/productos/detalle', product().slug]" class="absolute inset-0 block cursor-pointer">
+      @if (isPriority()) {
+        <img 
+          [ngSrc]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
+          [alt]="product().name"
+          fill
+          priority
+          class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-out p-4" 
+        />
+      } @else {
+        <img 
+          [ngSrc]="product().image_url || product().gallery_urls?.[0] || 'assets/img/no-image.png'" 
+          [alt]="product().name"
+          fill
+          class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-out p-4" 
+        />
+      }
+    </a>
     
     <!-- Badges -->
     <div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10">

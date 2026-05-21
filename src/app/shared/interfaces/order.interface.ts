@@ -12,12 +12,14 @@ export interface OrderItem {
   unit_cost_at_time?: number;
   subtotal: number;
   tenant_id?: string;
+  product?: any;
 }
 
 export interface Order {
   id?: string;
   order_number?: string;
   user_id?: string;
+  session_id?: string;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;

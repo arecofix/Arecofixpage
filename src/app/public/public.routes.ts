@@ -137,7 +137,7 @@ export const publicRoutes: Routes = [
         loadChildren: () => import('@app/public/gsm/gsm.routes').then(m => m.gsmRoutes),
       },
       {
-        title: 'Portfolio - Ezequiel Enrico Areco | Fullstack Engineer',
+        title: 'Portfolio - Ezequiel Enrico Areco | Java Backend Engineer',
         path: 'portfolio',
         loadComponent: () =>
           import('./portfolio/portfolio').then(
@@ -145,23 +145,23 @@ export const publicRoutes: Routes = [
           ),
         data: {
             seo: {
-                title: 'Ezequiel Enrico Areco - Senior Backend & Fullstack Engineer | Portfolio',
-                description: 'Arquitecto de Soluciones Escalables & Ingeniero de Software. Experto en Node.js, Cloud, Clean Architecture y sistemas de alto rendimiento.',
+                title: 'Ezequiel Enrico Areco - Java Backend Engineer | Portfolio',
+                description: 'Desarrollador Backend enfocado en APIs robustas con Java, Spring Boot y Project Loom. Con experiencia en persistencia JPA/Hibernate, bases de datos SQL, Docker y Git.',
                 imageUrl: 'assets/img/branding/logo/Logo (2).png',
-                keywords: 'software engineer, backend developer, clean architecture, node.js, cloud architect, ezequiel enrico areco, fullstack developer',
+                keywords: 'java developer, spring boot, project loom, hibernate, jpa, backend engineer, databases, docker, git, ezequiel enrico areco',
                 type: 'profile',
                 schema: {
                   '@context': 'https://schema.org',
                   '@type': 'Person',
                   'name': 'Ezequiel Enrico Areco',
-                  'jobTitle': 'Senior Backend & Fullstack Engineer',
+                  'jobTitle': 'Java Backend Engineer',
                   'url': 'https://arecofix.com.ar/portfolio',
                   'image': 'https://arecofix.com.ar/assets/img/branding/logo/Logo (2).png',
                   'sameAs': [
                     'https://www.linkedin.com/in/ezequiel-enrico/',
                     'https://github.com/arecofix'
                   ],
-                  'knowsAbout': ['Node.js', 'Angular', 'Cloud Architecture', 'System Design', 'Supabase', 'Docker', 'Clean Architecture'],
+                  'knowsAbout': ['Java', 'Spring Boot', 'Project Loom', 'Hibernate', 'JPA', 'SQL Databases', 'Docker', 'Git'],
                   'worksFor': {
                     '@type': 'Organization',
                     'name': 'Arecofix'
