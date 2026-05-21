@@ -13,11 +13,10 @@ import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operato
 import { Subject, combineLatest, of } from 'rxjs';
 import { TenantService } from '@app/core/services/tenant.service';
 
-import { IsErrorComponent } from '@app/shared/components/resource-status';
 import { ProductService } from '@app/public/products/services';
 import { CartService } from '@app/shared/services/cart.service';
-import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
-import { ProductCard } from '@app/public/products/components';
+import { PaginationService, iPagination } from '@app/shared/components/pagination';
+import { ProductsGridComponent } from '@app/public/products/components';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '@app/public/products/interfaces';
 
@@ -25,9 +24,7 @@ import { Product } from '@app/public/products/interfaces';
   selector: 'app-products-all-page',
   standalone: true,
   imports: [
-    IsErrorComponent,
-    ProductCard,
-    Pagination,
+    ProductsGridComponent,
     RouterModule,
     FormsModule,
     CommonModule,
@@ -158,6 +155,18 @@ export class ProductsAllPage {
     this.updateQueryParams({
       _sort: sort,
       _order: order,
+      _page: 1
+    });
+  }
+
+  clearAllFilters() {
+    this.searchQuery.set('');
+    this.minPriceInput.set(null);
+    this.maxPriceInput.set(null);
+    this.updateQueryParams({
+      q: null,
+      min_price: null,
+      max_price: null,
       _page: 1
     });
   }

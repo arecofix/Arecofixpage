@@ -81,50 +81,16 @@
         </div>
 
         <!-- PRODUCTS GRID -->
-        <main class="min-h-[400px]">
-            @if (productsRs.isLoading()) {
-                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
-                    @for(i of [1,2,3,4,5,6]; track i) {
-                        <div class="animate-pulse bg-gray-200 dark:bg-gray-800 rounded-3xl h-[400px] w-full"></div>
-                    }
-                 </div>
-            }
-            @if (productsRs.error()) { <is-error [message]="productsRs.error()?.message || 'Error al cargar productos'" /> }
-
-            @if (productsRs.value()) {
-                @if (productsRs.value()?.items === 0) {
-                    <div class="flex flex-col items-center justify-center py-20 text-center">
-                        <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
-                            <i class="fas fa-search text-4xl text-gray-300 dark:text-gray-600"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No encontramos lo que buscas</h3>
-                        <p class="text-gray-500 dark:text-gray-400 max-w-md">
-                            Intenta con otros términos, verifica la ortografía o elimina los filtros aplicados.
-                        </p>
-                        <button (click)="onSearch(''); minPriceInput.set(null); maxPriceInput.set(null)" class="btn btn-link text-indigo-600 mt-4">
-                            Limpiar búsqueda
-                        </button>
-                    </div>
-                } @else {
-                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-8">
-                        @for (product of productsRs.value()!.data; track product.id; let i = $index) {
-                            <product-card 
-                                [product]="product" 
-                                [isPriority]="i < 2" 
-                                (quickView)="openQuickView($event)"
-                                class="h-full"
-                            ></product-card>
-                        }
-                    </div>
-
-                    @if (paginationData(); as pagination) {
-                        <div class="mt-16 flex justify-center">
-                            <pagination [pages]="pagination.pages" [currentPage]="paginationService.currentPage()"></pagination>
-                        </div>
-                    }
-                }
-            }
-        </main>
+        <app-products-grid
+            [products]="productsRs.value()?.data || []"
+            [isLoading]="productsRs.isLoading()"
+            [error]="productsRs.error()"
+            [totalItems]="productsRs.value()?.items || 0"
+            [pages]="paginationData()?.pages || 1"
+            [currentPage]="paginationService.currentPage()"
+            (quickView)="openQuickView($event)"
+            (clearFilters)="clearAllFilters()"
+        ></app-products-grid>
         
         <!-- SEO Content Section -->
         <section class="mt-24 pt-12 border-t border-gray-200 dark:border-gray-800">
@@ -234,7 +200,7 @@
         </div>
         
         <div class="mt-auto pt-8">
-            <button (click)="onSearch(''); minPriceInput.set(null); maxPriceInput.set(null); applyPriceFilter()" class="btn btn-outline btn-block rounded-xl">
+            <button (click)="clearAllFilters(); isMobileFiltersOpen.set(false)" class="btn btn-outline btn-block rounded-xl">
                 Limpiar Todo
             </button>
         </div>

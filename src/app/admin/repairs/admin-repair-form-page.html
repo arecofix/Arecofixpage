@@ -71,7 +71,7 @@
                         [customerPhone]="repairForm.value.customer_phone"
                         [customerEmail]="repairForm.value.customer_email"
                         [customerDni]="repairForm.value.customer_dni"
-                        [clients]="clients"
+                        [clients]="clients()"
                         (onNameChange)="onSelectClient($event)"
                         (onPhoneChange)="updateFormField('customer_phone', $event)"
                         (onEmailChange)="updateFormField('customer_email', $event)"

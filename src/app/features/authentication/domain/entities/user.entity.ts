@@ -41,6 +41,8 @@ export interface UserProfile {
     updated_at: string;
     is_active: boolean;
     role: UserRole;
+    notes?: string;
+    is_guest?: boolean;
 }
 
 /**

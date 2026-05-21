@@ -25,6 +25,8 @@ export interface UserProfile {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  notes?: string;
+  is_guest?: boolean;
 }
 
 export interface CourseData {

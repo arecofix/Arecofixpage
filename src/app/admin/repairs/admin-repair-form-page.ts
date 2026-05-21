@@ -144,7 +144,7 @@ export class AdminRepairFormPage implements OnInit {
 
         // Client Search Stream
         this.clientSearch$.pipe(
-            debounceTime(500),
+            debounceTime(300),
             distinctUntilChanged(),
             switchMap(query => {
                 const q = query.trim();
@@ -159,7 +159,7 @@ export class AdminRepairFormPage implements OnInit {
             })
         ).subscribe(data => {
             if (data) {
-                this.clients = data.map((c: any) => this.clientView(c)) as any[];
+                this.clients.set(data.map((c: any) => this.clientView(c)));
             }
         });
     }
@@ -176,7 +176,7 @@ export class AdminRepairFormPage implements OnInit {
     error = signal<string | null>(null);
     company = signal<any>(null); // Company settings are quite dynamic, can keep any or define interface
     uploadingImages = signal(false);
-    clients: any[] = [];
+    clients = signal<any[]>([]);
 
     public missingBranch = computed(() => {
         // SuperAdmins are never 'missing' a branch (fall back to Central)
@@ -188,7 +188,7 @@ export class AdminRepairFormPage implements OnInit {
         try {
             const data = await this.customerService.getRecentClients();
             if (data) {
-                this.clients = data.map((c: any) => this.clientView(c)) as any[];
+                this.clients.set(data.map((c: any) => this.clientView(c)));
             }
         } catch (e) {
             console.error('Error loading clients', e);
@@ -233,7 +233,7 @@ export class AdminRepairFormPage implements OnInit {
     onSelectClient(clientName: string) {
         this.clientSearch$.next(clientName);
 
-        const client = this.clients.find((c: any) => c.displayName === clientName) as any;
+        const client = this.clients().find((c: any) => c.displayName === clientName) as any;
         if (client) {
             this.repairForm.patchValue({
                 customer_id: client.id, 

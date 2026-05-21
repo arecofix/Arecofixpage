@@ -5,6 +5,7 @@
 
 /** Values persisted in public.orders.status */
 export const DB_ORDER_STATUSES = [
+  'cart',
   'pending',
   'pending_payment',
   'awaiting_verification',
@@ -21,6 +22,7 @@ export type DbOrderStatus = (typeof DB_ORDER_STATUSES)[number];
 export type OrderStatus = DbOrderStatus;
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  cart: 'Carrito',
   pending: 'Pendiente',
   pending_payment: 'Pago pendiente',
   awaiting_verification: 'Verificando pago',
