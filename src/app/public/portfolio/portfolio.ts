@@ -132,8 +132,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     es: {
       image: 'assets/img/portfolio/ezequiel-enrico-areco.jpeg',
       name: 'EZEQUIEL ENRICO ARECO',
-      role: 'Especialista en DevOps | Infraestructura, Automatización y Ciberseguridad',
-      tagline: 'Estudiante de Licenciatura en Informática con sólida base académica. Apasionado por la automatización de infraestructura, seguridad de aplicaciones (CI/CD) y la administración de sistemas Linux.',
+      role: 'Software Developer & DevOps | Backend, Infrastructure & Cybersecurity',
+      tagline: 'Desarrollador enfocado en construir arquitecturas escalables y seguras. Combino la automatizacion de infraestructura (CI/CD) y la administración de sistemas Linux para desplegar productos SaaS y aplicaciones de seguridad de alto rendimiento. Actualmente complementando mi perfil tecnico con la Licenciatura en Informatica (UNO)',
       location: 'Buenos Aires, Argentina',
       email: 'ezequielenrico15@gmail.com',
       linkedin: environment.contact.socialMedia.linkedin,
@@ -147,10 +147,10 @@ export class PortfolioComponent implements OnInit, OnDestroy {
         primaryTechLabel: 'Foco Principal',
         primaryTechValue: 'Terraform, Docker, Linux, CI/CD',
         primaryTechIcon: 'fa-solid fa-shield-halved',
-        complementaryLabel: 'Infraestructura & Scripting',
+        complementaryLabel: 'Base de datos & Seguridad',
         complementaryValue: 'Bash/Shell, Powershell, AWS, PostgreSQL RLS, Github',
         cloudDbLabel: 'Backend & Cloud',
-        cloudDbValue: 'Python, Java, Node.js, Supabase, Firebase',
+        cloudDbValue: 'Java, Node.js, Supabase, Firebase',
         keyStrengthsLabel: 'Fortalezas Clave',
         keyStrengths: ['Licenciatura en Informática (UNO)', 'Promedio Académico: 8.40', 'Inglés Avanzado C1 (Global Teams)', 'Automatización & Hardening de Servidores']
       },
@@ -235,7 +235,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           skills: [
             { name: 'Docker & Contenedores', icon: 'fa-brands fa-docker', description: 'Contenedorización de aplicaciones, optimización de builds multi-etapa y orquestación de servicios en producción.', isPrimary: true },
             { name: 'Scripting & Linux (Bash)', icon: 'fas fa-terminal', description: 'Automatización de tareas con scripting Bash/Powershell, tareas programadas (cron), monitoreo y SysAdmin general.', isPrimary: true },
-            { name: 'Git & Gitflow', icon: 'fa-brands fa-git-alt', description: 'Control de versiones profesional, administración de flujos de trabajo e integración en pipelines bajo metodologías ágiles.', isPrimary: true }
+            { name: 'Angular', icon: 'fa-brands fa-git-alt', description: 'Desarrollo de aplicaciones PWA Utilizando Frameworks para el Frontend Manejo de Git y Control de versiones profesional, administración de flujos de trabajo e integración en pipelines bajo metodologías ágiles.', isPrimary: true }
           ]
         },
         {
@@ -257,7 +257,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           category: 'Educación & Certificaciones',
           skills: [
             { name: 'Licenciatura en Informática (UNO)', icon: 'fas fa-graduation-cap', description: 'Estudiante universitario (Promedio: 8.40) con bases teóricas sólidas en redes, criptografía y algoritmos.' },
-            { name: 'Inglés Avanzado C1', icon: 'fas fa-language', description: 'Nivel C1 certificado. Fluidez en conversación y documentación técnica para integración inmediata en equipos internacionales.' }
+            { name: 'Inglés Avanzado B2', icon: 'fas fa-language', description: 'Nivel C1 certificado. Fluidez en conversación y documentación técnica para integración inmediata en equipos internacionales.' }
           ]
         }
       ],
