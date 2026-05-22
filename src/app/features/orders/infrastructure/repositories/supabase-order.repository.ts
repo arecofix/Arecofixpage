@@ -56,14 +56,14 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     });
   }
 
-  getOrders(): Observable<Order[]> {
-    const query = this.applyTenantFilter(
+  getOrders(params?: { page?: number; pageSize?: number }): Observable<Order[]> {
+    let query = this.applyTenantFilter(
       this.supabase.from(this.tableName).select('*, items:order_items(*)')
     ).order('created_at', { ascending: false });
 
-    if (page !== undefined && pageSize !== undefined) {
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize - 1;
+    if (params?.page !== undefined && params?.pageSize !== undefined) {
+      const start = (params.page - 1) * params.pageSize;
+      const end = start + params.pageSize - 1;
       query = query.range(start, end);
     }
 
