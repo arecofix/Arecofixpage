@@ -49,7 +49,7 @@ import { NavigationStateService } from '@app/core/services/navigation-state.serv
   templateUrl: './public-layout-header.html',
   styles: `
     :host {
-      display: contents;
+      display: block;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

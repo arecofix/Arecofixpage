@@ -4,10 +4,12 @@ import { AppServiceEntity } from '../../domain/entities/app-service.entity';
 import { LoggerService } from '@app/core/services/logger.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
+import { AppServiceRepository } from '../../domain/repositories/app-service.repository';
+
 @Injectable({
   providedIn: 'root'
 })
-export class SupabaseAppServiceRepository extends BaseRepository<AppServiceEntity> {
+export class SupabaseAppServiceRepository extends BaseRepository<AppServiceEntity> implements AppServiceRepository {
   protected override tableName = 'services';
   protected override suppressAuthNotifications = true;
 

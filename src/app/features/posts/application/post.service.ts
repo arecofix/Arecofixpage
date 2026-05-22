@@ -33,9 +33,17 @@ export class PostService {
   private mapToEntity(data: Record<string, unknown>): Post {
     const rawImage = (data['featured_image'] ?? data['image'] ?? data['image_url']) as string | null;
     return {
-      ...(data as object),
-      image: this.getImageUrl(rawImage),
-    } as Post;
+      id: data['id'] as string,
+      created_at: data['created_at'] as string,
+      updated_at: data['updated_at'] as string,
+      title: data['title'] as string,
+      slug: data['slug'] as string,
+      content: data['content'] as string,
+      image: this.getImageUrl(rawImage) || undefined,
+      published: data['status'] === 'published',
+      meta_title: (data['seo_title'] || data['meta_title']) as string | undefined,
+      meta_description: (data['seo_description'] || data['meta_description']) as string | undefined,
+    };
   }
 
   private getImageUrl(pathOrUrl: string | null): string | null {

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { SupabaseAppServiceRepository } from '../../infrastructure/repositories/supabase-app-service.repository';
+import { AppServiceRepository } from '../../domain/repositories/app-service.repository';
 import { AppServiceEntity, CreateAppServiceDto, UpdateAppServiceDto } from '../../domain/entities/app-service.entity';
 import { firstValueFrom } from 'rxjs';
 
@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root'
 })
 export class AppCatalogService {
-  private repository = inject(SupabaseAppServiceRepository);
+  private repository = inject(AppServiceRepository);
 
   async getAll(): Promise<AppServiceEntity[]> {
     return firstValueFrom(this.repository.getAll({ column: 'created_at', ascending: false }));

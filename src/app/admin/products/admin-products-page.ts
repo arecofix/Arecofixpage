@@ -3,6 +3,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
+import { Category } from '@app/features/products/domain/entities/category.entity';
 import { AdminProductService, ImportReport } from './services/admin-product.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
@@ -31,7 +32,7 @@ export class AdminProductsPage implements OnInit {
   // Signals
   public products = signal<Product[]>([]);
   public brands = signal<Brand[]>([]); 
-  public categories = signal<any[]>([]);
+  public categories = signal<Category[]>([]);
   public searchQuery = signal<string>('');
   public selectedCategoryId = signal<string>('all');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
@@ -165,7 +166,7 @@ export class AdminProductsPage implements OnInit {
           include_inactive: true
       });
 
-      this.products.set(response.data as any[] || []);
+      this.products.set((response.data || []) as unknown as Product[]);
       this.totalItems.set(response.items || 0);
 
     } catch (e: any) {
@@ -176,8 +177,9 @@ export class AdminProductsPage implements OnInit {
     }
   }
 
-  updateSort(event: any) {
-    this.sortOrder.set(event.target.value);
+  updateSort(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.sortOrder.set(target.value as any);
     this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
@@ -187,8 +189,9 @@ export class AdminProductsPage implements OnInit {
     this.loadData();
   }
 
-  onCategoryChange(event: any) {
-    this.selectedCategoryId.set(event.target.value);
+  onCategoryChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.selectedCategoryId.set(target.value);
     this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
@@ -278,10 +281,11 @@ export class AdminProductsPage implements OnInit {
     }
   }
 
-  async importProducts(event: any) {
-    const file: File = event.target.files?.[0];
+  async importProducts(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file: File | undefined = target.files?.[0];
     // Reset file input so the same file can be re-selected if needed
-    event.target.value = '';
+    target.value = '';
 
     if (!file) return;
 

@@ -14,6 +14,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 @Injectable({ providedIn: 'root' })
 export class SupabaseBrandRepository extends BaseRepository<Brand> implements BrandRepository {
     protected override tableName = 'brands';
+    protected override useSoftDeletes = true;
     protected override suppressAuthNotifications = true;
 
     constructor() {

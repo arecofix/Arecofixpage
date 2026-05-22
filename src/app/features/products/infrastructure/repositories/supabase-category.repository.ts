@@ -18,6 +18,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 @Injectable({ providedIn: 'root' })
 export class SupabaseCategoryRepository extends BaseRepository<Category> implements CategoryRepository {
     protected override tableName = 'categories';
+    protected override useSoftDeletes = true;
     protected override suppressAuthNotifications = true;
 
     constructor() {

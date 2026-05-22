@@ -1,0 +1,78 @@
+import { Injectable, inject } from '@angular/core';
+import { ProductStockRepository } from '../../domain/repositories/product-stock.repository';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { DatabaseError } from '@app/core/errors/application.error';
+import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SupabaseProductStockRepository implements ProductStockRepository {
+  private supabase = inject(SUPABASE_CLIENT);
+
+  async updateBranchStock(productId: string, branchId: string, quantity: number, tenantId: string | null): Promise<void> {
+    // Try focused update first
+    const { data, error: updateError } = await this.supabase
+      .from('product_stock_per_branch')
+      .update({ 
+        quantity, 
+        updated_at: new Date().toISOString() 
+      })
+      .eq('product_id', productId)
+      .eq('branch_id', branchId)
+      .select('id')
+      .maybeSingle();
+
+    if (updateError) throw new DatabaseError(updateError.message, updateError);
+
+    // If no row was updated, insert it
+    if (!data) {
+      const { error: insertError } = await this.supabase
+        .from('product_stock_per_branch')
+        .insert({
+          product_id: productId,
+          branch_id: branchId,
+          tenant_id: tenantId === TENANT_CONSTANTS.FALLBACK_ID ? null : tenantId,
+          quantity,
+          updated_at: new Date().toISOString()
+        });
+
+      if (insertError) throw new DatabaseError(insertError.message, insertError);
+    }
+    
+    // Also sync the global products.stock field (aggregated)
+    await this.syncGlobalStock(productId);
+  }
+
+  async syncGlobalStock(productId: string): Promise<void> {
+    const { data: stocks, error: fetchError } = await this.supabase
+      .from('product_stock_per_branch')
+      .select('quantity')
+      .eq('product_id', productId);
+
+    if (fetchError) return;
+
+    const totalStock = (stocks || []).reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);
+
+    await this.supabase
+      .from('products')
+      .update({ stock: totalStock })
+      .eq('id', productId);
+  }
+
+  async deductStock(productId: string, branchId: string, quantityToDeduct: number, tenantId: string | null): Promise<void> {
+    const cleanTenantId = tenantId === TENANT_CONSTANTS.FALLBACK_ID ? null : tenantId;
+
+    const { error } = await this.supabase.rpc('deduct_product_stock_v3', {
+      p_product_id: productId,
+      p_branch_id: branchId,
+      p_quantity_to_deduct: quantityToDeduct,
+      p_tenant_id: cleanTenantId
+    });
+
+    if (error) {
+       console.error('[SupabaseProductStockRepository] RPC Failed:', error);
+       throw new DatabaseError(error.message, error);
+    }
+  }
+}

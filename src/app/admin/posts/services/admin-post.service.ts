@@ -14,7 +14,7 @@ export class AdminPostService {
     async getPosts(): Promise<Post[]> {
         const { data, error } = await this.supabase
             .from('blog_posts')
-            .select('id, title, slug, summary, content, featured_image, image, image_url, created_at, updated_at, is_active, author_id, tags, view_count, is_featured, category_id')
+            .select('id, title, slug, excerpt, content, featured_image, created_at, updated_at, view_count, category_id, status, seo_title, seo_description, author')
             .eq('tenant_id', this.tenantService.getTenantId())
             .order('created_at', { ascending: false });
 
@@ -25,7 +25,7 @@ export class AdminPostService {
     async getPost(id: string): Promise<Post | null> {
         const { data, error } = await (this.supabase
             .from('blog_posts')
-            .select('id, title, slug, summary, content, featured_image, image, image_url, created_at, updated_at, is_active, author_id, tags, view_count, is_featured, category_id')
+            .select('id, title, slug, excerpt, content, featured_image, created_at, updated_at, view_count, category_id, status, seo_title, seo_description, author')
             .eq('id', id)
             .eq('tenant_id', this.tenantService.getTenantId()) as any)
             .maybeSingle();
@@ -36,45 +36,45 @@ export class AdminPostService {
 
     private mapToEntity(data: any): Post {
         return {
-            ...data,
-            image: data.featured_image || data.image || data.image_url
+            id: data.id,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            title: data.title,
+            slug: data.slug,
+            content: data.content,
+            image: data.featured_image || undefined,
+            published: data.status === 'published',
+            meta_title: data.seo_title || undefined,
+            meta_description: data.seo_description || undefined
         };
     }
 
     async createPost(payload: Partial<Post>): Promise<void> {
-        // Map 'image' to 'featured_image' for DB
-        const dbPayload: any = { ...payload };
-
-        // Map image
-        if (dbPayload.image) {
-            dbPayload.featured_image = dbPayload.image;
-            delete dbPayload.image;
-        }
-
-        // Remove fields that don't exist in the user's table
-        delete dbPayload.meta_title;
-        delete dbPayload.meta_description;
-        delete dbPayload.published;
-
-        dbPayload.tenant_id = this.tenantService.getTenantId();
+        const dbPayload: any = {
+            title: payload.title,
+            slug: payload.slug,
+            content: payload.content,
+            featured_image: payload.image || null,
+            status: payload.published ? 'published' : 'draft',
+            seo_title: payload.meta_title || null,
+            seo_description: payload.meta_description || null,
+            tenant_id: this.tenantService.getTenantId()
+        };
 
         const { error } = await this.supabase.from('blog_posts').insert(dbPayload);
         if (error) throw error;
     }
 
     async updatePost(id: string, payload: Partial<Post>): Promise<void> {
-        const dbPayload: any = { ...payload };
-
-        // Map image
-        if (dbPayload.image) {
-            dbPayload.featured_image = dbPayload.image;
-            delete dbPayload.image;
-        }
-
-        // Remove fields that don't exist in the user's table
-        delete dbPayload.meta_title;
-        delete dbPayload.meta_description;
-        delete dbPayload.published;
+        const dbPayload: any = {
+            title: payload.title,
+            slug: payload.slug,
+            content: payload.content,
+            featured_image: payload.image || null,
+            status: payload.published ? 'published' : 'draft',
+            seo_title: payload.meta_title || null,
+            seo_description: payload.meta_description || null
+        };
 
         const { error } = await this.supabase.from('blog_posts')
             .update(dbPayload)

@@ -19,7 +19,11 @@ CREATE POLICY "Allow select orders" ON public.orders
   FOR SELECT
   TO anon, authenticated
   USING (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND (
       (auth.role() = 'anon' AND user_id IS NULL AND session_id IS NOT NULL)
       OR
@@ -32,7 +36,11 @@ CREATE POLICY "Allow insert orders" ON public.orders
   FOR INSERT
   TO anon, authenticated
   WITH CHECK (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND (
       (auth.role() = 'anon' AND user_id IS NULL AND session_id IS NOT NULL)
       OR
@@ -45,7 +53,11 @@ CREATE POLICY "Allow update orders" ON public.orders
   FOR UPDATE
   TO anon, authenticated
   USING (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND (
       (auth.role() = 'anon' AND user_id IS NULL AND session_id IS NOT NULL)
       OR
@@ -53,7 +65,11 @@ CREATE POLICY "Allow update orders" ON public.orders
     )
   )
   WITH CHECK (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND (
       (auth.role() = 'anon' AND user_id IS NULL AND session_id IS NOT NULL)
       OR
@@ -66,7 +82,11 @@ CREATE POLICY "Allow delete orders" ON public.orders
   FOR DELETE
   TO anon, authenticated
   USING (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND (
       (auth.role() = 'anon' AND user_id IS NULL AND session_id IS NOT NULL)
       OR
@@ -80,10 +100,15 @@ CREATE POLICY "Allow select order_items" ON public.order_items
   FOR SELECT
   TO anon, authenticated
   USING (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND EXISTS (
       SELECT 1 FROM public.orders
       WHERE public.orders.id = order_items.order_id
+        AND public.orders.tenant_id = order_items.tenant_id
     )
   );
 
@@ -92,10 +117,15 @@ CREATE POLICY "Allow insert order_items" ON public.order_items
   FOR INSERT
   TO anon, authenticated
   WITH CHECK (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND EXISTS (
       SELECT 1 FROM public.orders
       WHERE public.orders.id = order_items.order_id
+        AND public.orders.tenant_id = order_items.tenant_id
     )
   );
 
@@ -104,17 +134,27 @@ CREATE POLICY "Allow update order_items" ON public.order_items
   FOR UPDATE
   TO anon, authenticated
   USING (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND EXISTS (
       SELECT 1 FROM public.orders
       WHERE public.orders.id = order_items.order_id
+        AND public.orders.tenant_id = order_items.tenant_id
     )
   )
   WITH CHECK (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND EXISTS (
       SELECT 1 FROM public.orders
       WHERE public.orders.id = order_items.order_id
+        AND public.orders.tenant_id = order_items.tenant_id
     )
   );
 
@@ -123,9 +163,14 @@ CREATE POLICY "Allow delete order_items" ON public.order_items
   FOR DELETE
   TO anon, authenticated
   USING (
-    tenant_id = public.get_my_tenant()
+    (
+      (auth.role() = 'authenticated' AND tenant_id = public.get_my_tenant())
+      OR
+      (auth.role() = 'anon' AND tenant_id IS NOT NULL)
+    )
     AND EXISTS (
       SELECT 1 FROM public.orders
       WHERE public.orders.id = order_items.order_id
+        AND public.orders.tenant_id = order_items.tenant_id
     )
   );

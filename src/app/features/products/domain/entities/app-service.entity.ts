@@ -2,9 +2,13 @@ export interface AppServiceEntity {
     id: string;
     tenant_id?: string;
     name: string;
+    slug?: string;
     description?: string;
+    estimated_time?: string;
+    image_url?: string;
     price: number;
     duration_minutes: number;
+    category_id?: string;
     is_active: boolean;
     created_at?: string;
     updated_at?: string;
