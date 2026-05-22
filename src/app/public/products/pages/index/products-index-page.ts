@@ -7,6 +7,7 @@ import { GetProductsByCategorySlugUseCase } from '@app/core/usecases/products/ge
 import { SeoService } from '@app/core/services/seo.service';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { Product } from '@app/shared/interfaces/product.interface';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 @Component({
     selector: 'app-products-index-page',
@@ -18,6 +19,7 @@ export class ProductsIndexPage implements OnInit {
     private getProductsUseCase = inject(GetProductsByCategorySlugUseCase);
     private seoService = inject(SeoService);
     private router = inject(Router);
+    private gsmService = inject(GsmService);
 
     celulares = signal<Product[]>([]);
     repuestos = signal<Product[]>([]);
@@ -44,15 +46,26 @@ export class ProductsIndexPage implements OnInit {
     private async loadData() {
         try {
             // Parallel execution using forkJoin
-            const [celularesData, repuestosData] = await firstValueFrom(
+            const [celularesData, repuestosData, rate] = await firstValueFrom(
                 forkJoin([
                     this.getProductsUseCase.execute('celulares'),
-                    this.getProductsUseCase.execute('repuestos')
+                    this.getProductsUseCase.execute('repuestos'),
+                    this.gsmService.getUsdtRate()
                 ])
             );
             
-            this.celulares.set(celularesData as Product[]); // Cast needed if usecase returns any[]
-            this.repuestos.set(repuestosData as Product[]);
+            const mapProduct = (p: Product) => {
+                if (p.currency === 'USD') {
+                    return {
+                        ...p,
+                        convertedPrice: p.price * rate
+                    };
+                }
+                return p;
+            };
+
+            this.celulares.set((celularesData as Product[]).map(mapProduct));
+            this.repuestos.set((repuestosData as Product[]).map(mapProduct));
 
         } catch (error) {
             console.error('Error loading products', error);

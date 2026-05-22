@@ -28,6 +28,7 @@ import {
 } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
 import { Product } from '@app/public/products/interfaces';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 @Component({
   selector: 'products-featured-page',
@@ -48,12 +49,18 @@ export class ProductsFeaturedPage {
   private productService: ProductService = inject(ProductService);
   public paginationService: PaginationService = inject(PaginationService);
   public cartService: CartService = inject(CartService);
+  private gsmService: GsmService = inject(GsmService);
 
   private router = inject(Router);
   private tenantService = inject(TenantService);
 
   // Create observable in injection context (field initializer)
   private tenant$ = toObservable(this.tenantService.currentTenant);
+
+  // Exchange rate resource
+  usdRate = rxResource({
+    stream: () => this.gsmService.getUsdtRate()
+  });
 
    // Search Signal and Subject
   searchQuery = signal('');
@@ -126,6 +133,21 @@ export class ProductsFeaturedPage {
             });
         })
       ),
+  });
+
+  displayProducts = computed<Product[]>(() => {
+    const res = this.productsRs.value();
+    if (!res || !res.data) return [];
+    const rate = this.usdRate.value() || 1240;
+    return res.data.map(p => {
+      if (p.currency === 'USD') {
+        return {
+          ...p,
+          convertedPrice: p.price * rate
+        };
+      }
+      return p;
+    });
   });
 
   // Computed para extraer datos de paginación de forma reactiva

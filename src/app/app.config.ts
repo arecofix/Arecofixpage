@@ -4,10 +4,16 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
   APP_INITIALIZER,
+  LOCALE_ID,
 } from '@angular/core';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withInMemoryScrolling, TitleStrategy } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { registerLocaleData } from '@angular/common';
+import localeEsAr from '@angular/common/locales/es-AR';
+import { AppTitleStrategy } from './core/strategies/app-title.strategy';
+
+registerLocaleData(localeEsAr, 'es-AR');
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { SupabaseService } from './core/services/supabase.service';
@@ -45,6 +51,12 @@ import { TenantService } from './core/services/tenant.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Locale provider
+    { provide: LOCALE_ID, useValue: 'es-AR' },
+
+    // Title Strategy
+    { provide: TitleStrategy, useClass: AppTitleStrategy },
+
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     

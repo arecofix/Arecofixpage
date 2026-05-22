@@ -36,6 +36,7 @@ import { ProductReviewBaseRepository } from '@app/features/products/domain/repos
 import { NotificationService } from '@app/core/services/notification.service';
 import { ProductStrategicService } from '@app/core/services/product-strategic.service';
 import { ShippingService, ShippingQuote } from '@app/features/orders/application/services/shipping.service';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 /*  */
 
 
@@ -71,6 +72,12 @@ export class ProductsDetailsPage {
   private destroyRef = inject(DestroyRef);
   private strategicService = inject(ProductStrategicService);
   private shippingService = inject(ShippingService);
+  private gsmService = inject(GsmService);
+
+  // Exchange rate resource
+  usdRate = rxResource({
+    stream: () => this.gsmService.getUsdtRate()
+  });
 
   // UI Constants
   starRating = [1, 2, 3, 4, 5];
@@ -243,7 +250,15 @@ export class ProductsDetailsPage {
     if (!data || !data.data || data.data.length === 0) return null;
 
     // Retornar el primer producto encontrado (debería ser único por slug)
-    return data.data[0];
+    const p = data.data[0];
+    const rate = this.usdRate.value() || 1240;
+    if (p.currency === 'USD') {
+      return {
+        ...p,
+        convertedPrice: p.price * rate
+      };
+    }
+    return p;
   });
 
   // Strategic Computeds

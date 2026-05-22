@@ -97,11 +97,11 @@ export class AdminProductService {
             include_inactive: params.include_inactive ?? true,
             branch_id: params.branch_id || contextBranchId
         };
-        return firstValueFrom(this.productRepo.findWithFilters(enrichedParams));
+        return firstValueFrom(this.productsStore.getProductsPage(enrichedParams));
     }
 
     async getProduct(id: string): Promise<Product | null> {
-        return firstValueFrom(this.productRepo.getById(id));
+        return firstValueFrom(this.productsStore.getProductDetail(id));
     }
 
     async getBrands(): Promise<Brand[]> {
@@ -122,10 +122,12 @@ export class AdminProductService {
 
     async approveProduct(id: string): Promise<void> {
         await firstValueFrom(this.productRepo.approveProduct(id));
+        this.productsStore.clearCache();
     }
 
     async rejectProduct(id: string): Promise<void> {
         await firstValueFrom(this.productRepo.rejectProduct(id));
+        this.productsStore.clearCache();
     }
 
     async getPendingApprovalsCount(): Promise<number> {
@@ -164,10 +166,12 @@ export class AdminProductService {
             }
         }
         await firstValueFrom(this.productRepo.create(payload as Product));
+        this.productsStore.clearCache();
     }
 
     async updateProduct(id: string, payload: Partial<Product>): Promise<void> {
         await firstValueFrom(this.productRepo.update(id, payload));
+        this.productsStore.clearCache();
     }
 
     async getProductsByIds(ids: string[]): Promise<Product[]> {
@@ -540,10 +544,9 @@ export class AdminProductService {
             details.push(`🆕 ${inserted} productos nuevos insertados.`);
         }
 
-        if (skipped > 0) {
-            details.push(`⛔ ${skipped} filas omitidas.`);
+        if (inserted > 0 || priceUpdated > 0 || renamed > 0) {
+            this.productsStore.clearCache();
         }
-
         return { inserted, priceUpdated, renamed, skipped, details };
     }
 
@@ -579,14 +582,17 @@ export class AdminProductService {
     async bulkCustomUpdate(updates: Array<{ id: string; payload: Record<string, any> }>): Promise<void> {
         const products = updates.map(u => ({ id: u.id, ...u.payload }));
         await firstValueFrom(this.productRepo.updateMany(products));
+        this.productsStore.clearCache();
     }
 
     async bulkDelete(ids: string[]): Promise<void> {
         await firstValueFrom(this.productRepo.bulkDelete(ids));
+        this.productsStore.clearCache();
     }
 
     async bulkUpdateCategory(ids: string[], categoryId: string): Promise<void> {
         await firstValueFrom(this.productRepo.bulkUpdateCategory(ids, categoryId));
+        this.productsStore.clearCache();
     }
 
     async getInventorySummary(branchId?: string) {
@@ -599,5 +605,6 @@ export class AdminProductService {
         if (!products || products.length === 0) return;
         const updates = products.map(p => ({ id: p.id, price: Math.round(p.price * (1 + percentage / 100)) }));
         await firstValueFrom(this.productRepo.updateMany(updates));
+        this.productsStore.clearCache();
     }
 }

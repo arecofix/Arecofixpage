@@ -87,8 +87,11 @@
           <div class="bh-product-card__body">
             <h3>{{ p.name }}</h3>
             <p class="bh-product-card__price">
-              {{ (p.sale_price || p.price) | currency:'ARS':'symbol-narrow':'1.0-0' }}
+              {{ (p.sale_price || p.price) | currency: (p.currency || 'ARS'): 'symbol-narrow': (p.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
             </p>
+            <span class="bh-product-card__converted" *ngIf="p.currency === 'USD' && p.convertedPrice" style="font-size: 0.75rem; color: #10b981; font-weight: 700; margin-top: 0.25rem; display: block;">
+              ~ {{ p.convertedPrice | currency:'ARS':'symbol-narrow':'1.0-0':'es-AR' }}
+            </span>
             <button class="bh-product-card__btn">Ver detalle</button>
           </div>
         </div>

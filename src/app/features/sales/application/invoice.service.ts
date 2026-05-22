@@ -8,6 +8,8 @@ import {
   InvoiceResult,
 } from '@app/features/sales/domain/entities/invoice.entity';
 import { InvoiceRepository } from '../domain/repositories/invoice.repository';
+import { InvoicesStore } from './services/invoices.store';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * InvoiceService — Application Layer (Use Case)
@@ -19,6 +21,7 @@ export class InvoiceService {
   private tenantService = inject(TenantService);
   private logger = inject(LoggerService);
   private repository = inject(InvoiceRepository);
+  private invoicesStore = inject(InvoicesStore);
 
   /**
    * UC-01: Generate Invoice
@@ -66,6 +69,9 @@ export class InvoiceService {
       const result = await this.repository.create(payload);
       if (result.error) throw result.error;
 
+      // Invalidate cache on new invoice creation
+      this.invoicesStore.clearCache();
+
       this.logger.info(`[InvoiceService] Invoice generated: ${result.data?.id} (origin: ${dto.origin})`);
       return { data: result.data, error: null, duplicate: false };
 
@@ -81,7 +87,7 @@ export class InvoiceService {
   async getAll(limit: number = 20, offset: number = 0, searchTerm?: string): Promise<Invoice[]> {
     const tenantId = this.tenantService.getTenantId();
     try {
-        return await this.repository.getAll({ limit, offset, tenantId, searchTerm });
+        return await firstValueFrom(this.invoicesStore.getInvoicesList({ limit, offset, tenantId, searchTerm }));
     } catch (error) {
         this.logger.error('[InvoiceService] getAll failed', error);
         return [];
@@ -100,7 +106,7 @@ export class InvoiceService {
   async getById(id: string): Promise<Invoice | null> {
     const tenantId = this.tenantService.getTenantId();
     try {
-        return await this.repository.getById(id, tenantId);
+        return await firstValueFrom(this.invoicesStore.getInvoiceDetail(id, tenantId));
     } catch (error) {
         return null;
     }
