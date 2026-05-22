@@ -48,6 +48,7 @@ export interface Product {
   updated_at?: string;
   barcode?: string | null;
   currency?: string;
+  convertedPrice?: number;
   tenant_id?: string;
   is_global?: boolean;
   deleted_at?: string | null;

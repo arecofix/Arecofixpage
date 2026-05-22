@@ -19,6 +19,7 @@ import { PaginationService, iPagination } from '@app/shared/components/paginatio
 import { ProductsGridComponent } from '@app/public/products/components';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '@app/public/products/interfaces';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 @Component({
   selector: 'app-products-all-page',
@@ -99,6 +100,21 @@ export class ProductsAllPage {
         });
       })
     )
+  });
+
+  displayProducts = computed<Product[]>(() => {
+    const res = this.productsRs.value();
+    if (!res || !res.data) return [];
+    const rate = this.usdRate.value() || 1240;
+    return res.data.map(p => {
+      if (p.currency === 'USD') {
+        return {
+          ...p,
+          convertedPrice: p.price * rate
+        };
+      }
+      return p;
+    });
   });
 
   paginationData = computed<iPagination | null>(() => {

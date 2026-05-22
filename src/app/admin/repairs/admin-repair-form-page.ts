@@ -540,6 +540,6 @@ export class AdminRepairFormPage implements OnInit {
     getTrackingUrl(): string {
         const trackingCode = this.repairForm.get('tracking_code')?.value;
         if (!trackingCode) return '';
-        return `${window.location.origin}/#/tracking/${trackingCode}`;
+        return `${window.location.origin}/tracking/${trackingCode}`;
     }
 }

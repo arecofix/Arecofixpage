@@ -58,15 +58,14 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const end = start + _per_page - 1;
 
     let selectFields = `
-      id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
-      media_metadata,
       branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert),
       branches(name)
     `;
 
     if (!minimal) {
-      selectFields += ', gallery_urls';
+      selectFields += ', description, media_metadata, gallery_urls';
     }
 
     // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET para buscar/listar):
@@ -157,7 +156,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   findLowStock(threshold: number = 5): Observable<Product[]> {
     const selectFields = `
-      id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, 
       branch_stock:product_stock_per_branch(quantity, branch_id)
     `;
@@ -214,6 +213,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
+        if (branch_id) {
+          query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
+        }
         const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
         if (error) this.errorHandler.handleError(error, 'getAll (Products)');
         

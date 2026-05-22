@@ -103,13 +103,20 @@
                         <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1">
                           Precio Web Autogestionado
                         </span>
-                        <div class="flex items-baseline gap-2">
-                          <span class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
-                            {{ item.currency === 'USD' ? 'USD ' : '$' }}{{ item.price | number:'1.0-0' }}
-                          </span>
-                          @if (item.discount_percentage) {
-                            <span class="text-sm font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
-                              -{{ item.discount_percentage }}%
+                        <div class="flex flex-col gap-1">
+                          <div class="flex items-baseline gap-2">
+                            <span class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
+                              {{ item.price | currency: (item.currency || 'ARS'): 'symbol-narrow': (item.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                            </span>
+                            @if (item.discount_percentage) {
+                              <span class="text-sm font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                                -{{ item.discount_percentage }}%
+                              </span>
+                            }
+                          </div>
+                          @if (item.currency === 'USD' && item.convertedPrice) {
+                            <span class="text-sm text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 mt-1">
+                              <i class="fas fa-exchange-alt"></i> Equivale a: {{ item.convertedPrice | currency: 'ARS': 'symbol-narrow': '1.0-0': 'es-AR' }}
                             </span>
                           }
                         </div>
@@ -121,7 +128,7 @@
                       @if (item.discount_percentage) {
                         <div class="text-right pb-2">
                           <span class="text-sm line-through text-gray-400 font-medium">
-                            ${{ (item.price / (1 - (item.discount_percentage || 0)/100)) | number:'1.0-0' }}
+                            {{ (item.price / (1 - (item.discount_percentage || 0)/100)) | currency: (item.currency || 'ARS'): 'symbol-narrow': (item.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
                           </span>
                         </div>
                       }

@@ -29,6 +29,7 @@ import {
 } from '@app/shared/components/pagination';
 import { ProductCard } from '@app/public/products/components';
 import { Product } from '@app/public/products/interfaces';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 @Component({
   selector: 'products-by-category-page',

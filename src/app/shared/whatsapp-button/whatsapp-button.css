@@ -1,9 +1,17 @@
-/* Contenedor principal */
-.whatsapp-btn-container {
+:host {
+  display: block;
   position: fixed;
   bottom: 25px;
   right: 25px;
   z-index: 99999;
+  isolation: isolate;
+}
+
+/* Contenedor principal */
+.whatsapp-btn-container {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 
   /* Hardware acceleration to prevent ghosting */
   backface-visibility: hidden;

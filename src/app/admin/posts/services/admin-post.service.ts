@@ -2,6 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { Post } from '@app/features/posts/domain/entities/post.entity';
+import { PostsStore } from '@app/features/posts/application/services/posts.store';
+import { firstValueFrom } from 'rxjs';
+import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +13,8 @@ export class AdminPostService {
     private auth = inject(AuthService);
     private tenantService = inject(TenantService);
     private supabase = this.auth.getSupabaseClient();
+    private postsStore = inject(PostsStore);
+    private storageService = inject(SupabaseStorageService);
 
     async getPosts(): Promise<Post[]> {
         const { data, error } = await this.supabase
@@ -63,6 +68,7 @@ export class AdminPostService {
 
         const { error } = await this.supabase.from('blog_posts').insert(dbPayload);
         if (error) throw error;
+        this.postsStore.clearCache();
     }
 
     async updatePost(id: string, payload: Partial<Post>): Promise<void> {
@@ -81,6 +87,7 @@ export class AdminPostService {
             .eq('id', id)
             .eq('tenant_id', this.tenantService.getTenantId());
         if (error) throw error;
+        this.postsStore.clearCache();
     }
 
     async deletePost(id: string): Promise<void> {
@@ -89,16 +96,11 @@ export class AdminPostService {
             .eq('id', id)
             .eq('tenant_id', this.tenantService.getTenantId());
         if (error) throw error;
+        this.postsStore.clearCache();
     }
 
     async uploadImage(file: File): Promise<string> {
-        const filePath = `posts/${Date.now()}-${file.name}`;
-        const { data, error } = await this.supabase.storage.from('public-assets').upload(filePath, file);
-
-        if (error) throw error;
-
-        const { data: publicUrl } = this.supabase.storage.from('public-assets').getPublicUrl(data.path);
-        return publicUrl.publicUrl;
+        return this.storageService.uploadFile(file, 'posts');
     }
 
     slugify(text: string): string {

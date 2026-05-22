@@ -1,7 +1,7 @@
 
 <!-- Toggler Button -->
 <button (click)="toggleChat()"
-  class="fixed bottom-6 left-6 z-9999 w-14 h-14 md:w-16 md:h-16 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group"
+  class="absolute bottom-6 left-6 z-9999 ai-assistant-interactive w-14 h-14 md:w-16 md:h-16 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group"
   [attr.aria-label]="isOpen() ? 'Cerrar asistente de IA' : 'Abrir asistente de IA'"
   aria-haspopup="dialog">
   @if (!isOpen()) {
@@ -19,7 +19,7 @@
 <!-- Chat Window -->
 @if (isOpen()) {
   <div
-    class="fixed bottom-0 right-0 md:bottom-24 md:right-6 w-full md:w-[400px] h-dvh md:h-[600px] md:max-h-[80vh] z-9999 md:rounded-2xl glass-panel border-t md:border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-slide-up bg-surface-dark/95 backdrop-blur-xl">
+    class="absolute bottom-0 right-0 md:bottom-24 md:right-6 w-full md:w-[400px] h-dvh md:h-[600px] md:max-h-[80vh] z-9999 ai-assistant-interactive md:rounded-2xl glass-panel border-t md:border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-slide-up bg-surface-dark/95 backdrop-blur-xl">
     <!-- Header -->
     <div class="p-4 border-b border-white/10 flex items-center justify-between bg-white/5 shrink-0">
       <div class="flex items-center gap-3">

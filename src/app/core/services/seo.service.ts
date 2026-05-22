@@ -82,22 +82,26 @@ export class SeoService {
       }
 
       this.lastDynamicPath = null;
+      const contentRoute = this.getContentRoute(this.activatedRoute);
+      const routeTitle = contentRoute.snapshot.title;
       let seoData = STATIC_SEO_CONFIG[currentPath];
 
       if (!seoData) {
-        const routeData = this.getContentRoute(this.activatedRoute).snapshot.data;
+        const routeData = contentRoute.snapshot.data;
         if (routeData && routeData['seo']) {
-          seoData = routeData['seo'] as SeoData;
+          seoData = { ...routeData['seo'] } as SeoData;
         }
       }
 
       // Final Fallback for standard pages
       if (!seoData) {
         seoData = {
-          title: 'Arecofix - Servicio Técnico y Soluciones IT',
+          title: routeTitle || 'Arecofix - Servicio Técnico y Soluciones IT',
           description: 'Líderes en reparación técnica y soluciones tecnológicas en Marcos Paz.',
           imageUrl: 'assets/img/branding/og-services.jpg'
         };
+      } else if (!seoData.title && routeTitle) {
+        seoData.title = routeTitle;
       }
 
       this.setPageData(seoData);

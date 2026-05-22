@@ -169,7 +169,7 @@ export class RepairPdfService {
 
     // URL tracking (Footer)
     doc.setFontSize(9);
-    const trackingUrl = `${window.location.origin}/#/tracking/${repair.tracking_code}`;
+    const trackingUrl = `${window.location.origin}/tracking/${repair.tracking_code}`;
     doc.text(`Sigue el estado de tu equipo online en: ${trackingUrl}`, 15, 290);
 
     // Save PDF
