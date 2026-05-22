@@ -55,6 +55,7 @@ export class ProductsByCategoryPage {
   public cartService: CartService = inject(CartService);
   private seoService: SeoService = inject(SeoService);
   private tenantService = inject(TenantService);
+  private gsmService: GsmService = inject(GsmService);
 
   public currentCategory = signal<iCategory | null>(null);
   /** Stores the full ancestor chain (root → ... → current) for hierarchical breadcrumbs */
@@ -249,6 +250,25 @@ export class ProductsByCategoryPage {
           );
         })
       ),
+  });
+
+  usdRate = rxResource({
+    stream: () => this.gsmService.getUsdtRate()
+  });
+
+  displayProducts = computed<Product[]>(() => {
+    const res = this.productsRs.value();
+    if (!res || !res.data) return [];
+    const rate = this.usdRate.value() || 1240;
+    return res.data.map(p => {
+      if (p.currency === 'USD') {
+        return {
+          ...p,
+          convertedPrice: p.price * rate
+        };
+      }
+      return p;
+    });
   });
 
   // Computed para extraer datos de paginación de forma reactiva

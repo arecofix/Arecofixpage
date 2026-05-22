@@ -19,6 +19,7 @@ import { environment } from '@env/environment';
 import { NotificationBaseRepository } from '../../../features/messages/domain/repositories/notification.repository';
 import { UserProfileRepository } from '@app/core/repositories/user-profile.repository';
 import { ProductsParams, ProductsResponse } from '@app/shared/interfaces/product.interface';
+import { ProductsStore } from '@app/features/products/application/services/products.store';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
 export interface ImportReport {
@@ -67,6 +68,7 @@ export class AdminProductService {
     private branchRepo = inject(BranchRepository);
     private notificationRepo = inject(NotificationBaseRepository);
     private userProfileRepo = inject(UserProfileRepository);
+    private productsStore = inject(ProductsStore);
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();

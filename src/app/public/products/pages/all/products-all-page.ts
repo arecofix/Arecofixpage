@@ -42,6 +42,11 @@ export class ProductsAllPage {
   public cartService: CartService = inject(CartService);
   private tenantService = inject(TenantService);
   private tenant$ = toObservable(this.tenantService.currentTenant);
+  private gsmService: GsmService = inject(GsmService);
+
+  usdRate = rxResource({
+    stream: () => this.gsmService.getUsdtRate()
+  });
 
   // Search Signal and Subject for debounce
   searchQuery = signal('');
