@@ -6,12 +6,11 @@ export interface Brand {
     id: string;
     name: string;
     slug?: string;
-    description?: string;
     logo_url?: string;
-    website_url?: string;
     is_active: boolean;
     created_at: string;
     updated_at: string;
+    deleted_at?: string;
 }
 
 /**
@@ -20,9 +19,7 @@ export interface Brand {
 export interface CreateBrandDto {
     name: string;
     slug?: string;
-    description?: string;
     logo_url?: string;
-    website_url?: string;
 }
 
 /**

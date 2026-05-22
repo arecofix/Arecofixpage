@@ -11,10 +11,10 @@
 
     <div class="flex gap-3">
       <a routerLink="/admin/products" class="btn btn-ghost">Cancelar</a>
-      <button (click)="save()" class="btn btn-primary px-8 shadow-lg shadow-indigo-500/30" [disabled]="saving || uploading()">
+      <button (click)="save()" class="btn btn-primary px-8 shadow-lg shadow-indigo-500/30" [disabled]="saving() || uploading()">
         @if (uploading()) {
           <span class="loading loading-spinner text-white"></span>
-        } @else if (saving) {
+        } @else if (saving()) {
           <span class="loading loading-spinner text-white"></span>
         } @else {
           <i class="fas fa-save mr-2"></i> Guardar
@@ -23,10 +23,10 @@
     </div>
   </div>
 
-  @if (error) {
+  @if (error()) {
     <div class="alert alert-error mb-6 shadow-lg animate-fade-in">
       <i class="fas fa-exclamation-triangle"></i>
-      <span>{{ error }}</span>
+      <span>{{ error() }}</span>
     </div>
   }
 

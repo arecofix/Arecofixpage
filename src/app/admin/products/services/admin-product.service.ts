@@ -16,8 +16,9 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { environment } from '@env/environment';
-import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
 import { NotificationBaseRepository } from '../../../features/messages/domain/repositories/notification.repository';
+import { UserProfileRepository } from '@app/core/repositories/user-profile.repository';
+import { ProductsParams, ProductsResponse } from '@app/shared/interfaces/product.interface';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
 export interface ImportReport {
@@ -65,6 +66,7 @@ export class AdminProductService {
     private branchContextService = inject(BranchContextService);
     private branchRepo = inject(BranchRepository);
     private notificationRepo = inject(NotificationBaseRepository);
+    private userProfileRepo = inject(UserProfileRepository);
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();
@@ -144,12 +146,7 @@ export class AdminProductService {
                 const tenantId = profile.tenant_id || this.tenantService.getTenantId();
 
                 // Get admins for this tenant to notify them
-                const supabase = this.auth.getSupabaseClient();
-                const { data: admins } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .in('role', [ROLES.ADMIN, ROLES.TENANT_OWNER, ROLES.SUPER_ADMIN])
-                    .eq('tenant_id', tenantId);
+                const admins = await firstValueFrom(this.userProfileRepo.getAdminsByTenant(tenantId));
 
                 if (admins && admins.length > 0) {
                     const notifications = (admins as any[]).map(a => ({

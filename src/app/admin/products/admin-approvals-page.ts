@@ -38,7 +38,7 @@ export class AdminApprovalsPage implements OnInit {
     }
   }
 
-  async approve(product: any) {
+  async approve(product: Product) {
     if(!confirm(`¿Aprobar el producto ${product.name} y agregarlo al catálogo activo?`)) return;
 
     try {
@@ -50,7 +50,7 @@ export class AdminApprovalsPage implements OnInit {
     }
   }
 
-  async reject(product: any) {
+  async reject(product: Product) {
     if(!confirm(`¿Rechazar (eliminar) la solicitud del producto ${product.name}?`)) return;
 
     try {

@@ -366,24 +366,55 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }> {
     const fetchSummary = async () => {
-        // We select all items with stock > 0 for calculation or just all active items.
-        // For performance in large catalogs, a specialized RPC would be better, 
-        // but let's use a select with aggregations if possible or a simple sum logic.
-        let query = this.supabase.from(this.tableName)
-            .select('price, stock');
-        
-        query = this.applyTenantFilter(query);
-        if (branch_id) query = query.eq('branch_id', branch_id);
+        if (branch_id) {
+            let query = this.supabase.from('product_stock_per_branch')
+                .select('quantity, min_stock_alert, products!inner(price, is_active, deleted_at)')
+                .eq('branch_id', branch_id);
+            
+            const tenantId = this.tenantService.getTenantId();
+            if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+                query = query.eq('tenant_id', tenantId);
+            }
+            query = query.eq('products.is_active', true).is('products.deleted_at', null);
 
-        const { data, error } = await (query as any);
-        if (error) throw error;
+            const { data, error } = await (query as any);
+            if (error) throw error;
 
-        const results = data || [];
-        const totalItems = results.length;
-        const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
-        const lowStockCount = results.filter((p: any) => p.stock > 0 && p.stock <= 5).length;
+            const results = data || [];
+            const totalItems = results.length;
+            const totalValue = results.reduce((acc: number, item: any) => {
+                const price = Number(item.products?.price || 0);
+                const quantity = Number(item.quantity || 0);
+                return acc + (price * quantity);
+            }, 0);
+            const lowStockCount = results.filter((item: any) => {
+                const quantity = Number(item.quantity || 0);
+                const threshold = Number(item.min_stock_alert ?? 5);
+                return quantity > 0 && quantity <= threshold;
+            }).length;
 
-        return { totalItems, totalValue, lowStockCount };
+            return { totalItems, totalValue, lowStockCount };
+        } else {
+            let query = this.supabase.from(this.tableName)
+                .select('price, stock, min_stock_alert');
+            
+            query = this.applyTenantFilter(query);
+            query = query.eq('is_active', true);
+
+            const { data, error } = await (query as any);
+            if (error) throw error;
+
+            const results = data || [];
+            const totalItems = results.length;
+            const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
+            const lowStockCount = results.filter((p: any) => {
+                const stock = Number(p.stock || 0);
+                const threshold = Number(p.min_stock_alert ?? 5);
+                return stock > 0 && stock <= threshold;
+            }).length;
+
+            return { totalItems, totalValue, lowStockCount };
+        }
     };
     return from(fetchSummary());
   }

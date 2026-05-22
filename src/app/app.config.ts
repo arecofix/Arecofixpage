@@ -19,6 +19,10 @@ import { CategoryRepository } from './features/products/domain/repositories/cate
 import { SupabaseCategoryRepository } from './features/products/infrastructure/repositories/supabase-category.repository';
 import { BrandRepository } from './features/products/domain/repositories/brand.repository';
 import { SupabaseBrandRepository } from './features/products/infrastructure/repositories/supabase-brand.repository';
+import { ProductStockRepository } from './features/products/domain/repositories/product-stock.repository';
+import { SupabaseProductStockRepository } from './features/products/infrastructure/repositories/supabase-product-stock.repository';
+import { AppServiceRepository } from './features/products/domain/repositories/app-service.repository';
+import { SupabaseAppServiceRepository } from './features/products/infrastructure/repositories/supabase-app-service.repository';
 import { RepairRepository } from './features/repairs/domain/repositories/repair.repository';
 import { SupabaseRepairRepository } from './features/repairs/infrastructure/repositories/supabase-repair.repository';
 import { AnalyticsRepository } from './features/analytics/domain/repositories/analytics.repository';
@@ -79,6 +83,8 @@ export const appConfig: ApplicationConfig = {
     { provide: ProductRepository, useClass: SupabaseProductRepository },
     { provide: CategoryRepository, useClass: SupabaseCategoryRepository },
     { provide: BrandRepository, useClass: SupabaseBrandRepository },
+    { provide: ProductStockRepository, useClass: SupabaseProductStockRepository },
+    { provide: AppServiceRepository, useClass: SupabaseAppServiceRepository },
     { provide: RepairRepository, useClass: SupabaseRepairRepository },
     { provide: AnalyticsRepository, useClass: SupabaseAnalyticsRepository },
     { provide: UserProfileRepository, useClass: SupabaseUserProfileRepository },

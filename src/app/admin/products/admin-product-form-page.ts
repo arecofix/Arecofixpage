@@ -5,6 +5,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdminProductService } from './services/admin-product.service';
 import { ProductImagesManagerComponent } from './components/product-images-manager/product-images-manager.component';
 import { NotificationService } from '@app/core/services/notification.service';
+import { Brand } from '@app/features/products/domain/entities/brand.entity';
+import { Category } from '@app/features/products/domain/entities/category.entity';
+import { Branch } from '@app/shared/interfaces/branch.interface';
 
 @Component({
   selector: 'app-admin-product-form-page',
@@ -42,15 +45,15 @@ export class AdminProductFormPage implements OnInit {
   };
 
   // Resources
-  brands = signal<any[]>([]);
-  categories = signal<any[]>([]);
-  branches = signal<any[]>([]);
+  brands = signal<Brand[]>([]);
+  categories = signal<Category[]>([]);
+  branches = signal<Branch[]>([]);
 
   // UI State
-  loading = true;
-  saving = false;
+  loading = signal<boolean>(true);
+  saving = signal<boolean>(false);
   uploading = signal(false); // Can be controlled by child
-  error: string | null = null;
+  error = signal<string | null>(null);
   activeTab = signal<'general' | 'price' | 'media'>('general');
 
   async ngOnInit() {
@@ -91,10 +94,10 @@ export class AdminProductFormPage implements OnInit {
         }
       }
     } catch (e: any) {
-      this.error = e.message || 'Error al cargar datos';
-      this.notificationService.showError(this.error || '');
+      this.error.set(e.message || 'Error al cargar datos');
+      this.notificationService.showError(this.error() || '');
     } finally {
-      this.loading = false;
+      this.loading.set(false);
       this.cdr.markForCheck();
     }
   }
@@ -114,14 +117,14 @@ export class AdminProductFormPage implements OnInit {
   }
 
   async save() {
-    this.saving = true;
-    this.error = null;
+    this.saving.set(true);
+    this.error.set(null);
     const formVal = this.formVal;
 
     // Basic Validation
     if (!formVal.name || formVal.price < 0) {
-        this.error = 'Por favor complete los campos requeridos correctamente.';
-        this.saving = false;
+        this.error.set('Por favor complete los campos requeridos correctamente.');
+        this.saving.set(false);
         this.cdr.markForCheck();
         return;
     }
@@ -171,21 +174,21 @@ export class AdminProductFormPage implements OnInit {
       }
       this.router.navigate(['/admin/products']);
     } catch (e: any) {
-      this.error = e.message || 'Error al guardar producto';
-      this.notificationService.showError(this.error || '');
+      this.error.set(e.message || 'Error al guardar producto');
+      this.notificationService.showError(this.error() || '');
       console.error('Save error:', e);
     } finally {
-      this.saving = false;
+      this.saving.set(false);
       this.cdr.markForCheck();
     }
   }
 
   handleUploadError(msg: string) {
-    this.error = msg;
+    this.error.set(msg);
     this.cdr.markForCheck();
     // Auto clear error after 3s
     setTimeout(() => {
-        this.error = null;
+        this.error.set(null);
         this.cdr.markForCheck();
     }, 3000);
   }
