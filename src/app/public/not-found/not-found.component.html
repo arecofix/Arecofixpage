@@ -1,0 +1,442 @@
+<section
+  class="not-found-page min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 py-16"
+  aria-labelledby="not-found-title"
+>
+  <!-- ── Animated background blobs ── -->
+  <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- ── Grid noise overlay ── -->
+  <div class="absolute inset-0 bg-grid-pattern opacity-[0.04] pointer-events-none" aria-hidden="true"></div>
+
+  <!-- ── Main card ── -->
+  <div class="not-found-card relative z-10 w-full max-w-2xl text-center">
+
+    <!-- Icon + 404 badge -->
+    <div class="not-found-icon-wrap mx-auto mb-6" aria-hidden="true">
+      <div class="not-found-icon-ring">
+        <i class="fas fa-satellite-dish not-found-icon"></i>
+      </div>
+      <span class="not-found-badge">404</span>
+    </div>
+
+    <!-- Heading -->
+    <h1 id="not-found-title" class="not-found-title">
+      ¡Ups! Esta página<br />
+      <span class="not-found-accent">no existe</span>
+    </h1>
+
+    <!-- Sub-text -->
+    <p class="not-found-sub mt-4 mb-8">
+      La página que buscás fue movida, está en reparación o nunca existió.<br class="hidden sm:inline" />
+      Pero no te preocupes — nuestro equipo siempre está listo para ayudarte.
+    </p>
+
+    <!-- ── Search bar ── -->
+    <div class="not-found-search-wrap mb-8" role="search" aria-label="Buscar productos">
+      <div class="not-found-search-inner">
+        <i class="fas fa-search not-found-search-icon" aria-hidden="true"></i>
+        <input
+          id="nf-search-input"
+          type="search"
+          class="not-found-search-input"
+          placeholder="Buscá un producto o servicio…"
+          autocomplete="off"
+          aria-label="Buscar en Arecofix"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          (keyup.enter)="onSearch()"
+        />
+        <button
+          id="nf-search-btn"
+          type="button"
+          class="not-found-search-btn"
+          (click)="onSearch()"
+          aria-label="Buscar"
+        >
+          Buscar
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Quick links ── -->
+    <nav aria-label="Páginas principales" class="mb-10">
+      <p class="not-found-links-label mb-3">O explorá estas secciones:</p>
+      <div class="not-found-links-grid">
+        @for (link of quickLinks; track link.path) {
+          <a
+            [routerLink]="link.path"
+            class="not-found-link-chip"
+          >
+            <i class="fas {{ link.icon }}" aria-hidden="true"></i>
+            <span>{{ link.label }}</span>
+          </a>
+        }
+      </div>
+    </nav>
+
+    <!-- ── CTA buttons ── -->
+    <div class="not-found-actions">
+      <button
+        id="nf-back-btn"
+        type="button"
+        class="btn-nf-secondary"
+        (click)="goBack()"
+        aria-label="Volver a la página anterior"
+      >
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        Volver atrás
+      </button>
+
+      <a
+        id="nf-home-btn"
+        routerLink="/"
+        class="btn-nf-primary"
+        aria-label="Ir al inicio de Arecofix"
+      >
+        <i class="fas fa-house" aria-hidden="true"></i>
+        Ir al inicio
+      </a>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- ── Bottom branding strip ── -->
+  <footer class="relative z-10 mt-16 not-found-footer" aria-label="Marca Arecofix">
+    <div class="not-found-logo-wrap">
+      <img
+        src="/assets/img/branding/logo/logo-normal1.PNG"
+        alt="Arecofix logo"
+        width="120"
+        height="40"
+        class="not-found-logo"
+        loading="lazy"
+      />
+    </div>
+    <p class="not-found-footer-text mt-2">
+      &copy; {{ currentYear }} Arecofix — Servicio Técnico &amp; Software en Marcos Paz
+    </p>
+  </footer>
+
+</section>
+
+<!-- ── Scoped styles ── -->
+<style>
+  /* ── Variables ── */
+  :host {
+    --nf-primary: #56b43c;
+    --nf-primary-dark: #3c8f25;
+    --nf-accent: #327cbe;
+    --nf-dark: #1a1d2e;
+    --nf-dark-card: rgba(26, 29, 46, 0.75);
+    --nf-dark-border: rgba(86, 180, 60, 0.18);
+    --nf-text: #e8eaf6;
+    --nf-muted: #9fa8b8;
+  }
+
+  /* ── Page background ── */
+  .not-found-page {
+    background: radial-gradient(ellipse at 20% 30%, #0d1547 0%, #111324 40%, #0a0d1a 100%);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+
+  /* ── Animated blobs ── */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.25;
+    animation: blobFloat 14s ease-in-out infinite alternate;
+  }
+  .blob-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #56b43c55 0%, transparent 70%);
+    top: -150px; left: -200px;
+    animation-delay: 0s;
+  }
+  .blob-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #327cbe55 0%, transparent 70%);
+    bottom: -100px; right: -150px;
+    animation-delay: -5s;
+  }
+  .blob-3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #222144aa 0%, transparent 70%);
+    top: 40%; left: 55%;
+    animation-delay: -10s;
+  }
+  @keyframes blobFloat {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(40px, -60px) scale(1.08); }
+  }
+
+  /* ── Grid pattern ── */
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ── Glass card ── */
+  .not-found-card {
+    background: rgba(16, 20, 42, 0.65);
+    border: 1px solid var(--nf-dark-border);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+      0 0 0 1px rgba(86,180,60,0.08),
+      0 32px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Icon ring ── */
+  .not-found-icon-wrap {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    animation: iconEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+  @keyframes iconEntrance {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .not-found-icon-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(86,180,60,0.2), rgba(50,124,190,0.15));
+    border: 2px solid rgba(86,180,60,0.35);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 40px rgba(86,180,60,0.2), inset 0 0 30px rgba(86,180,60,0.05);
+    animation: ringPulse 3s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(86,180,60,0.2); }
+    50%       { box-shadow: 0 0 60px rgba(86,180,60,0.35); }
+  }
+  .not-found-icon {
+    font-size: 2.75rem;
+    color: var(--nf-primary);
+    animation: iconWiggle 4s ease-in-out infinite;
+  }
+  @keyframes iconWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    20%       { transform: rotate(-8deg); }
+    40%       { transform: rotate(6deg); }
+    60%       { transform: rotate(-4deg); }
+    80%       { transform: rotate(2deg); }
+  }
+
+  /* ── 404 badge ── */
+  .not-found-badge {
+    position: absolute;
+    bottom: -8px; right: -8px;
+    background: linear-gradient(135deg, var(--nf-primary), var(--nf-primary-dark));
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 2px solid rgba(16, 20, 42, 0.8);
+    box-shadow: 0 4px 12px rgba(86,180,60,0.4);
+    animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+  }
+  @keyframes badgePop {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Heading ── */
+  .not-found-title {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--nf-text);
+    letter-spacing: -0.02em;
+  }
+  .not-found-accent {
+    background: linear-gradient(90deg, var(--nf-primary), #7ed957);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Sub-text ── */
+  .not-found-sub {
+    color: var(--nf-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+
+  /* ── Search ── */
+  .not-found-search-wrap {
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .not-found-search-inner {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(86,180,60,0.25);
+    border-radius: 14px;
+    padding: 6px 6px 6px 16px;
+    gap: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .not-found-search-inner:focus-within {
+    border-color: var(--nf-primary);
+    box-shadow: 0 0 0 3px rgba(86,180,60,0.15);
+  }
+  .not-found-search-icon {
+    color: var(--nf-muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .not-found-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--nf-text);
+    font-size: 0.95rem;
+    min-width: 0;
+  }
+  .not-found-search-input::placeholder { color: var(--nf-muted); }
+  .not-found-search-input::-webkit-search-cancel-button { display: none; }
+  .not-found-search-btn {
+    flex-shrink: 0;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--nf-primary), var(--nf-primary-dark));
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+  .not-found-search-btn:hover { opacity: 0.9; transform: scale(1.02); }
+  .not-found-search-btn:active { transform: scale(0.98); }
+
+  /* ── Quick links ── */
+  .not-found-links-label {
+    color: var(--nf-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .not-found-links-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .not-found-link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--nf-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .not-found-link-chip i { color: var(--nf-primary); font-size: 0.85rem; }
+  .not-found-link-chip:hover {
+    background: rgba(86,180,60,0.12);
+    border-color: rgba(86,180,60,0.35);
+    transform: translateY(-2px);
+  }
+
+  /* ── Action buttons ── */
+  .not-found-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  .btn-nf-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--nf-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-nf-secondary:hover {
+    background: rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+  }
+  .btn-nf-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--nf-primary), var(--nf-primary-dark));
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    box-shadow: 0 8px 24px rgba(86,180,60,0.35);
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .btn-nf-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(86,180,60,0.45);
+  }
+
+  /* ── Footer branding ── */
+  .not-found-footer { text-align: center; }
+  .not-found-logo-wrap {
+    display: flex;
+    justify-content: center;
+    filter: brightness(0) invert(1) opacity(0.35);
+  }
+  .not-found-logo { height: 36px; width: auto; object-fit: contain; }
+  .not-found-footer-text {
+    color: rgba(159, 168, 184, 0.45);
+    font-size: 0.8rem;
+  }
+
+  /* ── Mobile tweaks ── */
+  @media (max-width: 480px) {
+    .not-found-card {
+      padding: 2rem 1.25rem;
+      border-radius: 16px;
+    }
+    .not-found-search-btn { padding: 10px 14px; font-size: 0.8rem; }
+    .not-found-actions { flex-direction: column; }
+    .btn-nf-secondary, .btn-nf-primary { width: 100%; justify-content: center; }
+  }
+</style>

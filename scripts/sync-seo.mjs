@@ -14,7 +14,7 @@ const STATIC_ROUTES = [
   '/', '/celular', '/servicios', '/academy', '/blog',
   '/contacto', '/nosotros', '/fixtecnicos', '/recursos',
   '/productos', '/productos/destacados', '/portfolio',
-  '/gsm', '/privacy', '/terms'
+  '/gsm', '/privacy', '/terms', '/not-found'
 ];
 
 async function fetchAll(table, select = 'slug', filters = {}) {
