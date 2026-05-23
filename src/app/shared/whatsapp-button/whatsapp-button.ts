@@ -1,4 +1,4 @@
-import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output, computed, ChangeDetectionStrategy } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -12,6 +12,8 @@ import { environment } from '../../../environments/environment';
 export class WhatsappButton {
   phoneNumber = input<string>(environment.contact.whatsappNumber);
   defaultMessage = input<string>('Hola, necesito información');
+  
+  toggleChat = output<void>();
 
   encodedMessage = computed(() => encodeURIComponent(this.defaultMessage()));
   

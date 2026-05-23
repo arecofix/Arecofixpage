@@ -110,6 +110,7 @@ unlighthouse-report/
 # AI / AGENTES / PLANES TEMPORALES
 # -------------------------------------------------------------------------
 .agent/
+scratch_chatbot/
 
 # -------------------------------------------------------------------------
 # SAMPLES, SCRATCH Y TEMPORALES
