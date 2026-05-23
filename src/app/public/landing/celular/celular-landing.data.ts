@@ -209,12 +209,12 @@ export const PARTNERS = [
 ];
 
 export const MENTIONS = [
-    { name: 'La Electrónica Online', url: 'https://laelectronicaonline.com.ar/casa-electronica/arecofix-servicio-tecnico-de-celulares-venta-de-repuestos/' },
     { name: 'Municipio Marcos Paz', url: 'https://www.marcospaz.gov.ar/noticias/item/8551-j%C3%B3venes-del-programa-envi%C3%B3n-finalizaron-el-curso-de-reparaci%C3%B3n-de-celulares.html' },
+    { name: 'La Electrónica Online', url: 'https://laelectronicaonline.com.ar/casa-electronica/arecofix-servicio-tecnico-de-celulares-venta-de-repuestos/' },
     { name: 'A1 Noticias', url: 'https://a1noticias.com.ar/nota/9798/marcos-paz-jovenes-del-programa-envion-finalizaron-el-curso-de-reparacion-de-celulares' },
+    { name: 'Marcos Paz Conectada', url: 'https://noticias.marcospazconectada.com/2023/02/09/termino-el-curso-de-reparacion-de-celulares-del-programa-envion/' },
     { name: 'Mobidoc', url: 'https://mobidoc.com.ar/servicio-tecnico/arecofix-soluciones-digitales/' },
-    { name: 'Red Argentina', url: 'https://www.redargentina.com.ar/arecofix-servicio-tecnico-de-celulares-en-marcos-paz-F120EC10E1AD945' },
-    { name: 'Marcos Paz Conectada', url: 'https://noticias.marcospazconectada.com/2023/02/09/termino-el-curso-de-reparacion-de-celulares-del-programa-envion/' }
+    { name: 'Red Argentina', url: 'https://www.redargentina.com.ar/arecofix-servicio-tecnico-de-celulares-en-marcos-paz-F120EC10E1AD945' }
 ];
 
 export const BLOG_FEATURES = [
@@ -275,7 +275,7 @@ export const LOCATION_DATA = {
 
 export const WHY_US = [
     {
-        title: '7+ Años de Experiencia',
+        title: '5+ Años de Experiencia',
         desc: 'Conocemos cada tornillo de tu equipo. Trayectoria comprobable en Marcos Paz.',
         icon: 'fas fa-medal',
         color: 'text-blue-600',

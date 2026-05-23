@@ -52,7 +52,6 @@
     "@capacitor/browser": "^8.0.1",
     "@capacitor/core": "^8.1.0",
     "@fortawesome/fontawesome-free": "^7.2.0",
-    "@mlc-ai/web-llm": "^0.2.80",
     "@supabase/supabase-js": "^2.49.1",
     "chart.js": "4.5.1",
     "express": "^4.21.2",

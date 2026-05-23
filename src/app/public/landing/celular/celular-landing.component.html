@@ -150,7 +150,7 @@
     ✦ Desktop : layout horizontal de 2 columnas — máximo aprovechamiento visual
     ✦ Estilo  : Minimalista, tipografía limpia, gap generoso
   -->
-  <section class="hidden md:block py-20 bg-[#131c2d]" aria-label="Información sobre el servicio">
+  <section class="hidden md:block py-20 bg-base-100 dark:bg-[#131c2d]" aria-label="Información sobre el servicio">
     <div class="container mx-auto px-6 lg:px-8 max-w-6xl">
       <!-- Grid 2 columnas: Texto principal | Links relacionados -->
       <div class="grid md:grid-cols-2 gap-16 items-start">
@@ -224,7 +224,7 @@
 
           <nav aria-label="Servicios relacionados" class="space-y-3">
             <a routerLink="/productos/categoria/repuestos" title="Catálogo de Repuestos Originales"
-              class="group relative flex items-center gap-4 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+              class="group relative flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-gray-800 overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
               <!-- Pseudo-element for hover background composite animation -->
               <div
                 class="absolute inset-0 bg-indigo-50 dark:bg-indigo-950/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10">
@@ -247,7 +247,7 @@
             </a>
 
             <a routerLink="/academy" title="Cursos de Reparación de Celulares"
-              class="group relative flex items-center gap-4 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+              class="group relative flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-gray-800 overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
               <div
                 class="absolute inset-0 bg-violet-50 dark:bg-violet-950/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10">
               </div>
@@ -269,7 +269,7 @@
             </a>
 
             <a routerLink="/productos/categoria/repuestos/consolas" title="Reparación de Consolas PlayStation y Xbox"
-              class="group relative flex items-center gap-4 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+              class="group relative flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-gray-800 overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
               <div
                 class="absolute inset-0 bg-emerald-50 dark:bg-emerald-950/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10">
               </div>
@@ -312,7 +312,7 @@
   </section>
 
   <!-- APPOINTMENT / CALENDAR SECTION (Priority as requested) -->
-  <section class="py-16 md:py-24 bg-[#131c2d] relative font-sans overflow-hidden" #appointmentSection>
+  <section class="py-16 md:py-24 bg-gray-50 dark:bg-[#131c2d] relative font-sans overflow-hidden" #appointmentSection>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <div class="w-full max-w-3xl mx-auto text-center mb-10">
@@ -437,7 +437,7 @@
   </section>
 
   <!-- MIGRATED: SPECIAL OFFERS (Product Carousel) -->
-  <section class="py-16 bg-[#131c2d]">
+  <section class="py-16 bg-base-200 dark:bg-[#131c2d]">
     <div class="container mx-auto px-4">
       <div class="text-center mb-12">
         <h2 class="text-3xl font-bold mb-4">Ofertas Especiales</h2>
@@ -484,11 +484,11 @@
   </section>
 
   <!-- MIGRATED: TECH BEST (More Products) -->
-  <section class="py-16 bg-[#131c2d]">
+  <section class="py-16 bg-base-100 dark:bg-[#131c2d]">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-end mb-8">
         <div>
-          <h5 class="text-3xl font-bold text-white">Lo mejor en tecnología</h5>
+          <h5 class="text-3xl font-bold text-gray-900 dark:text-white">Lo mejor en tecnología</h5>
           <p class="text-base-content/60 mt-2">
             Equipos usados seleccionados con garantía.
           </p>
@@ -886,31 +886,34 @@
   </section>
 
   <!-- PARTNERS SECTION -->
-  <section class="hidden md:block py-12 bg-base-200 border-y border-base-300">
+  <section class="py-12 bg-base-200 border-y border-base-300">
     <div class="container mx-auto px-4 text-center">
-      <p class="text-sm font-bold text-base-content/40 uppercase tracking-widest mb-8">
-        Confían en Nosotros
-      </p>
-      <div
-        class="flex justify-center items-center gap-12 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all">
-        @for (partner of partners; track partner.name) {
-        @if (partner.img) {
-        <img [src]="partner.img" [alt]="partner.name" class="h-8" />
-        } @else {
-        <div [class]="
-                'flex items-center gap-2 text-xl font-bold ' + partner.color
-              ">
-          @if (partner.icon) {
-          <i [class]="partner.icon"></i>
+      <!-- Only show Partners on Desktop (hidden on mobile) -->
+      <div class="hidden md:block mb-8">
+        <p class="text-sm font-bold text-base-content/40 uppercase tracking-widest mb-8">
+          Confían en Nosotros
+        </p>
+        <div
+          class="flex justify-center items-center gap-12 flex-wrap opacity-60 grayscale hover:grayscale-0 transition-all">
+          @for (partner of partners; track partner.name) {
+          @if (partner.img) {
+          <img [src]="partner.img" [alt]="partner.name" class="h-8" />
+          } @else {
+          <div [class]="
+                  'flex items-center gap-2 text-xl font-bold ' + partner.color
+                ">
+            @if (partner.icon) {
+            <i [class]="partner.icon"></i>
+            }
+            {{ partner.name }}
+          </div>
           }
-          {{ partner.name }}
+          }
         </div>
-        }
-        }
       </div>
 
-      <!-- MENTIONS -->
-      <div class="mt-8 pt-8 border-t border-base-300 text-center">
+      <!-- MENTIONS (Visible on both mobile and desktop) -->
+      <div class="pt-4 md:pt-8 md:border-t md:border-base-300 text-center">
         <!-- Título siempre centrado y arriba -->
         <p class="text-xs text-base-content/40 uppercase tracking-widest mb-4">
           Mencionado en
@@ -1022,7 +1025,7 @@
     </div>
   </section>
 
-  <div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+  <div class="hidden md:block relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
     <img
       src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply"
       alt="Background decorative image for technical service"
@@ -1073,7 +1076,7 @@
           );
         " class="aspect-1097/845 w-274.25 bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"></div>
     </div>
-    <div class="hidden md:block mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="mx-auto max-w-2xl lg:mx-0">
         <h2 class="text-5xl font-semibold tracking-tight text-white sm:text-7xl">
           ¿Buscas Donde reparar Celulares en Mariano Acosta?
@@ -1173,50 +1176,156 @@
 
 
   <!-- RELATED SERVICES SECTION -->
-  <div class="mt-24 mb-12">
-    <div class="text-center mb-12">
-      <span class="text-green-600 font-bold tracking-widest uppercase text-xs mb-3 block">Soluciones Integrales</span>
-      <h2 class="text-3xl font-bold text-gray-900 mb-4">
-        Otros Servicios Relacionados
-      </h2>
-      <p class="text-gray-600 max-w-2xl mx-auto">
-        Además de reparar celulares, somos expertos en una amplia gama de
-        dispositivos electrónicos.
-      </p>
-    </div>
+  <section class="relative py-20 bg-base-100 dark:bg-slate-950 font-sans overflow-hidden">
+    <!-- Ambient Blur Glows for premium feel -->
+    <div class="absolute top-1/4 left-1/10 w-96 h-96 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/10 w-96 h-96 bg-purple-500/10 dark:bg-purple-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mb-12">
-      @for (service of relatedServices; track service.title) {
-      <div [class]="
-            'bg-gray-50 rounded-2xl p-4 md:p-8 hover:bg-white hover:shadow-xl transition-all border border-gray-100 group text-center ' +
-            ($last ? 'col-span-2 md:col-span-1' : '')
-          ">
-        <div
-          class="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl md:text-2xl mb-3 md:mb-6 group-hover:scale-110 transition-transform">
-          <i [class]="'fas ' + service.icon"></i>
-        </div>
-        <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
-          {{ service.title }}
-        </h3>
-        <p class="text-gray-600 text-xs md:text-sm mb-4 md:mb-6">
-          {{ service.desc }}
+    <div class="max-w-6xl mx-auto px-4 relative z-10">
+      
+      <div class="text-center mb-16">
+        <span class="inline-block text-[#5CE638] dark:text-[#5CE638] font-bold tracking-widest uppercase text-xs md:text-sm mb-3 font-['Montserrat']">
+          Servicios de Laboratorio
+        </span>
+        <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 font-['Montserrat'] tracking-tight">
+          Otros Servicios Especialidades
+        </h2>
+        <p class="text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
+          Nuestra capacidad técnica va más allá de los celulares. Resolvemos fallos complejos en placas y equipos de entretenimiento en nuestro propio laboratorio.
         </p>
-        <!-- Using RouterLink to navigate to services page -->
-        <a [routerLink]="service.link"
-          class="text-green-600 font-bold text-xs md:text-sm hover:text-green-800 transition-colors inline-flex items-center gap-2">
-          Ver Detalles <i class="fas fa-arrow-right"></i>
+      </div>
+
+      <!-- Grid of 3 Customized Premium Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16">
+        
+        <!-- CARD 1: TABLETS (Blue Theme) -->
+        <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 flex flex-col justify-between hover:border-blue-500/50 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 transition-all duration-500 hover:-translate-y-2">
+          <!-- Ambient card glow -->
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none"></div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                <i class="fas fa-tablet-alt"></i>
+              </div>
+              <span class="badge bg-blue-500/10 border-none text-blue-600 dark:text-blue-400 font-bold px-3 py-2 text-xs">iPad & Android</span>
+            </div>
+
+            <h3 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat'] mb-3">
+              Reparación de Tablets
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              Arreglamos pantallas astilladas, baterías degradadas y conectores de carga sulfatados en iPads y tablets de todas las marcas.
+            </p>
+
+            <ul class="space-y-2.5 mb-8">
+              <li class="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300">
+                <i class="fas fa-check text-blue-500 text-xxs"></i> Cambio de Pantallas (Glass y Módulos)
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300">
+                <i class="fas fa-check text-blue-500 text-xxs"></i> Reemplazo de Baterías de Alta Capacidad
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300">
+                <i class="fas fa-check text-blue-500 text-xxs"></i> Reparación de Pines de Carga Type-C / Lightning
+              </li>
+            </ul>
+          </div>
+
+          <a routerLink="/servicios/reparacion-tablets" class="inline-flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-gray-900 dark:text-white font-bold py-3 px-5 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-md">
+            Ver Detalles <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1.5 duration-300"></i>
+          </a>
+        </div>
+
+        <!-- CARD 2: CONSOLES (Purple Gamer Theme - Highlighted) -->
+        <div class="group relative bg-slate-900 dark:bg-slate-900 border border-purple-500/30 rounded-3xl p-6 lg:p-8 flex flex-col justify-between hover:border-purple-500 hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-purple-500/10 transition-all duration-500 hover:-translate-y-2 scale-100 md:scale-105 shadow-2xl relative overflow-hidden">
+          <!-- Gamer Gradient Background -->
+          <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-slate-950 pointer-events-none"></div>
+          
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                <i class="fas fa-gamepad"></i>
+              </div>
+              <span class="badge bg-purple-500 text-white border-none font-bold px-3 py-2 text-xs animate-pulse">Servicio Especializado</span>
+            </div>
+
+            <h3 class="text-xl lg:text-2xl font-bold text-white font-['Montserrat'] mb-3">
+              Reparación de Consolas
+            </h3>
+            <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+              Laboratorio preparado para consolas de nueva generación. Resolvemos sobrecalentamiento, fallos de video HDMI y reparaciones de placa.
+            </p>
+
+            <ul class="space-y-2.5 mb-8">
+              <li class="flex items-center gap-2.5 text-xs text-slate-300">
+                <i class="fas fa-check text-purple-400 text-xxs"></i> PlayStation 5, PS4, Xbox Series X/S y One
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-slate-300">
+                <i class="fas fa-check text-purple-400 text-xxs"></i> Mantenimiento Térmico con Metal Líquido / MX-6
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-slate-300">
+                <i class="fas fa-check text-purple-400 text-xxs"></i> Cambio de Puertos HDMI y Controladores de Video IC
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-slate-300">
+                <i class="fas fa-check text-purple-400 text-xxs"></i> Nintendo Switch (Joy-Con Drift, Pantalla, Placa)
+              </li>
+            </ul>
+          </div>
+
+          <a routerLink="/servicios/reparacion-de-consolas" class="relative z-10 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 px-5 rounded-2xl hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg shadow-purple-500/20">
+            Ver Detalles <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1.5 duration-300"></i>
+          </a>
+        </div>
+
+        <!-- CARD 3: MICRO SOLDERING (Green Tech Theme) -->
+        <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 flex flex-col justify-between hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-500/5 transition-all duration-500 hover:-translate-y-2">
+          <!-- Ambient card glow -->
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none"></div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                <i class="fas fa-microchip"></i>
+              </div>
+              <span class="badge bg-emerald-500/10 border-none text-emerald-600 dark:text-emerald-400 font-bold px-3 py-2 text-xs">Laboratorio Avanzado</span>
+            </div>
+
+            <h3 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat'] mb-3">
+              Micro Electrónica
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              Diagnosticamos y reparamos placas a nivel de microcomponente. Recuperamos placas en corto, daños por agua y fallos lógicos complejos.
+            </p>
+
+            <ul class="space-y-2.5 mb-8">
+              <li class="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300">
+                <i class="fas fa-check text-emerald-500 text-xxs"></i> Búsqueda de Cortos con Cámara Térmica
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300">
+                <i class="fas fa-check text-emerald-500 text-xxs"></i> Soldadura de Integrados (ICs, FPC, BGA)
+              </li>
+              <li class="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300">
+                <i class="fas fa-check text-emerald-500 text-xxs"></i> Reparación de Face ID, Touch ID y Líneas de Datos
+              </li>
+            </ul>
+          </div>
+
+          <a routerLink="/servicios/servicio-tecnico-de-celulares-en-marcos-paz" class="inline-flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-gray-900 dark:text-white font-bold py-3 px-5 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-md">
+            Ver Detalles <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1.5 duration-300"></i>
+          </a>
+        </div>
+
+      </div>
+
+      <div class="text-center font-sans">
+        <a routerLink="/servicios"
+          class="inline-flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 text-white px-8 py-4 rounded-full font-bold hover:-translate-y-1 transition-all shadow-lg hover:shadow-slate-900/30 dark:hover:shadow-white/30 duration-300">
+          Ver Todos los Servicios <i class="fas fa-layer-group"></i>
         </a>
       </div>
-      }
+      
     </div>
-
-    <div class="text-center">
-      <a routerLink="/servicios"
-        class="inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 hover:-translate-y-1 transition-all shadow-lg shadow-gray-900/20">
-        Ver Todos los Servicios <i class="fas fa-layer-group"></i>
-      </a>
-    </div>
-  </div>
+  </section>
 
   <!-- BRANDS CAROUSEL (Bottom) -->
 </div>

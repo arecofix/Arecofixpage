@@ -1,5 +1,4 @@
-import { Component, inject, OnInit, PLATFORM_ID, DOCUMENT } from '@angular/core';
-import { AiAssistant } from './features/ai-assistant/ai-assistant';
+import { Component, inject, OnInit, PLATFORM_ID, DOCUMENT, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button';
@@ -17,9 +16,9 @@ import { TenantService } from './core/services/tenant.service';
   imports: [
     RouterOutlet,
     WhatsappButton,
-    ToastComponent,
-    AiAssistant
+    ToastComponent
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './app.html'
 })
 export class App implements OnInit {
@@ -35,20 +34,20 @@ export class App implements OnInit {
     this.seoService.initialize();
 
     if (isPlatformBrowser(this.platformId)) {
-      // Inicializar el servicio de tenants primero
-      /*
-      this.tenantService.getCurrentTenant$().subscribe((tenant: any) => {
-        if (tenant) {
-          console.debug(`🏢 Tenant activo: ${tenant.name} (${this.tenantService.isMainTenant() ? 'Principal' : 'Sucursal'})`);
-        }
-      });
-      */
-
       // SEO Redirection Rule Heredada
       const currentHost = window.location.hostname;
       if (currentHost === 'celulares.arecofix.com.ar') {
         this.document.location.href = 'https://arecofix.com.ar/celular';
         return;
+      }
+    }
+  }
+
+  toggleChatbot() {
+    if (isPlatformBrowser(this.platformId)) {
+      const chatbot = this.document.querySelector('react-mfe-app');
+      if (chatbot && typeof (chatbot as any).toggleChat === 'function') {
+        (chatbot as any).toggleChat();
       }
     }
   }

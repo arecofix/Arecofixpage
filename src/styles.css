@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./assets/css/react-mfe.css";
 
 @plugin "daisyui" {
   themes: light, dark;
@@ -627,5 +628,10 @@ details > summary::-webkit-details-marker {
   .overflow-x-auto * {
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Force block display on chatbot custom element */
+react-mfe-app {
+  display: block;
 }
 
