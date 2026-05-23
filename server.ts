@@ -378,7 +378,26 @@ export function app(): express.Express {
             { provide: APP_BASE_HREF, useValue: baseUrl },
         ],
       })
-      .then((html) => res.send(html))
+      .then((html) => {
+        // Detect 404: if the requested path doesn't match any known valid prefix,
+        // return a real HTTP 404 so bots and crawlers see the correct status.
+        const pathname = originalUrl.split('?')[0].replace(/\/$/, '') || '/';
+        const validPrefixes = [
+          '/', '/celular', '/servicios', '/productos', '/repuestos',
+          '/categorias', '/nosotros', '/contacto', '/academy', '/blog',
+          '/posts', '/portfolio', '/gsm', '/privacy', '/terms', '/sitemap',
+          '/fixtecnicos', '/recursos', '/tracking', '/checkout', '/perfil',
+          '/login', '/register', '/admin', '/upgrade-required', '/diagnostico',
+          '/Zona-Norte',
+        ];
+        const isKnownRoute = validPrefixes.some(
+          (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
+        );
+        if (!isKnownRoute) {
+          res.status(404);
+        }
+        res.send(html);
+      })
       .catch((err) => next(err));
   });
 
