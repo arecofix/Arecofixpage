@@ -24,7 +24,8 @@ export const routes: Routes = [
         loadComponent: () => import('@app/shared/components/upgrade-required/upgrade-required.component').then(m => m.UpgradeRequiredComponent)
     },
     {
+        title: 'Página no encontrada | Arecofix',
         path: '**',
-        redirectTo: '',
+        loadComponent: () => import('@app/public/not-found/not-found.component').then(m => m.NotFoundComponent)
     }
 ];
