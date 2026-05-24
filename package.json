@@ -30,11 +30,30 @@
     ]
   },
   "overrides": {
+    "@angular/animations": "21.2.11",
+    "@angular/common": "21.2.11",
+    "@angular/compiler": "21.2.11",
+    "@angular/core": "21.2.11",
+    "@angular/forms": "21.2.11",
+    "@angular/platform-browser": "21.2.11",
+    "@angular/platform-server": "21.2.11",
+    "@angular/router": "21.2.11",
+    "@angular/ssr": "21.2.11",
+    "@angular/build": "21.2.11",
+    "@angular/cli": "21.2.11",
+    "@angular/compiler-cli": "21.2.11",
     "gh-pages": "^6.3.0",
     "trim-newlines": "^3.0.1",
     "uglify-js": "^3.19.3",
     "ajv": "^8.17.2",
-    "minimatch": "^10.2.2"
+    "minimatch": "^10.2.2",
+    "protobufjs": "^7.5.8",
+    "jsonwebtoken": "^9.0.0",
+    "ws": "^8.20.1",
+    "qs": "^6.15.2",
+    "uuid": "^11.1.1",
+    "gaxios>uuid": "^11.1.1",
+    "google-auth-library>gaxios>uuid": "^11.1.1"
   },
   "private": true,
   "dependencies": {
@@ -56,7 +75,7 @@
     "chart.js": "4.5.1",
     "express": "^4.21.2",
     "firebase": "^12.11.0",
-    "firebase-admin": "^10.3.0",
+    "firebase-admin": "^13.0.0",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "ng2-charts": "10.0.0",
@@ -92,31 +111,15 @@
     "url": "^0.11.4",
     "wrangler": "^4.70.0"
   },
-  "pnpm": {
-    "overrides": {
-      "@angular/animations": "21.2.11",
-      "@angular/common": "21.2.11",
-      "@angular/compiler": "21.2.11",
-      "@angular/core": "21.2.11",
-      "@angular/forms": "21.2.11",
-      "@angular/platform-browser": "21.2.11",
-      "@angular/platform-server": "21.2.11",
-      "@angular/router": "21.2.11",
-      "@angular/ssr": "21.2.11",
-      "@angular/build": "21.2.11",
-      "@angular/cli": "21.2.11",
-      "@angular/compiler-cli": "21.2.11"
-    },
-    "onlyBuiltDependencies": [
-      "@firebase/util",
-      "@parcel/watcher",
-      "core-js",
-      "esbuild",
-      "lmdb",
-      "msgpackr-extract",
-      "protobufjs",
-      "sharp",
-      "workerd"
-    ]
-  }
+  "pnpmOnlyBuiltDependencies": [
+    "@firebase/util",
+    "@parcel/watcher",
+    "core-js",
+    "esbuild",
+    "lmdb",
+    "msgpackr-extract",
+    "protobufjs",
+    "sharp",
+    "workerd"
+  ]
 }
