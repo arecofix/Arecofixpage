@@ -304,7 +304,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         }
 
         const totalCost = parts.reduce((acc: number, p: RepairPart) => acc + (Number(p.cost_at_time || 0)), 0);
-        const query = this.applyTenantFilter(this.supabase.from(this.tableName).update({ costo_repuesto: totalCost }))
+        const query = this.applyTenantFilter(this.supabase.from(this.tableName).update({ spare_part_cost: totalCost }))
             .eq('id', repairId);
         await query;
     }
@@ -364,7 +364,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             security_pattern: p.security_pattern,
             device_passcode: p.device_passcode,
             upsell_vidrio: p.upsell_vidrio,
-            costo_repuesto: Number(p.costo_repuesto || 0)
+            spare_part_cost: Number(p.spare_part_cost || 0)
         };
     }
 
@@ -394,7 +394,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             security_pattern: r.security_pattern || null,
             device_passcode: r.device_passcode || null,
             upsell_vidrio: r.upsell_vidrio || false,
-            costo_repuesto: r.costo_repuesto || 0,
+            spare_part_cost: r.spare_part_cost || 0,
             whatsapp_notifications: r.whatsapp_notifications ?? true
         };
     }
@@ -463,7 +463,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     private async getMonthProfit(branch_id: string | undefined, startOfMonth: string, endOfMonth: string, includeOrphans?: boolean): Promise<number> {
         let profitQuery = this.supabase.from(this.tableName)
-            .select('final_cost, costo_repuesto')
+            .select('final_cost, spare_part_cost')
             .eq('current_status_id', 6) // DELIVERED
             .gte('completed_at', startOfMonth)
             .lte('completed_at', endOfMonth);
@@ -481,7 +481,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         if (error) throw error;
 
         return (data || []).reduce((acc: number, r: any) => {
-            return acc + (Number(r.final_cost || 0) - Number(r.costo_repuesto || 0));
+            return acc + (Number(r.final_cost || 0) - Number(r.spare_part_cost || 0));
         }, 0);
     }
 }

@@ -55,8 +55,8 @@ describe('ConfirmCheckoutUseCase', () => {
       // Verificar que los datos pasados al repositorio de órdenes coincidan
       const orderArg = orderRepoSpy.createOrder.calls.mostRecent().args[0];
       expect(orderArg.customer_name).toBe('Ezequiel Test');
-      expect(orderArg.items.length).toBe(1);
-      expect(orderArg.items[0].subtotal).toBe(500);
+      expect(orderArg.items!.length).toBe(1);
+      expect(orderArg.items![0].subtotal).toBe(500);
 
       // Verificar que se guardó el mensaje en el CRM
       expect(messageRepoSpy.saveMessage).toHaveBeenCalled();

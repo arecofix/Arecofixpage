@@ -33,7 +33,7 @@ export class RepairWorkflowService {
 
     const mappedDto = {
         ...dto,
-        costo_repuesto: costoRepuestoCalculado,
+        spare_part_cost: costoRepuestoCalculado,
         branch_id: currentBranchId,
         deposit_amount: depositAmount
     };
