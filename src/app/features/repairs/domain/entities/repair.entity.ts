@@ -64,7 +64,7 @@ export interface Repair {
     readonly received_by?: string;
     readonly assigned_technician_id?: string;
     readonly upsell_vidrio?: boolean;
-    readonly costo_repuesto?: number;
+    readonly spare_part_cost?: number;
     
     // Additional fields from form
     readonly checklist?: RepairChecklist;
@@ -110,7 +110,7 @@ export interface CreateRepairDto {
     current_status_id?: number;
     upsell_vidrio?: boolean;
     tracking_code?: string;
-    costo_repuesto?: number;
+    spare_part_cost?: number;
     parts?: RepairPart[];
 }
 
@@ -126,5 +126,5 @@ export interface UpdateRepairDto extends Partial<CreateRepairDto> {
     completed_at?: string;
     parts?: RepairPart[];
     upsell_vidrio?: boolean;
-    costo_repuesto?: number;
+    spare_part_cost?: number;
 }

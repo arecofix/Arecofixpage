@@ -39,18 +39,26 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
 
   it('should format labels, map RPC data and calculate correct totals instead of defaulting to 100% margin', async () => {
     // Arrange: Mock financial DB response representing the bug scenario but fixed
-    const mockFinanceData = [
-      {
-        period: '2026-04',
-        gross_revenue: 34900,
-        total_cost: 15000,
-        net_profit: 19900,
-        repair_revenue: 34900,
-        sales_revenue: 0,
-        repair_cost: 15000,
-        sales_cost: 0
-      }
-    ];
+    const mockFinanceData = {
+      total_gross_revenue: 34900,
+      total_cost: 15000,
+      total_net_profit: 19900,
+      current_month_gross: 34900,
+      current_month_cost: 15000,
+      current_month_profit: 19900,
+      monthly_breakdown: [
+        {
+          period: '2026-04',
+          gross_revenue: 34900,
+          cost: 15000,
+          net_profit: 19900,
+          repairs_revenue: 34900,
+          sales_revenue: 0,
+          repairs_cost: 15000,
+          sales_cost: 0
+        }
+      ]
+    };
 
     const mockLegacyData = {
       users: 5,
@@ -58,8 +66,9 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
     };
 
     mockSupabase.rpc.and.callFake((fnName: string) => {
-      if (fnName === 'get_financial_analytics_v2') return Promise.resolve({ data: mockFinanceData, error: null });
+      if (fnName === 'get_financial_analytics_v3') return Promise.resolve({ data: mockFinanceData, error: null });
       if (fnName === 'get_dashboard_stats_v2') return Promise.resolve({ data: mockLegacyData, error: null });
+      return Promise.resolve({ data: null, error: null });
     });
 
     // Act
