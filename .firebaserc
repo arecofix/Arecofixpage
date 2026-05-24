@@ -7,9 +7,6 @@
       "hosting": {
         "areco-fix": [
           "areco-fix"
-        ],
-        "arecofix-default": [
-            "arecofix-20698"
         ]
       }
     }
