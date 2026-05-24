@@ -29,10 +29,9 @@ export class ProductMapper {
     if (branchId) {
        const specificBranch = branchStockList.find((b: any) => b.branch_id === branchId);
        displayedStock = specificBranch ? Number(specificBranch.quantity) : 0;
-    } else if (branchStockList.length > 0) {
-       displayedStock = branchStockList.reduce((acc: number, curr: any) => acc + (Number(curr.quantity) || 0), 0);
     } else {
-       displayedStock = Number(p['stock'] || 0);
+       // Calcular stock total sumando todas las sucursales si no se filtró por sucursal
+       displayedStock = branchStockList.reduce((acc: number, curr: any) => acc + (Number(curr.quantity) || 0), 0);
     }
 
     const rawGallery = p['gallery_urls'] || (p['image_url'] ? [p['image_url']] : []);
