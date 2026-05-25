@@ -4,9 +4,9 @@ import { CartService } from './cart.service';
 import { LoggerService } from '../../core/services/logger.service';
 import { ToastService } from './toast.service';
 import { Product } from '../interfaces/product.interface';
-import { AuthService } from '@app/core/services/auth.service';
-import { OrderService } from '@app/features/orders/application/services/order.service';
-import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { AuthService } from '../../core/services/auth.service';
+import { OrderService } from '../../features/orders/application/services/order.service';
+import { SUPABASE_CLIENT } from '../../core/di/supabase-token';
 import { BehaviorSubject, of } from 'rxjs';
 
 describe('CartService (QA & Testing)', () => {

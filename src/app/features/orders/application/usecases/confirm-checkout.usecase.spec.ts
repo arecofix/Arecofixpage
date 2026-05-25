@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ConfirmCheckoutUseCase } from './confirm-checkout.usecase';
 import { OrderRepository } from '../../domain/repositories/order.repository';
-import { MessageRepository } from '@app/features/messages/domain/repositories/message.repository';
+import { MessageRepository } from '../../../messages/domain/repositories/message.repository';
 import { Observable, of } from 'rxjs';
 
 describe('ConfirmCheckoutUseCase', () => {
