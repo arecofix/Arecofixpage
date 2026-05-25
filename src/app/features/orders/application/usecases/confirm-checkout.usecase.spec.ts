@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ConfirmCheckoutUseCase } from './confirm-checkout.usecase';
 import { OrderRepository } from '../../domain/repositories/order.repository';
-import { MessageRepository } from '@app/features/messages/domain/repositories/message.repository';
+import { MessageRepository } from '../../../messages/domain/repositories/message.repository';
 import { Observable, of } from 'rxjs';
 
 describe('ConfirmCheckoutUseCase', () => {
@@ -55,8 +55,8 @@ describe('ConfirmCheckoutUseCase', () => {
       // Verificar que los datos pasados al repositorio de órdenes coincidan
       const orderArg = orderRepoSpy.createOrder.calls.mostRecent().args[0];
       expect(orderArg.customer_name).toBe('Ezequiel Test');
-      expect(orderArg.items.length).toBe(1);
-      expect(orderArg.items[0].subtotal).toBe(500);
+      expect(orderArg.items!.length).toBe(1);
+      expect(orderArg.items![0].subtotal).toBe(500);
 
       // Verificar que se guardó el mensaje en el CRM
       expect(messageRepoSpy.saveMessage).toHaveBeenCalled();

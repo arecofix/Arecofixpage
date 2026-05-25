@@ -67,7 +67,7 @@ export interface RepairDetailDto {
   security_pattern?: string;
   device_passcode?: string;
   upsell_vidrio?: boolean;
-  costo_repuesto?: number;
+  spare_part_cost?: number;
   // Relaciones relacionales pesadas, cargadas solo en detalle
   images?: { image_url: string }[];
   parts?: any[];
@@ -165,7 +165,7 @@ export class RepairsRepository {
         deposit_amount, technical_labor_cost, technician_notes, notes,
         technical_report, received_at, created_at, updated_at, completed_at,
         branch_id, tenant_id, checklist, security_pin, security_pattern,
-        device_passcode, upsell_vidrio, costo_repuesto,
+        device_passcode, upsell_vidrio, spare_part_cost,
         parts:repair_parts_used(id, product_id, quantity, unit_price_at_time, cost_at_time),
         images:repair_images(id, image_url)
       `)

@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
-import { CertificateGalleryComponent } from '../../shared/components/certificate-gallery/certificate-gallery.component';
 import { interval, Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -111,7 +110,7 @@ interface Project {
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, RouterLink, CertificateGalleryComponent, NgOptimizedImage],
+  imports: [CommonModule, RouterLink, NgOptimizedImage],
   templateUrl: './portfolio.html',
   styleUrls: ['./portfolio.css']
 })
