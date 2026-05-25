@@ -4,6 +4,7 @@ import { PublicLayout } from '@app/public/layout/public-layout';
 import { PublicHomePage } from './home/public-home-page';
 import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 import { BranchResolver } from '@app/core/resolvers/branch.resolver';
+import { tauriRootRedirectGuard } from '@app/guards/tauri-root-redirect.guard';
 
 export const publicRoutes: Routes = [
   {
@@ -26,6 +27,7 @@ export const publicRoutes: Routes = [
       {
         title: 'Consultoria IT & Software Solutions | Arecofix ',
         path: '',
+        canActivate: [tauriRootRedirectGuard],
         component: PublicHomePage,
         data: {
             seo: {

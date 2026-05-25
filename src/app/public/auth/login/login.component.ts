@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/perfil';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
     
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))
@@ -250,7 +250,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private sanitizeReturnUrl(url: string): string {
     const disallowed = ['/login', '/register'];
-    if (!url || disallowed.includes(url)) return '/';
+    if (!url || disallowed.includes(url)) return '/admin';
     return url;
   }
 

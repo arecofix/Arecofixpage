@@ -10,6 +10,7 @@ import { Branch } from '@app/shared/interfaces/branch.interface';
 import { PreferencesService } from '@app/shared/services/preferences.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
+import { LockScreenComponent } from '@app/shared/components/lock-screen/lock-screen.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 interface MenuItem {
@@ -29,7 +30,8 @@ interface MenuItem {
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    AccessibilitySidebarComponent
+    AccessibilitySidebarComponent,
+    LockScreenComponent
   ],
   templateUrl: './admin-layout.html',
 })

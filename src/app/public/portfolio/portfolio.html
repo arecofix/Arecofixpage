@@ -57,11 +57,11 @@
               </span>
             </a>
             <a [href]="currentContent.linkedin" target="_blank"
-              class="group relative px-8 py-4 bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:text-white rounded-lg transition-all">
+              class="group relative px-8 py-4 bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white rounded-lg transition-all">
               <span class="relative">LinkedIn</span>
             </a>
             <a [href]="currentContent.github" target="_blank"
-              class="group relative px-8 py-4 bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:text-white rounded-lg transition-all">
+              class="group relative px-8 py-4 bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white rounded-lg transition-all">
               <span class="relative">GitHub</span>
             </a>
           </div>
@@ -82,7 +82,7 @@
                 class="relative rounded-full p-[3px] bg-[linear-gradient(to_top_right,#ffffff_0%,#38bdf8_15%,#38bdf8_90%,#fbbf24_100%)] shadow-[0_0_40px_rgba(56,189,248,0.4)]">
                 <div class="rounded-full p-1 bg-slate-50 dark:bg-[#0d1017]">
                   <img [src]="currentContent.image" [alt]="currentContent.name"
-                    class="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover object-top grayscale-[15%] hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                    class="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover object-top grayscale-15 hover:grayscale-0 transition-all duration-500 hover:scale-105"
                     style="filter: brightness(1.05) contrast(1.05);" />
                 </div>
               </div>
@@ -203,7 +203,7 @@
               <div class="flex flex-wrap gap-2">
                 @for (skill of currentContent.quickScan.complementaryValue.split(', '); track $index) {
                 <span
-                  class="px-2.5 py-1 rounded bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700/50 text-slate-700 dark:text-gray-300 font-mono text-xs hover:border-cyan-500/50 hover:text-slate-900 dark:text-white transition-colors">
+                  class="px-2.5 py-1 rounded bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700/50 text-slate-700 dark:text-gray-300 font-mono text-xs hover:border-cyan-500/50 hover:text-slate-900 dark:hover:text-white transition-colors">
                   {{ skill }}
                 </span>
                 }
@@ -444,7 +444,7 @@
           <div class="relative pl-8 md:pl-12">
             <!-- Timeline Dot -->
             <div
-              class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-white dark:bg-[#0f111a] border-4 border-cyan-600 shadow-[0_0_10px_rgba(8,145,178,0.5)]">
+              class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-white dark:bg-surface-dark border-4 border-cyan-600 shadow-[0_0_10px_rgba(8,145,178,0.5)]">
             </div>
             <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
               <div>
@@ -461,7 +461,7 @@
             <div class="flex flex-wrap gap-2">
               @for (tech of exp.techStack; track $index) {
               <span
-                class="px-3 py-1 bg-slate-100 dark:bg-[#1a1d2d] hover:bg-slate-200 dark:bg-gray-800 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:text-white text-xs font-mono rounded border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 transition-colors">
+                class="px-3 py-1 bg-slate-100 dark:bg-[#1a1d2d] hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white text-xs font-mono rounded border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 transition-colors">
                 <span class="text-cyan-500 mr-1">$</span> {{ tech }}
               </span>
               }
@@ -759,7 +759,7 @@
   (click)="closeImageModal()" (keydown.escape)="closeImageModal()" tabindex="0">
   <!-- Close Button -->
   <button
-    class="absolute top-6 right-6 text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:text-white text-3xl focus:outline-none transition-colors duration-200 z-50 cursor-pointer"
+    class="absolute top-6 right-6 text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white text-3xl focus:outline-none transition-colors duration-200 z-50 cursor-pointer"
     (click)="closeImageModal()" aria-label="Close modal">
     <i class="fas fa-times"></i>
   </button>
