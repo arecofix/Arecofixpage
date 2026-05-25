@@ -7,7 +7,7 @@
     "frontendDist": "../dist/arecofix/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "npm run start",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": "npm run build && node scripts/copy-index.mjs"
   },
   "app": {
     "windows": [

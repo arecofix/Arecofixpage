@@ -1,9 +1,9 @@
 <div
-  class="min-h-screen bg-surface-dark text-gray-300 font-mono selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+  class="min-h-screen bg-slate-50 dark:bg-surface-dark text-slate-700 dark:text-gray-300 font-mono selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
 
   <!-- Background Grid Effect -->
-  <div class="fixed inset-0 z-0 pointer-events-none opacity-20"
-    style="background-image: linear-gradient(#1f2937 1px, transparent 1px), linear-gradient(90deg, #1f2937 1px, transparent 1px); background-size: 40px 40px;">
+  <div class="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-20 text-slate-300 dark:text-[#1f2937]"
+    style="background-image: linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px); background-size: 40px 40px;">
   </div>
 
   <!-- Main Content Wrapper -->
@@ -24,31 +24,31 @@
               </span>
               {{ currentContent.availableForHireLabel }}
             </div>
-            <h1 class="text-5xl md:text-7xl font-bold text-white tracking-tight">
+            <h1 class="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tight">
               {{ currentContent.name }}
             </h1>
             <h2 class="text-2xl md:text-3xl text-cyan-500 font-semibold">
               {{ currentContent.role }}
             </h2>
-            <div class="flex flex-col gap-2 text-gray-100 font-mono text-md py-2">
+            <div class="flex flex-col gap-2 text-slate-800 dark:text-gray-100 font-mono text-md py-2">
               <div class="flex items-center gap-2">
                 <i class="fas fa-phone text-cyan-500"></i>
-                <a href="tel:1125960900" class="hover:text-white transition-colors">1125960900</a>
+                <a href="tel:1125960900" class="hover:text-slate-900 dark:text-white transition-colors">1125960900</a>
               </div>
               <div class="flex items-center gap-2">
                 <i class="fas fa-envelope text-cyan-500"></i>
                 <a href="mailto:EzequielEnrico15@gmail.com"
-                  class="hover:text-white transition-colors">EzequielEnrico15@gmail.com</a>
+                  class="hover:text-slate-900 dark:text-white transition-colors">EzequielEnrico15@gmail.com</a>
               </div>
             </div>
-            <p class="text-lg text-gray-400 max-w-xl leading-relaxed border-l-4 border-cyan-700/50 pl-4">
+            <p class="text-lg text-slate-600 dark:text-gray-400 max-w-xl leading-relaxed border-l-4 border-cyan-700/50 pl-4">
               {{ currentContent.tagline }}
             </p>
           </div>
 
           <div class="flex flex-wrap gap-4">
             <a [href]="currentContent.cvUrl" download
-              class="group relative px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-all shadow-[0_0_20px_rgba(8,145,178,0.3)] hover:shadow-[0_0_30px_rgba(8,145,178,0.5)] overflow-hidden">
+              class="group relative px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-slate-900 dark:text-white font-bold rounded-lg transition-all shadow-[0_0_20px_rgba(8,145,178,0.3)] hover:shadow-[0_0_30px_rgba(8,145,178,0.5)] overflow-hidden">
               <div
                 class="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
               </div>
@@ -57,11 +57,11 @@
               </span>
             </a>
             <a [href]="currentContent.linkedin" target="_blank"
-              class="group relative px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all">
+              class="group relative px-8 py-4 bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white rounded-lg transition-all">
               <span class="relative">LinkedIn</span>
             </a>
             <a [href]="currentContent.github" target="_blank"
-              class="group relative px-8 py-4 bg-[#1a1d2d] border border-gray-700 hover:border-cyan-500/50 text-gray-300 hover:text-white rounded-lg transition-all">
+              class="group relative px-8 py-4 bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white rounded-lg transition-all">
               <span class="relative">GitHub</span>
             </a>
           </div>
@@ -76,13 +76,13 @@
             <!-- Outer animated ring -->
             <div class="relative">
               <div
-                class="absolute -inset-2 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-70 blur-md animate-pulse">
+                class="absolute -inset-2 rounded-full bg-[linear-gradient(to_top_right,#ffffff_0%,#38bdf8_15%,#38bdf8_90%,#fbbf24_100%)] opacity-70 blur-md animate-pulse">
               </div>
               <div
-                class="relative rounded-full p-[3px] bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 shadow-[0_0_40px_rgba(8,145,178,0.5)]">
-                <div class="rounded-full p-1 bg-[#0d1017]">
+                class="relative rounded-full p-[3px] bg-[linear-gradient(to_top_right,#ffffff_0%,#38bdf8_15%,#38bdf8_90%,#fbbf24_100%)] shadow-[0_0_40px_rgba(56,189,248,0.4)]">
+                <div class="rounded-full p-1 bg-slate-50 dark:bg-[#0d1017]">
                   <img [src]="currentContent.image" [alt]="currentContent.name"
-                    class="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover object-top grayscale-[15%] hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                    class="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover object-top grayscale-15 hover:grayscale-0 transition-all duration-500 hover:scale-105"
                     style="filter: brightness(1.05) contrast(1.05);" />
                 </div>
               </div>
@@ -172,21 +172,21 @@
           class="absolute -inset-1 bg-linear-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-700">
         </div>
         <div
-          class="relative bg-[#131620]/90 backdrop-blur-md border border-gray-800/80 rounded-2xl p-6 md:p-8 shadow-2xl">
+          class="relative bg-white dark:bg-[#131620]/90 backdrop-blur-md border border-slate-200 dark:border-gray-800/80 rounded-2xl p-6 md:p-8 shadow-2xl">
           <!-- Section Title -->
-          <div class="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
-            <h3 class="text-xl font-bold text-white font-mono tracking-tight">{{ currentContent.quickScan.title }}</h3>
+          <div class="flex items-center gap-3 mb-6 border-b border-slate-200 dark:border-gray-800 pb-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white font-mono tracking-tight">{{ currentContent.quickScan.title }}</h3>
           </div>
 
           <!-- Quick-Scan Grid -->
           <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             <!-- Core Focus Component -->
             <div class="space-y-3">
-              <div class="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">
+              <div class="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-wider font-mono">
                 {{ currentContent.quickScan.roleLabel }}
               </div>
               <div class="flex flex-col gap-2">
-                <span class="text-lg font-bold text-white leading-snug">{{ currentContent.quickScan.roleValue }}</span>
+                <span class="text-lg font-bold text-slate-900 dark:text-white leading-snug">{{ currentContent.quickScan.roleValue }}</span>
                 <div
                   class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-sm w-fit font-bold">
                   <i [class]="currentContent.quickScan.primaryTechIcon + ' text-lg'"></i> {{
@@ -197,13 +197,13 @@
 
             <!-- Complementary Backend -->
             <div class="space-y-3">
-              <div class="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">
+              <div class="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-wider font-mono">
                 {{ currentContent.quickScan.complementaryLabel }}
               </div>
               <div class="flex flex-wrap gap-2">
                 @for (skill of currentContent.quickScan.complementaryValue.split(', '); track $index) {
                 <span
-                  class="px-2.5 py-1 rounded bg-[#1a1d2d] border border-gray-700/50 text-gray-300 font-mono text-xs hover:border-cyan-500/50 hover:text-white transition-colors">
+                  class="px-2.5 py-1 rounded bg-slate-100 dark:bg-[#1a1d2d] border border-slate-300 dark:border-gray-700/50 text-slate-700 dark:text-gray-300 font-mono text-xs hover:border-cyan-500/50 hover:text-slate-900 dark:hover:text-white transition-colors">
                   {{ skill }}
                 </span>
                 }
@@ -212,22 +212,22 @@
 
             <!-- Databases & Cloud -->
             <div class="space-y-3">
-              <div class="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">
+              <div class="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-wider font-mono">
                 {{ currentContent.quickScan.cloudDbLabel }}
               </div>
-              <p class="text-gray-300 text-sm leading-relaxed font-mono">
+              <p class="text-slate-700 dark:text-gray-300 text-sm leading-relaxed font-mono">
                 {{ currentContent.quickScan.cloudDbValue }}
               </p>
             </div>
 
             <!-- Key Strengths -->
             <div class="space-y-3">
-              <div class="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">
+              <div class="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-wider font-mono">
                 {{ currentContent.quickScan.keyStrengthsLabel }}
               </div>
               <ul class="space-y-2">
                 @for (strength of currentContent.quickScan.keyStrengths; track $index) {
-                <li class="flex items-center gap-2 text-xs text-gray-300 font-mono">
+                <li class="flex items-center gap-2 text-xs text-slate-700 dark:text-gray-300 font-mono">
                   <i class="fas fa-check text-green-500"></i>
                   <span>{{ strength }}</span>
                 </li>
@@ -241,9 +241,9 @@
       <!-- SYSTEM STATUS / DASHBOARD -->
       <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
         @for (status of systemStatuses; track status.name) {
-        <div class="bg-[#131620] border border-gray-800 p-4 rounded-xl hover:border-cyan-500/30 transition-colors">
+        <div class="bg-white dark:bg-[#131620] border border-slate-200 dark:border-gray-800 p-4 rounded-xl hover:border-cyan-500/30 transition-colors">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-gray-400 text-sm">{{ status.name }}</span>
+            <span class="text-slate-600 dark:text-gray-400 text-sm">{{ status.name }}</span>
             <div class="flex items-center gap-2">
               <span class="relative flex h-2 w-2">
                 <span
@@ -254,12 +254,12 @@
           </div>
           <div class="flex items-end justify-between">
             <div>
-              <div class="text-xl font-mono text-white">{{ status.latency }}ms</div>
-              <div class="text-xs text-gray-500">Latency</div>
+              <div class="text-xl font-mono text-slate-900 dark:text-white">{{ status.latency }}ms</div>
+              <div class="text-xs text-slate-500 dark:text-gray-500">Latency</div>
             </div>
             <div class="text-right">
               <div class="text-sm font-mono text-cyan-500">{{ status.uptime }}</div>
-              <div class="text-xs text-gray-500">Uptime</div>
+              <div class="text-xs text-slate-500 dark:text-gray-500">Uptime</div>
             </div>
           </div>
           <!-- Tiny chart visualization -->
@@ -278,28 +278,28 @@
       <!-- BACKEND HIGHLIGHTS & ARCHITECTURE -->
       <section>
         <div class="flex items-center gap-4 mb-12">
-          <h2 class="text-3xl font-bold text-white" [innerHTML]="currentContent.engineeringExcellenceTitleHtml"></h2>
-          <div class="h-px flex-1 bg-gray-800"></div>
+          <h2 class="text-3xl font-bold text-slate-900 dark:text-white" [innerHTML]="currentContent.engineeringExcellenceTitleHtml"></h2>
+          <div class="h-px flex-1 bg-slate-200 dark:bg-gray-800"></div>
         </div>
 
         <div class="grid lg:grid-cols-3 gap-8 mb-16">
           @for (item of currentContent.backendHighlights; track item.title) {
           <div
-            class="bg-[#131620] border border-gray-800 p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group flex flex-col justify-between">
+            class="bg-white dark:bg-[#131620] border border-slate-200 dark:border-gray-800 p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group flex flex-col justify-between">
             <div>
               <div
                 class="w-14 h-14 bg-cyan-500/10 rounded-lg flex items-center justify-center text-2xl text-cyan-500 mb-6 group-hover:bg-cyan-500 group-hover:text-black transition-colors">
                 <i [class]="item.icon"></i>
               </div>
-              <h3 class="text-xl font-bold text-white mb-3">{{ item.title }}</h3>
-              <p class="text-gray-400 leading-relaxed mb-6">{{ item.description }}</p>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ item.title }}</h3>
+              <p class="text-slate-600 dark:text-gray-400 leading-relaxed mb-6">{{ item.description }}</p>
             </div>
-            <div class="grid grid-cols-2 gap-4 pt-6 border-t border-gray-800/50 mt-auto">
+            <div class="grid grid-cols-2 gap-4 pt-6 border-t border-slate-200 dark:border-gray-800/50 mt-auto">
               @for (stat of item.stats; track stat.label) {
               <div>
                 <div class="text-sm sm:text-base font-mono font-bold text-cyan-400 tracking-tight" [title]="stat.value">
                   {{ stat.value }}</div>
-                <div class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider mt-1">{{ stat.label }}</div>
+                <div class="text-[10px] sm:text-xs text-slate-500 dark:text-gray-500 uppercase tracking-wider mt-1">{{ stat.label }}</div>
               </div>
               }
             </div>
@@ -308,11 +308,11 @@
         </div>
 
         <!-- Code Snippet Viewer -->
-        <div class="bg-[#0d1017] rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
-          <div class="flex border-b border-gray-800 overflow-x-auto">
+        <div class="bg-slate-50 dark:bg-[#0d1017] rounded-xl border border-slate-200 dark:border-gray-800 overflow-hidden shadow-2xl">
+          <div class="flex bg-[#0d1017] border-b border-slate-200 dark:border-gray-800 overflow-x-auto">
             @for (snippet of currentContent.codeSnippets; track snippet.title; let i = $index) {
             <button (click)="activeSnippetIndex = i"
-              class="px-6 py-4 text-sm font-medium border-r border-gray-800 hover:bg-[#1a1d2d] transition-colors whitespace-nowrap"
+              class="px-6 py-4 text-sm font-medium border-r border-slate-200 dark:border-gray-800 hover:bg-[#1a1d2d] transition-colors whitespace-nowrap"
               [ngClass]="activeSnippetIndex === i ? 'bg-[#1a1d2d] text-cyan-400 border-b-2 border-b-cyan-500' : 'text-gray-500'">
               {{ snippet.title }}
             </button>
@@ -323,16 +323,16 @@
               <pre
                 class="font-mono text-sm leading-relaxed"><code class="language-typescript text-gray-300">{{ currentContent.codeSnippets[activeSnippetIndex].code }}</code></pre>
             </div>
-            <div class="bg-[#131620] p-6 border-l border-gray-800">
-              <h4 class="text-white font-bold mb-4">Code Analysis</h4>
-              <p class="text-gray-400 text-sm leading-relaxed">
+            <div class="bg-white dark:bg-[#131620] p-6 border-l border-slate-200 dark:border-gray-800">
+              <h4 class="text-slate-900 dark:text-white font-bold mb-4">Code Analysis</h4>
+              <p class="text-slate-600 dark:text-gray-400 text-sm leading-relaxed">
                 {{ currentContent.codeSnippets[activeSnippetIndex].description }}
               </p>
               <div class="mt-8">
-                <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Tech Stack</div>
+                <div class="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-3">Tech Stack</div>
                 <div class="flex flex-wrap gap-2">
                   @for (tag of currentContent.codeSnippets[activeSnippetIndex].tags; track $index) {
-                  <span class="px-2 py-1 bg-cyan-900/30 text-cyan-300 text-xs rounded-md border border-cyan-500/20">
+                  <span class="px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-xs rounded-md border border-cyan-500/30 dark:border-cyan-500/20">
                     {{ tag }}
                   </span>
                   }
@@ -347,8 +347,8 @@
       <!-- SKILLS MATRIX -->
       <section>
         <div class="flex items-center gap-4 mb-12">
-          <h2 class="text-3xl font-bold text-white" [innerHTML]="currentContent.technicalMasteryTitleHtml"></h2>
-          <div class="h-px flex-1 bg-gray-800"></div>
+          <h2 class="text-3xl font-bold text-slate-900 dark:text-white" [innerHTML]="currentContent.technicalMasteryTitleHtml"></h2>
+          <div class="h-px flex-1 bg-slate-200 dark:bg-gray-800"></div>
         </div>
 
         <div class="space-y-8">
@@ -359,7 +359,7 @@
             <div
               class="absolute -inset-1 bg-linear-to-r from-cyan-500 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-700">
             </div>
-            <div class="relative bg-[#131620] p-6 md:p-8 rounded-2xl border border-cyan-500/30">
+            <div class="relative bg-white dark:bg-[#131620] p-6 md:p-8 rounded-2xl border border-cyan-500/30">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="space-y-4">
                   <span
@@ -373,10 +373,10 @@
                       <i [class]="skill.icon"></i>
                     </div>
                     <div>
-                      <h3 class="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                      <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                         {{ skill.name }}
                       </h3>
-                      <p class="text-gray-400 text-sm md:text-base mt-2 max-w-3xl leading-relaxed font-mono">
+                      <p class="text-slate-600 dark:text-gray-400 text-sm md:text-base mt-2 max-w-3xl leading-relaxed font-mono">
                         {{ skill.description }}
                       </p>
                     </div>
@@ -387,11 +387,11 @@
                 <div class="shrink-0 flex items-center gap-3">
                   <div class="px-4 py-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center font-mono">
                     <div class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Expertise</div>
-                    <div class="text-base font-bold text-white">Core Focus</div>
+                    <div class="text-base font-bold text-slate-900 dark:text-white">Core Focus</div>
                   </div>
                   <div class="px-4 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center font-mono">
                     <div class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Status</div>
-                    <div class="text-base font-bold text-white">Production</div>
+                    <div class="text-base font-bold text-slate-900 dark:text-white">Production</div>
                   </div>
                 </div>
               </div>
@@ -405,23 +405,23 @@
             @for (category of currentContent.technicalSkills; track category.category) {
             @if (!category.isCore) {
             <div
-              class="bg-[#131620] p-6 rounded-2xl border border-gray-800/80 hover:border-cyan-500/30 transition-all duration-300">
+              class="bg-white dark:bg-[#131620] p-6 rounded-2xl border border-slate-200 dark:border-gray-800/80 hover:border-cyan-500/30 transition-all duration-300">
               <h3
-                class="text-lg font-bold text-white mb-6 flex items-center gap-3 font-mono border-b border-gray-800 pb-3">
+                class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3 font-mono border-b border-slate-200 dark:border-gray-800 pb-3">
                 <i class="fas fa-layer-group text-cyan-500/70"></i>
                 {{ category.category }}
               </h3>
               <div class="space-y-6">
                 @for (skill of category.skills; track skill.name) {
-                <div class="group flex gap-4 items-start p-3 rounded-lg hover:bg-gray-800/30 transition-colors">
+                <div class="group flex gap-4 items-start p-3 rounded-lg hover:bg-slate-200 dark:bg-gray-800/30 transition-colors">
                   <div
-                    class="w-10 h-10 rounded-lg bg-[#1a1d2d] flex items-center justify-center shrink-0 border border-gray-700/50 group-hover:border-cyan-500/50 group-hover:bg-cyan-900/10 transition-all">
-                    <i [class]="skill.icon + ' text-xl text-gray-400 group-hover:text-cyan-400 transition-colors'"></i>
+                    class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-[#1a1d2d] flex items-center justify-center shrink-0 border border-slate-300 dark:border-gray-700/50 group-hover:border-cyan-500/50 group-hover:bg-cyan-900/10 transition-all">
+                    <i [class]="skill.icon + ' text-xl text-slate-600 dark:text-gray-400 group-hover:text-cyan-400 transition-colors'"></i>
                   </div>
                   <div>
-                    <h4 class="text-white font-bold text-sm tracking-wide group-hover:text-cyan-300 transition-colors">
+                    <h4 class="text-slate-900 dark:text-white font-bold text-sm tracking-wide group-hover:text-cyan-300 transition-colors">
                       {{ skill.name }}</h4>
-                    <p class="text-gray-500 text-xs mt-1 leading-relaxed">{{ skill.description }}</p>
+                    <p class="text-slate-500 dark:text-gray-500 text-xs mt-1 leading-relaxed">{{ skill.description }}</p>
                   </div>
                 </div>
                 }
@@ -435,33 +435,33 @@
       <!-- EXPERIENCE -->
       <section>
         <div class="flex items-center gap-4 mb-12">
-          <h2 class="text-3xl font-bold text-white" [innerHTML]="currentContent.experienceLogTitleHtml"></h2>
-          <div class="h-px flex-1 bg-gray-800"></div>
+          <h2 class="text-3xl font-bold text-slate-900 dark:text-white" [innerHTML]="currentContent.experienceLogTitleHtml"></h2>
+          <div class="h-px flex-1 bg-slate-200 dark:bg-gray-800"></div>
         </div>
 
-        <div class="relative border-l border-gray-800 ml-4 md:ml-8 space-y-16">
+        <div class="relative border-l border-slate-200 dark:border-gray-800 ml-4 md:ml-8 space-y-16">
           @for (exp of currentContent.workExperience; track exp.company) {
           <div class="relative pl-8 md:pl-12">
             <!-- Timeline Dot -->
             <div
-              class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-[#0f111a] border-4 border-cyan-600 shadow-[0_0_10px_rgba(8,145,178,0.5)]">
+              class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-white dark:bg-surface-dark border-4 border-cyan-600 shadow-[0_0_10px_rgba(8,145,178,0.5)]">
             </div>
             <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
               <div>
-                <h3 class="text-2xl font-bold text-white">{{ exp.position }}</h3>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">{{ exp.position }}</h3>
                 <div class="text-cyan-500 text-lg">{{ exp.company }}</div>
               </div>
-              <div class="px-4 py-1 bg-gray-800 rounded-full text-xs font-mono text-gray-300 border border-gray-700">
+              <div class="px-4 py-1 bg-slate-200 dark:bg-gray-800 rounded-full text-xs font-mono text-slate-700 dark:text-gray-300 border border-slate-300 dark:border-gray-700">
                 {{ exp.period }}
               </div>
             </div>
-            <p class="text-gray-400 text-lg leading-relaxed mb-6 max-w-4xl">
+            <p class="text-slate-600 dark:text-gray-400 text-lg leading-relaxed mb-6 max-w-4xl">
               {{ exp.description }}
             </p>
             <div class="flex flex-wrap gap-2">
               @for (tech of exp.techStack; track $index) {
               <span
-                class="px-3 py-1 bg-[#1a1d2d] hover:bg-gray-800 text-gray-300 hover:text-white text-xs font-mono rounded border border-gray-700 hover:border-cyan-500/50 transition-colors">
+                class="px-3 py-1 bg-slate-100 dark:bg-[#1a1d2d] hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white text-xs font-mono rounded border border-slate-300 dark:border-gray-700 hover:border-cyan-500/50 transition-colors">
                 <span class="text-cyan-500 mr-1">$</span> {{ tech }}
               </span>
               }
@@ -473,7 +473,7 @@
 
       <!-- PROJECTS SHOWCASE -->
       <section
-        class="pb-20 relative group/section p-6 md:p-8 rounded-3xl bg-[#0e111a]/85 border-2 border-cyan-500/35 shadow-[0_0_80px_rgba(6,182,212,0.12)] hover:border-cyan-500/50 hover:shadow-[0_0_100px_rgba(6,182,212,0.2)] transition-all duration-500 overflow-hidden">
+        class="pb-20 relative group/section p-6 md:p-8 rounded-3xl bg-white dark:bg-[#0e111a]/85 border-2 border-cyan-500/35 shadow-[0_0_80px_rgba(6,182,212,0.12)] hover:border-cyan-500/50 hover:shadow-[0_0_100px_rgba(6,182,212,0.2)] transition-all duration-500 overflow-hidden">
         <!-- Cyber Corner Accents -->
         <div
           class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400/80 rounded-tl-3xl pointer-events-none">
@@ -505,12 +505,12 @@
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold mb-3 animate-pulse">
                 <i class="fas fa-star text-cyan-500"></i> RECRUITER HIGHLIGHTS
               </div>
-              <h2 class="text-3xl font-bold text-white font-mono tracking-tight"
+              <h2 class="text-3xl font-bold text-slate-900 dark:text-white font-mono tracking-tight"
                 [innerHTML]="currentContent.projectsTitleHtml"></h2>
             </div>
-            <div class="h-px flex-1 bg-gray-800/80 hidden md:block"></div>
+            <div class="h-px flex-1 bg-slate-200 dark:bg-gray-800/80 hidden md:block"></div>
             <div
-              class="flex items-center gap-2 text-xs font-mono text-cyan-400 bg-cyan-950/20 px-3 py-1.5 rounded-lg border border-cyan-500/20">
+              class="flex items-center gap-2 text-xs font-mono text-cyan-700 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/20 px-3 py-1.5 rounded-lg border border-cyan-500/30 dark:border-cyan-500/20">
               <i class="fas fa-info-circle text-cyan-500"></i> {{ currentContent.hoverToSeeAchievementsLabel }}
             </div>
           </div>
@@ -518,18 +518,18 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             @for (project of currentContent.projects; track project.title) {
             <div
-              class="group relative bg-[#0d0f17]/95 backdrop-blur-xs rounded-xl overflow-hidden border border-gray-800/80 hover:border-cyan-500/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] transition-all duration-300 flex flex-col sm:flex-row hover:-translate-y-1">
+              class="group relative bg-white/90 dark:bg-[#0d0f17]/95 backdrop-blur-md dark:backdrop-blur-xs rounded-xl overflow-hidden border border-slate-200 dark:border-gray-800/80 hover:border-cyan-500/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] transition-all duration-300 flex flex-col sm:flex-row hover:-translate-y-1">
 
               <!-- Project Visual (Image) -->
               <div (click)="openImageModal(project.image)"
-                class="relative overflow-hidden w-full sm:w-44 md:w-48 lg:w-40 xl:w-48 shrink-0 bg-gray-900 border-b sm:border-b-0 sm:border-r border-gray-800/50 h-40 sm:h-auto min-h-[160px] cursor-zoom-in"
+                class="relative overflow-hidden w-full sm:w-44 md:w-48 lg:w-40 xl:w-48 shrink-0 bg-slate-100 dark:bg-gray-900 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-gray-800/50 h-40 sm:h-auto min-h-[160px] cursor-zoom-in"
                 title="Click to zoom screenshot">
                 <img [ngSrc]="project.image"
                   class="object-cover w-full h-full transform scale-100 group-hover:scale-105 transition-transform duration-700 opacity-60 group-hover:opacity-40"
                   fill />
                 <!-- Ambient overlay inside image -->
                 <div
-                  class="absolute inset-0 bg-linear-to-b sm:bg-linear-to-r from-transparent to-[#0e111a]/95 z-10 opacity-70">
+                  class="absolute inset-0 bg-linear-to-b sm:bg-linear-to-r from-transparent to-white/95 dark:to-[#0e111a]/95 z-10 opacity-70">
                 </div>
 
                 <!-- Action Overlay -->
@@ -556,7 +556,7 @@
                   <!-- Header: Title and top tech icons -->
                   <div class="flex items-start justify-between gap-2 mb-1.5">
                     <h3
-                      class="text-xs md:text-sm font-bold text-white font-mono tracking-tight leading-snug group-hover:text-cyan-400 transition-colors">
+                      class="text-xs md:text-sm font-bold text-slate-900 dark:text-white font-mono tracking-tight leading-snug group-hover:text-cyan-400 transition-colors">
                       <a [href]="project.github || project.link" target="_blank">
                         {{ project.title }}
                       </a>
@@ -564,7 +564,7 @@
                     <div class="flex gap-1 shrink-0">
                       @for (tag of project.techStack.slice(0, 3); track $index) {
                       <span
-                        class="w-6 h-6 rounded bg-gray-900/80 border border-gray-800/80 flex items-center justify-center text-[10px]"
+                        class="w-6 h-6 rounded bg-slate-100 dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800/80 flex items-center justify-center text-[10px]"
                         [title]="tag">
                         <i [class]="getTechIcon(tag)"></i>
                       </span>
@@ -573,18 +573,18 @@
                   </div>
 
                   <!-- Description -->
-                  <p class="text-gray-400 text-[10.5px] leading-relaxed mb-2 font-mono">{{ project.description }}</p>
+                  <p class="text-slate-600 dark:text-gray-400 text-[10.5px] leading-relaxed mb-2 font-mono">{{ project.description }}</p>
 
                   <!-- Key Achievements (Logros Clave) - visible directly on card -->
                   @if (project.achievements && project.achievements.length) {
-                  <div class="mt-2 p-2 rounded bg-cyan-950/10 border border-cyan-500/10 space-y-1">
+                  <div class="mt-2 p-2 rounded bg-slate-50 dark:bg-cyan-950/10 border border-slate-200 dark:border-cyan-500/10 space-y-1">
                     <div
-                      class="text-[8.5px] font-bold text-cyan-400 uppercase tracking-widest font-mono flex items-center gap-1 select-none">
-                      <i class="fas fa-chart-line text-cyan-500"></i> {{ currentContent.keyAchievementsLabel }}
+                      class="text-[8.5px] font-bold text-cyan-700 dark:text-cyan-400 uppercase tracking-widest font-mono flex items-center gap-1 select-none">
+                      <i class="fas fa-chart-line text-cyan-600 dark:text-cyan-500"></i> {{ currentContent.keyAchievementsLabel }}
                     </div>
                     <ul class="space-y-1">
                       @for (achievement of project.achievements; track $index) {
-                      <li class="flex items-start gap-1 text-[9.5px] text-gray-300 font-mono leading-snug">
+                      <li class="flex items-start gap-1 text-[9.5px] text-slate-700 dark:text-gray-300 font-mono leading-snug">
                         <span class="text-cyan-500 select-none mt-0.5">•</span>
                         <span>{{ achievement }}</span>
                       </li>
@@ -600,7 +600,7 @@
                   <div class="flex flex-wrap gap-1 mb-2.5">
                     @for (tag of project.techStack; track $index) {
                     <span
-                      class="inline-flex items-center gap-1 text-[8px] text-cyan-300 bg-cyan-950/20 px-1.5 py-0.5 rounded border border-cyan-500/10">
+                      class="inline-flex items-center gap-1 text-[8px] text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-950/20 px-1.5 py-0.5 rounded border border-cyan-500/30 dark:border-cyan-500/10">
                       <i [class]="getTechIcon(tag) + ' scale-75'"></i>
                       {{ tag }}
                     </span>
@@ -608,16 +608,16 @@
                   </div>
 
                   <!-- Footer Buttons -->
-                  <div class="flex gap-4 border-t border-gray-800/30 pt-2 font-mono">
+                  <div class="flex gap-4 border-t border-slate-200 dark:border-gray-800/30 pt-2 font-mono">
                     @if (project.link) {
                     <a [href]="project.link" target="_blank"
-                      class="text-[11px] font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
+                      class="text-[11px] font-bold text-slate-900 dark:text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
                       <i class="fas fa-external-link-alt text-cyan-500"></i> {{ currentContent.liveDemoLabel }}
                     </a>
                     }
                     @if (project.github) {
                     <a [href]="project.github" target="_blank"
-                      class="text-[11px] font-bold text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
+                      class="text-[11px] font-bold text-slate-900 dark:text-white hover:text-cyan-400 transition-colors flex items-center gap-1">
                       <i class="fab fa-github text-cyan-500"></i> {{ currentContent.sourceCodeLabel }}
                     </a>
                     }
@@ -635,10 +635,10 @@
       <section class="pb-20">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
           <div>
-            <h2 class="text-3xl font-bold text-white flex items-center gap-3"
+            <h2 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3"
               [innerHTML]="currentContent.githubPinsTitleHtml">
             </h2>
-            <p class="text-gray-400 text-sm mt-2 font-mono">
+            <p class="text-slate-600 dark:text-gray-400 text-sm mt-2 font-mono">
               {{ currentContent.githubPinsSubLabel }} <a href="https://github.com/arecofix" target="_blank"
                 class="text-cyan-400 underline hover:text-cyan-300 font-bold">github.com/arecofix</a>
             </p>
@@ -653,15 +653,15 @@
 
         <!-- Skeleton loader -->
         @if (isLoadingRepos) {
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-          <div class="bg-[#131620] border border-gray-800 rounded-xl p-6 space-y-4 animate-pulse">
-            <div class="h-4 bg-gray-800 rounded w-2/3"></div>
-            <div class="h-3 bg-gray-800 rounded w-full"></div>
-            <div class="h-3 bg-gray-800 rounded w-5/6"></div>
-            <div class="flex gap-4 pt-2">
-              <div class="h-3 bg-gray-800 rounded w-10"></div>
-              <div class="h-3 bg-gray-800 rounded w-10"></div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+          @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+          <div class="bg-white dark:bg-[#131620] border border-slate-200 dark:border-gray-800 rounded-xl p-4 space-y-3 animate-pulse">
+            <div class="h-3 bg-slate-200 dark:bg-gray-800 rounded w-2/3"></div>
+            <div class="h-2 bg-slate-200 dark:bg-gray-800 rounded w-full"></div>
+            <div class="h-2 bg-slate-200 dark:bg-gray-800 rounded w-5/6"></div>
+            <div class="flex gap-2 pt-2">
+              <div class="h-2 bg-slate-200 dark:bg-gray-800 rounded w-8"></div>
+              <div class="h-2 bg-slate-200 dark:bg-gray-800 rounded w-8"></div>
             </div>
           </div>
           }
@@ -670,32 +670,32 @@
 
         <!-- Live Repos Grid -->
         @if (!isLoadingRepos) {
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
           @for (repo of gitHubRepos; track repo.id) {
           <a [href]="repo.html_url" target="_blank"
-            class="group bg-[#131620] hover:bg-[#181c2b] border border-gray-800/80 hover:border-cyan-500/50 rounded-xl p-6 transition-all duration-300 flex flex-col justify-between hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] relative">
+            class="group bg-white dark:bg-[#131620] hover:bg-slate-50 dark:hover:bg-[#181c2b] border border-slate-200 dark:border-gray-800/80 hover:border-cyan-500/50 rounded-xl p-4 transition-all duration-300 flex flex-col justify-between hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] relative">
             <div>
-              <div class="flex items-start justify-between mb-3 gap-2">
+              <div class="flex items-start justify-between mb-2 gap-2">
                 <h3
-                  class="text-base font-bold text-white group-hover:text-cyan-400 transition-colors truncate font-mono tracking-tight">
+                  class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-400 transition-colors truncate font-mono tracking-tight leading-none" title="{{ repo.name }}">
                   {{ repo.name }}
                 </h3>
                 <span
-                  class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-gray-700/50 text-gray-400 font-mono">
+                  class="shrink-0 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-slate-300 dark:border-gray-700/50 text-slate-600 dark:text-gray-400 font-mono hidden sm:inline-block">
                   {{ repo.visibility }}
                 </span>
               </div>
-              <p class="text-gray-400 text-xs leading-relaxed mb-6 font-mono">
+              <p class="text-slate-600 dark:text-gray-400 text-[10px] leading-relaxed mb-3 font-mono line-clamp-2" title="{{ repo.description }}">
                 {{ repo.description || 'No description provided.' }}
               </p>
             </div>
 
             <div>
               @if (repo.topics && repo.topics.length) {
-              <div class="flex flex-wrap gap-1.5 mb-4">
+              <div class="flex flex-wrap gap-1 mb-3">
                 @for (topic of repo.topics.slice(0, 3); track $index) {
                 <span
-                  class="text-[9px] font-semibold text-cyan-500/80 bg-cyan-950/20 border border-cyan-500/10 px-1.5 py-0.5 rounded">
+                  class="text-[8px] font-semibold text-cyan-700 dark:text-cyan-500/80 bg-cyan-100 dark:bg-cyan-950/20 border border-cyan-500/30 dark:border-cyan-500/10 px-1 py-0.5 rounded">
                   {{ topic }}
                 </span>
                 }
@@ -703,24 +703,24 @@
               }
 
               <div
-                class="flex items-center justify-between border-t border-gray-800/50 pt-4 text-xs text-gray-500 font-mono">
-                <div class="flex items-center gap-4">
+                class="flex items-center justify-between border-t border-slate-200 dark:border-gray-800/50 pt-2 text-[10px] text-slate-500 dark:text-gray-500 font-mono">
+                <div class="flex items-center gap-2">
                   @if (repo.language) {
-                  <span class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full" [class.bg-yellow-500]="repo.language === 'Python'"
+                  <span class="flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [class.bg-yellow-500]="repo.language === 'Python'"
                       [class.bg-blue-600]="repo.language === 'TypeScript'"
                       [class.bg-yellow-400]="repo.language === 'JavaScript'"
                       [class.bg-red-600]="repo.language === 'HTML'"
                       [class.bg-gray-500]="repo.language !== 'Python' && repo.language !== 'TypeScript' && repo.language !== 'JavaScript' && repo.language !== 'HTML'">
                     </span>
-                    {{ repo.language }}
+                    <span class="truncate max-w-[50px]" title="{{ repo.language }}">{{ repo.language }}</span>
                   </span>
                   }
                   <span class="flex items-center gap-1">
                     <i class="far fa-star"></i> {{ repo.stargazers_count }}
                   </span>
                 </div>
-                <span class="text-[10px] text-gray-600">
+                <span class="text-[8px] text-slate-400 dark:text-gray-600 truncate max-w-[45px]" title="{{ repo.updated_at | date:'MMM yyyy' }}">
                   {{ repo.updated_at | date:'MMM yyyy' }}
                 </span>
               </div>
@@ -732,20 +732,18 @@
       </section>
 
       <!-- Footer / Contact CTA -->
-      <div class="text-center pt-20 border-t border-gray-800">
-        <h2 class="text-3xl font-bold text-white mb-6">{{ currentContent.readyToScaleTitle }}</h2>
+      <div class="text-center pt-20 border-t border-slate-200 dark:border-gray-800">
+        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">{{ currentContent.readyToScaleTitle }}</h2>
         <div class="flex justify-center gap-4">
           <a routerLink="/contacto"
-            class="px-8 py-3 bg-cyan-600 text-white rounded-lg font-bold hover:bg-cyan-500 transition-colors shadow-lg shadow-cyan-500/20 cursor-pointer">
+            class="px-8 py-3 bg-cyan-600 text-slate-900 dark:text-white rounded-lg font-bold hover:bg-cyan-500 transition-colors shadow-lg shadow-cyan-500/20 cursor-pointer">
             {{ currentContent.initializeContactLabel }}
           </a>
         </div>
 
-        <div class="mt-16 text-left">
-          <app-certificate-gallery [title]="currentContent.verifiedCredentialsLabel"></app-certificate-gallery>
-        </div>
 
-        <p class="mt-8 text-gray-600 font-mono text-xs text-center">
+
+        <p class="mt-8 text-slate-400 dark:text-gray-600 font-mono text-xs text-center">
           SYSTEM_ID: EZEQUIEL-ENRICO-V2.5.0 // STATUS: ONLINE
         </p>
       </div>
@@ -761,42 +759,42 @@
   (click)="closeImageModal()" (keydown.escape)="closeImageModal()" tabindex="0">
   <!-- Close Button -->
   <button
-    class="absolute top-6 right-6 text-gray-400 hover:text-white text-3xl focus:outline-none transition-colors duration-200 z-50 cursor-pointer"
+    class="absolute top-6 right-6 text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white text-3xl focus:outline-none transition-colors duration-200 z-50 cursor-pointer"
     (click)="closeImageModal()" aria-label="Close modal">
     <i class="fas fa-times"></i>
   </button>
 
   <!-- Zoom Controls Panel -->
   <div
-    class="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-[#131620]/90 border border-gray-800 rounded-full px-6 py-3 shadow-2xl z-50 backdrop-blur-md"
+    class="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white dark:bg-[#131620]/90 border border-slate-200 dark:border-gray-800 rounded-full px-6 py-3 shadow-2xl z-50 backdrop-blur-md"
     (click)="$event.stopPropagation()">
     <button
-      class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center transition-colors cursor-pointer"
+      class="w-10 h-10 rounded-full bg-slate-200 dark:bg-gray-800 hover:bg-slate-300 dark:hover:bg-gray-700 text-slate-900 dark:text-white flex items-center justify-center transition-colors cursor-pointer"
       (click)="zoomOut($event)" title="Zoom Out">
       <i class="fas fa-search-minus"></i>
     </button>
 
-    <span class="text-white font-mono text-sm min-w-12 text-center select-none font-bold">
+    <span class="text-slate-900 dark:text-white font-mono text-sm min-w-12 text-center select-none font-bold">
       {{ zoomScale * 100 | number:'1.0-0' }}%
     </span>
 
     <button
-      class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center transition-colors cursor-pointer"
+      class="w-10 h-10 rounded-full bg-slate-200 dark:bg-gray-800 hover:bg-slate-300 dark:hover:bg-gray-700 text-slate-900 dark:text-white flex items-center justify-center transition-colors cursor-pointer"
       (click)="zoomIn($event)" title="Zoom In">
       <i class="fas fa-search-plus"></i>
     </button>
 
-    <div class="h-6 w-px bg-gray-800"></div>
+    <div class="h-6 w-px bg-slate-300 dark:bg-gray-800"></div>
 
     <button
-      class="px-4 py-2 rounded-full bg-gray-800 hover:bg-cyan-600 hover:text-white text-gray-300 text-xs font-mono font-bold transition-all cursor-pointer"
+      class="px-4 py-2 rounded-full bg-slate-200 dark:bg-gray-800 hover:bg-cyan-600 hover:text-white text-slate-700 dark:text-gray-300 text-xs font-mono font-bold transition-all cursor-pointer"
       (click)="resetZoom($event)">
       {{ currentContent.resetLabel }}
     </button>
   </div>
 
   <!-- Zoom Instructions -->
-  <div class="absolute top-6 left-6 text-gray-400 font-mono text-xs hidden md:block select-none pointer-events-none">
+  <div class="absolute top-6 left-6 text-slate-600 dark:text-gray-400 font-mono text-xs hidden md:block select-none pointer-events-none">
     <i class="fas fa-info-circle mr-1"></i> {{ currentContent.dragToPanLabel }}
   </div>
 

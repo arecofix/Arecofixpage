@@ -1,0 +1,57 @@
+@if (isLocked$ | async) {
+  <div class="fixed inset-0 z-9999 bg-slate-900/80 backdrop-blur-xl flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl max-w-sm w-full mx-4 border border-slate-100 dark:border-slate-700 text-center animate-slide-up">
+      
+      <!-- Profile Avatar -->
+      <div class="mx-auto w-20 h-20 bg-linear-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-6 ring-4 ring-white dark:ring-slate-800">
+        <span class="text-3xl font-bold text-white">{{ userInitial }}</span>
+      </div>
+      
+      <!-- User Info -->
+      <h2 class="text-xl font-black text-slate-800 dark:text-white mb-1">Sesión Bloqueada</h2>
+      <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 truncate px-2">{{ userEmail }}</p>
+
+      <!-- Unlock Form -->
+      <form [formGroup]="unlockForm" (ngSubmit)="onUnlock()" class="space-y-4">
+        
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="fas fa-lock text-slate-400"></i>
+          </div>
+          <input 
+            type="password" 
+            formControlName="password"
+            placeholder="Ingresa tu contraseña" 
+            class="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+            [class.border-red-300]="error"
+          >
+        </div>
+
+        @if (error) {
+          <p class="text-xs text-red-500 font-bold mt-1 text-left px-2"><i class="fas fa-exclamation-circle mr-1"></i> {{ error }}</p>
+        }
+
+        <button 
+          type="submit" 
+          [disabled]="loading || unlockForm.invalid"
+          class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          @if (loading) {
+            <span class="loading loading-spinner loading-sm"></span>
+            <span>Verificando...</span>
+          } @else {
+            <i class="fas fa-unlock"></i>
+            <span>Desbloquear Pantalla</span>
+          }
+        </button>
+      </form>
+
+      <!-- Logout Option -->
+      <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-700/50">
+         <button (click)="forceLogout()" class="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors uppercase tracking-wider">
+            ¿No eres tú? Cerrar sesión
+         </button>
+      </div>
+
+    </div>
+  </div>
+}

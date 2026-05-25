@@ -59,9 +59,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
     let selectFields = `
       id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
-      is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id,
-      branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert),
-      branches(name)
+      is_active, is_featured, sku, barcode, created_at, updated_at, is_global,
+      branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
     `;
 
     if (!minimal) {
@@ -89,11 +88,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     }
     
     if (brand_id) query = query.eq('brand_id', brand_id);
-    if (branch_id) {
-        query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
-    } else {
-        query = query.or(`branch_id.is.null,is_global.is.true`);
-    }
+    // Eliminamos el filtrado estricto por branch_id aquí porque la tabla products ya no lo tiene.
+    // El filtrado cruzado de stock y sucursales debería hacerse consultando a view_products_inventory.
+    // Por retrocompatibilidad, no filtramos por branch_id directamente en el repository central, 
+    // sino que lo delegamos al mapper o a la vista en los servicios de capa superior.
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
     if (id) query = query.eq('id', id);
@@ -104,13 +102,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     if (min_price !== undefined) query = query.gte('price', min_price);
     if (max_price !== undefined) query = query.lte('price', max_price);
     
-    if (params.stock_status) {
-      if (params.stock_status === 'out_of_stock') {
-        query = query.eq('stock', 0);
-      } else if (params.stock_status === 'low_stock') {
-        query = query.gt('stock', 0).lte('stock', 5);
-      }
-    }
+    // Filtrado de stock removido temporalmente del query de Supabase ya que 
+    // la tabla products no tiene la columna stock. 
+    // Si se requiere filtro de stock, se debe consultar a view_products_inventory.
     
     if (params.q) {
       const queryStr = params.q.trim();
@@ -157,8 +151,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   findLowStock(threshold: number = 5): Observable<Product[]> {
     const selectFields = `
       id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
-      is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, 
-      branch_stock:product_stock_per_branch(quantity, branch_id)
+      is_active, is_featured, sku, barcode, created_at, updated_at, is_global, 
+      branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
     `;
 
     const query = this.applyTenantFilter(
@@ -182,7 +176,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       let fromIdx = 0;
       let hasMore = true;
       const CHUNK = 1000;
-      const select = `id, name, slug, price, stock, is_active, is_global`;
+      const select = `id, name, slug, price, is_active, is_global`;
 
       while (hasMore) {
         const query = this.applyTenantFilter(this.supabase.from('products').select(select))
@@ -209,13 +203,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       let fromIdx = 0;
       let hasMore = true;
       const CHUNK = 1000;
-      const select = `id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id)`;
+      const select = `id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id)`;
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
-        if (branch_id) {
-          query = query.or(`branch_id.eq.${branch_id},is_global.is.true`);
-        }
         const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
         if (error) this.errorHandler.handleError(error, 'getAll (Products)');
         
@@ -309,7 +300,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const queryStr = query.trim();
     if (!queryStr) return of([]);
 
-    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id, media_metadata, gallery_urls';
+    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, media_metadata, gallery_urls';
     let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true);
     
@@ -332,12 +323,11 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   getPendingApprovals(): Observable<Product[]> {
-    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, stock, created_at, updated_at, is_global, branch_id, media_metadata, gallery_urls, branches(name)';
+    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, media_metadata, gallery_urls';
     let query = this.applyTenantFilter(
       this.supabase.from(this.tableName)
         .select(selectFields)
         .eq('is_active', false)
-        .not('branch_id', 'is', null)
     );
     return from(query as any).pipe(map(({ data }: any) => (data || []).map((p: any) => ProductMapper.mapFromDb(p))));
   }
@@ -361,7 +351,6 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       this.supabase.from(this.tableName)
         .select('*', { count: 'exact', head: true })
         .eq('is_active', false)
-        .not('branch_id', 'is', null)
     );
     return from(query as any).pipe(map(({ count }: any) => count || 0));
   }
@@ -397,8 +386,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
             return { totalItems, totalValue, lowStockCount };
         } else {
-            let query = this.supabase.from(this.tableName)
-                .select('price, stock, min_stock_alert');
+            let query = this.supabase.from('view_products_inventory')
+                .select('price, quantity, min_stock_alert');
             
             query = this.applyTenantFilter(query);
             query = query.eq('is_active', true);
@@ -408,9 +397,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
             const results = data || [];
             const totalItems = results.length;
-            const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
+            const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.quantity || 0)), 0);
             const lowStockCount = results.filter((p: any) => {
-                const stock = Number(p.stock || 0);
+                const stock = Number(p.quantity || 0);
                 const threshold = Number(p.min_stock_alert ?? 5);
                 return stock > 0 && stock <= threshold;
             }).length;
