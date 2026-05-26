@@ -20,6 +20,7 @@ import { NotificationBaseRepository } from '../../../features/messages/domain/re
 import { UserProfileRepository } from '@app/core/repositories/user-profile.repository';
 import { ProductsParams, ProductsResponse } from '@app/shared/interfaces/product.interface';
 import { ProductsStore } from '@app/features/products/application/services/products.store';
+import { StockManagementService } from '@app/features/products/application/services/stock-management.service';
 
 // ─── Import Report ──────────────────────────────────────────────────────────
 export interface ImportReport {
@@ -69,6 +70,7 @@ export class AdminProductService {
     private notificationRepo = inject(NotificationBaseRepository);
     private userProfileRepo = inject(UserProfileRepository);
     private productsStore = inject(ProductsStore);
+    private stockService = inject(StockManagementService);
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();
@@ -138,13 +140,20 @@ export class AdminProductService {
 
     async createProduct(payload: Partial<Product>): Promise<void> {
         const user = this.auth.getCurrentUser();
+        
+        // Extract stock and branch_id
+        const initialStock = payload.stock;
+        let branchId = payload.branch_id || this.branchContextService.getBranchId();
+        delete payload.stock;
+        delete payload.branch_id;
+
         if (user) {
             const profile = await this.auth.getUserProfile(user.id);
             if (profile && profile.role === ROLES.STAFF) {
                 // Staff-created products require manual approval
                 payload.is_active = false;
                 payload.is_global = false;
-                payload.branch_id = profile.branch_id;
+                branchId = profile.branch_id || branchId;
                 
                 // Trigger approval request for admins
                 const tenantId = profile.tenant_id || this.tenantService.getTenantId();
@@ -167,12 +176,28 @@ export class AdminProductService {
                 if (payload.is_global === undefined) payload.is_global = true; 
             }
         }
-        await firstValueFrom(this.productRepo.create(payload as Product));
+        const createdProduct = await firstValueFrom(this.productRepo.create(payload as Product));
+        
+        if (createdProduct && createdProduct.id && branchId && initialStock !== undefined) {
+            await this.stockService.updateStock(createdProduct.id, branchId, initialStock);
+        }
+        
         this.productsStore.clearCache();
     }
 
     async updateProduct(id: string, payload: Partial<Product>): Promise<void> {
+        // Extract stock and branch_id
+        const initialStock = payload.stock;
+        const branchId = payload.branch_id || this.branchContextService.getBranchId();
+        delete payload.stock;
+        delete payload.branch_id;
+
         await firstValueFrom(this.productRepo.update(id, payload));
+
+        if (branchId && initialStock !== undefined) {
+            await this.stockService.updateStock(id, branchId, initialStock);
+        }
+
         this.productsStore.clearCache();
     }
 
@@ -531,6 +556,17 @@ export class AdminProductService {
                 try {
                     const upserted = await firstValueFrom(this.productRepo.upsertMany(chunk));
                     inserted += (upserted || []).length;
+                    
+                    // Assign stock to inserted products
+                    const currentBranchId = this.branchContextService.getBranchId();
+                    if (currentBranchId && upserted && upserted.length > 0) {
+                        for (const product of upserted) {
+                            const originalItem = chunk.find(c => c.slug === product.slug);
+                            if (originalItem && originalItem.stock !== undefined) {
+                                await this.stockService.updateStock(product.id, currentBranchId, originalItem.stock);
+                            }
+                        }
+                    }
                 } catch (e: any) {
                     let errorMsg = e.message;
                     if (errorMsg.includes('products_brand_id_fkey')) {

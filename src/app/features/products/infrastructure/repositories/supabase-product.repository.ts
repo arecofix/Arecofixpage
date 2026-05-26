@@ -268,7 +268,17 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
-    const dataToUpsert = products.map(p => ({ ...p, tenant_id: this.tenantService.getTenantId(), updated_at: new Date().toISOString() }));
+    const dataToUpsert = products.map(p => {
+        const copy: any = { ...p, tenant_id: this.tenantService.getTenantId(), updated_at: new Date().toISOString() };
+        delete copy.stock;
+        delete copy.branch_id;
+        delete copy.min_stock_alert;
+        delete copy.convertedPrice;
+        delete copy.category_name;
+        delete copy.branch_stock;
+        delete copy.branches;
+        return copy;
+    });
     // 👇 EQUIVALENTE A POSTMAN (PETICIÓN POST para crear/upsert):
     // POST https://<TU_SUPABASE_URL>/rest/v1/products
     return from((this.supabase.from('products').upsert(dataToUpsert).select() as any)).pipe(

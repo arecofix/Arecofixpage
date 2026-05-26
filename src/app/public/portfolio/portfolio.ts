@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, HostListener } from '@angular/core';
-import { CommonModule, NgOptimizedImage, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { interval, Subscription } from 'rxjs';
@@ -122,16 +123,19 @@ export class PortfolioComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.showScrollTop = window.scrollY > 300;
   }
 
   scrollToTop() {
+    if (!isPlatformBrowser(this.platformId)) return;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
 
 
   sendEmail() {
+    if (!isPlatformBrowser(this.platformId)) return;
     window.location.href = 'mailto:' + atob('ZXplcXVpZWxlbnJpY28xNUBnbWFpbC5jb20=');
   }
   activeSnippetIndex = 0;
@@ -799,9 +803,11 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
 
 
     // Simulate realtime terminal updates
-    this.simulationSubscription = interval(2000).subscribe(() => {
-      this.simulateSystemActivity();
-    });
+    if (isPlatformBrowser(this.platformId)) {
+        this.simulationSubscription = interval(2000).subscribe(() => {
+          this.simulateSystemActivity();
+        });
+    }
 
     this.terminalOutput = [
       '> Initializing system...',
