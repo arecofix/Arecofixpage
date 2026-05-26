@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgOptimizedImage } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { PreferencesService } from '../services/preferences.service';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterLink, FormsModule, NgOptimizedImage],
+  imports: [RouterLink, FormsModule],
   templateUrl: './footer.html',
   styleUrl: './footer.css'
 })

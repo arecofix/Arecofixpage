@@ -26,11 +26,11 @@ import { ProductService } from '@app/public/products/services/product.service';
 import { ProfileService } from '@app/core/services/profile.service';
 import { BranchService } from '@app/core/services/branch.service';
 import { ShippingService, ShippingQuote } from '@app/features/orders/application/services/shipping.service';
-import { GetnetService } from '@app/features/orders/application/services/getnet.service';
+import { MercadoPagoService } from '@app/features/orders/application/services/mercadopago.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { firstValueFrom, debounceTime, distinctUntilChanged } from 'rxjs';
 
-type CheckoutStep = 'form' | 'payment_method' | 'pending_payment' | 'awaiting_verification' | 'paid' | 'getnet_redirect';
+type CheckoutStep = 'form' | 'payment_method' | 'pending_payment' | 'awaiting_verification' | 'paid' | 'mp_redirect';
 type PaymentMethodChoice = 'digital' | 'cash' | 'credit_card';
 
 @Component({
@@ -53,7 +53,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
   notificationService = inject(NotificationService);
   branchService   = inject(BranchService);
   shippingService = inject(ShippingService);
-  getnetService   = inject(GetnetService);
+  mercadopagoService = inject(MercadoPagoService);
 
   // ── Form ───────────────────────────────────────────────
   checkoutForm: FormGroup = this.fb.group({
@@ -80,7 +80,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
   proofPreviewUrl    = signal<string | null>(null);
   shippingQuote      = signal<ShippingQuote | null>(null);
   isCalculatingShipping = signal<boolean>(false);
-  getnetPaymentUrl   = signal<string | null>(null);
+  mpPaymentUrl       = signal<string | null>(null);
   
   // Cross-selling
   recommendedProducts = signal<Product[]>([]);
@@ -244,7 +244,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
         email:   formVal.email,
         phone:   formVal.phone,
         subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
-        message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : (method === 'credit_card' ? 'Tarjeta (Getnet)' : 'Efectivo (Rapipago/PagoFácil)')}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
+        message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : (method === 'credit_card' ? 'Mercado Pago' : 'Efectivo (Rapipago/PagoFácil)')}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
       }).catch((e: any) => console.warn('Contact message error (non-fatal):', e));
 
       if (method === 'cash') {
@@ -256,10 +256,10 @@ export class CheckoutPage implements OnInit, OnDestroy {
         this.paymentTicket.set(ticket);
         this.step.set('pending_payment');
       } else if (method === 'credit_card') {
-        // GETNET INTEGRATION
-        const intent = await firstValueFrom(this.getnetService.createPaymentIntent(created.id!, total, formVal.name));
-        this.getnetPaymentUrl.set(intent.paymentUrl);
-        this.step.set('getnet_redirect');
+        // MERCADO PAGO INTEGRATION
+        const intent = await firstValueFrom(this.mercadopagoService.createPreference(created.id!, orderItems, shippingCost, formVal.name));
+        this.mpPaymentUrl.set(intent.init_point);
+        this.step.set('mp_redirect');
       } else {
         // Digital: show instructions to complete payment externally
         this.step.set('pending_payment');

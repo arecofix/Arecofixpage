@@ -635,3 +635,11 @@ react-mfe-app {
   display: block;
 }
 
+
+/* Ocultar widgets flotantes globales en páginas específicas */
+body.hide-floating-widgets react-mfe-app,
+body.hide-floating-widgets app-accessibility-sidebar > button,
+body.hide-floating-widgets .floating-whatsapp {
+  display: none !important;
+}
+

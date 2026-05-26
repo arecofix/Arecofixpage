@@ -1,16 +1,24 @@
-<div class="drawer lg:drawer-open">
+<div class="drawer" [class.lg:drawer-open]="isMainMenuOpen()">
     <input id="admin-drawer" type="checkbox" class="drawer-toggle" />
 
-    <div class="drawer-content flex flex-col bg-gray-50/50 dark:bg-[#0f172a] min-h-screen text-base-content"
-        [ngClass]="[highContrast() ? 'high-contrast' : '']"
-        [style.font-size.px]="fontSize()">
+    <div class="drawer-content flex flex-col bg-gray-50/50 dark:bg-[#0f172a] h-screen print:h-auto overflow-hidden print:overflow-visible text-base-content"
+        [ngClass]="[highContrast() ? 'high-contrast' : '']">
         
         <!-- Navbar Premium -->
-        <header class="w-full navbar bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 sticky top-0 z-40 px-4 md:px-8 h-18 shadow-sm transition-all duration-300">
-            <div class="flex-none lg:hidden">
-                <label for="admin-drawer" class="btn btn-square btn-ghost text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800">
+        <header class="w-full navbar bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 sticky top-0 z-40 px-4 md:px-8 h-18 shadow-sm transition-all duration-300 print:hidden">
+            
+            <div class="flex-none mr-4">
+                <!-- Mobile Toggle -->
+                <label for="admin-drawer" class="btn btn-square btn-ghost text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 lg:hidden">
                     <i class="fas fa-bars text-xl"></i>
                 </label>
+
+                <!-- Desktop Toggle (Abridor) - Only visible when menu is CLOSED -->
+                @if (!isMainMenuOpen()) {
+                <button (click)="toggleMainMenu()" class="hidden lg:flex btn btn-square btn-neutral dark:btn-primary shadow-lg tooltip tooltip-bottom animate-fade-in" data-tip="Mostrar Menú">
+                    <i class="fas fa-bars text-xl text-white"></i>
+                </button>
+                }
             </div>
             
             <div class="flex-1 px-4 flex items-center gap-4">
@@ -85,18 +93,18 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-x-hidden p-0 sm:p-2 lg:p-4">
+        <main class="flex-1 overflow-y-auto print:overflow-visible overflow-x-hidden p-0 sm:p-2 lg:p-4 relative flex flex-col print:p-0">
             <router-outlet></router-outlet>
         </main>
     </div>
 
     <!-- Sidebar Premium Drawer -->
-    <aside class="drawer-side z-50">
+    <aside class="drawer-side z-50 print:hidden">
         <label for="admin-drawer" class="drawer-overlay"></label>
         <div class="w-72 min-h-full bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
             
             <!-- Logo Section -->
-            <div class="h-20 flex items-center px-8 border-b border-slate-800/50">
+            <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/50">
                 <div class="flex items-center gap-4 group cursor-pointer" routerLink="/admin/dashboard">
                     @let branding = branchBranding();
                     @if (branding.logo && branding.logo.includes('.')) {
@@ -111,6 +119,11 @@
                         <span class="block text-[9px] uppercase tracking-widest font-black text-indigo-400 mt-[-2px]">Management Pro</span>
                     </div>
                 </div>
+
+                <!-- Collapse Button (Minimalist arrow) -->
+                <button (click)="toggleMainMenu()" class="hidden lg:flex btn btn-circle btn-sm btn-ghost text-slate-400 hover:text-white hover:bg-slate-800 transition-colors tooltip tooltip-right" data-tip="Ocultar Menú">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
             </div>
 
             <!-- Branch Context Selector -->
@@ -191,7 +204,11 @@
             </nav>
 
             <!-- Bottom User & Exit -->
-            <div class="p-6 border-t border-slate-800/50">
+            <div class="p-6 border-t border-slate-800/50 space-y-2">
+                <button (click)="toggleMainMenu()" class="hidden lg:flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-xs font-bold text-slate-400 hover:bg-white/5 transition-all group">
+                    <i class="fas fa-compress-alt text-sm group-hover:scale-110 transition-transform"></i>
+                    <span>Ocultar Menú</span>
+                </button>
                 <button (click)="logout()" class="flex items-center gap-3 w-full px-4 py-3 rounded-22xl text-xs font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 transition-all group">
                     <i class="fas fa-power-off text-sm group-hover:scale-125 transition-transform"></i>
                     <span>Cerrar Sesión</span>

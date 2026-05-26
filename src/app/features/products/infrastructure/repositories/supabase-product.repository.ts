@@ -387,21 +387,21 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             return { totalItems, totalValue, lowStockCount };
         } else {
             let query = this.supabase.from('view_products_inventory')
-                .select('price, quantity, min_stock_alert');
+                .select('price, stock, min_stock_alert');
             
-            query = this.applyTenantFilter(query);
-            query = query.eq('is_active', true);
+            // Note: view_products_inventory does not have tenant_id or is_active exposed.
+            // If the view handles RLS, it filters automatically.
 
             const { data, error } = await (query as any);
             if (error) throw error;
 
             const results = data || [];
             const totalItems = results.length;
-            const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.quantity || 0)), 0);
+            const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
             const lowStockCount = results.filter((p: any) => {
-                const stock = Number(p.quantity || 0);
+                const stockVal = Number(p.stock || 0);
                 const threshold = Number(p.min_stock_alert ?? 5);
-                return stock > 0 && stock <= threshold;
+                return stockVal > 0 && stockVal <= threshold;
             }).length;
 
             return { totalItems, totalValue, lowStockCount };

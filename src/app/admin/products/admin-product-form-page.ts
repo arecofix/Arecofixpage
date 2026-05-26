@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -99,6 +99,24 @@ export class AdminProductFormPage implements OnInit {
     } finally {
       this.loading.set(false);
       this.cdr.markForCheck();
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+      event.preventDefault();
+      if (!this.saving()) {
+        this.save();
+      }
+    } else if (event.key === 'Enter') {
+      const target = event.target as HTMLElement;
+      if (target.tagName !== 'TEXTAREA' && target.tagName !== 'BUTTON') {
+        event.preventDefault();
+        if (!this.saving()) {
+          this.save();
+        }
+      }
     }
   }
 

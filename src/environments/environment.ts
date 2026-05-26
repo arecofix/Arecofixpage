@@ -67,7 +67,7 @@ export const environment: Environment = {
       sigmakey: 'https://sigmakey.com'
     },
     portfolio: {
-      cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
+      cv: '/curriculum-ezequiel-enrico.pdf'
     }
   },
   firebase: {

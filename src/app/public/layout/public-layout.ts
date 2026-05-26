@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PublicLayoutHeader } from './components';
@@ -20,15 +20,22 @@ export class PublicLayout implements OnInit, OnDestroy {
   private router = inject(Router);
   private subscription = new Subscription();
 
+  public isPortfolioRoute = signal(false);
+
   constructor(public preferencesService: PreferencesService) {}
 
   ngOnInit(): void {
+    this.isPortfolioRoute.set(this.router.url.includes('/portfolio'));
+
     // Cerrar sidebar de accesibilidad automáticamente al navegar
     this.subscription.add(
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
-      ).subscribe(() => {
+      ).subscribe((event: any) => {
         this.preferencesService.closeSidebar();
+        if (event.urlAfterRedirects) {
+          this.isPortfolioRoute.set(event.urlAfterRedirects.includes('/portfolio'));
+        }
       })
     );
   }

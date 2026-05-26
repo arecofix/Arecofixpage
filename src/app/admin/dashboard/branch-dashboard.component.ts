@@ -13,8 +13,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-branch-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './branch-dashboard.component.html',
-  styleUrls: ['./branch-dashboard.component.scss']
+  templateUrl: './branch-dashboard.component.html'
 })
 export class BranchDashboardComponent implements OnInit {
   private dashboardService = inject(TenantIsolatedDashboardService);

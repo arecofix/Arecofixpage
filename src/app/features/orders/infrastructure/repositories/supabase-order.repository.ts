@@ -34,14 +34,18 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
       order_number: orderNumber,
     });
 
+    const tenantId = this.tenantService.getTenantId();
+    const payload = this.sanitizePayload({
+      ...persistence,
+      created_at: order.created_at ?? new Date().toISOString(),
+    });
+    
+    // Bypass DEFAULT get_my_tenant() evaluation which throws "Usuario sin tenant asignado"
+    payload.tenant_id = tenantId;
+
     const { error: orderError } = await this.supabase
       .from(this.tableName)
-      .insert(
-        this.sanitizePayload({
-          ...persistence,
-          created_at: order.created_at ?? new Date().toISOString(),
-        })
-      );
+      .insert(payload);
 
     if (orderError) this.errorHandler.handleError(orderError, 'createOrder');
 
@@ -114,8 +118,9 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
   }
 
   private async _upsertOrderItems(orderId: string, items: OrderItem[]): Promise<void> {
-    const itemsPayload = items.map((item) =>
-      this.sanitizePayload({
+    const tenantId = this.tenantService.getTenantId();
+    const itemsPayload = items.map((item) => {
+      const sanitized = this.sanitizePayload({
         order_id: orderId,
         product_id: item.product_id || null,
         course_id: item.course_id || null,
@@ -124,8 +129,10 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
         unit_price: item.unit_price,
         unit_cost_at_time: item.unit_cost_at_time || 0,
         subtotal: item.subtotal,
-      })
-    );
+      });
+      sanitized.tenant_id = tenantId;
+      return sanitized;
+    });
 
     const { error: itemsError } = await this.supabase.from('order_items').insert(itemsPayload);
     if (itemsError) this.errorHandler.handleError(itemsError, 'upsertOrderItems');

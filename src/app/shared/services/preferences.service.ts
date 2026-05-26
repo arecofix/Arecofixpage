@@ -119,6 +119,7 @@ export class PreferencesService {
       const newSize = current + 2;
       this.fontSizeSubject.next(newSize);
       this.savePreference('portfolio-font-size', newSize.toString());
+      this.applyFontSize(newSize);
     }
   }
 
@@ -128,6 +129,7 @@ export class PreferencesService {
       const newSize = current - 2;
       this.fontSizeSubject.next(newSize);
       this.savePreference('portfolio-font-size', newSize.toString());
+      this.applyFontSize(newSize);
     }
   }
 
@@ -174,12 +176,22 @@ export class PreferencesService {
       this.applyTheme('system');
     }
     if (savedFontSize) {
-      this.fontSizeSubject.next(parseInt(savedFontSize, 10));
+      const size = parseInt(savedFontSize, 10);
+      this.fontSizeSubject.next(size);
+      this.applyFontSize(size);
+    } else {
+      this.applyFontSize(16);
     }
     if (savedContrast) {
       const isHighContrast = savedContrast === 'true';
       this.highContrastSubject.next(isHighContrast);
       this.applyHighContrast(isHighContrast);
+    }
+  }
+
+  private applyFontSize(size: number): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.documentElement.style.fontSize = `${size}px`;
     }
   }
 

@@ -1,343 +1,268 @@
-<!-- Premium Login Page — Arecofix -->
-<div class="min-h-screen flex">
+<!-- Minimalist SaaS Login Page — Arecofix Workspace -->
+<div class="min-h-screen flex bg-white dark:bg-[#0a0a0a] font-sans selection:bg-indigo-500/30">
   
-  <!-- Left Branding Panel (Desktop Only) -->
-  <div class="hidden lg:flex lg:w-1/2 bg-linear-to-br from-gray-900 via-indigo-950 to-gray-900 relative overflow-hidden items-center justify-center p-12">
-    <!-- Decorative Elements -->
-    <div class="absolute top-0 left-0 w-full h-full">
-      <div class="absolute top-20 left-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-32 right-16 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl"></div>
+  <!-- Left Panel: Branding & Context (Desktop Only) -->
+  <div class="hidden lg:flex lg:w-[45%] bg-slate-900 relative overflow-hidden flex-col justify-between p-12 border-r border-slate-800">
+    <!-- Subtle Top-Left Glow -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute top-[-20%] left-[-10%] w-[70%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
     </div>
 
-    <!-- Content -->
-    <div class="relative z-10 max-w-lg text-center">
-      <!-- Logo -->
-      <div class="mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-linear-to-br from-orange-500 to-amber-500 rounded-2xl shadow-2xl shadow-orange-500/20 mb-6">
-          <i class="fas fa-tools text-white text-3xl"></i>
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 mb-16">
+        <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fas fa-tools text-white text-lg"></i>
         </div>
-        <h1 class="text-5xl font-black text-white tracking-tight">Arecofix</h1>
-        <p class="text-indigo-300 text-lg mt-2 font-medium">Plataforma de Servicios Técnicos</p>
+        <span class="text-white font-bold text-xl tracking-tight">Arecofix</span>
       </div>
 
-      <!-- Features -->
-      <div class="mt-12 space-y-5 text-left">
-        <div class="flex items-start gap-4 bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
-          <div class="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0">
-            <i class="fas fa-microchip text-orange-400"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm">Repuestos Certificados</h3>
-            <p class="text-gray-400 text-xs mt-0.5">Miles de módulos y pantallas con garantía de calidad.</p>
-          </div>
+      <h1 class="text-4xl font-medium text-white tracking-tight leading-tight max-w-md">
+        Tecnología, repuestos y <br/>
+        <span class="text-slate-400">servicios técnicos de confianza.</span>
+      </h1>
+      
+      <div class="mt-12 space-y-6 max-w-sm">
+        <div class="flex items-center gap-4 text-slate-300">
+          <i class="fas fa-shopping-bag text-indigo-400 w-5 text-center"></i>
+          <span class="text-sm font-medium">Comprá online con total seguridad</span>
         </div>
-        <div class="flex items-start gap-4 bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
-          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
-            <i class="fas fa-shield-alt text-indigo-400"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm">Precios Exclusivos Web</h3>
-            <p class="text-gray-400 text-xs mt-0.5">Accedé a tarifas especiales al autogestionar tus pedidos online.</p>
-          </div>
+        <div class="flex items-center gap-4 text-slate-300">
+          <i class="fas fa-truck text-indigo-400 w-5 text-center"></i>
+          <span class="text-sm font-medium">Envíos rápidos a todo el país</span>
         </div>
-        <div class="flex items-start gap-4 bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
-            <i class="fas fa-truck text-emerald-400"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-bold text-sm">Envíos a Todo el País</h3>
-            <p class="text-gray-400 text-xs mt-0.5">Despacho en 24/48hs con seguimiento en tiempo real.</p>
-          </div>
+        <div class="flex items-center gap-4 text-slate-300">
+          <i class="fas fa-shield-alt text-indigo-400 w-5 text-center"></i>
+          <span class="text-sm font-medium">Seguimiento de compras y reparaciones</span>
         </div>
       </div>
+    </div>
 
-      <!-- Trust -->
-      <p class="mt-12 text-xs text-gray-500 uppercase tracking-widest font-bold">
-        <i class="fas fa-lock mr-1.5"></i> Conexión segura cifrada SSL
-      </p>
+    <div class="relative z-10 text-xs text-slate-500 font-medium">
+      &copy; {{ currentYear }} Arecofix. Todos los derechos reservados.
     </div>
   </div>
 
-  <!-- Right Form Panel -->
-  <div class="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 dark:bg-gray-950 py-12 px-6 sm:px-12">
-    <div class="w-full max-w-md">
-      
-      <!-- Mobile Logo -->
-      <div class="text-center mb-8 lg:hidden">
-        <div class="inline-flex items-center justify-center w-14 h-14 bg-linear-to-br from-orange-500 to-amber-500 rounded-2xl shadow-lg shadow-orange-500/20 mb-3">
-          <i class="fas fa-tools text-white text-xl"></i>
-        </div>
-        <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Arecofix</h1>
+  <!-- Right Panel: Login Form -->
+  <div class="w-full lg:w-[55%] flex items-center justify-center p-6 sm:p-12 relative">
+    
+    <!-- Mobile/Tablet Logo (Hidden on Desktop) -->
+    <div class="absolute top-8 left-8 lg:hidden flex items-center gap-2">
+      <div class="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center">
+        <i class="fas fa-layer-group text-white text-sm"></i>
+      </div>
+      <span class="text-slate-900 dark:text-white font-bold tracking-tight">Arecofix</span>
+    </div>
+
+    <div class="w-full max-w-[400px]">
+      <div class="mb-8 text-left">
+        <h2 class="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Iniciar sesión</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Ingresá tus credenciales para acceder al sistema.</p>
       </div>
 
-      <!-- Header -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-black text-gray-900 dark:text-white">Bienvenido de vuelta</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ingresá a tu cuenta para continuar</p>
-      </div>
-
-      <!-- Error Alert -->
+      <!-- Alerts -->
       @if (error) {
-        <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-2xl flex items-start gap-3">
-          <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
-            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400"></i>
-          </div>
-          <div>
-            <p class="text-red-800 dark:text-red-300 font-bold text-sm">Error de autenticación</p>
-            <p class="text-red-700 dark:text-red-400 text-xs mt-0.5">{{ error }}</p>
-          </div>
+        <div class="mb-6 p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-md flex items-center gap-3">
+          <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm"></i>
+          <p class="text-red-800 dark:text-red-300 text-sm">{{ error }}</p>
         </div>
       }
 
-      <!-- Success Alert -->
       @if (success) {
-        <div class="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 rounded-2xl flex items-start gap-3">
-          <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400"></i>
-          </div>
-          <p class="text-emerald-800 dark:text-emerald-300 font-bold text-sm">{{ success }}</p>
+        <div class="mb-6 p-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md flex items-center gap-3">
+          <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 text-sm"></i>
+          <p class="text-emerald-800 dark:text-emerald-300 text-sm">{{ success }}</p>
         </div>
       }
 
-      <!-- Reset Password Mode -->
+      <!-- Reset Password View -->
       @if (resetPasswordMode) {
-        <div class="mb-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-              <i class="fas fa-envelope text-indigo-600 dark:text-indigo-400"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Restablecer Contraseña</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Recibirás un enlace de recuperación.</p>
-            </div>
+        <div [formGroup]="form" class="space-y-4 animate-fade-in">
+          <div>
+            <label for="reset-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Correo electrónico</label>
+            <input
+              type="email"
+              id="reset-email"
+              formControlName="email"
+              placeholder="nombre@empresa.com"
+              class="w-full px-3 py-2.5 bg-white dark:bg-[#0a0a0a] border border-slate-300 dark:border-slate-800 rounded-md text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            />
           </div>
+          <button
+            type="button"
+            (click)="resetPassword()"
+            [disabled]="loading || resetEmailSent || !email?.value"
+            class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm py-2.5 rounded-md transition-colors flex items-center justify-center gap-2"
+          >
+            @if (!loading && !resetEmailSent) {
+              Recuperar contraseña
+            }
+            @if (loading) {
+              <i class="fas fa-circle-notch fa-spin"></i> Enviando...
+            }
+            @if (resetEmailSent) {
+              <i class="fas fa-check"></i> Enviado
+            }
+          </button>
+          <button
+            type="button"
+            (click)="toggleResetPasswordMode()"
+            class="w-full text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-sm font-medium py-2 transition-colors flex items-center justify-center gap-2"
+          >
+            <i class="fas fa-arrow-left text-xs"></i> Volver al login
+          </button>
         </div>
       }
 
-      <!-- Login Form -->
+      <!-- Standard Login View -->
       @if (!resetPasswordMode) {
-        <div>
-          <form [formGroup]="form" (ngSubmit)="handleLogin()" class="space-y-5">
-            <!-- Email Field -->
+        <form [formGroup]="form" (ngSubmit)="handleLogin()" class="space-y-5 animate-fade-in">
+          
+          <div class="space-y-4">
+            <!-- Email -->
             <div>
-              <label for="email" class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">Email</label>
-              <div class="relative">
-                <i class="fas fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input
-                  type="email"
-                  id="email"
-                  formControlName="email"
-                  autocomplete="email"
-                  placeholder="tu@email.com"
-                  class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700"
-                  [class.border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
-                  [class.dark:border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
-                  />
-                @if (email?.invalid && (email?.touched || email?.dirty)) {
-                  <div class="text-red-600 dark:text-red-400 text-xs mt-1.5 font-medium">
-                    @if (email?.errors?.['required']) {
-                      <p><i class="fas fa-exclamation-triangle mr-1"></i> El email es obligatorio.</p>
-                    }
-                    @if (email?.errors?.['email']) {
-                      <p><i class="fas fa-exclamation-triangle mr-1"></i> Debe ser un email válido.</p>
-                    }
-                  </div>
-                }
-              </div>
+              <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Correo electrónico</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                autocomplete="username"
+                placeholder="nombre@empresa.com"
+                class="w-full px-3 py-2.5 bg-white dark:bg-transparent border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                [class.border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
+                [class.dark:border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
+              />
             </div>
 
-            <!-- Password Field -->
+            <!-- Password -->
             <div>
-              <label for="password" class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">Contraseña</label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contraseña</label>
+                <button
+                  type="button"
+                  (click)="toggleResetPasswordMode()"
+                  class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
               <div class="relative">
-                <i class="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input
                   [type]="showPassword ? 'text' : 'password'"
                   id="password"
                   formControlName="password"
                   autocomplete="current-password"
                   placeholder="••••••••"
-                  class="w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                  class="w-full px-3 py-2.5 bg-white dark:bg-transparent border border-slate-300 dark:border-slate-700 rounded-md text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 pr-10"
                   [class.border-red-500]="password?.invalid && (password?.touched || password?.dirty)"
                   [class.dark:border-red-500]="password?.invalid && (password?.touched || password?.dirty)"
-                  />
+                />
                 <button
                   type="button"
                   (click)="togglePasswordVisibility()"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
-                  >
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                >
                   <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
                 </button>
               </div>
-              @if (password?.invalid && (password?.touched || password?.dirty)) {
-                <div class="text-red-600 dark:text-red-400 text-xs mt-1.5 font-medium">
-                  @if (password?.errors?.['required']) {
-                    <p><i class="fas fa-exclamation-triangle mr-1"></i> La contraseña es obligatoria.</p>
-                  }
-                  @if (password?.errors?.['minlength']) {
-                    <p><i class="fas fa-exclamation-triangle mr-1"></i> Mínimo 6 caracteres.</p>
-                  }
-                </div>
-              }
             </div>
-
-            <!-- Remember Me & Forgot -->
-            <div class="flex items-center justify-between">
-              <label for="rememberMe" class="flex items-center gap-2 cursor-pointer group">
-                <input
-                  id="rememberMe"
-                  type="checkbox"
-                  formControlName="rememberMe"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded cursor-pointer"
-                />
-                <span class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">Recordarme</span>
-              </label>
-              <button
-                type="button"
-                (click)="toggleResetPasswordMode()"
-                class="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
-                >
-                ¿Olvidaste tu clave?
-              </button>
-            </div>
-
-            <!-- Submit Button -->
-            <button
-              type="submit"
-              [disabled]="loading || form.invalid"
-              class="w-full bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-800 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 disabled:shadow-none transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
-              >
-              @if (!loading) {
-                <i class="fas fa-sign-in-alt mr-1"></i> Iniciar Sesión
-              }
-              @if (loading) {
-                <i class="fas fa-circle-notch fa-spin mr-2"></i> Verificando credenciales…
-              }
-            </button>
-          </form>
-
-          <!-- Social Divider -->
-          <div class="mt-8 flex items-center gap-4">
-            <div class="grow h-px bg-gray-200 dark:bg-gray-700"></div>
-            <span class="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest shrink-0">o ingresá con</span>
-            <div class="grow h-px bg-gray-200 dark:bg-gray-700"></div>
           </div>
 
-          <!-- Social Login Options -->
-          <div class="mt-6 grid grid-cols-3 gap-3">
-            <!-- Google -->
-            <button
-              type="button"
-              (click)="loginWithGoogle()"
-              [disabled]="socialLoading['google'] || loading"
-              class="flex flex-col items-center justify-center gap-1.5 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-3 px-3 rounded-xl transition-all hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm"
-              >
-              @if (!socialLoading['google']) {
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-              } @else {
-                <i class="fas fa-circle-notch fa-spin text-gray-400"></i>
-              }
-              <span class="text-[10px] font-bold uppercase tracking-wider">Google</span>
-            </button>
+          <!-- Remember Me -->
+          <label for="rememberMe" class="flex items-center gap-2 cursor-pointer group w-fit">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              formControlName="rememberMe"
+              class="w-4 h-4 text-indigo-600 bg-white dark:bg-[#0a0a0a] border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer transition-colors"
+            />
+            <span class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Mantener sesión iniciada</span>
+          </label>
 
-            <!-- Facebook -->
-            <button
-              type="button"
-              (click)="loginWithFacebook()"
-              [disabled]="socialLoading['facebook'] || loading"
-              class="flex flex-col items-center justify-center gap-1.5 bg-[#1877F2] hover:bg-[#166fe5] disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 px-3 rounded-xl transition-all hover:shadow-sm"
-              >
-              @if (!socialLoading['facebook']) {
-                <i class="fab fa-facebook-f text-lg"></i>
-              } @else {
-                <i class="fas fa-circle-notch fa-spin"></i>
-              }
-              <span class="text-[10px] font-bold uppercase tracking-wider">Facebook</span>
-            </button>
+          <!-- Submit -->
+          <button
+            type="submit"
+            [disabled]="loading || form.invalid"
+            class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm py-2.5 rounded-md transition-colors flex items-center justify-center gap-2"
+          >
+            @if (!loading) {
+              Ingresar al workspace
+            } @else {
+              <i class="fas fa-circle-notch fa-spin"></i> Autenticando...
+            }
+          </button>
+        </form>
 
-            <!-- GitHub -->
-            <button
-              type="button"
-              (click)="loginWithGithub()"
-              [disabled]="socialLoading['github'] || loading"
-              class="flex flex-col items-center justify-center gap-1.5 bg-gray-900 dark:bg-gray-800 hover:bg-gray-800 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 px-3 rounded-xl transition-all hover:shadow-sm"
-              >
-              @if (!socialLoading['github']) {
-                <i class="fab fa-github text-lg"></i>
-              } @else {
-                <i class="fas fa-circle-notch fa-spin"></i>
-              }
-              <span class="text-[10px] font-bold uppercase tracking-wider">GitHub</span>
-            </button>
-          </div>
+        <!-- Divider -->
+        <div class="mt-8 flex items-center gap-4">
+          <div class="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+          <span class="text-xs text-slate-500 font-medium">o continuar con</span>
+          <div class="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+        </div>
 
-          <!-- Register Link -->
-          <div class="mt-8 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              ¿No tenés cuenta?
-              <a routerLink="/register" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold transition-colors"> Registrate gratis</a>
-            </p>
-          </div>
+        <!-- Social Buttons (Minimalist) -->
+        <div class="mt-6 grid grid-cols-3 gap-3">
+          <button
+            type="button"
+            (click)="loginWithGoogle()"
+            [disabled]="socialLoading['google'] || loading"
+            aria-label="Iniciar sesión con Google"
+            class="flex items-center justify-center py-2 border border-slate-300 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors disabled:opacity-50"
+            title="Google"
+          >
+            @if (!socialLoading['google']) {
+              <svg class="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            } @else {
+              <i class="fas fa-circle-notch fa-spin text-slate-500"></i>
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="loginWithFacebook()"
+            [disabled]="socialLoading['facebook'] || loading"
+            aria-label="Iniciar sesión con Facebook"
+            class="flex items-center justify-center py-2 border border-slate-300 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors disabled:opacity-50 text-[#1877F2] dark:text-[#1877F2]"
+            title="Facebook"
+          >
+            @if (!socialLoading['facebook']) {
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
+              </svg>
+            } @else {
+              <i class="fas fa-circle-notch fa-spin text-slate-500"></i>
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="loginWithGithub()"
+            [disabled]="socialLoading['github'] || loading"
+            aria-label="Iniciar sesión con GitHub"
+            class="flex items-center justify-center py-2 border border-slate-300 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors disabled:opacity-50 text-slate-900 dark:text-white"
+            title="GitHub"
+          >
+            @if (!socialLoading['github']) {
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z" />
+              </svg>
+            } @else {
+              <i class="fas fa-circle-notch fa-spin text-slate-500"></i>
+            }
+          </button>
+        </div>
+
+        <div class="mt-8 text-center">
+          <p class="text-sm text-slate-500">
+            ¿No tienes cuenta?
+            <a routerLink="/register" class="font-medium text-slate-900 dark:text-white hover:underline transition-all">Regístrate</a>
+          </p>
         </div>
       }
-
-      <!-- Reset Password Form -->
-      @if (resetPasswordMode) {
-        <div [formGroup]="form">
-          <div class="space-y-5">
-            <div>
-              <label for="reset-email" class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">Email</label>
-              <div class="relative">
-                <i class="fas fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input
-                  type="email"
-                  id="reset-email"
-                  formControlName="email"
-                  placeholder="tu@email.com"
-                  class="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900"
-                  />
-              </div>
-            </div>
-            <button
-              type="button"
-              (click)="resetPassword()"
-              [disabled]="loading || resetEmailSent || !email?.value"
-              class="w-full bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-800 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 disabled:shadow-none"
-              >
-              @if (!loading && !resetEmailSent) {
-                <i class="fas fa-paper-plane mr-2"></i> Enviar Enlace de Recuperación
-              }
-              @if (loading) {
-                <i class="fas fa-circle-notch fa-spin mr-2"></i> Enviando…
-              }
-              @if (resetEmailSent) {
-                <i class="fas fa-check-circle mr-2"></i> Correo Enviado
-              }
-            </button>
-            <button
-              type="button"
-              (click)="toggleResetPasswordMode()"
-              class="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-bold text-sm py-3 transition-colors flex items-center justify-center gap-2"
-              >
-              <i class="fas fa-arrow-left"></i> Volver al Login
-            </button>
-          </div>
-        </div>
-      }
-
-      <!-- Footer -->
-      <div class="mt-10 text-center">
-        <p class="text-[11px] text-gray-400 dark:text-gray-600">
-          <i class="fas fa-shield-alt mr-1"></i> Protegido por cifrado SSL de 256 bits
-        </p>
-        <p class="text-[10px] text-gray-300 dark:text-gray-700 mt-1">© {{ 2026 }} Arecofix — Todos los derechos reservados.</p>
-      </div>
     </div>
   </div>
 </div>
