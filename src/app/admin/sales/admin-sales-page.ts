@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, effect, untracked } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect, untracked, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -25,6 +25,9 @@ interface CartItem extends Product {
     standalone: true,
     imports: [CommonModule, FormsModule, Pagination],
     templateUrl: './admin-sales-page.html',
+    host: {
+        class: 'flex flex-col flex-1 h-full min-h-0'
+    }
 })
 export class AdminSalesPage implements OnInit {
     private router = inject(Router);
@@ -37,6 +40,8 @@ export class AdminSalesPage implements OnInit {
     private notificationService = inject(NotificationService);
 
     private branchContextService = inject(BranchContextService);
+
+    @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
     // Data Signals
     products = signal<Product[]>([]);
@@ -87,7 +92,15 @@ export class AdminSalesPage implements OnInit {
     constructor() {
         // Reset pagination on search
         effect(() => {
-            this.searchQuery();
+            const query = this.searchQuery();
+            untracked(() => {
+                // Remove page from URL so it defaults to 1 cleanly
+                this.router.navigate([], {
+                    relativeTo: this.route,
+                    queryParams: { _page: null },
+                    queryParamsHandling: 'merge'
+                });
+            });
         });
 
         // RE-LOAD products on branch change!
@@ -98,6 +111,14 @@ export class AdminSalesPage implements OnInit {
     }
 
     private route = inject(ActivatedRoute);
+
+    @HostListener('window:keydown.f3', ['$event'])
+    handleF3(event: Event) {
+        event.preventDefault();
+        if (this.searchInput) {
+            this.searchInput.nativeElement.focus();
+        }
+    }
 
     async ngOnInit() {
         this.route.queryParams.subscribe((params: any) => {

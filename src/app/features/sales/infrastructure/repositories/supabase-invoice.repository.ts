@@ -78,6 +78,29 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
   }
 
   async create(invoice: Record<string, unknown>): Promise<{ data: Invoice | null; error: unknown }> {
+    // Bypass faulty database trigger by generating invoice_number client-side if missing
+    if (!invoice['invoice_number']) {
+      try {
+        const { data: latest } = await this.supabase
+          .from('invoices')
+          .select('invoice_number')
+          .eq('tenant_id', invoice['tenant_id'] as string)
+          .order('invoice_number', { ascending: false })
+          .limit(1);
+
+        let nextNumber = 1;
+        if (latest && latest.length > 0 && latest[0].invoice_number) {
+          const parsed = parseInt(latest[0].invoice_number, 10);
+          if (!isNaN(parsed)) {
+            nextNumber = parsed + 1;
+          }
+        }
+        invoice['invoice_number'] = nextNumber.toString().padStart(6, '0');
+      } catch (e) {
+        console.warn('Could not auto-generate invoice number on client side', e);
+      }
+    }
+
     const { data, error } = await this.supabase.from('invoices').insert(invoice).select().single();
     return { data: data as Invoice, error };
   }

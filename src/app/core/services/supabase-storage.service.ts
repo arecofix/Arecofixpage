@@ -44,8 +44,6 @@ export class SupabaseStorageService {
         if (expiresAt - now < 300) {
           await this.auth.refreshSession();
         }
-      } else {
-        await this.auth.refreshSession();
       }
 
       let fileToUpload = file;

@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
@@ -21,6 +22,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   resetEmailSent = false;
   resetPasswordMode = false;
   returnUrl = '';
+  currentYear = new Date().getFullYear();
   socialLoading: { [key: string]: boolean } = {
     google: false,
     github: false,
@@ -31,6 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private document = inject(DOCUMENT);
   private destroy$ = new Subject<void>();
 
   constructor() {
@@ -42,6 +45,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.document.body.classList.add('hide-floating-widgets');
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
     
     this.authService.authState$
@@ -58,6 +62,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.document.body.classList.remove('hide-floating-widgets');
     this.destroy$.next();
     this.destroy$.complete();
   }

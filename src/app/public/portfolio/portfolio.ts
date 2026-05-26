@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, HostListener } from '@angular/core';
+import { CommonModule, NgOptimizedImage, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PreferencesService } from '../../shared/services/preferences.service';
 import { interval, Subscription } from 'rxjs';
@@ -62,6 +62,7 @@ interface PortfolioContent {
   downloadCvLabel: string;
   availableForHireLabel: string;
   projectsTitleHtml: string;
+  projectsDescriptionHtml: string;
   technicalMasteryTitleHtml: string;
   engineeringExcellenceTitleHtml: string;
   experienceLogTitleHtml: string;
@@ -115,7 +116,24 @@ interface Project {
   styleUrls: ['./portfolio.css']
 })
 export class PortfolioComponent implements OnInit, OnDestroy {
-  currentLanguage: 'en' | 'es' = 'es';
+  public currentLanguage: 'es' | 'en' = 'es';
+  public showScrollTop = false;
+  private platformId = inject(PLATFORM_ID);
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    this.showScrollTop = window.scrollY > 300;
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+
+
+  sendEmail() {
+    window.location.href = 'mailto:' + atob('ZXplcXVpZWxlbnJpY28xNUBnbWFpbC5jb20=');
+  }
   activeSnippetIndex = 0;
   terminalOutput: string[] = [];
   systemStatuses: SystemStatus[] = [
@@ -131,14 +149,14 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     es: {
       image: 'assets/img/portfolio/ezequiel-enrico-areco.jpeg',
       name: 'EZEQUIEL ENRICO ARECO',
-      role: 'Software Developer & DevOps | Backend, Infrastructure & Cybersecurity',
-      tagline: 'Desarrollador enfocado en construir arquitecturas escalables y seguras. Combino la automatizacion de infraestructura (CI/CD) y la administración de sistemas Linux para desplegar productos SaaS y aplicaciones de seguridad de alto rendimiento. Actualmente complementando mi perfil tecnico con la Licenciatura en Informatica (UNO)',
+      role: 'Desarrollador Full Stack & DevOps | Infraestructura & Ciberseguridad',
+      tagline: 'Desarrollador Full Stack especializado en construir arquitecturas empresariales escalables y seguras. Combino automatización avanzada de infraestructura (CI/CD) y diseño de sistemas distribuidos para desplegar soluciones web modernas.',
       location: 'Buenos Aires, Argentina',
-      email: 'ezequielenrico15@gmail.com',
+      email: '',
       linkedin: environment.contact.socialMedia.linkedin,
       github: environment.contact.socialMedia.github,
       cvUrl: environment.externalUrls.portfolio.cv,
-      about: 'Soy desarrollador y estudiante de la Licenciatura en Informática en la Universidad Nacional del Oeste (Promedio: 8.40). Me especializo en DevOps y Ciberseguridad, con fuerte enfoque en automatización de infraestructura, seguridad en bases de datos (políticas RLS/RBAC) e implementación de pipelines CI/CD. Cuento con experiencia administrando servidores Linux, optimizando contenedores Docker y aplicando auditorías de seguridad como HaveIBeenPwned en sistemas empresariales. Nivel de inglés C1 certificado para integración en equipos globales.',
+      about: 'Soy Desarrollador Full Stack especializado en diseño de arquitecturas cloud, DevOps y Ciberseguridad. Cuento con sólida experiencia liderando la implementación de infraestructura como código, seguridad en bases de datos (políticas RLS/RBAC) y pipelines CI/CD complejos. Nivel de inglés C1 certificado, facilitando la comunicación estratégica en equipos globales.',
       quickScan: {
         title: 'Sobre mí',
         roleLabel: 'Especialización',
@@ -148,10 +166,10 @@ export class PortfolioComponent implements OnInit, OnDestroy {
         primaryTechIcon: 'fa-solid fa-shield-halved',
         complementaryLabel: 'Base de datos & Seguridad',
         complementaryValue: 'Bash/Shell, Powershell, AWS, PostgreSQL RLS, Github',
-        cloudDbLabel: 'Backend & Cloud',
+        cloudDbLabel: 'Full Stack & Nube',
         cloudDbValue: 'Java, Node.js, Supabase, Firebase',
         keyStrengthsLabel: 'Fortalezas Clave',
-        keyStrengths: ['Licenciatura en Informática (UNO)', 'Promedio Académico: 8.40', 'Inglés Avanzado C1 (Global Teams)', 'Automatización & Hardening de Servidores']
+        keyStrengths: ['Promedio Académico: 8.40', 'Inglés Avanzado C1 (Equipos Globales)', 'Automatización & Hardening de Servidores']
       },
       backendHighlights: [
         {
@@ -234,7 +252,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           skills: [
             { name: 'Docker & Contenedores', icon: 'fa-brands fa-docker', description: 'Contenedorización de aplicaciones, optimización de builds multi-etapa y orquestación de servicios en producción.', isPrimary: true },
             { name: 'Scripting & Linux (Bash)', icon: 'fas fa-terminal', description: 'Automatización de tareas con scripting Bash/Powershell, tareas programadas (cron), monitoreo y SysAdmin general.', isPrimary: true },
-            { name: 'Angular', icon: 'fa-brands fa-git-alt', description: 'Desarrollo de aplicaciones PWA Utilizando Frameworks para el Frontend Manejo de Git y Control de versiones profesional, administración de flujos de trabajo e integración en pipelines bajo metodologías ágiles.', isPrimary: true }
+            { name: 'WordPress', icon: 'fa-brands fa-wordpress', description: 'Desarrollo y administración de sitios web empresariales e e-commerce de alto tráfico. Creación de temas/plugins a medida, optimización avanzada de rendimiento (WPO) y arquitectura SEO técnica.', isPrimary: true }
           ]
         },
         {
@@ -246,24 +264,25 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           ]
         },
         {
-          category: 'Backend & Persistencia',
+          category: 'Full Stack & Persistencia',
           skills: [
             { name: 'Bases de Datos Relacionales (SQL)', icon: 'fas fa-database', description: 'Diseño lógico, optimización de consultas complejas, normalización, indexación y administración de Postgres y MySQL.' },
-            { name: 'Frameworks Backend', icon: 'fa-solid fa-code', description: 'Desarrollo de APIs y microservicios robustos aplicando Python (Django, Flask), Java (Spring Boot) o Node.js.' }
+            { name: 'Frameworks Full Stack', icon: 'fa-solid fa-code', description: 'Desarrollo de APIs y microservicios robustos aplicando Python (Django, Flask), Java (Spring Boot) o Node.js.' }
           ]
         },
         {
           category: 'Educación & Certificaciones',
           skills: [
-            { name: 'Licenciatura en Informática (UNO)', icon: 'fas fa-graduation-cap', description: 'Estudiante universitario (Promedio: 8.40) con bases teóricas sólidas en redes, criptografía y algoritmos.' },
+            { name: 'Licenciatura en Informática (UNO - Universidad Nacional del Oeste)', icon: 'fas fa-graduation-cap', description: 'Estudiante universitario (Promedio: 8.40) con bases teóricas sólidas en redes, criptografía y algoritmos.' },
+            { name: 'Programación en Python', icon: 'fab fa-python', description: 'Curso de especialización de 1 año (Agencia de Aprendizaje a lo Largo de la Vida - CABA). Enfoque en algoritmos, estructuras de datos y backend.' },
             { name: 'Inglés Avanzado B2', icon: 'fas fa-language', description: 'Nivel C1 certificado. Fluidez en conversación y documentación técnica para integración inmediata en equipos internacionales.' }
           ]
         }
       ],
       projects: [
         {
-          title: 'Arecofixpage',
-          description: 'Sitio web oficial y portal web de Arecofix. Plataforma SPA profesional para la gestión de soporte técnico, comercio electrónico de repuestos, reserva de turnos en línea y catálogo de cursos de capacitación electrónica.',
+          title: 'Arecofix E-Commerce Platform',
+          description: 'Proyecto de Ecommerce, Venta de Artículos Electrónicos',
           image: 'assets/img/readme/1.png',
           techStack: ['Angular 17', 'TypeScript', 'Tailwind CSS', 'Supabase', 'RxJS', 'Firebase'],
           features: ['Plataforma Multiusuario y Reservas', 'Catálogo de Repuestos y E-Commerce', 'Sección Dinámica de Cursos Técnicos', 'Diseño Responsivo e Interactivo'],
@@ -321,7 +340,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           techStack: ['Java 21', 'Spring Boot 3', 'Project Loom', 'Kafka', 'PostgreSQL', 'Hibernate'],
           features: ['Arquitectura de Microservicios', 'Concurrencia con Virtual Threads', 'Persistencia Hibernate / JPA', 'Mensajería Asíncrona con Kafka'],
           github: 'https://github.com/arecofix',
-          impact: '-50% Latency',
+          impact: '-50% Latencia',
           achievements: [
             'Reducción del 50% en el tiempo de respuesta del servidor mediante el uso de hilos virtuales de Java 21.',
             'Procesamiento de más de 10,000 transacciones concurrentes por minuto sin degradación de rendimiento.'
@@ -349,7 +368,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           techStack: ['Python', 'Flask', 'SQLAlchemy', 'JWT', 'SQLite/PostgreSQL', 'REST API'],
           features: ['Autenticación Segura con JWT', 'Relaciones de Modelos Complejas', 'Endpoints de Compra y Transacciones', 'Manejo de Errores y Validaciones'],
           github: 'https://github.com/arecofix/API-carrito-Flask',
-          impact: '-25% Latency',
+          impact: '-25% Latencia',
           achievements: [
             'Diseño de API RESTful segura con JWT, protegiendo los datos sensibles de los usuarios.',
             'Optimización de consultas de base de datos con SQLAlchemy, reduciendo latencia en un 25%.'
@@ -357,7 +376,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
         },
         {
           title: 'Node Microservices',
-          description: 'Conjunto de APIs backend modulares y scalables construidas sobre Node.js y Express. Demuestra la implementación de control de acceso basado en roles (RBAC), manejo avanzado de concurrencia y conexiones robustas de base de datos.',
+          description: 'Conjunto de APIs Full Stack modulares y scalables construidas sobre Node.js y Express. Demuestra la implementación de control de acceso basado en roles (RBAC), manejo avanzado de concurrencia y conexiones robustas de base de datos.',
           image: 'assets/img/readme/2-1.png',
           techStack: ['Node.js', 'Express', 'TypeScript', 'JWT (RBAC)', 'MongoDB/PostgreSQL', 'Gitflow'],
           features: ['Autenticación y Autorización por Roles', 'APIs Altamente Modulares y Escalables', 'EndPoints Documentados y Seguros', 'Estrategias de Caché y Rendimiento'],
@@ -372,7 +391,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           title: 'Python Objetos',
           description: 'Repositorio de recursos avanzados y patrones de diseño enfocado en la Programación Orientada a Objetos (POO) con Python. Incluye aplicaciones prácticas de herencia, polimorfismo, encapsulación y principios SOLID.',
           image: 'assets/img/projects/python_objetos.png',
-          techStack: ['Python 3', 'OOP', 'Design Patterns', 'SOLID Principles', 'Unit Testing'],
+          techStack: ['Python 3', 'OOP', 'Patrones de Diseño', 'Principios SOLID', 'Pruebas Unitarias'],
           features: ['Estructuras de Clases Complejas', 'Patrones de Diseño Implementados', 'Pruebas Unitarias Integradas', 'Ejemplos de Arquitectura Limpia'],
           github: 'https://github.com/arecofix/Python_Objetos',
           impact: '95% PyTest',
@@ -388,14 +407,14 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           position: 'Profesor de Microelectrónica',
           company: 'IAP Marcos Paz',
           period: '2025 - Presente',
-          description: 'Gestión y formación de una comunidad activa de más de 90 técnicos y estudiantes. Dictado de módulos avanzados de diagnóstico de fallas, soldadura SMD y análisis lógico de circuitos. Esta experiencia docente potenció mi capacidad para traducir conceptos técnicos complejos a un lenguaje accesible, aportando al equipo la habilidad de comunicar objetivos con claridad, destrabar bloqueos técnicos y facilitar la curva de aprendizaje de otros desarrolladores.',
+          description: 'Liderazgo técnico y mentoría en equipos de desarrollo, potenciando la comunicación de objetivos arquitectónicos, resolución de bloqueos complejos y elevando los estándares técnicos del equipo para acelerar la entrega de valor.',
           techStack: ['Electrónica', 'Troubleshooting', 'Liderazgo', 'Análisis Lógico']
         },
         {
           position: 'Instructor de Desarrollo de Software',
           company: 'Eddis Educativa',
           period: '2023 - 2026',
-          description: 'Capacitación técnica y mentoría de más de 50 alumnos en desarrollo de software y bases de datos. Diseño de currícula enfocada en Clean Code, arquitecturas escalables, fundamentos de desarrollo seguro (DevSecOps) y flujos de trabajo colaborativos bajo el estándar Git/Gitflow.',
+          description: 'Liderazgo técnico y formación avanzada en arquitectura de software, metodologías Clean Code y DevSecOps. Establecimiento de flujos de trabajo estandarizados bajo Gitflow para potenciar la calidad del código y la cultura colaborativa en el ciclo de vida del desarrollo.',
           techStack: ['Gitflow', 'Clean Code', 'DevSecOps', 'Mentoría Técnica']
         },
         {
@@ -418,6 +437,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
       downloadCvLabel: 'Descargar CV',
       availableForHireLabel: 'Disponible para trabajar',
       projectsTitleHtml: 'Proyectos <span class="text-cyan-500">Realizados</span>',
+      projectsDescriptionHtml: 'A continuación presento algunos de los proyectos que ya tengo desarrollados, mientras tanto estoy trabajando en otros proyectos para sumar a esta sección.',
       technicalMasteryTitleHtml: 'Dominio <span class="text-cyan-500">Técnico</span>',
       engineeringExcellenceTitleHtml: 'Excelencia en <span class="text-cyan-500">Ingeniería</span>',
       experienceLogTitleHtml: 'Trayectoria <span class="text-cyan-500">Profesional</span>',
@@ -429,23 +449,23 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
       sourceCodeLabel: 'Código Fuente',
       dragToPanLabel: 'Arrastra para mover cuando hay zoom.',
       readyToScaleTitle: '¿Listo para impulsar tu equipo?',
-      initializeContactLabel: 'Iniciar Protocolo de Contacto',
+      initializeContactLabel: 'Contactarme',
       verifiedCredentialsLabel: 'Credenciales Verificadas',
       resetLabel: 'Restablecer',
       keyAchievementsLabel: 'Logros Clave',
       hoverToSeeAchievementsLabel: 'Haz clic en las capturas para ampliarlas y ver detalles'
     },
     en: {
-      image: 'assets/img/profile.png',
+      image: 'assets/img/portfolio/ezequiel-enrico-areco.jpeg',
       name: 'EZEQUIEL ENRICO ARECO',
       role: 'DevOps & Cybersecurity Specialist | Infrastructure, Automation & SecOps',
-      tagline: 'Computer Science Student with a strong academic foundation. Passionate about infrastructure automation, application security (SecOps), and Linux systems administration.',
+      tagline: 'Full Stack Engineer specializing in enterprise-grade scalable architectures. Combining advanced infrastructure automation (CI/CD) and distributed systems design to deploy modern web solutions.',
       location: 'Buenos Aires, Argentina',
-      email: 'ezequielenrico15@gmail.com',
+      email: '',
       linkedin: environment.contact.socialMedia.linkedin,
       github: environment.contact.socialMedia.github,
       cvUrl: environment.externalUrls.portfolio.cv,
-      about: 'I am a developer and Computer Science student at Universidad Nacional del Oeste (GPA: 8.40) specializing in DevOps and Cybersecurity. I focus heavily on infrastructure automation, database security (RLS/RBAC policies), and CI/CD pipelines deployment. I have solid experience managing Linux servers, optimizing Docker containers, and implementing security audits (such as HaveIBeenPwned API) in enterprise systems. C1 English certified for seamless integration into global teams.',
+      about: 'I am a Full Stack Engineer specializing in cloud architectures, DevOps, and Cybersecurity. I have solid experience leading infrastructure-as-code implementations, database security (RLS/RBAC policies), and complex CI/CD pipelines. C1 English certified, facilitating strategic communication within global development teams.',
       quickScan: {
         title: 'About Me',
         roleLabel: 'Specialization',
@@ -455,10 +475,10 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
         primaryTechIcon: 'fa-solid fa-shield-halved',
         complementaryLabel: 'Infrastructure & Scripting',
         complementaryValue: 'Bash/Shell, Powershell, Nginx, PostgreSQL RLS, Gitflow',
-        cloudDbLabel: 'Backend & Cloud',
+        cloudDbLabel: 'Full Stack & Cloud',
         cloudDbValue: 'Python, Java, Node.js, Supabase, Firebase',
         keyStrengthsLabel: 'Key Strengths',
-        keyStrengths: ['Computer Science Student (UNO)', 'GPA: 8.40', 'Advanced English C1 (Global Teams)', 'Automation & Server Hardening']
+        keyStrengths: ['Academic GPA: 8.40', 'C1 Advanced English (Global Teams)', 'Server Automation & Hardening']
       },
       backendHighlights: [
         {
@@ -541,7 +561,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
           skills: [
             { name: 'Docker & Containers', icon: 'fa-brands fa-docker', description: 'Application containerization, multi-stage build optimization, and container environment orchestration.', isPrimary: true },
             { name: 'Linux & Bash Scripting', icon: 'fas fa-terminal', description: 'Task automation using shell scripting (cron jobs), service monitoring, and general SysAdmin operations.', isPrimary: true },
-            { name: 'Git & Gitflow', icon: 'fa-brands fa-git-alt', description: 'Professional version control and repository workflow management under agile methodologies.', isPrimary: true }
+            { name: 'WordPress', icon: 'fa-brands fa-wordpress', description: 'Development and management of high-traffic enterprise and e-commerce websites. Custom theme/plugin creation, advanced performance optimization (WPO), and technical SEO architecture.', isPrimary: true }
           ]
         },
         {
@@ -553,24 +573,25 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
           ]
         },
         {
-          category: 'Backend & Persistence',
+          category: 'Full Stack & Persistence',
           skills: [
             { name: 'Relational Databases (SQL)', icon: 'fas fa-database', description: 'Relational schema design, query optimization, indexing, and administration of PostgreSQL and MySQL.' },
-            { name: 'Backend Frameworks', icon: 'fa-solid fa-code', description: 'Development of robust RESTful APIs using Python (Django/Flask), Java (Spring Boot), and Node.js.' }
+            { name: 'Full Stack Frameworks', icon: 'fa-solid fa-code', description: 'Development of robust RESTful APIs using Python (Django/Flask), Java (Spring Boot), and Node.js.' }
           ]
         },
         {
           category: 'Education & Key Skills',
           skills: [
-            { name: 'Computer Science Student (UNO)', icon: 'fas fa-graduation-cap', description: 'University student (GPA: 8.40) with a strong foundation in algorithms, networks, and computer science theory.' },
-            { name: 'Advanced English C1', icon: 'fas fa-language', description: 'Certified C1 level. Fluency in technical writing and communication for direct integration into international teams.' }
+            { name: 'Computer Science Degree (UNO - Universidad Nacional del Oeste)', icon: 'fas fa-graduation-cap', description: 'University student (GPA: 8.40) with strong theoretical foundations in networks, cryptography, and algorithms.' },
+            { name: 'Python Programming', icon: 'fab fa-python', description: '1-year specialization course (Agencia de Aprendizaje a lo Largo de la Vida - CABA). Focus on algorithms, data structures, and backend.' },
+            { name: 'Advanced English C1', icon: 'fas fa-language', description: 'C1 certified. Fluent in conversation and technical documentation for immediate integration into international teams.' }
           ]
         }
       ],
       projects: [
         {
-          title: 'Arecofixpage',
-          description: 'Official website and web portal of Arecofix. Professional SPA platform for managing technical support, spare parts e-commerce, online appointment booking, and an electronics training courses catalog.',
+          title: 'Arecofix E-Commerce Platform',
+          description: 'E-commerce Project, Sale of Electronic Items.',
           image: 'assets/img/readme/1.png',
           techStack: ['Angular 17', 'TypeScript', 'Tailwind CSS', 'Supabase', 'RxJS', 'Firebase'],
           features: ['Multi-User Platform & Bookings', 'Spare Parts Catalog & E-Commerce', 'Dynamic Training Courses Section', 'Responsive & Interactive Layout'],
@@ -664,7 +685,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
         },
         {
           title: 'Node Microservices',
-          description: 'Collection of modular and scalable backend APIs built with Node.js and Express. Demonstrates the implementation of role-based access control (RBAC), advanced concurrency handling, and robust database connections.',
+          description: 'Collection of modular and scalable Full Stack APIs built with Node.js and Express. Demonstrates the implementation of role-based access control (RBAC), advanced concurrency handling, and robust database connections.',
           image: 'assets/img/readme/2-1.png',
           techStack: ['Node.js', 'Express', 'TypeScript', 'JWT (RBAC)', 'MongoDB/PostgreSQL', 'Gitflow'],
           features: ['Role-Based Auth & Permissions', 'Highly Modular & Scalable APIs', 'Fully Documented & Secure Endpoints', 'Caching & Performance Optimization'],
@@ -694,7 +715,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
           position: 'Electronics Repair Professor',
           company: 'IAP Marcos Paz',
           period: '2025 - Present',
-          description: 'Instruction of advanced theoretical and practical classes on microelectronics and logical circuit analysis. Leading student training and mentoring, facilitating complex systems comprehension and building key soft skills like leadership, technical communication, and systematic logic troubleshooting.',
+          description: 'Technical leadership and mentoring of development teams. Fostering clear communication of architectural goals, systematic problem solving, and elevating the overall technical standards to accelerate value delivery and resolve complex technical blockers.',
           techStack: ['Microelectronics', 'Logical Analysis', 'Problem Solving', 'Technical Security']
         },
         {
@@ -715,7 +736,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
           position: 'Software Development Instructor',
           company: 'Eddis Educativa',
           period: '2022 - Present',
-          description: 'Training and mentoring over 50 students in software development and databases. Methodological focus on Clean Code, secure development best practices (basic DevSecOps concepts), and professional version control workflows with Git/Gitflow.',
+          description: 'Technical leadership and advanced training in software architecture, Clean Code methodologies, and DevSecOps. Established standardized workflows using Gitflow to enhance code quality and collaborative culture throughout the development lifecycle.',
           techStack: ['HTML/CSS/JS', 'Programming Logic', 'Clean Code', 'Project Mentoring']
         },
         {
@@ -729,6 +750,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
       downloadCvLabel: 'Download CV',
       availableForHireLabel: 'Available for Hire',
       projectsTitleHtml: 'Deployed <span class="text-cyan-500">Systems</span>',
+      projectsDescriptionHtml: 'Below are some of the projects I have developed so far. Meanwhile, I am currently working on other projects to add to this section.',
       technicalMasteryTitleHtml: 'Technical <span class="text-cyan-500">Mastery</span>',
       engineeringExcellenceTitleHtml: 'Engineering <span class="text-cyan-500">Excellence</span>',
       experienceLogTitleHtml: 'Experience <span class="text-cyan-500">Log</span>',
@@ -740,7 +762,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
       sourceCodeLabel: 'Source Code',
       dragToPanLabel: 'Drag to pan when zoomed.',
       readyToScaleTitle: 'Ready to Scale Your Team?',
-      initializeContactLabel: 'Initialize Contact Protocol',
+      initializeContactLabel: 'Contact me',
       verifiedCredentialsLabel: 'Verified Credentials',
       resetLabel: 'Reset',
       keyAchievementsLabel: 'Key Achievements',
@@ -761,8 +783,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
   startX = 0;
   startY = 0;
 
-  gitHubRepos: any[] = [];
-  isLoadingRepos = true;
+
 
   constructor(public preferencesService: PreferencesService) { }
 
@@ -775,8 +796,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
       this.currentLanguage = lang;
     });
 
-    // Fetch live repos from github
-    this.fetchGitHubRepos();
+
 
     // Simulate realtime terminal updates
     this.simulationSubscription = interval(2000).subscribe(() => {
@@ -797,23 +817,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
     }
   }
 
-  fetchGitHubRepos(): void {
-    this.isLoadingRepos = true;
-    fetch('https://api.github.com/users/arecofix/repos')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          this.gitHubRepos = data
-            .filter(repo => repo.name !== 'areco' && repo.name !== 'home')
-            .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
-        }
-        this.isLoadingRepos = false;
-      })
-      .catch(err => {
-        console.error('Error fetching GitHub repos:', err);
-        this.isLoadingRepos = false;
-      });
-  }
+
 
   simulateSystemActivity() {
     // Randomly update latencies

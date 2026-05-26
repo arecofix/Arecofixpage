@@ -26,6 +26,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     hasNumeric: false,
     hasSpecialChar: false,
   };
+  currentYear = new Date().getFullYear();
   socialLoading: { [key: string]: boolean } = {
     google: false,
     github: false,

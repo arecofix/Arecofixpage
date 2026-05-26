@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, PLATFORM_ID, DOCUMENT, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-import { WhatsappButton } from './shared/whatsapp-button/whatsapp-button';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
@@ -15,7 +14,6 @@ import { TenantService } from './core/services/tenant.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    WhatsappButton,
     ToastComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -39,15 +37,6 @@ export class App implements OnInit {
       if (currentHost === 'celulares.arecofix.com.ar') {
         this.document.location.href = 'https://arecofix.com.ar/celular';
         return;
-      }
-    }
-  }
-
-  toggleChatbot() {
-    if (isPlatformBrowser(this.platformId)) {
-      const chatbot = this.document.querySelector('react-mfe-app');
-      if (chatbot && typeof (chatbot as any).toggleChat === 'function') {
-        (chatbot as any).toggleChat();
       }
     }
   }

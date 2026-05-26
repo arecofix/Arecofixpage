@@ -52,6 +52,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   currentBranchId = this.branchService.currentBranchId;
   currentAssignedBranch = signal<Branch | null>(null);
   userProfile = signal<UserProfile | null>(null);
+  isMainMenuOpen = signal(true);
   branchBranding = signal<{ logo: string; name: string }>({
     logo: '/assets/img/brands/logo/logo-normal.PNG',
     name: 'Arecofix'
@@ -305,5 +306,9 @@ export class AdminLayout implements OnInit, OnDestroy {
 
   toggleSidebar() {
     this.preferencesService.toggleSidebar();
+  }
+
+  toggleMainMenu() {
+    this.isMainMenuOpen.update(v => !v);
   }
 }
