@@ -5,6 +5,7 @@ import {
   computed,
   OnDestroy,
   OnInit,
+  PLATFORM_ID,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -13,7 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { CartService } from '@app/shared/services/cart.service';
 import { OrderService } from '@app/features/orders/application/services/order.service';
@@ -341,17 +342,21 @@ export class CheckoutPage implements OnInit, OnDestroy {
     )}`;
   }
 
+  private platformId = inject(PLATFORM_ID);
+
   private _startCountdown(): void {
     this._stopCountdown();
     this.reservationSeconds.set(900);
-    this.countdownInterval = setInterval(() => {
-      const current = this.reservationSeconds();
-      if (current > 0) {
-        this.reservationSeconds.set(current - 1);
-      } else {
-        this._stopCountdown();
-      }
-    }, 1000);
+    if (isPlatformBrowser(this.platformId)) {
+      this.countdownInterval = setInterval(() => {
+        const current = this.reservationSeconds();
+        if (current > 0) {
+          this.reservationSeconds.set(current - 1);
+        } else {
+          this._stopCountdown();
+        }
+      }, 1000);
+    }
   }
 
   private _stopCountdown(): void {

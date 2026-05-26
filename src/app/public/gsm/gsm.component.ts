@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { SeoService } from '@app/core/services/seo.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -205,33 +207,37 @@ export class GsmComponent implements OnInit, OnDestroy {
     }
   }
 
+  private platformId = inject(PLATFORM_ID);
+
   startCountdown() {
-    this.countdownInterval = setInterval(() => {
-      this.countdown.update((c: { days: number, hours: number, minutes: number, seconds: number }) => {
-        let { days, hours, minutes, seconds } = c;
-        if (seconds > 0) {
-          seconds--;
-        } else {
-          seconds = 59;
-          if (minutes > 0) {
-            minutes--;
+    if (isPlatformBrowser(this.platformId)) {
+      this.countdownInterval = setInterval(() => {
+        this.countdown.update((c: { days: number, hours: number, minutes: number, seconds: number }) => {
+          let { days, hours, minutes, seconds } = c;
+          if (seconds > 0) {
+            seconds--;
           } else {
-            minutes = 59;
-            if (hours > 0) {
-              hours--;
+            seconds = 59;
+            if (minutes > 0) {
+              minutes--;
             } else {
-              hours = 23;
-              if (days > 0) {
-                days--;
+              minutes = 59;
+              if (hours > 0) {
+                hours--;
               } else {
-                // Time up, reset for demo or stop
-                days = 5; hours = 9; minutes = 8; seconds = 19;
+                hours = 23;
+                if (days > 0) {
+                  days--;
+                } else {
+                  // Time up, reset for demo or stop
+                  days = 5; hours = 9; minutes = 8; seconds = 19;
+                }
               }
             }
           }
-        }
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
+          return { days, hours, minutes, seconds };
+        });
+      }, 1000);
+    }
   }
 }

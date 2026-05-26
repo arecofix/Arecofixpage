@@ -40,24 +40,6 @@ export class SupabaseProductStockRepository implements ProductStockRepository {
       if (insertError) throw new DatabaseError(insertError.message, insertError);
     }
     
-    // Also sync the global products.stock field (aggregated)
-    await this.syncGlobalStock(productId);
-  }
-
-  async syncGlobalStock(productId: string): Promise<void> {
-    const { data: stocks, error: fetchError } = await this.supabase
-      .from('product_stock_per_branch')
-      .select('quantity')
-      .eq('product_id', productId);
-
-    if (fetchError) return;
-
-    const totalStock = (stocks || []).reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);
-
-    await this.supabase
-      .from('products')
-      .update({ stock: totalStock })
-      .eq('id', productId);
   }
 
   async deductStock(productId: string, branchId: string, quantityToDeduct: number, tenantId: string | null): Promise<void> {

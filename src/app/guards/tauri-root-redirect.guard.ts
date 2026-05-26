@@ -1,7 +1,15 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CanActivateFn, Router } from '@angular/router';
 
 export const tauriRootRedirectGuard: CanActivateFn = (route, state) => {
+  const platformId = inject(PLATFORM_ID);
+
+  // During SSR/prerendering, window is not available — skip Tauri detection
+  if (!isPlatformBrowser(platformId)) {
+    return true;
+  }
+
   const isTauri = !!(
     (window as any).__TAURI_INTERNALS__ || 
     (window as any).__TAURI_IPC__ || 
