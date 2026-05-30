@@ -127,7 +127,7 @@ export class CelularLandingComponent implements OnInit {
     const seoData = {
       title: 'Reparación de Celulares en Marcos Paz y Merlo | Servicio Técnico iPhone Arecofix',
       description: 'Especialistas en arreglo de celulares en Marcos Paz. Cambio de pantallas, baterías y pines de carga en el acto con garantía escrita. iPhone, Samsung, Motorola y Xiaomi.',
-      imageUrl: 'assets/img/branding/og-celulares-pro.png',
+      imageUrl: 'assets/img/repair/cel.png',
       keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares merlo, arreglo de celulares zona oeste, cambio de modulos iphone, servicio tecnico samsung marcos paz, arecofix',
       type: 'website' as const,
       schema: {
@@ -139,7 +139,7 @@ export class CelularLandingComponent implements OnInit {
         "url": "https://www.arecofix.com.ar/celular",
         "telephone": "+5491125960900",
         "priceRange": "$$",
-        "image": "https://www.arecofix.com.ar/assets/img/branding/og-celulares-pro.png",
+        "image": "https://www.arecofix.com.ar/assets/img/repair/cel.png",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Jorge Newbery 69",
