@@ -31,10 +31,10 @@ export const publicRoutes: Routes = [
         component: PublicHomePage,
         data: {
             seo: {
-                title: 'Software & Servicio Técnico en Marcos Paz | Arecofix',
-                description: 'Líderes en desarrollo de software, aplicaciones móviles y transformación digital para empresas. logrando resultados excepcionales para tu empresa.',
+                title: 'Sistemas de Gestión SaaS y Desarrollo de Software | Arecofix',
+                description: 'Ofrecemos sistemas de gestión para tu empresa, SaaS, desarrollo de aplicaciones móviles y transformación digital. Aceleramos el crecimiento de tu negocio.',
                 imageUrl: 'assets/img/branding/og-services.jpg',
-                keywords: 'software marcos paz, desarrollo de aplicaciones para celular, desarrollo web argentina, Ingeniero de Software en Buenos Aires, arecofix, tecnologia argentina'
+                keywords: 'software marcos paz, sistemas de gestion, saas, desarrollo de aplicaciones, desarrollo web argentina, arecofix, tecnologia argentina'
             }
         }
       },
@@ -46,7 +46,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
             description: 'Servicio técnico especializado en la reparación de celulares iPhone en Marcos Paz. Arreglo de pantallas, cambio de módulos, baterías y pines de carga en el acto con repuestos de calidad original y garantía.',
-            imageUrl: 'assets/img/repair/tecnico.jpg',
+            imageUrl: 'assets/img/repair/cel.png',
             keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares, arreglo de pantallas, cambio de bateria, arecofix',
             schema: {
               '@context': 'https://schema.org',
