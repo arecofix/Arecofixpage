@@ -28,7 +28,7 @@ export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
   '/celular': {
     title: 'Reparación de Celulares en Marcos Paz | Arecofix',
     description: 'Cambio de módulos y baterías en el acto con repuestos originales. Servicio técnico especializado para iPhone, Samsung y Motorola.',
-    imageUrl: 'assets/img/branding/og-celulares-pro.png'
+    imageUrl: 'assets/img/repair/cel.png'
   },
   '/servicios': {
     title: 'Nuestros Servicios Técnicos | Arecofix',
