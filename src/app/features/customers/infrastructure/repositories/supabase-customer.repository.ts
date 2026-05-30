@@ -14,7 +14,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   protected override tableName = 'profiles'; // Point directly to profiles table
 
   private authService = inject(AuthService);
-  private branchContextService = inject(BranchContextService);
+  protected override branchContextService = inject(BranchContextService);
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);

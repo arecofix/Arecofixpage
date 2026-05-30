@@ -29,7 +29,10 @@
                            fill 
                            [priority]="true"/>
                     } @else {
-                      <img src="assets/img/no-image.png" [alt]="item.name" class="object-contain object-center max-h-full max-w-full" />
+                      <div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
+                        <i class="fas fa-camera text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Este producto no tiene imagen</span>
+                      </div>
                     }
                  </div>
                  

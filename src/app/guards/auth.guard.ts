@@ -55,12 +55,20 @@ export const authGuard: CanActivateFn = async (route, state) => {
       return false;
     }
     
-    // 2. Tenant Subscription Check
+    // 2. Tenant Subscription and Active Check
     const tenant = tenantService.getCurrentTenant();
-    if (tenant && ['moroso', 'cancelado', 'suspendido'].includes(tenant.subscription_status || '')) {
-       console.warn(`🚫 authGuard: Tenant subscription is ${tenant.subscription_status}. Redirecting to payment.`);
-       router.navigate(['/payment-required']);
-       return false;
+    if (tenant) {
+       if (tenant.is_active === false) {
+           console.warn(`🚫 authGuard: Tenant is suspended (is_active=false). Redirecting to login.`);
+           await authService.signOut();
+           router.navigate(['/login'], { queryParams: { error: 'tenant_suspended' } });
+           return false;
+       }
+       if (['moroso', 'cancelado', 'suspendido'].includes(tenant.subscription_status || '')) {
+           console.warn(`🚫 authGuard: Tenant subscription is ${tenant.subscription_status}. Redirecting to payment.`);
+           router.navigate(['/payment-required']);
+           return false;
+       }
     }
 
     console.log('📋 authGuard - Context:', {

@@ -268,7 +268,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   onBranchChange(event: any) {
     const branchId = event.target.value;
     const realBranchId = branchId === 'global' ? null : branchId;
-    this.branchContextService.setBranchId(realBranchId);
+    this.branchService.setBranchById(realBranchId);
   }
 
   onPeriodChange(event: any) {
@@ -278,7 +278,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   goToBranch(branchId?: string) {
     if (!branchId) return;
     const realBranchId = branchId === 'global' ? null : branchId;
-    this.branchContextService.setBranchId(realBranchId);
+    this.branchService.setBranchById(realBranchId);
   }
 
   private prepareCharts(stats: DashboardStats) {

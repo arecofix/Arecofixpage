@@ -52,7 +52,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       branch_id: paramBranchId
     } = params;
     
-    const branch_id = paramBranchId;
+    const branch_id = paramBranchId || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
 
     const start = (_page - 1) * _per_page;
     const end = start + _per_page - 1;
@@ -74,6 +74,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       .select(selectFields, { count: 'exact' });
       
     let query = this.applyTenantFilter(baseQuery);
+
+    if (branch_id) {
+      query = query.or(`branch_id.eq.${branch_id},is_global.eq.true`);
+    }
 
     if (params.is_active !== undefined) {
       query = query.eq('is_active', params.is_active);
@@ -194,7 +198,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
     override getAll(params?: any): Observable<Product[]> {
-    const branch_id = typeof params === 'string' ? params : undefined;
+    const paramBranchId = typeof params === 'string' ? params : (params?.branch_id || undefined);
+    const branch_id = paramBranchId || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
     const fetchAll = async (): Promise<Product[]> => {
       let allData: Product[] = [];
       let fromIdx = 0;
@@ -204,6 +209,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
+        if (branch_id) {
+          query = query.or(`branch_id.eq.${branch_id},is_global.eq.true`);
+        }
         const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
         if (error) this.errorHandler.handleError(error, 'getAll (Products)');
         
@@ -366,27 +374,38 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         if (branch_id) {
             let query = this.applyTenantFilter(
                 this.supabase.from('products')
-                    .select('price, is_active, deleted_at, branch_stock:product_stock_per_branch(quantity, min_stock_alert)')
+                    .select('price, is_active, deleted_at, branch_id, is_global, branch_stock:product_stock_per_branch(quantity, min_stock_alert, branch_id)')
             )
             .eq('is_active', true)
             .is('deleted_at', null)
-            .eq('product_stock_per_branch.branch_id', branch_id);
+            .or(`branch_id.eq.${branch_id},is_global.eq.true`);
 
             const { data, error } = await (query as any);
             if (error) throw error;
 
             const results = data || [];
-            const totalItems = results.length;
-            const totalValue = results.reduce((acc: number, item: any) => {
+            
+            // Un producto se considera "en inventario de la sucursal" si tiene stock asociado o si pertenece nativamente a la sucursal
+            const branchProducts = results.filter((item: any) => {
+                const hasStockEntry = item.branch_stock && Array.isArray(item.branch_stock) && item.branch_stock.some((s: any) => s.branch_id === branch_id);
+                return item.branch_id === branch_id || hasStockEntry;
+            });
+
+            const totalItems = branchProducts.length;
+            const totalValue = branchProducts.reduce((acc: number, item: any) => {
                 const price = Number(item.price || 0);
                 const stockList = item.branch_stock && Array.isArray(item.branch_stock) ? item.branch_stock : [];
-                const quantity = stockList.length > 0 ? Number(stockList[0].quantity || 0) : 0;
+                const branchStock = stockList.find((s: any) => s.branch_id === branch_id);
+                const quantity = branchStock ? Number(branchStock.quantity || 0) : 0;
                 return acc + (price * quantity);
             }, 0);
-            const lowStockCount = results.filter((item: any) => {
+
+            const lowStockCount = branchProducts.filter((item: any) => {
                 const stockList = item.branch_stock && Array.isArray(item.branch_stock) ? item.branch_stock : [];
-                const quantity = stockList.length > 0 ? Number(stockList[0].quantity || 0) : 0;
-                const threshold = stockList.length > 0 ? Number(stockList[0].min_stock_alert ?? 5) : 5;
+                const branchStock = stockList.find((s: any) => s.branch_id === branch_id);
+                if (!branchStock) return false;
+                const quantity = Number(branchStock.quantity || 0);
+                const threshold = Number(branchStock.min_stock_alert ?? 5);
                 return quantity > 0 && quantity <= threshold;
             }).length;
 

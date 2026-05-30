@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PublicLayoutHeader } from './components';
@@ -8,15 +15,24 @@ import { PreferencesService } from '../../shared/services/preferences.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { Subscription, filter } from 'rxjs';
 
+import { WhatsappButton } from '../../shared/whatsapp-button/whatsapp-button';
+
 @Component({
   selector: 'app-public-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, PublicLayoutHeader, AccessibilitySidebarComponent, Footer],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    PublicLayoutHeader,
+    AccessibilitySidebarComponent,
+    Footer,
+    WhatsappButton,
+  ],
   templateUrl: './public-layout.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicLayout implements OnInit, OnDestroy {
-  private seoService = inject(SeoService); 
+  private seoService = inject(SeoService);
   private router = inject(Router);
   private subscription = new Subscription();
 
@@ -29,14 +45,16 @@ export class PublicLayout implements OnInit, OnDestroy {
 
     // Cerrar sidebar de accesibilidad automáticamente al navegar
     this.subscription.add(
-      this.router.events.pipe(
-        filter(event => event instanceof NavigationEnd)
-      ).subscribe((event: any) => {
-        this.preferencesService.closeSidebar();
-        if (event.urlAfterRedirects) {
-          this.isPortfolioRoute.set(event.urlAfterRedirects.includes('/portfolio'));
-        }
-      })
+      this.router.events
+        .pipe(filter((event) => event instanceof NavigationEnd))
+        .subscribe((event: any) => {
+          this.preferencesService.closeSidebar();
+          if (event.urlAfterRedirects) {
+            this.isPortfolioRoute.set(
+              event.urlAfterRedirects.includes('/portfolio'),
+            );
+          }
+        }),
     );
   }
 
