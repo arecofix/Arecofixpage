@@ -69,8 +69,8 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       query = query.eq('phone', phone);
     }
 
-    return from(query.maybeSingle() as Promise<any>).pipe(
-      map((res) => res.data as UserProfile | null)
+    return from(query.maybeSingle() as unknown as PromiseLike<{ data: UserProfile | null, error: unknown }>).pipe(
+      map(({ data }) => data)
     );
   }
 

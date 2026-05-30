@@ -34,7 +34,7 @@ export class ProductService {
       })
     );
   }
-  public updateProduct(id: string, data: any): Observable<any> {
+  public updateProduct(id: string, data: Partial<import('@app/features/products/domain/entities/product.entity').Product>): Observable<import('@app/features/products/domain/entities/product.entity').Product> {
     return this.repository.update(id, data).pipe(
       catchError((err) => {
         this.logger.error('ProductService update error', err);

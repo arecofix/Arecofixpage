@@ -22,6 +22,13 @@ import { RepairCustomerSectionComponent } from './components/repair-customer-sec
 import { RepairDeviceSectionComponent } from './components/repair-device-section.component';
 import { RepairPartsSectionComponent } from './components/repair-parts-section.component';
 import { RepairFinanceSectionComponent } from './components/repair-finance-section.component';
+import { Product } from '@app/features/products/domain/entities/product.entity';
+import { UserProfile } from '@app/shared/interfaces/user.interface';
+
+interface ClientView extends Partial<UserProfile> {
+    displayName: string;
+    dni?: string;
+}
 
 @Component({
     selector: 'app-admin-repair-form-page',
@@ -40,7 +47,7 @@ import { RepairFinanceSectionComponent } from './components/repair-finance-secti
 })
 export class AdminRepairFormPage implements OnInit {
     // Helper interface for UI
-    private clientView = (client: any) => ({
+    private clientView = (client: UserProfile | Partial<UserProfile>): ClientView => ({
         ...client,
         displayName: client.full_name || `${client.first_name || ''} ${client.last_name || ''}`.trim() || client.email || 'Sin nombre'
     });
@@ -138,7 +145,7 @@ export class AdminRepairFormPage implements OnInit {
                 );
             })
         ).subscribe(response => {
-            this.filteredProducts.set(response.data || []);
+            this.filteredProducts.set((response.data || []) as unknown as Product[]);
             this.searchingProducts.set(false);
         });
 
@@ -159,13 +166,13 @@ export class AdminRepairFormPage implements OnInit {
             })
         ).subscribe(data => {
             if (data) {
-                this.clients.set(data.map((c: any) => this.clientView(c)));
+                this.clients.set(data.map(c => this.clientView(c as any)));
             }
         });
     }
 
     searchingProducts = signal(false);
-    filteredProducts = signal<any[]>([]);
+    filteredProducts = signal<Product[]>([]);
 
     async loadInitialProducts() {
         this.productSearch$.next('');
@@ -174,9 +181,9 @@ export class AdminRepairFormPage implements OnInit {
     loading = signal(true);
     saving = signal(false);
     error = signal<string | null>(null);
-    company = signal<any>(null); // Company settings are quite dynamic, can keep any or define interface
+    company = signal<unknown>(null); // Company settings are quite dynamic, can keep any or define interface
     uploadingImages = signal(false);
-    clients = signal<any[]>([]);
+    clients = signal<ClientView[]>([]);
 
     public missingBranch = computed(() => {
         // SuperAdmins are never 'missing' a branch (fall back to Central)
@@ -188,7 +195,7 @@ export class AdminRepairFormPage implements OnInit {
         try {
             const data = await this.customerService.getRecentClients();
             if (data) {
-                this.clients.set(data.map((c: any) => this.clientView(c)));
+                this.clients.set(data.map(c => this.clientView(c as any)));
             }
         } catch (e) {
             console.error('Error loading clients', e);
@@ -233,7 +240,7 @@ export class AdminRepairFormPage implements OnInit {
     onSelectClient(clientName: string) {
         this.clientSearch$.next(clientName);
 
-        const client = this.clients().find((c: any) => c.displayName === clientName) as any;
+        const client = this.clients().find(c => c.displayName === clientName);
         if (client) {
             this.repairForm.patchValue({
                 customer_id: client.id, 
@@ -316,7 +323,7 @@ export class AdminRepairFormPage implements OnInit {
         }
     }
 
-    addPart(product: any) {
+    addPart(product: Product) {
         const newPart = this.repairCalculator.buildNewPart(product, this.id || '');
         this.parts.update(p => [...p, newPart]);
         this.calculateFinalCost();
@@ -327,12 +334,12 @@ export class AdminRepairFormPage implements OnInit {
         this.calculateFinalCost();
     }
 
-    updateFormField(field: string, value: any) {
+    updateFormField(field: string, value: unknown) {
         this.repairForm.get(field)?.setValue(value);
         if (field === 'technical_labor_cost') this.calculateFinalCost();
     }
 
-    onPartsListChange(parts: any[]) {
+    onPartsListChange(parts: import('../../features/repairs/domain/entities/repair.entity').RepairPart[]) {
         this.parts.set(parts);
         this.calculateFinalCost();
     }
@@ -473,7 +480,7 @@ export class AdminRepairFormPage implements OnInit {
             console.log('📤 [AdminRepairForm] Enviando a servicio...', this.id ? 'UPDATE' : 'CREATE');
             
             if (this.id) {
-                await this.repairService.update(this.id, payload as any);
+                await this.repairService.update(this.id, payload as unknown as Partial<import('../../features/repairs/domain/entities/repair.entity').Repair>);
                 this.notificationService.showSuccess('✅ Reparación actualizada correctamente.');
             } else {
                 await this.repairService.create(payload as CreateRepairDto);
@@ -489,9 +496,9 @@ export class AdminRepairFormPage implements OnInit {
 
             console.log('🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...');
             this.router.navigate(['/admin/repairs']);
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('💥 [AdminRepairForm] Error crítico en save():', e);
-            const message = e.message || (e.error?.message) || 'Error desconocido al procesar la solicitud.';
+            const message = e instanceof Error ? e.message : ((e as { error?: { message?: string } })?.error?.message) || 'Error desconocido al procesar la solicitud.';
             this.notificationService.showError('Error al guardar: ' + message);
             this.error.set(message);
         } finally {
@@ -509,10 +516,11 @@ export class AdminRepairFormPage implements OnInit {
                 images: this.images(),
                 id: this.id || 'new'
             };
-            await this.repairPdfService.generateOrderPdf(repairData, this.company());
-        } catch (e: any) {
+            await this.repairPdfService.generateOrderPdf(repairData as import('../../features/repairs/domain/entities/repair.entity').Repair, this.company());
+        } catch (e: unknown) {
             console.error('PDF Error:', e);
-            this.notificationService.showError('Error al generar PDF: ' + e.message);
+            const message = e instanceof Error ? e.message : 'Error desconocido al generar PDF';
+            this.notificationService.showError('Error al generar PDF: ' + message);
         }
     }
 

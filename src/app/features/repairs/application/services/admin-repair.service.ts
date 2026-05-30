@@ -106,7 +106,7 @@ export class AdminRepairService {
             
             // Try to find existing first
             const existing = await this.customerService.findByEmailOrPhone(
-                (dto as any).customer_email || undefined,
+                dto.customer_email || undefined,
                 dto.customer_phone || undefined
             );
 
@@ -124,10 +124,10 @@ export class AdminRepairService {
                     const client = await this.customerService.create({
                         first_name: fn,
                         last_name: ln,
-                        email: (dto as any).customer_email || null,
+                        email: dto.customer_email || null,
                         phone: dto.customer_phone || null,
                         address: null,
-                        dni: (dto as any).customer_dni || null,
+                        dni: dto.customer_dni || null,
                         tenant_id: profile.tenant_id
                     });
 
@@ -136,19 +136,20 @@ export class AdminRepairService {
                     } else {
                         throw new Error('El servicio no devolvió un ID de perfil válido.');
                     }
-                } catch (error: any) {
+                } catch (error: unknown) {
                     console.error('💥 [AdminRepairService] Error creando cliente:', error);
+                    const err = error as any;
                     
                     // Detailed handling for the new standalone architecture
-                    if (error.code === '23503' || (error.message && error.message.includes('23503'))) {
+                    if (err.code === '23503' || (err.message && err.message.includes('23503'))) {
                         throw new Error('Error de Integridad (23503): No se pudo vincular la reparación. Asegúrate de haber ejecutado los scripts SQL para habilitar la tabla de "clients" independiente.');
                     }
                     
-                    if (error.status === 409 || error.code === '23505') {
+                    if (err.status === 409 || err.code === '23505') {
                         throw new Error('Conflicto: El teléfono ya está registrado en el sistema. Intenta buscarlo en el selector de clientes.');
                     }
 
-                    throw new Error(`Error en Registro: ${error.message || 'Error de comunicación con la base de datos'}`);
+                    throw new Error(`Error en Registro: ${err.message || 'Error de comunicación con la base de datos'}`);
                 }
             }
         }
@@ -238,7 +239,7 @@ export class AdminRepairService {
                                 total: totalToInvoice
                             }
                         ]
-                    } as any);
+                    });
                 } catch (invoiceErr) {
                     // We don't block the repair update if invoice fails, but we log it.
                     console.error('Error al generar factura automática para la reparación', invoiceErr);

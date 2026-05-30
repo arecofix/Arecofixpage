@@ -12,7 +12,17 @@ export interface OrderItem {
   unit_cost_at_time?: number;
   subtotal: number;
   tenant_id?: string;
-  product?: any;
+  product?: unknown;
+}
+
+export interface Address {
+  street?: string;
+  number?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  country?: string;
+  additional_info?: string;
 }
 
 export interface Order {
@@ -23,7 +33,7 @@ export interface Order {
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;
-  shipping_address?: unknown;
+  shipping_address?: Address;
   status: OrderStatus;
   subtotal: number;
   tax: number;
