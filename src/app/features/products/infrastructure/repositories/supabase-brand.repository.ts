@@ -16,6 +16,7 @@ export class SupabaseBrandRepository extends BaseRepository<Brand> implements Br
     protected override tableName = 'brands';
     protected override useSoftDeletes = true;
     protected override suppressAuthNotifications = true;
+    protected override useBranchIsolation = true;
 
     constructor() {
         const supabase = inject(SUPABASE_CLIENT);

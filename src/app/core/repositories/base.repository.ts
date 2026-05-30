@@ -5,6 +5,7 @@ import { TenantService } from '../services/tenant.service';
 import { Observable, from, map } from 'rxjs';
 import { TENANT_CONSTANTS } from '../constants/tenant.constants';
 import { LoggerService } from '../services/logger.service';
+import { BranchContextService } from '../services/branch-context.service';
 
 /**
  * Base Repository (SaaS Architecture)
@@ -17,9 +18,11 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     protected isGlobalTable: boolean = false;
     protected useSoftDeletes: boolean = false;
     protected suppressAuthNotifications: boolean = false;
+    protected useBranchIsolation: boolean = false;
 
     protected tenantService = inject(TenantService);
     protected errorHandler = inject(SupabaseErrorHandlerService);
+    protected branchContextService = inject(BranchContextService, { optional: true });
 
     constructor(
         protected supabase: SupabaseClient,
@@ -53,6 +56,13 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
             }
         }
 
+        if (this.useBranchIsolation && this.branchContextService) {
+            const branchId = this.branchContextService.getBranchId();
+            if (branchId && enhancedQuery && typeof enhancedQuery.or === 'function') {
+                enhancedQuery = enhancedQuery.or(`branch_id.eq.${branchId},branch_id.is.null`);
+            }
+        }
+
         return enhancedQuery;
     }
 
@@ -62,10 +72,20 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     protected sanitizePayload(item: Partial<T>): Partial<T> {
         if (this.isGlobalTable) return { ...item };
         
+        let payload: any = { ...item };
         const tenantId = this.tenantService.getTenantId();
-        if (tenantId === TENANT_CONSTANTS.FALLBACK_ID) return { ...item };
+        if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+            payload.tenant_id = tenantId;
+        }
         
-        return { ...item, tenant_id: tenantId } as Partial<T>;
+        if (this.useBranchIsolation && this.branchContextService) {
+            const branchId = this.branchContextService.getBranchId();
+            if (branchId) {
+                payload.branch_id = payload.branch_id || branchId;
+            }
+        }
+        
+        return payload as Partial<T>;
     }
 
     /**

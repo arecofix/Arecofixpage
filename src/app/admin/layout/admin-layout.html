@@ -143,47 +143,47 @@
 
             <!-- Branch Context Selector -->
             <div class="p-4" [ngClass]="!isMainMenuOpen() ? 'px-2' : 'p-6'">
-                @if (isMainMenuOpen()) {
-                <p class="text-[9px] uppercase font-black text-slate-500 tracking-[0.2em] mb-3 ml-2">Ubicación Actual</p>
-                }
-                <div class="relative group">
-                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10" [ngClass]="!isMainMenuOpen() ? 'w-full justify-center left-0' : ''">
-                        <i class="fas fa-store text-indigo-400 text-xs"></i>
-                    </div>
-                    <select 
-                        [disabled]="!canSwitchBranch()"
-                        [value]="currentBranchId() || ''"
-                        (change)="onBranchSelected($event)"
-                        class="select w-full bg-slate-800/50 border-slate-700/50 rounded-2xl text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all cursor-pointer appearance-none disabled:opacity-80 disabled:cursor-not-allowed"
-                        [ngClass]="!isMainMenuOpen() ? 'pl-8 pr-1 text-transparent opacity-0 absolute inset-0 cursor-pointer' : 'pl-9 h-11'">
-                        @if (canSwitchBranch()) {
-                            <option value="">🏛️ SEDE CENTRAL ({{ (tenantService.currentTenant()?.name || 'ARECOFIX') | uppercase }})</option>
-                        }
-                        @for (branch of branches(); track branch.id) {
-                            <option [value]="branch.id">{{ branch.name }}</option>
-                        }
-                    </select>
-                    @if (!isMainMenuOpen()) {
-                    <div class="w-full h-11 bg-slate-800/50 rounded-2xl flex items-center justify-center tooltip tooltip-right" data-tip="Cambiar Sucursal">
-                        <!-- Icon centered via absolute div above -->
-                    </div>
+                @if (!isLibreriaZaona() || isSuperAdmin()) {
+                    @if (isMainMenuOpen()) {
+                    <p class="text-[9px] uppercase font-black text-slate-500 tracking-[0.2em] mb-3 ml-2">Ubicación Actual</p>
                     }
-                </div>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10" [ngClass]="!isMainMenuOpen() ? 'w-full justify-center left-0' : ''">
+                            <i class="fas fa-store text-indigo-400 text-xs"></i>
+                        </div>
+                        <select 
+                            [disabled]="!canSwitchBranch()"
+                            [value]="currentBranchId() || ''"
+                            (change)="onBranchSelected($event)"
+                            class="select w-full bg-slate-800/50 border-slate-700/50 rounded-2xl text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all cursor-pointer appearance-none disabled:opacity-80 disabled:cursor-not-allowed"
+                            [ngClass]="!isMainMenuOpen() ? 'pl-8 pr-1 text-transparent opacity-0 absolute inset-0 cursor-pointer' : 'pl-9 h-11'">
+                            @if (canSwitchBranch()) {
+                                <option value="">🏛️ SEDE CENTRAL ({{ (tenantService.currentTenant()?.name || 'ARECOFIX') | uppercase }})</option>
+                            }
+                            @for (branch of branches(); track branch.id) {
+                                <option [value]="branch.id">{{ branch.name }}</option>
+                            }
+                        </select>
+                        @if (!isMainMenuOpen()) {
+                        <div class="w-full h-11 bg-slate-800/50 rounded-2xl flex items-center justify-center tooltip tooltip-right" data-tip="Cambiar Sucursal">
+                            <!-- Icon centered via absolute div above -->
+                        </div>
+                        }
+                    </div>
+                }
 
                 <!-- Web Pública Link -->
-                @if (currentBranchId()) {
-                    @if (isMainMenuOpen()) {
-                        <a [href]="'https://arecofix.com.ar/' + branchService.currentBranch()?.slug" target="_blank"
-                           class="mt-3 flex items-center justify-center gap-2 w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-xl text-xs font-bold transition-all border border-indigo-500/20">
-                            <i class="fas fa-external-link-alt"></i>
-                            Visitar Sitio Web
-                        </a>
-                    } @else {
-                        <a [href]="'https://arecofix.com.ar/' + branchService.currentBranch()?.slug" target="_blank"
-                           class="mt-3 w-full h-11 flex items-center justify-center bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-2xl text-xs font-bold transition-all tooltip tooltip-right" data-tip="Visitar Sitio Web">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    }
+                @if (isMainMenuOpen()) {
+                    <a [href]="currentBranchId() ? 'https://arecofix.com.ar/' + branchService.currentBranch()?.slug : 'https://arecofix.com.ar'" target="_blank"
+                       class="mt-3 flex items-center justify-center gap-2 w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-xl text-xs font-bold transition-all border border-indigo-500/20">
+                        <i class="fas fa-external-link-alt"></i>
+                        Visitar Sitio Web
+                    </a>
+                } @else {
+                    <a [href]="currentBranchId() ? 'https://arecofix.com.ar/' + branchService.currentBranch()?.slug : 'https://arecofix.com.ar'" target="_blank"
+                       class="mt-3 w-full h-11 flex items-center justify-center bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-2xl text-xs font-bold transition-all tooltip tooltip-right" data-tip="Visitar Sitio Web">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
                 }
             </div>
 

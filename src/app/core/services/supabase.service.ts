@@ -227,6 +227,7 @@ export class SupabaseService {
         if (event === 'TOKEN_REFRESHED') {
           if (!session) {
             this.logger.warn('Token refresh failed, signing out to allow public navigation');
+            alert('Tu sesión ha expirado por seguridad. Por favor, refresca la página y vuelve a ingresar.');
             this.client.auth.signOut().catch(err => {
               this.logger.error('Error signing out after failed refresh', err);
             });
@@ -247,6 +248,7 @@ export class SupabaseService {
             errorMessage.includes('400') && errorMessage.includes('refresh_token')) {
           this.logger.warn('Detected invalid refresh token in unhandled rejection, cleaning storage');
           event.preventDefault();
+          alert('Tu sesión ha expirado. Por favor, refresca la página y vuelve a ingresar.');
           this.client.auth.signOut().catch(err => {
             this.logger.error('Error signing out after invalid token detection', err);
           });

@@ -14,6 +14,7 @@ export interface Tenant {
   id: string;
   name: string;
   slug: string;
+  is_active: boolean;
   plan_type: 'basic' | 'premium' | 'enterprise';
   custom_domain?: string | null;
   branding_settings: {
@@ -169,6 +170,7 @@ export class TenantService {
                     id: TENANT_CONSTANTS.FALLBACK_ID,
                     name: 'Arecofix Dev Local',
                     slug: 'demo',
+                    is_active: true,
                     plan_type: 'basic',
                     currency: 'ARS',
                     usd_rate: 1,
@@ -316,6 +318,26 @@ export class TenantService {
     }
     
     return data as Tenant;
+  }
+
+  /**
+   * Alterna el estado is_active de un Tenant (Solo Super Admin)
+   */
+  async toggleTenantStatus(tenantId: string, isActive: boolean): Promise<void> {
+    const { error } = await this.supabase
+      .from('tenants')
+      .update({ is_active: isActive })
+      .eq('id', tenantId);
+
+    if (error) {
+      this.logger.error(`Error toggling tenant status: ${error.message}`);
+      throw error;
+    }
+    
+    // Si desactivamos el tenant actual, podríamos limpiar el contexto
+    if (!isActive && this._currentTenant()?.id === tenantId) {
+       this.clearTenantContext();
+    }
   }
 
   /**

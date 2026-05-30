@@ -10,6 +10,8 @@ import { LoggerService } from './logger.service';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 export type { Branch };
 
+import { BranchContextService } from './branch-context.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,6 +21,7 @@ export class BranchService {
   private branchRepo = inject(BranchRepository);
   private supabase = inject(SUPABASE_CLIENT);
   private logger = inject(LoggerService);
+  private branchContextService = inject(BranchContextService);
   
   private _currentBranch = signal<Branch | null>(null);
   public currentBranch = this._currentBranch.asReadonly();
@@ -63,6 +66,9 @@ export class BranchService {
    */
   setCurrentBranch(branch: Branch | null): void {
     this._currentBranch.set(branch);
+    
+    // Update BranchContextService
+    this.branchContextService.setBranchId(branch?.id || null);
     if (typeof window !== 'undefined' && window.localStorage) {
       if (branch) {
         if (branch.slug) this.branchCache.set(branch.slug, branch);

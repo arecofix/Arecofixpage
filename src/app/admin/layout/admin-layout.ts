@@ -178,7 +178,7 @@ export class AdminLayout implements OnInit, OnDestroy {
         children: [
           { title: 'Gestión de Productos', path: `${basePrefix}/products`, icon: 'fa-barcode' },
           { title: 'Stock & Almacén', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
-          { title: 'Audit Catálogo Meta', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
+          { title: 'Auditar Catálogo', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
           { title: 'Categorías de Venta', path: `${basePrefix}/categories`, icon: 'fa-tags' },
           { title: 'Marcas / Fabricantes', path: `${basePrefix}/brands`, icon: 'fa-copyright' },
         ]
@@ -248,7 +248,7 @@ export class AdminLayout implements OnInit, OnDestroy {
             if (['Gestión Red de Sucursales', 'Proveedores & Contactos'].includes(child.title)) return false;
           }
           if (isLibreriaZaona) {
-            if (['Servicios Web', 'Audit Catálogo Meta', 'Blog & Noticias', 'Mensajes Recibidos'].includes(child.title)) return false;
+            if (['Servicios Web', 'Auditar Catálogo', 'Blog & Noticias', 'Mensajes Recibidos'].includes(child.title)) return false;
           }
           return hasAccess(child.module);
         });
@@ -271,6 +271,11 @@ export class AdminLayout implements OnInit, OnDestroy {
   canSwitchBranch() {
     const role = this.userProfile()?.role;
     return this.isSuperAdmin() || role === 'tenant_owner';
+  }
+
+  isLibreriaZaona(): boolean {
+    const branch = this.branchService.currentBranch();
+    return !!(branch?.slug?.toLowerCase()?.includes('zaona') || branch?.name?.toLowerCase()?.includes('zaona'));
   }
 
   async logout() {

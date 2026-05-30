@@ -113,18 +113,23 @@ export class CategoryService {
    * of whether type was set properly in the admin panel.
    */
   public getDataBySlug(slug: string): Observable<iCategoriesResponse> {
-    const normalizedSlug = (slug || '').trim().toLowerCase();
+    const originalSlug = (slug || '').trim().toLowerCase();
+    const isCelulares = originalSlug === 'celulares';
     const tenantId = this.tenantService.getTenantId();
 
     // Step 1: exact match (fastest, most reliable)
-    return from(
-      this.supabase
+    let exactQuery = this.supabase
         .from('categories')
         .select('*')
-        .eq('tenant_id', tenantId)
-        .eq('slug', normalizedSlug)
-        .limit(1)
-    ).pipe(
+        .eq('tenant_id', tenantId);
+        
+    if (isCelulares) {
+        exactQuery = exactQuery.in('slug', ['celulares', 'smartphones', 'smartphone']);
+    } else {
+        exactQuery = exactQuery.eq('slug', originalSlug);
+    }
+    
+    return from(exactQuery.limit(1)).pipe(
       switchMap(({ data, error }) => {
         if (error) {
           if (error.code === '42501') {
@@ -138,21 +143,32 @@ export class CategoryService {
           return of({ data: data as iCategory[], error: null });
         }
         // Step 2: case-insensitive partial fallback (handles slugs with suffixes)
-        return from(
-          this.supabase
+        let fallbackQuery = this.supabase
             .from('categories')
             .select('*')
             .eq('tenant_id', tenantId)
-            .ilike('slug', `%${normalizedSlug}%`)
             .order('slug')
-            .limit(10)
-        ).pipe(
+            .limit(10);
+            
+        if (isCelulares) {
+            fallbackQuery = fallbackQuery.or('slug.ilike.%celulares%,slug.ilike.%smartphones%,slug.ilike.%smartphone%');
+        } else {
+            fallbackQuery = fallbackQuery.ilike('slug', `%${originalSlug}%`);
+        }
+
+        return from(fallbackQuery).pipe(
           map(({ data: d2, error: e2 }) => {
             if (e2) return { data: [] as iCategory[], error: e2 };
             const rows = (d2 || []) as iCategory[];
             // Prefer best match: starts with the slug
-            const best = rows.find(r => r.slug.toLowerCase() === normalizedSlug)
-              ?? rows.find(r => r.slug.toLowerCase().startsWith(normalizedSlug))
+            const best = rows.find(r => 
+                r.slug.toLowerCase() === originalSlug || 
+                (isCelulares && (r.slug.toLowerCase() === 'smartphones' || r.slug.toLowerCase() === 'smartphone'))
+              )
+              ?? rows.find(r => 
+                r.slug.toLowerCase().startsWith(originalSlug) ||
+                (isCelulares && (r.slug.toLowerCase().startsWith('smartphone')))
+              )
               ?? rows[0];
             return { data: best ? [best] : [], error: null };
           })

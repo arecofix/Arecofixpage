@@ -1,5 +1,4 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { BranchService } from './branch.service';
 import { Branch, BranchLandingConfig } from '@app/shared/interfaces/branch.interface';
 
 /**
@@ -12,19 +11,18 @@ import { Branch, BranchLandingConfig } from '@app/shared/interfaces/branch.inter
   providedIn: 'root'
 })
 export class BranchContextService {
-  private branchService = inject(BranchService);
-
-  public currentBranchId = this.branchService.currentBranchId;
+  private _currentBranchId = signal<string | null>(null);
+  public currentBranchId = this._currentBranchId.asReadonly();
 
   /** Config de landing resuelta — seteada por BranchHomeComponent al inicializar */
   public readonly resolvedLandingConfig = signal<BranchLandingConfig | null>(null);
 
   setBranchId(id: string | null): void {
-    this.branchService.setBranchById(id);
+    this._currentBranchId.set(id);
   }
 
   getBranchId(): string | null {
-    return this.branchService.currentBranchId();
+    return this._currentBranchId();
   }
 
   /** Llamado por BranchHomeComponent después de resolver la config */

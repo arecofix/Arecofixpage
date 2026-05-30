@@ -20,6 +20,7 @@ export class SupabaseCategoryRepository extends BaseRepository<Category> impleme
     protected override tableName = 'categories';
     protected override useSoftDeletes = true;
     protected override suppressAuthNotifications = true;
+    protected override useBranchIsolation = true;
 
     constructor() {
         const supabase = inject(SUPABASE_CLIENT);
