@@ -2,11 +2,14 @@ import { Component, inject, OnInit, PLATFORM_ID, DOCUMENT, CUSTOM_ELEMENTS_SCHEM
 import { RouterOutlet } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { RibbonMenuComponent } from './shared/components/ribbon-menu/ribbon-menu.component';
 import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
 import { ThemeService } from './core/services/theme.service';
 import { TenantService } from './core/services/tenant.service';
+import { ScannerService } from './core/services/scanner.service';
+import { ShortcutService } from './core/services/shortcut.service';
 
 @Component({
 
@@ -14,7 +17,8 @@ import { TenantService } from './core/services/tenant.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    ToastComponent
+    ToastComponent,
+    RibbonMenuComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './app.html'
@@ -27,6 +31,10 @@ export class App implements OnInit {
   private tenantService = inject(TenantService); 
   private platformId = inject(PLATFORM_ID);
   private document = inject(DOCUMENT);
+  
+  // Initialize global services for Tauri/ERP features
+  private scannerService = inject(ScannerService);
+  private shortcutService = inject(ShortcutService);
 
   ngOnInit() {
     this.seoService.initialize();
@@ -38,6 +46,58 @@ export class App implements OnInit {
         this.document.location.href = 'https://arecofix.com.ar/celular';
         return;
       }
+
+      // Check for Tauri environment
+      if ((window as any).__TAURI_INTERNALS__) {
+        this.startSidecar();
+      }
+    }
+  }
+
+  private async checkBackendStatus(): Promise<boolean> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'OPTIONS', // Fast preflight
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      // If we get a response (even a 405 Method Not Allowed), it means the server is UP.
+      return true;
+    } catch (e) {
+      return false; // Connection refused or timeout
+    }
+  }
+
+  private async startSidecar() {
+    this.logger.info('Checking if backend is already running...');
+    const isRunning = await this.checkBackendStatus();
+    
+    if (isRunning) {
+      this.logger.info('Backend is already responding on port 5000. Skipping sidecar spawn.');
+      return;
+    }
+
+    try {
+      this.logger.info('Backend not responding. Attempting to start sidecar...');
+      const { Command } = await import('@tauri-apps/plugin-shell');
+      
+      // Try sidecar approach first
+      try {
+        const sidecar = Command.sidecar('arecofix-backend');
+        const child = await sidecar.spawn();
+        this.logger.info('Sidecar started successfully with PID:', child.pid);
+        return;
+      } catch (sidecarErr) {
+        this.logger.warn('Sidecar spawn failed, attempting standard execution fallback...', sidecarErr);
+        // Fallback: standard execution if capabilities restricted the sidecar flag
+        const command = Command.create('arecofix-backend');
+        const child = await command.spawn();
+        this.logger.info('Backend started via fallback execution with PID:', child.pid);
+      }
+    } catch (e) {
+      this.logger.error('Failed to start backend completely:', e);
     }
   }
 }

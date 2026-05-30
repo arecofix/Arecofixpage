@@ -20,4 +20,5 @@ export interface iCategory {
     is_active?:  boolean;
     image_url?:  string;
     tenant_id?:  string;
+    branch_id?:  string;
 }

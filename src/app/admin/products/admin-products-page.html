@@ -24,9 +24,11 @@
       </button>
 
       <!-- Quick Action: Approvals -->
-      <a routerLink="/admin/products/approvals" class="btn btn-outline btn-warning btn-sm md:btn-md shadow-sm whitespace-nowrap">
-        <i class="fas fa-clipboard-check md:mr-2"></i> <span class="hidden md:inline">Revisión</span>
-      </a>
+      @if (!isLibreriaZaona()) {
+        <a routerLink="/admin/products/approvals" class="btn btn-outline btn-warning btn-sm md:btn-md shadow-sm whitespace-nowrap">
+          <i class="fas fa-clipboard-check md:mr-2"></i> <span class="hidden md:inline">Revisión</span>
+        </a>
+      }
 
       <!-- Advanced Tools Dropdown -->
       <div class="dropdown dropdown-end">

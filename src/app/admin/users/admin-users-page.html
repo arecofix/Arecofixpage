@@ -1,126 +1,350 @@
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-green-600">Usuarios</h1>
+<!-- ─── Header ──────────────────────────────────────────────────────────── -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div>
+        <h1 class="text-2xl font-black text-base-content">Gestión de Personas</h1>
+        <p class="text-sm text-base-content/60">Usuarios, staff y proveedores del negocio.</p>
+    </div>
+    <!-- Context-sensitive action button -->
+    @if (activeTab() === 'staff') {
+        <a routerLink="/admin/employees/new" class="btn btn-primary shadow-lg">
+            <i class="fas fa-plus mr-2"></i> Nuevo Empleado
+        </a>
+    } @else if (activeTab() === 'suppliers') {
+        <div class="flex gap-2">
+            @if (selectedSupplierIds().size > 0) {
+                <button (click)="isMessageModalOpen.set(true)" class="btn bg-green-500 hover:bg-green-600 text-white border-none shadow-lg">
+                    <i class="fab fa-whatsapp text-lg"></i> Msj a {{ selectedSupplierIds().size }}
+                </button>
+            }
+            <button (click)="openTracker()" class="btn btn-outline border-blue-500 text-blue-500 hover:bg-blue-600 hover:text-white">
+                <i class="fas fa-truck-fast mr-1"></i> Tracking
+            </button>
+            <a routerLink="/admin/suppliers/new" class="btn btn-primary shadow-lg">
+                <i class="fas fa-plus mr-1"></i> Nuevo Proveedor
+            </a>
+        </div>
+    }
 </div>
 
-<div class="bg-base-100 rounded-lg shadow overflow-hidden text-base-content">
+<!-- ─── Tabs ───────────────────────────────────────────────────────────── -->
+<div role="tablist" class="tabs tabs-bordered mb-6">
+    <button id="tab-users" role="tab" class="tab text-base font-semibold gap-2"
+        [class.tab-active]="activeTab() === 'users'"
+        (click)="setTab('users')">
+        <i class="fas fa-users text-sm"></i> Clientes
+        @if (users().length > 0) {
+            <span class="badge badge-sm badge-neutral">{{ users().length }}</span>
+        }
+    </button>
+    <button id="tab-staff" role="tab" class="tab text-base font-semibold gap-2"
+        [class.tab-active]="activeTab() === 'staff'"
+        (click)="setTab('staff')">
+        <i class="fas fa-id-badge text-sm"></i> Staff
+        @if (employees().length > 0) {
+            <span class="badge badge-sm badge-primary">{{ employees().length }}</span>
+        }
+    </button>
+    <button id="tab-suppliers" role="tab" class="tab text-base font-semibold gap-2"
+        [class.tab-active]="activeTab() === 'suppliers'"
+        (click)="setTab('suppliers')">
+        <i class="fas fa-truck text-sm"></i> Proveedores
+        @if (suppliers().length > 0) {
+            <span class="badge badge-sm badge-accent">{{ suppliers().length }}</span>
+        }
+    </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: CLIENTES / USUARIOS                                             -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+@if (activeTab() === 'users') {
+<div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="table w-full">
-            <thead>
-                <tr class="text-base-content">
+            <thead class="bg-base-200/50">
+                <tr class="text-base-content/70 text-xs uppercase tracking-wider">
                     <th>Usuario</th>
-                    <th>Rol en el Negocio</th>
+                    <th>Rol</th>
                     <th>Sucursal Asignada</th>
-                    <th>Fecha Registro</th>
+                    <th>Registro</th>
                 </tr>
             </thead>
             <tbody>
                 @if (loading()) {
-                <tr>
-                    <td colspan="4" class="text-center py-4">Cargando usuarios...</td>
-                </tr>
+                    <tr>
+                        <td colspan="4" class="text-center py-12">
+                            <span class="loading loading-spinner loading-md text-primary"></span>
+                            <p class="text-sm text-base-content/50 mt-2">Cargando usuarios...</p>
+                        </td>
+                    </tr>
                 } @else if (users().length === 0) {
-                <tr>
-                    <td colspan="4" class="text-center py-4 text-gray-400">No hay usuarios registrados.</td>
-                </tr>
+                    <tr>
+                        <td colspan="4" class="text-center py-12 text-base-content/40">
+                            <i class="fas fa-users text-4xl mb-3 block"></i>
+                            No hay usuarios registrados.
+                        </td>
+                    </tr>
                 } @else {
-                @for (user of users(); track user.id) {
-                <tr>
-                    <td>
-                        <div class="flex items-center gap-3">
-                            <div class="avatar">
-                                <div class="mask mask-squircle w-12 h-12">
-                                    <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.first_name + '+' + user.last_name"
-                                        alt="Avatar" />
+                    @for (user of users(); track user.id) {
+                    <tr class="hover:bg-base-50">
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="avatar">
+                                    <div class="mask mask-squircle w-10 h-10">
+                                        <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.first_name + '+' + user.last_name" alt="Avatar" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">{{ user.first_name }} {{ user.last_name }}</div>
+                                    <div class="text-xs opacity-50">{{ user.email }}</div>
                                 </div>
                             </div>
-                            <div>
-                                <div class="font-bold">{{ user.first_name }} {{ user.last_name }}</div>
-                                <div class="text-xs opacity-50">{{ user.email }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <select class="select select-sm select-bordered w-full max-w-xs"
-                                [ngModel]="user.role"
-                                (ngModelChange)="updateUserRole(user, $event)">
-                            <option value="user">Cliente (User)</option>
-                            <option value="staff">Técnico (Staff)</option>
-                            <option value="admin">Administrador (Admin)</option>
-                        </select>
-                    </td>
-                    <td>
-                        <div class="flex items-center gap-2">
-                            @if(user.role === 'admin' || user.role === 'super_admin') {
-                                <span class="badge badge-ghost badge-sm opacity-50 px-3 py-2 font-bold uppercase tracking-tighter">Acceso Global</span>
-                            } @else {
-                                <div class="flex flex-col gap-1">
-                                    <span class="badge badge-sm font-bold p-2" 
-                                          [class.badge-primary]="user.branch_id" 
-                                          [class.badge-ghost]="!user.branch_id">
-                                        {{ getBranchName(user.branch_id) }}
+                        </td>
+                        <td>
+                            <select class="select select-sm select-bordered w-full max-w-xs"
+                                    [ngModel]="user.role"
+                                    (ngModelChange)="updateUserRole(user, $event)">
+                                <option value="user">Cliente</option>
+                                <option value="staff">Staff</option>
+                                <option value="admin">Admin de Sucursal</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                @if (hasGlobalAccess(user)) {
+                                    <!-- Only true super_admin gets global access badge -->
+                                    <span class="badge badge-ghost badge-sm opacity-60 font-bold uppercase tracking-tighter px-3 py-2">
+                                        <i class="fas fa-globe text-[9px] mr-1"></i> Super Admin
                                     </span>
-                                    <button class="btn btn-xs btn-outline btn-primary border-primary/30 hover:bg-primary hover:border-primary" 
-                                            (click)="openBranchModal(user)">
-                                        <i class="fas fa-edit text-[10px]"></i> {{ user.branch_id ? 'Cambiar' : 'Asignar' }}
-                                    </button>
-                                </div>
-                            }
-                        </div>
-                    </td>
-                    <td class="text-sm opacity-70">{{ user.created_at | date:'shortDate' }}</td>
-                </tr>
-                }
+                                } @else {
+                                    <div class="flex flex-col gap-1">
+                                        <span class="badge badge-sm font-bold p-2"
+                                              [class.badge-primary]="user.branch_id"
+                                              [class.badge-ghost]="!user.branch_id">
+                                            {{ getBranchName(user.branch_id) }}
+                                        </span>
+                                        <button class="btn btn-xs btn-outline btn-primary border-primary/30"
+                                                (click)="openBranchModal(user)">
+                                            <i class="fas fa-edit text-[10px]"></i>
+                                            {{ user.branch_id ? 'Cambiar' : 'Asignar' }}
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                        <td class="text-sm opacity-70">{{ user.created_at | date:'shortDate' }}</td>
+                    </tr>
+                    }
                 }
             </tbody>
         </table>
     </div>
 </div>
+}
 
-<!-- Modal de Asignación de Sucursal -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: STAFF / EMPLEADOS                                               -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+@if (activeTab() === 'staff') {
+<div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead class="bg-base-200/50">
+                <tr class="text-base-content/70 text-xs uppercase tracking-wider">
+                    <th>Empleado</th>
+                    <th>Cargo / Rol</th>
+                    <th>Contacto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (staffLoading()) {
+                    <tr>
+                        <td colspan="5" class="text-center py-12">
+                            <span class="loading loading-spinner loading-md text-primary"></span>
+                            <p class="text-sm text-base-content/50 mt-2">Cargando staff...</p>
+                        </td>
+                    </tr>
+                } @else if (employees().length === 0) {
+                    <tr>
+                        <td colspan="5" class="text-center py-12 text-base-content/40">
+                            <i class="fas fa-id-badge text-4xl mb-3 block"></i>
+                            No hay empleados registrados.
+                            <div class="mt-4">
+                                <a routerLink="/admin/employees/new" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus mr-1"></i> Agregar primer empleado
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                } @else {
+                    @for (employee of employees(); track employee.id) {
+                    <tr class="hover:bg-base-50">
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="avatar">
+                                    <div class="mask mask-squircle w-10 h-10">
+                                        <img [src]="employee.avatar_url || 'https://ui-avatars.com/api/?name=' + employee.first_name + '+' + employee.last_name" alt="Avatar" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                    <div class="text-xs opacity-50">{{ employee.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="badge badge-primary badge-outline text-xs">{{ employee.role | uppercase }}</div>
+                            <div class="text-xs mt-1 opacity-60">{{ employee.job_title || 'Sin cargo definido' }}</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">{{ employee.phone || 'N/A' }}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-success badge-sm">Activo</span>
+                        </td>
+                        <td>
+                            <a [routerLink]="['/admin/employees', employee.id]" class="btn btn-sm btn-ghost">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB 3: PROVEEDORES                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+@if (activeTab() === 'suppliers') {
+<div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead class="bg-base-200/50">
+                <tr class="text-base-content/70 text-xs uppercase tracking-wider">
+                    <th class="w-10">
+                        <input type="checkbox" class="checkbox checkbox-sm"
+                            [checked]="selectedSupplierIds().size > 0 && selectedSupplierIds().size === suppliers().length"
+                            (change)="toggleAll($event)">
+                    </th>
+                    <th>Nombre</th>
+                    <th>Rubro / Tipo</th>
+                    <th>Contacto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (suppliersLoading()) {
+                    <tr>
+                        <td colspan="6" class="text-center py-12">
+                            <span class="loading loading-spinner loading-md text-primary"></span>
+                            <p class="text-sm text-base-content/50 mt-2">Cargando proveedores...</p>
+                        </td>
+                    </tr>
+                } @else if (suppliers().length === 0) {
+                    <tr>
+                        <td colspan="6" class="text-center py-12 text-base-content/40">
+                            <i class="fas fa-truck text-4xl mb-3 block"></i>
+                            No hay proveedores registrados.
+                            <div class="mt-4">
+                                <a routerLink="/admin/suppliers/new" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus mr-1"></i> Agregar primer proveedor
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                } @else {
+                    @for (supplier of suppliers(); track supplier.id) {
+                    <tr class="hover:bg-base-50" [class.bg-base-200]="selectedSupplierIds().has(supplier.id)">
+                        <td>
+                            @if (supplier.phone) {
+                                <input type="checkbox" class="checkbox checkbox-sm"
+                                    [checked]="selectedSupplierIds().has(supplier.id)"
+                                    (change)="toggleSupplier(supplier.id)">
+                            } @else {
+                                <div class="tooltip tooltip-right" data-tip="Sin teléfono">
+                                    <i class="fas fa-exclamation-triangle text-warning text-xs"></i>
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <div class="font-bold text-sm">{{ supplier.name }}</div>
+                            <div class="text-xs opacity-50">{{ supplier.cuil }}</div>
+                        </td>
+                        <td>
+                            <div class="badge badge-outline badge-sm">{{ supplier.rubro }}</div>
+                            <div class="text-xs mt-1 opacity-60">{{ supplier.type }}</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">{{ supplier.email }}</div>
+                            <div class="text-xs opacity-60">{{ supplier.phone }}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-sm"
+                                  [class.badge-success]="supplier.is_active"
+                                  [class.badge-ghost]="!supplier.is_active">
+                                {{ supplier.is_active ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a [routerLink]="['/admin/suppliers', supplier.id]" class="btn btn-sm btn-ghost">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+
+<!-- ─── Modal: Asignación de Sucursal ──────────────────────────────────── -->
 <dialog class="modal" [class.modal-open]="selectedUserForBranch()">
     <div class="modal-box bg-base-100 border border-base-300 shadow-2xl rounded-2xl p-0">
         <div class="p-6 border-b border-base-200 flex justify-between items-center bg-base-200/30">
             <div>
                 <h3 class="font-black text-xl text-primary uppercase">Asignar Sucursal</h3>
-                <p class="text-xs opacity-60">Selecciona el punto de venta para <strong>{{ selectedUserForBranch()?.first_name }} {{ selectedUserForBranch()?.last_name }}</strong></p>
+                <p class="text-xs opacity-60">Para <strong>{{ selectedUserForBranch()?.first_name }} {{ selectedUserForBranch()?.last_name }}</strong></p>
             </div>
             <button class="btn btn-sm btn-circle btn-ghost" (click)="selectedUserForBranch.set(null)">✕</button>
         </div>
-        
         <div class="p-6 max-h-[60vh] overflow-y-auto">
             <div class="grid grid-cols-1 gap-3">
-                <!-- Opción: Sin Sucursal -->
-                <button 
-                    class="btn btn-outline border-base-300 justify-between font-bold h-auto py-4 group hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                <button class="btn btn-outline border-base-300 justify-between font-bold h-auto py-4 group hover:bg-red-50 hover:text-red-600 hover:border-red-200"
                     [disabled]="isUpdating()"
                     (click)="saveUserBranch(null)">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center group-hover:bg-red-100">
-                             <i class="fas fa-times-circle opacity-30 group-hover:opacity-100"></i>
+                            <i class="fas fa-times-circle opacity-30 group-hover:opacity-100"></i>
                         </div>
-                         <div class="text-left">
+                        <div class="text-left">
                             <div class="text-sm">Quitar Asignación</div>
                             <div class="text-[10px] opacity-50 font-medium">El usuario no pertenecerá a ninguna sucursal</div>
-                         </div>
+                        </div>
                     </div>
                     <i class="fas fa-chevron-right text-xs opacity-20"></i>
                 </button>
-
-                <!-- Listado de Sucursales -->
                 @for (branch of branches(); track branch.id) {
-                    <button 
-                        class="btn btn-outline border-base-300 justify-between font-bold h-auto py-4 group hover:bg-primary-50 hover:text-primary hover:border-primary/30"
+                    <button class="btn btn-outline border-base-300 justify-between font-bold h-auto py-4 group hover:bg-primary/5 hover:text-primary hover:border-primary/30"
                         [class.bg-primary]="selectedUserForBranch()?.branch_id === branch.id"
                         [disabled]="isUpdating()"
                         (click)="saveUserBranch(branch.id)">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20">
-                                 <i class="fas fa-store text-primary"></i>
+                                <i class="fas fa-store text-primary"></i>
                             </div>
-                             <div class="text-left">
+                            <div class="text-left">
                                 <div class="text-sm">{{ branch.name }}</div>
                                 <div class="text-[10px] opacity-50 font-medium">{{ branch.address || 'Sin dirección' }}</div>
-                             </div>
+                            </div>
                         </div>
                         @if (isUpdating() && selectedUserForBranch()?.branch_id === branch.id) {
                             <span class="loading loading-spinner loading-xs"></span>
@@ -131,7 +355,6 @@
                 }
             </div>
         </div>
-        
         <div class="modal-action p-4 bg-base-200/30 rounded-b-2xl">
             <button class="btn btn-ghost" (click)="selectedUserForBranch.set(null)">Cancelar</button>
         </div>
@@ -140,3 +363,90 @@
         <button>close</button>
     </form>
 </dialog>
+
+<!-- ─── Modal: Tracking Andreani ──────────────────────────────────────── -->
+@if (isTrackingModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="bg-base-100 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-base-200">
+      <div class="bg-blue-600 py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center text-white">
+            <i class="fas fa-truck-fast text-2xl mr-3"></i>
+            <div>
+                <h3 class="font-bold text-lg leading-none">Logística Andreani</h3>
+                <p class="text-xs opacity-80 mt-1">Seguimiento de Compras y Repuestos</p>
+            </div>
+        </div>
+        <button (click)="isTrackingModalOpen.set(false)" class="btn btn-sm btn-ghost btn-circle text-white hover:bg-white/20">
+            <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-6">
+         <div class="form-control">
+             <label class="label mb-1">
+                 <span class="label-text font-bold">Código de Seguimiento</span>
+             </label>
+             <div class="relative">
+                 <input type="text" #trackingInput class="input input-bordered w-full pl-10 bg-base-200/50 uppercase font-mono text-lg tracking-widest text-center focus:border-blue-500" placeholder="Ej: 300012345JP">
+                 <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50"></i>
+             </div>
+         </div>
+         <div class="flex gap-3">
+             <button (click)="isTrackingModalOpen.set(false)" class="btn btn-ghost flex-1">Cerrar</button>
+             <button (click)="trackAndreani(trackingInput.value)" class="btn bg-blue-600 hover:bg-blue-700 text-white flex-1 border-none">
+                 <i class="fas fa-search"></i> Rastrear
+             </button>
+         </div>
+         @if (trackingUrl()) {
+            <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 flex flex-col items-center text-center">
+                <i class="fas fa-check-circle text-blue-500 text-3xl mb-2"></i>
+                <h4 class="font-bold text-base-content mb-1">Redirección Lista</h4>
+                <p class="text-xs text-base-content/70 mb-4">Código: <strong class="text-blue-600">{{ andreaniTrackingCode() }}</strong></p>
+                <a [href]="trackingUrl()" target="_blank" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none w-full">
+                    Ir al Rastreo Oficial <i class="fas fa-external-link-alt ml-1"></i>
+                </a>
+            </div>
+         }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Modal: Mensajería Masiva ───────────────────────────────────────── -->
+@if (isMessageModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="bg-base-100 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-base-200">
+      <div class="bg-green-600 py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center text-white">
+            <i class="fab fa-whatsapp text-2xl mr-3"></i>
+            <div>
+                <h3 class="font-bold text-lg leading-none">Mensajería Masiva (MSS)</h3>
+                <p class="text-xs opacity-80 mt-1">Enviarás a {{ selectedSupplierIds().size }} proveedores</p>
+            </div>
+        </div>
+        <button (click)="isMessageModalOpen.set(false)" class="btn btn-sm btn-ghost btn-circle text-white hover:bg-white/20">
+            <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+         <div class="alert alert-info shadow-none bg-blue-50 text-blue-900 border-blue-200 text-xs">
+            <i class="fas fa-info-circle text-blue-500"></i>
+            <span>Se abrirá una pestaña de WhatsApp por cada proveedor. Usa la variable <code>{{ '{' }}nombre{{ '}' }}</code> en el texto.</span>
+         </div>
+         <div class="form-control">
+             <label class="label mb-1">
+                 <span class="label-text font-bold">Mensaje a enviar</span>
+             </label>
+             <textarea [(ngModel)]="bulkMessage"
+                  class="textarea textarea-bordered w-full h-32 focus:border-green-500"
+                  placeholder="Escribe tu mensaje aquí..."></textarea>
+         </div>
+         <div class="flex gap-3 pt-2">
+             <button (click)="isMessageModalOpen.set(false)" class="btn btn-ghost flex-1">Cancelar</button>
+             <button (click)="sendBulkMessages()" class="btn bg-green-600 hover:bg-green-700 text-white flex-1 border-none">
+                 <i class="fas fa-paper-plane mr-1"></i> Enviar ({{ selectedSupplierIds().size }})
+             </button>
+         </div>
+      </div>
+    </div>
+  </div>
+}

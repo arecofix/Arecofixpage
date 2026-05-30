@@ -61,6 +61,29 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
       </div>
     </div>
 
+    <!-- Tabs for UGC (Pendientes vs Activos) -->
+    <div class="flex gap-4 mb-6 border-b border-gray-200 dark:border-slate-700">
+      <button (click)="activeTab.set('activos')" 
+              class="px-4 py-2 font-bold transition-colors border-b-2"
+              [class.text-blue-600]="activeTab() === 'activos'"
+              [class.border-blue-600]="activeTab() === 'activos'"
+              [class.text-gray-500]="activeTab() !== 'activos'"
+              [class.border-transparent]="activeTab() !== 'activos'">
+        Cursos Oficiales ({{ activeCoursesCount() }})
+      </button>
+      <button (click)="activeTab.set('pendientes')" 
+              class="px-4 py-2 font-bold transition-colors border-b-2 flex items-center gap-2"
+              [class.text-blue-600]="activeTab() === 'pendientes'"
+              [class.border-blue-600]="activeTab() === 'pendientes'"
+              [class.text-gray-500]="activeTab() !== 'pendientes'"
+              [class.border-transparent]="activeTab() !== 'pendientes'">
+        Pendientes de Aprobación
+        @if (pendingCoursesCount() > 0) {
+          <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{{ pendingCoursesCount() }}</span>
+        }
+      </button>
+    </div>
+
     <!-- The List Layout (Replaces strict dark table) -->
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
       <!-- Standardized Table Header inside the card -->
@@ -87,7 +110,7 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
           </div>
         } @else {
           <!-- Modern Row Design -->
-          @for (course of courses(); track course.id) {
+          @for (course of filteredCourses(); track course.id) {
             <div class="group px-6 py-5 grid grid-cols-12 gap-4 items-center bg-white dark:bg-slate-800 hover:bg-blue-50/50 dark:hover:bg-slate-800/80 transition-colors">
               
               <!-- Branding & Identity -->
@@ -143,6 +166,14 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
 
               <!-- Admin Actions -->
               <div class="col-span-6 md:col-span-2 flex justify-end items-center gap-1 md:gap-2">
+                @if (course.status === 'pending') {
+                  <!-- Approve Button -->
+                  <button (click)="approveCourse(course)" 
+                          class="btn btn-sm btn-circle bg-emerald-50 dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 border-none tooltip" data-tip="Aprobar">
+                    <i class="fas fa-check text-xs"></i>
+                  </button>
+                }
+
                 <!-- Direct Academy Link -->
                 <a [routerLink]="['/academy', course.slug]" target="_blank" 
                    class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-900 dark:hover:text-white tooltip" data-tip="Ver en página">
@@ -153,10 +184,10 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
                    class="btn btn-sm btn-circle bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 border-none transition-colors">
                   <i class="fas fa-pen text-xs"></i>
                 </a>
-                <!-- Delete -->
+                <!-- Delete / Reject -->
                 <button (click)="deleteCourse(course)" 
-                        class="btn btn-sm btn-circle bg-red-50 dark:bg-slate-700 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 border-none transition-colors">
-                  <i class="fas fa-trash text-xs"></i>
+                        class="btn btn-sm btn-circle bg-red-50 dark:bg-slate-700 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 border-none transition-colors" [attr.data-tip]="course.status === 'pending' ? 'Rechazar' : 'Eliminar'">
+                  <i class="fas fa-times text-xs"></i>
                 </button>
               </div>
 
@@ -173,9 +204,19 @@ export class AdminCoursesPage implements OnInit {
   
   courses = signal<Course[]>([]);
   loading = signal(true);
+  activeTab = signal<'activos' | 'pendientes'>('activos');
 
   // Dashboards computed metrics
-  activeCoursesCount = computed(() => this.courses().filter(c => c.is_active).length);
+  activeCoursesCount = computed(() => this.courses().filter(c => c.status !== 'pending').length);
+  pendingCoursesCount = computed(() => this.courses().filter(c => c.status === 'pending').length);
+  
+  filteredCourses = computed(() => {
+    if (this.activeTab() === 'pendientes') {
+      return this.courses().filter(c => c.status === 'pending');
+    }
+    return this.courses().filter(c => c.status !== 'pending');
+  });
+
   totalMonthlyRevenue = computed(() => this.courses().reduce((sum, c) => sum + (c.is_active ? Number(c.price || 0) : 0), 0));
 
   ngOnInit() {
@@ -198,15 +239,38 @@ export class AdminCoursesPage implements OnInit {
     });
   }
 
-  async deleteCourse(course: Course) {
-    if (!confirm(`¿Estás seguro de eliminar el curso "${course.title}"?`)) return;
+  async approveCourse(course: Course) {
+    if (!confirm(`¿Aprobar y publicar el curso "${course.title}"?`)) return;
 
+    try {
+      // @ts-ignore
+      const { error } = await this.coursesService.supabase
+        .from('courses')
+        .update({ status: 'published', is_active: true })
+        .eq('id', course.id);
+
+      if (error) throw error;
+      
+      this.courses.update(current => current.map(c => 
+        c.id === course.id ? { ...c, status: 'published', is_active: true } : c
+      ));
+      this.cdr.markForCheck();
+    } catch (err: any) {
+      alert('Error al aprobar: ' + err.message);
+    }
+  }
+
+  async deleteCourse(course: Course) {
+    const action = course.status === 'pending' ? 'rechazar' : 'eliminar';
+    if (!confirm(`¿Estás seguro de ${action} el curso "${course.title}"?`)) return;
+
+    // For rejection, we simply delete it or set status to rejected. We will use delete per standard.
     this.coursesService.deleteCourse(course.id).subscribe({
       next: () => {
         this.courses.update(current => current.filter(c => c.id !== course.id));
         this.cdr.markForCheck();
       },
-      error: (err: any) => alert('Error al eliminar el curso: ' + err.message)
+      error: (err: any) => alert(`Error al ${action} el curso: ` + err.message)
     });
   }
 

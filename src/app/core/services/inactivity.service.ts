@@ -6,8 +6,8 @@ import { debounceTime, switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class InactivityService {
-  // Default to 15 minutes
-  private readonly TIMEOUT_MS = 15 * 60 * 1000; 
+  // Default to 60 minutes
+  private readonly TIMEOUT_MS = 60 * 60 * 1000; 
   
   private isLockedSubject = new BehaviorSubject<boolean>(false);
   public isLocked$ = this.isLockedSubject.asObservable();

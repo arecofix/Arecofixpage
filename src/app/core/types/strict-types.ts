@@ -13,6 +13,7 @@ export interface Tenant {
   };
   isMain: boolean;
   settings?: Record<string, unknown>;
+  subscription_status?: 'active' | 'moroso' | 'cancelado' | 'suspendido';
 }
 
 export interface UserProfile {

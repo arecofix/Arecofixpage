@@ -140,7 +140,7 @@ export class GsmComponent implements OnInit, OnDestroy {
     minutes: 8,
     seconds: 19
   });
-  private countdownInterval: any;
+  private countdownInterval: ReturnType<typeof setInterval> | undefined;
 
   // New Offers Data
   offers = signal([

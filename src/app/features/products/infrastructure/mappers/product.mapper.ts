@@ -32,6 +32,9 @@ export class ProductMapper {
     } else {
        // Calcular stock total sumando todas las sucursales si no se filtró por sucursal
        displayedStock = branchStockList.reduce((acc: number, curr: any) => acc + (Number(curr.quantity) || 0), 0);
+       if (displayedStock === 0 && p['stock'] !== undefined && p['stock'] !== null) {
+           displayedStock = Number(p['stock']);
+       }
     }
 
     const rawGallery = p['gallery_urls'] || (p['image_url'] ? [p['image_url']] : []);

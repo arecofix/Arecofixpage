@@ -15,6 +15,8 @@ import { AppTitleStrategy } from './core/strategies/app-title.strategy';
 
 registerLocaleData(localeEsAr, 'es-AR');
 import { routes } from './app.routes';
+import { RouteReuseStrategy } from '@angular/router';
+import { CustomRouteReuseStrategy } from './core/strategies/custom-route-reuse.strategy';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { SupabaseService } from './core/services/supabase.service';
 import { SUPABASE_CLIENT } from './core/di/supabase-token';
@@ -59,6 +61,9 @@ export const appConfig: ApplicationConfig = {
 
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    
+    // Custom Route Reuse Strategy for Tabs
+    { provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy },
     
     // Initializer to resolve Tenant Context before anything else
     {

@@ -78,6 +78,7 @@
     "@capacitor/core": "^8.3.4",
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@supabase/supabase-js": "^2.106.1",
+    "@tauri-apps/plugin-shell": "^2.3.5",
     "chart.js": "4.5.1",
     "express": "^4.22.2",
     "firebase": "^12.13.0",

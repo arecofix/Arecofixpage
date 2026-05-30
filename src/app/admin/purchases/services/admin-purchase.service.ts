@@ -4,6 +4,8 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { FinanceService } from '@app/features/finance/application/services/finance.service';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { Purchase } from '@app/features/sales/domain/entities/purchase.entity';
+import { AuthService } from '@app/core/services/auth.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,14 +15,30 @@ export class AdminPurchaseService {
   private tenantService = inject(TenantService);
   private financeService = inject(FinanceService);
   private productRepository = inject(ProductRepository);
+  private authService = inject(AuthService);
+  private branchContextService = inject(BranchContextService);
 
   async getPurchases(): Promise<Purchase[]> {
     const tenantId = this.tenantService.getTenantId();
-    const { data, error } = await this.supabase
+    let query = this.supabase
       .from('purchases')
       .select('id, supplier_id, branch_id, date, status, total_amount, payment_method, created_at, updated_at, suppliers(name)')
-      .eq('tenant_id', tenantId)
-      .order('created_at', { ascending: false });
+      .eq('tenant_id', tenantId);
+
+    // Si el usuario NO es un administrador global en la sucursal central, filtramos obligatoriamente por la sucursal activa
+    const profile = this.authService.getCurrentProfile();
+    const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
+    const contextBranchId = this.branchContextService.getBranchId();
+    const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
+
+    if (!(isGlobalAdmin && isCentralBranch)) {
+      const branchId = contextBranchId || profile?.branch_id;
+      if (branchId) {
+        query = query.eq('branch_id', branchId);
+      }
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
     return (data as unknown) as Purchase[];

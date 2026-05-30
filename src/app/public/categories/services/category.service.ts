@@ -219,7 +219,16 @@ export class CategoryService {
 
   public create(category: Partial<iCategory>): Observable<iCategory> {
     const slug = category.slug || StringUtils.slugify(category.name || '');
-    const payload = { ...category, slug };
+    const tenantId = this.tenantService.getTenantId();
+    const profile = this.authService.getCurrentProfile();
+    const branchId = profile?.branch_id || null;
+
+    const payload = { 
+      ...category, 
+      slug,
+      tenant_id: tenantId,
+      branch_id: category.branch_id !== undefined ? category.branch_id : branchId
+    };
     return this.categoryRepo.create(payload) as Observable<iCategory>;
   }
 

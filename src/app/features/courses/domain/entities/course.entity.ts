@@ -15,6 +15,8 @@ export interface Course {
     rating?: number;
     students?: number;
     is_active?: boolean;
+    status?: string;
+    author_id?: string;
     tenant_id?: string;
     created_at?: string;
 }

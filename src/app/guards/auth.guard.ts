@@ -7,8 +7,11 @@ import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 import { filter, map, take, timeout, catchError } from 'rxjs/operators';
 import { of, firstValueFrom } from 'rxjs';
 
+import { TenantService } from '@app/core/services/tenant.service';
+
 export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
+  const tenantService = inject(TenantService);
   const router = inject(Router);
 
   console.log('🔍 authGuard - Checking access for:', state.url);
@@ -44,6 +47,22 @@ export const authGuard: CanActivateFn = async (route, state) => {
     const userRole = userProfile?.role;
     const userEmail = userProfile?.email;
     
+    // 1. Staff Revocation Check
+    if (userProfile && userProfile.is_active === false) {
+      console.warn('🚫 authGuard: User access revoked. Signing out.');
+      await authService.signOut();
+      router.navigate(['/login'], { queryParams: { error: 'access_revoked' } });
+      return false;
+    }
+    
+    // 2. Tenant Subscription Check
+    const tenant = tenantService.getCurrentTenant();
+    if (tenant && ['moroso', 'cancelado', 'suspendido'].includes(tenant.subscription_status || '')) {
+       console.warn(`🚫 authGuard: Tenant subscription is ${tenant.subscription_status}. Redirecting to payment.`);
+       router.navigate(['/payment-required']);
+       return false;
+    }
+
     console.log('📋 authGuard - Context:', {
       email: userEmail,
       role: userRole,
@@ -55,8 +74,6 @@ export const authGuard: CanActivateFn = async (route, state) => {
         (userProfile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(userEmail || '') || (userRole && allowedRoles.includes(userRole))))) {
       return true;
     }
-
-    // Supabase metadata fallback
     const metaRole = authState.user?.user_metadata?.['role'] ?? authState.user?.app_metadata?.['role'];
     if (metaRole && allowedRoles.includes(metaRole)) {
       return true;

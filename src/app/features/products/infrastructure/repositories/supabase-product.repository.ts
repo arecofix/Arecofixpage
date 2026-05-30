@@ -59,9 +59,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
     let selectFields = `
       id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
-      is_active, is_featured, sku, barcode, created_at, updated_at, is_global,
-      branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
-    `;
+      is_active, is_featured, sku, barcode, created_at, updated_at, is_global`;
+
+    selectFields += `, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
 
     if (!minimal) {
       selectFields += ', description, media_metadata, gallery_urls';
@@ -88,10 +88,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     }
     
     if (brand_id) query = query.eq('brand_id', brand_id);
-    // Eliminamos el filtrado estricto por branch_id aquí porque la tabla products ya no lo tiene.
-    // El filtrado cruzado de stock y sucursales debería hacerse consultando a view_products_inventory.
-    // Por retrocompatibilidad, no filtramos por branch_id directamente en el repository central, 
-    // sino que lo delegamos al mapper o a la vista en los servicios de capa superior.
+    
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
     if (id) query = query.eq('id', id);
@@ -129,7 +126,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         const totalItems = count || 0;
         const pages = Math.max(1, Math.ceil(totalItems / _per_page));
 
-        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p));
+        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, branch_id || undefined));
         
         if (params.q) {
           products = products.sort((a: Product, b: Product) => {
@@ -270,7 +267,6 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
     const dataToUpsert = products.map(p => {
         const copy: any = { ...p, tenant_id: this.tenantService.getTenantId(), updated_at: new Date().toISOString() };
-        delete copy.stock;
         delete copy.branch_id;
         delete copy.min_stock_alert;
         delete copy.convertedPrice;
@@ -368,15 +364,13 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }> {
     const fetchSummary = async () => {
         if (branch_id) {
-            let query = this.supabase.from('product_stock_per_branch')
-                .select('quantity, min_stock_alert, products!inner(price, is_active, deleted_at)')
-                .eq('branch_id', branch_id);
-            
-            const tenantId = this.tenantService.getTenantId();
-            if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
-                query = query.eq('tenant_id', tenantId);
-            }
-            query = query.eq('products.is_active', true).is('products.deleted_at', null);
+            let query = this.applyTenantFilter(
+                this.supabase.from('products')
+                    .select('price, is_active, deleted_at, branch_stock:product_stock_per_branch(quantity, min_stock_alert)')
+            )
+            .eq('is_active', true)
+            .is('deleted_at', null)
+            .eq('product_stock_per_branch.branch_id', branch_id);
 
             const { data, error } = await (query as any);
             if (error) throw error;
@@ -384,13 +378,15 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             const results = data || [];
             const totalItems = results.length;
             const totalValue = results.reduce((acc: number, item: any) => {
-                const price = Number(item.products?.price || 0);
-                const quantity = Number(item.quantity || 0);
+                const price = Number(item.price || 0);
+                const stockList = item.branch_stock && Array.isArray(item.branch_stock) ? item.branch_stock : [];
+                const quantity = stockList.length > 0 ? Number(stockList[0].quantity || 0) : 0;
                 return acc + (price * quantity);
             }, 0);
             const lowStockCount = results.filter((item: any) => {
-                const quantity = Number(item.quantity || 0);
-                const threshold = Number(item.min_stock_alert ?? 5);
+                const stockList = item.branch_stock && Array.isArray(item.branch_stock) ? item.branch_stock : [];
+                const quantity = stockList.length > 0 ? Number(stockList[0].quantity || 0) : 0;
+                const threshold = stockList.length > 0 ? Number(stockList[0].min_stock_alert ?? 5) : 5;
                 return quantity > 0 && quantity <= threshold;
             }).length;
 

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink, Params } from '@angular/router';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { Observable, map, of, Subject, switchMap, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -133,7 +133,7 @@ export class RepuestosComponent implements OnInit, OnDestroy {
         // Sync Input with URL
         this.route.queryParams
             .pipe(takeUntil(this.destroy$))
-            .subscribe((params: any) => {
+            .subscribe((params: Params) => {
                 this.routeParams.set(params);
                 if (params['search'] !== this.searchQuery()) {
                     this.searchQuery.set(params['search'] || '');
@@ -162,31 +162,31 @@ export class RepuestosComponent implements OnInit, OnDestroy {
                     const maxPrice = params['price'];
                     const sort = params['sort'] as string | undefined;
 
-                    const serviceParams: any = {
+                    const serviceParams: Record<string, string | number | string[]> = {
                         _page: page,
                         _per_page: 12,
                         _sort: sort === 'relevance' ? undefined : sort?.split('-')[0] || 'created_at',
                         _order: sort?.split('-')[1] || 'desc'
-                    };
+                    } as Record<string, string | number | string[]>;
 
                     // Filter Logic
-                    if (search) serviceParams.q = search; // Use 'q' for name OR description
+                    if (search) serviceParams['q'] = search; // Use 'q' for name OR description
 
-                    if (brandId && brandId !== 'all') serviceParams.brand_id = brandId;
-                    if (maxPrice) serviceParams.max_price = maxPrice;
+                    if (brandId && brandId !== 'all') serviceParams['brand_id'] = brandId;
+                    if (maxPrice) serviceParams['max_price'] = maxPrice;
 
                     // Category Logic
                     if (categoryId && categoryId !== 'all') {
                         // User selected a specific sub-category
                         // We must include this category AND its children
-                        serviceParams.category_ids = this.getAllChildIds(categoryId as string, this.categories());
+                        serviceParams['category_ids'] = this.getAllChildIds(categoryId as string, this.categories());
                     } else {
                         // User is viewing "All Repuestos" -> Use the massive calculated list
-                        serviceParams.category_ids = this.repuestosCategoryIds();
+                        serviceParams['category_ids'] = this.repuestosCategoryIds();
                     }
 
                     // Safety Check: If no IDs found (heuristic failed), return empty
-                    if (!serviceParams.category_ids || serviceParams.category_ids.length === 0) {
+                    if (!serviceParams['category_ids'] || (serviceParams['category_ids'] as string[]).length === 0) {
                          return of({ data: [], items: 0, pages: 0, first: 1, last: 1 } as ProductsResponse);
                     }
 
@@ -257,7 +257,7 @@ export class RepuestosComponent implements OnInit, OnDestroy {
     async loadCategories() {
         this.categoryService.getData({ _page: 1, _per_page: 500 })
           .pipe(takeUntil(this.destroy$))
-          .subscribe((res: any) => {
+          .subscribe((res: { data: iCategory[] }) => {
             const allCategories = res.data;
             this.categories.set(allCategories);
 
@@ -269,16 +269,16 @@ export class RepuestosComponent implements OnInit, OnDestroy {
                 'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power'
             ];
             
-            const relevantCategories = allCategories.filter((c: any) => 
+            const relevantCategories = allCategories.filter((c: iCategory) => 
                 keywords.some(k => c.name.toLowerCase().includes(k) || c.slug.toLowerCase().includes(k))
             );
 
-            let repuestosCat = allCategories.find((c: any) => c.slug.toLowerCase() === 'repuestos');
+            let repuestosCat = allCategories.find((c: iCategory) => c.slug.toLowerCase() === 'repuestos');
             if (!repuestosCat && relevantCategories.length > 0) repuestosCat = relevantCategories[0];
 
-            if (relevantCategories.length > 0) {
+                if (relevantCategories.length > 0) {
                 let allIds = new Set<string>();
-                relevantCategories.forEach((cat: any) => {
+                relevantCategories.forEach((cat: iCategory) => {
                     allIds.add(cat.id);
                     const treeIds = this.getAllChildIds(cat.id, allCategories);
                     treeIds.forEach(id => allIds.add(id));

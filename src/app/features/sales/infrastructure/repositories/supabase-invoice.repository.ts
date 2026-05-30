@@ -2,10 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { InvoiceRepository } from '../../domain/repositories/invoice.repository';
 import { Invoice, InvoiceOrigin } from '../../domain/entities/invoice.entity';
+import { AuthService } from '@app/core/services/auth.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseInvoiceRepository extends InvoiceRepository {
   private supabase = inject(SUPABASE_CLIENT);
+  private authService = inject(AuthService);
+  private branchContextService = inject(BranchContextService);
 
   async getAll(params: {
     limit: number;
@@ -21,7 +25,9 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
     let query = this.supabase
       .from('invoices')
       .select(selectFields)
-      .eq('tenant_id', params.tenantId)
+      .eq('tenant_id', params.tenantId);
+
+    query = query
       .order('issued_at', { ascending: false })
       .range(params.offset, params.offset + params.limit - 1);
 

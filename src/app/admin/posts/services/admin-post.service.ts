@@ -49,6 +49,7 @@ export class AdminPostService {
             content: data.content,
             image: data.featured_image || undefined,
             published: data.status === 'published',
+            status: data.status,
             meta_title: data.seo_title || undefined,
             meta_description: data.seo_description || undefined
         };
@@ -93,6 +94,15 @@ export class AdminPostService {
     async deletePost(id: string): Promise<void> {
         const { error } = await this.supabase.from('blog_posts')
             .delete()
+            .eq('id', id)
+            .eq('tenant_id', this.tenantService.getTenantId());
+        if (error) throw error;
+        this.postsStore.clearCache();
+    }
+
+    async approvePost(id: string): Promise<void> {
+        const { error } = await this.supabase.from('blog_posts')
+            .update({ status: 'published' })
             .eq('id', id)
             .eq('tenant_id', this.tenantService.getTenantId());
         if (error) throw error;

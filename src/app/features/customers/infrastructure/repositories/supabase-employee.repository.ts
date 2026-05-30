@@ -18,28 +18,8 @@ export class SupabaseEmployeeRepository extends BaseRepository<UserProfile> {
     super(supabase, logger);
   }
 
-  createEmployee(item: any, tenantId: string): Observable<UserProfile> {
-    return from(
-      this.supabase.rpc('create_employee', {
-        p_first_name: item.first_name,
-        p_last_name: item.last_name,
-        p_email: item.email,
-        p_phone: item.phone,
-        p_role: item.role,
-        p_password: item.password,
-        p_avatar_url: item.avatar_url,
-        p_tenant_id: tenantId
-      })
-    ).pipe(
-      map(({ data, error }) => {
-        if (error) {
-          this.logger.error(`Error creating employee via RPC`, error);
-          throw new DatabaseError(error.message, error);
-        }
-        return data as unknown as UserProfile;
-      })
-    );
-  }
+  // El método createEmployee vía RPC fue eliminado. 
+  // Ahora se maneja a través de Edge Functions en employee.service.ts
 
   getEmployees(): Observable<UserProfile[]> {
     let query = this.supabase

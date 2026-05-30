@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, computed, effect, untracked } from '@angular/core';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
@@ -13,8 +13,8 @@ import { MetaValidationModalComponent } from './components/meta-validation-modal
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
-import { effect } from '@angular/core';
 import { BranchContextService } from '@app/core/services/branch-context.service';
+import { BranchService } from '@app/core/services/branch.service';
 
 @Component({
   selector: 'app-admin-products-page',
@@ -28,6 +28,12 @@ export class AdminProductsPage implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private branchContextService = inject(BranchContextService);
+  private branchService = inject(BranchService);
+
+  public isLibreriaZaona = computed(() => {
+    const branch = this.branchService.currentBranch();
+    return branch?.slug?.toLowerCase()?.includes('zaona') || branch?.name?.toLowerCase()?.includes('zaona');
+  });
   
   // Signals
   public products = signal<Product[]>([]);
@@ -47,7 +53,7 @@ export class AdminProductsPage implements OnInit {
   public itemsPerPage = signal<number>(20); // Merged client per_page, let's use 20 for admin
   public totalItems = signal<number>(0);
   
-  public loading = signal<boolean>(true);
+  public loading = signal<boolean>(false);
   public importing = signal<boolean>(false);
   public importProgress = signal<string>('');
   public error = signal<string | null>(null);
@@ -94,14 +100,15 @@ export class AdminProductsPage implements OnInit {
          queryParams: { q: query || null, _page: 1 },
          queryParamsHandling: 'merge'
        });
-    });
+     });
 
     // React to branch changes globally
     effect(() => {
       const branchId = this.branchContextService.currentBranchId();
-      // Only reload if we are not in the middle of a query param change 
-      // which already triggers loadData
-      this.loadData();
+      // Wrap in untracked to prevent infinite signal loops due to reading other signals inside loadData()
+      untracked(() => {
+        this.loadData();
+      });
     });
   }
 
@@ -133,6 +140,7 @@ export class AdminProductsPage implements OnInit {
   }
 
   async loadData() {
+    if (this.loading()) return;
     this.loading.set(true);
     try {
       // 1. Fetch metadata (brands/categories) only once or if empty

@@ -1,8 +1,17 @@
 <div class="bg-white py-24 sm:py-32">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl text-center">
+    <div class="mx-auto max-w-2xl text-center relative">
       <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Nuestro Blog</h2>
       <p class="mt-2 text-lg leading-8 text-gray-600">Noticias, consejos y novedades sobre tecnología.</p>
+      
+      @if (authService.getCurrentUser()) {
+        <div class="mt-6">
+          <a routerLink="/blog/create" class="btn btn-primary btn-sm rounded-full bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg">
+            <i class="fas fa-plus mr-2"></i> Crear Publicación
+          </a>
+          <p class="text-[10px] text-gray-400 mt-2">* Requiere aprobación del administrador</p>
+        </div>
+      }
     </div>
     <div class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
       @if (loading()) {

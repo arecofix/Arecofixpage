@@ -1,0 +1,70 @@
+<div class="bg-white py-24 sm:py-32 min-h-screen">
+    <div class="mx-auto max-w-3xl px-6 lg:px-8">
+        <div class="mb-8">
+            <a routerLink="/blog" class="text-blue-600 hover:underline flex items-center gap-2 font-medium">
+                <i class="fas fa-arrow-left"></i> Volver al Blog
+            </a>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
+            <div class="bg-gray-900 p-8 text-white text-center">
+                <h1 class="text-3xl font-black mb-2">Crear Publicación</h1>
+                <p class="text-gray-300 opacity-90">Escribe tu artículo o noticia. Nuestro equipo la revisará antes de publicarla oficialmente.</p>
+            </div>
+
+            <div class="p-8">
+                @if (success()) {
+                    <div class="text-center py-10">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Publicación Enviada!</h2>
+                        <p class="text-gray-600 mb-6">Tu publicación ha sido enviada para revisión. Te contactaremos cuando sea aprobada.</p>
+                        <a routerLink="/blog" class="btn btn-primary bg-emerald-500 hover:bg-emerald-600 border-none text-white">Volver al Blog</a>
+                    </div>
+                } @else {
+                    <form (ngSubmit)="submitPost()" class="space-y-6">
+                        <div class="form-control">
+                            <label class="label font-bold text-gray-700">Título de la Publicación *</label>
+                            <input type="text" [(ngModel)]="post.title" name="title" required class="input input-bordered w-full bg-gray-50" placeholder="Ej: Nueva técnica de microsoldadura">
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-bold text-gray-700">Contenido *</label>
+                            <textarea [(ngModel)]="post.content" name="content" required class="textarea textarea-bordered h-48 bg-gray-50" placeholder="Escribe aquí el contenido de tu publicación..."></textarea>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-bold text-gray-700">URL de Imagen Principal (Opcional)</label>
+                            <input type="text" [(ngModel)]="post.image" name="image" class="input input-bordered w-full bg-gray-50" placeholder="https://...">
+                        </div>
+                        
+                        <div class="form-control">
+                            <label class="label font-bold text-gray-700">Meta Título SEO (Opcional)</label>
+                            <input type="text" [(ngModel)]="post.meta_title" name="meta_title" class="input input-bordered w-full bg-gray-50" placeholder="Título para buscadores">
+                        </div>
+                        
+                        <div class="form-control">
+                            <label class="label font-bold text-gray-700">Meta Descripción SEO (Opcional)</label>
+                            <textarea [(ngModel)]="post.meta_description" name="meta_description" class="textarea textarea-bordered h-20 bg-gray-50" placeholder="Breve resumen para buscadores..."></textarea>
+                        </div>
+
+                        @if (error()) {
+                            <div class="alert alert-error text-white text-sm shadow-lg rounded-xl">
+                                <div><i class="fas fa-exclamation-triangle mr-2"></i> {{ error() }}</div>
+                            </div>
+                        }
+
+                        <button type="submit" [disabled]="isSubmitting()" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white w-full border-none h-14 rounded-xl font-bold text-lg">
+                            @if (isSubmitting()) {
+                                <span class="loading loading-spinner"></span>
+                            } @else {
+                                Enviar para Revisión
+                            }
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -77,11 +77,13 @@ export class AdminProductService {
         if (user) {
             const profile = await this.auth.getUserProfile(user.id);
             const contextBranchId = this.branchContextService.getBranchId();
+            const isGlobalAdmin = this.auth.isSuperAdmin() || profile?.role === ROLES.TENANT_OWNER;
+            const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
 
             // Si es súper administrador o el dueño central
-            if (this.auth.isSuperAdmin() || profile?.role === ROLES.TENANT_OWNER) {
-                // Si hay una sucursal seleccionada en el contexto, filtramos por ella
-                if (contextBranchId) {
+            if (isGlobalAdmin) {
+                // Si hay una sucursal seleccionada en el contexto y no es central, filtramos por ella
+                if (contextBranchId && !isCentralBranch) {
                     return firstValueFrom(this.productRepo.getAll(contextBranchId));
                 }
                 // Si no, vemos todo
@@ -95,11 +97,14 @@ export class AdminProductService {
 
     async getProductsPaginated(params: ProductsParams): Promise<ProductsResponse> {
         const contextBranchId = this.branchContextService.getBranchId();
+        const profile = this.auth.getCurrentProfile();
+        const isGlobalAdmin = this.auth.isSuperAdmin() || (profile?.role as string) === 'tenant_owner' || (profile?.role as string) === ROLES.TENANT_OWNER;
+        const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
 
         const enrichedParams = {
             ...params,
             include_inactive: params.include_inactive ?? true,
-            branch_id: params.branch_id || contextBranchId
+            branch_id: (isGlobalAdmin && isCentralBranch) ? undefined : (params.branch_id || contextBranchId)
         };
         return firstValueFrom(this.productsStore.getProductsPage(enrichedParams));
     }
@@ -144,7 +149,6 @@ export class AdminProductService {
         // Extract stock and branch_id
         const initialStock = payload.stock;
         let branchId = payload.branch_id || this.branchContextService.getBranchId();
-        delete payload.stock;
         delete payload.branch_id;
 
         if (user) {
@@ -189,7 +193,8 @@ export class AdminProductService {
         // Extract stock and branch_id
         const initialStock = payload.stock;
         const branchId = payload.branch_id || this.branchContextService.getBranchId();
-        delete payload.stock;
+        
+        // La columna branch_id fue eliminada, pero stock sigue existiendo en products
         delete payload.branch_id;
 
         await firstValueFrom(this.productRepo.update(id, payload));
