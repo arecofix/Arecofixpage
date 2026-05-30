@@ -36,8 +36,8 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
      * cache keys are unique per tenant. Otherwise, offline caches would cross-pollinate
      * on shared devices.
      */
-    protected applyTenantFilter<U>(query: any): any {
-        let enhancedQuery = query;
+    protected applyTenantFilter<Q extends { eq?: Function, is?: Function, or?: Function }>(query: Q): Q {
+        let enhancedQuery: any = query;
 
         if (!this.isGlobalTable) {
             const tenantId = this.tenantService.getTenantId();
@@ -72,16 +72,16 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     protected sanitizePayload(item: Partial<T>): Partial<T> {
         if (this.isGlobalTable) return { ...item };
         
-        let payload: any = { ...item };
+        let payload = { ...item } as Record<string, unknown>;
         const tenantId = this.tenantService.getTenantId();
         if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
-            payload.tenant_id = tenantId;
+            payload['tenant_id'] = tenantId;
         }
         
         if (this.useBranchIsolation && this.branchContextService) {
             const branchId = this.branchContextService.getBranchId();
             if (branchId) {
-                payload.branch_id = payload.branch_id || branchId;
+                payload['branch_id'] = payload['branch_id'] || branchId;
             }
         }
         
@@ -101,10 +101,10 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         const CHUNK = 1000;
 
         while (hasMore) {
-            let query = queryBuilder();
+            let query: any = queryBuilder();
             query = this.applyTenantFilter(query);
 
-            if (options?.column) {
+            if (options?.column && typeof query.order === 'function') {
                 query = query.order(options.column, { ascending: options.ascending ?? true });
             }
 

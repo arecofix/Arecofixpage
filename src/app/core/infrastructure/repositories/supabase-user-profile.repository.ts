@@ -32,8 +32,8 @@ export class SupabaseUserProfileRepository extends BaseRepository<UserProfile> i
       .select('id')
       .in('role', ['admin', 'tenant_owner', 'super_admin'])
       .eq('tenant_id', tenantId);
-    return from(query as any).pipe(
-      map(({ data, error }: any) => {
+    return from(query as PromiseLike<{ data: { id: string }[] | null, error: unknown }>).pipe(
+      map(({ data, error }) => {
         if (error) this.errorHandler.handleError(error, 'getAdminsByTenant');
         return data || [];
       })

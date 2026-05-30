@@ -37,11 +37,10 @@ export class BranchRepository extends BaseRepository<Branch> {
       .eq('is_active', true)
       .order('name');
     
-    return from(this.applyTenantFilter(query)).pipe(
-      map((res: any) => {
-        const { data, error } = res;
+    return from(this.applyTenantFilter(query) as PromiseLike<{ data: Branch[] | null, error: unknown }>).pipe(
+      map(({ data, error }) => {
         if (error) this.errorHandler.handleError(error, 'getActiveBranches');
-        return (data || []) as Branch[];
+        return data || [];
       })
     );
   }

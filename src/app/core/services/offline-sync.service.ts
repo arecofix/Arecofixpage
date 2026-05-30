@@ -53,8 +53,9 @@ export class OfflineSyncService {
         reject('Error opening IndexedDB');
       };
 
-      request.onsuccess = (event: any) => {
-        this.db = event.target.result;
+      request.onsuccess = (event: Event) => {
+        const target = event.target as IDBOpenDBRequest;
+        this.db = target.result;
         this.isReady = true;
         resolve();
         
@@ -64,8 +65,9 @@ export class OfflineSyncService {
         }
       };
 
-      request.onupgradeneeded = (event: any) => {
-        const db = event.target.result;
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        const target = event.target as IDBOpenDBRequest;
+        const db = target.result;
         
         if (!db.objectStoreNames.contains(this.cacheStoreName)) {
           db.createObjectStore(this.cacheStoreName, { keyPath: 'url' });

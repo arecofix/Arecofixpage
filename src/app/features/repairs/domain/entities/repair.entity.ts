@@ -91,6 +91,8 @@ export interface CreateRepairDto {
     customer_id?: string;
     customer_name?: string;
     customer_phone?: string;
+    customer_email?: string;
+    customer_dni?: string;
     device_type: string;
     device_brand: string;
     device_model: string;

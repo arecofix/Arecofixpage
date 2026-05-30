@@ -133,7 +133,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
       // Filter out items already in the cart
       const inCartIds = this.cartService.cartItems().map(i => i.product.id);
       const suggestions = (res.data || []).filter(p => !inCartIds.includes(p.id)).slice(0, 3);
-      this.recommendedProducts.set(suggestions as any);
+      this.recommendedProducts.set(suggestions as unknown as Product[]);
     });
   }
 
@@ -246,7 +246,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
         phone:   formVal.phone,
         subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
         message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : (method === 'credit_card' ? 'Mercado Pago' : 'Efectivo (Rapipago/PagoFácil)')}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
-      }).catch((e: any) => console.warn('Contact message error (non-fatal):', e));
+      }).catch((e: unknown) => console.warn('Contact message error (non-fatal):', e));
 
       if (method === 'cash') {
         const ticket = this.paymentService.buildPaymentTicket(
@@ -271,10 +271,11 @@ export class CheckoutPage implements OnInit, OnDestroy {
       // Start polling for payment confirmation (every 20s)
       this.paymentService.startPolling(created.id!, 20000);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Checkout error:', error);
+      const err = error as { message?: string };
       this.notificationService.showError(
-        `Error al procesar tu reserva: ${error?.message || 'Error desconocido'}`
+        `Error al procesar tu reserva: ${err?.message || 'Error desconocido'}`
       );
     } finally {
       this.isProcessing.set(false);
@@ -315,8 +316,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
       await this.paymentService.uploadPaymentProof(order.id, file);
       this.notificationService.showSuccess('Comprobante enviado. ¡Te avisamos cuando lo validemos!');
       this.step.set('awaiting_verification');
-    } catch (err: any) {
-      this.notificationService.showError(`No se pudo enviar el comprobante: ${err?.message}`);
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string };
+      this.notificationService.showError(`No se pudo enviar el comprobante: ${errorObj?.message || 'Error desconocido'}`);
     }
   }
 

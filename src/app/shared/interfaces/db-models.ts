@@ -10,6 +10,16 @@ export interface DbOrderItem {
     created_at: string;
 }
 
+export interface DbAddress {
+    street: string;
+    number: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    additional_info?: string;
+}
+
 export interface DbOrder {
     id: string;
     created_at: string;
@@ -18,7 +28,7 @@ export interface DbOrder {
     customer_name: string;
     customer_email: string;
     customer_phone: string | null;
-    customer_address: any | null;
+    customer_address: DbAddress | null;
     customer_id: string | null;
     status: 'pending' | 'processing' | 'completed' | 'cancelled';
     subtotal: number;
