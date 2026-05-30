@@ -24,6 +24,11 @@ export const routes: Routes = [
         loadComponent: () => import('@app/shared/components/upgrade-required/upgrade-required.component').then(m => m.UpgradeRequiredComponent)
     },
     {
+        title: 'Pago Requerido',
+        path: 'payment-required',
+        loadComponent: () => import('@app/public/payment-required/payment-required.component').then(m => m.PaymentRequiredComponent)
+    },
+    {
         title: 'Página no encontrada | Arecofix',
         path: '**',
         loadComponent: () => import('@app/public/not-found/not-found.component').then(m => m.NotFoundComponent)

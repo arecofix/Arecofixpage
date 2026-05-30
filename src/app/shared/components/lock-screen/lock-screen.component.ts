@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { InactivityService } from '@app/core/services/inactivity.service';
@@ -14,6 +14,7 @@ export class LockScreenComponent implements OnInit {
   private inactivityService = inject(InactivityService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   public isLocked$ = this.inactivityService.isLocked$;
   public userEmail = '';
@@ -42,6 +43,7 @@ export class LockScreenComponent implements OnInit {
     
     this.loading = true;
     this.error = '';
+    this.cdr.detectChanges();
     
     try {
       const password = this.unlockForm.value.password!;
@@ -49,6 +51,7 @@ export class LockScreenComponent implements OnInit {
       if (!this.userEmail) {
          this.error = 'No se encontró un usuario activo para verificar.';
          this.loading = false;
+         this.cdr.detectChanges();
          return;
       }
 
@@ -63,6 +66,21 @@ export class LockScreenComponent implements OnInit {
       this.error = 'Error de conexión. Intente nuevamente.';
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async signInWithGoogle() {
+    this.loading = true;
+    this.error = '';
+    this.cdr.detectChanges();
+    try {
+      await this.authService.signInWithGoogle();
+    } catch (e) {
+      this.error = 'Error al conectar con Google.';
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 

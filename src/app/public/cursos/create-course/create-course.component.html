@@ -1,0 +1,88 @@
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <div class="mb-8">
+            <a routerLink="/academy" class="text-blue-600 hover:underline flex items-center gap-2 font-medium">
+                <i class="fas fa-arrow-left"></i> Volver a Academia
+            </a>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-white/10">
+            <div class="bg-blue-600 p-8 text-white text-center">
+                <h1 class="text-3xl font-black mb-2">Proponer Curso</h1>
+                <p class="text-blue-100 opacity-90">Completa la información básica de la capacitación que quieres ofrecer. Nuestro equipo la revisará antes de publicarla.</p>
+            </div>
+
+            <div class="p-8">
+                @if (success()) {
+                    <div class="text-center py-10">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">¡Propuesta Enviada!</h2>
+                        <p class="text-slate-600 dark:text-slate-400 mb-6">El curso ha sido enviado para revisión. Te contactaremos cuando sea aprobado.</p>
+                        <a routerLink="/academy" class="btn btn-primary bg-emerald-500 hover:bg-emerald-600 border-none text-white">Volver a la Academia</a>
+                    </div>
+                } @else {
+                    <form (ngSubmit)="submitCourse()" class="space-y-6">
+                        <div class="form-control">
+                            <label class="label font-bold text-slate-700 dark:text-slate-300">Título del Curso *</label>
+                            <input type="text" [(ngModel)]="course.title" name="title" required class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700" placeholder="Ej: Reparación de Computadoras">
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-bold text-slate-700 dark:text-slate-300">Descripción *</label>
+                            <textarea [(ngModel)]="course.description" name="description" required class="textarea textarea-bordered h-32 bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700" placeholder="¿Qué aprenderá el alumno en este curso?"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-control">
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Nivel</label>
+                                <select [(ngModel)]="course.level" name="level" class="select select-bordered w-full bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700">
+                                    <option value="Básico">Básico</option>
+                                    <option value="Intermedio">Intermedio</option>
+                                    <option value="Avanzado">Avanzado</option>
+                                    <option value="Todos los niveles">Todos los niveles</option>
+                                </select>
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Precio Estimado (ARS) *</label>
+                                <input type="number" [(ngModel)]="course.price" name="price" required class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-control">
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Duración (Opcional)</label>
+                                <input type="text" [(ngModel)]="course.duration" name="duration" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700" placeholder="Ej: 3 Meses">
+                            </div>
+                            <div class="form-control">
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Días y Horarios (Opcional)</label>
+                                <input type="text" [(ngModel)]="course.schedule" name="schedule" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700" placeholder="Ej: Sábados 10hs">
+                            </div>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-bold text-slate-700 dark:text-slate-300">URL de Imagen (Opcional)</label>
+                            <input type="text" [(ngModel)]="course.image_url" name="image_url" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:text-white dark:border-slate-700" placeholder="https://...">
+                        </div>
+
+                        @if (error()) {
+                            <div class="alert alert-error text-white text-sm shadow-lg rounded-xl">
+                                <div><i class="fas fa-exclamation-triangle mr-2"></i> {{ error() }}</div>
+                            </div>
+                        }
+
+                        <button type="submit" [disabled]="isSubmitting()" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white w-full border-none h-14 rounded-xl font-bold text-lg">
+                            @if (isSubmitting()) {
+                                <span class="loading loading-spinner"></span>
+                            } @else {
+                                Enviar Propuesta
+                            }
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

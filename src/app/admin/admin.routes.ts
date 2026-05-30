@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/guards/auth.guard';
 import { moduleGuard } from '@app/guards/module.guard';
+import { tenantOwnerGuard } from '@app/guards/tenant-owner.guard';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const adminRoutes: Routes = [
@@ -14,8 +15,11 @@ export const adminRoutes: Routes = [
       provideCharts(withDefaultRegisterables()),
     ],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
+      // Employees and Suppliers are now unified in /admin/users
+      { path: 'employees', redirectTo: 'users', pathMatch: 'full' },
+      { path: 'suppliers', redirectTo: 'users', pathMatch: 'full' },
       {
         title: 'Dashboard',
         path: 'dashboard',
@@ -53,6 +57,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'branches',
+        canActivate: [tenantOwnerGuard],
         loadChildren: () => import('@app/admin/branches/admin-branches.routes').then(m => m.ADMIN_BRANCHES_ROUTES)
       },
       {
@@ -102,6 +107,10 @@ export const adminRoutes: Routes = [
       {
         path: 'posts',
         loadChildren: () => import('@app/admin/posts/admin-posts.routes').then(m => m.ADMIN_POSTS_ROUTES)
+      },
+      {
+        path: 'finance',
+        loadChildren: () => import('@app/admin/finance/admin-finance.routes').then(m => m.ADMIN_FINANCE_ROUTES)
       }
     ]
   }

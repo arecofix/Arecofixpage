@@ -55,10 +55,9 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
     if (authService.isSuperAdmin() || 
         (userEmail && TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(userEmail)) || 
         role === ROLES.SUPER_ADMIN || 
-        role === ROLES.ADMIN || 
         role === ROLES.TENANT_OWNER) {
       hasAccess = true;
-    } else if (role === (ROLES.STAFF as string) && branchSlug) {
+    } else if ([ROLES.ADMIN as string, ROLES.STAFF as string, ROLES.TECHNICIAN as string].includes(role) && branchSlug) {
       const userBranchId = userProfile.branch_id;
       if (userBranchId) {
         const branch = await branchService.getBranchBySlug(branchSlug);

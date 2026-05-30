@@ -128,11 +128,24 @@ export class AuthService {
       if (session) {
         const profile = await this.ensureProfile(session);
         
-        if (profile?.branch_id) {
-          await this.fetchBranchDetails(profile.branch_id);
+        if (profile?.tenant_id) {
+          await this.tenantService.setCurrentTenant(profile.tenant_id);
         }
 
-        this.authState.next({ session, user: session.user, profile, isInitialized: true });
+        if (profile?.branch_id) {
+          await this.fetchBranchDetails(profile.branch_id);
+        } else {
+          const savedId = localStorage.getItem('arecofix_admin_branch_id');
+          if (savedId) {
+             await this.fetchBranchDetails(savedId);
+          }
+        }
+
+        if (profile) {
+           this.authState.next({ session, user: session.user, profile, isInitialized: true });
+        } else {
+           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
+        }
 
         if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
           this.isSuperAdmin.set(true);
@@ -159,13 +172,28 @@ export class AuthService {
         if (session) {
           const profile = await this.ensureProfile(session);
           
-          if (profile?.branch_id) {
-            await this.fetchBranchDetails(profile.branch_id);
-          } else {
-            this.currentBranchSubject.next(null);
+          if (profile?.tenant_id) {
+            await this.tenantService.setCurrentTenant(profile.tenant_id);
           }
 
-          this.authState.next({ session, user: session.user, profile, isInitialized: true });
+          if (profile?.branch_id) {
+            await this.fetchBranchDetails(profile.branch_id);
+          } else if (profile !== null) {
+            this.currentBranchSubject.next(null);
+          } else {
+            // Error fetching profile (e.g. 401 or offline), try to preserve existing branch
+            const savedId = localStorage.getItem('arecofix_admin_branch_id');
+            if (savedId) {
+               await this.fetchBranchDetails(savedId);
+            }
+          }
+
+          if (profile) {
+            this.authState.next({ session, user: session.user, profile, isInitialized: true });
+          } else {
+            // Keep existing profile if we failed to fetch
+            this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
+          }
 
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
             this.isSuperAdmin.set(true);
@@ -194,7 +222,10 @@ export class AuthService {
       this.currentBranchSubject.next(data as Branch | null);
     } catch (err) {
       this.logger.error('Error fetching assigned branch details', err);
-      this.currentBranchSubject.next(null);
+      // Prevent resetting to Sede Central if we hit a temporary error like 401 or offline
+      if (!this.currentBranchSubject.value) {
+         this.currentBranchSubject.next(null);
+      }
     }
   }
 
@@ -280,6 +311,15 @@ export class AuthService {
   }
 
   async signOut(): Promise<string | null> {
+    const { isTauri } = await import('@tauri-apps/api/core');
+    const runningInTauri = isTauri();
+    
+    if (runningInTauri) {
+      this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
+      this.isSuperAdmin.set(false);
+      this.currentBranchSubject.next(null);
+    }
+    
     const { error } = await this.supabase.auth.signOut();
     return error ? error.message : null;
   }
@@ -352,6 +392,73 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string): Promise<AuthResponse> {
+    const { isTauri } = await import('@tauri-apps/api/core');
+    const runningInTauri = isTauri();
+    
+    if (runningInTauri) {
+      try {
+        // Offline Login via Flask Sidecar
+        const response = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: email, password: password })
+        });
+
+        if (!response.ok) {
+          throw new Error('Invalid offline credentials');
+        }
+
+        const data = await response.json();
+        
+        // Mock Supabase Session based on Offline Token
+        const mockUser: User = {
+          id: data.admin.id,
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+          email: email
+        };
+
+        const mockSession: Session = {
+          access_token: data.token,
+          refresh_token: '',
+          expires_in: 3600,
+          expires_at: Math.floor(Date.now() / 1000) + 3600,
+          token_type: 'bearer',
+          user: mockUser
+        };
+
+        // Update local auth state to reflect offline login
+        const role = data.admin.role || 'super_admin';
+        this.authState.next({
+          session: mockSession,
+          user: mockUser,
+          profile: { 
+              id: data.admin.id, 
+              role: role, 
+              email: email,
+              branch_id: data.admin.branch_id
+          } as any,
+          isInitialized: true
+        });
+        
+        const isSuper = role === 'super_admin' || TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(email);
+        this.isSuperAdmin.set(isSuper);
+        
+        if (data.admin.branch_id) {
+           await this.fetchBranchDetails(data.admin.branch_id);
+        } else {
+           this.currentBranchSubject.next(null);
+        }
+
+        return { data: { user: mockUser, session: mockSession }, error: null };
+
+      } catch (error: any) {
+        return { data: { user: null, session: null }, error: error };
+      }
+    }
+
     return this.supabase.auth.signInWithPassword({ email, password });
   }
 

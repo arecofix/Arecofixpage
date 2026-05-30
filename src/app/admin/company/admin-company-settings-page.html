@@ -178,6 +178,7 @@
     </div>
 
     <!-- SUCURSALES (Branches) MANAGEMENT -->
+    @if (canManageBranches()) {
     <div class="card bg-base-100 shadow-lg mt-8">
         <div class="card-body p-6">
             <h2 class="text-xl font-bold mb-4">Gestión de Sucursales</h2>
@@ -276,6 +277,7 @@
 
         </div>
     </div>
+    }
 </div>
 
 <!-- Modal Editar Sucursal -->

@@ -40,14 +40,14 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start gap-8 border-b border-gray-100 dark:border-gray-700 print:border-gray-300 pb-8 relative z-10">
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest border border-indigo-100 dark:border-indigo-800 mb-4 print:border-black print:text-black print:bg-transparent">
-                            <i class="fas fa-receipt"></i> FACTURA {{ invoice().type || 'B' }}
+                            <i class="fas fa-receipt"></i> FACTURA {{ invoice()?.type || 'B' }}
                         </div>
                         <h1 class="text-4xl font-black text-gray-900 dark:text-white print:text-black tracking-tighter mb-1">Comprobante</h1>
-                        <p class="font-mono text-xl text-gray-500 dark:text-gray-400 tracking-wider">#{{ invoice().invoice_number || 'BORRADOR' }}</p>
+                        <p class="font-mono text-xl text-gray-500 dark:text-gray-400 tracking-wider">#{{ invoice()?.invoice_number || 'BORRADOR' }}</p>
                     </div>
                     <div class="text-left sm:text-right">
                         @if (company()?.logo_url) {
-                            <img [src]="company().logo_url" alt="Logo" class="h-16 mb-4 sm:ml-auto object-contain">
+                            <img [src]="company()?.logo_url" alt="Logo" class="h-16 mb-4 sm:ml-auto object-contain">
                         } @else {
                             <div class="w-16 h-16 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl mb-4 sm:ml-auto shadow-lg flex items-center justify-center text-white text-2xl font-black shadow-blue-500/30 print:border-2 print:border-black print:text-black print:shadow-none print:bg-none">A</div>
                         }
@@ -55,8 +55,8 @@
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 print:text-gray-600">{{ company()?.location || 'Servicios Integrales' }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 print:text-gray-600 mt-2">{{ company()?.address }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 print:text-gray-600 font-mono">{{ company()?.phone }}</p>
-                        @if (company()?.ruc) {
-                            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 print:text-gray-600 mt-1">CUIT: {{ company()?.ruc }}</p>
+                        @if (company()?.tax_id) {
+                            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 print:text-gray-600 mt-1">CUIT: {{ company()?.tax_id }}</p>
                         }
                     </div>
                 </div>
@@ -65,19 +65,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 relative z-10">
                     <div class="bg-gray-50 dark:bg-gray-900/50 print:bg-transparent p-6 rounded-3xl border border-gray-100 dark:border-gray-800 print:border-none print:p-0">
                         <h3 class="text-[10px] font-black tracking-widest text-gray-400 dark:text-gray-500 uppercase mb-4">Facturar A:</h3>
-                        <p class="font-bold text-lg text-gray-900 dark:text-white print:text-black mb-1">{{ invoice().customer_name || 'Consumidor Final' }}</p>
-                        @if(invoice().customer_address) {
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 print:text-gray-600 flex items-center gap-2"><i class="fas fa-map-marker-alt opacity-50"></i> {{ invoice().customer_address }}</p>
+                        <p class="font-bold text-lg text-gray-900 dark:text-white print:text-black mb-1">{{ invoice()?.customer_name || 'Consumidor Final' }}</p>
+                        @if(invoice()?.customer_address) {
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 print:text-gray-600 flex items-center gap-2"><i class="fas fa-map-marker-alt opacity-50"></i> {{ invoice()?.customer_address }}</p>
                         }
-                        @if(invoice().customer_dni_cuit) {
-                            <p class="text-sm font-mono text-gray-500 dark:text-gray-400 print:text-gray-600 flex items-center gap-2 mt-1"><i class="fas fa-id-card opacity-50"></i> DNI/CUIT: {{ invoice().customer_dni_cuit }}</p>
+                        @if($any(invoice())?.customer_dni_cuit) {
+                            <p class="text-sm font-mono text-gray-500 dark:text-gray-400 print:text-gray-600 flex items-center gap-2 mt-1"><i class="fas fa-id-card opacity-50"></i> DNI/CUIT: {{ $any(invoice())?.customer_dni_cuit }}</p>
                         }
                     </div>
                     
                     <div class="flex flex-col justify-center sm:items-end gap-4 p-6 sm:p-0">
                         <div class="text-left sm:text-right">
                             <h3 class="text-[10px] font-black tracking-widest text-gray-400 dark:text-gray-500 uppercase mb-1">Fecha de Emisión</h3>
-                            <p class="font-bold text-gray-900 dark:text-white print:text-black">{{ invoice().issued_at | date:'longDate' }}</p>
+                            <p class="font-bold text-gray-900 dark:text-white print:text-black">{{ invoice()?.issued_at | date:'longDate' }}</p>
                         </div>
                         <div class="text-left sm:text-right">
                             <h3 class="text-[10px] font-black tracking-widest text-gray-400 dark:text-gray-500 uppercase mb-1">Condición de Venta</h3>
@@ -98,10 +98,10 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 dark:divide-gray-800 print:divide-gray-200">
-                            @for (item of items(); track item.id) {
+                            @for (item of items(); track $index) {
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 print:hover:bg-transparent transition-colors">
                                 <td class="py-4 px-6 font-bold text-gray-800 dark:text-gray-200 print:text-black">
-                                    {{ item.products?.name || 'Producto / Servicio Base' }}
+                                    {{ item.description || 'Producto / Servicio Base' }}
                                 </td>
                                 <td class="py-4 px-6 text-center font-mono font-medium">
                                     {{ item.quantity }}
@@ -128,7 +128,7 @@
                     <div class="bg-gray-50 dark:bg-gray-900 print:bg-transparent p-6 rounded-3xl sm:min-w-[300px] border border-gray-100 dark:border-gray-800 print:border-2 print:border-gray-300">
                          <div class="flex justify-between items-center mb-2 text-gray-500 dark:text-gray-400 text-sm font-medium">
                              <span>Subtotal</span>
-                             <span class="font-mono">{{ invoice().total_amount | currency:'ARS':'symbol':'1.0-0' }}</span>
+                             <span class="font-mono">{{ invoice()?.total_amount | currency:'ARS':'symbol':'1.0-0' }}</span>
                          </div>
                          <div class="flex justify-between items-center mb-4 text-gray-500 dark:text-gray-400 text-sm font-medium">
                              <span>Impuestos (0%)</span>
@@ -138,7 +138,7 @@
                          <div class="flex justify-between items-end">
                              <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">TOTAL</span>
                              <span class="text-3xl font-black text-indigo-600 dark:text-indigo-400 print:text-black tracking-tighter">
-                                 {{ invoice().total_amount | currency:'ARS':'symbol':'1.0-0' }}
+                                 {{ invoice()?.total_amount | currency:'ARS':'symbol':'1.0-0' }}
                              </span>
                          </div>
                     </div>

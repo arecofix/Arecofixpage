@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
 import { Repair } from '@app/features/repairs/domain/entities/repair.entity';
+import { Product } from '@app/features/products/domain/entities/product.entity';
 
 @Injectable({
     providedIn: 'root'
@@ -23,10 +24,11 @@ export class TrackingService {
         const supabase = this.auth.getSupabaseClient();
         
         let { data, error } = await supabase.rpc('get_recommended_accessories', { p_tracking_code: code });
+        let products = (data || []) as Product[];
 
         // If it doesn't return enough products (less than 3), fallback to query manually
-        if (!error && data) {
-            if ((data as any[]).length < 3 && brand && brand.toLowerCase() !== 'generic') {
+        if (!error && products) {
+            if (products.length < 3 && brand && brand.toLowerCase() !== 'generic') {
                 const { data: fallback } = await supabase
                     .from('products')
                     .select('*')
@@ -36,16 +38,16 @@ export class TrackingService {
                 
                 if (fallback && fallback.length > 0) {
                     // merge unique
-                    const existingIds = new Set((data as any[]).map(d => d.id));
+                    const existingIds = new Set(products.map(d => d.id));
                     fallback.forEach(f => {
                         if (!existingIds.has(f.id) && f.stock > 0) {
-                            (data as any[]).push(f);
+                            products.push(f as Product);
                         }
                     });
                 }
             }
             // Still less than 3? Load random active stock
-            if ((data as any[]).length < 3) {
+            if (products.length < 3) {
                  const { data: randoms } = await supabase
                     .from('products')
                     .select('*')
@@ -54,17 +56,17 @@ export class TrackingService {
                     .limit(4);
                  
                  if (randoms) {
-                    const existingIds = new Set((data as any[]).map(d => d.id));
+                    const existingIds = new Set(products.map(d => d.id));
                     randoms.forEach(f => {
                         if (!existingIds.has(f.id)) {
-                            (data as any[]).push(f);
+                            products.push(f as Product);
                         }
                     });
                  }
             }
         }
         
-        return { data, error };
+        return { data: products, error };
     }
 
     async addAccessoryUpsell(code: string, productId: string) {

@@ -55,11 +55,17 @@ export class ProductsStore {
 
     if (cached && (now - cached.timestamp < this.LIST_TTL)) {
       console.log(`[ProductsStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
+      this.loading.set(false);
       return of({
-        pages: cached.totalPages || 1,
-        items: cached.totalItems || cached.data.length,
+        pages: cached.totalPages ?? 1,
+        items: cached.totalItems !== undefined ? cached.totalItems : (cached.data?.length || 0),
         data: cached.data
       } as unknown as ProductsResponse);
+    }
+
+    if (this.loading()) {
+      console.warn('[ProductsStore] ⚠️ Petición ignorada: Ya hay una carga en curso.');
+      return of({ pages: 1, items: 0, data: [] } as unknown as ProductsResponse);
     }
 
     console.log(`[ProductsStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
@@ -96,6 +102,7 @@ export class ProductsStore {
 
     if (cached && (now - cached.timestamp < this.DETAIL_TTL)) {
       console.log(`[ProductsStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
+      this.loading.set(false);
       return of(cached.data);
     }
 

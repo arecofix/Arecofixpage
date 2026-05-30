@@ -49,6 +49,7 @@ export interface Tenant {
     instagram?: string;
     twitter?: string;
   };
+  subscription_status?: 'active' | 'moroso' | 'cancelado' | 'suspendido';
 }
 
 @Injectable({

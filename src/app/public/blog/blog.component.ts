@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { PostService } from '@app/features/posts/application/post.service';
 import { Post } from '@app/features/posts/domain/entities/post.entity';
 import { SeoService } from '@app/core/services/seo.service';
-
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
   selector: 'app-blog',
@@ -15,6 +15,7 @@ import { SeoService } from '@app/core/services/seo.service';
 export class BlogComponent {
   private postService = inject(PostService);
   private seoService = inject(SeoService);
+  public authService = inject(AuthService);
 
   posts = signal<Post[]>([]);
   loading = signal(true);
@@ -27,8 +28,9 @@ export class BlogComponent {
       imageUrl: 'assets/img/branding/og-blog.jpg'
     });
     try {
-      const posts = await this.postService.getRecentPosts(100);
-      this.posts.set(posts);
+      const allPosts = await this.postService.getRecentPosts(100);
+      const publicPosts = allPosts.filter(p => p.published || p.status === 'published');
+      this.posts.set(publicPosts);
     } catch (err) {
       this.error.set('Error al cargar los artículos.');
     } finally {

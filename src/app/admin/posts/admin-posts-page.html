@@ -12,25 +12,48 @@
         </a>
     </div>
 
+    <!-- Tabs for UGC (Pendientes vs Activos) -->
+    <div class="flex gap-4 mb-2 border-b border-gray-200">
+      <button (click)="activeTab.set('activos')" 
+              class="px-4 py-2 font-bold transition-colors border-b-2"
+              [class.text-indigo-600]="activeTab() === 'activos'"
+              [class.border-indigo-600]="activeTab() === 'activos'"
+              [class.text-gray-500]="activeTab() !== 'activos'"
+              [class.border-transparent]="activeTab() !== 'activos'">
+        Publicados ({{ activePostsCount() }})
+      </button>
+      <button (click)="activeTab.set('pendientes')" 
+              class="px-4 py-2 font-bold transition-colors border-b-2 flex items-center gap-2"
+              [class.text-indigo-600]="activeTab() === 'pendientes'"
+              [class.border-indigo-600]="activeTab() === 'pendientes'"
+              [class.text-gray-500]="activeTab() !== 'pendientes'"
+              [class.border-transparent]="activeTab() !== 'pendientes'">
+        Pendientes de Aprobación
+        @if (pendingPostsCount() > 0) {
+          <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{{ pendingPostsCount() }}</span>
+        }
+      </button>
+    </div>
+
     <!-- Content -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        @if (loading) {
+        @if (loading()) {
         <div class="flex flex-col items-center justify-center p-12">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
             <p class="text-gray-500">Cargando entradas...</p>
         </div>
-        } @else if (error) {
+        } @else if (error()) {
         <div class="flex flex-col items-center justify-center p-12 text-center">
             <div class="bg-red-50 p-4 rounded-full mb-4">
                 <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Error al cargar</h3>
-            <p class="text-gray-500 mb-4">{{ error }}</p>
+            <p class="text-gray-500 mb-4">{{ error() }}</p>
             <button (click)="loadPosts()" class="text-indigo-600 hover:text-indigo-700 font-medium">
                 Intentar nuevamente
             </button>
         </div>
-        } @else if (posts.length === 0) {
+        } @else if (filteredPosts().length === 0) {
         <div class="flex flex-col items-center justify-center p-16 text-center">
             <div class="bg-gray-50 p-6 rounded-full mb-6">
                 <i class="fas fa-newspaper text-gray-400 text-3xl"></i>
@@ -63,7 +86,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @for (post of posts; track post.id) {
+                    @for (post of filteredPosts(); track post.id) {
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
@@ -94,13 +117,19 @@
                             {{ post.created_at | date:'mediumDate' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex justify-end gap-3">
+                            <div class="flex justify-end items-center gap-3">
+                                @if (post.status === 'draft' || post.status === 'pending') {
+                                    <button (click)="approvePost(post.id!)"
+                                        class="btn btn-sm btn-circle bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border-none tooltip" data-tip="Aprobar">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
                                 <a [routerLink]="[post.id]"
                                     class="text-indigo-600 hover:text-indigo-900 transition-colors" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button (click)="deletePost(post.id)"
-                                    class="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
+                                <button (click)="deletePost(post.id!)"
+                                    class="text-red-600 hover:text-red-900 transition-colors" [title]="(post.status === 'draft' || post.status === 'pending') ? 'Rechazar' : 'Eliminar'">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

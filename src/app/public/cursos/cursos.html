@@ -1,5 +1,5 @@
 <!-- Hero Section: Premium Academy Brand -->
-<section class="relative bg-[#0f172a] text-white py-16 lg:py-32 overflow-hidden border-b border-white/5">
+<section class="relative bg-[#0f172a] text-white py-16 lg:py-32 overflow-hidden border-b border-white/5 min-h-[80vh] flex items-center">
     <!-- Animated Background Elements -->
     <div class="absolute inset-0 z-0">
         <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.15)_0%,transparent_50%)]"></div>
@@ -7,39 +7,94 @@
         <div class="absolute bottom-0 left-10 w-72 h-72 bg-emerald-500/5 rounded-full blur-[80px]"></div>
     </div>
 
-    <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8 animate-fade-in">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                </span>
-                Arecofix Academy • Capacitación Profesional
+    <!-- Background Gradients Slider -->
+    @for (slide of featuredSlides(); track slide.title; let i = $index) {
+        <div class="absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out"
+             [class.opacity-100]="currentSlide() === i"
+             [class.opacity-0]="currentSlide() !== i"
+             [class.pointer-events-none]="currentSlide() !== i">
+            
+            <div class="absolute inset-0 bg-linear-to-br opacity-80" [ngClass]="slide.theme"></div>
+            <!-- Decorative overlay -->
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNykiLz48L3N2Zz4=')] opacity-50"></div>
+            <div class="absolute inset-0 bg-linear-to-t from-[#0f172a] via-transparent to-transparent"></div>
+        </div>
+    }
+
+    <div class="container mx-auto px-4 relative z-10 w-full">
+        <div class="relative overflow-hidden w-full max-w-6xl mx-auto">
+            <!-- Slider Track -->
+            <div class="flex transition-transform duration-700 ease-in-out"
+                 [style.transform]="'translateX(-' + (currentSlide() * 100) + '%)'">
+                
+                @for (slide of featuredSlides(); track slide.title; let i = $index) {
+                    <div class="w-full shrink-0 flex items-center justify-center">
+                        <div class="max-w-4xl mx-auto text-center px-4">
+                            @if (slide.highlight) {
+                                <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-bold tracking-widest uppercase mb-6 animate-fade-in shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                                    <i class="fas fa-star"></i>
+                                    Curso Destacado
+                                </div>
+                            } @else {
+                                <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-6 animate-fade-in">
+                                    Arecofix Academy
+                                </div>
+                            }
+                            
+                            <h2 class="text-xl md:text-3xl text-emerald-400 font-bold mb-2 tracking-wide uppercase">{{ slide.subtitle }}</h2>
+                            <h1 class="text-4xl md:text-7xl font-black mb-6 tracking-tight leading-[1.1] text-transparent bg-clip-text bg-linear-to-r from-white via-slate-200 to-slate-400 drop-shadow-lg">
+                                {{ slide.title }}
+                            </h1>
+                            
+                            <p class="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+                                {{ slide.description }}
+                            </p>
+                            
+                            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                                @if (slide.isInstitutional) {
+                                    <a href="{{slide.link}}" 
+                                       class="w-full sm:w-auto btn bg-blue-600 hover:bg-blue-500 border-none text-white btn-lg rounded-2xl px-10 shadow-2xl shadow-blue-500/30 transition-all hover:-translate-y-1">
+                                        Ver Capacitaciones
+                                    </a>
+                                } @else {
+                                    <a [routerLink]="slide.link" 
+                                       class="w-full sm:w-auto btn bg-blue-600 hover:bg-blue-500 border-none text-white btn-lg rounded-2xl px-10 shadow-2xl shadow-blue-500/30 transition-all hover:-translate-y-1">
+                                        Ver Detalles del Curso
+                                    </a>
+                                }
+                                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20info%20sobre%20' + (slide.isInstitutional ? 'Arecofix Academy' : 'el curso de ' + slide.title)" 
+                                   target="_blank"
+                                   class="w-full sm:w-auto btn btn-ghost btn-lg text-slate-200 hover:text-white hover:bg-white/10 rounded-2xl px-8 border border-white/20 backdrop-blur-sm">
+                                    <i class="fa-brands fa-whatsapp mr-2 text-xl text-green-400"></i> Consultar Inscripción
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
-            
-            <h1 class="text-4xl md:text-7xl font-black mb-8 tracking-tight leading-[1.1]">
-                Aprendé un Oficio que <br class="hidden md:block" />
-                <span class="text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-indigo-400 to-emerald-400">
-                    Construye tu Futuro
-                </span>
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                Formate como técnico profesional con clases 100% prácticas. 
-                Programas diseñados para que salgas al mercado con herramientas reales y certificación oficial.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a routerLink="." fragment="cursos-list" 
-                   class="w-full sm:w-auto btn bg-blue-600 hover:bg-blue-500 border-none text-white btn-lg rounded-2xl px-10 shadow-2xl shadow-blue-500/20 transition-all hover:-translate-y-1">
-                    Ver Capacitaciones
-                </a>
-                <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20info%20sobre%20cursos'" 
-                   target="_blank"
-                   class="w-full sm:w-auto btn btn-ghost btn-lg text-slate-300 hover:text-white hover:bg-white/5 rounded-2xl px-8 border border-white/10">
-                    <i class="fa-brands fa-whatsapp mr-2 text-xl"></i> Consultar WhatsApp
-                </a>
-            </div>
+
+            <!-- Slider Controls -->
+            <button (click)="prevSlide()" class="absolute left-0 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost bg-black/20 hover:bg-black/50 text-white backdrop-blur-sm border border-white/10 hidden md:flex items-center justify-center">
+                <i class="fas fa-chevron-left text-xl"></i>
+            </button>
+            <button (click)="nextSlide()" class="absolute right-0 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost bg-black/20 hover:bg-black/50 text-white backdrop-blur-sm border border-white/10 hidden md:flex items-center justify-center">
+                <i class="fas fa-chevron-right text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Slider Indicators -->
+        <div class="flex justify-center gap-3 mt-12">
+            @for (slide of featuredSlides(); track slide.title; let i = $index) {
+                <button (click)="setSlide(i)" 
+                        class="h-2 rounded-full transition-all duration-300"
+                        [class.w-8]="currentSlide() === i"
+                        [class.bg-blue-500]="currentSlide() === i"
+                        [class.w-2]="currentSlide() !== i"
+                        [class.bg-white/30]="currentSlide() !== i"
+                        [class.hover:bg-white/50]="currentSlide() !== i"
+                        aria-label="Go to slide">
+                </button>
+            }
         </div>
     </div>
 </section>
@@ -66,12 +121,21 @@
 <!-- Featured Courses Section -->
 <section id="cursos-list" class="py-24 bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
     <div class="container mx-auto px-4">
-        <div class="flex flex-col items-center text-center mb-20">
+        <div class="flex flex-col items-center text-center mb-20 relative">
             <h2 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">Capacitaciones Disponibles</h2>
             <div class="w-20 h-1.5 bg-blue-600 rounded-full mb-6"></div>
             <p class="text-slate-600 dark:text-slate-400 max-w-2xl text-lg">
                 Elegí el camino que transformará tu realidad económica. Cursos intensivos con cupos limitados.
             </p>
+            
+            @if (authService.getCurrentUser()) {
+                <div class="mt-6">
+                    <a routerLink="/academy/create" class="btn btn-primary btn-sm rounded-full bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg">
+                        <i class="fas fa-plus mr-2"></i> Proponer Curso
+                    </a>
+                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-2">* Requiere aprobación del administrador</p>
+                </div>
+            }
         </div>
 
         @if (isLoadingCourses()) {
@@ -80,87 +144,113 @@
                 <p class="text-slate-500 font-medium animate-pulse">Cargando academia...</p>
             </div>
         } @else {
-            <!-- Fix: Responsive Grid - grid-cols-1 on Mobile -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                @for (course of courses(); track course.id) {
-                    <div class="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-white/5 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                        
-                        <!-- Premium Course Header (Image + Badges) -->
-                        <div class="relative h-64 overflow-hidden">
-                            <div class="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/20 to-transparent z-10"></div>
-                            
-                            <!-- Main Image with Ken Burns Effect on Hover -->
-                            <img [src]="course.image_url" [alt]="course.title" 
-                                 class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
-                            
-                            <!-- Badges -->
-                            <div class="absolute top-6 left-6 z-20 flex flex-wrap gap-2">
-                                <span class="bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg">
-                                    {{ course.level }}
-                                </span>
-                                <span class="bg-black/40 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-white/20">
-                                    <i class="fas fa-users mr-1"></i> {{ course.students }}+ Alumnos
-                                </span>
-                            </div>
-
-                            <!-- Floating Price Tag -->
-                            <div class="absolute bottom-6 right-6 z-20">
-                                <div class="bg-emerald-500 text-white font-black px-4 py-2 rounded-2xl shadow-xl transform group-hover:scale-110 transition-transform">
-                                    <span class="text-[10px] block font-bold opacity-80 uppercase leading-none mb-1">Desde</span>
-                                    <span class="text-xl leading-none">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Course Body -->
-                        <div class="p-8 flex flex-col grow">
-                            <div class="mb-4 flex items-center gap-2 text-blue-500 dark:text-blue-400 text-xs font-bold uppercase tracking-widest">
-                                <i class="fas fa-microchip"></i>
-                                <span>Tecnología & Oficios</span>
-                            </div>
-                            
-                            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
-                                {{ course.title }}
-                            </h3>
-                            
-                            <p class="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed line-clamp-3">
-                                {{ course.description }}
-                            </p>
-
-                            <!-- Course Specs Grid -->
-                            <div class="grid grid-cols-2 gap-3 mb-8">
-                                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
-                                    <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Duración</span>
-                                    <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                                        <i class="fas fa-clock text-blue-500"></i> {{ course.duration }}
-                                    </span>
-                                </div>
-                                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
-                                    <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Modalidad</span>
-                                    <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 leading-tight">
-                                        <i class="fas fa-calendar text-emerald-500"></i> {{ course.schedule }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- CTA Section -->
-                            <div class="mt-auto flex flex-col gap-3">
-                                <a [routerLink]="['/academy', course.slug]" 
-                                   class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none text-white rounded-2xl h-14 font-black tracking-wide shadow-lg shadow-blue-500/20">
-                                    Ver Programa Completo
-                                </a>
-                                <button (click)="openRegistration(course)" 
-                                        class="btn btn-ghost text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl h-14 font-bold">
-                                    Inscribirme Ahora
-                                </button>
-                            </div>
-                        </div>
+            <!-- Featured Courses -->
+            @if (featuredCoursesList().length > 0) {
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-8">
+                        <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">Cursos Destacados</h3>
                     </div>
-                }
-            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10">
+                        @for (course of featuredCoursesList(); track course.id) {
+                            <ng-container *ngTemplateOutlet="courseCard; context: {$implicit: course}"></ng-container>
+                        }
+                    </div>
+                </div>
+                
+                <div class="w-full h-px bg-slate-200 dark:bg-slate-800 my-16"></div>
+            }
+
+            <!-- Regular Courses -->
+            @if (regularCoursesList().length > 0) {
+                <div class="mb-8">
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-8">Todos los Cursos</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                        @for (course of regularCoursesList(); track course.id) {
+                            <ng-container *ngTemplateOutlet="courseCard; context: {$implicit: course}"></ng-container>
+                        }
+                    </div>
+                </div>
+            }
         }
     </div>
 </section>
+
+<!-- Course Card Template -->
+<ng-template #courseCard let-course>
+    <div class="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-white/5 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+        <!-- Premium Course Header (Image + Badges) -->
+        <div class="relative h-64 overflow-hidden">
+            <div class="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/20 to-transparent z-10"></div>
+            
+            <!-- Main Image with Ken Burns Effect on Hover -->
+            <img [src]="course.image_url" [alt]="course.title" 
+                 class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+            
+            <!-- Badges -->
+            <div class="absolute top-6 left-6 z-20 flex flex-wrap gap-2">
+                <span class="bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg">
+                    {{ course.level }}
+                </span>
+                <span class="bg-black/40 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-white/20">
+                    <i class="fas fa-users mr-1"></i> {{ course.students }}+ Alumnos
+                </span>
+            </div>
+
+            <!-- Floating Price Tag -->
+            <div class="absolute bottom-6 right-6 z-20">
+                <div class="bg-emerald-500 text-white font-black px-4 py-2 rounded-2xl shadow-xl transform group-hover:scale-110 transition-transform">
+                    <span class="text-[10px] block font-bold opacity-80 uppercase leading-none mb-1">Desde</span>
+                    <span class="text-xl leading-none">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Body -->
+        <div class="p-8 flex flex-col grow">
+            <div class="mb-4 flex items-center gap-2 text-blue-500 dark:text-blue-400 text-xs font-bold uppercase tracking-widest">
+                <i class="fas fa-microchip"></i>
+                <span>Tecnología & Oficios</span>
+            </div>
+            
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+                {{ course.title }}
+            </h3>
+            
+            <p class="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed line-clamp-3">
+                {{ course.description }}
+            </p>
+
+            <!-- Course Specs Grid -->
+            <div class="grid grid-cols-2 gap-3 mb-8">
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                    <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Duración</span>
+                    <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                        <i class="fas fa-clock text-blue-500"></i> {{ course.duration }}
+                    </span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                    <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Modalidad</span>
+                    <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 leading-tight">
+                        <i class="fas fa-calendar text-emerald-500"></i> {{ course.schedule }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="mt-auto flex flex-col gap-3">
+                <a [routerLink]="['/academy', course.slug]" 
+                   class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none text-white rounded-2xl h-14 font-black tracking-wide shadow-lg shadow-blue-500/20">
+                    Ver Programa Completo
+                </a>
+                <button (click)="openRegistration(course)" 
+                        class="btn btn-ghost text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl h-14 font-bold">
+                    Inscribirme Ahora
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
 
 <!-- Tools & Supplies Integration (Professional Kits) -->
 <section class="py-24 bg-white dark:bg-[#0f172a] border-t border-slate-100 dark:border-white/5">

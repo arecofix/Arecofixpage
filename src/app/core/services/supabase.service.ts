@@ -2,12 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '@env/environment';
 import { LoggerService } from './logger.service';
+import { OfflineSyncService } from './offline-sync.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SupabaseService {
   private logger = inject(LoggerService);
+  private syncService = inject(OfflineSyncService);
   private client: SupabaseClient;
 
   private cacheMap = new Map<string, { data: string; headers: [string, string][]; status: number; statusText: string; expiresAt: number }>();
@@ -18,8 +20,10 @@ export class SupabaseService {
       const urlStr = typeof url === 'string' ? url : (url as URL).toString();
       const method = (options?.method || 'GET').toUpperCase();
       const isCacheable = method === 'GET' && urlStr.includes('/rest/v1/');
-      const CACHE_TTL = 60000; // 1 minute cache in memory to prevent redundant queries
-
+      const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && urlStr.includes('/rest/v1/') && !urlStr.includes('/rpc/');
+      
+      // Fast in-memory cache check for GET requests
+      const CACHE_TTL = 60000;
       if (isCacheable) {
         const cached = this.cacheMap.get(urlStr);
         if (cached && cached.expiresAt > Date.now()) {
@@ -32,17 +36,54 @@ export class SupabaseService {
         }
       }
 
+      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
+      if (isOffline) {
+        if (isCacheable) {
+           const cachedDB = await this.syncService.getCachedRequest(urlStr);
+           if (cachedDB) {
+             this.logger.info(`[OfflineSync] Serving from IndexedDB cache: ${urlStr}`);
+             return new Response(cachedDB.data, {
+               status: cachedDB.status,
+               statusText: cachedDB.statusText,
+               headers: new Headers(cachedDB.headers)
+             });
+           }
+           throw new Error('No internet connection and no offline cache available');
+        } else if (isMutation) {
+           this.logger.info(`[OfflineSync] Offline detected. Queueing mutation: ${method} ${urlStr}`);
+           const headersArray: [string, string][] = [];
+           if (options?.headers) {
+             new Headers(options.headers).forEach((val, key) => headersArray.push([key, val]));
+           }
+           
+           await this.syncService.enqueueMutation(urlStr, method, headersArray, typeof options?.body === 'string' ? options.body : null);
+           
+           // Mock successful response based on payload to keep UI functioning
+           let mockResponseData: any[] = [];
+           if (options?.body && typeof options.body === 'string') {
+              try {
+                const parsed = JSON.parse(options.body);
+                mockResponseData = Array.isArray(parsed) ? parsed : [parsed];
+              } catch (e) {}
+           }
+           
+           return new Response(JSON.stringify(mockResponseData), {
+             status: method === 'POST' ? 201 : 200,
+             statusText: 'OK (Offline Mock)',
+             headers: new Headers([['Content-Type', 'application/json']])
+           });
+        } else {
+           throw new Error('No internet connection');
+        }
+      }
+
       const MAX_RETRIES = 3;
       const RETRY_DELAY = 1500;
       let lastError: any;
 
-      for (let i = 0; i < MAX_RETRIES; i++) {
+       for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-          // Si estamos offline, no intentamos
-          if (typeof navigator !== 'undefined' && !navigator.onLine && i === 0) {
-            throw new Error('No internet connection');
-          }
-          
           const response = await fetch(url, options);
           if (!response.ok && response.status >= 500) {
               throw new Error(`Server Error: ${response.status}`);
@@ -63,6 +104,15 @@ export class SupabaseService {
               statusText: clonedResponse.statusText,
               expiresAt: Date.now() + CACHE_TTL
             });
+            
+            // Persist to IndexedDB for offline support
+            await this.syncService.cacheGetRequest(urlStr, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
+          }
+
+          if (isMutation && response.ok) {
+            this.logger.info(`[SupabaseCache] Mutation detected: ${method} ${urlStr}. Clearing cache.`);
+            this.cacheMap.clear();
+            await this.syncService.clearCache();
           }
 
           return response;
@@ -77,6 +127,21 @@ export class SupabaseService {
       }
       
       // Error Boundary fallback
+      // Try to read from IndexedDB as absolute fallback
+      if (isCacheable) {
+         try {
+           const cachedDB = await this.syncService.getCachedRequest(urlStr);
+           if (cachedDB) {
+             this.logger.warn(`[OfflineSync] Fallback to IndexedDB after fetch failure: ${urlStr}`);
+             return new Response(cachedDB.data, {
+               status: cachedDB.status,
+               statusText: cachedDB.statusText,
+               headers: new Headers(cachedDB.headers)
+             });
+           }
+         } catch (e) {}
+      }
+      
       this.logger.error('Supabase fetch critically failed after retries', lastError);
       throw lastError;
     };

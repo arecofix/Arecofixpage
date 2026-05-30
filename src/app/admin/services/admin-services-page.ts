@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AppCatalogService } from '@app/features/products/application/services/app-catalog.service';
+import { AppServiceEntity } from '@app/features/products/domain/entities/app-service.entity';
 
 @Component({
   selector: 'app-admin-services-page',
@@ -11,7 +12,7 @@ import { AppCatalogService } from '@app/features/products/application/services/a
 })
 export class AdminServicesPage implements OnInit {
   private catalogService = inject(AppCatalogService);
-  services = signal<any[]>([]);
+  services = signal<AppServiceEntity[]>([]);
   loading = signal(true);
 
   async ngOnInit() {
@@ -23,8 +24,8 @@ export class AdminServicesPage implements OnInit {
     try {
       const data = await this.catalogService.getAll();
       this.services.set(data);
-    } catch (e: any) {
-      console.error('Error loading services', e);
+    } catch (e: unknown) {
+      if (e instanceof Error) console.error('Error loading services', e.message);
     } finally {
       this.loading.set(false);
     }
@@ -36,7 +37,7 @@ export class AdminServicesPage implements OnInit {
     try {
       await this.catalogService.delete(id);
       await this.loadServices();
-    } catch (e: any) {
+    } catch (e: unknown) {
       alert('Error al eliminar el servicio');
     }
   }

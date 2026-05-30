@@ -44,15 +44,36 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.document.body.classList.add('hide-floating-widgets');
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
     
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((state) => {
+      .subscribe(async (state) => {
         if (state.user) {
-          const target = this.sanitizeReturnUrl(this.returnUrl);
+          let target = this.sanitizeReturnUrl(this.returnUrl);
+          
+          if (state.profile?.branch_id) {
+            try {
+              const { firstValueFrom, of } = await import('rxjs');
+              const { filter, take, timeout, catchError } = await import('rxjs/operators');
+              const branch = await firstValueFrom(
+                this.authService.currentBranch$.pipe(
+                  filter(b => b?.id === state.profile?.branch_id),
+                  take(1),
+                  timeout(2000),
+                  catchError(() => of(null))
+                )
+              );
+              if (branch?.slug) {
+                if (target === '/admin' || target.startsWith('/admin/')) {
+                  target = `/${branch.slug}${target}`;
+                }
+              }
+            } catch (e) {}
+          }
+          
           const currentUrl = this.router.url.split('?')[0];
           if (target !== currentUrl) {
             this.router.navigate([target]);
@@ -97,7 +118,42 @@ export class LoginComponent implements OnInit, OnDestroy {
       }
       
       this.success = '¡Bienvenido! Redirigiendo...';
-      const target = this.sanitizeReturnUrl(this.returnUrl);
+      
+      const { isTauri } = await import('@tauri-apps/api/core');
+      const runningInTauri = isTauri();
+      const isAdmin = this.authService.isSuperAdmin();
+
+      let target = this.sanitizeReturnUrl(this.returnUrl);
+      
+      const profile = this.authService.getCurrentProfile();
+      if (profile?.branch_id) {
+        try {
+          const { firstValueFrom, of } = await import('rxjs');
+          const { filter, take, timeout, catchError } = await import('rxjs/operators');
+          const branch = await firstValueFrom(
+            this.authService.currentBranch$.pipe(
+              filter(b => b?.id === profile.branch_id),
+              take(1),
+              timeout(2000),
+              catchError(() => of(null))
+            )
+          );
+          if (branch?.slug) {
+             if (target === '/admin' || target.startsWith('/admin/')) {
+                target = `/${branch.slug}${target}`;
+             } else if (runningInTauri && target === '/') {
+                target = `/${branch.slug}/admin`;
+             }
+          }
+        } catch (e) {}
+      } else if (runningInTauri) {
+        if (isAdmin) {
+          target = '/admin';
+        } else {
+          target = '/';
+        }
+      }
+
       setTimeout(() => {
         this.router.navigate([target]);
       }, 1500);

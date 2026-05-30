@@ -4,6 +4,8 @@ import { UserProfile } from '@app/features/authentication/domain/entities/user.e
 import { LoggerService } from '@app/core/services/logger.service';
 import { Observable, from, map, switchMap } from 'rxjs';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { AuthService } from '@app/core/services/auth.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +13,28 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   protected override tableName = 'profiles'; // Point directly to profiles table
 
+  private authService = inject(AuthService);
+  private branchContextService = inject(BranchContextService);
+
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
     super(supabase, logger);
+  }
+
+  private applyBranchFilter(query: any): any {
+    const profile = this.authService.getCurrentProfile();
+    const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
+    const contextBranchId = this.branchContextService.getBranchId();
+    const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
+
+    if (!(isGlobalAdmin && isCentralBranch)) {
+      const branchId = contextBranchId || profile?.branch_id;
+      if (branchId) {
+        return query.eq('branch_id', branchId);
+      }
+    }
+    return query;
   }
 
   createClient(item: any): Observable<UserProfile> {
@@ -38,6 +58,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
     if (!email && !phone) return from(Promise.resolve(null));
     
     let query = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'));
+    query = this.applyBranchFilter(query);
     query = query.or('role.eq.user,is_guest.eq.true');
     
     if (email && phone) {
@@ -60,6 +81,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .or('role.eq.user,is_guest.eq.true');
 
     dbQuery = this.applyTenantFilter(dbQuery);
+    dbQuery = this.applyBranchFilter(dbQuery);
 
     if (query && query.trim()) {
       const q = query.trim();
@@ -80,7 +102,9 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .select('*')
       .or('role.eq.user,is_guest.eq.true');
 
-    dbQuery = this.applyTenantFilter(dbQuery)
+    dbQuery = this.applyTenantFilter(dbQuery);
+    dbQuery = this.applyBranchFilter(dbQuery);
+    dbQuery = dbQuery
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -99,6 +123,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .or('role.eq.user,is_guest.eq.true');
 
     dbQuery = this.applyTenantFilter(dbQuery);
+    dbQuery = this.applyBranchFilter(dbQuery);
 
     return from(dbQuery as any).pipe(
       map(({ data, error }: any) => {
@@ -127,6 +152,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .or('role.eq.user,is_guest.eq.true');
 
     dbQuery = this.applyTenantFilter(dbQuery);
+    dbQuery = this.applyBranchFilter(dbQuery);
 
     return from(dbQuery as any).pipe(
       map(({ data, error }: any) => {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { Params } from '@angular/router';
 
 import { OrderService } from '@app/features/orders/application/services/order.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
@@ -58,7 +59,7 @@ export class AdminSalesPage implements OnInit {
 
     // Pagination Signals
     currentPage = signal(1);
-    itemsPerPage = signal(12);
+    itemsPerPage = signal(24);
 
     // Computed: Filtered Products
     filteredProducts = computed(() => {
@@ -121,7 +122,7 @@ export class AdminSalesPage implements OnInit {
     }
 
     async ngOnInit() {
-        this.route.queryParams.subscribe((params: any) => {
+        this.route.queryParams.subscribe((params: Params) => {
             const page = params['_page'] ? parseInt(params['_page'], 10) : 1;
             this.currentPage.set(page || 1);
         });
@@ -131,11 +132,11 @@ export class AdminSalesPage implements OnInit {
         this.loading.set(true);
         const branch_id = this.branchContextService.getBranchId() || undefined;
 
-        // Use any to bypass strict ProductsParams check if interface hasn't updated in memory
+        // Properly typing the query without any
         this.productRepository.findWithFilters({ 
             branch_id, 
             is_paginated: false 
-        } as any).subscribe({
+        }).subscribe({
             next: (res: any) => {
                 this.products.set(res.data || []);
                 this.loading.set(false);
@@ -171,8 +172,8 @@ export class AdminSalesPage implements OnInit {
         this.customerName.set('');
     }
 
-    updateDiscount(value: any) {
-        const num = parseFloat(value);
+    updateDiscount(value: number | string) {
+        const num = typeof value === 'string' ? parseFloat(value) : value;
         this.discount.set(isNaN(num) ? 0 : num);
     }
 
@@ -268,9 +269,10 @@ export class AdminSalesPage implements OnInit {
             this.clearCart();
             this.router.navigate(['/admin/sales/invoices']);
 
-        } catch (e: any) {
+        } catch (e: unknown) {
             this.logger.error('Checkout error', e);
-            this.notificationService.showError('Error al procesar la venta: ' + e.message);
+            const errorMessage = e instanceof Error ? e.message : 'Error desconocido';
+            this.notificationService.showError('Error al procesar la venta: ' + errorMessage);
         } finally {
             this.processing.set(false);
         }

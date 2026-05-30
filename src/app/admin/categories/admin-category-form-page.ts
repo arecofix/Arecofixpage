@@ -2,6 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CategoryService } from '@app/public/categories/services/category.service';
+import { AuthService } from '@app/core/services/auth.service';
+import { TenantService } from '@app/core/services/tenant.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -14,6 +16,8 @@ export class AdminCategoryFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private categoryService = inject(CategoryService);
+    private authService = inject(AuthService);
+    private tenantService = inject(TenantService);
 
     id: string | null = null;
     categories = signal<any[]>([]);

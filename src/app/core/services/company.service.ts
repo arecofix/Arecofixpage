@@ -5,6 +5,8 @@ import { TenantService } from './tenant.service';
 import { TenantRepository } from '../repositories/tenant.repository';
 import { BranchService } from './branch.service';
 import { BranchRepository } from '../repositories/branch.repository';
+import { Branch } from '@app/shared/interfaces/branch.interface';
+import { Tenant } from '../types/strict-types';
 
 export interface CompanySettings {
   id: string;
@@ -52,25 +54,26 @@ export class CompanyService {
             address: data.location || '',
             email: data.contact_email || '',
             phone: data.contact_phone || '',
-            logo_url: data.branding_settings?.logo_url || ''
+            logo_url: (data.branding_settings as any)?.logo_url || ''
         } as CompanySettings;
 
         // Si tenemos un contexto de sucursal, sobreescribimos con los datos específicos
         if (branchId) {
-            const branch = await firstValueFrom(this.branchRepo.getById(branchId));
+            const branch = await firstValueFrom(this.branchRepo.getById(branchId)) as Branch;
             if (branch) {
                 settings = {
                     ...settings,
-                    name: (branch as any).official_name || branch.name,
-                    location: branch.address || settings.location,
-                    address: branch.address || settings.address,
-                    contact_email: (branch as any).contact_email || settings.contact_email,
-                    email: (branch as any).contact_email || settings.email,
-                    contact_phone: (branch as any).contact_phone || settings.contact_phone,
-                    phone: (branch as any).contact_phone || settings.phone,
-                    tax_id: (branch as any).tax_id || settings.tax_id,
-                    branding_settings: (branch as any).branding_settings || settings.branding_settings,
-                    logo_url: (branch as any).branding_settings?.logo_url || settings.logo_url
+                    name: branch.official_name || branch.name,
+                    owner_name: (branch.branding_settings as any)?.owner_name || '',
+                    location: branch.address || '',
+                    address: branch.address || '',
+                    contact_email: branch.contact_email || '',
+                    email: branch.contact_email || '',
+                    contact_phone: branch.contact_phone || '',
+                    phone: branch.contact_phone || '',
+                    tax_id: branch.tax_id || '',
+                    branding_settings: branch.branding_settings as any || settings.branding_settings,
+                    logo_url: (branch.branding_settings as any)?.logo_url || ''
                 };
             }
         }
@@ -79,31 +82,34 @@ export class CompanyService {
     return data as CompanySettings | null;
   }
 
-  async updateSettings(tenantId: string, updateData: Partial<CompanySettings>, branchId?: string): Promise<any> {
+  async updateSettings(tenantId: string, updateData: Partial<CompanySettings>, branchId?: string): Promise<unknown> {
     if (branchId) {
         // Actualizamos la sucursal específica
-        const branchPayload = {
+        const branchPayload: Partial<Branch> = {
             official_name: updateData.name,
             address: updateData.location,
             contact_email: updateData.contact_email,
             contact_phone: updateData.contact_phone,
             tax_id: updateData.tax_id,
-            branding_settings: updateData.branding_settings
+            branding_settings: {
+                ...(updateData.branding_settings as any || {}),
+                owner_name: updateData.owner_name
+            }
         };
-        const updatedBranch = await firstValueFrom(this.branchRepo.update(branchId, branchPayload as any));
+        const updatedBranch = await firstValueFrom(this.branchRepo.update(branchId, branchPayload as any)); // Repo might need any if Partial doesn't match perfectly, but let's try to remove it
         
         // Sincronizar el estado del branchService si es la sucursal actual
         const currentBranch = this.branchService.currentBranch();
         if (currentBranch && currentBranch.id === branchId) {
             const freshBranch = await firstValueFrom(this.branchRepo.getById(branchId));
             if (freshBranch) {
-                this.branchService.setCurrentBranch(freshBranch as any);
+                this.branchService.setCurrentBranch(freshBranch as Branch);
             }
         }
         return updatedBranch;
     }
 
-    const updatedRows = await firstValueFrom(this.tenantRepo.update(tenantId, updateData as any));
+    const updatedRows = await firstValueFrom(this.tenantRepo.update(tenantId, updateData as Partial<Tenant>));
     
     // Update the TenantService state so other components reflect the change
     const updatedTenant = await firstValueFrom(this.tenantRepo.getById(tenantId));

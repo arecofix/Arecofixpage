@@ -10,7 +10,8 @@ export interface TenantDbRecord {
   contact_email?: string;
   contact_phone?: string;
   location?: string;
-  branding_settings?: any;
+  branding_settings?: Record<string, unknown>;
+  subscription_status?: 'active' | 'moroso' | 'cancelado' | 'suspendido';
 }
 
 @Injectable({

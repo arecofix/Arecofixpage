@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SupplierService } from '@app/features/customers/application/services/supplier.service';
+import { CreateSupplierDto, UpdateSupplierDto } from '@app/features/customers/domain/entities/supplier.entity';
 
 @Component({
     selector: 'app-admin-supplier-form-page',
@@ -60,7 +61,7 @@ export class AdminSupplierFormPage implements OnInit {
         this.saving.set(true);
         this.error.set(null);
         
-        const payload: any = {
+        const payload: CreateSupplierDto | UpdateSupplierDto = {
             name: this.form().name,
             type: this.form().type,
             rubro: this.form().rubro,
@@ -75,11 +76,11 @@ export class AdminSupplierFormPage implements OnInit {
             if (this.id) {
                 await this.supplierService.update(this.id, payload);
             } else {
-                await this.supplierService.create(payload);
+                await this.supplierService.create(payload as any);
             }
             this.router.navigate(['/admin/suppliers']);
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.saving.set(false);
         }

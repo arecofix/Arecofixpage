@@ -75,9 +75,9 @@ export class InvoiceService {
       this.logger.info(`[InvoiceService] Invoice generated: ${result.data?.id} (origin: ${dto.origin})`);
       return { data: result.data, error: null, duplicate: false };
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.logger.error('[InvoiceService] generateInvoice failed', err);
-      return { data: null, error: err, duplicate: false };
+      return { data: null, error: err instanceof Error ? err : new Error(String(err)), duplicate: false };
     }
   }
 
@@ -115,12 +115,12 @@ export class InvoiceService {
   /**
    * UC-04: Get Invoice With Details
    */
-  async getInvoiceWithDetails(id: string): Promise<{ invoice: Invoice | null, items: any[] }> {
+  async getInvoiceWithDetails(id: string): Promise<{ invoice: Invoice | null, items: InvoiceItem[] }> {
     const invoice = await this.getById(id);
     if (!invoice) return { invoice: null, items: [] };
 
     const tenantId = this.tenantService.getTenantId();
-    let items: any[] = [];
+    let items: InvoiceItem[] = [];
 
     try {
         const referenceId = invoice.order_id ?? invoice.repair_id;
@@ -130,7 +130,7 @@ export class InvoiceService {
                 referenceId,
                 tenantId,
                 embeddedItems: invoice.items,
-            });
+            }) as InvoiceItem[];
         } else {
             items = invoice.items ?? [];
         }

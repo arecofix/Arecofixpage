@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CompanyService } from '@app/core/services/company.service';
+import { CompanyService, CompanySettings } from '@app/core/services/company.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
+import { Invoice, InvoiceItem } from '@app/features/sales/domain/entities/invoice.entity';
 
 @Component({
     selector: 'app-admin-invoice-detail-page',
@@ -15,9 +16,9 @@ export class AdminInvoiceDetailPage implements OnInit {
     private companyService = inject(CompanyService);
     private invoiceService = inject(InvoiceService);
 
-    invoice = signal<any>(null);
-    items = signal<any[]>([]);
-    company = signal<any>(null);
+    invoice = signal<Invoice | null>(null);
+    items = signal<InvoiceItem[]>([]);
+    company = signal<CompanySettings | null>(null);
     loading = signal(true);
 
     error = signal('');
@@ -41,9 +42,10 @@ export class AdminInvoiceDetailPage implements OnInit {
                     this.error.set('Factura no encontrada');
                 }
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('Error loading invoice:', e);
-            this.error.set(e.message || 'Error al cargar la factura');
+            const errorMessage = e instanceof Error ? e.message : 'Error al cargar la factura';
+            this.error.set(errorMessage);
         } finally {
             this.loading.set(false);
         }

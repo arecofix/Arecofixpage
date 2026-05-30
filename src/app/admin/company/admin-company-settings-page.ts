@@ -1,10 +1,12 @@
-import { Component, inject, OnInit, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectorRef, computed } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CompanyService } from '@app/core/services/company.service';
 import { BranchService } from '@app/core/services/branch.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { Branch } from '@app/shared/interfaces/branch.interface';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
     selector: 'app-admin-company-settings-page',
@@ -18,6 +20,12 @@ export class AdminCompanySettingsPage implements OnInit {
     private branchService = inject(BranchService);
     private route = inject(ActivatedRoute);
     private cdr = inject(ChangeDetectorRef);
+    private authService = inject(AuthService);
+
+    canManageBranches = computed(() => {
+        const profile = this.authService.getCurrentProfile();
+        return this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
+    });
 
     form = signal({
         id: '',
@@ -42,10 +50,10 @@ export class AdminCompanySettingsPage implements OnInit {
     success = signal<string | null>(null);
 
     // Branches Setup
-    branches = signal<any[]>([]);
+    branches = signal<Branch[]>([]);
     newBranch = signal({ name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true });
-    editingBranch = signal<any | null>(null);
-    tempBranch = { name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true, id: '' };
+    editingBranch = signal<Branch | null>(null);
+    tempBranch: Partial<Branch> = { name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true, id: '' };
     savingBranch = signal(false);
 
     async ngOnInit() {
@@ -78,17 +86,18 @@ export class AdminCompanySettingsPage implements OnInit {
             }
             
             const branchData = await this.branchService.getAllAdminBranches();
-            this.branches.set(branchData || []);
-        } catch (e: any) {
-            this.error.set(e.message);
+            this.branches.set(branchData as Branch[] || []);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.loading.set(false);
             this.cdr.markForCheck();
         }
     }
 
-    async onFileChange(event: any) {
-        const file: File = event.target.files?.[0];
+    async onFileChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file: File | undefined = input.files?.[0];
         if (!file) return;
         
         // Let's keep this out for now or define a FileUploadService.
@@ -127,14 +136,14 @@ export class AdminCompanySettingsPage implements OnInit {
         try {
             const branchId = this.branchService.getCurrentBranchId();
             const updatedRows = await this.companyService.updateSettings(tenantId, updateData, branchId || undefined);
-            if (!updatedRows || updatedRows.length === 0) {
+            if (!updatedRows || (Array.isArray(updatedRows) && updatedRows.length === 0)) {
                 this.error.set("No se guardaron los cambios. Permisos denegados.");
             } else {
                 this.success.set('Configuración guardada correctamente');
                 await this.loadSettings(); 
             }
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.saving.set(false);
             this.cdr.markForCheck();
@@ -160,15 +169,15 @@ export class AdminCompanySettingsPage implements OnInit {
             this.success.set('Sucursal agregada con éxito');
             this.newBranch.set({ name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true });
             await this.loadSettings();
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.savingBranch.set(false);
             this.cdr.markForCheck();
         }
     }
 
-    openEditBranchModal(branch: any) {
+    openEditBranchModal(branch: Branch) {
         this.tempBranch = { ...branch };
         this.editingBranch.set(branch);
         this.cdr.markForCheck();
@@ -182,12 +191,12 @@ export class AdminCompanySettingsPage implements OnInit {
         this.cdr.markForCheck();
 
         try {
-            await this.branchService.updateBranch(branch);
+            await this.branchService.updateBranch(branch as Branch);
             this.success.set('Sucursal actualizada');
             this.editingBranch.set(null);
             await this.loadSettings();
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.savingBranch.set(false);
             this.cdr.markForCheck();
@@ -201,19 +210,19 @@ export class AdminCompanySettingsPage implements OnInit {
             await this.branchService.deleteBranch(id);
             this.success.set('Sucursal eliminada');
             await this.loadSettings();
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.cdr.markForCheck();
         }
     }
 
-    async toggleBranchStatus(branch: any) {
+    async toggleBranchStatus(branch: Branch) {
         try {
             await this.branchService.toggleBranchStatus(branch);
             await this.loadSettings();
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.cdr.markForCheck();
         }

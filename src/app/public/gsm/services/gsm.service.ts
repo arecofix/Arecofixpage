@@ -36,7 +36,7 @@ export class GsmService {
   private http = inject(HttpClient);
 
   getUsdtRate(): Observable<number> {
-    return this.http.get<any>('https://dolarapi.com/v1/dolares/cripto').pipe(
+    return this.http.get<{ compra?: number }>('https://dolarapi.com/v1/dolares/cripto').pipe(
       map(res => res.compra || 1240),
       catchError(() => of(1240))
     );

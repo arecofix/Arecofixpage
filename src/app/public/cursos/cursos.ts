@@ -12,6 +12,7 @@ import { ProductService } from '@app/public/products/services';
 import { PaginationService, iPagination } from '@app/shared/components/pagination';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '@app/core/services/tenant.service';
+import { AuthService } from '@app/core/services/auth.service';
 
 // Components
 import { ProductCard } from '@app/public/products/components';
@@ -41,6 +42,7 @@ export class CursosComponent implements OnInit {
     private tenantService = inject(TenantService);
     private destroyRef = inject(DestroyRef);
     public paginationService = inject(PaginationService);
+    public authService = inject(AuthService);
     private tenant$ = toObservable(this.tenantService.currentTenant);
 
     whatsappNumber = environment.contact.whatsappNumber;
@@ -61,6 +63,38 @@ export class CursosComponent implements OnInit {
     isRegistering = signal(false);
     registrationSuccess = signal(false);
     registrationError = signal<string | null>(null);
+
+    // Hero Slider State (Pure CSS styling)
+    currentSlide = signal(0);
+    featuredSlides = signal([
+        {
+            title: 'Aprendé un Oficio que Construye tu Futuro',
+            subtitle: 'Arecofix Academy • Capacitación Profesional',
+            description: 'Formate como técnico profesional con clases 100% prácticas. Programas diseñados para que salgas al mercado con herramientas reales y certificación oficial.',
+            highlight: false,
+            isInstitutional: true,
+            link: '#cursos-list',
+            theme: 'from-slate-900 via-slate-800 to-[#0f172a]'
+        },
+        {
+            title: 'Curso de Reparación de Celulares',
+            subtitle: 'El curso estrella de Arecofix Academy',
+            description: 'Dominá el hardware y software de smartphones. Diagnóstico, cambio de módulos, baterías, pines de carga y solución de fallas comunes con certificación oficial.',
+            highlight: true,
+            isInstitutional: false,
+            link: '/academy/reparacion-celulares-basico',
+            theme: 'from-blue-900 via-slate-900 to-[#0f172a]'
+        },
+        {
+            title: 'Microelectrónica Aplicada',
+            subtitle: 'Especialización Avanzada',
+            description: 'Lectura de esquemáticos, soldadura microscópica, reballing y reparación de placas base (iPhone/Android).',
+            highlight: false,
+            isInstitutional: false,
+            link: '/academy/curso-avanzado-microelectronica',
+            theme: 'from-emerald-900 via-slate-900 to-[#0f172a]'
+        }
+    ]);
 
     // Static Content
     benefits = signal([
@@ -138,7 +172,29 @@ export class CursosComponent implements OnInit {
                     this.loadCourses();
                 }
             });
+
+        // Auto-play slider
+        const intervalId = setInterval(() => {
+            this.nextSlide();
+        }, 5000);
+
+        this.destroyRef.onDestroy(() => {
+            clearInterval(intervalId);
+        });
     }
+
+    // Split courses for UI
+    featuredCoursesList = computed(() => {
+        // Here we define which courses are "Destacados" by their slug or ID.
+        // E.g. 'reparacion-celulares-basico' and 'curso-avanzado-microelectronica'
+        const featuredSlugs = ['reparacion-celulares-basico', 'curso-avanzado-microelectronica'];
+        return this.courses().filter(c => featuredSlugs.includes(c.slug!));
+    });
+
+    regularCoursesList = computed(() => {
+        const featuredSlugs = ['reparacion-celulares-basico', 'curso-avanzado-microelectronica'];
+        return this.courses().filter(c => !featuredSlugs.includes(c.slug!));
+    });
 
     setSEO() {
         this.seoService.setPageData({
@@ -160,8 +216,10 @@ export class CursosComponent implements OnInit {
             next: (res: { data: Course[] | null, error: any }) => {
                 const coursesData = res.data || this.getMockCourses(); // Fallback to mock
                 
-                // Enhance data if needed
-                const processedCourses = coursesData.map((c: Course) => ({
+                // Enhance data if needed and filter out pending/inactive
+                const processedCourses = coursesData
+                    .filter((c: Course) => c.is_active || c.status === 'published')
+                    .map((c: Course) => ({
                     ...c,
                     rating: c.rating || 4.9,
                     students: c.students || 150,
@@ -190,7 +248,7 @@ export class CursosComponent implements OnInit {
     getMockCourses(): Course[] {
         return [
             {
-                id: '1',
+                id: '11111111-1111-1111-1111-111111111111',
                 title: 'Técnico en Reparación de Celulares',
                 slug: 'reparacion-celulares-basico',
                 description: 'Dominá el hardware y software de smartphones. Diagnóstico, cambio de módulos, baterías, pines de carga y solución de fallas comunes.',
@@ -200,10 +258,12 @@ export class CursosComponent implements OnInit {
                 image_url: 'assets/img/cursos/pro.webp',
                 level: 'Intermedio',
                 students: 230,
-                rating: 4.9
+                rating: 4.9,
+                status: 'published',
+                is_active: true
             },
             {
-                id: '2',
+                id: '22222222-2222-2222-2222-222222222222',
                 title: 'Microelectrónica Aplicada',
                 slug: 'curso-avanzado-microelectronica',
                 description: 'Especialización avanzada. Lectura de esquemáticos, soldadura microscópica, reballing y reparación de placas base (iPhone/Android).',
@@ -213,10 +273,12 @@ export class CursosComponent implements OnInit {
                 image_url: 'assets/img/cursos/laboratorio.jpg',
                 level: 'Avanzado',
                 students: 85,
-                rating: 5.0
+                rating: 5.0,
+                status: 'published',
+                is_active: true
             },
             {
-                id: '3',
+                id: '33333333-3333-3333-3333-333333333333',
                 title: 'Reparación de Notebooks y PC',
                 slug: 'reparacion-pc',
                 description: 'Aprendé a diagnosticar, reparar y optimizar computadoras. Hardware, instalación de sistemas, mantenimiento térmico y upgrades.',
@@ -226,7 +288,9 @@ export class CursosComponent implements OnInit {
                 image_url: 'assets/img/cursos/pc-repair.jpg', // Ensure this asset exists or use a generic one
                 level: 'Básico',
                 students: 60,
-                rating: 4.8
+                rating: 4.8,
+                status: 'published',
+                is_active: true
             }
         ];
     }
@@ -238,6 +302,19 @@ export class CursosComponent implements OnInit {
         this.registrationSuccess.set(false);
         this.registrationError.set(null);
         this.isRegistrationOpen.set(true);
+    }
+
+    // Slider Logic
+    nextSlide() {
+        this.currentSlide.update(i => (i + 1) % this.featuredSlides().length);
+    }
+
+    prevSlide() {
+        this.currentSlide.update(i => (i - 1 + this.featuredSlides().length) % this.featuredSlides().length);
+    }
+
+    setSlide(index: number) {
+        this.currentSlide.set(index);
     }
 
     closeRegistration() {

@@ -12,6 +12,9 @@ import { NotificationService } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
 import { LockScreenComponent } from '@app/shared/components/lock-screen/lock-screen.component';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TabService } from '@app/core/services/tab.service';
+import { FavoritesService, FavoriteItem } from '@app/core/services/favorites.service';
+import { TenantService } from '@app/core/services/tenant.service';
 
 interface MenuItem {
   title: string;
@@ -38,10 +41,13 @@ interface MenuItem {
 export class AdminLayout implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   public branchService = inject(BranchService);
+  public tenantService = inject(TenantService);
   public notificationService = inject(NotificationService);
-  private router = inject(Router);
+  public router = inject(Router);
   public preferencesService = inject(PreferencesService);
   private cdr = inject(ChangeDetectorRef);
+  public tabService = inject(TabService);
+  public favoritesService = inject(FavoritesService);
 
   // Convert observables to signals for easier template usage and type safety
   public highContrast = toSignal(this.preferencesService.highContrast$, { initialValue: false });
@@ -73,14 +79,16 @@ export class AdminLayout implements OnInit, OnDestroy {
 
     // Escuchar cambios en el estado de autenticación (perfil, usuario)
     this.navigationSubscription.add(
-      this.authService.authState$.subscribe(state => {
+      this.authService.authState$.subscribe(async state => {
         this.userProfile.set(state.profile);
+        
+        // Load branches if SuperAdmin, Tenant Owner, or Admin
+        const role = state.profile?.role;
+        if (this.authService.isSuperAdmin() || role === 'tenant_owner') {
+          await this.loadAllBranches();
+        }
       })
     );
-
-    if (this.authService.isSuperAdmin()) {
-      await this.loadAllBranches();
-    }
 
     // Inicializar notificaciones
     this.notificationService.loadNotifications();
@@ -91,13 +99,17 @@ export class AdminLayout implements OnInit, OnDestroy {
       this.authService.currentBranch$.subscribe((assignedBranch: Branch | null) => {
         this.currentAssignedBranch.set(assignedBranch);
         if (assignedBranch) {
+          // Ensure the assigned branch is in the dropdown options even if loadAllBranches wasn't called or missed it
+          if (!this.branches().find(b => b.id === assignedBranch.id)) {
+            this.branches.update(list => [...list, assignedBranch]);
+          }
+          
           if (!this.authService.isSuperAdmin()) {
              this.branchService.setCurrentBranch(assignedBranch);
           } else {
             const currentSelectedId = this.branchService.getCurrentBranchId();
             if (!currentSelectedId) {
                this.branchService.setCurrentBranch(assignedBranch);
-
             }
           }
         }
@@ -129,25 +141,31 @@ export class AdminLayout implements OnInit, OnDestroy {
 
   updateBranchMenu(branch: Branch | null) {
     const basePrefix = branch?.slug ? `/${branch.slug}/admin` : '/admin';
-    const config = (this.authService as any).getTenantConfig?.() || {};
+    const tenantConfig = (this.authService as any).getTenantConfig?.() || {};
+    const branchConfig = branch?.modules_config || {};
     
     const hasAccess = (modName?: string) => {
       if (!modName) return true;
-      if (!config) return true;
-      return config[modName] === undefined || config[modName] === true;
+      
+      // 1. Check branch-level override first (modules_config jsonb)
+      if ((branchConfig as any)[modName] === false) return false;
+      
+      // 2. Fallback to tenant-level config
+      if (!tenantConfig) return true;
+      return tenantConfig[modName] !== false;
     };
 
+    const profile = this.authService.getCurrentProfile();
+    const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
+    const isCentral = !branch || branch.slug === 'arecofix' || branch.id === 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
+
     const companyChildren: MenuItem[] = [];
-    if (!branch) {
+    companyChildren.push({ title: 'Identidad de Empresa', path: `${basePrefix}/company`, icon: 'fa-id-badge' });
+
+    if (isGlobalAdmin && isCentral) {
       companyChildren.push({ title: 'Gestión Red de Sucursales', path: '/admin/branches', icon: 'fa-sitemap' });
-    } else {
-      companyChildren.push({ title: 'Identidad de Empresa', path: `${basePrefix}/branches`, icon: 'fa-id-badge' });
+      companyChildren.push({ title: 'Gestión de Personas', path: `${basePrefix}/users`, icon: 'fa-user-cog' });
     }
-    companyChildren.push(
-      { title: 'Gestión de Staff', path: `${basePrefix}/employees`, icon: 'fa-id-card' },
-      { title: 'Proveedores & Contactos', path: `${basePrefix}/suppliers`, icon: 'fa-truck' },
-      { title: 'Control de Usuarios', path: `${basePrefix}/users`, icon: 'fa-user-cog' }
-    );
 
     const baseItems: MenuItem[] = [
       { title: 'Panel de Control', path: `${basePrefix}/dashboard`, icon: 'fa-chart-line', module: 'dashboard' },
@@ -178,6 +196,15 @@ export class AdminLayout implements OnInit, OnDestroy {
           { title: 'Egresos / Compras', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag' },
         ]
       },
+      {
+        title: 'Gestión Financiera',
+        icon: 'fa-chart-pie',
+        expanded: false,
+        children: [
+          { title: 'Dashboard Contable', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
+          { title: 'Movimientos de Caja', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' }
+        ]
+      },
       { title: 'Servicio Técnico', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
       { title: 'Gestión de Clientes', path: `${basePrefix}/clients`, icon: 'fa-users', module: 'customers' },
       {
@@ -196,16 +223,20 @@ export class AdminLayout implements OnInit, OnDestroy {
           { title: 'Mensajes Recibidos', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
         ]
       },
-      { title: 'Academia Arecofix', path: `${basePrefix}/courses`, icon: 'fa-graduation-cap' },
+      { title: 'Academia Arecofix', path: `${basePrefix}/courses`, icon: 'fa-graduation-cap', module: 'academia' },
     ];
 
     const planId = (branch?.plan_id || 'basic').toLowerCase();
     const isBasicBranch = branch !== null && (planId === 'basic' || planId === 'free' || planId === 'standard');
+    const isLibreriaZaona = branch?.slug?.toLowerCase()?.includes('zaona') || branch?.name?.toLowerCase()?.includes('zaona');
 
     this.navigationItems = baseItems
       .filter(item => {
         if (isBasicBranch) {
           if (['Academia Arecofix', 'Marketing & Contenido'].includes(item.title)) return false;
+        }
+        if (isLibreriaZaona) {
+          if (['Servicio Técnico', 'Academia Arecofix'].includes(item.title)) return false;
         }
         return hasAccess(item.module);
       })
@@ -215,6 +246,9 @@ export class AdminLayout implements OnInit, OnDestroy {
         const filteredChildren = item.children.filter(child => {
           if (isBasicBranch) {
             if (['Gestión Red de Sucursales', 'Proveedores & Contactos'].includes(child.title)) return false;
+          }
+          if (isLibreriaZaona) {
+            if (['Servicios Web', 'Audit Catálogo Meta', 'Blog & Noticias', 'Mensajes Recibidos'].includes(child.title)) return false;
           }
           return hasAccess(child.module);
         });
@@ -234,9 +268,14 @@ export class AdminLayout implements OnInit, OnDestroy {
     return this.authService.isSuperAdmin();
   }
 
+  canSwitchBranch() {
+    const role = this.userProfile()?.role;
+    return this.isSuperAdmin() || role === 'tenant_owner';
+  }
+
   async logout() {
     await this.authService.signOut();
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 
   async handleNotificationClick(notif: any) {
@@ -283,9 +322,11 @@ export class AdminLayout implements OnInit, OnDestroy {
 
   private updateBranding(branch: Branch | null) {
     if (!branch) {
+      const tenant = this.tenantService.getCurrentTenant();
+      const tenantName = tenant ? tenant.name.toUpperCase() : 'ARECOFIX CENTRAL';
       this.branchBranding.set({
         logo: '/assets/img/brands/logo/logo-normal.PNG',
-        name: 'ARECOFIX CENTRAL'
+        name: tenantName
       });
       document.documentElement.style.removeProperty('--primary-branch-color');
       return;
@@ -310,5 +351,23 @@ export class AdminLayout implements OnInit, OnDestroy {
 
   toggleMainMenu() {
     this.isMainMenuOpen.update(v => !v);
+  }
+
+  toggleCurrentFavorite() {
+    const url = this.router.url;
+    let title = 'Favorito';
+    
+    // Find current route title
+    let currentRoute = this.router.routerState.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    title = currentRoute.snapshot.data['title'] || currentRoute.snapshot.routeConfig?.title || 'Favorito';
+
+    this.favoritesService.toggleFavorite({ url, title });
+  }
+
+  isCurrentFavorite(): boolean {
+    return this.favoritesService.isFavorite(this.router.url);
   }
 }

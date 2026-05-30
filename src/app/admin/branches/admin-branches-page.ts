@@ -44,7 +44,7 @@ export class AdminBranchesPage implements OnInit {
         branding_settings: {
             logo_url: null,
             favicon_url: null,
-            primary_color: '#3b82f6',
+            primary_color: '#0d9488',
             owner_name: ''
         },
         bank_info: {
@@ -71,7 +71,7 @@ export class AdminBranchesPage implements OnInit {
             this.currentForm.set({
                 ...form,
                 branding_settings: {
-                    ...(form.branding_settings || { logo_url: null, favicon_url: null, primary_color: '#3b82f6' }),
+                    ...(form.branding_settings || { logo_url: null, favicon_url: null, primary_color: '#0d9488' }),
                     logo_url: url
                 }
             });
@@ -123,7 +123,7 @@ export class AdminBranchesPage implements OnInit {
             branding_settings: {
                 logo_url: null,
                 favicon_url: null,
-                primary_color: '#3b82f6',
+                primary_color: '#0d9488',
                 owner_name: ''
             },
             bank_info: {
@@ -154,7 +154,7 @@ export class AdminBranchesPage implements OnInit {
         const branding = branch.branding_settings || {
             logo_url: null,
             favicon_url: null,
-            primary_color: '#4f46e5'
+            primary_color: '#0d9488'
         };
         const bank = branch.bank_info || {
             alias: '',

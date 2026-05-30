@@ -210,6 +210,18 @@ export class BranchService {
   // --- ADMIN SETTINGS METHODS ---
 
   async getAllAdminBranches(): Promise<Branch[]> {
+    const tenantId = this.tenantService.getTenantId();
+    if (!this.auth.isSuperAdmin()) {
+      const branchId = this.getCurrentBranchId() || this.auth.getCurrentProfile()?.branch_id;
+      if (branchId) {
+        const { data, error } = await this.supabase
+          .from('branches')
+          .select('*')
+          .eq('id', branchId);
+        if (error) throw error;
+        return data as Branch[] || [];
+      }
+    }
     return (await firstValueFrom(this.branchRepo.getAll({ column: 'name' }))) as Branch[];
   }
 

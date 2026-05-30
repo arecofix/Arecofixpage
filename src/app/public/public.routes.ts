@@ -244,6 +244,14 @@ export const publicRoutes: Routes = [
         }
       },
       {
+        title: 'Proponer Curso',
+        path: 'academy/create',
+        loadComponent: () =>
+          import('@app/public/cursos/create-course/create-course.component').then(
+            (m) => m.CreateCourseComponent
+          ),
+      },
+      {
         title: 'Detalle del Curso',
         path: 'academy/:slug',
         loadComponent: () =>
@@ -332,6 +340,14 @@ export const publicRoutes: Routes = [
             type: 'website'
           }
         }
+      },
+      {
+        title: 'Crear Publicación',
+        path: 'blog/create',
+        loadComponent: () =>
+          import('@app/public/blog/create-post/create-post.component').then(
+            (m) => m.CreatePostComponent
+          ),
       },
       {
         title: 'Protocolo de Diagnóstico | Arecofix',

@@ -28,6 +28,10 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
 
     /**
      * Applies SaaS context and soft-delete filters to a query.
+     * Note: While RLS mathematically isolates data on the server, we MUST
+     * include the tenant_id in the query so that the Offline IndexedDB
+     * cache keys are unique per tenant. Otherwise, offline caches would cross-pollinate
+     * on shared devices.
      */
     protected applyTenantFilter<U>(query: any): any {
         let enhancedQuery = query;
@@ -55,13 +59,13 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     /**
      * Adds tenant_id to a payload for inserts/upserts if not a global table.
      */
-    protected sanitizePayload(item: any): any {
+    protected sanitizePayload(item: Partial<T>): Partial<T> {
         if (this.isGlobalTable) return { ...item };
         
         const tenantId = this.tenantService.getTenantId();
         if (tenantId === TENANT_CONSTANTS.FALLBACK_ID) return { ...item };
         
-        return { ...item, tenant_id: tenantId };
+        return { ...item, tenant_id: tenantId } as Partial<T>;
     }
 
     /**
@@ -130,7 +134,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         return from(
             this.supabase
                 .from(this.tableName)
-                .insert(payload as any)
+                .insert(payload as never)
                 .select()
                 .single()
         ).pipe(
@@ -145,10 +149,10 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
 
     update(id: string, item: Partial<T>): Observable<T> {
         const payload = { ...item };
-        delete (payload as any).tenant_id;
-        delete (payload as any).id;
+        delete payload.tenant_id;
+        delete payload.id;
 
-        let query = this.supabase.from(this.tableName).update(payload as any).eq('id', id);
+        let query = this.supabase.from(this.tableName).update(payload as never).eq('id', id);
         query = this.applyTenantFilter(query);
 
         return from(query.select().single()).pipe(
@@ -206,7 +210,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     bulkUpdateByIds(ids: string[], payload: Partial<T>): Observable<void> {
         if (!ids.length) return from(Promise.resolve());
 
-        let query = this.supabase.from(this.tableName).update(payload as any).in('id', ids);
+        let query = this.supabase.from(this.tableName).update(payload as never).in('id', ids);
         query = this.applyTenantFilter(query);
 
         return from(query).pipe(

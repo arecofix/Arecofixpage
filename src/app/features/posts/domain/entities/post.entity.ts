@@ -7,6 +7,8 @@ export interface Post {
     content: string;
     image?: string;
     published: boolean;
+    status?: string;
     meta_title?: string;
     meta_description?: string;
+    author_id?: string;
 }
