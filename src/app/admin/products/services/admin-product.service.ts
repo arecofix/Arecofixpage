@@ -149,7 +149,10 @@ export class AdminProductService {
         // Extract stock and branch_id
         const initialStock = payload.stock;
         let branchId = payload.branch_id || this.branchContextService.getBranchId();
-        delete payload.branch_id;
+        
+        // 🐛 BUGFIX: Anteriormente se eliminaba el branch_id aquí. Ahora lo asignamos
+        // explícitamente para asegurar que el producto pertenezca a la sucursal actual.
+        payload.branch_id = branchId || undefined;
 
         if (user) {
             const profile = await this.auth.getUserProfile(user.id);
@@ -194,8 +197,8 @@ export class AdminProductService {
         const initialStock = payload.stock;
         const branchId = payload.branch_id || this.branchContextService.getBranchId();
         
-        // La columna branch_id fue eliminada, pero stock sigue existiendo en products
-        delete payload.branch_id;
+        // 🐛 BUGFIX: Mantener el branch_id para no perder la asignación del producto.
+        payload.branch_id = branchId || undefined;
 
         await firstValueFrom(this.productRepo.update(id, payload));
 

@@ -43,6 +43,7 @@ export interface UserProfile {
     role: UserRole;
     notes?: string;
     is_guest?: boolean;
+    branch_id?: string;
 }
 
 /**

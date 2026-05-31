@@ -28,7 +28,15 @@ export class ProductMapper {
     
     if (branchId) {
        const specificBranch = branchStockList.find((b: any) => b.branch_id === branchId);
-       displayedStock = specificBranch ? Number(specificBranch.quantity) : 0;
+       if (specificBranch) {
+           displayedStock = Number(specificBranch.quantity);
+       } else if ((p['branch_id'] === branchId || p['is_global']) && p['stock'] !== undefined && p['stock'] !== null) {
+           // Si no tiene stock específico en esta sucursal, pero el producto ES de esta sucursal nativamente,
+           // o es un producto global que no tiene registros en la tabla pivote, usamos su stock base `p.stock`
+           displayedStock = Number(p['stock']);
+       } else {
+           displayedStock = 0;
+       }
     } else {
        // Calcular stock total sumando todas las sucursales si no se filtró por sucursal
        displayedStock = branchStockList.reduce((acc: number, curr: any) => acc + (Number(curr.quantity) || 0), 0);

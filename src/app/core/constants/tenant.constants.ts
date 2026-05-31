@@ -29,5 +29,11 @@ export const TENANT_CONSTANTS = {
     /**
      * Default Branch ID (Central)
      */
-    DEFAULT_BRANCH_ID: '00000000-0000-0000-0000-000000000000'
+    DEFAULT_BRANCH_ID: '00000000-0000-0000-0000-000000000000',
+
+    /**
+     * Central Branch UUID (Arecofix)
+     * Used for special logic where Central sees aggregated data
+     */
+    CENTRAL_BRANCH_ID: 'de967f68-7b15-44c0-bc98-952ccf06e1e5'
 };
