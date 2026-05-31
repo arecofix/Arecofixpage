@@ -17,6 +17,7 @@ import { RepairPdfService } from '@app/features/repairs/application/services/rep
 import { TenantService } from '@app/core/services/tenant.service';
 import { RepairWorkflowService } from '@app/features/repairs/application/services/repair-workflow.service';
 import { RepairCalculatorService } from '@app/features/repairs/application/services/repair-calculator.service';
+import { SupabaseService } from '@app/core/services/supabase.service';
 
 import { RepairCustomerSectionComponent } from './components/repair-customer-section.component';
 import { RepairDeviceSectionComponent } from './components/repair-device-section.component';
@@ -66,6 +67,7 @@ export class AdminRepairFormPage implements OnInit {
     private fb = inject(FormBuilder);
     private repairWorkflowService = inject(RepairWorkflowService);
     private repairCalculator = inject(RepairCalculatorService);
+    private supabaseService = inject(SupabaseService);
 
     repairForm!: FormGroup;
 
@@ -81,7 +83,7 @@ export class AdminRepairFormPage implements OnInit {
         customer_dni: '',
         device_model: '',
         device_type: 'smartphone',
-        device_brand: 'generic',
+        brand_id: null,
         imei: '',
         issue_description: '',
         current_status_id: RepairStatus.PENDING_DIAGNOSIS,
@@ -113,6 +115,7 @@ export class AdminRepairFormPage implements OnInit {
     searchQuery = signal('');
     parts = signal<import('../../features/repairs/domain/entities/repair.entity').RepairPart[]>([]);
     images = signal<string[]>([]);
+    brands = signal<{id: string, name: string}[]>([]);
 
     // Reactive search streams
     private productSearch$ = new Subject<string>();
@@ -211,7 +214,7 @@ export class AdminRepairFormPage implements OnInit {
             customer_dni: [''],
             device_model: ['', [Validators.required]],
             device_type: ['smartphone'],
-            device_brand: ['generic'],
+            brand_id: [null],
             imei: [''],
             issue_description: ['', [Validators.required]],
             current_status_id: [RepairStatus.PENDING_DIAGNOSIS],
@@ -262,6 +265,7 @@ export class AdminRepairFormPage implements OnInit {
         await Promise.all([
             this.loadCompanySettings(),
             this.loadInitialClients(),
+            this.loadBrands(),
             this.id ? this.loadRepair() : Promise.resolve()
         ]);
         
@@ -320,6 +324,17 @@ export class AdminRepairFormPage implements OnInit {
             }
         } catch (error) {
             console.error('Error loading company settings', error);
+        }
+    }
+
+    async loadBrands() {
+        try {
+            const { data } = await this.supabaseService.getClient().from('brands').select('id, name').order('name');
+            if (data) {
+                this.brands.set(data);
+            }
+        } catch (error) {
+            console.error('Error loading brands', error);
         }
     }
 
@@ -386,7 +401,7 @@ export class AdminRepairFormPage implements OnInit {
                     customer_phone: data.customer_phone,
                     device_model: data.device_model,
                     device_type: data.device_type,
-                    device_brand: data.device_brand,
+                    brand_id: (data as any).brand_id || null,
                     imei: data.imei,
                     issue_description: data.issue_description,
                     current_status_id: data.current_status_id,
@@ -468,10 +483,15 @@ export class AdminRepairFormPage implements OnInit {
 
             // 3. Prepare payload
             console.log('📦 [AdminRepairForm] Preparando datos...');
-            const formData = this.repairForm.getRawValue();
+            const rawData = this.repairForm.getRawValue();
+            
+            // Destructuramos para extraer device_type que no existe en DB, 
+            // brand_id se pasará directo al payload.
+            const { device_type, ...validFormData } = rawData;
+
             const payload = {
-                ...formData,
-                customer_id: formData.customer_id || null,
+                ...validFormData,
+                customer_id: validFormData.customer_id || null,
                 images: this.images(),
                 parts: this.parts(),
                 branch_id: branchIdActual

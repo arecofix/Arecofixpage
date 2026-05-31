@@ -56,6 +56,12 @@ export class AdminCompanySettingsPage implements OnInit {
     tempBranch: Partial<Branch> = { name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true, id: '' };
     savingBranch = signal(false);
 
+    // Password Update Setup
+    passwordForm = signal({ newPassword: '', confirmPassword: '' });
+    updatingPassword = signal(false);
+    passwordError = signal<string | null>(null);
+    passwordSuccess = signal<string | null>(null);
+
     async ngOnInit() {
         await this.loadSettings();
     }
@@ -146,6 +152,43 @@ export class AdminCompanySettingsPage implements OnInit {
             if (e instanceof Error) this.error.set(e.message);
         } finally {
             this.saving.set(false);
+            this.cdr.markForCheck();
+        }
+    }
+
+    // --- ACCOUNT SECURITY ---
+    async updatePassword() {
+        const payload = this.passwordForm();
+        
+        this.passwordError.set(null);
+        this.passwordSuccess.set(null);
+
+        if (!payload.newPassword || payload.newPassword.length < 6) {
+            this.passwordError.set('La contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        if (payload.newPassword !== payload.confirmPassword) {
+            this.passwordError.set('Las contraseñas no coinciden.');
+            return;
+        }
+
+        this.updatingPassword.set(true);
+        this.cdr.markForCheck();
+
+        try {
+            const error = await this.authService.updatePassword(payload.newPassword);
+            
+            if (error) {
+                this.passwordError.set(error);
+            } else {
+                this.passwordSuccess.set('Tu contraseña se ha actualizado correctamente.');
+                this.passwordForm.set({ newPassword: '', confirmPassword: '' });
+            }
+        } catch (e: unknown) {
+            if (e instanceof Error) this.passwordError.set(e.message);
+        } finally {
+            this.updatingPassword.set(false);
             this.cdr.markForCheck();
         }
     }

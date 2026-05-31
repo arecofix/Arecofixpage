@@ -42,7 +42,8 @@ export interface Repair {
     readonly customer_name?: string;
     readonly customer_phone?: string;
     readonly device_type: string;
-    readonly device_brand: string;
+    readonly brand_id?: string | null;
+    readonly brand_name?: string;
     readonly device_model: string;
     readonly imei?: string;
     readonly repair_number?: number;
@@ -94,7 +95,7 @@ export interface CreateRepairDto {
     customer_email?: string;
     customer_dni?: string;
     device_type: string;
-    device_brand: string;
+    brand_id?: string | null;
     device_model: string;
     imei?: string;
     issue_description: string;

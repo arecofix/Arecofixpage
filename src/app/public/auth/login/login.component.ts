@@ -19,8 +19,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   error = '';
   success = '';
   showPassword = false;
-  resetEmailSent = false;
-  resetPasswordMode = false;
   returnUrl = '';
   currentYear = new Date().getFullYear();
   socialLoading: { [key: string]: boolean } = {
@@ -252,61 +250,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  async resetPassword() {
-    this.error = '';
-    this.success = '';
-    const email = this.email?.value as string | null;
-    
-    if (!email) {
-      this.error = 'Ingresa tu email para restablecer la contraseña.';
-      return;
-    }
-
-    if (!this.validateEmail(email)) {
-      this.error = 'Por favor ingresa un email válido.';
-      return;
-    }
-
-    this.loading = true;
-    
-    try {
-      const err = await this.authService.resetPassword(email);
-      this.loading = false;
-      
-      if (err) {
-        this.error = this.parseAuthError(err);
-      } else {
-        this.success = 'Te enviamos un email para restablecer la contraseña. Revisa tu bandeja de entrada.';
-        this.resetEmailSent = true;
-        setTimeout(() => {
-          this.resetPasswordMode = false;
-          this.resetEmailSent = false;
-          this.form.patchValue({ password: '' });
-        }, 3000);
-      }
-    } catch (err) {
-      this.loading = false;
-      this.error = 'Error al enviar el correo de recuperación.';
-    }
-  }
-
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
-  }
-
-  toggleResetPasswordMode() {
-    this.resetPasswordMode = !this.resetPasswordMode;
-    this.error = '';
-    this.success = '';
-    this.resetEmailSent = false;
-    if (!this.resetPasswordMode) {
-      this.form.patchValue({ password: '' });
-    }
-  }
-
-  private validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 
   private sanitizeReturnUrl(url: string): string {

@@ -177,6 +177,59 @@
         </div>
     </div>
 
+    <!-- ACCOUNT SECURITY -->
+    <div class="card bg-base-100 shadow-lg mt-8">
+        <div class="card-body p-6">
+            <h2 class="text-xl font-bold mb-4">Seguridad de la Cuenta</h2>
+            <p class="text-gray-500 mb-6 text-sm">Actualiza la contraseña de tu cuenta de administrador o empleado. Por razones de seguridad, asegúrate de utilizar una contraseña fuerte.</p>
+
+            @if (passwordError()) {
+            <div class="alert alert-error mb-4 shadow-sm">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ passwordError() }}</span>
+            </div>
+            }
+            @if (passwordSuccess()) {
+            <div class="alert alert-success mb-4 shadow-sm">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ passwordSuccess() }}</span>
+            </div>
+            }
+
+            <form (ngSubmit)="updatePassword()" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-control">
+                        <label for="new-password" class="label">
+                            <span class="label-text font-medium">Nueva Contraseña</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-lock text-gray-400"></i>
+                            <input id="new-password" type="password" [(ngModel)]="passwordForm().newPassword" name="newPassword" class="grow" placeholder="Mínimo 6 caracteres" required />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label for="confirm-password" class="label">
+                            <span class="label-text font-medium">Confirmar Contraseña</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-lock text-gray-400"></i>
+                            <input id="confirm-password" type="password" [(ngModel)]="passwordForm().confirmPassword" name="confirmPassword" class="grow" placeholder="Confirma la nueva contraseña" required />
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4 mt-2">
+                    <button type="submit" class="btn btn-neutral px-8" [disabled]="updatingPassword() || !passwordForm().newPassword || !passwordForm().confirmPassword">
+                        @if (updatingPassword()) {
+                        <span class="loading loading-spinner"></span>
+                        }
+                        Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- SUCURSALES (Branches) MANAGEMENT -->
     @if (canManageBranches()) {
     <div class="card bg-base-100 shadow-lg mt-8">

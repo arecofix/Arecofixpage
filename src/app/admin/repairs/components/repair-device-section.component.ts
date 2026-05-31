@@ -17,7 +17,16 @@ import { FormsModule } from '@angular/forms';
             <h2 class="text-xl text-gray-800 dark:text-white font-bold">Diagnóstico y Equipo</h2>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div class="form-control">
+                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Marca</span></label>
+                <select [ngModel]="brandId()" (ngModelChange)="onBrandIdChange.emit($event)" name="brand_id" class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white">
+                    <option [ngValue]="null">Seleccionar Marca...</option>
+                    @for (brand of brands(); track brand.id) {
+                        <option [value]="brand.id">{{ brand.name }}</option>
+                    }
+                </select>
+            </div>
             <div class="form-control">
                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Modelo del Equipo</span></label>
                 <input type="text" [ngModel]="deviceModel()" (ngModelChange)="onDeviceModelChange.emit($event)" name="device_model" class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white" required placeholder="Ej: iPhone 13 Pro Max" />
@@ -92,6 +101,8 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class RepairDeviceSectionComponent {
+  brands = input<{id: string, name: string}[]>([]);
+  brandId = input<string | null>(null);
   deviceModel = input.required<string>();
   imei = input<string>('');
   issueDescription = input<string>('');
@@ -106,6 +117,7 @@ export class RepairDeviceSectionComponent {
     case: false
   });
 
+  onBrandIdChange = output<string | null>();
   onDeviceModelChange = output<string>();
   onImeiChange = output<string>();
   onIssueDescriptionChange = output<string>();
