@@ -50,7 +50,6 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       phone: item.phone || '',
       address: item.address || '',
       dni: item.dni || '',
-      notes: item.notes || '',
       is_active: true
     };
     return this.create(clientPayload);

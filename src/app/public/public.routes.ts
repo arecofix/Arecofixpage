@@ -126,6 +126,14 @@ export const publicRoutes: Routes = [
           ),
       },
       {
+        title: 'Recuperar Contraseña',
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('@app/public/auth/forgot-password/forgot-password.component').then(
+            (m) => m.ForgotPasswordComponent
+          ),
+      },
+      {
         title: 'Perfil',
         path: 'perfil',
         loadComponent: () =>

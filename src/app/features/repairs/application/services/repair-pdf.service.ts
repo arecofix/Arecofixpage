@@ -90,7 +90,7 @@ export class RepairPdfService {
     doc.setFontSize(10);
     doc.text(`Modelo: ${repair.device_model}`, 110, 65);
     doc.text(`IMEI/Serie: ${repair.imei || 'Sin declarar'}`, 110, 72);
-    doc.text(`Tipo/Marca: ${repair.device_type} / ${repair.device_brand}`, 110, 79);
+    doc.text(`Tipo/Marca: ${repair.device_type} / ${repair.brand_name || 'No especificada'}`, 110, 79);
 
     // Security & Checklist Box
     doc.setDrawColor(200, 200, 200);

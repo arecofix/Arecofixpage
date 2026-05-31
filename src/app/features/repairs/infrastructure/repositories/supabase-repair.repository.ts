@@ -26,7 +26,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     override getById(id: string): Observable<Repair | null> {
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), brand:brands(id, name)')
             .eq('id', id);
 
         return from((this.applyTenantFilter(query) as any)).pipe(
@@ -45,7 +45,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const offset = params?.offset || 0;
 
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), brand:brands(id, name)')
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });
 
@@ -91,7 +91,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 // Fetch full record with relations so return value is complete
                 const { data: fetchedData, error: fetchError } = await this.applyTenantFilter(
                     this.supabase.from(this.tableName)
-                        .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
+                        .select('*, parts:repair_parts_used(*), images:repair_images(image_url), brand:brands(id, name)')
                         .eq('id', generatedId)
                 );
 
@@ -224,9 +224,10 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         let query = this.supabase.from(this.tableName)
             .select(`
                 *,
-                client:profiles(id, full_name, phone),
+                client:profiles!repairs_client_id_fkey(id, full_name, phone),
                 assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, full_name),
-                status:repair_status_types(id, name, color, icon)
+                status:repair_status_types(id, name, color, icon),
+                brand:brands(id, name)
             `)
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });
@@ -246,8 +247,11 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
         return from(query).pipe(
             map(({ data, error }) => {
-                if (error) return [];
-                return (data || []).map(d => this.mapFromDb(d));
+                if (error) {
+                    console.error('[SupabaseRepairRepository] getAdminList error:', error);
+                    return [];
+                }
+                return data ? data.map(r => this.mapFromDb(r)) : [];
             })
         );
     }
@@ -337,7 +341,8 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             customer_name: p.customer_name,
             customer_phone: p.customer_phone,
             device_type: p.device_type,
-            device_brand: p.device_brand,
+            brand_id: p.brand_id,
+            brand_name: p.brand?.name || undefined,
             device_model: p.device_model,
             imei: p.imei,
             repair_number: p.repair_number,
@@ -374,7 +379,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             customer_name: r.customer_name,
             customer_phone: r.customer_phone,
             device_type: r.device_type,
-            device_brand: r.device_brand,
+            brand_id: r.brand_id,
             device_model: r.device_model,
             imei: r.imei,
             issue_description: r.issue_description,

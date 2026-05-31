@@ -80,6 +80,8 @@
 
                     <!-- Tarjeta: Equipo y Falla -->
                     <app-repair-device-section
+                        [brands]="brands()"
+                        [brandId]="repairForm.value.brand_id"
                         [deviceModel]="repairForm.value.device_model"
                         [imei]="repairForm.value.imei"
                         [issueDescription]="repairForm.value.issue_description"
@@ -87,6 +89,7 @@
                         [securityPattern]="repairForm.value.security_pattern"
                         [devicePasscode]="repairForm.value.device_passcode"
                         [checklist]="repairForm.value.checklist"
+                        (onBrandIdChange)="updateFormField('brand_id', $event)"
                         (onDeviceModelChange)="updateFormField('device_model', $event)"
                         (onImeiChange)="updateFormField('imei', $event)"
                         (onIssueDescriptionChange)="updateFormField('issue_description', $event)"
