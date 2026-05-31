@@ -38,10 +38,12 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   }
 
   createClient(item: any): Observable<UserProfile> {
+    const branchId = this.branchContextService.getBranchId();
     const clientPayload: Partial<UserProfile> = {
       id: crypto.randomUUID(),
       role: 'user' as any,
       is_guest: true,
+      branch_id: branchId || undefined,
       first_name: item.first_name,
       last_name: item.last_name || '',
       email: item.email || '',

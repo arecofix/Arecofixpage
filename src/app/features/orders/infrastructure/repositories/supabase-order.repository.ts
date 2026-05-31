@@ -35,6 +35,8 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     });
 
     const tenantId = this.tenantService.getTenantId();
+    const branchId = this.branchContextService?.getBranchId();
+    
     const payload = this.sanitizePayload({
       ...persistence,
       created_at: order.created_at ?? new Date().toISOString(),
@@ -42,6 +44,9 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     
     // Bypass DEFAULT get_my_tenant() evaluation which throws "Usuario sin tenant asignado"
     payload.tenant_id = tenantId;
+    if (branchId && !payload.branch_id) {
+      payload.branch_id = branchId;
+    }
 
     const { error: orderError } = await this.supabase
       .from(this.tableName)
@@ -119,6 +124,8 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
 
   private async _upsertOrderItems(orderId: string, items: OrderItem[]): Promise<void> {
     const tenantId = this.tenantService.getTenantId();
+    const branchId = this.branchContextService?.getBranchId();
+    
     const itemsPayload = items.map((item) => {
       const sanitized = this.sanitizePayload({
         order_id: orderId,
@@ -131,6 +138,9 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
         subtotal: item.subtotal,
       } as any);
       sanitized.tenant_id = tenantId;
+      if (branchId && !sanitized.branch_id) {
+        sanitized.branch_id = branchId;
+      }
       return sanitized;
     });
 
