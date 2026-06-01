@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
-import { Post } from '@app/features/posts/domain/entities/post.entity';
+import { Post, PostComment } from '@app/features/posts/domain/entities/post.entity';
 import { PostService } from '@app/features/posts/application/post.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { ContactService } from '@app/core/services/contact.service';
@@ -39,6 +39,12 @@ export class PostPage implements OnInit, OnDestroy {
     contactMessage = '';
     sendingContact = false;
 
+    // Comments State
+    comments: PostComment[] = [];
+    newCommentName = '';
+    newCommentText = '';
+    submittingComment = false;
+
     async ngOnInit() {
         this.route.paramMap.subscribe(async params => {
             const slug = params.get('slug');
@@ -61,12 +67,14 @@ export class PostPage implements OnInit, OnDestroy {
 
             if (this.post) {
                 this.handleSeo(this.post, slug);
+                await this.loadComments(this.post.id);
             } else {
                 if (slug.includes('tcnico')) {
                     const correctedSlug = slug.replace('tcnico', 'tecnico');
                     this.post = await this.postService.getPostBySlug(correctedSlug);
                     if (this.post) {
                         this.handleSeo(this.post, correctedSlug);
+                        await this.loadComments(this.post.id);
                         return;
                     }
                 }
@@ -211,6 +219,41 @@ export class PostPage implements OnInit, OnDestroy {
             alert('Ocurrió un error al enviar el mensaje. Por favor intenta por WhatsApp.');
         } finally {
             this.sendingContact = false;
+            this.cdr.markForCheck();
+        }
+    }
+
+    async loadComments(postId: string) {
+        try {
+            this.comments = await this.postService.getComments(postId);
+        } catch (error) {
+            console.error('Error loading comments', error);
+        } finally {
+            this.cdr.markForCheck();
+        }
+    }
+
+    async submitComment() {
+        if (!this.newCommentName.trim() || !this.newCommentText.trim() || !this.post) return;
+
+        this.submittingComment = true;
+        this.cdr.markForCheck();
+
+        try {
+            const newComment = await this.postService.addComment(
+                this.post.id,
+                this.newCommentName,
+                this.newCommentText
+            );
+            // Append locally to avoid full reload
+            this.comments = [...this.comments, newComment];
+            this.newCommentName = '';
+            this.newCommentText = '';
+        } catch (error) {
+            console.error('Error submitting comment:', error);
+            alert('No se pudo enviar el comentario. Intenta nuevamente más tarde.');
+        } finally {
+            this.submittingComment = false;
             this.cdr.markForCheck();
         }
     }

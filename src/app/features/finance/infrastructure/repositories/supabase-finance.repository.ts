@@ -11,6 +11,9 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 })
 export class SupabaseFinanceRepository extends BaseRepository<CashMovement> implements FinanceRepository {
   protected override tableName = 'cash_movements';
+  protected override isGlobalTable = false;
+  protected override useSoftDeletes = false;
+  protected override useStrictBranchIsolation = true;
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);

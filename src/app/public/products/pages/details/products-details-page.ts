@@ -237,6 +237,12 @@ export class ProductsDetailsPage {
                 };
                 return fallbackResponse;
               }
+
+              // If product not found at all, navigate to global 404 page
+              if (!response.data || response.data.length === 0) {
+                const router = this.injector.get(Router);
+                router.navigate(['/404'], { skipLocationChange: true });
+              }
               return response;
             })
           );

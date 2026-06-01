@@ -19,6 +19,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     protected useSoftDeletes: boolean = false;
     protected suppressAuthNotifications: boolean = false;
     protected useBranchIsolation: boolean = false;
+    protected useStrictBranchIsolation: boolean = false;
 
     protected tenantService = inject(TenantService);
     protected errorHandler = inject(SupabaseErrorHandlerService);
@@ -56,10 +57,14 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
             }
         }
 
-        if (this.useBranchIsolation && this.branchContextService) {
+        if (this.branchContextService) {
             const branchId = this.branchContextService.getBranchId();
-            if (branchId && enhancedQuery && typeof enhancedQuery.or === 'function') {
-                enhancedQuery = enhancedQuery.or(`branch_id.eq.${branchId},branch_id.is.null`);
+            if (branchId && enhancedQuery) {
+                if (this.useStrictBranchIsolation && typeof enhancedQuery.eq === 'function') {
+                    enhancedQuery = enhancedQuery.eq('branch_id', branchId);
+                } else if (this.useBranchIsolation && typeof enhancedQuery.or === 'function') {
+                    enhancedQuery = enhancedQuery.or(`branch_id.eq.${branchId},branch_id.is.null`);
+                }
             }
         }
 
@@ -78,7 +83,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
             payload['tenant_id'] = tenantId;
         }
         
-        if (this.useBranchIsolation && this.branchContextService) {
+        if ((this.useBranchIsolation || this.useStrictBranchIsolation) && this.branchContextService) {
             const branchId = this.branchContextService.getBranchId();
             if (branchId) {
                 payload['branch_id'] = payload['branch_id'] || branchId;

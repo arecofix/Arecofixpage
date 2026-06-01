@@ -84,7 +84,13 @@ export class SupabaseService {
 
        for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-          const response = await fetch(url, options);
+          const fetchPromise = fetch(url, options);
+          const timeoutPromise = new Promise<Response>((_, reject) => {
+              setTimeout(() => reject(new Error(`Fetch timeout (${url})`)), 15000);
+          });
+          
+          const response = await Promise.race([fetchPromise, timeoutPromise]);
+          
           if (!response.ok && response.status >= 500) {
               throw new Error(`Server Error: ${response.status}`);
           }
@@ -151,9 +157,9 @@ export class SupabaseService {
       environment.supabaseUrl,
       environment.supabaseKey,
       {
-        global: {
+        /* global: {
           fetch: customFetch
-        },
+        }, */
         realtime: {
           params: {
             eventsPerSecond: 2,
@@ -187,25 +193,8 @@ export class SupabaseService {
           },
           persistSession: typeof window !== 'undefined',
           autoRefreshToken: typeof window !== 'undefined',
-          detectSessionInUrl: typeof window !== 'undefined',
-          lock: async (name: string, acquireTimeout: number, acquire: () => Promise<any>) => {
-            if (typeof navigator !== 'undefined' && navigator.locks) {
-              try {
-                return await navigator.locks.request(name, { mode: 'exclusive', ifAvailable: true }, async (lock) => {
-                  if (lock) {
-                    return await acquire();
-                  } else {
-                    return await acquire();
-                  }
-                });
-              } catch (e) {
-                return await acquire();
-              }
-            } else {
-              return await acquire();
-            }
-          },
-        },
+          detectSessionInUrl: typeof window !== 'undefined'
+        }
       },
     );
 

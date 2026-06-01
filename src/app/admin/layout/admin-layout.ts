@@ -163,7 +163,7 @@ export class AdminLayout implements OnInit, OnDestroy {
     companyChildren.push({ title: 'Identidad de Empresa', path: `${basePrefix}/company`, icon: 'fa-id-badge' });
 
     if (isGlobalAdmin && isCentral) {
-      companyChildren.push({ title: 'Gestión Red de Sucursales', path: '/admin/branches', icon: 'fa-sitemap' });
+      companyChildren.push({ title: 'Gestión Red de Sucursales', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
       companyChildren.push({ title: 'Gestión de Personas', path: `${basePrefix}/users`, icon: 'fa-user-cog' });
     }
 
@@ -253,7 +253,11 @@ export class AdminLayout implements OnInit, OnDestroy {
           return hasAccess(child.module);
         });
 
-        return { ...item, children: filteredChildren };
+        // Preserve the expanded state so the menu doesn't collapse/restart when route changes
+        const existingItem = this.navigationItems.find(n => n.title === item.title);
+        const expanded = existingItem !== undefined ? existingItem.expanded : item.expanded;
+
+        return { ...item, expanded, children: filteredChildren };
       })
       .filter(item => !item.children || item.children.length > 0);
 

@@ -34,6 +34,7 @@
         </div>
     </div>
   
+    <!-- UX Guard Warning Removido -->
     @if (loading()) {
         <div class="animate-fade-in">
             <!-- Header Skeleton -->
@@ -388,15 +389,22 @@
                     </h2>
                 </div>
                 <div class="h-64 sm:h-80 w-full relative block">
-                    @defer (on viewport) {
-                        <canvas baseChart
-                            [data]="salesChartData"
-                            [options]="salesChartOptions"
-                            [type]="salesChartType">
-                        </canvas>
-                    } @placeholder {
-                        <div class="w-full h-full flex items-center justify-center bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl">
-                            <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
+                    @if (salesChartData) {
+                        @defer (on viewport) {
+                            <canvas baseChart
+                                [data]="salesChartData"
+                                [options]="salesChartOptions"
+                                [type]="salesChartType">
+                            </canvas>
+                        } @placeholder {
+                            <div class="w-full h-full flex items-center justify-center bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl">
+                                <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
+                            </div>
+                        }
+                    } @else {
+                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                            <i class="fas fa-chart-area text-4xl mb-3 opacity-20"></i>
+                            <p class="text-sm">No hay datos de ventas disponibles.</p>
                         </div>
                     }
                 </div>
@@ -410,15 +418,22 @@
                     </h2>
                 </div>
                 <div class="h-56 sm:h-64 w-full flex-1 relative flex items-center justify-center">
-                    @defer (on viewport) {
-                        <canvas baseChart
-                            [data]="productsChartData"
-                            [options]="productsChartOptions"
-                            [type]="productsChartType">
-                        </canvas>
-                    } @placeholder {
-                        <div class="w-full h-full">
-                            <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
+                    @if (productsChartData) {
+                        @defer (on viewport) {
+                            <canvas baseChart
+                                [data]="productsChartData"
+                                [options]="productsChartOptions"
+                                [type]="productsChartType">
+                            </canvas>
+                        } @placeholder {
+                            <div class="w-full h-full">
+                                <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
+                            </div>
+                        }
+                    } @else {
+                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                            <i class="fas fa-box-open text-4xl mb-3 opacity-20"></i>
+                            <p class="text-sm">No hay productos vendidos.</p>
                         </div>
                     }
                 </div>
@@ -435,14 +450,21 @@
                     <i class="fas fa-chart-pie text-fuchsia-500"></i> Ventas por Categoría
                 </h2>
                 <div class="h-56 sm:h-64 w-full flex justify-center items-center">
-                    @defer (on viewport) {
-                        <canvas baseChart
-                            [data]="categoryChartData"
-                            [options]="categoryChartOptions"
-                            [type]="categoryChartType">
-                        </canvas>
-                    } @placeholder {
-                        <div class="w-48 h-48 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
+                    @if (categoryChartData) {
+                        @defer (on viewport) {
+                            <canvas baseChart
+                                [data]="categoryChartData"
+                                [options]="categoryChartOptions"
+                                [type]="categoryChartType">
+                            </canvas>
+                        } @placeholder {
+                            <div class="w-48 h-48 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
+                        }
+                    } @else {
+                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                            <i class="fas fa-chart-pie text-4xl mb-3 opacity-20"></i>
+                            <p class="text-sm">Sin datos por categoría.</p>
+                        </div>
                     }
                 </div>
             </div>

@@ -12,6 +12,9 @@ import { LoggerService } from '@app/core/services/logger.service';
 })
 export class SupabaseNotificationRepository extends BaseRepository<any> implements NotificationBaseRepository {
   protected override tableName = 'notifications';
+  protected override isGlobalTable = false;
+  protected override useSoftDeletes = false;
+  protected override useStrictBranchIsolation = true;
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);

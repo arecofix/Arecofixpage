@@ -15,6 +15,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     protected override tableName = 'repairs';
     protected override isGlobalTable = false;
     protected override useSoftDeletes = true;
+    protected override useStrictBranchIsolation = true;
 
     private storageService = inject(SupabaseStorageService);
 

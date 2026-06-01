@@ -119,9 +119,9 @@ export class NosotrosComponent implements OnInit {
       teamMembers: [
         {
           name: 'Ezequiel Enrico Areco',
-          role: 'Fundador & Director Técnico',
-          bio: 'Apasionado por la tecnología desde joven. Fundó Arecofix con la visión de profesionalizar el servicio técnico en la región. Ingeniero de software y experto en microelectrónica, lidera el equipo con un enfoque en calidad y educación continua.',
-          image: 'assets/img/perfil.jpeg',
+          role: 'Fundador & Ingeniero de Software',
+          bio: 'Desarrollador Full Stack y experto en Ciberseguridad e Infraestructura (DevOps). Con una sólida trayectoria construyendo sistemas empresariales (Spring Boot, Node, Supabase, AWS), Ezequiel aplica rigurosos estándares de ingeniería para garantizar reparaciones de alta complejidad y arquitecturas de software inquebrantables. Nivel de inglés C1 y estudiante universitario destacado.',
+          image: 'assets/img/portfolio/ezequiel-enrico-areco.jpeg',
           linkedin: environment.contact.socialMedia.linkedin
         }
       ],
