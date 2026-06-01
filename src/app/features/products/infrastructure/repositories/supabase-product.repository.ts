@@ -25,6 +25,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   protected override isGlobalTable = false;
   protected override useSoftDeletes = true;
   protected override suppressAuthNotifications = true;
+  protected override useStrictBranchIsolation = true;
 
   private stockService = inject(StockManagementService);
 
@@ -74,10 +75,6 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       .select(selectFields, { count: 'exact' });
       
     let query = this.applyTenantFilter(baseQuery);
-
-    if (branch_id) {
-      query = query.or(`branch_id.eq.${branch_id},is_global.eq.true`);
-    }
 
     if (params.is_active !== undefined) {
       query = query.eq('is_active', params.is_active);
@@ -209,9 +206,6 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
-        if (branch_id) {
-          query = query.or(`branch_id.eq.${branch_id},is_global.eq.true`);
-        }
         const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
         if (error) this.errorHandler.handleError(error, 'getAll (Products)');
         
@@ -377,8 +371,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
                     .select('price, is_active, deleted_at, branch_id, is_global, branch_stock:product_stock_per_branch(quantity, min_stock_alert, branch_id)')
             )
             .eq('is_active', true)
-            .is('deleted_at', null)
-            .or(`branch_id.eq.${branch_id},is_global.eq.true`);
+            .is('deleted_at', null);
 
             const { data, error } = await (query as any);
             if (error) throw error;

@@ -1,4 +1,4 @@
-import { ErrorHandler, Injectable, inject } from '@angular/core';
+import { ErrorHandler, Injectable, inject, Injector } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoggerService } from '../services/logger.service';
 import { NotificationService } from '../services/notification.service';
@@ -20,6 +20,7 @@ import {
 export class GlobalErrorHandler implements ErrorHandler {
     private logger = inject(LoggerService);
     private notification = inject(NotificationService);
+    private injector = inject(Injector);
 
     handleError(error: any): void {
         const errorString = String(error?.message || error || '').toLowerCase();
@@ -81,6 +82,13 @@ export class GlobalErrorHandler implements ErrorHandler {
                 break;
             case 404:
                 message = 'El recurso solicitado no fue encontrado.';
+                try {
+                    // Handle async injection of Router to avoid circular dependencies in ErrorHandler
+                    import('@angular/router').then(m => {
+                        const r = this.injector.get(m.Router);
+                        r.navigate(['/404'], { skipLocationChange: true });
+                    });
+                } catch(e) {}
                 break;
             case 500:
                 message = 'Error del servidor. Por favor intenta nuevamente más tarde.';

@@ -12,6 +12,8 @@ import { BranchContextService } from '@app/core/services/branch-context.service'
 })
 export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   protected override tableName = 'profiles'; // Point directly to profiles table
+  protected override isGlobalTable = false;
+  protected override useStrictBranchIsolation = true;
 
   private authService = inject(AuthService);
   protected override branchContextService = inject(BranchContextService);

@@ -1,206 +1,196 @@
 @if (content$ | async; as content) {
-  <!-- Hero Section -->
-  <!-- Hero Section -->
-  <div class="relative min-h-[60vh] flex items-center justify-center overflow-hidden py-20 bg-[#0a0a0a]">
-    <!-- Background Image/Gradient -->
-    <div class="absolute inset-0 z-0">
-      <div class="absolute inset-0 bg-linear-to-b from-gray-900/10 to-[#0a0a0a] z-10"></div>
-      <!-- Decorative circles -->
-      <div class="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse-slow"></div>
-      <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[100px]"></div>
+  <div class="bg-[#030712] text-white min-h-screen font-sans selection:bg-emerald-500/30">
+    <!-- Background Ambient Glow -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-emerald-900/20 blur-[120px] mix-blend-screen animate-pulse-slow"></div>
+      <div class="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-teal-900/20 blur-[120px] mix-blend-screen"></div>
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0wIDEwaDQwTTAgMjBoNDBNMCAzMGg0ME0xMCAwdjQwTTIwIDB2NDBNMzAgMHY0MCIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')] mask-[linear-gradient(to_bottom,black,transparent_80%)]"></div>
     </div>
-    <div class="relative z-10 container mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-7xl font-bold mb-6 tracking-tight text-white drop-shadow-lg text-gradient-premium">
-        {{ content.title }}
-      </h1>
-      <p class="text-xl md:text-3xl text-blue-200 mb-8 font-light drop-shadow-md">
-        {{ content.subtitle }}
-      </p>
-      <p class="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed drop-shadow-sm font-light">
-        {{ content.intro }}
-      </p>
-    </div>
-  </div>
-  <!-- Stats Section -->
-  <section class="py-12 glass-panel -mt-10 relative z-10 container mx-auto px-4 rounded-2xl shadow-2xl max-w-6xl border border-white/10 backdrop-blur-xl hover:translate-y-[-5px] transition-transform duration-500">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-gray-200 dark:divide-white/5">
-      @for (achievement of content.achievements; track achievement) {
-        <div class="p-4 group">
-          <div class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500 mb-2 group-hover:scale-110 transition-transform">{{ achievement.number }}</div>
-          <div class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">{{ achievement.label }}</div>
-          <div class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono">{{ achievement.description }}</div>
+
+    <div class="relative z-10 container mx-auto px-4 md:px-6 lg:px-8 py-24 md:py-32 flex flex-col gap-8 md:gap-12">
+      
+      <!-- HERO HEADER -->
+      <header class="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6 pt-10">
+        <div class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-sm font-semibold text-emerald-300 uppercase tracking-[0.2em]">{{ content.subtitle }}</span>
         </div>
-      }
-    </div>
-  </section>
-  <!-- History & Foundation -->
-  <section class="py-20 bg-gray-50 dark:bg-transparent">
-    <div class="container mx-auto px-4">
-      <div class="grid md:grid-cols-2 gap-12 items-center">
-        <div class="space-y-6">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ content.history }}</h2>
-          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-            {{ content.historyText }}
-          </p>
-          <div class="bg-white dark:bg-white/5 p-6 rounded-lg shadow-sm border-l-4 border-blue-500 backdrop-blur-sm">
-            <h3 class="font-bold text-gray-900 dark:text-white mb-2">{{ content.foundation }}</h3>
-            <p class="text-gray-600 dark:text-gray-300 text-sm italic">
-              "{{ content.foundationText }}"
-            </p>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-b from-white to-white/60 drop-shadow-2xl">
+          {{ content.title }}
+        </h1>
+        <p class="text-lg md:text-2xl text-gray-400 max-w-2xl font-light leading-relaxed">
+          {{ content.intro }}
+        </p>
+      </header>
+
+      <!-- BENTO GRID -->
+      <main class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-[auto] gap-4 md:gap-6 mt-10">
+        
+        <!-- Video Showcase (Col-span 2, Row-span 2) -->
+        <div class="group relative md:col-span-2 md:row-span-2 rounded-3xl bg-gray-900/40 border border-white/5 backdrop-blur-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-700 hover:shadow-[0_0_40px_rgba(16,185,129,0.15)] flex flex-col">
+          <div class="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="p-6 md:p-8 flex items-center gap-4 relative z-10">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0">
+              <i class="fa-solid fa-play ml-1"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-white">{{ content.history }}</h3>
+              <p class="text-sm text-gray-400">{{ content.foundation }}</p>
+            </div>
           </div>
-        </div>
-        <div class="relative">
-          <div class="aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10">
-            <iframe width="100%" height="100%" [src]="youtubeUrl"
-              title="Arecofix Video" frameborder="0"
+          <div class="relative w-full flex-1 min-h-[300px]">
+            <iframe class="absolute inset-0 w-full h-full grayscale group-hover:grayscale-0 transition-all duration-700" 
+              [src]="youtubeUrl" title="Arecofix Video" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen>
             </iframe>
           </div>
-          <!-- Decorative dot pattern -->
-          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500/10 dark:bg-blue-500/20 rounded-full -z-10 blur-xl"></div>
-          <div class="absolute -top-6 -left-6 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full -z-10 blur-xl"></div>
         </div>
-      </div>
-    </div>
-  </section>
-  <!-- Mission & Vision -->
-  <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
-    <div class="container mx-auto px-4">
-      <div class="grid grid-cols-2 gap-4 md:gap-8">
+
         <!-- Mission Card -->
-        <div class="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-blue-500/30 transition-colors shadow-sm dark:shadow-none">
-          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-600/80 text-blue-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
-            🎯
+        <div class="group md:col-span-1 md:row-span-1 rounded-3xl bg-linear-to-br from-emerald-900/40 to-gray-900/40 border border-emerald-500/20 backdrop-blur-2xl p-6 hover:bg-emerald-900/60 transition-all duration-500 flex flex-col justify-between">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl mb-6">
+            <i class="fa-solid fa-bullseye"></i>
           </div>
-          <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.mission }}</h3>
-          <p class="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-            {{ content.missionText }}
-          </p>
+          <div>
+            <h3 class="text-2xl font-bold text-white mb-2">{{ content.mission }}</h3>
+            <p class="text-sm text-gray-300 leading-relaxed">{{ content.missionText }}</p>
+          </div>
         </div>
+
         <!-- Vision Card -->
-        <div class="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/40 p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-white/10 hover:border-purple-500/30 transition-colors shadow-sm dark:shadow-none">
-          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-600/80 text-purple-600 dark:text-white rounded-lg flex items-center justify-center text-2xl mb-6 shadow-sm dark:shadow-lg backdrop-blur-md">
-            🔭
+        <div class="group md:col-span-1 md:row-span-1 rounded-3xl bg-linear-to-br from-teal-900/40 to-gray-900/40 border border-teal-500/20 backdrop-blur-2xl p-6 hover:bg-teal-900/60 transition-all duration-500 flex flex-col justify-between">
+          <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl mb-6">
+            <i class="fa-solid fa-eye"></i>
           </div>
-          <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ content.vision }}</h3>
-          <p class="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-            {{ content.visionText }}
-          </p>
+          <div>
+            <h3 class="text-2xl font-bold text-white mb-2">{{ content.vision }}</h3>
+            <p class="text-sm text-gray-300 leading-relaxed">{{ content.visionText }}</p>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
-  <!-- Values Section -->
-  <section class="py-20 bg-gray-50 dark:bg-transparent">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.valuesTitle }}</h2>
-        <div class="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
-      </div>
-      <div class="grid grid-cols-2 gap-4 md:gap-8">
-        @for (value of content.values; track value) {
-          <div class="bg-white dark:bg-white/5 p-4 md:p-8 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-white/10 transition-all duration-300 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
-            <div class="text-3xl md:text-4xl mb-4 md:mb-6">{{ value.icon }}</div>
-            <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">{{ value.title }}</h3>
-            <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              {{ value.description }}
-            </p>
+
+        <!-- Stats Grid (Col-span 2) -->
+        <div class="md:col-span-2 grid grid-cols-2 gap-4">
+          @for (stat of content.achievements; track stat) {
+            <div class="rounded-3xl bg-gray-900/40 border border-white/5 backdrop-blur-2xl p-6 flex flex-col justify-center items-center text-center hover:bg-gray-800/40 transition-colors">
+              <span class="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter">{{ stat.number }}</span>
+              <span class="text-xs text-emerald-400 font-bold uppercase tracking-widest mb-1">{{ stat.label }}</span>
+              <span class="text-xs text-gray-500">{{ stat.description }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Values Banner (Col Span 4) -->
+        <div class="md:col-span-4 rounded-3xl bg-gray-900/60 border border-white/5 backdrop-blur-3xl overflow-hidden relative group mt-6">
+          <div class="absolute right-0 top-0 w-1/3 h-full bg-linear-to-l from-emerald-900/30 to-transparent pointer-events-none"></div>
+          <div class="p-8 md:p-12">
+            <h2 class="text-3xl font-black text-white mb-8">{{ content.valuesTitle }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
+              @for (value of content.values; track value) {
+                <div class="flex gap-4 items-start">
+                  <div class="text-3xl bg-gray-800/50 p-3 rounded-2xl border border-white/5 shrink-0">{{ value.icon }}</div>
+                  <div>
+                    <h3 class="text-lg font-bold text-white mb-2">{{ value.title }}</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">{{ value.description }}</p>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
-        }
-      </div>
-    </div>
-  </section>
-  <!-- Team Section -->
-  <section class="py-20 bg-white dark:bg-white/5 backdrop-blur-sm">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.teamTitle }}</h2>
-        <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {{ content.teamSubtitle }}
-        </p>
-      </div>
-      <div class="flex justify-center flex-wrap gap-8">
-        @for (member of content.teamMembers; track member) {
-          <div class="max-w-md w-full bg-white dark:bg-white/5 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-white/10 transform hover:-translate-y-1 transition-transform duration-300 backdrop-blur-md">
-            <div class="h-32 bg-linear-to-r from-blue-600 to-indigo-600 opacity-80"></div>
-            <div class="px-8 pb-8">
-              <div class="relative -mt-16 mb-6">
-                <div class="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-900 overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-lg flex items-center justify-center text-4xl relative">
-                  <!-- Placeholder for image if not present -->
+        </div>
+
+        <!-- Team / Engineer Card (Col Span 4) -->
+        <div class="md:col-span-4 mt-6">
+          <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-black text-white mb-3">{{ content.teamTitle }}</h2>
+            <p class="text-gray-400">{{ content.teamSubtitle }}</p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-4xl mx-auto">
+            @for (member of content.teamMembers; track member) {
+              <div class="group rounded-3xl bg-gray-900/40 border border-white/10 backdrop-blur-2xl p-2 pr-2 md:pr-8 flex flex-col md:flex-row items-center gap-6 md:gap-10 hover:border-emerald-500/40 transition-colors duration-500">
+                <div class="w-full md:w-1/3 aspect-square rounded-3xl overflow-hidden relative shrink-0">
                   @if (member.image) {
-                    <img [ngSrc]="member.image" [alt]="member.name" class="object-cover" fill>
-                  } @else {
-                    👨‍💻
+                    <img [ngSrc]="member.image" [alt]="member.name" class="object-cover w-full h-full hover:scale-105 transition-all duration-700" fill>
+                  }
+                </div>
+                <div class="p-6 md:p-0 flex-1 flex flex-col justify-center">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4 w-fit">
+                    <i class="fa-solid fa-code"></i> {{ member.role }}
+                  </div>
+                  <h3 class="text-3xl md:text-4xl font-black text-white mb-4">{{ member.name }}</h3>
+                  <p class="text-gray-400 leading-relaxed mb-8">
+                    {{ member.bio }}
+                  </p>
+                  @if (member.linkedin) {
+                    <a [href]="member.linkedin" target="_blank" class="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 hover:bg-emerald-600 border border-white/10 hover:border-emerald-500 text-white font-medium transition-all duration-300 w-fit">
+                      <i class="fa-brands fa-linkedin-in text-lg"></i> Conectar en LinkedIn
+                    </a>
                   }
                 </div>
               </div>
-              <div class="text-center">
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ member.name }}</h3>
-                <p class="text-blue-600 dark:text-blue-400 font-medium mb-4">{{ member.role }}</p>
-                <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">
-                  {{ member.bio }}
-                </p>
-                @if (member.linkedin) {
-                  <a [href]="member.linkedin" target="_blank" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block p-2">
-                    <i class="fab fa-linkedin text-2xl"></i>
-                  </a>
-                }
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-  <!-- Certificate Gallery Section -->
-  <app-certificate-gallery [title]="'Nuestros Certificados'"></app-certificate-gallery>
-  <!-- FAQ Section -->
-  <section class="py-20 bg-gray-50 dark:bg-transparent">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ content.faqTitle }}</h2>
-      </div>
-      <div class="space-y-4">
-        @for (faq of content.faqs; track faq; let i = $index) {
-          <div class="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden backdrop-blur-sm">
-            <button (click)="toggleFAQ(i)"
-              class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
-              <span class="font-semibold text-gray-900 dark:text-white">{{ faq.question }}</span>
-              <span class="transform transition-transform duration-200" [class.rotate-180]="expandedFAQ === i">
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </span>
-            </button>
-            @if (expandedFAQ === i) {
-              <div class="px-6 pb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 mt-2 pt-4">
-                {{ faq.answer }}
-              </div>
             }
           </div>
-        }
+        </div>
+      </main>
+
+      <!-- FAQ Section -->
+      <section class="max-w-4xl mx-auto w-full mt-16">
+        <h2 class="text-3xl font-black text-white mb-8 text-center">{{ content.faqTitle }}</h2>
+        <div class="space-y-3">
+          @for (faq of content.faqs; track faq; let i = $index) {
+            <div class="rounded-2xl bg-gray-900/40 border border-white/5 backdrop-blur-xl overflow-hidden hover:border-white/10 transition-colors">
+              <button (click)="toggleFAQ(i)" class="w-full px-6 py-5 text-left flex items-center justify-between focus:outline-none">
+                <span class="font-semibold text-white">{{ faq.question }}</span>
+                <span class="shrink-0 ml-4 flex items-center justify-center w-8 h-8 rounded-full bg-white/5 text-gray-400 transition-transform duration-300" [class.rotate-180]="expandedFAQ === i">
+                  <i class="fa-solid fa-chevron-down text-sm"></i>
+                </span>
+              </button>
+              <div class="overflow-hidden transition-all duration-500 ease-in-out"
+                   [style.max-height]="expandedFAQ === i ? '500px' : '0px'"
+                   [style.opacity]="expandedFAQ === i ? '1' : '0'">
+                <div class="px-6 pb-6 text-gray-400 text-sm leading-relaxed">
+                  {{ faq.answer }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Bottom CTA -->
+      <section class="mt-10 mb-10">
+        <div class="rounded-[3rem] bg-linear-to-r from-emerald-900/80 to-gray-900 border border-emerald-500/20 backdrop-blur-3xl p-12 md:p-20 text-center relative overflow-hidden">
+          <img src="assets/img/branches/zona-norte/nosotros-hero.jpg" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay pointer-events-none" />
+          <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 blur-[80px]"></div>
+          
+          <div class="relative z-10 max-w-2xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight">{{ content.ctaTitle }}</h2>
+            <p class="text-lg text-emerald-100/70 mb-10">{{ content.ctaText }}</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a href="https://wa.me/541125960900" target="_blank"
+                class="inline-flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] w-full sm:w-auto">
+                <i class="fa-brands fa-whatsapp mr-3 text-xl"></i>
+                {{ content.ctaWhatsapp }}
+              </a>
+              <a routerLink="/contacto"
+                class="inline-flex items-center justify-center px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-105 w-full sm:w-auto">
+                {{ content.ctaContact }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Certificate Gallery -->
+      <div class="mt-10 border-t border-white/10 pt-20 pb-20">
+        <app-certificate-gallery [title]="'Nuestras Credenciales y Certificaciones'"></app-certificate-gallery>
       </div>
+
     </div>
-  </section>
-  <!-- CTA Section -->
-  <section class="py-20 bg-linear-to-r from-blue-600/90 to-indigo-600/90 dark:from-blue-900/80 dark:to-indigo-900/80 text-white text-center backdrop-blur-md border-t border-white/10">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl md:text-4xl font-bold mb-6">{{ content.ctaTitle }}</h2>
-      <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-        {{ content.ctaText }}
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="https://wa.me/541125960900" target="_blank"
-          class="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg">
-          <i class="fab fa-whatsapp mr-2 text-xl"></i>
-          {{ content.ctaWhatsapp }}
-        </a>
-        <a routerLink="/contacto"
-          class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
-          {{ content.ctaContact }}
-        </a>
-      </div>
-    </div>
-  </section>
+  </div>
 }

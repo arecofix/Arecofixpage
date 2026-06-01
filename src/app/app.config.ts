@@ -21,6 +21,7 @@ import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { SupabaseService } from './core/services/supabase.service';
 import { SUPABASE_CLIENT } from './core/di/supabase-token';
 import { globalErrorInterceptor } from './core/interceptors/error.interceptor';
+import { timeoutInterceptor } from './core/interceptors/timeout.interceptor';
 import { ProductRepository } from './features/products/domain/repositories/product.repository';
 import { SupabaseProductRepository } from './features/products/infrastructure/repositories/supabase-product.repository';
 import { CategoryRepository } from './features/products/domain/repositories/category.repository';
@@ -93,7 +94,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(
       withFetch(),
-      withInterceptors([globalErrorInterceptor])
+      withInterceptors([timeoutInterceptor, globalErrorInterceptor])
     ),
 
     // Repositories

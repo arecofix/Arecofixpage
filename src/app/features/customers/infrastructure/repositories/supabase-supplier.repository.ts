@@ -9,6 +9,8 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 })
 export class SupabaseSupplierRepository extends BaseRepository<Supplier> {
   protected override tableName = 'suppliers';
+  protected override isGlobalTable = false;
+  protected override useStrictBranchIsolation = true;
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);

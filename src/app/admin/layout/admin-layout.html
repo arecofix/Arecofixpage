@@ -121,7 +121,7 @@
             
             <!-- Logo Section -->
             <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/50" [ngClass]="!isMainMenuOpen() ? 'justify-center px-0' : ''">
-                <div class="flex items-center gap-4 group cursor-pointer" routerLink="/admin/dashboard">
+                <div class="flex items-center gap-4 group cursor-pointer" [routerLink]="branchService.currentBranch()?.slug ? '/' + branchService.currentBranch()?.slug + '/admin/dashboard' : '/admin/dashboard'">
                     @let branding = branchBranding();
                     @if (branding.logo && branding.logo.includes('.')) {
                         <img [src]="branding.logo" [alt]="branding.name" class="w-10 h-10 rounded-2xl object-contain bg-white shadow-xl group-hover:scale-105 transition-transform" [ngClass]="!isMainMenuOpen() ? 'mx-auto' : ''">
@@ -266,7 +266,7 @@
                         <p class="text-[10px] uppercase font-bold text-slate-500 tracking-[0.2em] mb-4 ml-4">ADMINISTRACIÓN</p>
                         }
                         <div class="space-y-1">
-                            <a routerLink="/admin/branches" routerLinkActive="bg-white/10 text-white"
+                            <a [routerLink]="branchService.currentBranch()?.slug ? '/' + branchService.currentBranch()?.slug + '/admin/branches' : '/admin/branches'" routerLinkActive="bg-white/10 text-white"
                                class="flex items-center gap-3 py-3 rounded-2xl text-sm font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-all group"
                                [ngClass]="isMainMenuOpen() ? 'px-4' : 'px-0 justify-center tooltip tooltip-right'" data-tip="Gestión Sucursales">
                                 <div class="w-8 h-8 rounded-xl bg-slate-800/50 flex items-center justify-center group-hover:bg-slate-700 transition-colors">

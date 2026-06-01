@@ -78,12 +78,58 @@
                         <p class="mt-1 text-xs text-gray-500">Título que aparecerá en Google.</p>
                     </div>
 
-                    <div>
-                        <label for="meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta
-                            Descripción</label>
-                        <textarea id="meta_description" formControlName="meta_description" rows="3"
-                            class="w-full rounded-lg border-gray-300 bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"></textarea>
-                        <p class="mt-1 text-xs text-gray-500">Breve descripción para los resultados de búsqueda.</p>
+                    <!-- SEO Description -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Descripción SEO
+                        </label>
+                        <textarea formControlName="meta_description" rows="3"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors resize-none"
+                            placeholder="Breve descripción para buscadores"></textarea>
+                    </div>
+
+                    <!-- Plantilla del Post -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Diseño de Plantilla (Template)
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <!-- Modern -->
+                            <label class="cursor-pointer">
+                                <input type="radio" formControlName="template" value="modern" class="peer sr-only">
+                                <div class="rounded-xl border-2 border-transparent bg-white dark:bg-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 shadow-sm">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-bold text-gray-900 dark:text-white">Moderno</h4>
+                                        <i class="fas fa-desktop text-indigo-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Cabecera panorámica, diseño limpio y minimalista. Ideal para artículos estándar.</p>
+                                </div>
+                            </label>
+
+                            <!-- Classic -->
+                            <label class="cursor-pointer">
+                                <input type="radio" formControlName="template" value="classic" class="peer sr-only">
+                                <div class="rounded-xl border-2 border-transparent bg-white dark:bg-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 shadow-sm">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-bold text-gray-900 dark:text-white">Clásico</h4>
+                                        <i class="fas fa-book-open text-amber-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Enfoque en la lectura profunda. Tipografía tradicional y contenido centrado.</p>
+                                </div>
+                            </label>
+
+                            <!-- Minimal -->
+                            <label class="cursor-pointer">
+                                <input type="radio" formControlName="template" value="minimal" class="peer sr-only">
+                                <div class="rounded-xl border-2 border-transparent bg-white dark:bg-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 shadow-sm">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-bold text-gray-900 dark:text-white">Minimalista</h4>
+                                        <i class="fas fa-feather text-emerald-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Sin distracciones. Puro texto y espaciado amplio para máxima inmersión.</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -96,6 +142,25 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Imagen Destacada</h3>
 
                 <div class="space-y-4">
+                    <!-- Published Toggle -->
+                    <div class="mb-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="relative">
+                                <input type="checkbox" formControlName="published" class="sr-only">
+                                <div class="block bg-gray-300 w-10 h-6 rounded-full transition-colors"
+                                     [class.bg-green-500]="form.get('published')?.value"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"
+                                     [class.translate-x-4]="form.get('published')?.value"></div>
+                            </div>
+                            <div class="ml-3">
+                                <span class="block text-sm font-medium text-gray-900">Estado de Publicación</span>
+                                <span class="block text-xs text-gray-500">
+                                    {{ form.get('published')?.value ? 'La entrada será visible en el blog' : 'Se guardará como borrador oculto' }}
+                                </span>
+                            </div>
+                        </label>
+                    </div>
+
                     @if (imagePreview) {
                     <div
                         class="relative group rounded-lg overflow-hidden border border-gray-200 aspect-video bg-gray-100">

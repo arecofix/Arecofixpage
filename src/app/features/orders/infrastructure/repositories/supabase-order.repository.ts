@@ -13,7 +13,8 @@ import { OrderMapper } from '../mappers/order.mapper';
 export class SupabaseOrderRepository extends BaseRepository<Order> implements OrderRepository {
   protected override tableName = 'orders';
   protected override isGlobalTable = false;
-  protected override useSoftDeletes = false;
+  protected override useSoftDeletes = true;
+  protected override useStrictBranchIsolation = true;
 
   constructor() {
     const supabase = inject(SUPABASE_CLIENT);

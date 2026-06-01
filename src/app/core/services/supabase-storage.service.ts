@@ -77,9 +77,9 @@ export class SupabaseStorageService {
           upsert: options.upsert || false
         });
 
-      // 30s timeout safety
+      // 60s timeout safety for slow network connections
       const timeoutPromise = new Promise<{ data: any; error: any }>((_, reject) => {
-          setTimeout(() => reject(new Error('Upload timeout (30s)')), 30000);
+          setTimeout(() => reject(new Error('Upload timeout (60s)')), 60000);
       });
 
       const { data, error } = await Promise.race([uploadPromise, timeoutPromise]) as any;

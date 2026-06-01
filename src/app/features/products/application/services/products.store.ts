@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, finalize } from 'rxjs/operators';
 import { ProductRepository } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
@@ -83,12 +83,13 @@ export class ProductsStore {
             totalPages: response.pages
           }
         }));
-        this.loading.set(false);
       }),
       catchError((err) => {
-        this.loading.set(false);
         this.error.set(err.message || 'Error al obtener listado de productos.');
         return throwError(() => err);
+      }),
+      finalize(() => {
+        this.loading.set(false);
       })
     );
   }
@@ -121,12 +122,13 @@ export class ProductsStore {
             }
           }));
         }
-        this.loading.set(false);
       }),
       catchError((err) => {
-        this.loading.set(false);
         this.error.set(err.message || 'Error al obtener detalle de producto.');
         return throwError(() => err);
+      }),
+      finalize(() => {
+        this.loading.set(false);
       })
     );
   }

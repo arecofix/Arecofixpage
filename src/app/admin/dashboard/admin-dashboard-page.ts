@@ -221,6 +221,8 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
       const branchId = this.branchContextService.currentBranchId();
       this.loadStats$.next(branchId || undefined);
     });
+
+    // Efecto removido: watchdogTimer
   }
 
   async ngOnInit() {
@@ -254,6 +256,12 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
 
   async loadStats(branchId?: string) {
     this.loadStats$.next(branchId);
+  }
+
+  forceRetryStats() {
+    this.loading.set(false);
+    const branchId = this.branchContextService.currentBranchId();
+    this.loadStats$.next(branchId || undefined);
   }
 
   async loadPendingProductsCount() {
@@ -296,23 +304,34 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
           pointRadius: 0
         }]
       };
+    } else {
+      this.salesChartData = undefined;
     }
 
     // Category Chart
     if (stats.category_chart?.length > 0) {
+      const colors = [
+        CHART_COLORS.primary,
+        CHART_COLORS.success,
+        CHART_COLORS.warning,
+        CHART_COLORS.error,
+        CHART_COLORS.info,
+        '#8b5cf6', // violet
+        '#ec4899', // pink
+        '#14b8a6', // teal
+        '#f97316', // orange
+        '#64748b'  // slate
+      ];
+
       this.categoryChartData = {
         labels: stats.category_chart.map(c => c.name),
         datasets: [{
           data: stats.category_chart.map(c => c.count),
-          backgroundColor: [
-            CHART_COLORS.primary,
-            CHART_COLORS.success,
-            CHART_COLORS.warning,
-            CHART_COLORS.error,
-            CHART_COLORS.info
-          ]
+          backgroundColor: stats.category_chart.map((_, i) => colors[i % colors.length])
         }]
       };
+    } else {
+      this.categoryChartData = undefined;
     }
 
     // Products Chart
@@ -326,6 +345,8 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
           borderRadius: 8
         }]
       };
+    } else {
+      this.productsChartData = undefined;
     }
   }
 

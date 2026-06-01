@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Post } from '@app/features/posts/domain/entities/post.entity';
+import { Post, PostComment } from '@app/features/posts/domain/entities/post.entity';
 import { TenantScopedQueryService } from '@app/core/infrastructure/supabase/tenant-scoped-query.service';
 
 @Injectable({ providedIn: 'root' })
@@ -30,6 +30,34 @@ export class PostService {
     return (data || []).map((item) => this.mapToEntity(item));
   }
 
+  async getComments(postId: string): Promise<PostComment[]> {
+    const { data, error } = await this.scoped.client
+      .from('post_comments')
+      .select('*')
+      .eq('post_id', postId)
+      .eq('status', 'approved')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data as PostComment[];
+  }
+
+  async addComment(postId: string, userName: string, comment: string): Promise<PostComment> {
+    const { data, error } = await this.scoped.client
+      .from('post_comments')
+      .insert({
+        post_id: postId,
+        user_name: userName,
+        comment: comment,
+        status: 'approved' // Automatically approved for simplicity, or pending if you prefer
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as PostComment;
+  }
+
   private mapToEntity(data: Record<string, unknown>): Post {
     const rawImage = (data['featured_image'] ?? data['image'] ?? data['image_url']) as string | null;
     return {
@@ -43,6 +71,7 @@ export class PostService {
       published: data['status'] === 'published',
       meta_title: (data['seo_title'] || data['meta_title']) as string | undefined,
       meta_description: (data['seo_description'] || data['meta_description']) as string | undefined,
+      template: (data['template'] || 'modern') as string,
     };
   }
 
