@@ -21,4 +21,5 @@ export interface iCategory {
     image_url?:  string;
     tenant_id?:  string;
     branch_id?:  string;
+    children?:   iCategory[];
 }

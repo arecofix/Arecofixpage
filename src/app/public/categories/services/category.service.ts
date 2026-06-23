@@ -211,26 +211,39 @@ export class CategoryService {
   }
 
   /**
-   * Builds the full ancestor chain for a category (root → ... → parent → self).
+   * Builds the full ancestor chain for a category (root → ... → parent → self) using recursion.
    * Operates on an already-loaded flat list to avoid extra HTTP calls.
    * @param categoryId - The ID of the target category
    * @param allCategories - Full flat list of all categories
+   * @param visited - Set of visited IDs to prevent infinite loops from circular references
    * @returns Ordered array from root ancestor to the category itself
    */
-  public buildAncestorChain(categoryId: string, allCategories: iCategory[]): iCategory[] {
-    const chain: iCategory[] = [];
-    let current = allCategories.find(c => c.id === categoryId);
+  public buildAncestorChain(categoryId: string, allCategories: iCategory[], visited = new Set<string>()): iCategory[] {
+    const current = allCategories.find(c => c.id === categoryId);
+    if (!current || visited.has(current.id)) return [];
 
-    // Walk up the tree with a guard against circular refs
-    const visited = new Set<string>();
-    while (current && !visited.has(current.id)) {
-      visited.add(current.id);
-      chain.unshift(current); // prepend so order is root → leaf
-      if (!current.parent_id) break;
-      current = allCategories.find(c => c.id === current!.parent_id);
-    }
+    visited.add(current.id);
+    const parentChain = current.parent_id 
+        ? this.buildAncestorChain(current.parent_id, allCategories, visited) 
+        : [];
+        
+    return [...parentChain, current];
+  }
 
-    return chain;
+  /**
+   * Optimización/Refactorización con Recursividad:
+   * Construye un árbol anidado de categorías de forma recursiva a partir de una lista plana.
+   * @param allCategories - Full flat list of all categories
+   * @param parentId - The parent ID to start from (null for root categories)
+   * @returns Nested array of categories with their children
+   */
+  public buildCategoryTree(allCategories: iCategory[], parentId: string | null = null): iCategory[] {
+    return allCategories
+      .filter(c => (parentId === null ? !c.parent_id : c.parent_id === parentId))
+      .map(c => ({
+        ...c,
+        children: this.buildCategoryTree(allCategories, c.id)
+      }));
   }
 
   public create(category: Partial<iCategory>): Observable<iCategory> {

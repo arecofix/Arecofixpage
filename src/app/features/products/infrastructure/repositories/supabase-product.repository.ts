@@ -107,11 +107,11 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     if (params.q) {
       const queryStr = params.q.trim();
       if (queryStr) {
-        // Use PostgreSQL Full Text Search for better performance and ranking
-        // This requires 'search_tsv' column in the database
-        query = query.textSearch('search_tsv', queryStr, { 
-          config: 'spanish', 
-          type: 'websearch' 
+        // Separamos por espacios y buscamos que el nombre contenga todas las palabras
+        // Esto permite coincidencias parciales y desordenadas (ej: "pantalla 11" encuentra "Pantalla original iphone 11")
+        const words = queryStr.split(/\s+/).filter(w => w.length > 0);
+        words.forEach(word => {
+          query = query.ilike('name', `%${word}%`);
         });
       }
     }

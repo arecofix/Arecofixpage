@@ -28,7 +28,7 @@ import { FormsModule } from '@angular/forms';
                 </select>
             </div>
             <div class="form-control">
-                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Modelo del Equipo</span></label>
+                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Modelo del Equipo <span class="text-error">*</span></span></label>
                 <input type="text" [ngModel]="deviceModel()" (ngModelChange)="onDeviceModelChange.emit($event)" name="device_model" class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white" required placeholder="Ej: iPhone 13 Pro Max" />
             </div>
             <div class="form-control">
@@ -43,7 +43,7 @@ import { FormsModule } from '@angular/forms';
         </div>
 
         <div class="form-control mb-8">
-            <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Motivo de Ingreso / Fallas reportadas</span></label>
+            <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Motivo de Ingreso / Fallas reportadas <span class="text-error">*</span></span></label>
             <textarea [ngModel]="issueDescription()" (ngModelChange)="onIssueDescriptionChange.emit($event)" name="issue_description" class="textarea textarea-bordered h-28 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all text-gray-700 dark:text-gray-200 leading-relaxed resize-none" placeholder="El cliente indica que la pantalla no enciende, pero vibra al conectarlo al cargador..."></textarea>
         </div>
 

@@ -141,6 +141,16 @@ export class CartService {
         await this.supabase.from('orders').delete().eq('id', guestCart.id!);
     }
 
+    private syncOrderState(updatedOrder: Order) {
+        this.currentOrderSignal.set(updatedOrder);
+        this.cartItems.set(
+            updatedOrder.items?.filter(item => item.product).map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })) || []
+        );
+    }
+
     private async getOrCreateActiveOrder(): Promise<Order> {
         const user = this.authService.getCurrentUser();
         const userId = user?.id;
@@ -197,14 +207,7 @@ export class CartService {
             order.total_amount = subtotal;
 
             const updatedOrder = await firstValueFrom(this.orderService.updateOrder(order.id!, order));
-            this.currentOrderSignal.set(updatedOrder);
-
-            this.cartItems.set(
-                updatedOrder.items?.filter(item => item.product).map(item => ({
-                    product: item.product,
-                    quantity: item.quantity
-                })) || []
-            );
+            this.syncOrderState(updatedOrder);
 
             this.logger.debug('Product added to cart', { productName: product.name });
             this.toastService.show('Agregaste un producto al carrito', 'success', () => this.openCart());
@@ -226,14 +229,7 @@ export class CartService {
             order.total_amount = subtotal;
 
             const updatedOrder = await firstValueFrom(this.orderService.updateOrder(order.id!, order));
-            this.currentOrderSignal.set(updatedOrder);
-
-            this.cartItems.set(
-                updatedOrder.items?.filter(item => item.product).map(item => ({
-                    product: item.product,
-                    quantity: item.quantity
-                })) || []
-            );
+            this.syncOrderState(updatedOrder);
         } catch (error) {
             this.logger.error('Error removing from cart', error);
             this.toastService.show('Error al eliminar el producto', 'error');
@@ -263,14 +259,7 @@ export class CartService {
             order.total_amount = subtotal;
 
             const updatedOrder = await firstValueFrom(this.orderService.updateOrder(order.id!, order));
-            this.currentOrderSignal.set(updatedOrder);
-
-            this.cartItems.set(
-                updatedOrder.items?.filter(i => i.product).map(i => ({
-                    product: i.product,
-                    quantity: i.quantity
-                })) || []
-            );
+            this.syncOrderState(updatedOrder);
         } catch (error) {
             this.logger.error('Error updating quantity in cart', error);
             this.toastService.show('Error al actualizar la cantidad', 'error');

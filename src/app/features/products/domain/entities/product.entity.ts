@@ -20,9 +20,11 @@ export interface Product {
     sale_price?: number;
     category_id: string;
     brand_id?: string;
+    model_id?: string;
     image_url?: string;
     gallery_urls?: string[];
     media_metadata?: Array<{ url: string; color?: string; order?: number }>;
+    specifications?: Record<string, any>;
     is_featured: boolean;
     is_active: boolean;
     is_global?: boolean;
@@ -38,6 +40,7 @@ export interface Product {
     updated_at: string;
     tenant_id?: string;
     deleted_at?: string;
+    search_tsv?: string;
     // strategic fields for UI
     discount_percentage?: number;
     category_name?: string;
@@ -55,10 +58,14 @@ export interface CreateProductDto {
     slug: string;
     description?: string;
     price: number;
+    sale_price?: number;
     category_id: string;
     brand_id?: string;
+    model_id?: string;
     image_url?: string;
     gallery_urls?: string[];
+    media_metadata?: Array<{ url: string; color?: string; order?: number }>;
+    specifications?: Record<string, any>;
     is_featured?: boolean;
     stock: number;
     min_stock_alert?: number;

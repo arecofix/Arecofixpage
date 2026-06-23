@@ -30,10 +30,13 @@
     "strictTemplates": true
   },
   "files": [],
-  "exclude": ["supabase"],
+  "exclude": ["supabase", "cypress"],
   "references": [
     {
       "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
     }
   ]
 }

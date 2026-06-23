@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "Arecofix Supabase API Test",
+    "description": "Colección autogenerada para probar la conexión a la base de datos de Supabase desde el front-end.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Obtener Productos (Products)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{SUPABASE_ANON_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{SUPABASE_ANON_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{SUPABASE_URL}}/rest/v1/products?select=*",
+          "host": [
+            "{{SUPABASE_URL}}"
+          ],
+          "path": [
+            "rest",
+            "v1",
+            "products"
+          ],
+          "query": [
+            {
+              "key": "select",
+              "value": "*"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Obtener Cursos (Courses)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{SUPABASE_ANON_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{SUPABASE_ANON_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{SUPABASE_URL}}/rest/v1/courses?select=*",
+          "host": [
+            "{{SUPABASE_URL}}"
+          ],
+          "path": [
+            "rest",
+            "v1",
+            "courses"
+          ],
+          "query": [
+            {
+              "key": "select",
+              "value": "*"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Obtener Reparaciones (Repairs)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{SUPABASE_ANON_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{SUPABASE_ANON_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{SUPABASE_URL}}/rest/v1/repairs?select=*",
+          "host": [
+            "{{SUPABASE_URL}}"
+          ],
+          "path": [
+            "rest",
+            "v1",
+            "repairs"
+          ],
+          "query": [
+            {
+              "key": "select",
+              "value": "*"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "SUPABASE_URL",
+      "value": "https://TU_PROYECTO.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "SUPABASE_ANON_KEY",
+      "value": "TU_ANON_KEY",
+      "type": "string"
+    }
+  ]
+}

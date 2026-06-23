@@ -278,7 +278,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
           category: 'Educación & Certificaciones',
           skills: [
             { name: 'Licenciatura en Informática (UNO - Universidad Nacional del Oeste)', icon: 'fas fa-graduation-cap', description: 'Estudiante universitario (Promedio: 8.40) con bases teóricas sólidas en redes, criptografía y algoritmos.' },
-            { name: 'Programación en Python', icon: 'fab fa-python', description: 'Curso de especialización de 1 año (Agencia de Aprendizaje a lo Largo de la Vida - CABA). Enfoque en algoritmos, estructuras de datos y backend.' },
+            { name: 'Programación en Python', icon: 'fa-brands fa-python fa-fw', description: 'Curso de especialización de 1 año (Agencia de Aprendizaje a lo Largo de la Vida - CABA). Enfoque en algoritmos, estructuras de datos y backend.' },
             { name: 'Inglés Avanzado B2', icon: 'fas fa-language', description: 'Nivel C1 certificado. Fluidez en conversación y documentación técnica para integración inmediata en equipos internacionales.' }
           ]
         }
@@ -587,7 +587,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
           category: 'Education & Key Skills',
           skills: [
             { name: 'Computer Science Degree (UNO - Universidad Nacional del Oeste)', icon: 'fas fa-graduation-cap', description: 'University student (GPA: 8.40) with strong theoretical foundations in networks, cryptography, and algorithms.' },
-            { name: 'Python Programming', icon: 'fab fa-python', description: '1-year specialization course (Agencia de Aprendizaje a lo Largo de la Vida - CABA). Focus on algorithms, data structures, and backend.' },
+            { name: 'Python Programming', icon: 'fa-brands fa-python fa-fw', description: '1-year specialization course (Agencia de Aprendizaje a lo Largo de la Vida - CABA). Focus on algorithms, data structures, and backend.' },
             { name: 'Advanced English C1', icon: 'fas fa-language', description: 'C1 certified. Fluent in conversation and technical documentation for immediate integration into international teams.' }
           ]
         }
@@ -935,7 +935,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
     if (t.includes('tailwind')) return 'fab fa-css3-alt text-[#38bdf8]';
     if (t.includes('firebase')) return 'fas fa-fire text-[#ffca28]';
     if (t.includes('rxjs')) return 'fas fa-sync text-[#c2185b]';
-    if (t.includes('python')) return 'fab fa-python text-[#3776ab]';
+    if (t.includes('python')) return 'fa-brands fa-python fa-fw text-[#3776ab]';
     if (t.includes('flask')) return 'fas fa-flask text-[#e5e5e5]';
     if (t.includes('django')) return 'fas fa-server text-[#092e20]';
     if (t.includes('sqlite')) return 'fas fa-database text-[#003b57]';

@@ -307,7 +307,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             title: 'Technology Stack',
             subtitle: 'Our Engineering Core',
             items: [
-                { name: 'Python', icon: 'fab fa-python', category: 'backend' },
+                { name: 'Python', icon: 'fa-brands fa-python fa-fw', category: 'backend' },
                 { name: 'TensorFlow', icon: 'fas fa-brain', category: 'backend' },
                 { name: 'Angular', icon: 'fab fa-angular', category: 'frontend' },
                 { name: 'Node.js', icon: 'fab fa-node', category: 'backend' },
@@ -582,7 +582,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
         title: 'Tecnologías Principales',
         subtitle: 'Dominamos el ecosistema moderno',
         items: [
-            { name: 'Python', icon: 'fab fa-python', category: 'backend' },
+            { name: 'Python', icon: 'fa-brands fa-python fa-fw', category: 'backend' },
             { name: 'Java', icon: 'fab fa-java', category: 'backend' },
             { name: 'Angular', icon: 'fab fa-angular', category: 'frontend' },
             { name: 'React', icon: 'fab fa-react', category: 'frontend' },

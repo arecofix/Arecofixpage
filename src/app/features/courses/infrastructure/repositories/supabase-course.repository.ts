@@ -106,7 +106,7 @@ export class SupabaseCourseRepository extends CourseRepository {
       course_id: courseId,
       order_index: idx + 1,
       tenant_id: tid,
-      id: m.id && m.id.length > 10 ? m.id : undefined,
+      id: m.id && m.id.length > 10 ? m.id : crypto.randomUUID(),
     }));
 
     const { data, error } = await this.scoped.from('course_modules').upsert(toUpsert).select();

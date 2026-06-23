@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { CoursesService } from '@app/core/services/courses.service';
-import { Course } from '@app/features/courses/domain/entities/course.entity';
+import { Course, CourseLevel } from '@app/features/courses/domain/entities/course.entity';
 import { TenantService } from '@app/core/services/tenant.service';
 
 @Component({
@@ -29,7 +29,7 @@ export class CreateCourseComponent {
     description: '',
     duration: '',
     schedule: '',
-    level: 'Básico',
+    level: CourseLevel.BASIC,
     price: 0,
     image_url: ''
   };

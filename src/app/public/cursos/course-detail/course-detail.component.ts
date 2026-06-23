@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SeoService } from '@app/core/services/seo.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CoursesService, Course, Module } from '@app/core/services/courses.service';
+import { CourseLevel } from '@app/features/courses/domain/entities/course.entity';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { IsLoadingComponent, IsErrorComponent } from '@app/shared/components/resource-status';
@@ -198,7 +199,7 @@ export class CourseDetailComponent implements OnInit {
               schedule: 'Sábados 10:00 - 13:00hs',
               price: 45000,
               image_url: 'assets/img/cursos/pro.webp',
-              level: 'Intermedio',
+              level: CourseLevel.INTERMEDIATE,
               students: 230,
               rating: 4.9,
               status: 'published',
@@ -213,7 +214,7 @@ export class CourseDetailComponent implements OnInit {
               schedule: 'Miércoles 18:00 - 21:00hs',
               price: 65000,
               image_url: 'assets/img/cursos/laboratorio.jpg',
-              level: 'Avanzado',
+              level: CourseLevel.ADVANCED,
               students: 85,
               rating: 5.0,
               status: 'published',
@@ -228,7 +229,7 @@ export class CourseDetailComponent implements OnInit {
               schedule: 'Martes 19:00 - 21:00hs',
               price: 42000,
               image_url: 'assets/img/cursos/pc-repair.jpg',
-              level: 'Básico',
+              level: CourseLevel.BASIC,
               students: 60,
               rating: 4.8,
               status: 'published',

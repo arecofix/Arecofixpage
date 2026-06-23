@@ -1,0 +1,3162 @@
+[
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "color",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "contacto@empresa.com",
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "+5491100000000",
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: Banco Galicia",
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "EMPRESA.PAGO.AR",
+    "selector": "input"
+  },
+  {
+    "file": "admin/branches/admin-branches-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0000000000000000000000",
+    "selector": "input"
+  },
+  {
+    "file": "admin/brands/admin-brand-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "brand-name",
+    "name": "name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#brand-name"
+  },
+  {
+    "file": "admin/brands/admin-brand-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "brand-slug",
+    "name": "slug",
+    "formControlName": null,
+    "placeholder": "Se genera automáticamente si se deja vacío",
+    "selector": "input#brand-slug"
+  },
+  {
+    "file": "admin/brands/admin-brand-form-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": "brand-logo",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#brand-logo"
+  },
+  {
+    "file": "admin/brands/admin-brand-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "brand-is_active",
+    "name": "is_active",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#brand-is_active"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "cat-name",
+    "name": "name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#cat-name"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "cat-slug",
+    "name": "slug",
+    "formControlName": null,
+    "placeholder": "Se genera automáticamente si se deja vacío",
+    "selector": "input#cat-slug"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "cat-description",
+    "name": "description",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "textarea#cat-description"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "cat-image_url",
+    "name": "image_url",
+    "formControlName": null,
+    "placeholder": "Ej: fas fa-mobile-alt",
+    "selector": "input#cat-image_url"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": "cat-type",
+    "name": "type",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#cat-type"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": "cat-parent_id",
+    "name": "parent_id",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#cat-parent_id"
+  },
+  {
+    "file": "admin/categories/admin-category-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "cat-is_active",
+    "name": "is_active",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#cat-is_active"
+  },
+  {
+    "file": "admin/clients/admin-client-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "client-first_name",
+    "name": "first_name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#client-first_name"
+  },
+  {
+    "file": "admin/clients/admin-client-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "client-last_name",
+    "name": "last_name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#client-last_name"
+  },
+  {
+    "file": "admin/clients/admin-client-form-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "client-email",
+    "name": "email",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#client-email"
+  },
+  {
+    "file": "admin/clients/admin-client-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "client-phone",
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#client-phone"
+  },
+  {
+    "file": "admin/clients/admin-client-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "client-dni",
+    "name": "dni",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#client-dni"
+  },
+  {
+    "file": "admin/clients/admin-client-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "client-address",
+    "name": "address",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#client-address"
+  },
+  {
+    "file": "admin/clients/admin-clients-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar por nombre, email, teléfono o DNI...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "comp-name",
+    "name": "name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#comp-name"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "comp-owner_name",
+    "name": "owner_name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#comp-owner_name"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "comp-tax_id",
+    "name": "tax_id",
+    "formControlName": null,
+    "placeholder": "Ej: 20-12345678-9",
+    "selector": "input#comp-tax_id"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "comp-address",
+    "name": "address",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#comp-address"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "comp-email",
+    "name": "email",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#comp-email"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "comp-phone",
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#comp-phone"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "comp-location",
+    "name": "location",
+    "formControlName": null,
+    "placeholder": "Ej: Buenos Aires, Argentina",
+    "selector": "input#comp-location"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "tax_percentage",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"tax_percentage\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "tax_abbreviation",
+    "formControlName": null,
+    "placeholder": "Ej: IVA",
+    "selector": "input[name=\"tax_abbreviation\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "ruc_name",
+    "formControlName": null,
+    "placeholder": "Ej: CUIT, CUIL, RUC",
+    "selector": "input[name=\"ruc_name\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "currency",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"currency\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "usd_rate",
+    "formControlName": null,
+    "placeholder": "1.00",
+    "selector": "input[name=\"usd_rate\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "password",
+    "id": "new-password",
+    "name": "newPassword",
+    "formControlName": null,
+    "placeholder": "Mínimo 6 caracteres",
+    "selector": "input#new-password"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "password",
+    "id": "confirm-password",
+    "name": "confirmPassword",
+    "formControlName": null,
+    "placeholder": "Confirma la nueva contraseña",
+    "selector": "input#confirm-password"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "branch-name",
+    "name": "branch_name",
+    "formControlName": null,
+    "placeholder": "Ej: Zona Centro",
+    "selector": "input#branch-name"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "branch-slug",
+    "name": "branch_slug",
+    "formControlName": null,
+    "placeholder": "zona-centro",
+    "selector": "input#branch-slug"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": "branch-markup",
+    "name": "branch_markup",
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input#branch-markup"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "branch-address",
+    "name": "branch_address",
+    "formControlName": null,
+    "placeholder": "Ej: San Martin 123",
+    "selector": "input#branch-address"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "edit_name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"edit_name\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "edit_slug",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"edit_slug\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "edit_markup",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"edit_markup\"]"
+  },
+  {
+    "file": "admin/company/admin-company-settings-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "edit_address",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"edit_address\"]"
+  },
+  {
+    "file": "admin/dashboard/admin-dashboard-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/dashboard/admin-dashboard-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "amount",
+    "formControlName": null,
+    "placeholder": "0.00",
+    "selector": "input[name=\"amount\"]"
+  },
+  {
+    "file": "admin/dashboard/admin-dashboard-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "category",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"category\"]"
+  },
+  {
+    "file": "admin/dashboard/admin-dashboard-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "payment_method",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"payment_method\"]"
+  },
+  {
+    "file": "admin/dashboard/admin-dashboard-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "notes",
+    "formControlName": null,
+    "placeholder": "Ej: Compra de café para taller, Pago de publicidad de Meta Pixel...",
+    "selector": "textarea[name=\"notes\"]"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "creationMode",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"creationMode\"]"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "creationMode",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"creationMode\"]"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": "emp-existing-user",
+    "name": "selectedUser",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#emp-existing-user"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "emp-first_name",
+    "name": "first_name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#emp-first_name"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "emp-last_name",
+    "name": "last_name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#emp-last_name"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "emp-email",
+    "name": "email",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#emp-email"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "emp-phone",
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#emp-phone"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": "emp-role",
+    "name": "role",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#emp-role"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "password",
+    "id": "emp-password",
+    "name": "password",
+    "formControlName": null,
+    "placeholder": "Mínimo 6 caracteres",
+    "selector": "input#emp-password"
+  },
+  {
+    "file": "admin/employees/admin-employee-form-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": "emp-avatar",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#emp-avatar"
+  },
+  {
+    "file": "admin/inventory/admin-inventory-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar producto...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/inventory/admin-inventory-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "options",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"options\"]"
+  },
+  {
+    "file": "admin/inventory/admin-inventory-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "options",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"options\"]"
+  },
+  {
+    "file": "admin/inventory/admin-inventory-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "options",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"options\"]"
+  },
+  {
+    "file": "admin/inventory/admin-inventory-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/inventory/admin-inventory-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/layout/admin-layout.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "admin-drawer",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#admin-drawer"
+  },
+  {
+    "file": "admin/layout/admin-layout.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "customer_name",
+    "formControlName": "customer_name",
+    "placeholder": "Buscar por nombre o escribir uno nuevo...",
+    "selector": "input[formControlName=\"customer_name\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": null,
+    "name": "customer_email",
+    "formControlName": "customer_email",
+    "placeholder": "ejemplo@email.com",
+    "selector": "input[formControlName=\"customer_email\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": null,
+    "name": "customer_phone",
+    "formControlName": "customer_phone",
+    "placeholder": "+54 9 11 1234 5678",
+    "selector": "input[formControlName=\"customer_phone\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "street",
+    "formControlName": "street",
+    "placeholder": "Ej: San Martin",
+    "selector": "input[formControlName=\"street\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "number",
+    "formControlName": "number",
+    "placeholder": "123",
+    "selector": "input[formControlName=\"number\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "city",
+    "formControlName": "city",
+    "placeholder": "Ej: Rosario",
+    "selector": "input[formControlName=\"city\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "product_name",
+    "formControlName": "product_name",
+    "placeholder": "Buscar producto a enviar...",
+    "selector": "input[formControlName=\"product_name\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "quantity",
+    "formControlName": "quantity",
+    "placeholder": null,
+    "selector": "input[formControlName=\"quantity\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "unit_price",
+    "formControlName": "unit_price",
+    "placeholder": null,
+    "selector": "input[formControlName=\"unit_price\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "notes",
+    "formControlName": "notes",
+    "placeholder": "Información extra del envío, preferencias del cliente...",
+    "selector": "textarea[formControlName=\"notes\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "status",
+    "formControlName": "status",
+    "placeholder": null,
+    "selector": "select[formControlName=\"status\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "payment_method",
+    "formControlName": "payment_method",
+    "placeholder": null,
+    "selector": "select[formControlName=\"payment_method\"]"
+  },
+  {
+    "file": "admin/orders/admin-order-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "discount",
+    "formControlName": "discount",
+    "placeholder": "0.00",
+    "selector": "input[formControlName=\"discount\"]"
+  },
+  {
+    "file": "admin/orders/admin-orders-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar cliente, email, # pedido...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/orders/admin-orders-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "title",
+    "name": "title",
+    "formControlName": "title",
+    "placeholder": "Ej: Servicio técnico de celulares",
+    "selector": "input#title"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "slug",
+    "name": "slug",
+    "formControlName": "slug",
+    "placeholder": "servicio-tecnico",
+    "selector": "input#slug"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "content",
+    "name": "content",
+    "formControlName": "content",
+    "placeholder": "Escribe el contenido de tu entrada aquí...",
+    "selector": "textarea#content"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "meta_title",
+    "name": "meta_title",
+    "formControlName": "meta_title",
+    "placeholder": null,
+    "selector": "input#meta_title"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "meta_description",
+    "formControlName": "meta_description",
+    "placeholder": "Breve descripción para buscadores",
+    "selector": "textarea[formControlName=\"meta_description\"]"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "template",
+    "formControlName": "template",
+    "placeholder": null,
+    "selector": "input[formControlName=\"template\"]"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "template",
+    "formControlName": "template",
+    "placeholder": null,
+    "selector": "input[formControlName=\"template\"]"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "template",
+    "formControlName": "template",
+    "placeholder": null,
+    "selector": "input[formControlName=\"template\"]"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": "published",
+    "formControlName": "published",
+    "placeholder": null,
+    "selector": "input[formControlName=\"published\"]"
+  },
+  {
+    "file": "admin/posts/admin-post-form-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": "file-upload",
+    "name": "file-upload",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#file-upload"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "name",
+    "formControlName": null,
+    "placeholder": "Ej: iPhone 14 Pro",
+    "selector": "input[name=\"name\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "price",
+    "formControlName": null,
+    "placeholder": "0.00",
+    "selector": "input[name=\"price\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "stock",
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input[name=\"stock\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "description",
+    "formControlName": null,
+    "placeholder": "Detalles del producto...",
+    "selector": "textarea[name=\"description\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "sku",
+    "formControlName": null,
+    "placeholder": "APL-14P",
+    "selector": "input[name=\"sku\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "barcode",
+    "formControlName": null,
+    "placeholder": "UPC/EAN",
+    "selector": "input[name=\"barcode\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "brand_id",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"brand_id\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "category_id",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"category_id\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": "is_active",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"is_active\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "unit_cost_at_time",
+    "formControlName": null,
+    "placeholder": "0.00",
+    "selector": "input[name=\"unit_cost_at_time\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "currency",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"currency\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "slug",
+    "formControlName": null,
+    "placeholder": "iphone-14-pro",
+    "selector": "input[name=\"slug\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": "is_global",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"is_global\"]"
+  },
+  {
+    "file": "admin/products/admin-product-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "branch_id",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"branch_id\"]"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar por nombre, SKU, marca...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/admin-products-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Cantidad",
+    "selector": "input"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/components/bulk-edit-modal/bulk-edit-modal.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/products/components/product-images-manager/product-images-manager.component.html",
+    "tagName": "input",
+    "type": "file",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "supplier_id",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"supplier_id\"]"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "branch_id",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"branch_id\"]"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "date",
+    "id": null,
+    "name": "purchase_date",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"purchase_date\"]"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "status",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"status\"]"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "payment_method",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"payment_method\"]"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "search",
+    "formControlName": null,
+    "placeholder": "Escanear o buscar producto por código o nombre...",
+    "selector": "input[name=\"search\"]"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Módulo Original Samsung A52",
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "SAM-A52-MOD-ORG",
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input"
+  },
+  {
+    "file": "admin/purchases/admin-purchase-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/repairs/admin-repair-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar pantalla, pin de carga, batería...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/repairs/admin-repairs-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar por cliente, teléfono o código de seguimiento...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/repairs/admin-repairs-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar por cliente, notas o número de comprobante...",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "manual-invoice-customer",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Consumidor Final",
+    "selector": "input#manual-invoice-customer"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "cliente@email.com",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Descripción del servicio o producto",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Cant.",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0.00",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0.00",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-invoices-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: Reparación fuera de garantía",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-sales-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Escanear o buscar producto... (F3)",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-sales-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Cliente (Opcional)",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-sales-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input"
+  },
+  {
+    "file": "admin/sales/admin-sales-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/services/admin-service-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"name\"]"
+  },
+  {
+    "file": "admin/services/admin-service-form-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "description",
+    "formControlName": null,
+    "placeholder": "Describe los detalles del servicio...",
+    "selector": "textarea[name=\"description\"]"
+  },
+  {
+    "file": "admin/services/admin-service-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "price",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"price\"]"
+  },
+  {
+    "file": "admin/services/admin-service-form-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "duration_minutes",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"duration_minutes\"]"
+  },
+  {
+    "file": "admin/services/admin-service-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": "is_active",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"is_active\"]"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "supplier-name",
+    "name": "name",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#supplier-name"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "supplier-type",
+    "name": "type",
+    "formControlName": null,
+    "placeholder": "Ej: Mayorista, Fabricante",
+    "selector": "input#supplier-type"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "supplier-rubro",
+    "name": "rubro",
+    "formControlName": null,
+    "placeholder": "Ej: Electrónica",
+    "selector": "input#supplier-rubro"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "supplier-cuil",
+    "name": "cuil",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#supplier-cuil"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "supplier-phone",
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#supplier-phone"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "supplier-email",
+    "name": "email",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#supplier-email"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "supplier-address",
+    "name": "address",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#supplier-address"
+  },
+  {
+    "file": "admin/suppliers/admin-supplier-form-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "supplier-is_active",
+    "name": "is_active",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#supplier-is_active"
+  },
+  {
+    "file": "admin/suppliers/admin-suppliers-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/suppliers/admin-suppliers-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/suppliers/admin-suppliers-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: 300012345JP",
+    "selector": "input"
+  },
+  {
+    "file": "admin/suppliers/admin-suppliers-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Escribe tu mensaje de cotización aquí...",
+    "selector": "textarea"
+  },
+  {
+    "file": "admin/users/admin-users-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "admin/users/admin-users-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/users/admin-users-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "admin/users/admin-users-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: 300012345JP",
+    "selector": "input"
+  },
+  {
+    "file": "admin/users/admin-users-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Escribe tu mensaje aquí...",
+    "selector": "textarea"
+  },
+  {
+    "file": "public/auth/forgot-password/forgot-password.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "reset-email",
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": "nombre@empresa.com",
+    "selector": "input#reset-email"
+  },
+  {
+    "file": "public/auth/login/login.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": "nombre@empresa.com",
+    "selector": "input#email"
+  },
+  {
+    "file": "public/auth/login/login.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "password",
+    "name": "password",
+    "formControlName": "password",
+    "placeholder": "••••••••",
+    "selector": "input#password"
+  },
+  {
+    "file": "public/auth/login/login.component.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "rememberMe",
+    "name": "rememberMe",
+    "formControlName": "rememberMe",
+    "placeholder": null,
+    "selector": "input#rememberMe"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "first_name",
+    "name": "first_name",
+    "formControlName": "first_name",
+    "placeholder": "Juan",
+    "selector": "input#first_name"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "last_name",
+    "name": "last_name",
+    "formControlName": "last_name",
+    "placeholder": "Pérez",
+    "selector": "input#last_name"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": "nombre@empresa.com",
+    "selector": "input#email"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "phone",
+    "name": "phone",
+    "formControlName": "phone",
+    "placeholder": "+54 11 1234-5678",
+    "selector": "input#phone"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "password",
+    "name": "password",
+    "formControlName": "password",
+    "placeholder": "••••••••",
+    "selector": "input#password"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "confirmPassword",
+    "name": "confirmPassword",
+    "formControlName": "confirmPassword",
+    "placeholder": "••••••••",
+    "selector": "input#confirmPassword"
+  },
+  {
+    "file": "public/auth/register/register.component.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "terms",
+    "name": "terms",
+    "formControlName": "terms",
+    "placeholder": null,
+    "selector": "input#terms"
+  },
+  {
+    "file": "public/blog/create-post/create-post.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "title",
+    "formControlName": null,
+    "placeholder": "Ej: Nueva técnica de microsoldadura",
+    "selector": "input[name=\"title\"]"
+  },
+  {
+    "file": "public/blog/create-post/create-post.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "content",
+    "formControlName": null,
+    "placeholder": "Escribe aquí el contenido de tu publicación...",
+    "selector": "textarea[name=\"content\"]"
+  },
+  {
+    "file": "public/blog/create-post/create-post.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "image",
+    "formControlName": null,
+    "placeholder": "https://...",
+    "selector": "input[name=\"image\"]"
+  },
+  {
+    "file": "public/blog/create-post/create-post.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "meta_title",
+    "formControlName": null,
+    "placeholder": "Título para buscadores",
+    "selector": "input[name=\"meta_title\"]"
+  },
+  {
+    "file": "public/blog/create-post/create-post.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "meta_description",
+    "formControlName": null,
+    "placeholder": "Breve resumen para buscadores...",
+    "selector": "textarea[name=\"meta_description\"]"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "checkout-name",
+    "name": "name",
+    "formControlName": "name",
+    "placeholder": "Ej. Juan Pérez",
+    "selector": "input#checkout-name"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "checkout-email",
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": "email@ejemplo.com",
+    "selector": "input#checkout-email"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "checkout-phone",
+    "name": "phone",
+    "formControlName": "phone",
+    "placeholder": "+54 9 11...",
+    "selector": "input#checkout-phone"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "checkout-street",
+    "name": "street",
+    "formControlName": "street",
+    "placeholder": "Av. San Martín",
+    "selector": "input#checkout-street"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "checkout-number",
+    "name": "number",
+    "formControlName": "number",
+    "placeholder": "1234",
+    "selector": "input#checkout-number"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "checkout-neighborhood",
+    "name": "neighborhood",
+    "formControlName": "neighborhood",
+    "placeholder": "Opcional",
+    "selector": "input#checkout-neighborhood"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "checkout-city",
+    "name": "city",
+    "formControlName": "city",
+    "placeholder": null,
+    "selector": "input#checkout-city"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "checkout-cp",
+    "name": "postal_code",
+    "formControlName": "postal_code",
+    "placeholder": "1727",
+    "selector": "input#checkout-cp"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "checkout-notes",
+    "name": "notes",
+    "formControlName": "notes",
+    "placeholder": "Instrucciones de entrega, referencias, etc.",
+    "selector": "textarea#checkout-notes"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "payment",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"payment\"]"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "payment",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"payment\"]"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "payment",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"payment\"]"
+  },
+  {
+    "file": "public/checkout/checkout-page.html",
+    "tagName": "input",
+    "type": "file",
+    "id": "proof-upload",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#proof-upload"
+  },
+  {
+    "file": "public/contacto/contacto.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "name",
+    "name": "name",
+    "formControlName": "name",
+    "placeholder": null,
+    "selector": "input#name"
+  },
+  {
+    "file": "public/contacto/contacto.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": null,
+    "selector": "input#email"
+  },
+  {
+    "file": "public/contacto/contacto.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "phone",
+    "name": "phone",
+    "formControlName": "phone",
+    "placeholder": null,
+    "selector": "input#phone"
+  },
+  {
+    "file": "public/contacto/contacto.html",
+    "tagName": "select",
+    "type": null,
+    "id": "subject",
+    "name": "subject",
+    "formControlName": "subject",
+    "placeholder": null,
+    "selector": "select#subject"
+  },
+  {
+    "file": "public/contacto/contacto.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "message",
+    "name": "message",
+    "formControlName": "message",
+    "placeholder": null,
+    "selector": "textarea#message"
+  },
+  {
+    "file": "public/contacto/contacto.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "terms",
+    "name": "terms",
+    "formControlName": "terms",
+    "placeholder": null,
+    "selector": "input#terms"
+  },
+  {
+    "file": "public/cursos/course-detail/course-detail.component.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "faq-accordion",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"faq-accordion\"]"
+  },
+  {
+    "file": "public/cursos/course-detail/course-detail.component.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "my-accordion-3",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"my-accordion-3\"]"
+  },
+  {
+    "file": "public/cursos/course-detail/course-detail.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "full_name",
+    "name": "full_name",
+    "formControlName": null,
+    "placeholder": "Ej: Juan Pérez",
+    "selector": "input#full_name"
+  },
+  {
+    "file": "public/cursos/course-detail/course-detail.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": "email",
+    "formControlName": null,
+    "placeholder": "tucorreo@ejemplo.com",
+    "selector": "input#email"
+  },
+  {
+    "file": "public/cursos/course-detail/course-detail.component.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "phone",
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": "Ej: +54 9 11 1234 5678",
+    "selector": "input#phone"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "title",
+    "formControlName": null,
+    "placeholder": "Ej: Reparación de Computadoras",
+    "selector": "input[name=\"title\"]"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "description",
+    "formControlName": null,
+    "placeholder": "¿Qué aprenderá el alumno en este curso?",
+    "selector": "textarea[name=\"description\"]"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": "level",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select[name=\"level\"]"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": "price",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"price\"]"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "duration",
+    "formControlName": null,
+    "placeholder": "Ej: 3 Meses",
+    "selector": "input[name=\"duration\"]"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "schedule",
+    "formControlName": null,
+    "placeholder": "Ej: Sábados 10hs",
+    "selector": "input[name=\"schedule\"]"
+  },
+  {
+    "file": "public/cursos/create-course/create-course.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "image_url",
+    "formControlName": null,
+    "placeholder": "https://...",
+    "selector": "input[name=\"image_url\"]"
+  },
+  {
+    "file": "public/cursos/cursos.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/cursos/cursos.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/cursos/cursos.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "full_name",
+    "formControlName": null,
+    "placeholder": "Ej: Ezequiel Enrico",
+    "selector": "input[name=\"full_name\"]"
+  },
+  {
+    "file": "public/cursos/cursos.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": null,
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": "+54 9 11 ...",
+    "selector": "input[name=\"phone\"]"
+  },
+  {
+    "file": "public/cursos/cursos.html",
+    "tagName": "input",
+    "type": "email",
+    "id": null,
+    "name": "email",
+    "formControlName": null,
+    "placeholder": "tu@email.com",
+    "selector": "input[name=\"email\"]"
+  },
+  {
+    "file": "public/fixtecnicos/fixtecnicos.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: 3529...",
+    "selector": "input"
+  },
+  {
+    "file": "public/gsm/gsm.component.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: 100",
+    "selector": "input"
+  },
+  {
+    "file": "public/landing/celular/celular-landing.component.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "my-accordion-4",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"my-accordion-4\"]"
+  },
+  {
+    "file": "public/landing/celular/celular-landing.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "contactName",
+    "name": "name",
+    "formControlName": null,
+    "placeholder": "Tu nombre",
+    "selector": "input#contactName"
+  },
+  {
+    "file": "public/landing/celular/celular-landing.component.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "contactPhone",
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": "11 1234 5678",
+    "selector": "input#contactPhone"
+  },
+  {
+    "file": "public/landing/celular/celular-landing.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "contactMessage",
+    "name": "message",
+    "formControlName": null,
+    "placeholder": "Hola, quería saber el precio de...",
+    "selector": "textarea#contactMessage"
+  },
+  {
+    "file": "public/layout/components/header/public-layout-header.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar...",
+    "selector": "input"
+  },
+  {
+    "file": "public/layout/components/header/public-layout-header.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar productos...",
+    "selector": "input"
+  },
+  {
+    "file": "public/not-found/not-found.component.html",
+    "tagName": "input",
+    "type": "search",
+    "id": "nf-search-input",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscá un producto o servicio…",
+    "selector": "input#nf-search-input"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "faq",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"faq\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "faq",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"faq\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "faq",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"faq\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "faq",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"faq\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "name",
+    "formControlName": null,
+    "placeholder": "Tu nombre",
+    "selector": "input[name=\"name\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": null,
+    "name": "phone",
+    "formControlName": null,
+    "placeholder": "Ej: 11 1234 5678",
+    "selector": "input[name=\"phone\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "message",
+    "formControlName": null,
+    "placeholder": "Hola, tengo un Samsung A32 que no carga...",
+    "selector": "textarea[name=\"message\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "commentName",
+    "formControlName": null,
+    "placeholder": "Ej: Juan Pérez",
+    "selector": "input[name=\"commentName\"]"
+  },
+  {
+    "file": "public/posts/post-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "commentText",
+    "formControlName": null,
+    "placeholder": "¿Qué te pareció este artículo?",
+    "selector": "textarea[name=\"commentText\"]"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "shop-filters-drawer",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#shop-filters-drawer"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar por nombre, SKU o modelo...",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Max",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "rating-2",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"rating-2\"]"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "rating-2",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"rating-2\"]"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "rating-2",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"rating-2\"]"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "rating-2",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"rating-2\"]"
+  },
+  {
+    "file": "public/products/pages/all/products-all-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "rating-2",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"rating-2\"]"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "cat-filters-drawer",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#cat-filters-drawer"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar en esta categoría...",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "0",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Max",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/by-category/products-by-category-page.html",
+    "tagName": "input",
+    "type": "radio",
+    "id": null,
+    "name": "quick-color",
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input[name=\"quick-color\"]"
+  },
+  {
+    "file": "public/products/pages/details/products-details-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Tu código postal",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/details/products-details-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: Técnico Arecofix",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/details/products-details-page.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/products/pages/details/products-details-page.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "¿Cómo fue la instalación? ¿Qué tal los colores/brillo?",
+    "selector": "textarea"
+  },
+  {
+    "file": "public/products/pages/featured/products-featured-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar en destacados...",
+    "selector": "input"
+  },
+  {
+    "file": "public/products/pages/index/products-index-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar producto...",
+    "selector": "input"
+  },
+  {
+    "file": "public/profile/profile.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "first_name",
+    "formControlName": "first_name",
+    "placeholder": null,
+    "selector": "input[formControlName=\"first_name\"]"
+  },
+  {
+    "file": "public/profile/profile.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "last_name",
+    "formControlName": "last_name",
+    "placeholder": null,
+    "selector": "input[formControlName=\"last_name\"]"
+  },
+  {
+    "file": "public/profile/profile.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": null,
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": null,
+    "selector": "input[formControlName=\"email\"]"
+  },
+  {
+    "file": "public/profile/profile.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "phone",
+    "formControlName": "phone",
+    "placeholder": null,
+    "selector": "input[formControlName=\"phone\"]"
+  },
+  {
+    "file": "public/profile/profile.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": "avatar_url",
+    "formControlName": "avatar_url",
+    "placeholder": "https://...",
+    "selector": "input[formControlName=\"avatar_url\"]"
+  },
+  {
+    "file": "public/profile/profile.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": null,
+    "name": "bio",
+    "formControlName": "bio",
+    "placeholder": "Contanos algo sobre vos o dejá notas sobre tus equipos...",
+    "selector": "textarea[formControlName=\"bio\"]"
+  },
+  {
+    "file": "public/repuestos/repuestos.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": "repuestos-filter-drawer",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#repuestos-filter-drawer"
+  },
+  {
+    "file": "public/repuestos/repuestos.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar repuesto (ej: Módulo iPhone 11)...",
+    "selector": "input"
+  },
+  {
+    "file": "public/repuestos/repuestos.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/repuestos/repuestos.html",
+    "tagName": "select",
+    "type": null,
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select"
+  },
+  {
+    "file": "public/repuestos/repuestos.html",
+    "tagName": "input",
+    "type": "number",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: 50.000",
+    "selector": "input"
+  },
+  {
+    "file": "public/reservation/reservation-calendar.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: Juan Pérez",
+    "selector": "input"
+  },
+  {
+    "file": "public/reservation/reservation-calendar.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: +54 9 11 1234 5678",
+    "selector": "input"
+  },
+  {
+    "file": "public/reservation/reservation-calendar.html",
+    "tagName": "input",
+    "type": "checkbox",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input"
+  },
+  {
+    "file": "public/tracking/tracking-page.html",
+    "tagName": "input",
+    "type": "text",
+    "id": null,
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: AF-123",
+    "selector": "input"
+  },
+  {
+    "file": "public/zona-norte/pages/contacto/zona-norte-contacto.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "nombre",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Tu nombre completo",
+    "selector": "input#nombre"
+  },
+  {
+    "file": "public/zona-norte/pages/contacto/zona-norte-contacto.component.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "telefono",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Ej: 11 1234-5678",
+    "selector": "input#telefono"
+  },
+  {
+    "file": "public/zona-norte/pages/contacto/zona-norte-contacto.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "tu@email.com",
+    "selector": "input#email"
+  },
+  {
+    "file": "public/zona-norte/pages/contacto/zona-norte-contacto.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": "tipoServicio",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#tipoServicio"
+  },
+  {
+    "file": "public/zona-norte/pages/contacto/zona-norte-contacto.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "mensaje",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Describí tu proyecto o consulta...",
+    "selector": "textarea#mensaje"
+  },
+  {
+    "file": "public/zona-norte/pages/productos/zona-norte-productos.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "search",
+    "name": null,
+    "formControlName": null,
+    "placeholder": "Buscar productos...",
+    "selector": "input#search"
+  },
+  {
+    "file": "public/zona-norte/pages/productos/zona-norte-productos.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": "category",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#category"
+  },
+  {
+    "file": "public/zona-norte/pages/productos/zona-norte-productos.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": "brand",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#brand"
+  },
+  {
+    "file": "public/zona-norte/pages/productos/zona-norte-productos.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": "priceRange",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#priceRange"
+  },
+  {
+    "file": "public/zona-norte/pages/productos/zona-norte-productos.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": "sort",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#sort"
+  },
+  {
+    "file": "public/zona-norte/zona-norte.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "nombre",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#nombre"
+  },
+  {
+    "file": "public/zona-norte/zona-norte.component.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "telefono",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#telefono"
+  },
+  {
+    "file": "public/zona-norte/zona-norte.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "input#email"
+  },
+  {
+    "file": "public/zona-norte/zona-norte.component.html",
+    "tagName": "textarea",
+    "type": null,
+    "id": "consulta",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "textarea#consulta"
+  },
+  {
+    "file": "shared/components/lead-magnet/lead-magnet.component.html",
+    "tagName": "input",
+    "type": "text",
+    "id": "name",
+    "name": "name",
+    "formControlName": "name",
+    "placeholder": "Ej. Juan Pérez",
+    "selector": "input#name"
+  },
+  {
+    "file": "shared/components/lead-magnet/lead-magnet.component.html",
+    "tagName": "input",
+    "type": "tel",
+    "id": "whatsapp",
+    "name": "whatsapp",
+    "formControlName": "whatsapp",
+    "placeholder": "Ej. 1123456789",
+    "selector": "input#whatsapp"
+  },
+  {
+    "file": "shared/components/lead-magnet/lead-magnet.component.html",
+    "tagName": "input",
+    "type": "email",
+    "id": "email",
+    "name": "email",
+    "formControlName": "email",
+    "placeholder": "Ej. correo@ejemplo.com",
+    "selector": "input#email"
+  },
+  {
+    "file": "shared/components/lock-screen/lock-screen.component.html",
+    "tagName": "input",
+    "type": "password",
+    "id": null,
+    "name": "password",
+    "formControlName": "password",
+    "placeholder": "Ingresa tu contraseña",
+    "selector": "input[formControlName=\"password\"]"
+  },
+  {
+    "file": "shared/components/pagination/pagination.component.html",
+    "tagName": "select",
+    "type": null,
+    "id": "page-size",
+    "name": null,
+    "formControlName": null,
+    "placeholder": null,
+    "selector": "select#page-size"
+  }
+]

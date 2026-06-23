@@ -1,12 +1,17 @@
 allowBuilds:
   '@firebase/util': true
   '@parcel/watcher': true
+  appium: true
   core-js: true
+  cypress: true
+  edgedriver: true
   electron: true
   electron-winstaller: true
   esbuild: true
+  geckodriver: true
   lmdb: true
   msgpackr-extract: true
   protobufjs: true
   sharp: true
+  unrs-resolver: true
   workerd: true

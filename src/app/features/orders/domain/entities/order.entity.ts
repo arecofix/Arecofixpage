@@ -64,8 +64,10 @@ export interface Order {
   payment_proof_url?: string;
   notes?: string;
   invoice_url?: string;
+  invoice_generated?: boolean;
   tenant_id?: string;
   branch_id?: string;
+  deleted_at?: string;
   created_at?: string;
   updated_at?: string;
   items?: OrderItem[];

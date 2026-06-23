@@ -3,6 +3,7 @@ import { SupabaseCustomerRepository } from '../../infrastructure/repositories/su
 import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
 import { firstValueFrom } from 'rxjs';
 import { TenantService } from '@app/core/services/tenant.service';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 export class CustomerService {
   private repository = inject(SupabaseCustomerRepository);
   private tenantService = inject(TenantService);
+  private authService = inject(AuthService);
 
   async getAll(): Promise<UserProfile[]> {
     return this.getRecentClients(1000);
@@ -26,8 +28,46 @@ export class CustomerService {
       return existing;
     }
 
-    // 2. Si no existe, crear uno nuevo
-    return firstValueFrom(this.repository.createClient(data));
+    // 2. Usar la Edge Function para crear el cliente de forma segura en auth.users
+    // Esto previene el error 23503 (Foreign Key Constraint) con profiles
+    const tenantId = this.tenantService.getCurrentTenant()?.id || data.tenant_id;
+    const supabase = this.authService.getSupabaseClient();
+    
+    // Generar datos requeridos para auth.users
+    const dummyEmail = data.email || `cliente_${data.phone?.replace(/\D/g, '') || Date.now()}@arecofix.com`;
+    const dummyPassword = crypto.randomUUID(); // Contraseña segura al azar
+    
+    try {
+      const { data: functionData, error } = await supabase.functions.invoke('create-employee', {
+        body: {
+          ...data,
+          email: dummyEmail,
+          password: dummyPassword,
+          role: 'user', // Forzar rol
+          tenant_id: tenantId,
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (functionData?.error) {
+        throw new Error(functionData.error);
+      }
+
+      if (functionData?.user?.id) {
+         // Marcarlo como invitado
+         await this.update(functionData.user.id, { is_guest: true });
+         const newProfile = await this.getById(functionData.user.id);
+         if (newProfile) return newProfile;
+      }
+    } catch (e: any) {
+      console.warn('Error en Edge Function create-employee o en actualización posterior:', e);
+      throw e;
+    }
+
+    throw new Error('No se pudo crear el cliente, respuesta vacía del servidor.');
   }
 
   async update(id: string, data: any): Promise<UserProfile> {
