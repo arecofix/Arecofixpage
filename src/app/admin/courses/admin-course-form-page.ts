@@ -6,6 +6,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CoursesService, Module } from '@app/core/services/courses.service';
 import { ProductMediaService } from '@app/admin/products/services/product-media.service';
 import { LoggerService } from '@app/core/services/logger.service';
+import { CourseLevel } from '@app/features/courses/domain/entities/course.entity';
+import { NotificationService } from '@app/core/services/notification.service';
 
 @Component({
   selector: 'app-admin-course-form-page',
@@ -69,10 +71,10 @@ import { LoggerService } from '@app/core/services/logger.service';
                       <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Dificultad / Nivel</span>
                     </label>
                     <select formControlName="level" class="select select-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-12">
-                      <option value="Básico">Básico (Inicial)</option>
-                      <option value="Intermedio">Intermedio (Requiere experiencia)</option>
-                      <option value="Avanzado">Avanzado (Profesionales)</option>
-                      <option value="Todos los niveles">Apto para todo público</option>
+                      <option value="basic">Básico (Inicial)</option>
+                      <option value="intermediate">Intermedio (Requiere experiencia)</option>
+                      <option value="advanced">Avanzado (Profesionales)</option>
+                      <option value="all">Apto para todo público</option>
                     </select>
                   </div>
                 </div>
@@ -232,20 +234,20 @@ import { LoggerService } from '@app/core/services/logger.service';
               </div>
               <div class="p-6 space-y-4">
                 <div class="form-control">
-                  <label class="label"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Inversión Real (Mensual/Total)</span></label>
+                  <label class="label"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Precio Original / Normal</span></label>
                   <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <span class="font-bold text-emerald-600 dark:text-emerald-500">$</span>
+                    <span class="text-slate-400">$</span>
                     <input type="number" formControlName="price" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none text-lg font-bold" />
                   </label>
                 </div>
                 
                 <div class="form-control">
-                  <label class="label"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Precio Ficticio (Tachado)</span></label>
+                  <label class="label"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Precio de Oferta (Opcional)</span></label>
                   <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white opacity-80">
-                    <span class="text-slate-400">$</span>
+                    <span class="font-bold text-emerald-600 dark:text-emerald-500">$</span>
                     <input type="number" formControlName="sale_price" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Opcional..." />
                   </label>
-                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 ml-1">Usalo para generar urgencia mostrando un descuento.</span>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 ml-1">Debe ser menor al Precio Original.</span>
                 </div>
               </div>
             </div>
@@ -312,7 +314,7 @@ export class AdminCourseFormPage implements OnInit {
   private mediaService = inject(ProductMediaService);
   private cdr = inject(ChangeDetectorRef);
   private logger = inject(LoggerService);
-
+  private notificationService = inject(NotificationService);
 
   form: FormGroup;
   isEditing = false;
@@ -326,16 +328,33 @@ export class AdminCourseFormPage implements OnInit {
       description: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
       sale_price: [null],
-      level: ['Básico', Validators.required],
+      level: [CourseLevel.BASIC, Validators.required],
       duration: ['', Validators.required],
       schedule: ['', Validators.required],
       image_url: ['', Validators.required],
       is_active: [true],
       instructor_name: [''],
+      instructor_id: [''],
+      start_date: [''],
+      is_featured: [false],
+      short_description: [''],
       students: [0],
       rating: [5.0],
       modules: this.fb.array([])
-    });
+    }, { validators: this.priceValidator });
+  }
+
+  // Custom validator to ensure sale_price < price
+  priceValidator(group: FormGroup) {
+    const price = group.get('price')?.value;
+    const salePrice = group.get('sale_price')?.value;
+    
+    if (price !== null && salePrice !== null && salePrice !== '') {
+       if (Number(salePrice) >= Number(price)) {
+          return { salePriceTooHigh: true };
+       }
+    }
+    return null;
   }
 
   get modulesFormArray() {
@@ -361,6 +380,14 @@ export class AdminCourseFormPage implements OnInit {
     if (this.courseId) {
       this.isEditing = true;
       this.loadCourse(this.courseId);
+    } else {
+      // Auto-generate slug for new courses
+      this.form.get('title')?.valueChanges.subscribe(val => {
+        if (val) {
+          const slug = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+          this.form.get('slug')?.setValue(slug, { emitEvent: false });
+        }
+      });
     }
   }
 
@@ -386,7 +413,7 @@ export class AdminCourseFormPage implements OnInit {
       this.cdr.markForCheck(); // Update preview
     } catch (error: any) {
       this.logger.error('Error uploading image', error);
-      alert('Error al subir la imagen: ' + (error.message || error));
+      this.notificationService.showError('Error al subir la imagen: ' + (error.message || error));
     } finally {
       this.saving = false;
       this.cdr.markForCheck(); // Ensure spinner stops
@@ -419,12 +446,39 @@ export class AdminCourseFormPage implements OnInit {
   async save() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      alert('Por favor completa todos los campos requeridos');
+      
+      // Extract which fields are invalid
+      const invalidFields = Object.keys(this.form.controls).filter(key => this.form.get(key)?.invalid);
+      
+      const fieldNames: Record<string, string> = {
+         title: 'Título', slug: 'URL (Slug)', description: 'Descripción',
+         price: 'Inversión Real', duration: 'Duración Total',
+         schedule: 'Días y Horarios', image_url: 'Portada del Curso', level: 'Dificultad'
+      };
+      
+      const translatedFields = invalidFields.map(f => fieldNames[f] || f);
+      
+      this.logger.warn('Form is invalid. Missing fields:', invalidFields);
+      
+      if (this.modulesFormArray.invalid) {
+         this.notificationService.showError('Por favor asegúrate de que todos los módulos tengan un título.');
+      } else if (this.form.hasError('salePriceTooHigh')) {
+         this.notificationService.showError('El Precio Ficticio (Tachado) no puede ser mayor o igual a la Inversión Real.');
+      } else {
+         this.notificationService.showError(`Faltan completar campos obligatorios: ${translatedFields.join(', ')}`);
+      }
       return;
     }
 
     this.saving = true;
-    const { modules, ...courseData } = this.form.value;
+    const { modules, rating, students, ...courseData } = this.form.value;
+    
+    // Convert empty strings to null to prevent Postgres type casting errors (UUID, Date, etc.)
+    Object.keys(courseData).forEach(key => {
+      if (courseData[key] === '') {
+        courseData[key] = null;
+      }
+    });
     
     this.logger.debug('Starting course save workflow', { isEditing: this.isEditing });
 
@@ -447,17 +501,20 @@ export class AdminCourseFormPage implements OnInit {
           await this.coursesService.saveModules(savedCourseId, modules).toPromise();
         } catch (modErr: any) {
           this.logger.warn('Failed to sync modules', modErr);
-          alert('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario.');
+          this.notificationService.showError('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario.');
         }
       }
       
+      this.notificationService.showSuccess('Programa educativo guardado correctamente.');
       this.router.navigate(['/admin/courses']);
       
     } catch (err: any) {
       this.logger.error('Save workflow failed', err);
-      alert('Error al guardar: ' + err.message);
+      this.notificationService.showError('Error al guardar: ' + err.message);
+      alert('Error al guardar: ' + err.message); // Adding an alert as fallback so the user definitely sees the database error
     } finally {
       this.saving = false;
+      this.cdr.markForCheck();
     }
   }
 }

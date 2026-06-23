@@ -128,7 +128,8 @@ export class AdminRepairService {
                         phone: dto.customer_phone || null,
                         address: null,
                         dni: dto.customer_dni || null,
-                        tenant_id: profile.tenant_id
+                        tenant_id: profile.tenant_id,
+                        branch_id: branchIdActual
                     });
 
                     if (client && client.id) {

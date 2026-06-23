@@ -15,9 +15,7 @@ export class ProductMediaService {
   }
 
   async uploadFile(file: File, folder: string): Promise<string> {
-    const isImage = file.type.startsWith('image/');
-    const processedFile = isImage ? await ImageProcessor.compress(file) : file;
-    return this.storage.uploadFile(processedFile, folder, 'public-assets', { context: folder });
+    return this.storage.uploadFile(file, folder, 'public-assets', { context: folder });
   }
 
   async deleteImage(url: string): Promise<void> {

@@ -23,6 +23,7 @@ export class AdminClientFormPage implements OnInit {
         phone: '',
         address: '',
         dni: '',
+        cuit_cuil: '',
     });
 
     loading = signal(true);
@@ -42,6 +43,7 @@ export class AdminClientFormPage implements OnInit {
                         phone: data.phone || '',
                         address: data.address || '', 
                         dni: data.dni || '',
+                        cuit_cuil: data.cuit_cuil || '',
                     });
                 }
             } catch (err) {
@@ -62,7 +64,8 @@ export class AdminClientFormPage implements OnInit {
             email: formValues.email || null,
             phone: formValues.phone || null,
             address: formValues.address || null,
-            dni: formValues.dni || null
+            dni: formValues.dni || null,
+            cuit_cuil: formValues.cuit_cuil || null
         };
 
         try {

@@ -64,8 +64,15 @@ export interface Repair {
     readonly branch_id?: string;
     readonly received_by?: string;
     readonly assigned_technician_id?: string;
+    readonly client_id?: string;
+    readonly device_id?: string;
+    readonly tenant_id?: string;
+    readonly deleted_at?: string;
+    readonly whatsapp_notifications?: boolean;
     readonly upsell_vidrio?: boolean;
+    readonly glass_upsell?: boolean;
     readonly spare_part_cost?: number;
+    readonly costo_repuesto?: number;
     
     // Additional fields from form
     readonly checklist?: RepairChecklist;

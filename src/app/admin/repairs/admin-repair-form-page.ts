@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -25,6 +25,7 @@ import { RepairPartsSectionComponent } from './components/repair-parts-section.c
 import { RepairFinanceSectionComponent } from './components/repair-finance-section.component';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
+import { AdminLayout } from '@app/admin/layout/admin-layout';
 
 interface ClientView extends Partial<UserProfile> {
     displayName: string;
@@ -46,7 +47,7 @@ interface ClientView extends Partial<UserProfile> {
     ],
     templateUrl: './admin-repair-form-page.html',
 })
-export class AdminRepairFormPage implements OnInit {
+export class AdminRepairFormPage implements OnInit, OnDestroy {
     // Helper interface for UI
     private clientView = (client: UserProfile | Partial<UserProfile>): ClientView => ({
         ...client,
@@ -68,6 +69,7 @@ export class AdminRepairFormPage implements OnInit {
     private repairWorkflowService = inject(RepairWorkflowService);
     private repairCalculator = inject(RepairCalculatorService);
     private supabaseService = inject(SupabaseService);
+    private adminLayout = inject(AdminLayout, { optional: true });
 
     repairForm!: FormGroup;
 
@@ -107,7 +109,12 @@ export class AdminRepairFormPage implements OnInit {
         technical_labor_cost: 0,
         technical_report: '',
         parts: [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
-        upsell_vidrio: false
+        upsell_vidrio: false,
+        glass_upsell: false,
+        whatsapp_notifications: true,
+        costo_repuesto: 0,
+        client_id: '',
+        device_id: ''
     };
 
     // Keep some UI-only signals
@@ -209,7 +216,7 @@ export class AdminRepairFormPage implements OnInit {
         this.repairForm = this.fb.group({
             customer_id: [''],
             customer_name: ['', [Validators.required, Validators.minLength(3)]],
-            customer_phone: ['', [Validators.required]],
+            customer_phone: [''],
             customer_email: ['', [Validators.email]],
             customer_dni: [''],
             device_model: ['', [Validators.required]],
@@ -235,6 +242,11 @@ export class AdminRepairFormPage implements OnInit {
             technical_labor_cost: [0],
             technical_report: [''],
             upsell_vidrio: [false],
+            glass_upsell: [false],
+            whatsapp_notifications: [true],
+            costo_repuesto: [0],
+            client_id: [''],
+            device_id: [''],
             tracking_code: [''],
             repair_number: [0]
         });
@@ -258,6 +270,10 @@ export class AdminRepairFormPage implements OnInit {
     }
 
     async ngOnInit() {
+        if (this.adminLayout) {
+            this.adminLayout.isMainMenuOpen.set(false);
+        }
+
         this.id = this.route.snapshot.paramMap.get('id');
         this.setupForm();
         this.setupSearchStreams();
@@ -344,6 +360,44 @@ export class AdminRepairFormPage implements OnInit {
         this.calculateFinalCost();
     }
 
+    async addManualProduct() {
+        const manualName = this.searchQuery().trim() || 'Repuesto Genérico';
+        this.saving.set(true);
+        
+        try {
+            const branchIdActual = await this.branchService.resolveEffectiveBranchId();
+            const newId = crypto.randomUUID();
+            
+            const genericProduct: Product = {
+                id: newId,
+                name: manualName,
+                price: 0,
+                stock: 9999, // Ensures it's not disabled
+                unit_cost_at_time: 0,
+                is_active: true,
+                is_global: false,
+                sku: '',
+                barcode: '',
+                branch_id: branchIdActual,
+                slug: 'manual-' + newId,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            } as Product;
+            
+            // Register it in the DB so repair_parts_used can link to it (uuid format & foreign key)
+            await this.productService.createProduct(genericProduct);
+            
+            this.addPart(genericProduct);
+            this.showProductModal.set(false);
+            this.searchQuery.set('');
+        } catch (error) {
+            console.error('Error creating manual product:', error);
+            this.notificationService.showError('Error al crear el repuesto manual en la base de datos');
+        } finally {
+            this.saving.set(false);
+        }
+    }
+
     removePart(index: number) {
         this.parts.update(p => p.filter((_, i) => i !== index));
         this.calculateFinalCost();
@@ -416,7 +470,12 @@ export class AdminRepairFormPage implements OnInit {
                     repair_number: data.repair_number,
                     technical_labor_cost: data.technical_labor_cost,
                     technical_report: data.technical_report,
-                    upsell_vidrio: data.upsell_vidrio
+                    upsell_vidrio: data.upsell_vidrio,
+                    glass_upsell: data.glass_upsell,
+                    whatsapp_notifications: data.whatsapp_notifications,
+                    costo_repuesto: data.costo_repuesto,
+                    client_id: data.client_id,
+                    device_id: data.device_id
                 });
 
                 if (data.checklist) {
@@ -472,7 +531,6 @@ export class AdminRepairFormPage implements OnInit {
                     else if (nameControl.errors?.['minlength']) firstError = `El nombre es demasiado corto (mínimo ${nameControl.errors?.['minlength'].requiredLength} letras).`;
                     else firstError = 'Revisa el nombre del cliente.';
                 }
-                else if (this.repairForm.get('customer_phone')?.invalid) firstError = 'El teléfono es obligatorio.';
                 else if (this.repairForm.get('device_model')?.invalid) firstError = 'El modelo del equipo es obligatorio.';
                 else if (this.repairForm.get('issue_description')?.invalid) firstError = 'La falla es obligatoria.';
                 
@@ -492,6 +550,7 @@ export class AdminRepairFormPage implements OnInit {
             const payload = {
                 ...validFormData,
                 customer_id: validFormData.customer_id || null,
+                client_id: validFormData.customer_id || validFormData.client_id || null,
                 images: this.images(),
                 parts: this.parts(),
                 branch_id: branchIdActual
@@ -569,5 +628,11 @@ export class AdminRepairFormPage implements OnInit {
         const trackingCode = this.repairForm.get('tracking_code')?.value;
         if (!trackingCode) return '';
         return `${window.location.origin}/tracking/${trackingCode}`;
+    }
+
+    ngOnDestroy() {
+        if (this.adminLayout) {
+            this.adminLayout.isMainMenuOpen.set(true);
+        }
     }
 }

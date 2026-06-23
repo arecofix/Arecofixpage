@@ -7,6 +7,7 @@ import { switchMap, timeout, catchError, of, combineLatest } from 'rxjs';
 
 import { SeoService } from '@app/core/services/seo.service';
 import { CoursesService, Course } from '@app/core/services/courses.service';
+import { CourseLevel } from '@app/features/courses/domain/entities/course.entity';
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';
 import { PaginationService, iPagination } from '@app/shared/components/pagination';
@@ -256,7 +257,7 @@ export class CursosComponent implements OnInit {
                 schedule: 'Sábados 10:00 - 13:00hs',
                 price: 45000,
                 image_url: 'assets/img/cursos/pro.webp',
-                level: 'Intermedio',
+                level: CourseLevel.INTERMEDIATE,
                 students: 230,
                 rating: 4.9,
                 status: 'published',
@@ -271,7 +272,7 @@ export class CursosComponent implements OnInit {
                 schedule: 'Miércoles 18:00 - 21:00hs',
                 price: 65000,
                 image_url: 'assets/img/cursos/laboratorio.jpg',
-                level: 'Avanzado',
+                level: CourseLevel.ADVANCED,
                 students: 85,
                 rating: 5.0,
                 status: 'published',
@@ -286,7 +287,7 @@ export class CursosComponent implements OnInit {
                 schedule: 'Martes 19:00 - 21:00hs',
                 price: 42000,
                 image_url: 'assets/img/cursos/pc-repair.jpg', // Ensure this asset exists or use a generic one
-                level: 'Básico',
+                level: CourseLevel.BASIC,
                 students: 60,
                 rating: 4.8,
                 status: 'published',

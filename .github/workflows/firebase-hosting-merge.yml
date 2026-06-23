@@ -30,6 +30,15 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          start: pnpm run start
+          wait-on: 'http://localhost:4200'
+          wait-on-timeout: 120
+          browser: chrome
+          command: pnpm run test:e2e
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

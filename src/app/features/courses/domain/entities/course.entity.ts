@@ -1,17 +1,28 @@
-export type CourseLevel = 'Básico' | 'Intermedio' | 'Avanzado' | 'Todos los niveles';
+export enum CourseLevel {
+  BASIC = 'basic',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
+  ALL_LEVELS = 'all'
+}
 
 export interface Course {
     id: string;
     title: string;
     slug: string;
     description: string;
+    short_description?: string;
     duration: string;
     schedule: string;
-    level: CourseLevel;
+    level: CourseLevel | string;
     price: number;
     sale_price?: number;
     image_url: string;
     instructor_name?: string;
+    instructor_id?: string;
+    start_date?: string;
+    is_featured?: boolean;
+    syllabus?: any;
+    benefits?: any;
     rating?: number;
     students?: number;
     is_active?: boolean;
@@ -19,6 +30,7 @@ export interface Course {
     author_id?: string;
     tenant_id?: string;
     created_at?: string;
+    updated_at?: string;
 }
 
 export interface CourseModule {

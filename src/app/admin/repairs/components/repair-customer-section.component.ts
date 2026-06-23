@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
-                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Nombre Completo</span></label>
+                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Nombre Completo <span class="text-error">*</span></span></label>
                 <div class="relative group/input">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400 group-focus-within/input:text-blue-500 transition-colors"></i>
@@ -34,7 +34,7 @@ import { FormsModule } from '@angular/forms';
                 </datalist>
             </div>
             <div class="form-control">
-                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Whatsapp / Teléfono</span></label>
+                <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Whatsapp / Teléfono <span class="text-xs font-normal text-gray-400">(Opcional)</span></span></label>
                 <div class="relative group/input">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fab fa-whatsapp text-gray-400 group-focus-within/input:text-green-500 transition-colors"></i>

@@ -70,27 +70,64 @@ export class SupabaseStorageService {
       // Obligatory requirement: Set Cache-Control metadata to at least 1 year (31536000)
       const cacheHeader = options.cacheControl || '31536000';
 
-      const uploadPromise = this.supabase.storage
-        .from(bucket)
-        .upload(filePath, fileToUpload, {
-          cacheControl: cacheHeader,
-          upsert: options.upsert || false
-        });
+      // Convert File to ArrayBuffer to prevent fetch API hanging bugs with dynamically created Blobs in some browser engines
+      const arrayBuffer = await fileToUpload.arrayBuffer();
 
-      // 60s timeout safety for slow network connections
-      const timeoutPromise = new Promise<{ data: any; error: any }>((_, reject) => {
-          setTimeout(() => reject(new Error('Upload timeout (60s)')), 60000);
+      // We use native fetch to bypass any hanging issues in the Supabase JS SDK (cross-fetch)
+      const { data: sessionData } = await this.supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || '';
+      
+      // We must get the supabase url from the client config
+      // In Supabase v2, it's accessible via this.supabase.supabaseUrl
+      const supabaseUrl = (this.supabase as any).supabaseUrl;
+      const uploadUrl = `${supabaseUrl}/storage/v1/object/${bucket}/${filePath}`;
+      
+      const fetchHeaders: Record<string, string> = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': fileToUpload.type,
+        'cache-control': cacheHeader,
+        'x-upsert': options.upsert ? 'true' : 'false'
+      };
+
+      const uploadPromise = fetch(uploadUrl, {
+        method: 'POST',
+        body: arrayBuffer,
+        headers: fetchHeaders
+      }).then(async (res) => {
+        if (!res.ok) {
+          const errBody = await res.text();
+          let errMsg = `HTTP ${res.status}`;
+          try { errMsg = JSON.parse(errBody).message || errMsg; } catch(e) {}
+          throw new Error(errMsg);
+        }
+        return res.json();
       });
 
-      const { data, error } = await Promise.race([uploadPromise, timeoutPromise]) as any;
+      // 60s timeout safety for slow network connections
+      let timeoutId: any;
+      const timeoutPromise = new Promise<{ Key?: string; path?: string }>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Upload timeout (60s)')), 60000);
+      });
 
-      if (error) {
-        this.logger.error(`Storage Upload Error [${options.context || 'General'}]:`, error);
-        throw error;
+      let data;
+      try {
+        data = await Promise.race([uploadPromise, timeoutPromise]);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      let finalPath = data.path;
+      if (!finalPath && data.Key) {
+         // REST API returns Key like "bucket/folder/file.ext"
+         if (data.Key.startsWith(bucket + '/')) {
+             finalPath = data.Key.substring(bucket.length + 1);
+         } else {
+             finalPath = data.Key;
+         }
       }
 
       // Return public URL optimized with Supabase Image Transformations
-      return this.getPublicUrl(data.path, bucket);
+      return this.getPublicUrl(finalPath || filePath, bucket);
     } catch (error) {
       this.logger.error(`Unhandled error in SupabaseStorageService.uploadFile`, error);
       throw error;

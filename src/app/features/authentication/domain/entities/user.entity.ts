@@ -44,6 +44,9 @@ export interface UserProfile {
     notes?: string;
     is_guest?: boolean;
     branch_id?: string;
+    cuit_cuil?: string;
+    tenant_id?: string;
+    deleted_at?: string;
 }
 
 /**

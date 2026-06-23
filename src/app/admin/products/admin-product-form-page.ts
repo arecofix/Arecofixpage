@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, signal, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -8,6 +8,7 @@ import { NotificationService } from '@app/core/services/notification.service';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
 import { Branch } from '@app/shared/interfaces/branch.interface';
+import { AdminLayout } from '@app/admin/layout/admin-layout';
 
 @Component({
   selector: 'app-admin-product-form-page',
@@ -16,12 +17,13 @@ import { Branch } from '@app/shared/interfaces/branch.interface';
   templateUrl: './admin-product-form-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminProductFormPage implements OnInit {
+export class AdminProductFormPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(AdminProductService);
   private cdr = inject(ChangeDetectorRef);
   private notificationService = inject(NotificationService);
+  private adminLayout = inject(AdminLayout, { optional: true });
 
   id: string | null = null;
   
@@ -40,6 +42,8 @@ export class AdminProductFormPage implements OnInit {
     is_active: true,
     is_global: true,
     branch_id: '',
+    model_id: '',
+    specifications: {} as Record<string, any>,
     images: [] as any[], // Now holds { url: string, color?: string }
     unit_cost_at_time: 0,
   };
@@ -57,6 +61,11 @@ export class AdminProductFormPage implements OnInit {
   activeTab = signal<'general' | 'price' | 'media'>('general');
 
   async ngOnInit() {
+    // Cerrar el menú lateral automáticamente para mejor experiencia de llenado de formulario
+    if (this.adminLayout) {
+      this.adminLayout.isMainMenuOpen.set(false);
+    }
+
     try {
       const [brands, categories, branches] = await Promise.all([
         this.productService.getBrands(),
@@ -86,6 +95,8 @@ export class AdminProductFormPage implements OnInit {
             is_active: data.is_active ?? true,
             is_global: data.is_global ?? true,
             branch_id: data.branch_id || '',
+            model_id: data.model_id || '',
+            specifications: data.specifications || {},
             images: data.media_metadata && data.media_metadata.length > 0 
                     ? data.media_metadata 
                     : (data.gallery_urls || (data.image_url ? [data.image_url] : [])).map(url => ({ url, color: '' })),
@@ -165,6 +176,8 @@ export class AdminProductFormPage implements OnInit {
       is_active: formVal.is_active,
       is_global: formVal.is_global,
       branch_id: formVal.branch_id || null,
+      model_id: formVal.model_id || null,
+      specifications: formVal.specifications,
       image_url: formVal.images.length > 0 ? formVal.images[0].url : null, // Main image
       unit_cost_at_time: formVal.unit_cost_at_time || 0,
     };
@@ -209,5 +222,12 @@ export class AdminProductFormPage implements OnInit {
         this.error.set(null);
         this.cdr.markForCheck();
     }, 3000);
+  }
+
+  ngOnDestroy() {
+    // Restaurar el menú lateral al salir del formulario
+    if (this.adminLayout) {
+      this.adminLayout.isMainMenuOpen.set(true);
+    }
   }
 }
