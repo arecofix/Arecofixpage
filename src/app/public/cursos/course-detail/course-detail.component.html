@@ -91,6 +91,7 @@
               class="flex-1 py-3 px-6 rounded-lg font-medium text-sm transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300">
               Temario
             </button>
+            @if (isCelularCourse) {
             <button (click)="activeTab = 'galeria'"
               [class.bg-indigo-50]="activeTab === 'galeria'"
               [class.text-indigo-600]="activeTab === 'galeria'"
@@ -99,6 +100,7 @@
               class="flex-1 py-3 px-6 rounded-lg font-medium text-sm transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300">
               Galería
             </button>
+            }
             @if (isCelularCourse) {
             <button (click)="activeTab = 'testimonios'"
               [class.bg-indigo-50]="activeTab === 'testimonios'"
@@ -181,21 +183,20 @@
               }
 
               <!-- 3. Methodology (Visual Section) -->
-              <div class="grid grid-cols-1 gap-8 items-center" [ngClass]="{'md:grid-cols-2': isCelularCourse}">
-                @if (isCelularCourse) {
-                  <div class="rounded-xl overflow-hidden shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                    <img src="assets/img/cursos/academy/capacitaciones.jpeg" class="w-full h-full object-cover" alt="Clases 100% Prácticas">
-                  </div>
-                }
-                <div class="space-y-4" [ngClass]="{'text-center mx-auto max-w-3xl': !isCelularCourse}">
-                  <div class="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2" [ngClass]="{'mx-auto': !isCelularCourse}">
+              @if (isCelularCourse) {
+              <div class="grid grid-cols-1 gap-8 items-center md:grid-cols-2">
+                <div class="rounded-xl overflow-hidden shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <img src="assets/img/cursos/academy/capacitaciones.jpeg" class="w-full h-full object-cover" alt="Clases 100% Prácticas">
+                </div>
+                <div class="space-y-4">
+                  <div class="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2">
                     <i class="fas fa-tools"></i>
                   </div>
                   <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Metodología 100% Práctica</h3>
                   <p class="text-gray-600 dark:text-gray-300 text-lg">
                     Creemos que la única forma de aprender es metiendo mano. Trabajamos con un enfoque orientado a la experiencia.
                   </p>
-                  <ul class="space-y-2" [ngClass]="{'inline-block text-left': !isCelularCourse}">
+                  <ul class="space-y-2">
                     @for (benefit of benefitsList.slice(0, 3); track benefit.text) {
                     <li class="flex items-center text-gray-700 dark:text-gray-300"><i class="fas fa-check-circle text-green-500 mr-3"></i> {{ benefit.text }}</li>
                     }
@@ -205,8 +206,8 @@
 
               <!-- 4. Instructors (Visual Section) -->
               <div class="bg-indigo-900 text-white rounded-xl shadow-xl overflow-hidden">
-                <div class="grid grid-cols-1" [ngClass]="{'md:grid-cols-2': isCelularCourse}">
-                  <div class="p-10 flex flex-col justify-center" [ngClass]="{'items-center text-center': !isCelularCourse}">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                  <div class="p-10 flex flex-col justify-center">
                     <span class="text-indigo-300 font-bold tracking-wider uppercase text-sm mb-2">Mentoria Experta</span>
                     <h3 class="text-3xl font-bold mb-6">Aprende de los Mejores</h3>
                     <p class="text-indigo-100 text-lg mb-6 max-w-2xl">
@@ -221,13 +222,12 @@
                       <span class="text-sm font-medium">Acompañamiento personalizado</span>
                     </div>
                   </div>
-                  @if (isCelularCourse) {
-                    <div class="h-164 md:h-auto relative">
-                      <img src="assets/img/cursos/academy/eddis_educativa.jpeg" class="absolute inset-0 w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" alt="Instructor Experto">
-                    </div>
-                  }
+                  <div class="h-164 md:h-auto relative">
+                    <img src="assets/img/cursos/academy/eddis_educativa.jpeg" class="absolute inset-0 w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" alt="Instructor Experto">
+                  </div>
                 </div>
               </div>
+              }
 
               <!-- 5. Facilities (Visual Section) -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -283,24 +283,22 @@
               }
 
               <!-- 7. Community (Visual Section) -->
+              @if (isCelularCourse) {
               <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-8 border border-gray-100 dark:border-gray-700">
-                <div class="grid grid-cols-1 gap-8 items-center" [ngClass]="{'md:grid-cols-2': isCelularCourse}">
-                  @if (isCelularCourse) {
-                    <div class="h-64 rounded-xl overflow-hidden shadow-sm">
-                      <img src="assets/img/cursos/academy/aprender.jpeg" class="w-full h-full object-cover" alt="Grupo de Alumnos">
-                    </div>
-                  }
-                  <div [ngClass]="{'text-center mx-auto max-w-2xl': !isCelularCourse}">
+                <div class="grid grid-cols-1 gap-8 items-center md:grid-cols-2">
+                  <div class="h-64 rounded-xl overflow-hidden shadow-sm">
+                    <img src="assets/img/cursos/academy/aprender.jpeg" class="w-full h-full object-cover" alt="Grupo de Alumnos">
+                  </div>
+                  <div>
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Más que un Curso, una Comunidad</h3>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                       Participa de foros, grupos de WhatsApp exclusivos y actualizaciones constantes junto a otros compañeros.
                     </p>
-                    @if (isCelularCourse) {
-                      <button (click)="activeTab = 'testimonios'" class="btn btn-outline btn-sm">Ver Testimonios de alumnos</button>
-                    }
+                    <button (click)="activeTab = 'testimonios'" class="btn btn-outline btn-sm">Ver Testimonios de alumnos</button>
                   </div>
                 </div>
               </div>
+              }
 
               <!-- 8. Inclusions (Grid) -->
               <div>
