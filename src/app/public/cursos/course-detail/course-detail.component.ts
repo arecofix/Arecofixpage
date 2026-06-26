@@ -74,57 +74,25 @@ export class CourseDetailComponent implements OnInit {
   ];
 
   // Sales Content Types
-  audienceList = [
-      'No tenés experiencia pero querés una salida laboral rápida.',
-      'Ya reparás celulares pero querés subir de nivel.',
-      'Querés trabajar desde tu casa o armar tu propio taller.',
-      'Buscás independizarte y tener horarios flexibles.',
-      'Querés un trabajo rentable sin depender de terceros.'
-  ];
+  audienceList: string[] = [];
+  benefitsList: any[] = [];
+  syllabusTimeline: any[] = [];
+  roiExamples: any[] = [];
+  inclusions: any[] = [];
+  faqs: any[] = [];
+  
+  get isCelularCourse(): boolean {
+      if (!this.course) return false;
+      const title = (this.course.title || '').toLowerCase();
+      const slug = (this.course.slug || '').toLowerCase();
+      return title.includes('celular') || slug.includes('celular') || title.includes('microelectr');
+  }
 
-  benefitsList = [
-      { icon: 'fas fa-microscope', text: 'Laboratorio real equipado con microscopios y estaciones.' },
-      { icon: 'fas fa-hands-on', text: 'Clases 100% prácticas desde el día 1.' },
-      { icon: 'fas fa-user-tie', text: 'Instructor con experiencia real en taller.' },
-      { icon: 'fas fa-certificate', text: 'Certificado con validez y matrícula.' },
-      { icon: 'fas fa-users', text: 'Bolsa de trabajo y comunidad de alumnos.' },
-      { icon: 'fas fa-video', text: 'Acceso a Aula Virtual con material premium.' }
-  ];
-
-  syllabusTimeline = [
-      { week: 'Semana 1', title: 'Fundamentos y Desarme', desc: 'Conceptos, herramientas, seguridad y desarme de equipos.' },
-      { week: 'Semana 2', title: 'Diagnóstico Inicial', desc: 'Manejo de multímetro, fuentes y detección de fallas comunes.' },
-      { week: 'Semana 3', title: 'Reparaciones Modulares', desc: 'Cambio de pantallas, baterías, cámaras y periféricos.' },
-      { week: 'Semana 4', title: 'Electrónica Aplicada', desc: 'Medición de componentes, cortos y fugas en placa.' },
-      { week: 'Semana 5', title: 'Microsoldadura I', desc: 'Pin de carga, botones, micrófonos y técnica de soldado.' },
-      { week: 'Semana 6', title: 'Software', desc: 'Flasheo, desbloqueo, cuentas Google y sistemas operativos.' },
-      { week: 'Semana 7', title: 'Práctica Real', desc: 'Trabajos con equipos reales traídos por los alumnos.' },
-      { week: 'Semana 8', title: 'Examen Final', desc: 'Evaluación teórica-práctica y entrega de certificados.' }
-  ];
-
-  roiExamples = [
-      { job: 'Cambio de Módulo', range: '$15.000 – $40.000', earning: true },
-      { job: 'Cambio de Batería', range: '$8.000 – $20.000', earning: true },
-      { job: 'Cambio de Pin de Carga', range: '$10.000 – $30.000', earning: true },
-      { job: 'Limpieza de Software/Flasheo', range: '$5.000 – $15.000', earning: true }
-  ];
-
-  inclusions = [
-      { icon: 'fas fa-laptop', text: 'Aula Virtual 24/7' },
-      { icon: 'fas fa-file-pdf', text: 'Material PDF' },
-      { icon: 'fas fa-video', text: 'Clases Grabadas' },
-      { icon: 'fas fa-certificate', text: 'Certificado Oficial' },
-      { icon: 'fas fa-users', text: 'Comunidad VIP' },
-      { icon: 'fas fa-briefcase', text: 'Bolsa de Trabajo' }
-  ];
-
-  faqs = [
-      { question: '¿Necesito experiencia previa?', answer: 'No, el curso inicia desde cero absoluto. Te guiamos paso a paso.' },
-      { question: '¿Qué herramientas necesito?', answer: 'Durante la cursada proveemos todo en el taller. Solo necesitas ganas de aprender.' },
-      { question: '¿Realmente voy a poder reparar después?', answer: 'Sí. El enfoque es 100% práctico para que salgas con la confianza de trabajar.' },
-      { question: '¿Entregan certificado?', answer: 'Sí, entregamos certificado de asistencia y aprobación al finalizar el curso.' },
-      { question: '¿Puedo pagar en cuotas?', answer: 'Sí, aceptamos todas las tarjetas y ofrecemos financiación propia.' }
-  ];
+  get facilityImage(): string {
+      return this.isCelularCourse 
+          ? 'assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg' 
+          : (this.course?.image_url || 'assets/img/cursos/academy/capacitaciones.jpeg');
+  }
 
   getVideoUrl() {
       // YouTube embed with start time 45s
@@ -182,6 +150,81 @@ export class CourseDetailComponent implements OnInit {
       }
 
       this.course = courseData;
+      
+      // Update dynamic arrays based on course
+      this.audienceList = this.isCelularCourse ? [
+          'No tenés experiencia pero querés una salida laboral rápida.',
+          'Ya reparás celulares pero querés subir de nivel.',
+          'Querés trabajar desde tu casa o armar tu propio taller.',
+          'Buscás independizarte y tener horarios flexibles.',
+          'Querés un trabajo rentable sin depender de terceros.'
+      ] : [
+          'Buscás una salida laboral rápida y rentable.',
+          'Querés emprender tu propio negocio.',
+          'Buscás independizarte y tener horarios flexibles.',
+          'Te apasiona la temática del curso y querés profesionalizarte.'
+      ];
+
+      this.benefitsList = this.isCelularCourse ? [
+          { icon: 'fas fa-microscope', text: 'Laboratorio real equipado con microscopios y estaciones.' },
+          { icon: 'fas fa-hands-on', text: 'Clases 100% prácticas desde el día 1.' },
+          { icon: 'fas fa-user-tie', text: 'Instructor con experiencia real en taller.' },
+          { icon: 'fas fa-certificate', text: 'Certificado con validez y matrícula.' },
+          { icon: 'fas fa-users', text: 'Bolsa de trabajo y comunidad de alumnos.' },
+          { icon: 'fas fa-video', text: 'Acceso a Aula Virtual con material premium.' }
+      ] : [
+          { icon: 'fas fa-hands-on', text: 'Clases 100% prácticas y dinámicas.' },
+          { icon: 'fas fa-user-tie', text: 'Instructores expertos y capacitados.' },
+          { icon: 'fas fa-certificate', text: 'Certificado oficial con validez.' },
+          { icon: 'fas fa-users', text: 'Bolsa de trabajo y comunidad activa.' },
+          { icon: 'fas fa-video', text: 'Acceso a material exclusivo y clases grabadas.' }
+      ];
+
+      this.syllabusTimeline = this.isCelularCourse ? [
+          { week: 'Semana 1', title: 'Fundamentos y Desarme', desc: 'Conceptos, herramientas, seguridad y desarme de equipos.' },
+          { week: 'Semana 2', title: 'Diagnóstico Inicial', desc: 'Manejo de multímetro, fuentes y detección de fallas comunes.' },
+          { week: 'Semana 3', title: 'Reparaciones Modulares', desc: 'Cambio de pantallas, baterías, cámaras y periféricos.' },
+          { week: 'Semana 4', title: 'Electrónica Aplicada', desc: 'Medición de componentes, cortos y fugas en placa.' },
+          { week: 'Semana 5', title: 'Microsoldadura I', desc: 'Pin de carga, botones, micrófonos y técnica de soldado.' },
+          { week: 'Semana 6', title: 'Software', desc: 'Flasheo, desbloqueo, cuentas Google y sistemas operativos.' },
+          { week: 'Semana 7', title: 'Práctica Real', desc: 'Trabajos con equipos reales traídos por los alumnos.' },
+          { week: 'Semana 8', title: 'Examen Final', desc: 'Evaluación teórica-práctica y entrega de certificados.' }
+      ] : [];
+
+      this.roiExamples = this.isCelularCourse ? [
+          { job: 'Cambio de Módulo', range: '$15.000 – $40.000', earning: true },
+          { job: 'Cambio de Batería', range: '$8.000 – $20.000', earning: true },
+          { job: 'Cambio de Pin de Carga', range: '$10.000 – $30.000', earning: true },
+          { job: 'Limpieza de Software/Flasheo', range: '$5.000 – $15.000', earning: true }
+      ] : [];
+
+      if (!this.isCelularCourse) {
+          this.pressLinks = [];
+          this.galleryImages = [
+              this.course.image_url || 'assets/img/cursos/academy/cursos.jpeg',
+              'assets/img/cursos/academy/aprender.jpeg',
+              'assets/img/cursos/academy/capacitaciones.jpeg',
+              'assets/img/cursos/academy/diploma.jpeg'
+          ];
+      }
+
+      this.inclusions = [
+          { icon: 'fas fa-laptop', text: 'Aula Virtual 24/7' },
+          { icon: 'fas fa-file-pdf', text: 'Material PDF' },
+          { icon: 'fas fa-video', text: 'Clases Grabadas' },
+          { icon: 'fas fa-certificate', text: 'Certificado Oficial' },
+          { icon: 'fas fa-users', text: 'Comunidad VIP' },
+          { icon: 'fas fa-briefcase', text: 'Bolsa de Trabajo' }
+      ];
+
+      this.faqs = [
+          { question: '¿Necesito experiencia previa?', answer: 'No, el curso inicia desde cero absoluto. Te guiamos paso a paso.' },
+          { question: '¿Qué herramientas necesito?', answer: 'Durante la cursada proveemos todo lo necesario en clase. Solo necesitas ganas de aprender.' },
+          { question: '¿Realmente voy a poder trabajar de esto después?', answer: 'Sí. El enfoque es 100% práctico para que salgas con la confianza de trabajar de forma autónoma.' },
+          { question: '¿Entregan certificado?', answer: 'Sí, entregamos certificado de asistencia y aprobación al finalizar el curso.' },
+          { question: '¿Puedo pagar en cuotas?', answer: 'Sí, aceptamos todas las tarjetas y ofrecemos financiación propia.' }
+      ];
+
       if (this.course) this.setSEO(this.course);
       this.loadModules(this.course!.id);
       this.loading = false;
