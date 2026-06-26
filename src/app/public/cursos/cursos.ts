@@ -220,13 +220,13 @@ export class CursosComponent implements OnInit {
                 // Enhance data if needed and filter out pending/inactive
                 const processedCourses = coursesData
                     .filter((c: Course) => {
-                        const titleLower = c.title.toLowerCase();
+                        const titleLower = (c.title || '').toLowerCase();
                         // Hide drones course completely as requested
                         if (titleLower.includes('drone')) return false;
                         return c.is_active || c.status === 'published';
                     })
                     .map((c: Course) => {
-                        const titleLower = c.title.toLowerCase();
+                        const titleLower = (c.title || '').toLowerCase();
                         
                         // User preferences for featured content
                         const isRepairCourse = titleLower.includes('reparaci') || titleLower.includes('celular');
@@ -253,8 +253,8 @@ export class CursosComponent implements OnInit {
                     })
                     .sort((a, b) => {
                         // Force Cell Phone Repair course to be strictly first
-                        const aIsRepair = a.title.toLowerCase().includes('reparaci') || a.title.toLowerCase().includes('celular');
-                        const bIsRepair = b.title.toLowerCase().includes('reparaci') || b.title.toLowerCase().includes('celular');
+                        const aIsRepair = (a.title || '').toLowerCase().includes('reparaci') || (a.title || '').toLowerCase().includes('celular');
+                        const bIsRepair = (b.title || '').toLowerCase().includes('reparaci') || (b.title || '').toLowerCase().includes('celular');
                         if (aIsRepair && !bIsRepair) return -1;
                         if (!aIsRepair && bIsRepair) return 1;
                         return 0; // keep original order for others
