@@ -9,6 +9,7 @@ import { RepairStatusUtils } from '@app/features/repairs/domain/utils/repair-sta
 import { BranchContextService } from '@app/core/services/branch-context.service';
 
 
+import { OfflineSyncService } from '@app/core/services/offline-sync.service';
 
 @Component({
   selector: 'app-admin-repairs-page',
@@ -19,6 +20,7 @@ import { BranchContextService } from '@app/core/services/branch-context.service'
 export class AdminRepairsPage implements OnInit {
   private repairService = inject(AdminRepairService);
   private branchContextService = inject(BranchContextService);
+  offlineSyncService = inject(OfflineSyncService); // Injected to manage offline form submissions
 
   constructor() {
     // React to branch changes globally
@@ -193,5 +195,12 @@ export class AdminRepairsPage implements OnInit {
     if (index >= total - 5 && this.hasMore() && !this.loadingMore() && !this.loading()) {
       this.loadMore();
     }
+  }
+
+  async syncOfflineRepairs() {
+    await this.offlineSyncService.syncAll();
+    // After syncing, reload repairs to fetch the newly synced ones from the database
+    this.loadRepairs();
+    this.loadSummary();
   }
 }

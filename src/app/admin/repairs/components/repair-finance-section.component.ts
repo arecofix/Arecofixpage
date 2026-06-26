@@ -67,24 +67,24 @@ import { FormsModule } from '@angular/forms';
                 <div class="space-y-4">
                     <div class="form-control">
                         <label class="label pb-1"><span class="label-text text-gray-400 text-[10px] uppercase tracking-widest font-bold">Base Presupuesto ($)</span></label>
-                        <input type="number" [ngModel]="estimatedCost()" (ngModelChange)="onEstimatedCostChange.emit($event)" name="estimated_cost" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
+                        <input type="number" [ngModel]="estimatedCost()" (ngModelChange)="onEstimatedCostChange.emit($event)" name="estimated_cost" tabindex="5" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
                     </div>
 
                     <div class="form-control">
                         <label class="label pb-1"><span class="label-text text-gray-400 text-[10px] uppercase tracking-widest font-bold">Labor Técnica (M.O)</span></label>
-                        <input type="number" [ngModel]="technicalLaborCost()" (ngModelChange)="onLaborCostChange.emit($event)" name="technical_labor_cost" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
+                        <input type="number" [ngModel]="technicalLaborCost()" (ngModelChange)="onLaborCostChange.emit($event)" name="technical_labor_cost" tabindex="108" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
                     </div>
                     
                     <div class="border-t border-gray-700/50 my-2 shadow-[0_-1px_0_rgba(255,255,255,0.05)]"></div>
 
                     <div class="form-control">
                         <label class="label pb-1"><span class="label-text text-gray-400 text-[10px] uppercase tracking-widest font-bold">Costo Final / Subtotal ($)</span></label>
-                        <input type="number" [ngModel]="finalCost()" (ngModelChange)="onFinalCostChange.emit($event)" name="final_cost" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
+                        <input type="number" [ngModel]="finalCost()" (ngModelChange)="onFinalCostChange.emit($event)" name="final_cost" tabindex="109" class="input input-bordered w-full rounded-xl bg-gray-800 border-gray-700 text-gray-300 focus:bg-gray-800 focus:border-emerald-500 font-mono text-lg" min="0" />
                     </div>
 
                     <div class="form-control mt-4">
                         <label class="label pb-1"><span class="label-text text-emerald-400 text-[10px] uppercase tracking-widest font-bold">Seña / Recibido a Cuenta ($)</span></label>
-                        <input type="number" [ngModel]="depositAmount()" (ngModelChange)="onDepositChange.emit($event)" name="deposit_amount" class="input input-bordered w-full rounded-xl bg-emerald-900/30 border-emerald-500/50 text-emerald-400 focus:bg-emerald-900/40 focus:border-emerald-400 font-mono text-lg" min="0" />
+                        <input type="number" [ngModel]="depositAmount()" (ngModelChange)="onDepositChange.emit($event)" name="deposit_amount" tabindex="6" class="input input-bordered w-full rounded-xl bg-emerald-900/30 border-emerald-500/50 text-emerald-400 focus:bg-emerald-900/40 focus:border-emerald-400 font-mono text-lg" min="0" />
                     </div>
 
                     <div class="bg-black/40 rounded-xl p-4 mt-6 border border-white/5 backdrop-blur-sm">

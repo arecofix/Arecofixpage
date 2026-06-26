@@ -110,8 +110,8 @@ export class RepairStatsService {
         };
 
         for (const r of (allRepairs as any[] || [])) {
-            const revenueDate = r.completed_at || r.created_at;
-            const revenuePeriod = revenueDate.slice(0, 7);
+            const revenueDate = r.completed_at || r.created_at || '';
+            const revenuePeriod = revenueDate ? revenueDate.slice(0, 7) : '';
             
             if (!monthlyMap.has(revenuePeriod)) monthlyMap.set(revenuePeriod, { ingreso: 0, costo: 0 });
 

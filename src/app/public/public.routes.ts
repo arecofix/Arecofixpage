@@ -290,6 +290,21 @@ export const publicRoutes: Routes = [
       },
       {
         title: 'Seguimiento de Reparación',
+        path: 'tracking',
+        loadComponent: () =>
+          import('@app/public/tracking/tracking-page').then(
+            (m) => m.TrackingPage
+          ),
+        data: {
+          seo: {
+            title: 'Seguimiento de Reparación | Arecofix',
+            description: 'Consultá el estado de tu reparación en tiempo real con tu código de seguimiento.',
+            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+          }
+        }
+      },
+      {
+        title: 'Seguimiento de Reparación',
         path: 'tracking/:code',
         loadComponent: () =>
           import('@app/public/tracking/tracking-page').then(

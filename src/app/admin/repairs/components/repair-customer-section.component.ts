@@ -25,7 +25,7 @@ import { FormsModule } from '@angular/forms';
                         <i class="fas fa-search text-gray-400 group-focus-within/input:text-blue-500 transition-colors"></i>
                     </div>
                     <input type="text" [ngModel]="customerName()" (ngModelChange)="onNameChange.emit($event)" 
-                        name="customer_name" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" list="repair-clients-list" placeholder="Seleccionar en cartera..." required autocomplete="off" />
+                        name="customer_name" tabindex="1" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" list="repair-clients-list" placeholder="Seleccionar en cartera..." required autocomplete="off" />
                 </div>
                 <datalist id="repair-clients-list">
                     @for (client of clients(); track client.id) {
@@ -39,7 +39,7 @@ import { FormsModule } from '@angular/forms';
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fab fa-whatsapp text-gray-400 group-focus-within/input:text-green-500 transition-colors"></i>
                     </div>
-                    <input type="tel" [ngModel]="customerPhone()" (ngModelChange)="onPhoneChange.emit($event)" name="customer_phone" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="+54 9..." />
+                    <input type="tel" [ngModel]="customerPhone()" (ngModelChange)="onPhoneChange.emit($event)" name="customer_phone" tabindex="2" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="+54 9..." />
                 </div>
             </div>
             <div class="form-control">
@@ -48,7 +48,7 @@ import { FormsModule } from '@angular/forms';
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-envelope text-gray-400 group-focus-within/input:text-blue-500 transition-colors"></i>
                     </div>
-                    <input type="email" [ngModel]="customerEmail()" (ngModelChange)="onEmailChange.emit($event)" name="customer_email" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="cliente@email.com" />
+                    <input type="email" [ngModel]="customerEmail()" (ngModelChange)="onEmailChange.emit($event)" name="customer_email" tabindex="101" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="cliente@email.com" />
                 </div>
             </div>
             <div class="form-control">
@@ -57,7 +57,7 @@ import { FormsModule } from '@angular/forms';
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-id-card text-gray-400 group-focus-within/input:text-blue-500 transition-colors"></i>
                     </div>
-                    <input type="text" [ngModel]="customerDni()" (ngModelChange)="onDniChange.emit($event)" name="customer_dni" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="Ej. 30123456" />
+                    <input type="text" [ngModel]="customerDni()" (ngModelChange)="onDniChange.emit($event)" name="customer_dni" tabindex="102" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="Ej. 30123456" />
                 </div>
             </div>
         </div>

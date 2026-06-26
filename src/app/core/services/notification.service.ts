@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { AuthService } from './auth.service';
 import { TenantService } from './tenant.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 export interface AppNotification {
   id: string;
@@ -42,6 +43,7 @@ export class NotificationService {
     private supabase = inject(SUPABASE_CLIENT);
     private auth = inject(AuthService);
     private tenantService = inject(TenantService);
+    private toastService = inject(ToastService);
 
     private _dbNotifications = signal<AppNotification[]>([]);
     public dbNotifications = this._dbNotifications.asReadonly();
@@ -83,6 +85,10 @@ export class NotificationService {
      * Show notification
      */
     private show(type: NotificationType, message: string, duration: number): void {
+        const toastType = type === 'warning' ? 'info' : type;
+        this.toastService.show(message, toastType);
+
+        // Keep the old signal logic intact just in case any component (like a legacy widget) still reads it
         const notification: Notification = {
             id: this.generateId(),
             type,

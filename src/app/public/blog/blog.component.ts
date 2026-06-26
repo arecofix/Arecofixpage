@@ -30,9 +30,10 @@ export class BlogComponent {
     try {
       const allPosts = await this.postService.getRecentPosts(100);
       const publicPosts = allPosts.filter(p => p.published || p.status === 'published');
+      
       this.posts.set(publicPosts);
     } catch (err) {
-      this.error.set('Error al cargar los artículos.');
+      this.posts.set([]);
     } finally {
       this.loading.set(false);
     }

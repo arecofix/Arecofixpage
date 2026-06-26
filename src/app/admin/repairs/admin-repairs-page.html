@@ -36,6 +36,21 @@
                 </button>
             </div>
         }
+        <!-- Offline Sync State -->
+        @if (offlineSyncService.pendingCount() > 0) {
+            <div class="bg-yellow-50 dark:bg-yellow-500/10 border-l-4 border-l-yellow-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-yellow-700 dark:text-yellow-400 mb-6 border border-yellow-100 dark:border-yellow-900 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-wifi text-xl opacity-70"></i>
+                    <div>
+                        <span class="font-bold block text-sm">{{ offlineSyncService.pendingCount() }} Órdenes Guardadas Sin Internet</span>
+                        <span class="text-xs opacity-80">Presiona el botón para sincronizarlas ahora.</span>
+                    </div>
+                </div>
+                <button (click)="syncOfflineRepairs()" class="btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-white border-none rounded-xl shadow-md flex items-center gap-2">
+                    <i class="fas fa-cloud-upload-alt"></i> <span class="hidden sm:inline">Sincronizar</span>
+                </button>
+            </div>
+        }
 
         <!-- BI Dashboard Entry Point -->
         <div class="mb-6 w-full animate-fade-in-up" style="animation-delay: 100ms;">

@@ -29,7 +29,7 @@ export class AdminPostFormPage implements OnInit {
             title: ['', [Validators.required]],
             slug: ['', [Validators.required]],
             content: [''],
-            published: [false],
+            published: [true],
             meta_title: [''],
             meta_description: [''],
             image: [''],

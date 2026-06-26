@@ -20,7 +20,7 @@ import { FormsModule } from '@angular/forms';
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <div class="form-control">
                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Marca</span></label>
-                <select [ngModel]="brandId()" (ngModelChange)="onBrandIdChange.emit($event)" name="brand_id" class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white">
+                <select [ngModel]="brandId()" (ngModelChange)="onBrandIdChange.emit($event)" name="brand_id" tabindex="103" class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white">
                     <option [ngValue]="null">Seleccionar Marca...</option>
                     @for (brand of brands(); track brand.id) {
                         <option [value]="brand.id">{{ brand.name }}</option>
@@ -29,7 +29,7 @@ import { FormsModule } from '@angular/forms';
             </div>
             <div class="form-control">
                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Modelo del Equipo <span class="text-error">*</span></span></label>
-                <input type="text" [ngModel]="deviceModel()" (ngModelChange)="onDeviceModelChange.emit($event)" name="device_model" class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white" required placeholder="Ej: iPhone 13 Pro Max" />
+                <input type="text" [ngModel]="deviceModel()" (ngModelChange)="onDeviceModelChange.emit($event)" name="device_model" tabindex="3" class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-bold text-gray-800 dark:text-white" required placeholder="Ej: iPhone 13 Pro Max" />
             </div>
             <div class="form-control">
                 <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">IMEI o N° Serie</span></label>
@@ -37,14 +37,14 @@ import { FormsModule } from '@angular/forms';
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-barcode text-gray-400 group-focus-within/input:text-purple-500 transition-colors"></i>
                     </div>
-                    <input type="text" [ngModel]="imei()" (ngModelChange)="onImeiChange.emit($event)" name="imei" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-mono text-gray-600 dark:text-gray-300 tracking-wider" placeholder="Opcional..." />
+                    <input type="text" [ngModel]="imei()" (ngModelChange)="onImeiChange.emit($event)" name="imei" tabindex="104" class="input input-bordered pl-11 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-mono text-gray-600 dark:text-gray-300 tracking-wider" placeholder="Opcional..." />
                 </div>
             </div>
         </div>
 
         <div class="form-control mb-8">
             <label class="label pb-1.5"><span class="label-text font-semibold text-gray-600 dark:text-gray-300">Motivo de Ingreso / Fallas reportadas <span class="text-error">*</span></span></label>
-            <textarea [ngModel]="issueDescription()" (ngModelChange)="onIssueDescriptionChange.emit($event)" name="issue_description" class="textarea textarea-bordered h-28 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all text-gray-700 dark:text-gray-200 leading-relaxed resize-none" placeholder="El cliente indica que la pantalla no enciende, pero vibra al conectarlo al cargador..."></textarea>
+            <textarea [ngModel]="issueDescription()" (ngModelChange)="onIssueDescriptionChange.emit($event)" name="issue_description" tabindex="4" class="textarea textarea-bordered h-28 w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all text-gray-700 dark:text-gray-200 leading-relaxed resize-none" placeholder="El cliente indica que la pantalla no enciende, pero vibra al conectarlo al cargador..."></textarea>
         </div>
 
         <!-- Estado y Seguridad -->
@@ -53,13 +53,13 @@ import { FormsModule } from '@angular/forms';
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div class="form-control">
-                    <input type="text" [ngModel]="securityPin()" (ngModelChange)="onSecurityPinChange.emit($event)" name="security_pin" class="input input-sm input-bordered rounded-xl text-center font-bold tracking-[0.2em] bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700" placeholder="PIN EJ: 1234" />
+                    <input type="text" [ngModel]="securityPin()" (ngModelChange)="onSecurityPinChange.emit($event)" name="security_pin" tabindex="105" class="input input-sm input-bordered rounded-xl text-center font-bold tracking-[0.2em] bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700" placeholder="PIN EJ: 1234" />
                 </div>
                 <div class="form-control">
-                    <input type="text" [ngModel]="securityPattern()" (ngModelChange)="onSecurityPatternChange.emit($event)" name="security_pattern" class="input input-sm input-bordered rounded-xl text-center font-medium bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700" placeholder="Patrón: (L, Z, M)" />
+                    <input type="text" [ngModel]="securityPattern()" (ngModelChange)="onSecurityPatternChange.emit($event)" name="security_pattern" tabindex="106" class="input input-sm input-bordered rounded-xl text-center font-medium bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700" placeholder="Patrón: (L, Z, M)" />
                 </div>
                 <div class="form-control">
-                    <input type="text" [ngModel]="devicePasscode()" (ngModelChange)="onDevicePasscodeChange.emit($event)" name="device_passcode" class="input input-sm input-bordered rounded-xl text-center font-medium bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-xs" placeholder="Passcode Texto" />
+                    <input type="text" [ngModel]="devicePasscode()" (ngModelChange)="onDevicePasscodeChange.emit($event)" name="device_passcode" tabindex="107" class="input input-sm input-bordered rounded-xl text-center font-medium bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-xs" placeholder="Passcode Texto" />
                 </div>
             </div>
 

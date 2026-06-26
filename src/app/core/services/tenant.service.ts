@@ -257,6 +257,7 @@ export class TenantService {
     if (!isPlatformBrowser(this.platformId)) return true;
     const hostname = window.location.hostname;
     return hostname.includes('localhost') || 
+           hostname === '127.0.0.1' ||
            hostname === 'arecofix.com.ar' || 
            hostname === 'www.arecofix.com.ar' ||
            hostname.endsWith('.web.app') || // Firebase default

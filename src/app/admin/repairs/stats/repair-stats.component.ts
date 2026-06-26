@@ -274,7 +274,7 @@ export class AdminRepairStatsComponent implements OnInit {
             },
             error: (err) => {
                 console.error("Error loading stats", err);
-                this.error.set("No se pudo compilar el Dashboard contable. Refresque la base de datos.");
+                this.error.set(err.message || JSON.stringify(err) || "No se pudo compilar el Dashboard contable.");
                 this.loading.set(false);
             }
         });
