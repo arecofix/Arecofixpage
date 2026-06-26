@@ -201,10 +201,7 @@ export class CourseDetailComponent implements OnInit {
       if (!this.isCelularCourse) {
           this.pressLinks = [];
           this.galleryImages = [
-              this.course.image_url || 'assets/img/cursos/academy/cursos.jpeg',
-              'assets/img/cursos/academy/aprender.jpeg',
-              'assets/img/cursos/academy/capacitaciones.jpeg',
-              'assets/img/cursos/academy/diploma.jpeg'
+              this.course.image_url || 'assets/img/cursos/academy/cursos.jpeg'
           ];
       }
 
