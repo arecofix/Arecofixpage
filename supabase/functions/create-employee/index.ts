@@ -51,16 +51,18 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Forbidden: Profile not found' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
     }
 
+    // Parse the request payload first to inspect the target role
+    const reqBody = await req.json();
+    const { email, password, first_name, last_name, role, phone, avatar_url, tenant_id, branch_id } = reqBody;
+
     const allowedRoles = ['super_admin', 'tenant_owner', 'admin'];
-    if (!allowedRoles.includes(invokerProfile.role)) {
+    const isStaffCreatingUser = invokerProfile.role === 'staff' && role === 'user';
+    if (!allowedRoles.includes(invokerProfile.role) && !isStaffCreatingUser) {
        return new Response(JSON.stringify({ error: 'Forbidden: Insufficient permissions to create employees' }), {
          status: 403,
          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
        });
     }
-
-    // Parse the request payload
-    const { email, password, first_name, last_name, role, phone, avatar_url, tenant_id, branch_id } = await req.json();
 
     if (!email || !password || !role) {
       return new Response(JSON.stringify({ error: 'Bad Request: Missing required fields (email, password, role)' }), {

@@ -444,6 +444,8 @@ export class AdminCourseFormPage implements OnInit {
   }
 
   async save() {
+    if (this.saving) return; // Prevent double execution
+    
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       

@@ -5,8 +5,8 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
-    baseUrl: "http://localhost:4200",
-    supportFile: false, // Omitimos support file de momento
+    baseUrl: "http://127.0.0.1:4200",
+    supportFile: "cypress/support/e2e.ts",
   },
 
   env: {
@@ -15,4 +15,21 @@ export default defineConfig({
 
   allowCypressEnv: false,
 
+  component: {
+    devServer: {
+      framework: "angular",
+      bundler: "webpack",
+      options: {
+        projectConfig: {
+          root: "",
+          sourceRoot: "src",
+          buildOptions: {
+            outputPath: "dist/arecofix",
+            main: "src/main.ts",
+          },
+        },
+      },
+    },
+    specPattern: "**/*.cy.ts",
+  },
 });

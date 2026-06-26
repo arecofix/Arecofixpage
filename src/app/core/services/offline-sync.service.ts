@@ -1,5 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, Injector } from '@angular/core';
 import { LoggerService } from './logger.service';
+import { firstValueFrom } from 'rxjs';
+import { RepairRepository } from '../../features/repairs/domain/repositories/repair.repository';
+import { NotificationService } from './notification.service';
 
 export interface CachedRequest {
   url: string;
@@ -25,6 +28,12 @@ export interface QueuedMutation {
 })
 export class OfflineSyncService {
   private logger = inject(LoggerService);
+  private injector = inject(Injector);
+  
+  private get repairRepo(): RepairRepository { return this.injector.get(RepairRepository); }
+  private get notification(): NotificationService { return this.injector.get(NotificationService); }
+  
+  public pendingCount = signal<number>(0);
   private dbName = 'ArecofixOfflineDB';
   private dbVersion = 1;
   private db: IDBDatabase | null = null;
@@ -39,6 +48,17 @@ export class OfflineSyncService {
     if (typeof window !== 'undefined' && 'indexedDB' in window) {
       this.initDB();
       this.setupNetworkListeners();
+    }
+    
+    // Auto-sync when coming back online
+    if (typeof window !== 'undefined') {
+      this.pendingCount.set(this.getOfflineRepairs().length);
+      window.addEventListener('online', () => {
+        if (this.pendingCount() > 0) {
+          this.notification.showInfo('Conexión restaurada. Procesando órdenes offline...');
+          this.syncAll();
+        }
+      });
     }
   }
 
@@ -225,5 +245,66 @@ export class OfflineSyncService {
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
+  }
+
+  // --- REPAIR EXPLICIT OFFLINE QUEUE --- //
+  private readonly REPAIR_STORAGE_KEY = 'arecofix_offline_repairs';
+
+  saveOfflineRepair(payload: any): void {
+    const repairs = this.getOfflineRepairs();
+    repairs.push({
+      id: crypto.randomUUID(),
+      payload,
+      timestamp: Date.now()
+    });
+    localStorage.setItem(this.REPAIR_STORAGE_KEY, JSON.stringify(repairs));
+    this.pendingCount.set(repairs.length);
+  }
+
+  getOfflineRepairs(): any[] {
+    if (typeof localStorage === 'undefined') return [];
+    const data = localStorage.getItem(this.REPAIR_STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  }
+
+  clearOfflineRepairs(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(this.REPAIR_STORAGE_KEY);
+      this.pendingCount.set(0);
+    }
+  }
+
+  async syncAll(): Promise<void> {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      this.notification.showWarning('No hay conexión a internet para sincronizar.');
+      return;
+    }
+
+    const repairs = this.getOfflineRepairs();
+    if (repairs.length === 0) return;
+
+    this.notification.showInfo(`Sincronizando ${repairs.length} órdenes pendientes...`);
+    let successCount = 0;
+    let newRepairs: any[] = [];
+
+    for (const item of repairs) {
+      try {
+        await firstValueFrom(this.repairRepo.create(item.payload));
+        successCount++;
+      } catch (err) {
+        this.logger.error('Error syncing offline repair:', err);
+        newRepairs.push(item); // Keep it if it failed
+      }
+    }
+
+    localStorage.setItem(this.REPAIR_STORAGE_KEY, JSON.stringify(newRepairs));
+    this.pendingCount.set(newRepairs.length);
+
+    if (successCount > 0) {
+      this.notification.showSuccess(`¡${successCount} órdenes sincronizadas con éxito!`);
+    }
+    if (newRepairs.length > 0) {
+      this.notification.showError(`Fallo al sincronizar ${newRepairs.length} órdenes. Revise la conexión.`);
+    }
   }
 }

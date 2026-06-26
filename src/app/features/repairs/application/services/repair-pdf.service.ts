@@ -13,6 +13,7 @@ export class RepairPdfService {
     const { jsPDF } = await import('jspdf') as any;
     const { default: autoTable } = await import('jspdf-autotable') as any;
 
+    // A4 format (210 x 297 mm)
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -33,85 +34,84 @@ export class RepairPdfService {
 
     const colorArray = this.hexToRgb(primaryColor);
 
-    // Header Background
+    // --- ENTIRE CONTENT MUST FIT IN TOP HALF (Y < 148mm) ---
+
+    // Header Background (Height 22)
     doc.setFillColor(243, 244, 246);
-    doc.rect(0, 0, 210, 45, 'F');
+    doc.rect(0, 0, 210, 22, 'F');
 
     // Company Name or Logo
     if (logoBase64) {
-      doc.addImage(logoBase64, 'PNG', 15, 10, 30, 15);
-      doc.setFontSize(18);
+      // Dibujar logo medio chico en la esquina (e.g. 12x12 mm)
+      doc.addImage(logoBase64, 'PNG', 10, 4, 12, 12);
+      doc.setFontSize(14);
       doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-      doc.text(company?.name || 'Arecofix', 48, 20);
+      // Texto pegado al logo
+      doc.text(company?.name || 'Arecofix', 25, 12);
     } else {
-      doc.setFontSize(24);
+      doc.setFontSize(16);
       doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-      doc.text(company?.name || 'Arecofix', 15, 20);
+      doc.text(company?.name || 'Arecofix', 10, 12);
     }
 
-    // Standard Text Color
+    // Company Contact
     doc.setTextColor(55, 65, 81);
-    
-    doc.setFontSize(9);
-    const contactY = logoBase64 ? 27 : 28;
-    doc.text(company?.address || company?.location || 'Dirección de la Sucursal', 15, contactY);
-    doc.text(`Tel: ${company?.phone || company?.contact_phone || 'Sin Teléfono'} | Email: ${company?.email || company?.contact_email || 'Sin Email'}`, 15, contactY + 5);
-    
-    const cuit = company?.tax_id || company?.cuit;
-    if (cuit) {
-      doc.text(`CUIT: ${cuit}`, 15, contactY + 10);
-    }
+    doc.setFontSize(8);
+    const contactY = logoBase64 ? 18 : 16;
+    doc.text(company?.address || company?.location || 'Dirección de la Sucursal', 10, contactY);
+    doc.text(`Tel: ${company?.phone || company?.contact_phone || 'Sin Teléfono'}`, 80, contactY); // side-by-side to save space
 
     // Ticket Info (Right side)
-    doc.setFontSize(16);
+    doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text(`ORDEN TÉCNICA # ${repair.repair_number || 'S/N'}`, 120, 20);
+    doc.text(`ORDEN TÉCNICA # ${repair.repair_number || 'S/N'}`, 140, 8);
     
-    doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 120, 28);
-    doc.text(`Código de Seguimiento:`, 120, 34);
-    doc.setFontSize(11);
+    doc.setFontSize(8);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 140, 14);
+    doc.text(`Cód. Seg.:`, 140, 19);
+    doc.setFontSize(9);
     doc.setTextColor(colorArray[0], colorArray[1], colorArray[2]);
-    doc.text(`${repair.tracking_code || '---'}`, 162, 34);
+    doc.text(`${repair.tracking_code || '---'}`, 160, 19);
 
-    // Customer Details
+    // Customer & Device Details (Side by side to save height)
     doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.text('Datos del Cliente', 15, 55);
-    doc.line(15, 57, 95, 57);
-    doc.setFontSize(10);
-    doc.text(`Nombre: ${repair.customer_name}`, 15, 65);
-    doc.text(`Teléfono: ${repair.customer_phone || 'No registrado'}`, 15, 72);
+    doc.setFontSize(9);
+    doc.text('Datos del Cliente', 10, 28);
+    doc.line(10, 29, 95, 29);
+    doc.setFontSize(8);
+    doc.text(`Nombre: ${repair.customer_name}`, 10, 34);
+    doc.text(`Teléfono: ${repair.customer_phone || 'No registrado'}`, 10, 39);
 
-    // Device Details
-    doc.setFontSize(12);
-    doc.text('Detalles del Equipo', 110, 55);
-    doc.line(110, 57, 195, 57);
-    doc.setFontSize(10);
-    doc.text(`Modelo: ${repair.device_model}`, 110, 65);
-    doc.text(`IMEI/Serie: ${repair.imei || 'Sin declarar'}`, 110, 72);
-    doc.text(`Tipo/Marca: ${repair.device_type} / ${repair.brand_name || 'No especificada'}`, 110, 79);
+    doc.setFontSize(9);
+    doc.text('Detalles del Equipo', 110, 28);
+    doc.line(110, 29, 195, 29);
+    doc.setFontSize(8);
+    doc.text(`Modelo: ${repair.device_model}`, 110, 34);
+    doc.text(`IMEI/Serie: ${repair.imei || 'Sin declarar'}`, 110, 39);
+    doc.text(`Tipo/Marca: ${repair.device_type} / ${repair.brand_name || 'No especificada'}`, 110, 44);
 
-    // Security & Checklist Box
+    // Security & Checklist Box (Very compact)
     doc.setDrawColor(200, 200, 200);
     doc.setFillColor(249, 250, 251);
-    doc.roundedRect(15, 87, 180, 25, 3, 3, 'FD');
-    doc.text(`Seguridad - PIN: ${repair.security_pin || 'Ninguno'} | Patrón: ${repair.security_pattern || 'Ninguno'} | Passcode: ${repair.device_passcode || 'No'}`, 20, 95);
+    doc.roundedRect(10, 47, 190, 12, 1, 1, 'FD');
+    doc.setFontSize(7);
+    doc.text(`Seguridad - PIN: ${repair.security_pin || 'Ninguno'} | Patrón: ${repair.security_pattern || 'Ninguno'} | Passcode: ${repair.device_passcode || 'No'}`, 13, 52);
     
     const chk = repair.checklist;
     if (chk) {
-      doc.text(`Accesorios: [${chk.charger ? 'X' : ' '}] Cargador  [${chk.battery ? 'X' : ' '}] Batería  [${chk.chip ? 'X' : ' '}] Chip  [${chk.sd ? 'X' : ' '}] SD  [${chk.case ? 'X' : ' '}] Funda`, 20, 105);
+      doc.text(`Accesorios: [${chk.charger ? 'X' : ' '}] Cargador  [${chk.battery ? 'X' : ' '}] Batería  [${chk.chip ? 'X' : ' '}] Chip  [${chk.sd ? 'X' : ' '}] SD  [${chk.case ? 'X' : ' '}] Funda`, 13, 57);
     }
 
     // Reason / Fault
-    doc.setFontSize(12);
-    doc.text('Motivo de Ingreso / Falla Reportada', 15, 122);
-    doc.setFontSize(10);
-    const splitDescription = doc.splitTextToSize(repair.issue_description || 'Sin detalles.', 180);
-    doc.text(splitDescription, 15, 130);
+    doc.setFontSize(9);
+    doc.text('Motivo de Ingreso / Falla Reportada', 10, 65);
+    doc.setFontSize(8);
+    // Limit to fewer lines
+    const splitDescription = doc.splitTextToSize(repair.issue_description || 'Sin detalles.', 190);
+    doc.text(splitDescription, 10, 70);
 
-    // Table for Parts
-    const defaultTableY = splitDescription.length * 5 + 135;
+    // Table for Parts (Highly compressed)
+    const defaultTableY = 70 + (splitDescription.length * 3) + 2;
     const tableData = (repair.parts || []).map(p => [
       p.product_name || 'Repuesto',
       p.quantity.toString(),
@@ -134,43 +134,49 @@ export class RepairPdfService {
         head: [['Detalle', 'Cant', 'Precio Unitario', 'Subtotal']],
         body: tableData,
         theme: 'striped',
-        headStyles: { fillColor: colorArray as [number, number, number] },
-        margin: { left: 15, right: 15 }
+        headStyles: { fillColor: colorArray as [number, number, number], fontSize: 7, halign: 'center' },
+        bodyStyles: { fontSize: 7, cellPadding: 1 },
+        margin: { left: 10, right: 10 },
+        tableWidth: 'auto'
       });
     }
 
-    const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : defaultTableY + 10;
+    // Check if table exceeded half page, though it's unlikely for normal receipts
+    const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : defaultTableY + 5;
 
     // Financial Totals
-    doc.setFontSize(11);
-    doc.text(`Presupuesto Inicial Estimado: $ ${repair.estimated_cost?.toLocaleString('es-AR') || '0'}`, 110, finalY + 10);
-    doc.text(`Seña / Adelanto Pagado: $ ${repair.deposit_amount?.toLocaleString('es-AR') || '0'}`, 110, finalY + 17);
+    doc.setFontSize(8);
+    doc.text(`Presupuesto Inicial Estimado: $ ${repair.estimated_cost?.toLocaleString('es-AR') || '0'}`, 120, finalY + 6);
+    doc.text(`Seña / Adelanto Pagado: $ ${repair.deposit_amount?.toLocaleString('es-AR') || '0'}`, 120, finalY + 11);
     
-    doc.setFontSize(14);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     const final_cost = repair.final_cost || 0;
     const deposit = repair.deposit_amount || 0;
-    doc.text(`RESTANTE A ABONAR: $ ${(final_cost - deposit).toLocaleString('es-AR')}`, 110, finalY + 27);
+    doc.text(`RESTANTE A ABONAR: $ ${(final_cost - deposit).toLocaleString('es-AR')}`, 120, finalY + 18);
 
     // Signatures
-    doc.setFontSize(10);
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.line(25, finalY + 50, 85, finalY + 50);
-    doc.text('Firma y Aclaración Cliente', 33, finalY + 56);
-
-    doc.line(125, finalY + 50, 185, finalY + 50);
-    doc.text('Firma Técnico / Local', 135, finalY + 56);
+    doc.line(15, finalY + 25, 75, finalY + 25);
+    doc.text('Firma y Aclaración Cliente', 25, finalY + 29);
 
     // Terms and conditions
-    doc.setFontSize(7);
+    doc.setFontSize(5);
     doc.setTextColor(100, 100, 100);
     const terminos = 'Términos y Condiciones: Pasados los 30 días de notificada la reparación, la empresa cobrará resguardo diario. Pasados los 90 días el equipo se considerará abandonado perdiendo el cliente todo derecho a reclamo y pasando a ser propiedad del local para cubrir costos. Todo presupuesto no aceptado tiene cargo de revisión técnica. NO SE ENTREGAN EQUIPOS SIN ESTA ORDEN.';
-    doc.text(doc.splitTextToSize(terminos, 180), 15, 275);
+    doc.text(doc.splitTextToSize(terminos, 190), 10, 137);
 
     // URL tracking (Footer)
-    doc.setFontSize(9);
+    doc.setFontSize(7);
     const trackingUrl = `${window.location.origin}/tracking/${repair.tracking_code}`;
-    doc.text(`Sigue el estado de tu equipo online en: ${trackingUrl}`, 15, 290);
+    doc.text(`Sigue tu equipo en: ${trackingUrl}`, 10, 145);
+
+    // Cut line (Optional, to show where the half page is)
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.line(0, 148.5, 210, 148.5);
+    doc.setLineDashPattern([], 0); // reset
 
     // Save PDF
     const fileName = `Arecofix_Orden_${repair.repair_number || 'S-N'}_${(repair.customer_name || 'Cliente').replace(/\s+/g, '_')}.pdf`;

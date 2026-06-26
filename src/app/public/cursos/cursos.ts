@@ -65,37 +65,37 @@ export class CursosComponent implements OnInit {
     registrationSuccess = signal(false);
     registrationError = signal<string | null>(null);
 
-    // Hero Slider State (Pure CSS styling)
+    // Hero Slider State
     currentSlide = signal(0);
-    featuredSlides = signal([
-        {
-            title: 'Aprendé un Oficio que Construye tu Futuro',
-            subtitle: 'Arecofix Academy • Capacitación Profesional',
-            description: 'Formate como técnico profesional con clases 100% prácticas. Programas diseñados para que salgas al mercado con herramientas reales y certificación oficial.',
-            highlight: false,
-            isInstitutional: true,
-            link: '#cursos-list',
-            theme: 'from-slate-900 via-slate-800 to-[#0f172a]'
-        },
-        {
-            title: 'Curso de Reparación de Celulares',
-            subtitle: 'El curso estrella de Arecofix Academy',
-            description: 'Dominá el hardware y software de smartphones. Diagnóstico, cambio de módulos, baterías, pines de carga y solución de fallas comunes con certificación oficial.',
-            highlight: true,
-            isInstitutional: false,
-            link: '/academy/reparacion-celulares-basico',
-            theme: 'from-blue-900 via-slate-900 to-[#0f172a]'
-        },
-        {
-            title: 'Microelectrónica Aplicada',
-            subtitle: 'Especialización Avanzada',
-            description: 'Lectura de esquemáticos, soldadura microscópica, reballing y reparación de placas base (iPhone/Android).',
-            highlight: false,
-            isInstitutional: false,
-            link: '/academy/curso-avanzado-microelectronica',
-            theme: 'from-emerald-900 via-slate-900 to-[#0f172a]'
+    featuredSlides = computed(() => {
+        const courses = this.courses();
+        if (courses.length === 0) {
+            return [{
+                title: 'Arecofix Academy',
+                subtitle: 'Capacitación Profesional',
+                description: 'Próximamente nuevos cursos disponibles.',
+                highlight: false,
+                isInstitutional: true,
+                link: '#cursos-list',
+                theme: 'from-slate-900 via-slate-800 to-[#0f172a]'
+            }];
         }
-    ]);
+        
+        // Prioritize featured courses for the slider
+        const featured = courses.filter(c => c.is_featured);
+        const others = courses.filter(c => !c.is_featured);
+        const sliderCourses = [...featured, ...others].slice(0, 3);
+        
+        return sliderCourses.map((c, i) => ({
+            title: c.title,
+            subtitle: c.level === 'basic' ? 'Nivel Inicial' : (c.level === 'advanced' ? 'Especialización Avanzada' : 'Formación Profesional'),
+            description: c.short_description || (c.description ? c.description.substring(0, 150) + '...' : ''),
+            highlight: c.is_featured || i === 0,
+            isInstitutional: false,
+            link: `/academy/${c.slug}`,
+            theme: i === 0 ? 'from-blue-900 via-slate-900 to-[#0f172a]' : (i === 1 ? 'from-emerald-900 via-slate-900 to-[#0f172a]' : 'from-purple-900 via-slate-900 to-[#0f172a]')
+        }));
+    });
 
     // Static Content
     benefits = signal([
@@ -186,15 +186,15 @@ export class CursosComponent implements OnInit {
 
     // Split courses for UI
     featuredCoursesList = computed(() => {
-        // Here we define which courses are "Destacados" by their slug or ID.
-        // E.g. 'reparacion-celulares-basico' and 'curso-avanzado-microelectronica'
-        const featuredSlugs = ['reparacion-celulares-basico', 'curso-avanzado-microelectronica'];
-        return this.courses().filter(c => featuredSlugs.includes(c.slug!));
+        // Use courses that have 'is_featured' true, or just the first two
+        const all = this.courses();
+        const featured = all.filter(c => c.is_featured);
+        return featured.length > 0 ? featured : all.slice(0, 2);
     });
 
     regularCoursesList = computed(() => {
-        const featuredSlugs = ['reparacion-celulares-basico', 'curso-avanzado-microelectronica'];
-        return this.courses().filter(c => !featuredSlugs.includes(c.slug!));
+        const featured = this.featuredCoursesList();
+        return this.courses().filter(c => !featured.find(f => f.id === c.id));
     });
 
     setSEO() {
@@ -208,33 +208,63 @@ export class CursosComponent implements OnInit {
     loadCourses() {
         this.isLoadingCourses.set(true);
         this.coursesService.getCourses().pipe(
-            timeout(5000),
+            timeout(15000),
             catchError(err => {
                 console.error('API Error:', err);
                 return of({ data: null, error: err });
             })
         ).subscribe({
             next: (res: { data: Course[] | null, error: any }) => {
-                const coursesData = res.data || this.getMockCourses(); // Fallback to mock
+                const coursesData = res.data || [];
                 
                 // Enhance data if needed and filter out pending/inactive
                 const processedCourses = coursesData
-                    .filter((c: Course) => c.is_active || c.status === 'published')
-                    .map((c: Course) => ({
-                    ...c,
-                    rating: c.rating || 4.9,
-                    students: c.students || 150,
-                    duration: c.duration || 'Consultar',
-                    schedule: c.schedule || 'A confirmar',
-                    // Fix outdated image paths if any
-                    image_url: this.fixImageUrl(c.image_url)
-                }));
+                    .filter((c: Course) => {
+                        const titleLower = c.title.toLowerCase();
+                        // Hide drones course completely as requested
+                        if (titleLower.includes('drone')) return false;
+                        return c.is_active || c.status === 'published';
+                    })
+                    .map((c: Course) => {
+                        const titleLower = c.title.toLowerCase();
+                        
+                        // User preferences for featured content
+                        const isRepairCourse = titleLower.includes('reparaci') || titleLower.includes('celular');
+                        const isPythonCourse = titleLower.includes('python');
+                        const isEnglishCourse = titleLower.includes('ingle') || titleLower.includes('inglé');
+                        
+                        let shouldBeFeatured = c.is_featured;
+                        
+                        // Force promote
+                        if (isRepairCourse || isPythonCourse || isEnglishCourse) {
+                            shouldBeFeatured = true;
+                        }
+                        
+                        return {
+                            ...c,
+                            rating: c.rating || 4.9,
+                            students: c.students || 150,
+                            duration: c.duration || 'Consultar',
+                            schedule: c.schedule || 'A confirmar',
+                            is_featured: shouldBeFeatured,
+                            // Fix outdated image paths if any
+                            image_url: this.fixImageUrl(c.image_url)
+                        };
+                    })
+                    .sort((a, b) => {
+                        // Force Cell Phone Repair course to be strictly first
+                        const aIsRepair = a.title.toLowerCase().includes('reparaci') || a.title.toLowerCase().includes('celular');
+                        const bIsRepair = b.title.toLowerCase().includes('reparaci') || b.title.toLowerCase().includes('celular');
+                        if (aIsRepair && !bIsRepair) return -1;
+                        if (!aIsRepair && bIsRepair) return 1;
+                        return 0; // keep original order for others
+                    });
 
                 this.courses.set(processedCourses);
                 this.isLoadingCourses.set(false);
             },
             error: () => {
-                this.courses.set(this.getMockCourses());
+                this.courses.set([]);
                 this.isLoadingCourses.set(false);
             }
         });
@@ -246,55 +276,7 @@ export class CursosComponent implements OnInit {
         return url;
     }
 
-    getMockCourses(): Course[] {
-        return [
-            {
-                id: '11111111-1111-1111-1111-111111111111',
-                title: 'Técnico en Reparación de Celulares',
-                slug: 'reparacion-celulares-basico',
-                description: 'Dominá el hardware y software de smartphones. Diagnóstico, cambio de módulos, baterías, pines de carga y solución de fallas comunes.',
-                duration: '4 Meses',
-                schedule: 'Sábados 10:00 - 13:00hs',
-                price: 45000,
-                image_url: 'assets/img/cursos/pro.webp',
-                level: CourseLevel.INTERMEDIATE,
-                students: 230,
-                rating: 4.9,
-                status: 'published',
-                is_active: true
-            },
-            {
-                id: '22222222-2222-2222-2222-222222222222',
-                title: 'Microelectrónica Aplicada',
-                slug: 'curso-avanzado-microelectronica',
-                description: 'Especialización avanzada. Lectura de esquemáticos, soldadura microscópica, reballing y reparación de placas base (iPhone/Android).',
-                duration: '3 Meses',
-                schedule: 'Miércoles 18:00 - 21:00hs',
-                price: 65000,
-                image_url: 'assets/img/cursos/laboratorio.jpg',
-                level: CourseLevel.ADVANCED,
-                students: 85,
-                rating: 5.0,
-                status: 'published',
-                is_active: true
-            },
-            {
-                id: '33333333-3333-3333-3333-333333333333',
-                title: 'Reparación de Notebooks y PC',
-                slug: 'reparacion-pc',
-                description: 'Aprendé a diagnosticar, reparar y optimizar computadoras. Hardware, instalación de sistemas, mantenimiento térmico y upgrades.',
-                duration: '4 Meses',
-                schedule: 'Martes 19:00 - 21:00hs',
-                price: 42000,
-                image_url: 'assets/img/cursos/pc-repair.jpg', // Ensure this asset exists or use a generic one
-                level: CourseLevel.BASIC,
-                students: 60,
-                rating: 4.8,
-                status: 'published',
-                is_active: true
-            }
-        ];
-    }
+    // getMockCourses removed
 
     // Modal Logic
     openRegistration(course: Course) {

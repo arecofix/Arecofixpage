@@ -2,7 +2,7 @@ import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, from, catchError, of, finalize } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, from, catchError, of, finalize, firstValueFrom } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 import { CompanyService } from '@app/core/services/company.service';
 import { BranchService } from '@app/core/services/branch.service';
@@ -18,6 +18,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { RepairWorkflowService } from '@app/features/repairs/application/services/repair-workflow.service';
 import { RepairCalculatorService } from '@app/features/repairs/application/services/repair-calculator.service';
 import { SupabaseService } from '@app/core/services/supabase.service';
+import { OfflineSyncService } from '@app/core/services/offline-sync.service';
 
 import { RepairCustomerSectionComponent } from './components/repair-customer-section.component';
 import { RepairDeviceSectionComponent } from './components/repair-device-section.component';
@@ -69,6 +70,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     private repairWorkflowService = inject(RepairWorkflowService);
     private repairCalculator = inject(RepairCalculatorService);
     private supabaseService = inject(SupabaseService);
+    private offlineSyncService = inject(OfflineSyncService);
     private adminLayout = inject(AdminLayout, { optional: true });
 
     repairForm!: FormGroup;
@@ -405,6 +407,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     updateFormField(field: string, value: unknown) {
         this.repairForm.get(field)?.setValue(value);
+        this.repairForm.get(field)?.markAsDirty();
         if (field === 'technical_labor_cost') this.calculateFinalCost();
     }
 
@@ -558,18 +561,38 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             
             console.log('📤 [AdminRepairForm] Enviando a servicio...', this.id ? 'UPDATE' : 'CREATE');
             
+            const isOffline = !navigator.onLine || (window as any).forceOffline;
+            if (!this.id && typeof navigator !== 'undefined' && isOffline) {
+                console.log('📶 [AdminRepairForm] Sin conexión, guardando offline...');
+                this.offlineSyncService.saveOfflineRepair(payload);
+                this.notificationService.showWarning('Guardado localmente. Se sincronizará cuando haya conexión.');
+                this.router.navigate(['/admin/repairs']);
+                this.saving.set(false);
+                return;
+            }
+
             if (this.id) {
                 await this.repairService.update(this.id, payload as unknown as Partial<import('../../features/repairs/domain/entities/repair.entity').Repair>);
                 this.notificationService.showSuccess('✅ Reparación actualizada correctamente.');
             } else {
-                await this.repairService.create(payload as CreateRepairDto);
+                const createdRepair = await this.repairService.create(payload as CreateRepairDto);
                 this.notificationService.showSuccess('✅ Orden Creada exitosamente.');
+                
+                // Set the tracking code so shareWhatsApp and printOrder can use it
+                if (createdRepair && createdRepair.tracking_code) {
+                    this.repairForm.patchValue({ tracking_code: createdRepair.tracking_code });
+                }
                 
                 try {
                     console.log('📄 [AdminRepairForm] Generando comprobante...');
                     await this.printOrder();
                 } catch (pdfErr) {
                     console.error('Error generando PDF automático:', pdfErr);
+                }
+
+                // WhatsApp Auto-Trigger
+                if (payload.customer_phone && payload.whatsapp_notifications !== false) {
+                    this.shareWhatsApp();
                 }
             }
 
@@ -588,9 +611,18 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     async printOrder() {
         try {
             this.notificationService.showInfo('Generando documento PDF...');
+            const rawData = this.repairForm.getRawValue();
+            
+            let brandName = 'No especificada';
+            if (rawData.brand_id) {
+                const brand = this.brands().find(b => b.id === rawData.brand_id);
+                if (brand) brandName = brand.name;
+            }
+
             // Need a Repair typed object for the service
             const repairData: any = {
-                ...this.repairForm.getRawValue(),
+                ...rawData,
+                brand_name: brandName,
                 parts: this.parts(),
                 images: this.images(),
                 id: this.id || 'new'

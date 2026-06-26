@@ -63,17 +63,17 @@ export class CompanyService {
             if (branch) {
                 settings = {
                     ...settings,
-                    name: branch.official_name || branch.name,
-                    owner_name: (branch.branding_settings as any)?.owner_name || '',
-                    location: branch.address || '',
-                    address: branch.address || '',
-                    contact_email: branch.contact_email || '',
-                    email: branch.contact_email || '',
-                    contact_phone: branch.contact_phone || '',
-                    phone: branch.contact_phone || '',
-                    tax_id: branch.tax_id || '',
+                    name: branch.official_name || branch.name || settings.name,
+                    owner_name: (branch.branding_settings as any)?.owner_name || settings.owner_name || '',
+                    location: branch.address || settings.location || '',
+                    address: branch.address || settings.address || '',
+                    contact_email: branch.contact_email || settings.contact_email || '',
+                    email: branch.contact_email || settings.email || '',
+                    contact_phone: branch.contact_phone || branch.whatsapp_number || settings.contact_phone || '',
+                    phone: branch.contact_phone || branch.whatsapp_number || settings.phone || '',
+                    tax_id: branch.tax_id || settings.tax_id || '',
                     branding_settings: branch.branding_settings as any || settings.branding_settings,
-                    logo_url: (branch.branding_settings as any)?.logo_url || ''
+                    logo_url: (branch.branding_settings as any)?.logo_url || settings.logo_url || ''
                 };
             }
         }
