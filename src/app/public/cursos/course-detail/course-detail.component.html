@@ -293,7 +293,7 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                       Participa de foros, grupos de WhatsApp exclusivos y actualizaciones constantes junto a otros compañeros.
                     </p>
-                    <button (click)="activeTab = 'testimonios'" class="btn btn-outline btn-sm">Ver Testimonios de Alumni</button>
+                    <button (click)="activeTab = 'testimonios'" class="btn btn-outline btn-sm">Ver Testimonios de alumnos</button>
                   </div>
                 </div>
               </div>
@@ -680,12 +680,5 @@
       <i class="fab fa-whatsapp text-lg animate-pulse"></i> Inscribirme 
     </a>
   </div>
-
-  <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20tengo%20consultas%20sobre%20el%20curso:%20' + course.title"
-    target="_blank"
-    class="hidden md:flex fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-2xl items-center justify-center transition-transform hover:scale-110 animate-bounce-slow"
-    aria-label="Chat en WhatsApp">
-    <i class="fab fa-whatsapp text-3xl"></i>
-  </a>
   }
 </div>
