@@ -270,8 +270,16 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
         {
           category: 'Full Stack & Persistencia',
           skills: [
+            { name: 'Node.js & Express.js', icon: 'fa-brands fa-node-js', description: 'Construcción de APIs REST escalables, middleware de servidor y manejo de concurrencia asíncrona de alto rendimiento.' },
             { name: 'Bases de Datos Relacionales (SQL)', icon: 'fas fa-database', description: 'Diseño lógico, optimización de consultas complejas, normalización, indexación y administración de Postgres y MySQL.' },
-            { name: 'Frameworks Full Stack', icon: 'fa-solid fa-code', description: 'Desarrollo de APIs y microservicios robustos aplicando Python (Django, Flask), Java (Spring Boot) o Node.js.' }
+            { name: 'Frameworks Backend', icon: 'fa-solid fa-code', description: 'Desarrollo de APIs y microservicios robustos aplicando arquitecturas limpias en entornos empresariales.' }
+          ]
+        },
+        {
+          category: 'Frontend & Testing Automation',
+          skills: [
+            { name: 'React', icon: 'fa-brands fa-react', description: 'Desarrollo de interfaces web SPA dinámicas basadas en componentes interactivos y gestión de estado.' },
+            { name: 'Testing E2E & UI (Cypress)', icon: 'fas fa-vial', description: 'Automatización de flujos de usuario (End-to-End), aserciones de integración y validación visual para prevenir regresiones en CI/CD.' }
           ]
         },
         {
@@ -579,8 +587,16 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
         {
           category: 'Full Stack & Persistence',
           skills: [
+            { name: 'Node.js & Express.js', icon: 'fa-brands fa-node-js', description: 'Building scalable RESTful APIs, server middleware, and handling high-performance asynchronous concurrency.' },
             { name: 'Relational Databases (SQL)', icon: 'fas fa-database', description: 'Relational schema design, query optimization, indexing, and administration of PostgreSQL and MySQL.' },
-            { name: 'Full Stack Frameworks', icon: 'fa-solid fa-code', description: 'Development of robust RESTful APIs using Python (Django/Flask), Java (Spring Boot), and Node.js.' }
+            { name: 'Backend Frameworks', icon: 'fa-solid fa-code', description: 'Development of robust APIs and microservices applying clean architectures in enterprise environments.' }
+          ]
+        },
+        {
+          category: 'Frontend & Testing Automation',
+          skills: [
+            { name: 'React', icon: 'fa-brands fa-react', description: 'Development of dynamic SPA web interfaces based on interactive components and state management.' },
+            { name: 'E2E & UI Testing (Cypress)', icon: 'fas fa-vial', description: 'End-to-End user flow automation, integration assertions, and visual validation to prevent regressions in CI/CD pipelines.' }
           ]
         },
         {
