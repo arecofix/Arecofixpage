@@ -14,4 +14,5 @@ export abstract class CourseRepository {
     
     // Enrollments
     abstract enrollStudent(enrollment: StudentEnrollment): Promise<StudentEnrollment>;
+    abstract getEnrollments(): Promise<StudentEnrollment[]>;
 }

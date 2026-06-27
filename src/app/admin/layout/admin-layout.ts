@@ -15,15 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { TabService } from '@app/core/services/tab.service';
 import { FavoritesService, FavoriteItem } from '@app/core/services/favorites.service';
 import { TenantService } from '@app/core/services/tenant.service';
-
-interface MenuItem {
-  title: string;
-  path?: string;
-  icon: string;
-  expanded?: boolean;
-  children?: MenuItem[];
-  module?: string;
-}
+import { MenuBuilderService, MenuItem } from '@app/core/services/menu-builder.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -48,6 +40,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   public tabService = inject(TabService);
   public favoritesService = inject(FavoritesService);
+  public menuBuilder = inject(MenuBuilderService);
 
   // Convert observables to signals for easier template usage and type safety
   public highContrast = toSignal(this.preferencesService.highContrast$, { initialValue: false });
@@ -140,127 +133,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   }
 
   updateBranchMenu(branch: Branch | null) {
-    const basePrefix = branch?.slug ? `/${branch.slug}/admin` : '/admin';
-    const tenantConfig = (this.authService as any).getTenantConfig?.() || {};
-    const branchConfig = branch?.modules_config || {};
-    
-    const hasAccess = (modName?: string) => {
-      if (!modName) return true;
-      
-      // 1. Check branch-level override first (modules_config jsonb)
-      if ((branchConfig as any)[modName] === false) return false;
-      
-      // 2. Fallback to tenant-level config
-      if (!tenantConfig) return true;
-      return tenantConfig[modName] !== false;
-    };
-
-    const profile = this.authService.getCurrentProfile();
-    const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
-    const isCentral = !branch || branch.slug === 'arecofix' || branch.id === 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
-
-    const companyChildren: MenuItem[] = [];
-    companyChildren.push({ title: 'Identidad de Empresa', path: `${basePrefix}/company`, icon: 'fa-id-badge' });
-
-    if (isGlobalAdmin && isCentral) {
-      companyChildren.push({ title: 'Gestión Red de Sucursales', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
-      companyChildren.push({ title: 'Gestión de Personas', path: `${basePrefix}/users`, icon: 'fa-user-cog' });
-    }
-
-    const baseItems: MenuItem[] = [
-      { title: 'Panel de Control', path: `${basePrefix}/dashboard`, icon: 'fa-chart-line', module: 'dashboard' },
-      { 
-        title: 'Inventario & Catálogo', 
-        path: `${basePrefix}/products`,
-        icon: 'fa-cubes', 
-        module: 'inventory',
-        expanded: true,
-        children: [
-          { title: 'Gestión de Productos', path: `${basePrefix}/products`, icon: 'fa-barcode' },
-          { title: 'Stock & Almacén', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
-          { title: 'Auditar Catálogo', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
-          { title: 'Categorías de Venta', path: `${basePrefix}/categories`, icon: 'fa-tags' },
-          { title: 'Marcas / Fabricantes', path: `${basePrefix}/brands`, icon: 'fa-copyright' },
-        ]
-      },
-      { 
-        title: 'Ventas & Operaciones', 
-        path: `${basePrefix}/sales`,
-        icon: 'fa-cash-register', 
-        module: 'inventory',
-        expanded: false,
-        children: [
-          { title: 'Terminal de Venta', path: `${basePrefix}/sales`, icon: 'fa-plus-circle' },
-          { title: 'Pedidos & E-commerce', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart' },
-          { title: 'Historial de Facturación', path: `${basePrefix}/sales/invoices`, icon: 'fa-file-invoice-dollar' },
-          { title: 'Egresos / Compras', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag' },
-        ]
-      },
-      {
-        title: 'Gestión Financiera',
-        icon: 'fa-chart-pie',
-        expanded: false,
-        children: [
-          { title: 'Dashboard Contable', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
-          { title: 'Movimientos de Caja', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' }
-        ]
-      },
-      { title: 'Servicio Técnico', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
-      { title: 'Gestión de Clientes', path: `${basePrefix}/clients`, icon: 'fa-users', module: 'customers' },
-      {
-        title: 'Configuración Empresa',
-        icon: 'fa-building',
-        expanded: false,
-        children: companyChildren
-      },
-      { 
-        title: 'Marketing & Contenido', 
-        icon: 'fa-bullhorn', 
-        expanded: false, 
-        children: [
-          { title: 'Servicios Web', path: `${basePrefix}/services`, icon: 'fa-tools' },
-          { title: 'Blog & Noticias', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
-          { title: 'Mensajes Recibidos', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
-        ]
-      },
-      { title: 'Academia Arecofix', path: `${basePrefix}/courses`, icon: 'fa-graduation-cap', module: 'academia' },
-    ];
-
-    const planId = (branch?.plan_id || 'basic').toLowerCase();
-    const isBasicBranch = branch !== null && (planId === 'basic' || planId === 'free' || planId === 'standard');
-    const isLibreriaZaona = branch?.slug?.toLowerCase()?.includes('zaona') || branch?.name?.toLowerCase()?.includes('zaona');
-
-    this.navigationItems = baseItems
-      .filter(item => {
-        if (isBasicBranch) {
-          if (['Academia Arecofix', 'Marketing & Contenido'].includes(item.title)) return false;
-        }
-        if (isLibreriaZaona) {
-          if (['Servicio Técnico', 'Academia Arecofix'].includes(item.title)) return false;
-        }
-        return hasAccess(item.module);
-      })
-      .map(item => {
-        if (!item.children) return item;
-
-        const filteredChildren = item.children.filter(child => {
-          if (isBasicBranch) {
-            if (['Gestión Red de Sucursales', 'Proveedores & Contactos'].includes(child.title)) return false;
-          }
-          if (isLibreriaZaona) {
-            if (['Servicios Web', 'Auditar Catálogo', 'Blog & Noticias', 'Mensajes Recibidos'].includes(child.title)) return false;
-          }
-          return hasAccess(child.module);
-        });
-
-        // Preserve the expanded state so the menu doesn't collapse/restart when route changes
-        const existingItem = this.navigationItems.find(n => n.title === item.title);
-        const expanded = existingItem !== undefined ? existingItem.expanded : item.expanded;
-
-        return { ...item, expanded, children: filteredChildren };
-      })
-      .filter(item => !item.children || item.children.length > 0);
-
+    this.navigationItems = this.menuBuilder.buildMenuForBranch(branch, this.navigationItems);
     this.cdr.markForCheck();
   }
 

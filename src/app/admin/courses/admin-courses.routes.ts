@@ -7,6 +7,11 @@ export const ADMIN_COURSES_ROUTES: Routes = [
     loadComponent: () => import('./admin-courses-page').then(m => m.AdminCoursesPage)
   },
   {
+    path: 'solicitudes',
+    title: 'Solicitudes de Cursos',
+    loadComponent: () => import('./enrollments/admin-course-enrollments-page').then(m => m.AdminCourseEnrollmentsPage)
+  },
+  {
     path: 'new',
     title: 'Nuevo Curso',
     loadComponent: () => import('./admin-course-form-page').then(m => m.AdminCourseFormPage)

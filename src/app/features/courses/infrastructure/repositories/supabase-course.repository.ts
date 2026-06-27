@@ -3,6 +3,10 @@ import { CourseRepository } from '../../domain/repositories/course.repository';
 import { Course, CourseModule, StudentEnrollment } from '../../domain/entities/course.entity';
 import { TenantScopedQueryService } from '@app/core/infrastructure/supabase/tenant-scoped-query.service';
 
+const isUUID = (id?: string | null): boolean => {
+  return !!id && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+};
+
 @Injectable({ providedIn: 'root' })
 export class SupabaseCourseRepository extends CourseRepository {
   private scoped = inject(TenantScopedQueryService);
@@ -88,7 +92,7 @@ export class SupabaseCourseRepository extends CourseRepository {
     tenantId?: string
   ): Promise<CourseModule[]> {
     const tid = tenantId ?? this.scoped.getTenantId();
-    const existingIds = modules.filter((m) => !!m.id && m.id!.length > 10).map((m) => m.id!);
+    const existingIds = modules.filter((m) => isUUID(m.id)).map((m) => m.id!);
 
     if (existingIds.length > 0) {
       await this.scoped
@@ -106,7 +110,7 @@ export class SupabaseCourseRepository extends CourseRepository {
       course_id: courseId,
       order_index: idx + 1,
       tenant_id: tid,
-      id: m.id && m.id.length > 10 ? m.id : crypto.randomUUID(),
+      id: isUUID(m.id) ? m.id : crypto.randomUUID(),
     }));
 
     const { data, error } = await this.scoped.from('course_modules').upsert(toUpsert).select();
@@ -123,5 +127,17 @@ export class SupabaseCourseRepository extends CourseRepository {
 
     if (error) throw error;
     return data as StudentEnrollment;
+  }
+
+  async getEnrollments(): Promise<StudentEnrollment[]> {
+    const { data, error } = await this.scoped.withTenantScope(
+      this.scoped.from('course_enrollments').select(`
+        *,
+        course:courses(id, title)
+      `)
+    ).order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as unknown as StudentEnrollment[];
   }
 }

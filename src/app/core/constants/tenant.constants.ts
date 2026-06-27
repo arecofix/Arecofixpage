@@ -37,3 +37,14 @@ export const TENANT_CONSTANTS = {
      */
     CENTRAL_BRANCH_ID: 'de967f68-7b15-44c0-bc98-952ccf06e1e5'
 };
+
+/**
+ * Subscription Statuses for Tenants
+ */
+export const SUBSCRIPTION_STATUS = {
+    ACTIVE: 'active',
+    OVERDUE: 'moroso',
+    CANCELED: 'cancelado',
+    SUSPENDED: 'suspendido',
+    TRIALING: 'trialing'
+};

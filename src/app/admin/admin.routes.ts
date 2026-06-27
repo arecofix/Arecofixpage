@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/guards/auth.guard';
+import { roleGuard } from '@app/guards/role.guard';
+import { tenantStatusGuard } from '@app/guards/tenant-status.guard';
 import { moduleGuard } from '@app/guards/module.guard';
 import { tenantOwnerGuard } from '@app/guards/tenant-owner.guard';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -8,7 +10,7 @@ export const adminRoutes: Routes = [
   {
     title: 'Admin',
     path: '',
-    canActivate: [authGuard],
+    canActivate: [authGuard, tenantStatusGuard, roleGuard],
     loadComponent: () => import('@app/admin/layout/admin-layout').then(m => m.AdminLayout),
     providers: [
       // Charts are only needed in admin — keep them out of the public bundle

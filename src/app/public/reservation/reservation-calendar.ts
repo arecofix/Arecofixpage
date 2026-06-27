@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContactService } from '@app/core/services/contact.service';
 import { NotificationService } from '@app/core/services/notification.service';
+import { RESERVATION_CONFIG } from './reservation.constants';
 
 interface ReservationStep {
   number: 1 | 2 | 3;
@@ -20,14 +21,11 @@ interface ReservationStep {
 export class ReservationCalendar implements OnInit {
   private contactService = inject(ContactService);
   private notificationService = inject(NotificationService);
+  private document = inject(DOCUMENT);
 
   // ===== CONFIGURACIÓN =====
-  readonly WHATSAPP_NUMBER = '5491125960900';
-  readonly AVAILABLE_SLOTS = signal(['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00']);
-  readonly DISCOUNT_PERCENTAGE = 10;
-  readonly LOCATION_ADDRESS = 'Jorge Newbery 69, Marcos Paz, Buenos Aires';
-  readonly LOCATION_HOURS = 'Lun-Sab: 09:00 - 13:00 / 16:00 - 20:00';
-  readonly PHONE_DISPLAY = '+54 (9) 11 2596-0900';
+  readonly config = RESERVATION_CONFIG;
+  readonly AVAILABLE_SLOTS = signal(this.config.AVAILABLE_SLOTS);
 
   // ===== ESTADO REACTIVO (SIGNALS) =====
   currentDate = signal(new Date());
@@ -192,11 +190,11 @@ export class ReservationCalendar implements OnInit {
         slot: this.selectedSlot(),
         name: this.customerName(),
         phone: this.customerPhone(),
-        discount: this.DISCOUNT_PERCENTAGE
+        discount: this.config.DISCOUNT_PERCENTAGE
       };
 
-      // TODO: Integrar con servicio real cuando esté disponible
-      // await this.contactService.createReservation(reservation).toPromise();
+      // Guardar reserva y enviar notificacion en BD
+      await this.contactService.createReservation(reservation);
 
       // Simular éxito (1.5s delay para UX)
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -204,9 +202,9 @@ export class ReservationCalendar implements OnInit {
       // Construir mensaje de WhatsApp
       const message = this._buildWhatsAppMessage(reservation);
       
-      // Abrir WhatsApp (SSR-safe check)
-      if (typeof window !== 'undefined') {
-        window.open(`https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+      // Abrir WhatsApp (SSR-safe check usando DOCUMENT)
+      if (this.document.defaultView) {
+        this.document.defaultView.open(`https://wa.me/${this.config.WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
       }
 
       // Notificación de éxito
@@ -226,6 +224,6 @@ export class ReservationCalendar implements OnInit {
   }
 
   private _buildWhatsAppMessage(reservation: any): string {
-    return `¡Hola Arecofix! 🔧\n\n*Solicito agendar mi turno:*\n\n📅 *Fecha:* ${this.formattedSelectedDate()}\n⏰ *Hora:* ${reservation.slot}\n👤 *Nombre:* ${reservation.name}\n📱 *Teléfono:* ${reservation.phone}\n\n✅ Confirmo el ${this.DISCOUNT_PERCENTAGE}% de descuento en mano de obra.\n🔒 Mi repuesto será reservado en el taller.\n\n¡Gracias!`;
+    return `¡Hola Arecofix! 🔧\n\n*Solicito agendar mi turno:*\n\n📅 *Fecha:* ${this.formattedSelectedDate()}\n⏰ *Hora:* ${reservation.slot}\n👤 *Nombre:* ${reservation.name}\n📱 *Teléfono:* ${reservation.phone}\n\n✅ Confirmo el ${this.config.DISCOUNT_PERCENTAGE}% de descuento en mano de obra.\n🔒 Mi repuesto será reservado en el taller.\n\n¡Gracias!`;
   }
 }

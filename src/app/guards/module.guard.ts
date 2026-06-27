@@ -25,13 +25,21 @@ export const moduleGuard: CanActivateFn = async (route, state) => {
     return true; // Si no hay módulo definido, permitimos el paso
   }
 
-  // 3. Obtener la sucursal actual
-  const currentBranch = branchService.currentBranch();
+  // 3. Obtener la sucursal actual, esperando si es necesario
+  let currentBranch = branchService.currentBranch();
   
   if (!currentBranch) {
-    // Si no hay sucursal cargada aún (ej: recarga de página), 
-    // esperamos un breve momento o dejamos pasar al branchAdminGuard (que carga la sucursal)
-    // En este sistema, branchAdminGuard se ejecuta antes.
+    // SECURITY FIX: Si la sucursal aún no se cargó (ej. recarga de página), 
+    // debemos esperar a que branchAdminGuard (u otro inicializador) la cargue.
+    const savedId = localStorage.getItem('arecofix_admin_branch_id');
+    if (savedId) {
+      await branchService.setBranchById(savedId);
+      currentBranch = branchService.currentBranch();
+    }
+  }
+
+  // Si a pesar de esperar no hay sucursal, es porque no está logueado correctamente, dejamos pasar al auth guard
+  if (!currentBranch) {
     return true; 
   }
 
@@ -55,6 +63,5 @@ export const moduleGuard: CanActivateFn = async (route, state) => {
   console.warn(`🚫 Acceso denegado al módulo [${requiredModule}] para la sucursal [${currentBranch.slug}]`);
   
   // Redirigir a la página de upgrade con el nombre del módulo como parámetro
-  router.navigate(['/upgrade-required'], { queryParams: { module: requiredModule } });
-  return false;
+  return router.createUrlTree(['/upgrade-required'], { queryParams: { module: requiredModule } });
 };
