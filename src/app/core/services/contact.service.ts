@@ -43,6 +43,16 @@ export class ContactService {
             
             if (error) {
                 this.logger.error('Supabase ContactService Error:', error);
+            } else {
+                // Insert explicit notification for admins
+                await this.supabase.from('notifications').insert({
+                    title: '✉️ Nuevo Mensaje de Contacto',
+                    message: `${msg.name} ha enviado un mensaje: ${msg.subject ? '(' + msg.subject + ')' : ''} ${msg.message.substring(0, 50)}...`,
+                    type: 'info',
+                    scope: 'admin',
+                    is_read: false,
+                    tenant_id: this.tenantService.getTenantId()
+                });
             }
 
             return { error };
@@ -107,6 +117,62 @@ export class ContactService {
         if (error) {
             this.logger.error('Error deleting message:', error);
             throw error;
+        }
+    }
+
+    async createReservation(reservation: any): Promise<{ error: PostgrestError | null }> {
+        try {
+            // Save reservation as a formatted contact message for simplicity and Admin visibility
+            const payload = { 
+                name: reservation.name,
+                email: reservation.email || 'N/A',
+                phone: reservation.phone,
+                subject: 'Solicitud de Turno: Reparación',
+                message: `Se ha solicitado un nuevo turno.\nFecha: ${reservation.date}\nHora: ${reservation.slot}\nCliente: ${reservation.name}\nTeléfono: ${reservation.phone}\nDescuento aplicado: ${reservation.discount}%`,
+                is_read: false,
+                tenant_id: this.tenantService.getTenantId()
+            };
+
+            const { error } = await this.supabase
+                .from('contact_messages' as any)
+                .insert(payload);
+            
+            if (error) {
+                this.logger.error('Supabase ContactService Error (Reservation):', error);
+            } else {
+                // Insert explicit notification for admins
+                await this.supabase.from('notifications').insert({
+                    title: '🔧 Nuevo Turno Solicitado',
+                    message: `${reservation.name} ha solicitado un turno para el ${reservation.date} a las ${reservation.slot}.`,
+                    type: 'info',
+                    scope: 'admin',
+                    is_read: false,
+                    tenant_id: this.tenantService.getTenantId()
+                });
+            }
+
+            return { error };
+        } catch (e: unknown) {
+            this.logger.error('ContactService Exception (Reservation):', e);
+            const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+            
+            const pgError: PostgrestError = {
+                message: errorMessage,
+                details: '',
+                hint: '',
+                code: 'UNKNOWN',
+                name: 'PostgrestError',
+                toJSON: function() {
+                    return {
+                        name: this.name,
+                        message: this.message,
+                        details: this.details,
+                        hint: this.hint,
+                        code: this.code
+                    };
+                }
+            };
+            return { error: pgError };
         }
     }
 }

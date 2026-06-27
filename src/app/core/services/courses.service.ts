@@ -125,8 +125,18 @@ export class CoursesService {
                     is_read: false,
                     tenant_id: this.tenantService.getTenantId()
                 });
+                
+                // 3. Create explicit Admin Notification
+                await this.supabase.from('notifications').insert({
+                    title: '🎓 Nueva Inscripción a Curso',
+                    message: `${data.full_name} se ha inscripto al curso de ${data.course_title || 'N/A'}.`,
+                    type: 'info',
+                    scope: 'admin',
+                    is_read: false,
+                    tenant_id: this.tenantService.getTenantId()
+                });
             } catch (msgErr) {
-                this.logger.error('Failed to create secondary contact message for enrollment', msgErr);
+                this.logger.error('Failed to create secondary contact message or notification for enrollment', msgErr);
             }
 
             return { data: result, error: null };
@@ -134,5 +144,15 @@ export class CoursesService {
             this.logger.error('Error registering student', error);
             return { data: null, error };
         }
+    }
+
+    getEnrollments(): Observable<{ data: StudentEnrollment[], error: any }> {
+        return from(this.repository.getEnrollments()).pipe(
+            map(data => ({ data, error: null })),
+            catchError(error => {
+                this.logger.error('Failed to fetch enrollments', error);
+                return of({ data: [], error });
+            })
+        );
     }
 }

@@ -77,8 +77,43 @@ Cypress.Commands.add('loginAsAdmin', () => {
     }]
   }).as('getProfile');
 
-  // Catch-all
-  cy.intercept('**/rest/v1/*', (req) => {
+  // Mock Dashboard RPCs
+  cy.intercept('POST', '**/rest/v1/rpc/get_dashboard_stats_v2*', {
+    statusCode: 200,
+    body: {
+      users: 15,
+      products: 120,
+      sales: 45,
+      devices_fixed: 89,
+      products_chart: [
+        { name: 'Módulo iPhone 11', quantity: 12 },
+        { name: 'Batería Samsung S20', quantity: 8 },
+        { name: 'Pin de Carga Tipo C', quantity: 25 }
+      ],
+      category_chart: [
+        { name: 'Reparaciones', count: 45 },
+        { name: 'Accesorios', count: 30 },
+        { name: 'Repuestos', count: 25 }
+      ]
+    }
+  }).as('getLegacyStats');
+
+  cy.intercept('POST', '**/rest/v1/rpc/get_financial_analytics_v3*', {
+    statusCode: 200,
+    body: {
+      total_gross_revenue: 1500000,
+      total_cost: 400000,
+      current_month_gross: 250000,
+      current_month_cost: 60000,
+      monthly_breakdown: [
+        { period: '2025-01', gross_revenue: 200000, cost: 50000, repairs_revenue: 150000, sales_revenue: 50000, repairs_cost: 20000, sales_cost: 30000 },
+        { period: '2025-02', gross_revenue: 250000, cost: 60000, repairs_revenue: 180000, sales_revenue: 70000, repairs_cost: 25000, sales_cost: 35000 }
+      ]
+    }
+  }).as('getFinanceStats');
+
+  // Catch-all for ANY rest/v1 request (prevents 401 leaks)
+  cy.intercept('**/rest/v1/**', (req) => {
     req.reply({
       statusCode: 200,
       body: []

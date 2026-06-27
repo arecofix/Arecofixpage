@@ -72,7 +72,8 @@ export class SeoService {
       
       const isDynamic = currentPath.includes('/detalle/') || 
                        currentPath.includes('/posts/') || 
-                       currentPath.includes('/tracking/');
+                       currentPath.includes('/tracking/') ||
+                       currentPath.includes('/academy/');
 
       // If it's a dynamic route, we let the COMPONENT handle SEO.
       // We don't overwrite if we are already on the same dynamic path to avoid flicker.
@@ -168,7 +169,7 @@ export class SeoService {
     // 1. Never use the same URL for page and image (Facebook Crawler error)
     // 2. Never use dynamic routes as images (prevents HTML-as-image error)
     const normalize = (u: string) => u.toLowerCase().replace(/\/$/, '');
-    const isDynamic = finalImageUrl.includes('/detalle/') || finalImageUrl.includes('/posts/') || finalImageUrl.includes('/tracking/');
+    const isDynamic = finalImageUrl.includes('/detalle/') || finalImageUrl.includes('/posts/') || finalImageUrl.includes('/tracking/') || finalImageUrl.includes('/academy/');
     
     if (normalize(finalImageUrl) === normalize(finalUrl) || isDynamic) {
         if (isPlatformServer(this.platformId)) {

@@ -52,4 +52,5 @@ export interface StudentEnrollment {
     status: 'pending' | 'confirmed' | 'rejected';
     tenant_id?: string;
     created_at?: string;
+    course?: { id?: string; title: string; };
 }

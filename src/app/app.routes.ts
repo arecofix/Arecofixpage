@@ -14,11 +14,6 @@ export const routes: Routes = [
         loadChildren: () => import('@app/admin/admin.routes').then(m => m.default),
     },
     {
-        title: 'Home',
-        path: '',
-        loadChildren: () => import('@app/public/public.routes'),
-    },
-    {
         title: 'Upgrade Requerido',
         path: 'upgrade-required',
         loadComponent: () => import('@app/shared/components/upgrade-required/upgrade-required.component').then(m => m.UpgradeRequiredComponent)
@@ -27,6 +22,11 @@ export const routes: Routes = [
         title: 'Pago Requerido',
         path: 'payment-required',
         loadComponent: () => import('@app/public/payment-required/payment-required.component').then(m => m.PaymentRequiredComponent)
+    },
+    {
+        title: 'Home',
+        path: '',
+        loadChildren: () => import('@app/public/public.routes'),
     },
     {
         title: 'Página no encontrada | Arecofix',

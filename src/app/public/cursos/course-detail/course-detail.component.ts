@@ -274,6 +274,21 @@ export class CourseDetailComponent implements OnInit {
               rating: 4.8,
               status: 'published',
               is_active: true
+          },
+          {
+              id: '44444444-4444-4444-4444-444444444444',
+              title: 'Curso de Barbería Profesional',
+              slug: 'curso-de-barberia',
+              description: 'Convertite en barbero profesional con nuestro curso práctico. Aprendé técnicas de corte, perfilado de barba, diseño y colorimetría. ¡Salida laboral inmediata!',
+              duration: '3 Meses',
+              schedule: 'A confirmar',
+              price: 35000,
+              image_url: 'assets/img/branding/og-academy.jpg',
+              level: CourseLevel.BASIC,
+              students: 80,
+              rating: 4.9,
+              status: 'published',
+              is_active: true
           }
       ];
       return mocks.find(m => m.slug === slug) || null;
@@ -284,7 +299,8 @@ export class CourseDetailComponent implements OnInit {
       const mockIds = [
           '11111111-1111-1111-1111-111111111111', 
           '22222222-2222-2222-2222-222222222222', 
-          '33333333-3333-3333-3333-333333333333'
+          '33333333-3333-3333-3333-333333333333',
+          '44444444-4444-4444-4444-444444444444'
       ];
       if (mockIds.includes(courseId)) {
           this.modules = [];

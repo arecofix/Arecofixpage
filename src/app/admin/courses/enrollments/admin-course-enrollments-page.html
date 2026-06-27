@@ -1,0 +1,68 @@
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Solicitudes de Inscripción a Cursos</h1>
+</div>
+
+<div class="grid gap-4">
+    @if (loading()) {
+    <div class="flex justify-center py-8">
+        <span class="loading loading-spinner loading-lg text-indigo-500"></span>
+    </div>
+    } @else if (enrollments().length === 0) {
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <span>No hay solicitudes de inscripción registradas.</span>
+    </div>
+    } @else {
+    @for (enroll of enrollments(); track enroll.id) {
+    <div class="card bg-base-100 dark:bg-slate-800 shadow hover:shadow-md transition-shadow text-base-content border-l-4"
+        [class.border-l-indigo-500]="enroll.status === 'pending'"
+        [class.border-l-success]="enroll.status === 'confirmed'"
+        [class.border-l-error]="enroll.status === 'rejected'">
+        <div class="card-body p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold text-lg dark:text-white">{{ enroll.full_name }}</h3>
+                        @if (enroll.status === 'pending') {
+                            <span class="badge badge-primary badge-sm">Pendiente</span>
+                        } @else if (enroll.status === 'confirmed') {
+                            <span class="badge badge-success badge-sm text-white">Contactado</span>
+                        } @else if (enroll.status === 'rejected') {
+                            <span class="badge badge-error badge-sm text-white">Cancelado</span>
+                        }
+                        <span class="text-sm text-gray-500">{{ enroll.created_at | date:'medium' }}</span>
+                    </div>
+
+                    <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                        <div class="flex items-center gap-4">
+                            <span><i class="fas fa-envelope mr-1"></i> {{ enroll.email }}</span>
+                            @if (enroll.phone) {
+                            <span><i class="fas fa-phone mr-1"></i> {{ enroll.phone }}</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="font-medium mb-2 text-indigo-600 dark:text-indigo-400">
+                        Curso: {{ enroll.course?.title || 'Desconocido' }}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    @if (enroll.status === 'pending') {
+                    <button class="btn btn-sm btn-ghost" (click)="markAsConfirmed(enroll.id!)" title="Marcar como contactado">
+                        <i class="fas fa-check text-success"></i>
+                    </button>
+                    }
+                    <button class="btn btn-sm btn-ghost text-error" (click)="deleteEnrollment(enroll.id!)" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <a [href]="'https://wa.me/' + (enroll.phone.replace('+', '') || '')" target="_blank" class="btn btn-sm btn-ghost text-success" title="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+    }
+</div>
