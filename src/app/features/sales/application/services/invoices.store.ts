@@ -43,11 +43,11 @@ export class InvoicesStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.LIST_TTL)) {
-      console.log(`[InvoicesStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
+      // console.log(`[InvoicesStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
       return of(cached.data);
     }
 
-    console.log(`[InvoicesStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
+    // console.log(`[InvoicesStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -78,11 +78,11 @@ export class InvoicesStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.DETAIL_TTL)) {
-      console.log(`[InvoicesStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
+      // console.log(`[InvoicesStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
       return of(cached.data);
     }
 
-    console.log(`[InvoicesStore] 🌐 Cache MISS (Detail) para ID: "${id}". Consultando Supabase...`);
+    // console.log(`[InvoicesStore] 🌐 Cache MISS (Detail) para ID: "${id}". Consultando Supabase...`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -111,7 +111,7 @@ export class InvoicesStore {
    * Limpia la caché.
    */
   clearCache(): void {
-    console.log('[InvoicesStore] 🧹 Limpiando caché de facturas.');
+    // console.log('[InvoicesStore] 🧹 Limpiando caché de facturas.');
     this.listCache.set({});
     this.detailCache.set({});
   }

@@ -34,7 +34,7 @@ describe('Course Detail - Dynamic Content', () => {
 
         // Check for cell phone specific content
         cy.contains('Ya reparás celulares pero querés subir de nivel.').should('exist');
-        cy.contains('Laboratorio real equipado con microscopios y estaciones.').should('exist');
+        cy.contains('Querés practicar en un laboratorio real equipado con microscopios y estaciones.').should('exist');
         cy.contains('Cambio de Módulo').should('exist'); // ROI specific
     });
 
@@ -68,7 +68,7 @@ describe('Course Detail - Dynamic Content', () => {
 
         // Verify cellphone specific content is NOT present
         cy.contains('Ya reparás celulares pero querés subir de nivel.').should('not.exist');
-        cy.contains('Laboratorio real equipado con microscopios y estaciones.').should('not.exist');
+        cy.contains('Querés practicar en un laboratorio real equipado con microscopios y estaciones.').should('not.exist');
         cy.contains('Cambio de Módulo').should('not.exist');
     });
 
@@ -127,7 +127,7 @@ describe('Course Detail - Dynamic Content', () => {
         cy.wait('@getOrders'); // Wait for global cart data
 
         // Open the registration modal
-        cy.contains('button', 'Asegurar mi Vacante').click();
+        cy.contains('button', 'Empieza ya').click();
 
         // Wait for modal animation to complete
         cy.wait(500);

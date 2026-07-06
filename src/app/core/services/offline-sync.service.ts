@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, Injector } from '@angular/core';
+import { Injectable, inject, signal, Injector, NgZone } from '@angular/core';
 import { LoggerService } from './logger.service';
 import { firstValueFrom } from 'rxjs';
 import { RepairRepository } from '../../features/repairs/domain/repositories/repair.repository';
@@ -29,17 +29,19 @@ export interface QueuedMutation {
 export class OfflineSyncService {
   private logger = inject(LoggerService);
   private injector = inject(Injector);
+  private ngZone = inject(NgZone);
   
   private get repairRepo(): RepairRepository { return this.injector.get(RepairRepository); }
   private get notification(): NotificationService { return this.injector.get(NotificationService); }
   
   public pendingCount = signal<number>(0);
   private dbName = 'ArecofixOfflineDB';
-  private dbVersion = 1;
+  private dbVersion = 2; // Incremented for masterData store
   private db: IDBDatabase | null = null;
   
   private cacheStoreName = 'requestsCache';
   private queueStoreName = 'syncQueue';
+  private masterDataStoreName = 'masterData';
 
   public isReady = false;
   private initPromise: Promise<void> | null = null;
@@ -68,16 +70,22 @@ export class OfflineSyncService {
     this.initPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
 
+      const timeout = setTimeout(() => {
+          this.ngZone.run(() => reject('IndexedDB init timeout'));
+      }, 2000);
+
       request.onerror = (event) => {
+        clearTimeout(timeout);
         this.logger.error('Error opening IndexedDB', event);
-        reject('Error opening IndexedDB');
+        this.ngZone.run(() => reject('Error opening IndexedDB'));
       };
 
       request.onsuccess = (event: Event) => {
+        clearTimeout(timeout);
         const target = event.target as IDBOpenDBRequest;
         this.db = target.result;
         this.isReady = true;
-        resolve();
+        this.ngZone.run(() => resolve());
         
         // Process queue immediately if we are online on startup
         if (typeof navigator !== 'undefined' && navigator.onLine) {
@@ -96,6 +104,10 @@ export class OfflineSyncService {
         if (!db.objectStoreNames.contains(this.queueStoreName)) {
           const queueStore = db.createObjectStore(this.queueStoreName, { keyPath: 'id', autoIncrement: true });
           queueStore.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+        
+        if (!db.objectStoreNames.contains(this.masterDataStoreName)) {
+          db.createObjectStore(this.masterDataStoreName, { keyPath: 'key' });
         }
       };
     });
@@ -141,9 +153,19 @@ export class OfflineSyncService {
       const transaction = this.db!.transaction([this.cacheStoreName], 'readonly');
       const store = transaction.objectStore(this.cacheStoreName);
       const request = store.get(url);
+      
+      const timeout = setTimeout(() => {
+          this.ngZone.run(() => reject(new Error('IndexedDB get timeout')));
+      }, 2000);
 
-      request.onsuccess = () => resolve(request.result as CachedRequest || null);
-      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        clearTimeout(timeout);
+        this.ngZone.run(() => resolve(request.result as CachedRequest || null));
+      };
+      request.onerror = () => {
+        clearTimeout(timeout);
+        this.ngZone.run(() => reject(request.error));
+      };
     });
   }
 
@@ -243,6 +265,32 @@ export class OfflineSyncService {
       const store = transaction.objectStore(this.cacheStoreName);
       const request = store.clear();
       request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async saveMasterData(key: string, data: any): Promise<void> {
+    if (!this.db) await this.initDB();
+    if (!this.db) return;
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.masterDataStoreName], 'readwrite');
+      const store = transaction.objectStore(this.masterDataStoreName);
+      const request = store.put({ key, data, timestamp: Date.now() });
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getMasterData<T>(key: string): Promise<T | null> {
+    if (!this.db) await this.initDB();
+    if (!this.db) return null;
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.masterDataStoreName], 'readonly');
+      const store = transaction.objectStore(this.masterDataStoreName);
+      const request = store.get(key);
+      request.onsuccess = () => resolve(request.result ? request.result.data : null);
       request.onerror = () => reject(request.error);
     });
   }

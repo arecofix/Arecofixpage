@@ -287,10 +287,10 @@ export class AdminOrderFormPage implements OnInit {
     }
 
     async save() {
-        console.log('[AdminOrderForm] SAVE BUTTON CLICKED');
+        // console.log('[AdminOrderForm] SAVE BUTTON CLICKED');
         
-        console.log('[AdminOrderForm] Starting save process...');
-        console.log('[AdminOrderForm] Form status:', this.orderForm.status);
+        // console.log('[AdminOrderForm] Starting save process...');
+        // console.log('[AdminOrderForm] Form status:', this.orderForm.status);
         
         if (this.orderForm.invalid) {
             console.warn('[AdminOrderForm] Form is invalid:', this.getFormValidationErrors());
@@ -383,11 +383,12 @@ export class AdminOrderFormPage implements OnInit {
         const query = this.productSearchQueries()[index] || '';
         if (!query) return this.products();
         
-        return this.products().filter(product => 
-            product.name.toLowerCase().includes(query) ||
-            product.sku.toLowerCase().includes(query) ||
-            product.price.toString().includes(query)
-        );
+        const searchTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+        
+        return this.products().filter(product => {
+            const searchString = `${product.name} ${product.sku} ${product.price}`.toLowerCase();
+            return searchTerms.every(term => searchString.includes(term));
+        });
     }
 
     showProductDropdown(index: number): boolean {

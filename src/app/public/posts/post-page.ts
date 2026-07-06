@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, Inject, DOCUMENT } from '@angular/core';
+﻿import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, Inject, DOCUMENT } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -124,7 +124,7 @@ export class PostPage implements OnInit, OnDestroy {
             }
 
             // Open Graph (Social)
-            const postImage = post.image || 'assets/img/branding/og-services.jpg';
+            const postImage = post.image || 'assets/img/branding/og-services.png';
             const absoluteImageUrl = postImage.startsWith('http') 
                 ? postImage 
                 : `${environment.baseUrl}/${postImage.startsWith('/') ? postImage.substring(1) : postImage}`;

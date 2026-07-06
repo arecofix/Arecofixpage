@@ -42,7 +42,8 @@
     } @else {
         <!-- Desktop Table -->
         <div class="hidden md:block bg-white dark:bg-gray-800/50 rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 dark:border-gray-800 animate-fade-in-up" style="animation-delay: 300ms;">
-            <table class="w-full text-left border-collapse">
+            <div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
                 <thead class="bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10">
                     <tr class="text-gray-400 dark:text-gray-500 font-bold text-[10px] tracking-widest uppercase">
                         <th class="px-6 py-4 rounded-tl-4xl">Fecha Registro</th>
@@ -100,6 +101,7 @@
                     }
                 </tbody>
             </table>
+</div>
         </div>
 
         <!-- Mobile Cards -->

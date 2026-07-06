@@ -25,3 +25,12 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   // Se puede retornar false para ignorar TODOS los errores, pero es mejor ser específico
   return false;
 });
+
+beforeEach(() => {
+  // Bloquear llamadas a Google Analytics, Tag Manager y PostHog para evitar timeouts y datos de test
+  cy.intercept('https://www.google-analytics.com/**', { statusCode: 200, body: '' });
+  cy.intercept('https://www.googletagmanager.com/**', { statusCode: 200, body: '' });
+  cy.intercept('https://us.i.posthog.com/**', { statusCode: 200, body: '' });
+  cy.intercept('https://us-assets.i.posthog.com/**', { statusCode: 200, body: '' });
+  cy.intercept('https://connect.facebook.net/**', { statusCode: 200, body: '' });
+});

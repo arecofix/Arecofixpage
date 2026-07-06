@@ -271,12 +271,18 @@ export class CheckoutPage implements OnInit, OnDestroy {
       // Start polling for payment confirmation (every 20s)
       this.paymentService.startPolling(created.id!, 20000);
 
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Checkout error:', error);
-      const err = error as { message?: string };
-      this.notificationService.showError(
-        `Error al procesar tu reserva: ${err?.message || 'Error desconocido'}`
-      );
+      this.isProcessing.set(false);
+      
+      let errorMsg = error?.message || 'Error desconocido';
+      
+      // Specifically handle permission errors to be clear for the user
+      if (errorMsg.includes('permisos') || error?.code === '42501') {
+        errorMsg = 'No tienes permisos para crear la orden. Asegúrate de que tu sesión sea válida o contacta a soporte si el problema persiste.';
+      }
+      
+      this.notificationService.showError(`Error al procesar tu reserva: ${errorMsg}`);
     } finally {
       this.isProcessing.set(false);
     }

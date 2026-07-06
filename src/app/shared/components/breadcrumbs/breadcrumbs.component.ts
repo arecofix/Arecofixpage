@@ -13,16 +13,16 @@ export interface BreadcrumbItem {
   imports: [RouterModule],
   template: `
     <nav aria-label="Breadcrumb" class="container mx-auto px-4 py-4">
-      <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+      <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 flex-nowrap overflow-hidden">
         @for (item of items; track trackByBreadcrumb($index, item); let last = $last) {
-          <li class="flex items-center">
+          <li class="flex items-center min-w-0 shrink" [class.shrink-0]="last" [class.shrink]="!last">
             @if (!last) {
-              <a [routerLink]="item.url" class="hover:text-primary transition-colors hover:underline">
+              <a [routerLink]="item.url" class="hover:text-primary transition-colors hover:underline p-1 -m-1 truncate block" style="max-width: 150px;">
                 {{ item.label }}
               </a>
-              <i class="fas fa-chevron-right text-xs mx-2 opacity-50"></i>
+              <i class="fas fa-chevron-right text-xs mx-2 opacity-50 shrink-0"></i>
             } @else {
-              <span class="font-semibold text-gray-900 dark:text-gray-200" aria-current="page">
+              <span class="font-semibold text-gray-900 dark:text-gray-200 truncate block" aria-current="page">
                 {{ item.label }}
               </span>
             }

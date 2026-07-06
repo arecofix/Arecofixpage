@@ -38,7 +38,7 @@
                  
                  <!-- Thumbnails / Gallery Grid -->
                  @if (item.gallery_urls && item.gallery_urls.length > 0) {
-                  <div class="mt-4 grid grid-cols-4 gap-4">
+                  <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
                       @for(img of item.gallery_urls; track $index) {
                        <button 
                           type="button"

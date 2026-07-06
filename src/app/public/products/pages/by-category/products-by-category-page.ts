@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -58,7 +58,7 @@ export class ProductsByCategoryPage {
   private gsmService: GsmService = inject(GsmService);
 
   public currentCategory = signal<iCategory | null>(null);
-  /** Stores the full ancestor chain (root → ... → current) for hierarchical breadcrumbs */
+  /** Stores the full ancestor chain (root â†’ ... â†’ current) for hierarchical breadcrumbs */
   private ancestorChain = signal<iCategory[]>([]);
 
   // Filter signals to bind to UI inputs
@@ -100,7 +100,7 @@ export class ProductsByCategoryPage {
     }
 
     // Build the hierarchical slug path for each ancestor
-    // e.g., chain = [repuestos, modulos] → /productos/categoria/repuestos, /productos/categoria/repuestos/modulos
+    // e.g., chain = [repuestos, modulos] â†’ /productos/categoria/repuestos, /productos/categoria/repuestos/modulos
     chain.forEach((cat, idx) => {
       const slugPath = chain
         .slice(0, idx + 1)
@@ -185,7 +185,7 @@ export class ProductsByCategoryPage {
 
           /**
            * Support for hierarchical URL paths.
-           * e.g. slugPath = 'repuestos/modulos' → leaf slug = 'modulos'
+           * e.g. slugPath = 'repuestos/modulos' â†’ leaf slug = 'modulos'
            * This allows both old (/productos/categoria/modulos) and new
            * (/productos/categoria/repuestos/modulos) URLs to resolve correctly.
            */
@@ -341,7 +341,7 @@ export class ProductsByCategoryPage {
 
   private setSEO(category: iCategory) {
     const description = category.description || `Explorá nuestra selección de ${category.name} en Arecofix. Calidad y mejores precios garantizados.`;
-    const imageUrl = category.image_url || 'assets/img/branding/og-services.jpg';
+    const imageUrl = category.image_url || 'assets/img/branding/og-services.png';
 
     this.seoService.setPageData({
       title: `${category.name} | Arecofix`,

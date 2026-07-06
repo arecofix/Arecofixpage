@@ -12,7 +12,7 @@ import { AppServiceRepository } from '../../domain/repositories/app-service.repo
 export class SupabaseAppServiceRepository extends BaseRepository<AppServiceEntity> implements AppServiceRepository {
   protected override tableName = 'services';
   protected override isGlobalTable = false;
-  protected override useSoftDeletes = true;
+  protected override useSoftDeletes = false;
   protected override useStrictBranchIsolation = true;
   protected override suppressAuthNotifications = true;
 

@@ -30,12 +30,45 @@ export {};
 declare global {
   namespace Cypress {
     interface Chainable<Subject = any> {
-      loginAsAdmin(): Chainable<void>;
+      loginAsAdmin(url?: string): Chainable<void>;
+      loginRealAdmin(url?: string): Chainable<void>;
     }
   }
 }
 
-Cypress.Commands.add('loginAsAdmin', () => {
+Cypress.Commands.add('loginRealAdmin', (url = '/') => {
+  const email = 'zaona@arecofix.com.ar';
+  const password = 'zaona2026';
+  const supabaseUrl = 'https://jftiyfnnaogmgvksgkbn.supabase.co';
+  const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
+
+  cy.request({
+    method: 'POST',
+    url: `${supabaseUrl}/auth/v1/token?grant_type=password`,
+    headers: {
+      'apikey': anonKey,
+      'Authorization': `Bearer ${anonKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: { email, password }
+  }).then((response) => {
+    expect(response.status).to.eq(200);
+    const session = response.body;
+    
+    cy.visit(url, {
+      onBeforeLoad: (win) => {
+        // Inject auth token BEFORE Angular initializes so the guard reads it on first load
+        win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('supabase-remember-me', 'true');
+        // Pre-set branch so the admin guard doesn't bounce back to /
+        win.localStorage.setItem('arecofix_current_branch_id', 'ae0776b7-2034-4baf-acf3-a9dab87a1e51');
+        win.localStorage.setItem('arecofix_admin_branch_id', 'ae0776b7-2034-4baf-acf3-a9dab87a1e51');
+      }
+    });
+  });
+});
+
+Cypress.Commands.add('loginAsAdmin', (url = '/') => {
   const session = {
     provider_token: null,
     access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoibW9jay1hZG1pbi1pZCJ9.signature',
@@ -58,23 +91,44 @@ Cypress.Commands.add('loginAsAdmin', () => {
   };
 
   // 1. PRIMERO definimos los interceptores
+
+  // Catch-all for ANY rest/v1 request (prevents 401 leaks). Definido primero para que sea pisado por los específicos.
+  cy.intercept('**/rest/v1/**', (req) => {
+    req.reply({
+      statusCode: 200,
+      body: []
+    });
+  }).as('catchAllSupabase');
+
   // Intercept the /auth/v1/user call
   cy.intercept('GET', '**/auth/v1/user', {
     statusCode: 200,
     body: session.user
   }).as('getUser');
 
-  // Intercept the profile fetch
-  cy.intercept('GET', '**/rest/v1/profiles?*', {
-    statusCode: 200,
-    body: [{
+  // Intercept the profile fetch and upsert
+  cy.intercept('**/rest/v1/profiles*', (req) => {
+    const profile = {
       id: 'mock-admin-id',
       email: 'admin@arecofix.com',
       role: 'super_admin',
       first_name: 'Admin',
       last_name: 'Test',
       is_active: true
-    }]
+    };
+
+    if (req.url.includes('id=eq.mock-admin-id') || req.url.includes('maybeSingle')) {
+      req.reply({
+        statusCode: 200,
+        body: profile
+      });
+      return;
+    }
+
+    req.reply({
+      statusCode: 200,
+      body: [profile]
+    });
   }).as('getProfile');
 
   // Mock Dashboard RPCs
@@ -112,39 +166,59 @@ Cypress.Commands.add('loginAsAdmin', () => {
     }
   }).as('getFinanceStats');
 
-  // Catch-all for ANY rest/v1 request (prevents 401 leaks)
-  cy.intercept('**/rest/v1/**', (req) => {
-    req.reply({
-      statusCode: 200,
-      body: []
-    });
-  }).as('catchAllSupabase');
+
 
   // Mock tenants
-  cy.intercept('GET', '**/rest/v1/tenants?*', {
-    statusCode: 200,
-    body: [{
+  cy.intercept('**/rest/v1/tenants*', (req) => {
+    const tenant = {
       id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b',
       name: 'Arecofix',
       slug: 'arecofix',
       is_active: true
-    }]
+    };
+
+    if (req.url.includes('custom_domain=eq.127.0.0.1') || req.url.includes('id=eq.bba26ccd-59ce-471c-aac0-4c1f5513de3b') || req.url.includes('slug=eq.arecofix') || req.url.includes('maybeSingle')) {
+      req.reply({
+        statusCode: 200,
+        body: tenant
+      });
+      return;
+    }
+
+    req.reply({
+      statusCode: 200,
+      body: [tenant]
+    });
   }).as('getTenants');
 
   // Mock branches
-  cy.intercept('GET', '**/rest/v1/branches?*', {
-    statusCode: 200,
-    body: [{ id: 'branch-1', name: 'Sede Central' }]
+  cy.intercept('**/rest/v1/branches*', (req) => {
+    const branch = { id: 'branch-1', name: 'Sede Central' };
+
+    if (req.url.includes('id=eq.branch-1') || req.url.includes('maybeSingle')) {
+      req.reply({
+        statusCode: 200,
+        body: branch
+      });
+      return;
+    }
+
+    req.reply({
+      statusCode: 200,
+      body: [branch]
+    });
   }).as('getBranches');
 
   // 2. Ejecutamos un cy.visit rápido a la raíz con onBeforeLoad
   // Esto garantiza que el origen es correcto y que el token se inyecta ANTES de que Angular y Supabase se inicialicen.
-  cy.visit('/', { 
+  cy.visit(url, { 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
       win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
       win.localStorage.setItem('arecofix_admin_branch_id', 'branch-1');
+      win.localStorage.setItem('cypress-test', 'true');
     }
   });
 });

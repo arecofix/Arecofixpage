@@ -14,12 +14,12 @@
   <!-- Header fijo -->
   <div class="shrink-0 bg-gray-900/80 backdrop-blur border-b border-brand-blue/20 p-4" style="padding-top: max(1rem, env(safe-area-inset-top));">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+      <h2 class="text-lg font-bold text-white flex items-center gap-2">
         <svg class="w-5 h-5 text-brand-blue" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
         </svg>
         {{ (preferencesService.language$ | async) === 'es' ? 'Accesibilidad' : 'Accessibility' }}
-      </h3>
+      </h2>
       <button
         (click)="preferencesService.closeSidebar()"
         class="p-2 hover:bg-white/10 rounded-lg transition-all"

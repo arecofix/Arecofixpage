@@ -65,6 +65,9 @@ import { NotificationService } from '@app/core/services/notification.service';
                       <i class="fas fa-link text-slate-400 dark:text-slate-500"></i>
                       <input type="text" formControlName="slug" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="ej: hardware-apple" />
                     </label>
+                    @if (form.get('slug')?.invalid && form.get('slug')?.touched) {
+                      <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> El slug es obligatorio</span>
+                    }
                   </div>
                   <div class="form-control">
                     <label class="label">
@@ -85,6 +88,9 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Descripción / Propuesta de Valor</span>
                   </label>
                   <textarea formControlName="description" class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-28 resize-none focus:ring-2 focus:ring-blue-500/20" placeholder="¿Qué va a lograr el alumno con este curso? Redactá un texto vendedor..."></textarea>
+                  @if (form.get('description')?.invalid && form.get('description')?.touched) {
+                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> La descripción es obligatoria</span>
+                  }
                 </div>
               </div>
             </div>
@@ -104,6 +110,9 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <i class="fas fa-hourglass-half text-slate-400 dark:text-slate-500"></i>
                     <input type="text" formControlName="duration" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 3 meses (12 clases)" />
                   </label>
+                  @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
+                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> La duración es obligatoria</span>
+                  }
                 </div>
                 <!-- Horarios -->
                 <div class="form-control">
@@ -114,6 +123,9 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <i class="fas fa-clock text-slate-400 dark:text-slate-500"></i>
                     <input type="text" formControlName="schedule" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Lunes y Miércoles 18hs a 21hs" />
                   </label>
+                  @if (form.get('schedule')?.invalid && form.get('schedule')?.touched) {
+                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> Los horarios son obligatorios</span>
+                  }
                 </div>
               </div>
             </div>
@@ -239,6 +251,9 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <span class="text-slate-400">$</span>
                     <input type="number" formControlName="price" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none text-lg font-bold" />
                   </label>
+                  @if (form.get('price')?.invalid && form.get('price')?.touched) {
+                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> El precio es obligatorio</span>
+                  }
                 </div>
                 
                 <div class="form-control">
@@ -279,6 +294,9 @@ import { NotificationService } from '@app/core/services/notification.service';
                 <div class="form-control">
                   <span class="text-[10px] text-center text-slate-500 dark:text-slate-400 mb-2">O pega una URL directamente:</span>
                   <input type="text" formControlName="image_url" class="input input-sm bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-xs text-gray-900 dark:text-white w-full rounded-lg text-center" placeholder="https://..." />
+                  @if (form.get('image_url')?.invalid && form.get('image_url')?.touched) {
+                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1 justify-center"><i class="fas fa-exclamation-circle"></i> La portada es obligatoria</span>
+                  }
                 </div>
               </div>
             </div>

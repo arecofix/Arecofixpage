@@ -53,7 +53,10 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
       .from(this.tableName)
       .insert(payload);
 
-    if (orderError) this.errorHandler.handleError(orderError, 'createOrder');
+    if (orderError) {
+      this.errorHandler.handleError(orderError, 'createOrder');
+      throw orderError;
+    }
 
     if (order.items?.length) {
       await this._upsertOrderItems(orderId, order.items);
@@ -146,7 +149,10 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     });
 
     const { error: itemsError } = await this.supabase.from('order_items').insert(itemsPayload);
-    if (itemsError) this.errorHandler.handleError(itemsError, 'upsertOrderItems');
+    if (itemsError) {
+      this.errorHandler.handleError(itemsError, 'upsertOrderItems');
+      throw itemsError;
+    }
   }
 
   updateOrderStatus(orderId: string, status: OrderStatus): Observable<void> {

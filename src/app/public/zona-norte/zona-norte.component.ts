@@ -91,7 +91,7 @@ export class ZonaNorteComponent {
   // Método para enviar formulario
   enviarConsulta() {
     // Aquí iría la lógica para enviar el formulario
-    console.log('Enviando consulta:', this.contactoForm);
+    // console.log('Enviando consulta:', this.contactoForm);
     
     // Simulación de envío
     alert('¡Consulta enviada con éxito! Nos contactaremos a la brevedad.');

@@ -1,175 +1,449 @@
-<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans no-print">
-    <div class="max-w-6xl mx-auto animate-fade-in-up">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white/50 dark:bg-gray-800/50 p-6 rounded-3xl backdrop-blur-lg border border-white max-sm:shadow-sm">
-        <div class="w-full md:w-auto">
-            <div class="flex items-center gap-3 mb-1">
-                <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 hover:bg-white shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all shrink-0">
+<div class="px-2 md:px-6 py-4 md:py-8 min-h-[calc(100vh-4rem)] bg-white dark:bg-[#101828] font-sans no-print text-gray-800 dark:text-gray-200">
+    <div class="max-w-[1400px] mx-auto animate-fade-in-up">
+        
+        <!-- Header: Logo & Botonera -->
+        <div class="flex flex-col xl:flex-row justify-between items-center mb-6 gap-4 bg-gray-50 dark:bg-[#1A253A]/90 p-4 rounded-2xl border border-gray-200 dark:border-gray-700/50 shadow-lg shadow-black/20">
+            <div class="flex items-center gap-3 w-full xl:w-auto">
+                <a routerLink="/admin/repairs" class="btn btn-sm btn-circle btn-ghost text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all shrink-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
-                <h1 class="text-2xl md:text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-emerald-600 to-teal-500 tracking-tight truncate">
-                    {{ id ? 'Taller de Reparación' : 'Nuevo Ingreso Técnico' }}
-                </h1>
+
+            
+            <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto xl:ml-auto">
+                <button type="button" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(52,199,89,0.2)] rounded-lg">
+                    <i class="fas fa-plus"></i> Nueva orden
+                </button>
+                <button type="button" routerLink="/admin/repairs" class="btn btn-sm bg-[#1F2937] hover:bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-600 rounded-lg">
+                    <i class="fas fa-list"></i> Órdenes guardadas
+                </button>
+                <button type="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-600 rounded-lg">
+                    <i class="fas fa-chart-line"></i> Contabilidad
+                </button>
+                
+                <div class="divider divider-horizontal mx-0 before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 hidden xl:flex"></div>
+                
+                @if (id && repairForm.value.tracking_code) {
+                    <button type="button" (click)="printOrder()" class="btn btn-sm bg-[#1F2937] hover:bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-600 rounded-lg" [disabled]="saving()">
+                        <i class="fas fa-file-pdf text-red-400"></i> Imprimir PDF
+                    </button>
+                    <button type="button" (click)="printOrder()" class="btn btn-sm bg-[#3498DB] hover:bg-blue-500 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(52,152,219,0.2)] rounded-lg" [disabled]="saving()">
+                        <i class="fas fa-receipt"></i> Ticket 80mm
+                    </button>
+                    <button type="button" (click)="shareWhatsApp()" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(52,199,89,0.2)] rounded-lg">
+                        <i class="fab fa-whatsapp"></i> WhatsApp PDF
+                    </button>
+                    <button type="button" (click)="openNotifyModal()" class="btn btn-sm bg-[#25D366] hover:bg-green-400 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(37,211,102,0.3)] rounded-lg font-bold animate-pulse-once" id="btn-notificar-cliente">
+                        <i class="fas fa-bell"></i> Notificar Cliente
+                    </button>
+                }
             </div>
-            @if(id && repairForm.value.tracking_code) {
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 flex flex-wrap items-center gap-2">
-                    <span class="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full text-xs font-mono shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
-                        <i class="fas fa-barcode text-gray-400 mr-1"></i> {{ repairForm.value.tracking_code }}
-                    </span>
-                    <span class="text-[10px] uppercase tracking-widest bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-lg border border-yellow-200 font-bold">Orden #{{ repairForm.value.repair_number | number:'3.0-0' }}</span>
-                    @if(repairForm.value.upsell_vidrio) {
-                        <span class="text-[10px] uppercase tracking-widest bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg border border-purple-200 font-bold flex items-center gap-1 shadow-sm">
-                            <i class="fas fa-star text-amber-500"></i> Vidrio Adicional
-                        </span>
-                    }
+        </div>
+
+        @if (loading()) {
+            <div class="flex flex-col items-center justify-center py-32">
+                <span class="loading loading-spinner text-[#34C759] w-12 h-12"></span>
+                <p class="text-[#34C759] mt-4 font-medium animate-pulse">Cargando módulo de taller...</p>
+            </div>
+        } @else {
+            <!-- Offline Sync State Indicator -->
+            @if (offlineSyncService.pendingCount() > 0) {
+                <div class="bg-yellow-50 dark:bg-yellow-500/10 border-l-4 border-l-yellow-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-yellow-700 dark:text-yellow-400 mb-6 border border-yellow-100 dark:border-yellow-900 shadow-sm" role="alert" aria-live="polite" aria-label="Órdenes guardadas sin internet">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-wifi text-xl opacity-70" aria-hidden="true"></i>
+                        <div>
+                            <span class="font-bold block text-sm">{{ offlineSyncService.pendingCount() }} Órdenes Guardadas Sin Internet</span>
+                            <span class="text-xs opacity-80">Presiona el botón para sincronizarlas ahora.</span>
+                        </div>
+                    </div>
+                    <button type="button" (click)="syncOfflineRepairs()" class="btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-gray-900 dark:text-white border-none rounded-xl shadow-md flex items-center gap-2" aria-label="Sincronizar órdenes guardadas">
+                        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> <span class="hidden sm:inline">Sincronizar</span>
+                    </button>
                 </div>
             }
-        </div>
-        
-        <div class="flex flex-wrap items-center gap-3 md:ml-auto w-full md:w-auto mt-4 md:mt-0">
-             @if (id && repairForm.value.tracking_code) {
-                <button type="button" (click)="shareWhatsApp()"
-                    class="btn bg-[#25D366] hover:bg-[#1DA851] text-white border-none rounded-xl shadow-[0_4px_15px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.4)] transition-all">
-                    <i class="fab fa-whatsapp text-lg"></i> Notificar
-                </button>
-             }
-             <button type="button" (click)="printOrder()" class="btn btn-outline bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-200 hover:text-gray-900 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all" [disabled]="saving()">
-                 <i class="fas fa-print"></i> PDF / Talón
-             </button>
-        </div>
-    </div>
 
-    @if (loading()) {
-        <div class="flex flex-col items-center justify-center py-32">
-            <div class="relative w-20 h-20">
-                <div class="absolute inset-0 rounded-full border-t-4 border-emerald-500 border-opacity-20"></div>
-                <div class="absolute inset-0 rounded-full border-t-4 border-emerald-500 animate-spin"></div>
-                <i class="fas fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-emerald-500 text-2xl"></i>
-            </div>
-            <p class="text-emerald-600 mt-6 font-medium tracking-wide animate-pulse">Escaneando sistema...</p>
-        </div>
-    } @else {
-        @if (missingBranch() && !id) {
-            <div class="alert alert-warning shadow-lg mb-8 rounded-3xl border-none bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200">
-                <i class="fas fa-exclamation-triangle text-xl"></i>
-                <div class="flex flex-col">
-                    <span class="font-bold">Sucursal no detectada</span>
-                    <span class="text-sm">Para dar de alta un equipo debes seleccionar una sucursal activa en el panel superior.</span>
-                </div>
-            </div>
-        }
-
-        <form [formGroup]="repairForm" (ngSubmit)="save()" class="space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <form [formGroup]="repairForm" (ngSubmit)="save()" class="flex flex-col xl:flex-row gap-6">
                 
-                <!-- Columna Izquierda (Datos Generales) -->
-                <div class="lg:col-span-8 flex flex-col gap-8">
+                <!-- Columna Izquierda: Panel Principal de ORDEN DE SERVICIO -->
+                <div class="flex-1 flex flex-col gap-6">
                     
-                    <!-- Tarjeta: Cliente -->
-                    <app-repair-customer-section 
-                        [customerName]="repairForm.value.customer_name"
-                        [customerPhone]="repairForm.value.customer_phone"
-                        [customerEmail]="repairForm.value.customer_email"
-                        [customerDni]="repairForm.value.customer_dni"
-                        [clients]="clients()"
-                        (onNameChange)="onSelectClient($event)"
-                        (onPhoneChange)="updateFormField('customer_phone', $event)"
-                        (onEmailChange)="updateFormField('customer_email', $event)"
-                        (onDniChange)="updateFormField('customer_dni', $event)">
-                    </app-repair-customer-section>
-
-                    <!-- Tarjeta: Equipo y Falla -->
-                    <app-repair-device-section
-                        [brands]="brands()"
-                        [brandId]="repairForm.value.brand_id"
-                        [deviceModel]="repairForm.value.device_model"
-                        [imei]="repairForm.value.imei"
-                        [issueDescription]="repairForm.value.issue_description"
-                        [securityPin]="repairForm.value.security_pin"
-                        [securityPattern]="repairForm.value.security_pattern"
-                        [devicePasscode]="repairForm.value.device_passcode"
-                        [checklist]="repairForm.value.checklist"
-                        (onBrandIdChange)="updateFormField('brand_id', $event)"
-                        (onDeviceModelChange)="updateFormField('device_model', $event)"
-                        (onImeiChange)="updateFormField('imei', $event)"
-                        (onIssueDescriptionChange)="updateFormField('issue_description', $event)"
-                        (onSecurityPinChange)="updateFormField('security_pin', $event)"
-                        (onSecurityPatternChange)="updateFormField('security_pattern', $event)"
-                        (onDevicePasscodeChange)="updateFormField('device_passcode', $event)"
-                        (onChecklistChange)="updateFormField('checklist', $event)">
-                    </app-repair-device-section>
-
-                    <!-- Tarjeta: Gestión de Taller -->
-                    <app-repair-parts-section
-                        [parts]="parts()"
-                        [technicianNotes]="repairForm.value.technician_notes"
-                        [technicalReport]="repairForm.value.technical_report"
-                        [images]="images()"
-                        [uploadingImages]="uploadingImages()"
-                        (onRequestProductModal)="openProductModal()"
-                        (onPartsChange)="onPartsListChange($event)"
-                        (onRemovePart)="removePart($event)"
-                        (onTechnicianNotesChange)="updateFormField('technician_notes', $event)"
-                        (onTechnicalReportChange)="updateFormField('technical_report', $event)"
-                        (onFileSelected)="onFileSelected($event)"
-                        (onRemoveImage)="removeImage($event)">
-                    </app-repair-parts-section>
-
-                </div>
-
-                <!-- Columna Derecha (Finanzas y Estado) -->
-                <div class="lg:col-span-4 flex flex-col gap-8">
-                    
-                    <!-- Tarjeta: Finanzas, Estado y Presupuesto -->
-                    <app-repair-finance-section
-                        [currentStatusId]="repairForm.value.current_status_id"
-                        [estimatedCost]="repairForm.value.estimated_cost"
-                        [technicalLaborCost]="repairForm.value.technical_labor_cost"
-                        [finalCost]="repairForm.value.final_cost"
-                        [depositAmount]="repairForm.value.deposit_amount"
-                        (onStatusChange)="updateFormField('current_status_id', $event)"
-                        (onEstimatedCostChange)="onEstimatedCostChange($event)"
-                        (onLaborCostChange)="onLaborCostChange($event)"
-                        (onFinalCostChange)="onFinalCostChange($event)"
-                        (onDepositChange)="updateFormField('deposit_amount', $event)">
-                    </app-repair-finance-section>
-
-                    <!-- Sticky Save Box -->
-                    <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 dark:border-gray-800 flex flex-col gap-3 sticky top-4">
-                        @if (error()) {
-                        <div class="alert alert-error text-white font-medium p-3 rounded-xl text-sm shadow-sm flex items-start">
-                            <i class="fas fa-exclamation-circle text-lg mt-0.5"></i>
-                            <span class="leading-tight">{{ error() }}</span>
-                        </div>
-                        }
-
-                        <button type="submit" tabindex="7" class="btn btn-lg bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all text-lg"
-                            [disabled]="saving()">
-                            @if (saving()) {
-                                <span class="loading loading-spinner text-white opacity-80"></span> Guardando...
-                            } @else {
-                                <i class="fas fa-save mr-1 opacity-80"></i> Guardar Ficha
+                    <!-- Tarjeta Principal Oscura -->
+                    <div class="bg-gray-50 dark:bg-[#1A253A] rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-inner">
+                        
+                        <!-- Header Tarjeta -->
+                        <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700/50">
+                            <i class="fas fa-clipboard-list text-[#3498DB] text-xl drop-shadow-[0_0_8px_rgba(52,152,219,0.5)]"></i>
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white tracking-wide">ORDEN DE SERVICIO</h2>
+                            
+                            @if(id) {
+                                <span class="ml-auto bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 px-3 py-1 rounded-md text-xs font-mono text-gray-700 dark:text-gray-300">
+                                    <i class="fas fa-hashtag text-gray-500 dark:text-gray-400 mr-1"></i>{{ repairForm.value.repair_number | number:'3.0-0' }}
+                                </span>
                             }
-                        </button>
+                        </div>
+
+                        <div class="flex flex-col gap-5">
+                            
+                            <!-- Fila 1: N° Orden, Fecha, Cliente, Teléfono, DNI -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">N° de Orden</label>
+                                    <input type="text" [value]="repairForm.value.repair_number || 'AUTO'" readonly class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 transition-colors">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Fecha</label>
+                                    <input type="text" [value]="date | date:'dd/MM/yyyy'" readonly class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="flex text-xs items-center gap-1"><i class="fas fa-user text-[#3498DB]"></i> Cliente</label>
+                                    <input type="text" formControlName="customer_name" list="repair-clients-list" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 focus:shadow-[0_0_10px_rgba(52,152,219,0.2)] transition-all placeholder-gray-500 dark:placeholder-gray-400" [class.border-red-500]="repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched" [class.ring-red-500]="repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched" placeholder="Buscar o ingresar..." autocomplete="off">
+                                    @if (repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched) {
+                                        <p class="text-xs text-red-500 mt-1 font-medium">El nombre del cliente es obligatorio (mín. 3 caracteres).</p>
+                                    }
+                                    <datalist id="repair-clients-list">
+                                        @for (client of clients(); track client.id) {
+                                            <option [value]="client.displayName">{{ client.phone ? client.phone + ' - ' : '' }}{{ client.email }}</option>
+                                        }
+                                    </datalist>
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="flex text-xs items-center gap-1"><i class="fab fa-whatsapp text-[#34C759]"></i> Teléfono</label>
+                                    <input type="text" formControlName="customer_phone" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#34C759] focus:ring-1 focus:ring-[#34C759]/30 focus:shadow-[0_0_10px_rgba(52,199,89,0.2)] transition-all">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">DNI/RUC</label>
+                                    <input type="text" formControlName="customer_dni" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 transition-all">
+                                </div>
+                            </div>
+
+                            <!-- Fila 2: Dirección y Correo -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="flex text-xs items-center gap-1"><i class="fas fa-map-marker-alt text-red-400"></i> Dirección</label>
+                                    <input type="text" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 transition-all">
+                                </div>
+                                <div>
+                                    <label class="flex text-xs items-center gap-1"><i class="fas fa-envelope text-yellow-400"></i> Correo</label>
+                                    <input type="email" formControlName="customer_email" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 transition-all">
+                                </div>
+                            </div>
+
+                            <!-- Fila 3: Estado y Pago -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-[#101828]/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700/30">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Estado del Equipo</label>
+                                    <select formControlName="current_status_id" class="w-full bg-white dark:bg-[#101828] border border-emerald-500/50 rounded-lg px-3 py-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm focus:outline-none focus:border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.1)] appearance-none">
+                                        <option [ngValue]="1">RECIBIDO / PENDIENTE</option>
+                                        <option [ngValue]="3">EN REPARACIÓN</option>
+                                        <option [ngValue]="5">LISTO PARA ENTREGAR</option>
+                                        <option [ngValue]="6">ENTREGADO</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Forma de Pago</label>
+                                    <select formControlName="payment_method" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 appearance-none">
+                                        <option value="efectivo">Efectivo</option>
+                                        <option value="transferencia">Transferencia / QR</option>
+                                        <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="divider before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 my-1"></div>
+
+                            <!-- Fila 4: Tipo de Equipo, Marca, Modelo, Serie, Accesorios -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <!-- Tipo Equipo -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Tipo de Equipo</label>
+                                    <div class="flex gap-2">
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" formControlName="device_type" value="smartphone" class="peer sr-only">
+                                            <div class="h-10 bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-[#3498DB] peer-checked:text-[#3498DB] peer-checked:bg-[#3498DB]/10 transition-all hover:bg-gray-200 dark:hover:bg-gray-800">
+                                                <i class="fas fa-mobile-alt text-lg"></i>
+                                            </div>
+                                        </label>
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" formControlName="device_type" value="tablet" class="peer sr-only">
+                                            <div class="h-10 bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-[#3498DB] peer-checked:text-[#3498DB] peer-checked:bg-[#3498DB]/10 transition-all hover:bg-gray-200 dark:hover:bg-gray-800">
+                                                <i class="fas fa-tablet-alt text-lg"></i>
+                                            </div>
+                                        </label>
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" formControlName="device_type" value="pc" class="peer sr-only">
+                                            <div class="h-10 bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-[#3498DB] peer-checked:text-[#3498DB] peer-checked:bg-[#3498DB]/10 transition-all hover:bg-gray-200 dark:hover:bg-gray-800">
+                                                <i class="fas fa-laptop text-lg"></i>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Marca</label>
+                                    <select formControlName="brand_id" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30">
+                                        <option [ngValue]="null">Seleccionar</option>
+                                        @for (brand of brands(); track brand.id) {
+                                            <option [value]="brand.id">{{ brand.name }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Modelo</label>
+                                    <input type="text" formControlName="device_model" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30" [class.border-red-500]="repairForm.get('device_model')?.invalid && repairForm.get('device_model')?.touched" [class.ring-red-500]="repairForm.get('device_model')?.invalid && repairForm.get('device_model')?.touched">
+                                    @if (repairForm.get('device_model')?.invalid && repairForm.get('device_model')?.touched) {
+                                        <p class="text-xs text-red-500 mt-1 font-medium">El modelo del equipo es obligatorio.</p>
+                                    }
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">IMEI/Serie</label>
+                                    <input type="text" formControlName="imei" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 font-mono">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Accesorios</label>
+                                    <div class="relative group" formGroupName="checklist">
+                                        <button type="button" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300 text-sm focus:outline-none text-left flex justify-between items-center hover:bg-gray-200 dark:hover:bg-gray-800">
+                                            <span>Seleccionar</span>
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </button>
+                                        <div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-2 hidden group-hover:block z-10">
+                                            <label class="flex items-center gap-2 text-sm p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"><input type="checkbox" formControlName="charger" class="checkbox checkbox-xs checkbox-primary"> Cargador</label>
+                                            <label class="flex items-center gap-2 text-sm p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"><input type="checkbox" formControlName="battery" class="checkbox checkbox-xs checkbox-primary"> Batería</label>
+                                            <label class="flex items-center gap-2 text-sm p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"><input type="checkbox" formControlName="chip" class="checkbox checkbox-xs checkbox-primary"> Chip/SIM</label>
+                                            <label class="flex items-center gap-2 text-sm p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"><input type="checkbox" formControlName="sd" class="checkbox checkbox-xs checkbox-primary"> MicroSD</label>
+                                            <label class="flex items-center gap-2 text-sm p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"><input type="checkbox" formControlName="case" class="checkbox checkbox-xs checkbox-primary"> Funda</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fila 5 y 6: Detalles Multi-línea -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="flex text-xs items-center gap-1"><i class="fas fa-search-plus text-[#F39C12]"></i> Estado Físico / Observaciones</label>
+                                    <textarea formControlName="technician_notes" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#F39C12] focus:ring-1 focus:ring-[#F39C12]/30 focus:shadow-[0_0_10px_rgba(243,156,18,0.1)] transition-all resize-none"></textarea>
+                                </div>
+                                <div>
+                                    <label class="flex text-xs items-center gap-1"><i class="fas fa-tools text-[#3498DB]"></i> Falla Declarada</label>
+                                    <textarea formControlName="issue_description" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 focus:shadow-[0_0_10px_rgba(52,152,219,0.1)] transition-all resize-none" [class.border-red-500]="repairForm.get('issue_description')?.invalid && repairForm.get('issue_description')?.touched" [class.ring-red-500]="repairForm.get('issue_description')?.invalid && repairForm.get('issue_description')?.touched"></textarea>
+                                    @if (repairForm.get('issue_description')?.invalid && repairForm.get('issue_description')?.touched) {
+                                        <p class="text-xs text-red-500 mt-1 font-medium">La falla declarada es obligatoria.</p>
+                                    }
+                                </div>
+                                <div class="md:col-span-2">
+                                    <div class="flex justify-between items-end mb-1">
+                                        <label class="flex text-xs items-center gap-1"><i class="fas fa-wrench text-emerald-500"></i> Trabajo a Realizar / Repuestos Usados</label>
+                                        <button type="button" (click)="showProductModal.set(true)" class="btn btn-xs bg-[#34C759]/20 text-[#34C759] border-none hover:bg-[#34C759] hover:text-gray-900 dark:hover:text-white rounded">
+                                            <i class="fas fa-plus"></i> Repuesto
+                                        </button>
+                                    </div>
+                                    
+                                    @if (parts().length > 0) {
+                                        <div class="flex flex-col gap-2 mb-2 bg-white dark:bg-[#101828]/50 p-2 rounded-lg border border-gray-200 dark:border-gray-700/50">
+                                            @for (part of parts(); track part.id || part.product_id; let idx = $index) {
+                                                <div class="flex justify-between items-center text-xs text-gray-700 dark:text-gray-300">
+                                                    <span class="flex items-center gap-2">
+                                                        <i class="fas fa-box text-emerald-500"></i> {{ part.name || part.product_name }} (x{{ part.quantity }})
+                                                    </span>
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="font-bold text-gray-900 dark:text-white">{{ part.cost_at_time | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                                        <button type="button" (click)="removePart(idx)" class="text-red-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    
+                                    <textarea formControlName="technical_report" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500 focus:shadow-[0_0_10px_rgba(16,185,129,0.1)] transition-all resize-none"></textarea>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="flex text-xs items-center gap-1"><i class="fas fa-shield-alt text-purple-400"></i> Garantía Otorgada</label>
+                                    <input type="text" formControlName="warranty" placeholder="Ej: 30 días en módulo" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-purple-500 transition-all">
+                                </div>
+                            </div>
+                            
+                            <div class="divider before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 my-1"></div>
+                            
+                            <!-- Imágenes -->
+                            <div class="grid grid-cols-1">
+                                <label class="flex text-xs items-center gap-1"><i class="fas fa-camera text-gray-500 dark:text-gray-400"></i> Evidencia Fotográfica</label>
+                                <div class="relative group/file">
+                                    <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" [disabled]="uploadingImages()" />
+                                    <div class="w-full flex items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg py-4 bg-white dark:bg-[#101828] font-medium text-gray-500 dark:text-gray-400 group-hover/file:border-[#3498DB] group-hover/file:bg-[#3498DB]/10 transition-colors">
+                                         @if(uploadingImages()) {
+                                             <span class="loading loading-spinner text-[#3498DB]"></span> <span class="ml-2 text-[#3498DB]">Subiendo...</span>
+                                         } @else {
+                                             <i class="fas fa-cloud-upload-alt text-xl mr-2 text-gray-600 group-hover/file:text-[#3498DB]"></i> Click o Arrastrar fotos del equipo
+                                         }
+                                    </div>
+                                </div>
+
+                                @if (images().length > 0) {
+                                    <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mt-3">
+                                        @for (img of images(); track img; let i = $index) {
+                                            <div class="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                <img [src]="img" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" alt="Repair image" />
+                                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                     <button type="button" (click)="removeImage(i)" class="btn btn-circle btn-xs bg-red-500 border-none text-gray-900 dark:text-white shadow-xl hover:scale-110">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Finanzas y Resumen (Bottom) -->
+                    <div class="bg-gray-50 dark:bg-[#1A253A] rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-inner">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Fecha Entrada</label>
+                                <input type="text" [value]="date | date:'dd/MM/yyyy HH:mm'" readonly class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Fecha Entrega</label>
+                                <input type="text" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Presupuesto Estimado</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                                    <input type="number" formControlName="estimated_cost" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg pl-7 pr-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">Cobrado / Seña</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold">$</span>
+                                    <input type="number" formControlName="deposit_amount" class="w-full bg-white dark:bg-[#101828] border border-emerald-500/50 rounded-lg pl-7 pr-3 py-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm focus:outline-none focus:border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Highlight Boxes -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center">
+                                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Recargo %</span>
+                                <span class="text-xl font-bold text-gray-900 dark:text-white">0%</span>
+                            </div>
+                            <div class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center">
+                                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Recargo</span>
+                                <span class="text-xl font-bold text-gray-900 dark:text-white">$ 0</span>
+                            </div>
+                            <div class="bg-white dark:bg-[#101828] border border-[#3498DB]/50 shadow-[0_0_15px_rgba(52,152,219,0.15)] rounded-xl p-4 flex flex-col justify-center items-center">
+                                <span class="text-xs font-semibold text-[#3498DB] uppercase tracking-wider mb-1">Total Servicio</span>
+                                <input type="number" formControlName="final_cost" class="bg-transparent text-2xl font-black text-gray-900 dark:text-white text-center w-full focus:outline-none">
+                            </div>
+                            <div class="bg-white dark:bg-[#101828] border border-[#F39C12]/50 shadow-[0_0_15px_rgba(243,156,18,0.15)] rounded-xl p-4 flex flex-col justify-center items-center">
+                                <span class="text-xs font-semibold text-[#F39C12] uppercase tracking-wider mb-1">Saldo a Cobrar</span>
+                                <span class="text-2xl font-black text-gray-900 dark:text-white">$ {{ (repairForm.value.final_cost || 0) - (repairForm.value.deposit_amount || 0) }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </form>
-    }
-</div>
+
+                <!-- Columna Derecha: Panel Lateral -->
+                <div class="w-full xl:w-80 flex flex-col gap-6">
+                    
+                    <!-- Servicio Rápido -->
+                    <div class="bg-gray-50 dark:bg-[#1A253A] rounded-2xl p-5 border border-gray-200 dark:border-gray-700/50 shadow-inner">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2"><i class="fas fa-bolt text-yellow-400"></i> Servicio Rápido</h3>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Ej: Cambio glass" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
+                            </div>
+                            <div class="flex gap-2 justify-between">
+                                <button type="button" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text--400 hover:bg-gray-200"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text--400 hover:bg-gray-200"><i class="fas fa-pen"></i></button>
+                                <button type="button" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text--400 hover:bg-gray-200"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-gray-900 dark:text-white border-none rounded-lg flex-1 ml-2">Aplicar</button>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-tight text-center">Usa atajos para llenar los campos de falla y trabajo automáticamente.</p>
+                        </div>
+                    </div>
+
+                    <!-- Estado de la Orden (Timeline) -->
+                    <div class="bg-gray-50 dark:bg-[#1A253A] rounded-2xl p-5 border border-gray-200 dark:border-gray-700/50 shadow-inner">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2"><i class="fas fa-stream text-[#3498DB]"></i> Estado</h3>
+                        <div class="flex flex-col gap-3 relative before:absolute before:inset-y-0 before:left-[11px] before:w-0.5 before:bg-gray-200 before:dark:bg-gray-700">
+                            
+                            <!-- Timeline items -->
+                            <div class="relative flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center z-10 shrink-0">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                </div>
+                                <div class="flex-1 bg-white dark:bg-[#101828] border border-emerald-500/30 rounded-lg px-3 py-2 flex justify-between items-center shadow-[0_0_10px_rgba(16,185,129,0.05)]">
+                                    <span class="text-xs font-bold text-emerald-400">Recibido</span>
+                                    <i class="fas fa-check-circle text-emerald-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="relative flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-white dark:bg-[#101828] border-2 border-gray-600 flex items-center justify-center z-10 shrink-0"></div>
+                                <div class="flex-1 bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex justify-between items-center opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                    <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">En Reparación</span>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-white dark:bg-[#101828] border-2 border-gray-600 flex items-center justify-center z-10 shrink-0"></div>
+                                <div class="flex-1 bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex justify-between items-center opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                    <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Entregado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seguridad y Proveedor -->
+                    <div class="bg-gray-50 dark:bg-[#1A253A] rounded-2xl p-5 border border-gray-200 dark:border-gray-700/50 shadow-inner flex flex-col gap-4">
+                        
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><i class="fas fa-lock text-purple-400"></i> Seguridad</h3>
+                            <div class="flex bg-white dark:bg-[#101828] rounded-lg p-1 border border-gray-200 dark:border-gray-700 mb-3">
+                                <button type="button" class="flex-1 text-xs py-1.5 font-bold rounded-md bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">PIN</button>
+                                <button type="button" class="flex-1 text-xs py-1.5 font-bold rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Patrón</button>
+                                <button type="button" class="flex-1 text-xs py-1.5 font-bold rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Clave</button>
+                            </div>
+                            <input type="text" formControlName="security_pin" placeholder="****" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
+                        </div>
+
+                        <div class="divider before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 my-0"></div>
+
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><i class="fas fa-truck text-orange-400"></i> Proveedor de Repuesto</h3>
+                            <input type="text" formControlName="supplier" placeholder="Visible solo para el taller..." class="w-full bg-white dark:bg-[#101828] border border-orange-500/30 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-orange-500 shadow-[0_0_10px_rgba(243,156,18,0.05)]">
+                        </div>
+
+                    </div>
+
+                    <!-- Main Action Button -->
+                    <button type="submit" [disabled]="saving()" class="btn h-14 mt-auto bg-linear-to-r from-[#34C759] to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-gray-900 dark:text-white border-none rounded-2xl shadow-[0_8px_20px_rgba(52,199,89,0.3)] hover:shadow-[0_8px_25px_rgba(52,199,89,0.5)] transform hover:-translate-y-1 transition-all text-lg font-bold">
+                        @if(saving()) {
+                            <span class="loading loading-spinner"></span>
+                        } @else {
+                            <i class="fas fa-save mr-2 text-xl"></i> GUARDAR ORDEN
+                        }
+                    </button>
+                    @if (error()) {
+                        <p class="text-red-400 text-xs text-center font-medium">{{ error() }}</p>
+                    }
+
+                </div>
+            </form>
+        }
+    </div>
 </div>
 
 <!-- Modal Selección de Repuestos -->
 @if (showProductModal()) {
-<div class="fixed inset-0 z-60 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm animate-fade-in px-4">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-slide-up border border-white relative">
-        <div class="bg-gray-50 dark:bg-gray-900 p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center relative">
-            <h3 class="font-bold text-xl text-gray-800 dark:text-white flex items-center gap-3">
-                <i class="fas fa-box text-emerald-500 bg-emerald-100 w-10 h-10 rounded-full flex items-center justify-center"></i> 
+<div class="fixed inset-0 z-60 flex items-center justify-center bg-white dark:bg-[#101828]/80 backdrop-blur-sm animate-fade-in px-4">
+    <div class="bg-gray-50 dark:bg-[#1A253A] border border-gray-200 dark:border-gray-700/50 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.5)] w-full max-w-2xl overflow-hidden animate-slide-up relative">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700/50 flex justify-between items-center relative">
+            <h3 class="font-bold text-xl text-gray-900 dark:text-white flex items-center gap-3">
+                <i class="fas fa-box text-[#34C759] bg-[#34C759]/10 w-10 h-10 rounded-full flex items-center justify-center"></i> 
                 Catálogo de Stock
             </h3>
-            <button type="button" class="btn btn-sm btn-circle btn-ghost text-gray-400 shadow-none border-none hover:bg-gray-200 focus:outline-none" (click)="showProductModal.set(false)">
+            <button type="button" class="btn btn-sm btn-circle btn-ghost text-gray-500 dark:text-gray-400 shadow-none border-none hover:bg-gray-200 dark:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none" (click)="showProductModal.set(false)">
                 <i class="fas fa-times text-lg"></i>
             </button>
         </div>
@@ -177,11 +451,11 @@
         <div class="p-6">
             <div class="form-control mb-4">
                 <div class="relative">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)" class="input input-bordered w-full pl-11 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-200" placeholder="Buscar pantalla, pin de carga, batería..." />
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"></i>
+                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 focus:shadow-[0_0_10px_rgba(52,152,219,0.2)] transition-all placeholder-gray-500 dark:placeholder-gray-400" placeholder="Buscar pantalla, pin de carga, batería..." />
                     @if (searchingProducts()) {
                         <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                            <span class="loading loading-spinner loading-xs text-emerald-500"></span>
+                            <span class="loading loading-spinner loading-xs text-[#34C759]"></span>
                         </div>
                     }
                 </div>
@@ -190,57 +464,155 @@
             <div class="max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                 @if (!searchingProducts() && filteredProducts().length === 0) {
                     <div class="flex flex-col items-center justify-center py-10 opacity-50">
-                        <i class="fas fa-dolly text-5xl mb-3 text-gray-300"></i>
-                        <p class="text-sm font-medium">Buscando productos o sin resultados...</p>
+                        <i class="fas fa-dolly text-5xl mb-3 text-gray-600"></i>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Buscando productos o sin resultados...</p>
                     </div>
                 }
 
                 @if (searchingProducts() && filteredProducts().length === 0) {
                     <div class="flex flex-col items-center justify-center py-10 opacity-50">
-                         <span class="loading loading-dots loading-lg text-emerald-500"></span>
+                         <span class="loading loading-dots loading-lg text-[#34C759]"></span>
                     </div>
                 }
 
                 @for (product of filteredProducts(); track product.id) {
-                <div class="flex justify-between items-center py-4 border-b border-gray-50 hover:bg-emerald-50/50 transition-colors px-3 rounded-xl group/item">
+                <div class="flex justify-between items-center py-4 border-b border-gray-200 dark:border-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-800/50 transition-colors px-3 rounded-xl group/item">
                     <div class="flex items-center gap-4">
                         @if (product.image_url) {
-                            <img [src]="product.image_url" alt="Product image" class="w-12 h-12 object-cover rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50" />
+                            <img [src]="product.image_url" alt="Product image" class="w-12 h-12 object-cover rounded-xl shadow-sm border border-gray-600 bg-gray-200 dark:bg-gray-800" />
                         } @else {
-                            <div class="w-12 h-12 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-300 shadow-inner">
+                            <div class="w-12 h-12 bg-white dark:bg-[#101828] rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 shadow-inner">
                                 <i class="fas fa-image"></i>
                             </div>
                         }
                         <div>
-                            <div class="font-bold text-gray-800 dark:text-white text-sm mb-0.5 group-hover/item:text-emerald-700 transition-colors">{{ product.name }}</div>
+                            <div class="font-bold text-gray-900 dark:text-white text-sm mb-0.5 group-hover/item:text-[#34C759] transition-colors">{{ product.name }}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded-md font-bold text-[10px] uppercase border"
-                                    [class.bg-red-50]="product.stock === 0" [class.text-red-600]="product.stock === 0" [class.border-red-100]="product.stock === 0"
-                                    [class.bg-amber-50]="product.stock > 0 && product.stock <= 5" [class.text-amber-600]="product.stock > 0 && product.stock <= 5" [class.border-amber-100]="product.stock > 0 && product.stock <= 5"
-                                    [class.bg-green-50]="product.stock > 5" [class.text-green-600]="product.stock > 5" [class.border-green-100]="product.stock > 5">
+                                <span class="px-2 py-0.5 rounded-md font-bold text-xs uppercase border"
+                                    [class.bg-red-500/10]="product.stock === 0" [class.text-red-400]="product.stock === 0" [class.border-red-500/30]="product.stock === 0"
+                                    [class.bg-amber-500/10]="product.stock > 0 && product.stock <= 5" [class.text-amber-400]="product.stock > 0 && product.stock <= 5" [class.border-amber-500/30]="product.stock > 0 && product.stock <= 5"
+                                    [class.bg-[#34C759]/10]="product.stock > 5" [class.text-[#34C759]]="product.stock > 5" [class.border-[#34C759]/30]="product.stock > 5">
                                     Stock: {{ product.stock }}
                                 </span>
-                                <span class="text-gray-300">|</span>
-                                <span class="font-bold text-emerald-600">{{ product.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                <span class="text-gray-600">|</span>
+                                <span class="font-bold text-[#34C759]">{{ product.price | currency:'ARS':'symbol':'1.0-0' }}</span>
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-sm bg-gray-100 hover:bg-emerald-500 hover:text-white border-none rounded-lg text-gray-600 dark:text-gray-300 font-bold transition-all shadow-sm" (click)="addPart(product); showProductModal.set(false)" [disabled]="product.stock === 0">
+                    <button type="button" class="btn btn-sm bg-white dark:bg-[#101828] hover:bg-[#34C759] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-700 hover:border-[#34C759] rounded-lg font-bold transition-all shadow-sm" (click)="addPart(product); showProductModal.set(false)" [disabled]="product.stock === 0">
                         <i class="fas fa-plus"></i> Añadir
                     </button>
                 </div>
                 }
 
                 @if (!searchingProducts() && searchQuery().trim().length > 0) {
-                    <div class="flex flex-col items-center justify-center py-8 border-t border-gray-100 dark:border-gray-800 mt-2 bg-gray-50/50 dark:bg-gray-900/30 rounded-xl">
-                        <i class="fas fa-search-plus text-3xl mb-3 text-emerald-400 opacity-50"></i>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4 text-center">¿No encuentras el repuesto exacto?</p>
-                        <button type="button" class="btn btn-outline border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-600 rounded-xl font-bold shadow-sm" (click)="addManualProduct()">
+                    <div class="flex flex-col items-center justify-center py-8 border-t border-gray-200 dark:border-gray-700/50 mt-2 bg-white dark:bg-[#101828] rounded-xl">
+                        <i class="fas fa-search-plus text-3xl mb-3 text-[#34C759] opacity-50"></i>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 text-center">¿No encuentras el repuesto exacto?</p>
+                        <button type="button" class="btn btn-sm bg-transparent border border-[#34C759] text-[#34C759] hover:bg-[#34C759] hover:text-gray-900 dark:hover:text-white rounded-lg font-bold shadow-sm" (click)="addManualProduct()">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar "{{ searchQuery() }}" manualmente
                         </button>
                     </div>
                 }
             </div>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Modal: Notificar Estado al Cliente -->
+@if (showNotifyModal()) {
+<div class="fixed inset-0 z-70 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4" id="notify-modal-overlay">
+    <div class="bg-gray-50 dark:bg-[#1A253A] border border-gray-200 dark:border-gray-700/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden animate-fade-in-up relative" id="notify-modal">
+        
+        <!-- Header del Modal -->
+        <div class="p-5 border-b border-gray-200 dark:border-gray-700/50 flex justify-between items-center bg-white dark:bg-[#101828]">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#25D366]/20 border border-[#25D366]/30 flex items-center justify-center">
+                    <i class="fab fa-whatsapp text-[#25D366] text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 dark:text-white text-base">Notificar Estado al Cliente</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Seleccioná el paso actual de la reparación</p>
+                </div>
+            </div>
+            <button type="button" (click)="showNotifyModal.set(false)" class="btn btn-sm btn-circle btn-ghost text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:bg-gray-700 hover:text-gray-900 dark:hover:text-white border-none" id="btn-cerrar-notify-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Cuerpo del Modal -->
+        <div class="p-5 flex flex-col gap-4">
+
+            <!-- Info del cliente -->
+            <div class="bg-white dark:bg-[#101828] rounded-xl p-3 border border-gray-200 dark:border-gray-700/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-[#3498DB]/20 border border-[#3498DB]/30 flex items-center justify-center shrink-0">
+                    <i class="fas fa-user text-[#3498DB] text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-gray-900 dark:text-white font-bold text-sm truncate">{{ repairForm.value.customer_name || 'Cliente sin nombre' }}</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-xs font-mono">{{ repairForm.value.customer_phone || 'Sin teléfono' }} &bull; Cód: <span class="text-[#34C759] font-bold">{{ repairForm.value.tracking_code }}</span></p>
+                </div>
+            </div>
+
+            <!-- Selector de estado -->
+            <div>
+                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Seleccioná el estado a notificar:</p>
+                <div class="flex flex-col gap-2" id="notify-status-list">
+                    @for (st of notifyStatuses(); track st.id) {
+                        <button type="button"
+                            (click)="selectedNotifyStatus.set(st.id)"
+                            [id]="'notify-status-' + st.id"
+                            class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left font-semibold text-sm"
+                            [ngClass]="[
+                                selectedNotifyStatus() !== st.id ? 'border-gray-200 dark:border-gray-700 bg-transparent text-gray-700 dark:text-gray-300 opacity-70' : '',
+                                selectedNotifyStatus() === st.id ? st.activeClass : ''
+                            ]">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-base"
+                                [ngClass]="selectedNotifyStatus() === st.id ? st.iconBgActive : 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400'">
+                                <i [class]="st.icon"></i>
+                            </div>
+                            <div class="flex-1">
+                                <span class="block">{{ st.label }}</span>
+                                <span class="text-xs font-normal opacity-70">{{ st.sublabel }}</span>
+                            </div>
+                            @if (selectedNotifyStatus() === st.id) {
+                                <i class="fas fa-check-circle text-current text-lg ml-auto"></i>
+                            }
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Preview del mensaje -->
+            @if (selectedNotifyStatus()) {
+                <div class="bg-white dark:bg-[#101828] rounded-xl p-4 border border-[#25D366]/20" id="notify-message-preview">
+                    <p class="text-xs font-semibold text-[#25D366] uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fab fa-whatsapp"></i> Preview del Mensaje
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed italic">&quot;{{ notifyPreviewMessage() }}&quot;</p>
+                </div>
+            }
+
+            <!-- Botones de acción -->
+            <div class="flex gap-3 pt-2">
+                <button type="button" (click)="showNotifyModal.set(false)" class="btn flex-1 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-none rounded-xl">
+                    Cancelar
+                </button>
+                <button type="button"
+                    (click)="sendStatusNotification()"
+                    [disabled]="!selectedNotifyStatus() || !repairForm.value.customer_phone"
+                    class="btn flex-1 bg-[#25D366] hover:bg-green-400 text-gray-900 dark:text-white border-none rounded-xl font-bold shadow-[0_0_15px_rgba(37,211,102,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="btn-enviar-notificacion">
+                    <i class="fab fa-whatsapp mr-1"></i> Enviar Notificación
+                </button>
+            </div>
+
+            @if (!repairForm.value.customer_phone) {
+                <p class="text-amber-400 text-xs text-center">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> El cliente no tiene teléfono registrado. Guardá la orden primero o añadí el teléfono.
+                </p>
+            }
         </div>
     </div>
 </div>

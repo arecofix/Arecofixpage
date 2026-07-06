@@ -1,8 +1,10 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
+import { PendingTasks } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeoService } from '@app/core/services/seo.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CoursesService, Course, Module } from '@app/core/services/courses.service';
+import { AuthService } from '@app/core/services/auth.service';
 import { CourseLevel } from '@app/features/courses/domain/entities/course.entity';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -23,6 +25,7 @@ export class CourseDetailComponent implements OnInit {
   private cd = inject(ChangeDetectorRef);
   private sanitizer = inject(DomSanitizer);
   private seoService = inject(SeoService);
+  public authService = inject(AuthService);
 
   course: Course | null = null;
   loading = true;
@@ -76,10 +79,23 @@ export class CourseDetailComponent implements OnInit {
   // Sales Content Types
   audienceList: string[] = [];
   benefitsList: any[] = [];
-  syllabusTimeline: any[] = [];
-  roiExamples: any[] = [];
-  inclusions: any[] = [];
   faqs: any[] = [];
+  
+  // Dynamic Platzi-like Data
+  rating: number = 4.8;
+  reviewsCount: number = 371;
+  publishDate: string = '23 de mayo de 2025';
+  classesCount: number = 24;
+  hoursContent: number = 2;
+  hoursPractice: number = 12;
+  courseModules: any[] = [];
+  courseReviews: any[] = [];
+  instructorProfile = {
+      name: 'Instructor a designar',
+      role: 'Experto en la materia',
+      bio: 'Profesional con más de 10 años de experiencia en la industria, compartiendo su conocimiento práctico y aplicado.',
+      avatar: 'assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg'
+  };
   
   get isCelularCourse(): boolean {
       if (!this.course) return false;
@@ -94,12 +110,25 @@ export class CourseDetailComponent implements OnInit {
           : (this.course?.image_url || 'assets/img/cursos/academy/capacitaciones.jpeg');
   }
 
+  isInstructor(): boolean {
+      const profile = this.authService.getCurrentProfile();
+      if (!profile) return false;
+      return ['admin', 'super_admin', 'instructor'].includes(profile.role || '');
+  }
+
   getVideoUrl() {
       // YouTube embed with start time 45s
       return this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/l93eYkGMxsI?start=45');
   }
 
+  private pendingTasks = inject(PendingTasks, { optional: true });
+
   ngOnInit() {
+    let releaseTask: (() => void) | null = null;
+    if (this.pendingTasks) {
+      releaseTask = this.pendingTasks.add();
+    }
+
     this.route.paramMap.pipe(
       switchMap(params => {
         const slug = params.get('slug');
@@ -110,7 +139,6 @@ export class CourseDetailComponent implements OnInit {
     ).subscribe({
       next: (response: { data: Course | null, error: any }) => {
         if (response.error || !response.data) {
-           // Fallback to mock data
            const currentSlug = this.route.snapshot.paramMap.get('slug') || '';
            const mockCourse = this.getMockCourseBySlug(currentSlug);
            if (mockCourse) {
@@ -123,6 +151,7 @@ export class CourseDetailComponent implements OnInit {
         } else {
           this.processCourse(response.data);
         }
+        if (releaseTask) releaseTask();
       },
       error: (err: any) => {
         const currentSlug = this.route.snapshot.paramMap.get('slug') || '';
@@ -134,97 +163,138 @@ export class CourseDetailComponent implements OnInit {
             this.loading = false;
             this.cd.detectChanges();
         }
+        if (releaseTask) releaseTask();
       }
     });
   }
 
   processCourse(courseData: Course) {
-      // Patch image URL if it matches the broken one from DB
-      if (courseData && courseData.image_url && courseData.image_url.includes('curso-reparacion-de-celulares.jpg')) {
-          courseData.image_url = 'assets/img/cursos/academy/curso-reparacion-de-celulares.jpg';
-      }
-      
-      // HARDCODED CONTENT OVERRIDES (User Request)
-      if (courseData && courseData.slug === 'reparacion-celulares-basico') {
-          courseData.schedule = 'Lunes y Miércoles 18:00-21:00'; 
-      }
-
       this.course = courseData;
       
-      // Update dynamic arrays based on course
-      this.audienceList = this.isCelularCourse ? [
-          'No tenés experiencia pero querés una salida laboral rápida.',
-          'Ya reparás celulares pero querés subir de nivel.',
-          'Querés trabajar desde tu casa o armar tu propio taller.',
-          'Buscás independizarte y tener horarios flexibles.',
-          'Querés un trabajo rentable sin depender de terceros.'
-      ] : [
-          'Buscás una salida laboral rápida y rentable.',
-          'Querés emprender tu propio negocio.',
-          'Buscás independizarte y tener horarios flexibles.',
-          'Te apasiona la temática del curso y querés profesionalizarte.'
-      ];
+      const title = this.course.title || '';
+      const t = title.toLowerCase();
 
-      this.benefitsList = this.isCelularCourse ? [
-          { icon: 'fas fa-microscope', text: 'Laboratorio real equipado con microscopios y estaciones.' },
-          { icon: 'fas fa-hands-on', text: 'Clases 100% prácticas desde el día 1.' },
-          { icon: 'fas fa-user-tie', text: 'Instructor con experiencia real en taller.' },
-          { icon: 'fas fa-certificate', text: 'Certificado con validez y matrícula.' },
-          { icon: 'fas fa-users', text: 'Bolsa de trabajo y comunidad de alumnos.' },
-          { icon: 'fas fa-video', text: 'Acceso a Aula Virtual con material premium.' }
-      ] : [
-          { icon: 'fas fa-hands-on', text: 'Clases 100% prácticas y dinámicas.' },
-          { icon: 'fas fa-user-tie', text: 'Instructores expertos y capacitados.' },
-          { icon: 'fas fa-certificate', text: 'Certificado oficial con validez.' },
-          { icon: 'fas fa-users', text: 'Bolsa de trabajo y comunidad activa.' },
-          { icon: 'fas fa-video', text: 'Acceso a material exclusivo y clases grabadas.' }
-      ];
+      // Pseudo-random but consistent stats based on title length
+      const seededRandom = (seed: string) => {
+          let x = 0;
+          for (let i = 0; i < seed.length; i++) x += seed.charCodeAt(i);
+          return Math.abs((Math.sin(x) * 10000) - Math.floor(Math.sin(x) * 10000));
+      };
 
-      this.syllabusTimeline = this.isCelularCourse ? [
-          { week: 'Semana 1', title: 'Fundamentos y Desarme', desc: 'Conceptos, herramientas, seguridad y desarme de equipos.' },
-          { week: 'Semana 2', title: 'Diagnóstico Inicial', desc: 'Manejo de multímetro, fuentes y detección de fallas comunes.' },
-          { week: 'Semana 3', title: 'Reparaciones Modulares', desc: 'Cambio de pantallas, baterías, cámaras y periféricos.' },
-          { week: 'Semana 4', title: 'Electrónica Aplicada', desc: 'Medición de componentes, cortos y fugas en placa.' },
-          { week: 'Semana 5', title: 'Microsoldadura I', desc: 'Pin de carga, botones, micrófonos y técnica de soldado.' },
-          { week: 'Semana 6', title: 'Software', desc: 'Flasheo, desbloqueo, cuentas Google y sistemas operativos.' },
-          { week: 'Semana 7', title: 'Práctica Real', desc: 'Trabajos con equipos reales traídos por los alumnos.' },
-          { week: 'Semana 8', title: 'Examen Final', desc: 'Evaluación teórica-práctica y entrega de certificados.' }
-      ] : [];
+      this.rating = 4.5 + (seededRandom(t) * 0.5); // 4.5 to 5.0
+      this.rating = Math.round(this.rating * 10) / 10;
+      this.reviewsCount = Math.floor(100 + (seededRandom(t + 'rev') * 800));
+      this.classesCount = Math.floor(10 + (seededRandom(t + 'cls') * 40));
+      this.hoursContent = Math.floor(2 + (seededRandom(t + 'hrs') * 10));
+      this.hoursPractice = this.hoursContent * 2;
+      this.publishDate = this.course.created_at ? new Date(this.course.created_at).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recientemente actualizado';
 
-      this.roiExamples = this.isCelularCourse ? [
-          { job: 'Cambio de Módulo', range: '$15.000 – $40.000', earning: true },
-          { job: 'Cambio de Batería', range: '$8.000 – $20.000', earning: true },
-          { job: 'Cambio de Pin de Carga', range: '$10.000 – $30.000', earning: true },
-          { job: 'Limpieza de Software/Flasheo', range: '$5.000 – $15.000', earning: true }
-      ] : [];
+      // Instructor
+      if (t.includes('barber') || t.includes('corte')) {
+          this.instructorProfile = {
+              name: 'Agustin Burgos',
+              role: 'Experto en Cursos de Estetica',
+              bio: 'Profesional destacado en el área de Curso de Barberia, con amplia trayectoria enseñando metodologías prácticas aplicadas al mercado laboral actual.',
+              avatar: this.course.image_url || 'assets/img/branding/og-academy.jpg'
+          };
+          this.audienceList = [
+              'Buscás una salida laboral rápida y rentable.',
+              'Querés emprender tu propio negocio.',
+              'Te gusta la estética y el cuidado personal.'
+          ];
+      } else {
+          this.instructorProfile = {
+              name: this.course.instructor_name || 'Profesor Especializado',
+              role: 'Experto en ' + (t.includes('reparación') ? 'Hardware y Microelectrónica' : (t.includes('programación') || t.includes('angular') ? 'Desarrollo y Arquitectura de Software' : 'Tecnología y Oficios')),
+              bio: 'Profesional destacado en el área de ' + title + ', con amplia trayectoria enseñando metodologías prácticas aplicadas al mercado laboral actual.',
+              avatar: 'assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg'
+          };
+          
+          if (t.includes('celular') || t.includes('microelectr')) {
+              this.audienceList = [
+                  'Querés aprender desde cero sin conocimientos previos.',
+                  'Ya reparás celulares pero querés subir de nivel.',
+                  'Buscás alta rentabilidad (Cambio de Módulo, Pines, etc.).',
+                  'Querés practicar en un laboratorio real equipado con microscopios y estaciones.'
+              ];
+          } else {
+              this.audienceList = [
+                  'Querés especializarte y mejorar tus ingresos.',
+                  'Buscás una salida laboral con alta demanda.',
+                  'Deseas aprender con clases 100% prácticas.'
+              ];
+          }
+      }
 
-      if (!this.isCelularCourse) {
-          this.pressLinks = [];
-          this.galleryImages = [
-              this.course.image_url || 'assets/img/cursos/academy/cursos.jpeg'
+      // Modules (Syllabus)
+      if (t.includes('angular') || t.includes('programación') || t.includes('software') || t.includes('web')) {
+          this.courseModules = [
+              { title: 'Contexto e Introducción', lessons: [{ name: 'Fundamentos de la tecnología', duration: '05:30 min' }, { name: 'Configuración del entorno', duration: '10:15 min' }, { name: 'Arquitectura base', duration: '08:45 min' }] },
+              { title: 'Estructura y Componentes', lessons: [{ name: 'Creación de componentes', duration: '12:00 min' }, { name: 'Comunicación entre capas', duration: '15:20 min' }, { name: 'Manejo de estado', duration: '09:10 min' }] },
+              { title: 'Diseño y Patrones', lessons: [{ name: 'Principios SOLID', duration: '18:40 min' }, { name: 'Patrones de diseño aplicados', duration: '14:15 min' }] },
+              { title: 'Proyecto Final', lessons: [{ name: 'Construcción del proyecto', duration: '25:00 min' }, { name: 'Despliegue a producción', duration: '11:30 min' }] }
+          ];
+      } else if (t.includes('barber') || t.includes('corte')) {
+          this.courseModules = [
+              { title: 'Introducción a la Barbería', lessons: [{ name: 'Herramientas del barbero', duration: '08:00 min' }, { name: 'Higiene y seguridad', duration: '06:30 min' }] },
+              { title: 'Técnicas de Corte', lessons: [{ name: 'Corte a máquina y peines', duration: '15:45 min' }, { name: 'Técnica de Fade (Degradado)', duration: '22:10 min' }] },
+              { title: 'Perfilado y Barba', lessons: [{ name: 'Diseño de barba', duration: '12:20 min' }, { name: 'Uso de la navaja', duration: '10:15 min' }] },
+              { title: 'Práctica Profesional', lessons: [{ name: 'Atención al cliente', duration: '07:30 min' }, { name: 'Administración de la barbería', duration: '09:00 min' }] }
+          ];
+      } else if (t.includes('celular') || t.includes('microelectr')) {
+          this.courseModules = [
+              { title: 'Fundamentos', lessons: [{ name: 'Reconocimiento de partes', duration: '10:00 min' }, { name: 'Uso del multímetro', duration: '14:20 min' }] },
+              { title: 'Desarme y Ensamblaje', lessons: [{ name: 'Apertura de equipos', duration: '18:15 min' }, { name: 'Cambio de módulos (Pantallas)', duration: '25:00 min' }] },
+              { title: 'Microelectrónica', lessons: [{ name: 'Soldadura SMD', duration: '20:45 min' }, { name: 'Diagnóstico de placas', duration: '30:00 min' }] },
+              { title: 'Software', lessons: [{ name: 'Flasheo y sistemas operativos', duration: '15:30 min' }, { name: 'Bypass y seguridad', duration: '12:00 min' }] }
+          ];
+      } else {
+          // Generic dynamic modules
+          this.courseModules = [
+              { title: 'Introducción al curso', lessons: [{ name: 'Conceptos básicos', duration: '05:00 min' }, { name: 'Preparación', duration: '07:30 min' }] },
+              { title: 'Desarrollo de habilidades', lessons: [{ name: 'Técnicas fundamentales', duration: '15:00 min' }, { name: 'Aplicación práctica', duration: '20:00 min' }] },
+              { title: 'Especialización', lessons: [{ name: 'Casos avanzados', duration: '18:30 min' }, { name: 'Resolución de problemas', duration: '12:15 min' }] },
+              { title: 'Cierre', lessons: [{ name: 'Proyecto final', duration: '25:00 min' }, { name: 'Conclusión', duration: '05:00 min' }] }
           ];
       }
 
-      this.inclusions = [
-          { icon: 'fas fa-laptop', text: 'Aula Virtual 24/7' },
-          { icon: 'fas fa-file-pdf', text: 'Material PDF' },
-          { icon: 'fas fa-video', text: 'Clases Grabadas' },
-          { icon: 'fas fa-certificate', text: 'Certificado Oficial' },
-          { icon: 'fas fa-users', text: 'Comunidad VIP' },
-          { icon: 'fas fa-briefcase', text: 'Bolsa de Trabajo' }
-      ];
-
-      this.faqs = [
-          { question: '¿Necesito experiencia previa?', answer: 'No, el curso inicia desde cero absoluto. Te guiamos paso a paso.' },
-          { question: '¿Qué herramientas necesito?', answer: 'Durante la cursada proveemos todo lo necesario en clase. Solo necesitas ganas de aprender.' },
-          { question: '¿Realmente voy a poder trabajar de esto después?', answer: 'Sí. El enfoque es 100% práctico para que salgas con la confianza de trabajar de forma autónoma.' },
-          { question: '¿Entregan certificado?', answer: 'Sí, entregamos certificado de asistencia y aprobación al finalizar el curso.' },
-          { question: '¿Puedo pagar en cuotas?', answer: 'Sí, aceptamos todas las tarjetas y ofrecemos financiación propia.' }
+      // Reviews
+      this.courseReviews = [
+          { name: 'Juan Carlos', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Juan' + seededRandom(t), rating: 5, date: 'Hace 2 semanas', comment: 'Excelente contenido y explicación del docente. El profesor es muy claro en lo que enseña, literal se siente como si lo llevara a uno de la mano.' },
+          { name: 'María Gómez', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria' + seededRandom(t), rating: 5, date: 'Hace 1 mes', comment: 'Lo mejor fue lo claro y preciso en los conceptos que el profesor expresó a lo largo de este maravilloso curso. 100% recomendado para entrar al mercado laboral.' },
+          { name: 'Carlos Ruíz', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos' + seededRandom(t), rating: 4, date: 'Hace 2 meses', comment: 'Muy buen nivel técnico. Pude aplicar los conocimientos de inmediato en mi trabajo. Me gustaría que dure un poco más, pero la calidad es excelente.' }
       ];
 
       if (this.course) this.setSEO(this.course);
       this.loadModules(this.course!.id);
       this.loading = false;
+      this.cd.detectChanges();
+  }
+
+  newCommentText = '';
+  newCommentRating = 5;
+
+  submitComment() {
+      if (!this.newCommentText.trim()) return;
+
+      const profile = this.authService.getCurrentProfile();
+      let name = 'Estudiante';
+      if (profile) {
+          name = profile.full_name || profile.display_name || profile.first_name || profile.email || 'Estudiante';
+      }
+      
+      const avatar = profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.replace(/\s+/g, '')}`;
+
+      this.courseReviews.unshift({
+          name,
+          avatar,
+          rating: this.newCommentRating,
+          date: 'Hace un momento',
+          comment: this.newCommentText
+      });
+
+      this.newCommentText = '';
+      this.newCommentRating = 5;
       this.cd.detectChanges();
   }
 
@@ -242,7 +312,7 @@ export class CourseDetailComponent implements OnInit {
               level: CourseLevel.INTERMEDIATE,
               students: 230,
               rating: 4.9,
-              status: 'published',
+              status: 'PUBLISHED',
               is_active: true
           },
           {
@@ -257,7 +327,7 @@ export class CourseDetailComponent implements OnInit {
               level: CourseLevel.ADVANCED,
               students: 85,
               rating: 5.0,
-              status: 'published',
+              status: 'PUBLISHED',
               is_active: true
           },
           {
@@ -272,7 +342,7 @@ export class CourseDetailComponent implements OnInit {
               level: CourseLevel.BASIC,
               students: 60,
               rating: 4.8,
-              status: 'published',
+              status: 'PUBLISHED',
               is_active: true
           },
           {
@@ -287,7 +357,7 @@ export class CourseDetailComponent implements OnInit {
               level: CourseLevel.BASIC,
               students: 80,
               rating: 4.9,
-              status: 'published',
+              status: 'PUBLISHED',
               is_active: true
           }
       ];

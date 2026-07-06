@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { branchAdminGuard } from '@app/guards/branch-admin.guard';
+import { instructorGuard } from '@app/guards/instructor.guard';
 
 export const routes: Routes = [
     {
@@ -17,6 +18,12 @@ export const routes: Routes = [
         title: 'Upgrade Requerido',
         path: 'upgrade-required',
         loadComponent: () => import('@app/shared/components/upgrade-required/upgrade-required.component').then(m => m.UpgradeRequiredComponent)
+    },
+    {
+        title: 'Portal de Instructor',
+        path: 'instructor',
+        canActivate: [instructorGuard],
+        loadChildren: () => import('./instructor/instructor.routes')
     },
     {
         title: 'Pago Requerido',

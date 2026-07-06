@@ -18,7 +18,7 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
   const branchService = inject(BranchService);
   const router = inject(Router);
 
-  console.log('🔍 branchAdminGuard - Checking access for:', state.url);
+  // console.log('🔍 branchAdminGuard - Checking access for:', state.url);
   
   try {
     const authState = await firstValueFrom(

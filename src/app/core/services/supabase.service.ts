@@ -36,7 +36,7 @@ export class SupabaseService {
         }
       }
 
-      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+      const isOffline = (typeof navigator !== 'undefined' && !navigator.onLine) || (typeof window !== 'undefined' && (window as any).forceOffline);
 
       if (isOffline) {
         if (isCacheable) {
@@ -157,9 +157,9 @@ export class SupabaseService {
       environment.supabaseUrl,
       environment.supabaseKey,
       {
-        /* global: {
+        global: {
           fetch: customFetch
-        }, */
+        },
         realtime: {
           params: {
             eventsPerSecond: 2,

@@ -116,11 +116,24 @@ export class AuthService {
 
   private async initAuth() {
     try {
-      const { data: { session }, error } = await this.supabase.auth.getSession();
+      let { data: { session }, error } = await this.supabase.auth.getSession();
       
+      if (typeof navigator !== 'undefined' && !navigator.onLine && !session) {
+        // Fallback: manually read from local storage
+        const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        if (storageKey) {
+           const storedSession = JSON.parse(localStorage.getItem(storageKey) || '{}');
+           if (storedSession?.session) {
+               session = storedSession.session;
+               error = null;
+               this.logger.info('Recovered session from localStorage for offline mode');
+           }
+        }
+      }
+
       if (error) {
         this.logger.error('Session retrieval error', error);
-        if (error.message.includes('Refresh Token')) {
+        if (error.message.includes('Refresh Token') && navigator.onLine) {
            await this.supabase.auth.signOut();
         }
       }
@@ -256,8 +269,16 @@ export class AuthService {
    */
   private async ensureProfile(session: Session): Promise<UserProfile | null> {
     try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
+        if (cached) return JSON.parse(cached);
+      }
+
       const existingProfile = await this.profileService.getProfile(session.user.id);
-      if (existingProfile) return existingProfile;
+      if (existingProfile) {
+         localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
+         return existingProfile;
+      }
 
       const meta = session.user.user_metadata || {};
       const tenantId = this.tenantService.getTenantId();
@@ -298,14 +319,14 @@ export class AuthService {
 
       this.logger.info(`Profile auto-created for user ${session.user.id}`);
       
-      const createdProfile = data as UserProfile | null;
-      if (createdProfile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(createdProfile.email || '') || createdProfile.role === 'super_admin')) {
-        this.isSuperAdmin.set(true);
+      if (data) {
+        localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(data));
       }
-      
-      return createdProfile;
-    } catch (err) {
-      this.logger.error('ensureProfile error', err);
+      return data as UserProfile;
+    } catch (e) {
+      this.logger.error('Unexpected error ensuring profile', e);
+      const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
+      if (cached) return JSON.parse(cached);
       return null;
     }
   }

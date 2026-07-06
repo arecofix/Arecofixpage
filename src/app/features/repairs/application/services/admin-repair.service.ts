@@ -102,7 +102,7 @@ export class AdminRepairService {
         let customerId = dto.customer_id;
         
         if (!customerId && dto.customer_name) {
-            console.log('🔍 [AdminRepairService] Resolviendo cliente por email/teléfono...');
+            // console.log('🔍 [AdminRepairService] Resolviendo cliente por email/teléfono...');
             
             // Try to find existing first
             const existing = await this.customerService.findByEmailOrPhone(
@@ -111,10 +111,10 @@ export class AdminRepairService {
             );
 
             if (existing) {
-                console.log('✅ [AdminRepairService] Cliente existente encontrado:', existing.id);
+                // console.log('✅ [AdminRepairService] Cliente existente encontrado:', existing.id);
                 customerId = existing.id;
             } else {
-                console.log('🆕 [AdminRepairService] Creando nuevo cliente vía RPC...');
+                // console.log('🆕 [AdminRepairService] Creando nuevo cliente vía RPC...');
                 const nameParts = dto.customer_name.trim().split(' ');
                 const fn = nameParts[0] || '';
                 const ln = nameParts.slice(1).join(' ') || '';
@@ -288,7 +288,7 @@ export class AdminRepairService {
         // Fire-and-forget: CORS will fail in local dev (localhost not in Edge Function allowlist).
         // This must never throw — it's a best-effort notification only.
         this.whatsappService.sendTextMessage(phone, message).subscribe({
-            next: () => console.log(`[WhatsApp] ✅ Notification sent for event: ${event}`),
+            next: () => { /* console.log(`[WhatsApp] ✅ Notification sent for event: ${event}`) */ },
             error: (err) => {
                 // Dev-only: CORS is expected on localhost. Suppress noise in prod too —
                 // WhatsApp notification failure should never break the repair workflow.

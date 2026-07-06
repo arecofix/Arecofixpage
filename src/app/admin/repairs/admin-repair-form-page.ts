@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, from, catchError, of, finalize, firstValueFrom } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '@app/core/services/auth.service';
 import { CompanyService } from '@app/core/services/company.service';
 import { BranchService } from '@app/core/services/branch.service';
@@ -20,10 +21,6 @@ import { RepairCalculatorService } from '@app/features/repairs/application/servi
 import { SupabaseService } from '@app/core/services/supabase.service';
 import { OfflineSyncService } from '@app/core/services/offline-sync.service';
 
-import { RepairCustomerSectionComponent } from './components/repair-customer-section.component';
-import { RepairDeviceSectionComponent } from './components/repair-device-section.component';
-import { RepairPartsSectionComponent } from './components/repair-parts-section.component';
-import { RepairFinanceSectionComponent } from './components/repair-finance-section.component';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
@@ -40,11 +37,7 @@ interface ClientView extends Partial<UserProfile> {
         CommonModule, 
         FormsModule, 
         ReactiveFormsModule,
-        RouterLink,
-        RepairCustomerSectionComponent,
-        RepairDeviceSectionComponent,
-        RepairPartsSectionComponent,
-        RepairFinanceSectionComponent
+        RouterLink
     ],
     templateUrl: './admin-repair-form-page.html',
 })
@@ -57,7 +50,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private companyService = inject(CompanyService);
-    private branchService = inject(BranchService);
+    public branchService = inject(BranchService);
     private repairService = inject(AdminRepairService);
     private productService = inject(AdminProductService);
     private auth = inject(AuthService);
@@ -70,8 +63,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     private repairWorkflowService = inject(RepairWorkflowService);
     private repairCalculator = inject(RepairCalculatorService);
     private supabaseService = inject(SupabaseService);
-    private offlineSyncService = inject(OfflineSyncService);
+    public offlineSyncService = inject(OfflineSyncService);
     private adminLayout = inject(AdminLayout, { optional: true });
+    private destroyRef = inject(DestroyRef);
 
     repairForm!: FormGroup;
 
@@ -114,13 +108,38 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         upsell_vidrio: false,
         glass_upsell: false,
         whatsapp_notifications: true,
-        costo_repuesto: 0,
-        client_id: '',
-        device_id: ''
+        costo_repuesto: 0
     };
 
     // Keep some UI-only signals
     showProductModal = signal(false);
+    showNotifyModal = signal(false);
+    selectedNotifyStatus = signal<number | null>(null);
+
+    notifyStatuses = signal([
+        { id: 5, label: 'Listo', sublabel: 'Avisa que puede retirar', icon: 'fas fa-check-circle', color: 'text-green-500', activeClass: 'border-green-500 bg-green-50/50 dark:bg-green-500/10', iconBgActive: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400' },
+        { id: 6, label: 'Entregado', sublabel: 'Marca como retirado', icon: 'fas fa-box-open', color: 'text-blue-500', activeClass: 'border-blue-500 bg-blue-50/50 dark:bg-blue-500/10', iconBgActive: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' },
+        { id: 2, label: 'En Presupuesto', sublabel: 'Notifica presupuesto', icon: 'fas fa-search-dollar', color: 'text-yellow-500', activeClass: 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-500/10', iconBgActive: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400' }
+    ]);
+
+    notifyPreviewMessage = computed(() => {
+        const statusId = this.selectedNotifyStatus();
+        const customerName = this.repairForm?.get('customer_name')?.value || 'Cliente';
+        const device = this.repairForm?.get('device_model')?.value || 'Equipo';
+        const cost = this.repairForm?.get('final_cost')?.value || 0;
+        
+        if (!statusId) return 'Selecciona un estado para ver la vista previa...';
+        
+        if (statusId === 5) {
+            return `¡Hola ${customerName}! Te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost}. ¡Te esperamos!`;
+        }
+        if (statusId === 2) {
+            return `¡Hola ${customerName}! Tenemos el presupuesto para tu ${device}. Por favor comunicate con nosotros para confirmarlo.`;
+        }
+        return `Notificación para el estado seleccionado...`;
+    });
+
+    readonly TAX_RATE = 0.21;
     searchQuery = signal('');
     parts = signal<import('../../features/repairs/domain/entities/repair.entity').RepairPart[]>([]);
     images = signal<string[]>([]);
@@ -155,7 +174,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     }),
                     finalize(() => this.searchingProducts.set(false))
                 );
-            })
+            }),
+            takeUntilDestroyed(this.destroyRef)
         ).subscribe(response => {
             this.filteredProducts.set((response.data || []) as unknown as Product[]);
             this.searchingProducts.set(false);
@@ -175,7 +195,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                         return of([]);
                     })
                 );
-            })
+            }),
+            takeUntilDestroyed(this.destroyRef)
         ).subscribe(data => {
             if (data) {
                 this.clients.set(data.map(c => this.clientView(c as any)));
@@ -190,10 +211,11 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         this.productSearch$.next('');
     }
 
-    loading = signal(true);
-    saving = signal(false);
+    saving = signal<boolean>(false);
     error = signal<string | null>(null);
-    company = signal<unknown>(null); // Company settings are quite dynamic, can keep any or define interface
+    loading = signal<boolean>(true);
+    company = signal<unknown>(null);
+    // Removed duplicate properties
     uploadingImages = signal(false);
     clients = signal<ClientView[]>([]);
 
@@ -247,8 +269,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             glass_upsell: [false],
             whatsapp_notifications: [true],
             costo_repuesto: [0],
-            client_id: [''],
-            device_id: [''],
             tracking_code: [''],
             repair_number: [0]
         });
@@ -476,9 +496,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     upsell_vidrio: data.upsell_vidrio,
                     glass_upsell: data.glass_upsell,
                     whatsapp_notifications: data.whatsapp_notifications,
-                    costo_repuesto: data.costo_repuesto,
-                    client_id: data.client_id,
-                    device_id: data.device_id
+                    costo_repuesto: data.costo_repuesto
                 });
 
                 if (data.checklist) {
@@ -494,8 +512,36 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         }
     }
 
+    syncOfflineRepairs() {
+        this.offlineSyncService.syncAll().then(() => {
+            this.notificationService.showSuccess(`¡Órdenes sincronizadas con éxito!`);
+        }).catch(err => {
+            this.notificationService.showError(`Error al sincronizar.`);
+        });
+    }
+
+    sendStatusNotification() {
+        const statusId = this.selectedNotifyStatus();
+        if (!statusId) return;
+        
+        const phone = this.repairForm.get('customer_phone')?.value;
+        if (!phone) {
+            this.notificationService.showWarning('El cliente no tiene teléfono cargado.');
+            return;
+        }
+
+        this.repairForm.patchValue({ current_status_id: statusId });
+        this.save();
+        this.showNotifyModal.set(false);
+    }
+    
+    openNotifyModal() {
+        this.showNotifyModal.set(true);
+    }
+    
     async save() {
         console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
+        (window as any).saveCalled = true;
         this.saving.set(true);
         this.error.set(null);
 
@@ -537,6 +583,16 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 else if (this.repairForm.get('device_model')?.invalid) firstError = 'El modelo del equipo es obligatorio.';
                 else if (this.repairForm.get('issue_description')?.invalid) firstError = 'La falla es obligatoria.';
                 
+                // Scroll to the first invalid element
+                setTimeout(() => {
+                    const firstInvalidElement = document.querySelector('input.ng-invalid, select.ng-invalid, textarea.ng-invalid');
+                    if (firstInvalidElement) {
+                        firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Add a small shake animation or highlight if needed, or just let the red border do its job
+                        (firstInvalidElement as HTMLElement).focus();
+                    }
+                }, 100);
+
                 this.notificationService.showError('⚠️ ' + firstError);
                 this.saving.set(false);
                 return;

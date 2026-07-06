@@ -28,7 +28,7 @@ export class LeadMagnetComponent {
 
       // TODO: Lógica para enviar los datos al backend (Supabase, Firebase, etc.)
       const formData = this.leadForm.value;
-      console.log('Datos capturados Listos para enviar:', formData);
+      // console.log('Datos capturados Listos para enviar:', formData);
 
       // Simulamos un breve tiempo de procesamiento (e.g. guardando en DB) y luego disparamos la descarga
       setTimeout(() => {

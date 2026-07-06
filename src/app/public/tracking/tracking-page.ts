@@ -71,6 +71,28 @@ export class TrackingPage implements OnInit {
 
     baseUrl = environment.baseUrl;
 
+    // Tracking steps definition â€” 5 main repair stages
+    trackingSteps = [
+        { id: 1, shortLabel: 'Diagnóstico', label: 'Proceso de Diagnóstico', icon: 'fas fa-microscope' },
+        { id: 2, shortLabel: 'Repuestos',   label: 'Logística de Repuestos',  icon: 'fas fa-boxes' },
+        { id: 3, shortLabel: 'Reparación',  label: 'En Reparación',           icon: 'fas fa-tools' },
+        { id: 4, shortLabel: 'Revisión',    label: 'Revisión del Arreglo',    icon: 'fas fa-clipboard-check' },
+        { id: 5, shortLabel: 'Finalizado',  label: 'Reparación Finalizada',   icon: 'fas fa-check-circle' }
+    ];
+
+    /** Returns % width for the progress bar (0-100) for steps 1-5 */
+    getProgressPercent(statusId: number): number {
+        if (statusId <= 1) return 0;
+        if (statusId >= 5) return 100;
+        return (statusId - 1) * 25;
+    }
+
+    /** Returns the label of the current active step for mobile view */
+    getCurrentStepLabel(statusId: number): string {
+        const step = this.trackingSteps.find(s => s.id === statusId);
+        return step ? step.label : '';
+    }
+
     qrCodeUrl = computed(() => {
         const r = this.repair();
         if (!r) return '';
@@ -135,7 +157,7 @@ export class TrackingPage implements OnInit {
 
     private async updateSeo(r: PublicRepairDto) {
         const statusName = r.status_label;
-        let imageUrl = 'assets/img/branding/og-services.jpg';
+        let imageUrl = 'assets/img/branding/og-services.png';
 
         try {
             const settings = await this.companyService.getSettings();

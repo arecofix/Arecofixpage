@@ -23,14 +23,15 @@ import { AutoFocusDirective } from '@app/shared/directives/auto-focus.directive'
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
+import { CoursesService, Course } from '@app/core/services/courses.service';
 import { Category } from '@app/features/products/domain/entities/category.entity';
 import { NavItem } from '@app/shared/models/navigation.model';
 import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/models/navigation.data';
 import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
 import { ThemeToggleComponent } from '@app/shared/components/theme-toggle/theme-toggle.component';
 import { SearchUtils } from '@app/shared/utils/search.utils';
-import { map } from 'rxjs/operators';
-import { Subscription, firstValueFrom } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
+import { Subscription, firstValueFrom, of } from 'rxjs';
 
 import { NavigationStateService } from '@app/core/services/navigation-state.service';
 
@@ -67,8 +68,13 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private productRepo = inject(ProductRepository);
   private categoryRepo = inject(CategoryRepository);
+  private coursesService = inject(CoursesService);
 
-  public user$ = this.authService.authState$.pipe(map((state) => state.user));
+  public user$ = this.authService.authState$.pipe(map((state) => state.profile || (state.user as any)));
+
+  get isAcademyMode(): boolean {
+    return this.router.url.includes('/academy');
+  }
 
   /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
   public searchFocusRequested = signal(false);
@@ -96,6 +102,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   // ── Search Logic (OPTIMIZED: Server-side search) ──────────────────
   public searchQuery = signal('');
   public products = signal<Product[]>([]);
+  public coursesResults = signal<Course[]>([]);
   public showResults = signal(false);
   public isSearching = signal(false);
 
@@ -211,25 +218,54 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
 
     // Debounced search — fetch results from the server on demand
     this.subscriptions.add(
-      this.searchService.debouncedQuery$.subscribe(async (term) => {
-        this.searchQuery.set(term);
-        this.showResults.set(!!term);
-        
-        if (term && term.length > 1) {
-          this.isSearching.set(true);
-          try {
-            const results = await firstValueFrom(this.productRepo.search(term));
-            this.products.set(results.slice(0, 10)); // Take top results
-          } catch (err) {
-            console.error('Search error:', err);
-          } finally {
+      this.searchService.debouncedQuery$.pipe(
+        switchMap((term) => {
+          this.searchQuery.set(term);
+          this.showResults.set(!!term);
+          
+          if (term && term.length > 1) {
+            this.isSearching.set(true);
+            this.cdr.markForCheck();
+            
+            if (this.isAcademyMode) {
+              return this.coursesService.getCourses().pipe(
+                map(res => {
+                  const filtered = (res.data || []).filter(c => c.title.toLowerCase().includes(term.toLowerCase()));
+                  this.coursesResults.set(filtered.slice(0, 10));
+                  this.isSearching.set(false);
+                  this.cdr.markForCheck();
+                }),
+                catchError(err => {
+                  console.error('Search error:', err);
+                  this.isSearching.set(false);
+                  this.cdr.markForCheck();
+                  return of(null);
+                })
+              );
+            } else {
+              return this.productRepo.search(term).pipe(
+                map(results => {
+                  this.products.set(results.slice(0, 10)); // Take top results
+                  this.isSearching.set(false);
+                  this.cdr.markForCheck();
+                }),
+                catchError(err => {
+                  console.error('Search error:', err);
+                  this.isSearching.set(false);
+                  this.cdr.markForCheck();
+                  return of(null);
+                })
+              );
+            }
+          } else {
+            this.products.set([]);
+            this.coursesResults.set([]);
             this.isSearching.set(false);
+            this.cdr.markForCheck();
+            return of(null);
           }
-        } else {
-          this.products.set([]);
-        }
-        this.cdr.markForCheck();
-      })
+        })
+      ).subscribe()
     );
   }
 
@@ -252,6 +288,23 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     } else if (scrollDelta < 0) {
       this.showNavbar();
       this.lastScrollTop = currentScroll;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!isPlatformBrowser(this.platformId) || !this.showResults()) return;
+    
+    const target = event.target as HTMLElement;
+    const searchWrapper = document.querySelector('.desktop-search-wrapper');
+    const mobileSearchWrapper = document.querySelector('.mobile-search-wrapper');
+    
+    const clickedInsideDesktop = searchWrapper && searchWrapper.contains(target);
+    const clickedInsideMobile = mobileSearchWrapper && mobileSearchWrapper.contains(target);
+    
+    if (!clickedInsideDesktop && !clickedInsideMobile) {
+      this.showResults.set(false);
+      this.cdr.markForCheck();
     }
   }
 
@@ -332,12 +385,28 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     this.showResults.set(!!this.searchQuery());
   }
 
+  public onSearchFocus(): void {
+    if (this.searchQuery().length > 1) {
+      this.showResults.set(true);
+    }
+  }
+
+  public clearSearch(): void {
+    this.searchQuery.set('');
+    this.showResults.set(false);
+    this.searchService.updateQuery('');
+  }
+
   public goToSearch(): void {
     const query = this.searchQuery().trim();
     if (query) {
       this.showResults.set(false);
       this.closeMobileMenu();
-      this.router.navigate(['/productos'], { queryParams: { q: query, _page: 1 } });
+      if (this.isAcademyMode) {
+        this.router.navigate(['/academy'], { queryParams: { q: query } });
+      } else {
+        this.router.navigate(['/productos'], { queryParams: { q: query, _page: 1 } });
+      }
     }
   }
 
@@ -371,8 +440,17 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   public selectProduct(product: Product) {
     this.searchQuery.set('');
     this.showResults.set(false);
+    this.searchService.updateQuery('');
     this.closeMobileMenu();
     this.router.navigate(['/productos/detalle', product.slug || product.id]);
+  }
+
+  public selectCourse(course: Course) {
+    this.searchQuery.set('');
+    this.showResults.set(false);
+    this.searchService.updateQuery('');
+    this.closeMobileMenu();
+    this.router.navigate(['/academy', course.slug || course.id]);
   }
 
   // ── Auth ──────────────────────────────────────────
@@ -380,10 +458,21 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     try {
       await this.authService.signOut();
       this.cdr.markForCheck();
-      this.router.navigate(['/login']);
+      this.goToRoute('/login');
     } catch (err) {
       console.error('Error during logout:', err);
     }
+  }
+
+  // ── Navigation Helper ─────────────────────────────
+  public goToRoute(route: string) {
+    if (isPlatformBrowser(this.platformId)) {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    }
+    this.closeMobileMenu();
+    this.router.navigate([route]);
   }
 
   // ── Theme Helpers (for template) ──────────────────

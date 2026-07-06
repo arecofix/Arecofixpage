@@ -163,7 +163,8 @@
                  </div>
             } @else {
                  <div class="border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm">
-                      <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
+                      <div class="overflow-x-auto w-full">
+<table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
                           <thead class="bg-gray-50 dark:bg-gray-900 font-medium text-gray-500 dark:text-gray-400 uppercase text-[10px] tracking-wider">
                               <tr>
                                   <th class="py-3 px-4">Componente</th>
@@ -202,6 +203,7 @@
                               }
                           </tbody>
                       </table>
+</div>
                  </div>
             }
 
@@ -289,7 +291,7 @@
                 <input type="text" [ngModel]="newProductForm().sku" (ngModelChange)="updateNewProductField('sku', $event)" class="input input-bordered w-full rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 border-gray-200 dark:border-gray-700 font-mono tracking-wider focus:border-emerald-300 dark:focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition-all text-gray-800 dark:text-gray-200 shadow-sm" placeholder="SAM-A52-MOD-ORG" />
             </div>
 
-            <div class="grid grid-cols-2 gap-4 pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div class="form-control">
                     <label class="label pb-1.5"><span class="label-text font-bold text-gray-500 uppercase text-[10px] tracking-widest">Costo Pago ($)</span></label>
                     <input type="number" [ngModel]="newProductForm().unit_cost" (ngModelChange)="updateNewProductField('unit_cost', $event)" class="input input-bordered w-full rounded-xl bg-gray-50 dark:bg-gray-900 focus:bg-white dark:focus:bg-gray-800 border-gray-200 dark:border-gray-700 font-mono font-bold focus:border-emerald-300 dark:focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition-all text-gray-800 dark:text-gray-200 shadow-sm" min="0" placeholder="0" />

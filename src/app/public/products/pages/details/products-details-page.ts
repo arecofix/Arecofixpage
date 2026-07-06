@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -184,7 +184,7 @@ export class ProductsDetailsPage {
       { label: 'Productos', url: '/productos' },
     ];
 
-    // Build clickable path for every ancestor in root→leaf order
+    // Build clickable path for every ancestor in rootâ†’leaf order
     if (ancestorChain && ancestorChain.length > 0) {
       ancestorChain.forEach((cat, idx) => {
         const slugPath = ancestorChain
@@ -204,7 +204,7 @@ export class ProductsDetailsPage {
     }
 
     if (product) {
-      items.push({ label: product.name }); // Current page — no link
+      items.push({ label: product.name }); // Current page â€” no link
     }
 
     return items;
@@ -223,9 +223,10 @@ export class ProductsDetailsPage {
           }).pipe(
             map(response => {
               const fallbackItem = this.fallbackService.getFallbackProduct(slug);
+              let productToUse = null;
 
               if ((!response.data || response.data.length === 0) && fallbackItem) {
-                // Return fallback item if DB empty and we have a fallback
+                productToUse = fallbackItem;
                 const fallbackResponse: ProductsResponse = {
                   data: [fallbackItem],
                   items: 1,
@@ -235,14 +236,18 @@ export class ProductsDetailsPage {
                   prev: undefined,
                   next: undefined
                 };
-                return fallbackResponse;
+                response = fallbackResponse;
+              } else if (response.data && response.data.length > 0) {
+                productToUse = response.data[0];
               }
 
-              // If product not found at all, navigate to global 404 page
-              if (!response.data || response.data.length === 0) {
+              if (!productToUse) {
                 const router = this.injector.get(Router);
                 router.navigate(['/404'], { skipLocationChange: true });
+              } else {
+                this.updateSeoTags(productToUse);
               }
+              
               return response;
             })
           );
@@ -291,6 +296,42 @@ export class ProductsDetailsPage {
   // Signal for the currently selected image to display
   selectedImage = signal<string | null>(null);
 
+  updateSeoTags(product: Product) {
+    // â”€â”€ SEO / Open Graph / WhatsApp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    let absoluteImageUrl = product.image_url || '';
+    
+    // Validation: Ensure we don't use detail pages OR non-images as OG images
+    const isRecursive = absoluteImageUrl.includes('/detalle/') || absoluteImageUrl.includes('/posts/');
+
+    if (!absoluteImageUrl || isRecursive) {
+      absoluteImageUrl = `assets/img/branding/og-services.png`;
+    }
+
+    const productDescription = product.description
+      ? product.description.slice(0, 155) + (product.description.length > 155 ? '...' : '')
+      : `Comprá ${product.name} al mejor precio en Arecofix. Stock disponible con garantía.`;
+
+    const nameKeywords = product.name
+      .toLowerCase()
+      .replace(/[^a-z0-9áéíóúñ ]/g, '')
+      .split(' ')
+      .filter(w => w.length > 3)
+      .join(', ');
+
+    // Set all standard + social meta tags via SeoService
+    this.seoService.setPageData({
+      title: product.name,
+      description: productDescription,
+      imageUrl: absoluteImageUrl,
+      type: 'product',
+      url: `/productos/detalle/${product.slug}`,
+      keywords: `repuesto, módulo, pantalla, repair, arecofix, ${nameKeywords}`,
+      twitterCard: 'summary_large_image',
+    });
+    // â”€â”€ JSON-LD Product Schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    this.injectProductSchema(product, absoluteImageUrl);
+  }
+
   constructor() {
     toObservable(this.product, { injector: this.injector }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(product => {
       if (!product) return;
@@ -301,40 +342,6 @@ export class ProductsDetailsPage {
       }
 
       this.loadReviews(product.id);
-
-      // ── SEO / Open Graph / WhatsApp ────────────────────────────────────────
-      let absoluteImageUrl = product.image_url || '';
-      
-      // Validation: Ensure we don't use detail pages OR non-images as OG images
-      const isRecursive = absoluteImageUrl.includes('/detalle/') || absoluteImageUrl.includes('/posts/');
-
-      if (!absoluteImageUrl || isRecursive) {
-        absoluteImageUrl = `assets/img/branding/og-services.jpg`;
-      }
-
-      const productDescription = product.description
-        ? product.description.slice(0, 155) + (product.description.length > 155 ? '...' : '')
-        : `Comprá ${product.name} al mejor precio en Arecofix. Stock disponible con garantía.`;
-
-      const nameKeywords = product.name
-        .toLowerCase()
-        .replace(/[^a-z0-9áéíóúñ ]/g, '')
-        .split(' ')
-        .filter(w => w.length > 3)
-        .join(', ');
-
-      // Set all standard + social meta tags via SeoService
-      this.seoService.setPageData({
-        title: product.name,
-        description: productDescription,
-        imageUrl: absoluteImageUrl,
-        type: 'product',
-        url: `/productos/detalle/${product.slug}`,
-        keywords: `repuesto, módulo, pantalla, repair, arecofix, ${nameKeywords}`,
-        twitterCard: 'summary_large_image',
-      });
-      // ── JSON-LD Product Schema ──────────────────────────────────────────────
-      this.injectProductSchema(product, absoluteImageUrl);
     });
   }
 
