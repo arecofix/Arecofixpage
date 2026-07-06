@@ -57,7 +57,7 @@ export class AdminPostService {
     }
 
     async createPost(payload: Partial<Post>): Promise<void> {
-        console.log('AdminPostService.createPost called with payload', payload);
+        // console.log('AdminPostService.createPost called with payload', payload);
         const dbPayload: any = {
             title: payload.title,
             slug: payload.slug,
@@ -70,17 +70,17 @@ export class AdminPostService {
             tenant_id: this.tenantService.getTenantId()
         };
 
-        console.log('Executing supabase insert with payload:', dbPayload);
+        // console.log('Executing supabase insert with payload:', dbPayload);
         const { error } = await this.supabase.from('blog_posts').insert(dbPayload).select();
-        console.log('Supabase insert finished. Error:', error);
+        // console.log('Supabase insert finished. Error:', error);
         
         if (error) throw error;
         this.postsStore.clearCache();
-        console.log('Cache cleared successfully.');
+        // console.log('Cache cleared successfully.');
     }
 
     async updatePost(id: string, payload: Partial<Post>): Promise<void> {
-        console.log('AdminPostService.updatePost called with id:', id, 'payload:', payload);
+        // console.log('AdminPostService.updatePost called with id:', id, 'payload:', payload);
         const dbPayload: any = {
             title: payload.title,
             slug: payload.slug,
@@ -92,7 +92,7 @@ export class AdminPostService {
             template: payload.template || 'modern'
         };
 
-        console.log('Executing supabase update with payload:', dbPayload);
+        // console.log('Executing supabase update with payload:', dbPayload);
         
         const updatePromise = this.supabase.from('blog_posts')
             .update(dbPayload)
@@ -106,7 +106,7 @@ export class AdminPostService {
 
         const { error } = await Promise.race([updatePromise, timeoutPromise]);
             
-        console.log('Supabase update finished. Error:', error);
+        // console.log('Supabase update finished. Error:', error);
         if (error) throw error;
         this.postsStore.clearCache();
     }

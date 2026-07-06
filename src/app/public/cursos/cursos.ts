@@ -54,6 +54,9 @@ export class CursosComponent implements OnInit {
     coursesError = signal<string | null>(null);
 
     // Filter Signals
+    searchQuery = signal('');
+    selectedLevel = signal<string>('');
+    maxPrice = signal<number | null>(null);
     sort = signal('created_at');
     order = signal<'asc' | 'desc'>('desc');
 
@@ -184,17 +187,31 @@ export class CursosComponent implements OnInit {
         });
     }
 
-    // Split courses for UI
-    featuredCoursesList = computed(() => {
-        // Use courses that have 'is_featured' true, or just the first two
-        const all = this.courses();
-        const featured = all.filter(c => c.is_featured);
-        return featured.length > 0 ? featured : all.slice(0, 2);
-    });
+    // Combined Filtered List
+    filteredCoursesList = computed(() => {
+        let list = this.courses();
+        const search = this.searchQuery().toLowerCase();
+        const level = this.selectedLevel();
+        const price = this.maxPrice();
 
-    regularCoursesList = computed(() => {
-        const featured = this.featuredCoursesList();
-        return this.courses().filter(c => !featured.find(f => f.id === c.id));
+        if (search) {
+            list = list.filter(c => 
+                c.title?.toLowerCase().includes(search) || 
+                c.description?.toLowerCase().includes(search) ||
+                c.duration?.toLowerCase().includes(search) ||
+                c.schedule?.toLowerCase().includes(search)
+            );
+        }
+
+        if (level) {
+            list = list.filter(c => c.level === level);
+        }
+
+        if (price !== null) {
+            list = list.filter(c => (c.price || 0) <= price);
+        }
+
+        return list;
     });
 
     setSEO() {
@@ -223,7 +240,7 @@ export class CursosComponent implements OnInit {
                         const titleLower = (c.title || '').toLowerCase();
                         // Hide drones course completely as requested
                         if (titleLower.includes('drone')) return false;
-                        return c.is_active || c.status === 'published';
+                        return c.is_active || c.status === 'PUBLISHED';
                     })
                     .map((c: Course) => {
                         const titleLower = (c.title || '').toLowerCase();

@@ -25,17 +25,29 @@ export const publicRoutes: Routes = [
     canActivate: [TenantIsolationGuard],
     children: [
       {
-        title: 'Consultoria IT & Software Solutions | Arecofix ',
+        title: 'Consultoría IT & Software Solutions | Arecofix ',
         path: '',
         canActivate: [tauriRootRedirectGuard],
         component: PublicHomePage,
         data: {
             seo: {
-                title: 'Sistemas de Gestión SaaS y Desarrollo de Software | Arecofix',
-                description: 'Ofrecemos sistemas de gestión para tu empresa, SaaS, desarrollo de aplicaciones móviles y transformación digital. Aceleramos el crecimiento de tu negocio.',
-                imageUrl: 'assets/img/branding/og-services.jpg',
+                title: 'Consultoría IT & Software Factory | Arecofix',
+                description: 'Especialistas en desarrollo de software, sistemas de gestión SaaS y consultoría IT para transformar tu negocio.',
+                imageUrl: 'assets/img/branding/og-inicio.png',
                 keywords: 'software marcos paz, sistemas de gestion, saas, desarrollo de aplicaciones, desarrollo web argentina, arecofix, tecnologia argentina'
             }
+        }
+      },
+      {
+        title: 'Prueba Gratuita Sistema Taller | Arecofix',
+        path: 'prueba',
+        loadComponent: () => import('@app/public/free-trial/free-trial.component').then(m => m.FreeTrialPageComponent),
+        data: {
+          seo: {
+            title: 'Prueba Gratuita 72h - Sistema Taller Arecofix',
+            description: 'Prueba nuestro sistema de gestión para talleres técnicos por 72 horas gratis. Crea tu cuenta al instante con tu logo.',
+            keywords: 'prueba gratis sistema taller, software tecnico, software reparacion celulares'
+          }
         }
       },
       {
@@ -222,7 +234,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Servicios de Tecnología y Reparación | Arecofix',
             description: 'Soluciones integrales: Reparación de Celulares, Desarrollo de Software, Cámaras de Seguridad y Soporte IT para empresas.',
-            imageUrl: 'assets/img/branding/og-services.jpg',
+            imageUrl: 'assets/img/branding/og-services.png',
             keywords: 'servicios informaticos, reparacion celulares, desarrollo software, soporte it, camaras seguridad'
           }
         }

@@ -41,11 +41,11 @@ export class OrdersStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.LIST_TTL)) {
-      console.log(`[OrdersStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
+      // console.log(`[OrdersStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
       return of(cached.data);
     }
 
-    console.log(`[OrdersStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
+    // console.log(`[OrdersStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -76,11 +76,11 @@ export class OrdersStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.DETAIL_TTL)) {
-      console.log(`[OrdersStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
+      // console.log(`[OrdersStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
       return of(cached.data);
     }
 
-    console.log(`[OrdersStore] 🌐 Cache MISS (Detail) para ID: "${id}". Consultando Supabase...`);
+    // console.log(`[OrdersStore] 🌐 Cache MISS (Detail) para ID: "${id}". Consultando Supabase...`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -109,7 +109,7 @@ export class OrdersStore {
    * Limpia toda la caché local.
    */
   clearCache(): void {
-    console.log('[OrdersStore] 🧹 Limpiando caché de órdenes.');
+    // console.log('[OrdersStore] 🧹 Limpiando caché de órdenes.');
     this.listCache.set({});
     this.detailCache.set({});
   }

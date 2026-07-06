@@ -54,7 +54,7 @@
                                         class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-gray-800 dark:text-gray-200"
                                         list="clients-list"
                                         placeholder="Buscar por nombre o escribir uno nuevo..."
-                                        required />
+                                         />
                                     <datalist id="clients-list">
                                          @for (client of clients(); track client.id) {
                                              <option [value]="client.displayName">{{ client.email }}</option>
@@ -64,9 +64,9 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email *</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email</label>
                                 <input type="email" formControlName="customer_email"
-                                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-gray-800 dark:text-gray-200" placeholder="ejemplo@email.com" required />
+                                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-gray-800 dark:text-gray-200" placeholder="ejemplo@email.com" />
                             </div>
 
                             <div>
@@ -131,7 +131,7 @@
                                             (focus)="onProductFocus(idx)"
                                             (blur)="onProductBlur(idx)"
                                             class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-fuchsia-500/20 focus:border-fuchsia-500 transition-all text-gray-800 dark:text-white"
-                                            placeholder="Buscar producto a enviar..." required autocomplete="off" />
+                                            placeholder="Buscar producto a enviar..." autocomplete="off" />
                                           
                                           <!-- Autocomplete Dropdown -->
                                           @if (getFilteredProducts(idx).length > 0 && showProductDropdown(idx)) {
@@ -272,7 +272,7 @@
                              
                              <!-- Action Button inside Receipt -->
                              <div class="mt-6 relative z-50">
-                                 <button type="button" (mousedown)="save()" (click)="save(); $event.stopPropagation()" [disabled]="saving" 
+                                 <button type="submit" [disabled]="saving" 
                                      class="btn w-full bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-2xl shadow-lg shadow-emerald-500/20 py-4 h-auto text-lg font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95"
                                      style="border: 4px solid #10b981 !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);">
                                      @if (saving) {

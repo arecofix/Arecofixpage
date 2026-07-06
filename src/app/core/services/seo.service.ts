@@ -23,7 +23,7 @@ export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
   '/': {
     title: 'Arecofix - Servicio Técnico y Soluciones IT en Marcos Paz',
     description: 'Especialistas en reparación de celulares, notebooks y consolas en el acto. Venta de repuestos y accesorios. ¡Presupuesto gratis!',
-    imageUrl: 'assets/img/branding/og-services.jpg'
+    imageUrl: 'assets/img/branding/og-services.png'
   },
   '/celular': {
     title: 'Reparación de Celulares en Marcos Paz | Arecofix',
@@ -33,7 +33,7 @@ export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
   '/servicios': {
     title: 'Nuestros Servicios Técnicos | Arecofix',
     description: 'Reparación de Hardware, Microsoldadura, Desarrollo Web y Cámaras de Seguridad para empresas y hogares.',
-    imageUrl: 'assets/img/branding/og-services.jpg'
+    imageUrl: 'assets/img/branding/og-services.png'
   }
 };
 
@@ -97,9 +97,9 @@ export class SeoService {
       // Final Fallback for standard pages
       if (!seoData) {
         seoData = {
-          title: routeTitle || 'Arecofix - Servicio Técnico y Soluciones IT',
+          title: routeTitle || 'Servicio Técnico de Celulares en Marcos Paz - Arecofix',
           description: 'Líderes en reparación técnica y soluciones tecnológicas en Marcos Paz.',
-          imageUrl: 'assets/img/branding/og-services.jpg'
+          imageUrl: 'assets/img/branding/og-services.png'
         };
       } else if (!seoData.title && routeTitle) {
         seoData.title = routeTitle;
@@ -148,12 +148,16 @@ export class SeoService {
     }
 
     const currentPath = url || this.router.url.split('?')[0];
-    const finalUrl = currentPath.startsWith('http') 
+    let finalUrl = currentPath.startsWith('http') 
         ? currentPath 
         : `${SITE_URL}${currentPath.startsWith('/') ? '' : '/'}${currentPath}`;
     
+    try {
+        finalUrl = encodeURI(decodeURI(finalUrl));
+    } catch(e) {}
+    
     // --- Image URL Resolution ---
-    let finalImageUrl = `${SITE_URL}/assets/img/branding/og-services.jpg`;
+    let finalImageUrl = `${SITE_URL}/assets/img/branding/og-services.png`;
     
     if (imageUrl && imageUrl.trim().length > 0) {
         if (imageUrl.startsWith('http')) {
@@ -165,17 +169,19 @@ export class SeoService {
         }
     }
 
+    try {
+        finalImageUrl = encodeURI(decodeURI(finalImageUrl));
+    } catch(e) {}
+
     // --- Critical Validation: Prevent Recursive or Broken URLs ---
     // 1. Never use the same URL for page and image (Facebook Crawler error)
-    // 2. Never use dynamic routes as images (prevents HTML-as-image error)
     const normalize = (u: string) => u.toLowerCase().replace(/\/$/, '');
-    const isDynamic = finalImageUrl.includes('/detalle/') || finalImageUrl.includes('/posts/') || finalImageUrl.includes('/tracking/') || finalImageUrl.includes('/academy/');
     
-    if (normalize(finalImageUrl) === normalize(finalUrl) || isDynamic) {
+    if (normalize(finalImageUrl) === normalize(finalUrl)) {
         if (isPlatformServer(this.platformId)) {
           console.warn(`[SEO] Warning: Invalid Image URL detected: ${finalImageUrl}. Falling back to default branding.`);
         }
-        finalImageUrl = `${SITE_URL}/assets/img/branding/og-services.jpg`;
+        finalImageUrl = `${SITE_URL}/assets/img/branding/og-services.png`;
     }
 
     // Open Graph

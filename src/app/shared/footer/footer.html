@@ -4,24 +4,24 @@
 
       <!-- Logo + Links + Redes -->
       <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-1/2">
-        <img src="assets/img/brands/logo/Logo.png" alt="Logo Arecofix" class="h-10 w-auto" />
+        <img src="assets/img/brands/logo/Logo.png" width="212" height="228" alt="Logo Arecofix" class="h-10 w-auto" />
 
         <nav aria-label="Footer navigation" class="w-full">
           <ul class="flex flex-row flex-wrap justify-center lg:justify-start gap-5 text-sm text-gray-700 dark:text-gray-300">
-            <li><a routerLink="./" class="hover:text-blue-400 transition-colors font-medium">Inicio</a>
+            <li><a routerLink="./" class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Inicio</a>
             </li>
             <li><a routerLink="/recursos"
-                class="hover:text-blue-400 transition-colors font-medium">Recursos</a></li>
+                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Recursos</a></li>
             <li><a routerLink="/nosotros"
-                class="hover:text-blue-400 transition-colors font-medium">Nosotros</a></li>
+                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Nosotros</a></li>
             <li><a routerLink="/productos"
-                class="hover:text-blue-400 transition-colors font-medium">Productos</a></li>
+                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Productos</a></li>
             <li><a routerLink="/contacto"
-                class="hover:text-blue-400 transition-colors font-medium">Contacto</a></li>
+                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Contacto</a></li>
             <li><a routerLink="/academy"
-                class="hover:text-blue-400 transition-colors font-medium">Cursos</a></li>
+                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Cursos</a></li>
             <li><a routerLink="/servicios"
-                class="hover:text-blue-400 transition-colors font-medium">Servicios</a></li>
+                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Servicios</a></li>
           </ul>
         </nav>
 
@@ -84,13 +84,13 @@
           <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b-2 border-blue-500 pb-2 inline-block w-max">Enlaces
             Rápidos</h3>
           <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-            <li><a routerLink="/privacy" class="hover:text-blue-400 transition flex items-center gap-2"><i
+            <li><a routerLink="/privacy" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
                   class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Privacidad</a></li>
-            <li><a routerLink="/terms" class="hover:text-blue-400 transition flex items-center gap-2"><i
+            <li><a routerLink="/terms" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
                   class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Términos Legales</a></li>
-            <li><a routerLink="/nosotros" class="hover:text-blue-400 transition flex items-center gap-2"><i
+            <li><a routerLink="/nosotros" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
                   class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Preguntas Frecuentes</a></li>
-            <li><a routerLink="/blog" class="hover:text-blue-400 transition flex items-center gap-2"><i
+            <li><a routerLink="/blog" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
                   class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Blog</a></li>
           </ul>
         </div>
@@ -105,12 +105,12 @@
             </li>
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-phone text-blue-500"></i>
-              <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="hover:text-blue-400 transition">+{{ whatsappNumber }}</a>
+              <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="hover:text-blue-400 transition inline-block p-1 -m-1">+{{ whatsappNumber }}</a>
             </li>
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-envelope text-blue-500"></i>
               <a href="mailto:info@arecofix.com.ar"
-                class="hover:text-blue-400 transition">info@arecofix.com.ar</a>
+                class="hover:text-blue-400 transition inline-block p-1 -m-1">info@arecofix.com.ar</a>
             </li>
           </ul>
         </div>
@@ -126,10 +126,10 @@
         </a>
       </p>
       <div class="flex gap-6">
-        <button (click)="openAccessibilityMenu()" class="hover:text-blue-400 transition flex items-center gap-2" aria-label="Cambiar idioma a Español">
+        <button (click)="openAccessibilityMenu()" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1" aria-label="Cambiar idioma a Español">
           <i class="fa-solid fa-globe"></i> Español
         </button>
-        <a routerLink="/sitemap" class="hover:text-blue-400 transition">Mapa del sitio</a>
+        <a routerLink="/sitemap" class="hover:text-blue-400 transition inline-block p-1 -m-1">Mapa del sitio</a>
       </div>
     </div>
   </div>

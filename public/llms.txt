@@ -1,0 +1,16 @@
+# Arecofix - Centro de Reparaciones y Academia
+
+Arecofix es un sistema integral de reparación de celulares y centro de capacitaciones (Arecofix Academy).
+Ofrecemos servicios técnicos profesionales, venta de repuestos y cursos online.
+
+## Secciones principales
+
+- [Inicio](https://arecofix.com.ar/)
+- [Reparaciones](https://arecofix.com.ar/repairs)
+- [Tienda](https://arecofix.com.ar/shop)
+- [Arecofix Academy](https://arecofix.com.ar/academy)
+- [Contacto](https://arecofix.com.ar/contacto)
+
+## Sobre nuestro agente
+
+Esta información proporciona un contexto básico para los LLM y sistemas agénticos que visitan Arecofix.

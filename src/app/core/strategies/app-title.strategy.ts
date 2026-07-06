@@ -14,7 +14,7 @@ export class AppTitleStrategy extends TitleStrategy {
       const finalTitle = title.includes('Arecofix') ? title : `${title} | Arecofix`;
       this.titleService.setTitle(finalTitle);
     } else {
-      this.titleService.setTitle('Arecofix - Servicio Técnico y Soluciones IT');
+      this.titleService.setTitle('Servicio Técnico de Celulares en Marcos Paz - Arecofix');
     }
   }
 }

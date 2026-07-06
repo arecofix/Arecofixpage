@@ -1,4 +1,4 @@
-export type UserRole = 'super_admin' | 'tenant_owner' | 'technician' | 'staff' | 'user' | 'admin';
+export type UserRole = 'super_admin' | 'tenant_owner' | 'technician' | 'staff' | 'user' | 'admin' | 'instructor';
 
 export interface Address {
   street?: string;

@@ -12,8 +12,8 @@ import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject, combineLatest, of } from 'rxjs';
 import { TenantService } from '@app/core/services/tenant.service';
-
 import { ProductService } from '@app/public/products/services';
+import { SeoService } from '@app/core/services/seo.service';
 import { CartService } from '@app/shared/services/cart.service';
 import { PaginationService, iPagination } from '@app/shared/components/pagination';
 import { ProductsGridComponent } from '@app/public/products/components';
@@ -62,7 +62,17 @@ export class ProductsAllPage {
   maxPriceInput = signal<number | null>(null);
   currentSort = 'created_at|desc';
 
+  private seoService = inject(SeoService);
+
   constructor() {
+    this.seoService.setPageData({
+      title: 'Tienda Virtual | Arecofix',
+      description: 'Explora nuestra tienda virtual. Encuentra los mejores repuestos, celulares y soluciones tecnológicas en Marcos Paz.',
+      imageUrl: 'assets/img/branding/og-tienda.png',
+      url: '/productos',
+      type: 'website'
+    });
+
     this.searchSubject.pipe(
       debounceTime(400),
       distinctUntilChanged()

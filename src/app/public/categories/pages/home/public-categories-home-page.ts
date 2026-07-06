@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+﻿import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, switchMap, of } from 'rxjs';
@@ -59,7 +59,7 @@ export class PublicCategoriesHomePage {
     return pagination as iPagination;
   });
 
-  /** ✅ NUEVO: Computed con categorías filtradas */
+  /** âœ… NUEVO: Computed con categorías filtradas */
   filteredCategories = computed(() => {
     const res = this.categoriesRs.value();
     if (!res) return [];
@@ -78,7 +78,7 @@ export class PublicCategoriesHomePage {
 
   private setSEO() {
     const description = 'Explorá nuestro catálogo de productos organizado por categorías: Repuestos, Herramientas, Celulares y más.';
-    const imageUrl = 'assets/img/branding/og-services.jpg';
+    const imageUrl = 'assets/img/branding/og-services.png';
 
     this.seoService.setPageData({
       title: 'Categorías de Productos | Arecofix',

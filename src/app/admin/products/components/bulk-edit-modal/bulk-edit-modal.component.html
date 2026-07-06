@@ -44,7 +44,7 @@
           }
 
           <!-- PRICE -->
-          <div class="grid grid-cols-3 gap-3 items-start border-b border-gray-100 dark:border-gray-700 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start border-b border-gray-100 dark:border-gray-700 pb-5">
             <div class="pt-2">
               <p class="font-bold text-xs uppercase tracking-wider text-gray-400">Precio</p>
             </div>
@@ -69,7 +69,7 @@
           </div>
 
           <!-- STOCK -->
-          <div class="grid grid-cols-3 gap-3 items-start border-b border-gray-100 dark:border-gray-700 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start border-b border-gray-100 dark:border-gray-700 pb-5">
             <div class="pt-2">
               <p class="font-bold text-xs uppercase tracking-wider text-gray-400">Stock</p>
             </div>
@@ -90,7 +90,7 @@
           </div>
 
           <!-- CATEGORY -->
-          <div class="grid grid-cols-3 gap-3 items-center border-b border-gray-100 dark:border-gray-700 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center border-b border-gray-100 dark:border-gray-700 pb-5">
             <p class="font-bold text-xs uppercase tracking-wider text-gray-400">Categoría</p>
             <div class="col-span-2">
               <select [ngModel]="targetCategoryId()" (ngModelChange)="targetCategoryId.set($event)"
@@ -104,7 +104,7 @@
           </div>
 
           <!-- BRAND -->
-          <div class="grid grid-cols-3 gap-3 items-center border-b border-gray-100 dark:border-gray-700 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center border-b border-gray-100 dark:border-gray-700 pb-5">
             <p class="font-bold text-xs uppercase tracking-wider text-gray-400">Marca</p>
             <div class="col-span-2">
               <select [ngModel]="targetBrandId()" (ngModelChange)="targetBrandId.set($event)"
@@ -118,7 +118,7 @@
           </div>
 
           <!-- STATUS -->
-          <div class="grid grid-cols-3 gap-3 items-center">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
             <p class="font-bold text-xs uppercase tracking-wider text-gray-400">Estado</p>
             <div class="col-span-2">
               <select [ngModel]="targetStatus()" (ngModelChange)="targetStatus.set($event)"

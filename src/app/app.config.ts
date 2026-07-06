@@ -5,7 +5,9 @@ import {
   provideZonelessChangeDetection,
   APP_INITIALIZER,
   LOCALE_ID,
+  isDevMode
 } from '@angular/core';
+import { provideServiceWorker } from '@angular/service-worker';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideRouter, withInMemoryScrolling, TitleStrategy } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
@@ -96,6 +98,10 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([timeoutInterceptor, globalErrorInterceptor])
     ),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
 
     // Repositories
     { provide: ProductRepository, useClass: SupabaseProductRepository },

@@ -29,6 +29,16 @@ import { MenuBuilderService, MenuItem } from '@app/core/services/menu-builder.se
     LockScreenComponent
   ],
   templateUrl: './admin-layout.html',
+  styles: [`
+    :host-context(body.is-tauri) .drawer-side,
+    :host-context(body.is-tauri) .drawer-open > .drawer-side {
+      height: calc(100vh - 65px) !important;
+      top: 65px !important;
+    }
+    :host-context(body.is-tauri) .drawer-content.h-screen {
+      height: calc(100vh - 65px) !important;
+    }
+  `]
 })
 export class AdminLayout implements OnInit, OnDestroy {
   public authService = inject(AuthService);
@@ -62,7 +72,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       const branch = this.branchService.currentBranch();
-      console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
+      // console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
       this.updateBranchMenu(branch);
       this.updateBranding(branch);
     });
@@ -114,6 +124,13 @@ export class AdminLayout implements OnInit, OnDestroy {
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: any) => {
         this.preferencesService.closeSidebar();
+        
+        // Cierra el drawer de daisyUI en mobile al navegar
+        const drawerCheckbox = document.getElementById('admin-drawer') as HTMLInputElement;
+        if (drawerCheckbox && drawerCheckbox.checked) {
+          drawerCheckbox.checked = false;
+        }
+
         const urlString = event.urlAfterRedirects || event.url;
         // Split and filter out empty segments to handle leading slashes cleanly
         const urlSegments = urlString.split('/').filter((s: string) => s);
@@ -123,7 +140,7 @@ export class AdminLayout implements OnInit, OnDestroy {
 
         if (isSedeCentralUrl) {
            if (this.branchService.getCurrentBranchId() !== null) {
-             console.log('[AdminLayout NavigationEnd] Sede Central detected. Resetting active branch to Central (null)');
+             // console.log('[AdminLayout NavigationEnd] Sede Central detected. Resetting active branch to Central (null)');
              this.branchService.setCurrentBranch(null);
              this.updateBranding(null);
            }
@@ -195,7 +212,13 @@ export class AdminLayout implements OnInit, OnDestroy {
   }
 
   onParentClick(item: MenuItem) {
-    item.expanded = !item.expanded;
+    if (!this.isMainMenuOpen()) {
+      this.isMainMenuOpen.set(true);
+      item.expanded = true;
+    } else {
+      item.expanded = !item.expanded;
+    }
+    
     if (item.path) {
       this.router.navigate([item.path]);
     }

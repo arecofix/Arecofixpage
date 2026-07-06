@@ -80,7 +80,7 @@ export class NosotrosComponent implements OnInit {
     this.seoService.setPageData({
       title: 'Sobre Nosotros',
       description: 'Más que una empresa de software. Somos un equipo apasionado por transformar negocios a través de la tecnología en Marcos Paz y el mundo.',
-      imageUrl: 'assets/img/branding/og-nosotros.jpg'
+      imageUrl: 'assets/img/branding/og-nosotros.png'
     });
   }
 

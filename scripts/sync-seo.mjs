@@ -3,8 +3,14 @@ import fs from 'fs';
 import path from 'path';
 
 // --- CONFIGURATION ---
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://jftiyfnnaogmgvksgkbn.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_KEY || 'YOUR_SUPABASE_ANON_KEY';
+const envPath = path.join(process.cwd(), 'src/environments/environment.prod.ts');
+const envContent = fs.readFileSync(envPath, 'utf8');
+
+const urlMatch = envContent.match(/supabaseUrl:\s*'([^']+)'/);
+const keyMatch = envContent.match(/supabaseKey:\s*'([^']+)'/);
+
+const SUPABASE_URL = process.env.SUPABASE_URL || (urlMatch ? urlMatch[1] : 'https://jftiyfnnaogmgvksgkbn.supabase.co');
+const SUPABASE_KEY = process.env.SUPABASE_KEY || (keyMatch ? keyMatch[1] : 'YOUR_SUPABASE_ANON_KEY');
 const BASE_URL = 'https://arecofix.com.ar';
 const CHUNK_SIZE = 1000;
 
@@ -58,6 +64,7 @@ async function run() {
     // 1. Fetch Products (Active & Not Deleted)
     console.log('📦 Fetching products...');
     const products = await fetchAll('products', 'slug', { is_active: true, deleted_at: null });
+    // Prerender all products so Facebook crawler sees the SEO tags
     products.forEach(p => p.slug && routes.push(`/productos/detalle/${p.slug}`));
 
     // 2. Fetch Blog Posts (Published)

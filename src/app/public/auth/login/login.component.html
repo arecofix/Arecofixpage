@@ -112,7 +112,7 @@
                 <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contraseña</label>
                 <a
                   routerLink="/forgot-password"
-                  class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors"
+                  class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors inline-block p-1 -m-1"
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -130,8 +130,9 @@
                 />
                 <button
                   type="button"
+                  aria-label="Mostrar u ocultar contraseña"
                   (click)="togglePasswordVisibility()"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  class="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                 >
                   <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
                 </button>
@@ -231,7 +232,7 @@
         <div class="mt-8 text-center">
           <p class="text-sm text-slate-500">
             ¿No tienes cuenta?
-            <a routerLink="/register" class="font-medium text-slate-900 dark:text-white hover:underline transition-all">Regístrate</a>
+            <a routerLink="/register" class="font-medium text-slate-900 dark:text-white hover:underline transition-all inline-block p-1 -m-1">Regístrate</a>
           </p>
         </div>
     </div>

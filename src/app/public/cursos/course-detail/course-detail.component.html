@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12">
-
   @if (loading) {
     <div class="flex justify-center items-center h-screen">
       <is-loading />
@@ -10,19 +9,21 @@
       <a routerLink="/academy" class="btn btn-primary mt-4">Volver a Cursos</a>
     </div>
   } @else {
-    <!-- Hero Section Premium EdTech -->
-    <div class="relative bg-slate-900 text-white pt-24 pb-16 lg:py-24 overflow-hidden border-b border-slate-800">
+    <!-- Hero Section Platzi Style -->
+    <div class="bg-slate-900 text-white pt-24 pb-12 overflow-hidden border-b border-slate-800 relative">
       <!-- Background Image with Modern Dual Overlay -->
       <div class="absolute inset-0">
-        <img [src]="course.image_url" [alt]="course.title" class="w-full h-full object-cover opacity-20 filter blur-sm scale-110">
+        <img [src]="course.image_url" [alt]="course.title" fetchpriority="high" class="w-full h-full object-cover opacity-10 filter blur-sm scale-110">
         <div class="absolute inset-0 bg-linear-to-r from-slate-900 via-slate-900/90 to-transparent"></div>
         <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"></div>
         <!-- Decorative Glow -->
-        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute top-0 right-0 w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-blue-600/20 rounded-full blur-[60px] md:blur-[100px] pointer-events-none"></div>
       </div>
 
-      <div class="relative container mx-auto px-4 z-10">
-        <div class="max-w-4xl">
+      <div class="container mx-auto px-4 relative z-10 max-w-6xl flex flex-col md:flex-row gap-8 items-start">
+        
+        <!-- Course Meta & Title -->
+        <div class="w-full md:w-2/3">
           <div class="text-sm font-medium text-blue-400 mb-6 flex items-center gap-2">
             <a routerLink="/" class="hover:text-blue-300 transition-colors">Inicio</a>
             <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
@@ -31,575 +32,249 @@
             <span class="text-white hidden sm:inline">{{course.title}}</span>
           </div>
 
-          <div class="flex flex-wrap gap-3 mb-6">
-            <span class="bg-blue-600/20 border border-blue-500/30 text-blue-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
-              <i class="fas fa-layer-group mr-1.5"></i> {{course.level}}
-            </span>
-            <span class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
-              <i class="fas fa-certificate mr-1.5"></i> Certificación Oficial
-            </span>
-            @if(course.rating) {
-              <span class="bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 px-4 py-1.5 rounded-full text-xs font-bold flex items-center backdrop-blur-sm">
-                <i class="fas fa-star mr-1.5"></i> {{course.rating}}
-              </span>
-            }
-          </div>
-
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 tracking-tight leading-[1.1] text-white">
+          <h1 class="text-4xl sm:text-5xl font-black mb-4 tracking-tight leading-[1.1] text-white">
             {{course.title}}
           </h1>
 
-          <p class="text-base sm:text-xl text-slate-300 mb-10 max-w-2xl leading-relaxed font-light">
-            {{course.description}}
+          <p class="text-base sm:text-lg text-slate-300 mb-6 max-w-2xl leading-relaxed font-light">
+            {{course.description || course.short_description}}
           </p>
 
-          <div class="flex flex-col sm:flex-row gap-4 mt-8">
-            <button (click)="openRegistration()"
-              class="btn border-none bg-blue-600 hover:bg-blue-500 text-white px-8 h-14 rounded-xl text-lg shadow-lg shadow-blue-500/30 font-bold w-full sm:w-auto flex items-center justify-center gap-2 group">
-              <i class="fas fa-bolt text-yellow-300"></i> Asegurar mi Vacante
-            </button>
-            <a routerLink="/login"
-              class="btn border border-slate-600 bg-slate-800/50 hover:bg-slate-700 text-white h-14 rounded-xl px-8 text-lg font-bold w-full sm:w-auto flex items-center justify-center gap-2 backdrop-blur-sm transition-colors">
-              <i class="fas fa-sign-in-alt opacity-70"></i> Ya soy alumno
-            </a>
+          <div class="flex items-center gap-4 text-sm text-slate-300 mb-6 flex-wrap">
+            <div class="flex items-center gap-1 text-yellow-400 font-bold">
+              <i class="fas fa-star"></i> {{rating}}
+            </div>
+            <span>·</span>
+            <div class="underline hover:text-white cursor-pointer">{{reviewsCount}} opiniones</div>
+            <span>·</span>
+            <div>Publicado el {{publishDate}}</div>
           </div>
+
+          <!-- Highlight Stats Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5 w-fit backdrop-blur-sm">
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase text-slate-400 font-bold">Nivel</span>
+              <span class="font-bold text-white capitalize">{{course.level === 'basic' ? 'Básico' : (course.level === 'intermediate' ? 'Intermedio' : 'Avanzado')}}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase text-slate-400 font-bold">Clases</span>
+              <span class="font-bold text-white">{{classesCount}} clases</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase text-slate-400 font-bold">Contenido</span>
+              <span class="font-bold text-white">{{hoursContent}} horas</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase text-slate-400 font-bold">Práctica</span>
+              <span class="font-bold text-white">{{hoursPractice}} horas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Card Floating Action -->
+        <div class="w-full md:w-1/3 hidden md:block">
+           <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700">
+              <img [src]="course.image_url" [alt]="course.title" fetchpriority="high" class="w-full h-48 object-cover">
+              <div class="p-6">
+                 <div class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+                    {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                 </div>
+                 <button (click)="openRegistration()" class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3 shadow-lg shadow-blue-500/30">
+                    Empieza ya
+                 </button>
+                 <a routerLink="/login" class="block text-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                    Accede a este curso adquiriendo un plan
+                 </a>
+                 <div class="text-xs text-gray-500 text-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <i class="fas fa-shield-alt mr-1"></i> Garantía de aprendizaje 100% práctico
+                 </div>
+              </div>
+           </div>
         </div>
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 -mt-8 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <!-- Left Column: Details -->
-        <div class="lg:col-span-2 space-y-8">
-          <!-- Tabs Navigation -->
-          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-2 flex overflow-x-auto">
-            <button (click)="activeTab = 'info'"
-              [class.bg-indigo-50]="activeTab === 'info'"
-              [class.text-indigo-600]="activeTab === 'info'"
-              [class.dark:bg-gray-700]="activeTab === 'info'"
-              [class.dark:text-white]="activeTab === 'info'"
-              class="flex-1 py-3 px-6 rounded-lg font-medium text-sm transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300">
-              Información
-            </button>
-            <button (click)="activeTab = 'temario'"
-              [class.bg-indigo-50]="activeTab === 'temario'"
-              [class.text-indigo-600]="activeTab === 'temario'"
-              [class.dark:bg-gray-700]="activeTab === 'temario'"
-              [class.dark:text-white]="activeTab === 'temario'"
-              class="flex-1 py-3 px-6 rounded-lg font-medium text-sm transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300">
-              Temario
-            </button>
-            @if (isCelularCourse) {
-            <button (click)="activeTab = 'galeria'"
-              [class.bg-indigo-50]="activeTab === 'galeria'"
-              [class.text-indigo-600]="activeTab === 'galeria'"
-              [class.dark:bg-gray-700]="activeTab === 'galeria'"
-              [class.dark:text-white]="activeTab === 'galeria'"
-              class="flex-1 py-3 px-6 rounded-lg font-medium text-sm transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300">
-              Galería
-            </button>
-            }
-            @if (isCelularCourse) {
-            <button (click)="activeTab = 'testimonios'"
-              [class.bg-indigo-50]="activeTab === 'testimonios'"
-              [class.text-indigo-600]="activeTab === 'testimonios'"
-              [class.dark:bg-gray-700]="activeTab === 'testimonios'"
-              [class.dark:text-white]="activeTab === 'testimonios'"
-              class="flex-1 py-3 px-6 rounded-lg font-medium text-sm transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300">
-              Testimonios
-            </button>
-            }
-          </div>
-
-
-          <!-- Tab Content: Info -->
-          @if (activeTab === 'info') {
-            <div class="space-y-16 fade-in pb-12">
-
-              <!-- 1. Intro + Audience (From Initial Version - RESTORED) -->
-              <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 sm:p-10">
-                <div class="max-w-3xl mx-auto text-center mb-10">
-                  <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">¿Buscas una profesión con futuro?</h2>
-                  <p class="text-xl text-gray-600 dark:text-gray-300">
-                    La reparación de celulares es uno de los oficios más rentables y demandados de la actualidad.
-                  </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                  <div>
-                    <h3 class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Este curso es para vos si:</h3>
-                    <ul class="space-y-4">
-                      @for (item of audienceList; track item) {
-                        <li class="flex items-start">
-                          <div class="mr-3 mt-1 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center shrink-0">
-                            <i class="fas fa-check text-indigo-600 dark:text-indigo-400 text-xs"></i>
-                          </div>
-                          <span class="text-gray-700 dark:text-gray-200">{{item}}</span>
-                        </li>
-                      }
-                    </ul>
-                  </div>
-                  <div class="relative h-64 sm:h-80 rounded-xl overflow-hidden shadow-lg transform rotate-2 hover:rotate-0 transition-all duration-500">
-                    <img [src]="course.image_url || 'assets/img/cursos/academy/salida_laboral_propia.jpeg'" class="w-full h-full object-cover" alt="Alumno aprendiendo">
-                    <div class="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-6">
-                      <p class="text-white font-bold text-lg">"Hoy tengo mi propio emprendimiento"</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 2. ROI & Salida Laboral (From Initial Version - RESTORED) -->
-              @if (roiExamples.length > 0) {
-              <section class="bg-indigo-900 rounded-2xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-                <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
-
-                <div class="relative z-10 text-center mb-12">
-                  <span class="inline-block py-1 px-3 rounded-full bg-green-500/20 border border-green-500/30 text-green-300 text-sm font-bold tracking-wide uppercase mb-4">Oportunidad de Negocio</span>
-                  <h2 class="text-3xl sm:text-4xl font-bold mb-4">Recupera tu inversión en menos de un mes</h2>
-                  <p class="text-indigo-100 text-lg max-w-2xl mx-auto">
-                    No necesitas miles de clientes. Con solo 3 o 4 reparaciones básicas ya cubrís el costo del curso. El resto es ganancia pura.
-                  </p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  @for (roi of roiExamples; track roi.job) {
-                    <div class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors">
-                      <div class="flex justify-between items-start mb-4">
-                        <i class="fas fa-tools text-2xl text-indigo-300"></i>
-                        @if (roi.earning) {
-                          <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded font-bold">Ganancia</span>
-                        }
-                      </div>
-                      <h3 class="font-bold text-lg mb-2">{{roi.job}}</h3>
-                      <p class="text-2xl font-bold text-green-300">{{roi.range}}</p>
-                      <p class="text-xs text-indigo-200 mt-1">promedio por trabajo</p>
-                    </div>
+    <!-- Main Content Body -->
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-12">
+        
+        <!-- Left Content -->
+        <div class="w-full md:w-2/3 space-y-12">
+          
+          <!-- Audience / What you will learn -->
+          <section>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Acerca de este curso</h2>
+            <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+               <p>{{course.description}}</p>
+               <h3 class="text-lg font-bold mt-6 mb-4 text-gray-900 dark:text-white">Este curso es para ti si:</h3>
+               <ul class="space-y-3 pl-0 list-none">
+                  @for (item of audienceList; track item) {
+                     <li class="flex items-start">
+                        <i class="fas fa-check text-blue-500 mt-1 mr-3 shrink-0"></i>
+                        <span>{{item}}</span>
+                     </li>
                   }
-                </div>
-              </section>
-              }
+               </ul>
+            </div>
+          </section>
 
-              <!-- 3. Methodology (Visual Section) -->
-              @if (isCelularCourse) {
-              <div class="grid grid-cols-1 gap-8 items-center md:grid-cols-2">
-                <div class="rounded-xl overflow-hidden shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <img src="assets/img/cursos/academy/capacitaciones.jpeg" class="w-full h-full object-cover" alt="Clases 100% Prácticas">
-                </div>
-                <div class="space-y-4">
-                  <div class="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2">
-                    <i class="fas fa-tools"></i>
+          <!-- Syllabus / Temario -->
+          <section>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Contenido del curso</h2>
+            <div class="text-sm text-gray-500 mb-4">{{courseModules.length}} módulos • {{classesCount}} clases • {{hoursContent}} horas de contenido</div>
+            
+            <div class="space-y-4">
+              @for (module of courseModules; track module.title; let i = $index) {
+                <div class="border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
+                  <div class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                     <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Módulo {{i + 1}}</span>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{module.title}}</h3>
+                     </div>
+                     <div class="text-sm text-gray-500">
+                        {{module.lessons.length}} clases
+                     </div>
                   </div>
-                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Metodología 100% Práctica</h3>
-                  <p class="text-gray-600 dark:text-gray-300 text-lg">
-                    Creemos que la única forma de aprender es metiendo mano. Trabajamos con un enfoque orientado a la experiencia.
-                  </p>
-                  <ul class="space-y-2">
-                    @for (benefit of benefitsList.slice(0, 3); track benefit.text) {
-                    <li class="flex items-center text-gray-700 dark:text-gray-300"><i class="fas fa-check-circle text-green-500 mr-3"></i> {{ benefit.text }}</li>
-                    }
-                  </ul>
-                </div>
-              </div>
-
-              <!-- 4. Instructors (Visual Section) -->
-              <div class="bg-indigo-900 text-white rounded-xl shadow-xl overflow-hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                  <div class="p-10 flex flex-col justify-center">
-                    <span class="text-indigo-300 font-bold tracking-wider uppercase text-sm mb-2">Mentoria Experta</span>
-                    <h3 class="text-3xl font-bold mb-6">Aprende de los Mejores</h3>
-                    <p class="text-indigo-100 text-lg mb-6 max-w-2xl">
-                      Nuestros instructores son profesionales activos con años de experiencia en el rubro. Transmiten los secretos del oficio que no están en los libros.
-                    </p>
-                    <div class="flex items-center space-x-4">
-                      <div class="flex -space-x-4">
-                        <div class="w-10 h-10 rounded-full bg-gray-300 border-2 border-indigo-900"></div>
-                        <div class="w-10 h-10 rounded-full bg-gray-400 border-2 border-indigo-900"></div>
-                        <div class="w-10 h-10 rounded-full bg-gray-500 border-2 border-indigo-900"></div>
-                      </div>
-                      <span class="text-sm font-medium">Acompañamiento personalizado</span>
-                    </div>
-                  </div>
-                  <div class="h-164 md:h-auto relative">
-                    <img src="assets/img/cursos/academy/eddis_educativa.jpeg" class="absolute inset-0 w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" alt="Instructor Experto">
-                  </div>
-                </div>
-              </div>
-              }
-
-              <!-- 5. Facilities (Visual Section) -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div class="order-2 md:order-1 space-y-4">
-                  <div class="w-12 h-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-2xl mb-2">
-                    <i class="fas fa-building"></i>
-                  </div>
-                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Instalaciones Profesionales</h3>
-                  <p class="text-gray-600 dark:text-gray-300 text-lg">
-                    Laboratorios equipados simulando un entorno real de trabajo.
-                    <br><span class="text-sm text-gray-500">* Clases en sedes equipadas (CIC, Puntos Digitales, y Aulas Propias).</span>
-                  </p>
-                </div>
-                <div class="order-1 md:order-2 rounded-xl overflow-hidden shadow-lg transform -rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <img [src]="facilityImage" class="w-full h-64 object-cover" alt="Instalaciones">
-                </div>
-              </div>
-
-              <!-- 6. Timeline (Syllabus) -->
-              @if (syllabusTimeline.length > 0) {
-              <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-                <div class="flex flex-col md:flex-row gap-10">
-                  <div class="md:w-1/3">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Plan de Estudio</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">
-                      Un programa diseñado paso a paso para llevarte de cero a experto. Sin rellenos, directo a la práctica.
-                    </p>
-                    <button (click)="activeTab = 'temario'" class="btn btn-outline w-full normal-case hidden md:block">
-                      Ver Temario Completo
-                    </button>
-                  </div>
-                  <div class="md:w-2/3 space-y-6">
-                    @for (step of syllabusTimeline; track step.week) {
-                      <div class="flex gap-4">
-                        <div class="flex flex-col items-center">
-                          <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0">
-                            {{$index + 1}}
-                          </div>
-                          @if (!$last) {
-                            <div class="h-full w-0.5 bg-indigo-100 dark:bg-gray-700 my-2"></div>
-                          }
+                  <div class="border-t border-gray-100 dark:border-gray-700 p-0">
+                     @for (lesson of module.lessons; track lesson.name; let j = $index) {
+                        <div class="px-5 py-4 flex items-center justify-between border-b border-gray-50 dark:border-gray-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                           <div class="flex items-center gap-3">
+                              <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold">
+                                 {{j + 1}}
+                              </div>
+                              <span class="text-gray-700 dark:text-gray-300 font-medium text-sm">{{lesson.name}}</span>
+                           </div>
+                           <span class="text-xs text-gray-500 font-medium"><i class="fas fa-play-circle mr-1 text-gray-400"></i> {{lesson.duration}}</span>
                         </div>
-                        <div class="pb-6">
-                          <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">{{step.week}}</span>
-                          <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{step.title}}</h4>
-                          <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">{{step.desc}}</p>
+                     }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <!-- Instructor -->
+          <section>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Profesores del curso</h2>
+            <div class="text-sm text-gray-500 mb-4">Conoce quién enseña el curso</div>
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col sm:flex-row gap-6 items-start shadow-sm">
+               <img [src]="instructorProfile.avatar" [alt]="instructorProfile.name" loading="lazy" decoding="async" class="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white dark:border-gray-700">
+               <div>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{instructorProfile.name}}</h3>
+                  <div class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-3">{{instructorProfile.role}}</div>
+                  <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">{{instructorProfile.bio}}</p>
+               </div>
+            </div>
+          </section>
+
+          <!-- Reviews -->
+          <section>
+            <div class="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+               <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Opiniones del curso</h2>
+               <div class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="fas fa-star text-yellow-400"></i> {{rating}} <span class="text-sm font-normal text-gray-500 hidden sm:inline">· {{reviewsCount}} opiniones</span>
+               </div>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-6">
+               @for (review of courseReviews; track review.name) {
+                  <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+                     <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                           <img [src]="review.avatar" [alt]="review.name" loading="lazy" decoding="async" class="w-10 h-10 rounded-full bg-gray-100">
+                           <div>
+                              <div class="font-bold text-gray-900 dark:text-white text-sm">{{review.name}}</div>
+                              <div class="text-[10px] text-gray-500">{{review.date}}</div>
+                           </div>
                         </div>
-                      </div>
-                    }
+                        <div class="flex text-yellow-400 text-xs">
+                           @for (star of [1,2,3,4,5]; track star) {
+                              <i class="fas fa-star" [class.opacity-30]="star > review.rating"></i>
+                           }
+                        </div>
+                     </div>
+                     <p class="text-gray-600 dark:text-gray-300 italic text-sm">"{{review.comment}}"</p>
                   </div>
-                </div>
-              </div>
-              }
+               }
+            </div>
 
-              <!-- 7. Community (Visual Section) -->
-              @if (isCelularCourse) {
-              <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-8 border border-gray-100 dark:border-gray-700">
-                <div class="grid grid-cols-1 gap-8 items-center md:grid-cols-2">
-                  <div class="h-64 rounded-xl overflow-hidden shadow-sm">
-                    <img src="assets/img/cursos/academy/aprender.jpeg" class="w-full h-full object-cover" alt="Grupo de Alumnos">
-                  </div>
-                  <div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Más que un Curso, una Comunidad</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-4">
-                      Participa de foros, grupos de WhatsApp exclusivos y actualizaciones constantes junto a otros compañeros.
-                    </p>
-                    <button (click)="activeTab = 'testimonios'" class="btn btn-outline btn-sm">Ver Testimonios de alumnos</button>
-                  </div>
-                </div>
-              </div>
-              }
-
-              <!-- 8. Inclusions (Grid) -->
-              <div>
-                <h2 class="text-2xl font-bold text-center mb-10 text-gray-900 dark:text-white">Todo lo que incluye tu inscripción</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  @for (inc of inclusions; track inc.text) {
-                    <div class="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 text-center h-32">
-                      <i [class]="inc.icon + ' text-3xl text-gray-400 dark:text-gray-500 mb-3'"></i>
-                      <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{inc.text}}</span>
-                    </div>
+            <!-- Formulario para nuevo comentario -->
+            <div class="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+               <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Escribe tu opinión</h3>
+               <div class="mb-4 flex items-center gap-2 text-yellow-400 text-lg">
+                  <span class="text-gray-700 dark:text-gray-300 mr-2 text-base">Calificación:</span>
+                  @for (star of [1,2,3,4,5]; track star) {
+                     <button (click)="newCommentRating = star" class="hover:scale-110 transition-transform cursor-pointer">
+                        <i class="fas fa-star" [class.opacity-30]="star > newCommentRating"></i>
+                     </button>
                   }
-                </div>
-              </div>
-
-              <!-- 9. Press Section -->
-              @if (pressLinks.length > 0) {
-              <div class="pt-8 border-t border-gray-100 dark:border-gray-700">
-                <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
-                  <i class="fas fa-newspaper text-indigo-500 mr-3"></i> Arecofix en los medios
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  @for (news of pressLinks; track news.url) {
-                    <a [href]="news.url" target="_blank" class="flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all transform hover:-translate-y-1 group">
-                      <div class="w-full md:w-1/3 h-48 md:h-auto overflow-hidden">
-                        <img [src]="news.image" [alt]="news.source" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='assets/img/logo-placeholder.png'">
-                      </div>
-                      <div class="w-full md:w-2/3 p-6 flex flex-col justify-center">
-                        <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">{{news.source}}</span>
-                        <h4 class="font-bold text-gray-900 dark:text-white text-lg leading-tight mb-3 group-hover:text-indigo-600 transition-colors">{{news.title}}</h4>
-                        <span class="text-sm text-gray-500 mt-auto flex items-center font-medium">
-                          Leer artículo completo <i class="fas fa-arrow-right ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"></i>
-                        </span>
-                      </div>
-                    </a>
-                  }
-                </div>
-              </div>
-              }
-
-              <!-- 10. Guarantee -->
-              <div class="bg-gray-900 text-white rounded-xl p-8 flex flex-col md:flex-row items-center gap-8 border border-gray-800">
-                <div class="shrink-0">
-                  <div class="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center text-4xl text-yellow-400">
-                    <i class="fas fa-shield-alt"></i>
-                  </div>
-                </div>
-                <div class="text-center md:text-left">
-                  <h3 class="text-2xl font-bold mb-2">Garantía de Confianza Arecofix</h3>
-                  <p class="text-gray-400 mb-0">
-                    Estamos tan seguros de nuestra calidad educativa que te ofrecemos una garantía de aprendizaje.
-                    Si sentís que necesitas reforzar algún tema, podrás asistir a clases de repaso sin costo adicional hasta que domines la técnica.
-                  </p>
-                </div>
-              </div>
-
-              <!-- 11. FAQ -->
-              <div class="max-w-3xl mx-auto">
-                <h2 class="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">Preguntas Frecuentes</h2>
-                <div class="space-y-4">
-                  @for (faq of faqs; track faq.question) {
-                    <div class="collapse collapse-plus bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
-                      <input type="radio" name="faq-accordion" />
-                      <div class="collapse-title text-base font-bold text-gray-900 dark:text-white">
-                        {{faq.question}}
-                      </div>
-                      <div class="collapse-content">
-                        <p class="text-gray-600 dark:text-gray-300">{{faq.answer}}</p>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-
-              <!-- 12. Final CTA -->
-              <div class="text-center pt-8">
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">¿Estás listo para dar el siguiente paso?</h3>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                  <button (click)="openRegistration()" class="btn btn-primary btn-lg shadow-xl shadow-indigo-500/30">
-                    Quiero Reservar mi Lugar
+               </div>
+               <textarea [(ngModel)]="newCommentText" rows="3" placeholder="¿Qué te pareció este curso? Comparte tu experiencia..." class="w-full textarea textarea-bordered mb-4 bg-gray-50 dark:bg-gray-900 dark:text-white text-base"></textarea>
+               <div class="flex justify-end">
+                  <button (click)="submitComment()" [disabled]="!newCommentText.trim()" class="btn bg-blue-600 hover:bg-blue-700 text-white border-none rounded-xl px-6">
+                     Publicar Opinión
                   </button>
-                  <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-outline btn-lg">
-                    <i class="fab fa-whatsapp mr-2"></i> Hablar con un Asesor
-                  </a>
-                </div>
-                <p class="mt-4 text-sm text-gray-500">Cupos limitados por disponibilidad de laboratorio.</p>
-              </div>
-
-              <!-- Mini Instructor Bio -->
-              <div class="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700 text-center opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/assets/img/brands/logo/log.png" alt="Arecofix Academy" class="h-8 mx-auto mb-4 grayscale">
-                <p class="text-sm">
-                  <strong>Instructor Certificado:</strong> {{ course.instructor_name || 'Ezequiel' }}. Especialista con años de experiencia impartiendo clases de alto nivel en nuestra academia.
-                </p>
-              </div>
-
+               </div>
             </div>
-          }
-
-          <!-- Tab Content: Temario -->
-          @if (activeTab === 'temario') {
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 fade-in">
-              <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Contenido del Curso</h2>
-
-              @if (loadingModules) {
-                <is-loading />
-              } @else if (modules.length === 0) {
-                <div class="text-center py-8 text-gray-500">
-                  No hay módulos cargados para este curso aún.
-                </div>
-              } @else {
-                <div class="space-y-4">
-                  @for (module of modules; track module.id) {
-                    <div class="collapse collapse-plus bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <input type="radio" name="my-accordion-3" />
-                      <div class="collapse-title text-lg font-medium text-gray-900 dark:text-white flex items-center">
-                        <span class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-sm mr-3 font-bold">
-                          {{$index + 1}}
-                        </span>
-                        {{module.title}}
-                      </div>
-                      <div class="collapse-content">
-                        <p class="text-gray-600 dark:text-gray-300 pt-2">{{module.description}}</p>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Tab Content: Galería -->
-          @if (activeTab === 'galeria') {
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 fade-in">
-              <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Galería de Clases</h2>
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                @for (img of galleryImages; track img) {
-                  <div class="aspect-square rounded-lg overflow-hidden bg-gray-200 border border-gray-100 dark:border-gray-700 relative group">
-                    <img [src]="img" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Clase práctica">
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-
-          <!-- Tab Content: Testimonios -->
-          @if (activeTab === 'testimonios') {
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 fade-in">
-              <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Lo que dicen nuestros alumnos</h2>
-
-              <!-- Main Video Testimonial -->
-              <div class="mb-10">
-                <div class="aspect-video rounded-xl overflow-hidden shadow-xl bg-black">
-                  <iframe
-                    [src]="getVideoUrl()"
-                    class="w-full h-full"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                  </iframe>
-                </div>
-                <p class="mt-3 text-center text-sm text-gray-500">
-                  Mira cómo nuestros alumnos aplican lo aprendido en clase (Video gentileza Municipio de Marcos Paz)
-                </p>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Text Testimonial 1 -->
-                <div class="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800/50">
-                  <div class="flex items-start">
-                    <div class="text-indigo-400 text-6xl mr-4 leading-none font-serif">"</div>
-                    <div>
-                      <p class="text-gray-700 dark:text-gray-300 italic mb-4 text-lg">
-                        Increíble experiencia. No solo aprendí a reparar, sino que me dieron las herramientas para montar mi propio negocio. Hoy vivo de esto.
-                      </p>
-                      <div class="flex items-center mt-4">
-                        <div class="w-10 h-10 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-700 font-bold mr-3">
-                          MR
-                        </div>
-                        <div>
-                          <h4 class="font-bold text-gray-900 dark:text-white">Martín Rodriguez</h4>
-                          <p class="text-xs text-gray-500">Egresado 2024</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Text Testimonial 2 -->
-                <div class="p-6 bg-white dark:bg-gray-700 rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm">
-                  <div class="flex items-start">
-                    <div class="text-indigo-400 text-6xl mr-4 leading-none font-serif">"</div>
-                    <div>
-                      <p class="text-gray-700 dark:text-gray-300 italic mb-4 text-lg">
-                        Los profesores explican con mucha paciencia y la práctica es constante. Me sentí muy cómodo desde el primer día.
-                      </p>
-                      <div class="flex items-center mt-4">
-                        <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold mr-3">
-                          LZ
-                        </div>
-                        <div>
-                          <h4 class="font-bold text-gray-900 dark:text-white">Lucas Zarate</h4>
-                          <p class="text-xs text-gray-500">Alumno Nivel Básico</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
+          </section>
 
         </div>
 
-        <!-- Right Column: Sidebar info -->
-        <div class="lg:col-span-1 space-y-6">
-          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 sticky top-24">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">Inversión Mensual</span>
-              <span class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold px-3 py-1 rounded-md border border-red-100 dark:border-red-800/50 animate-pulse">¡Pocos Cupos!</span>
-            </div>
-            
-            <div class="mb-6 pb-6 border-b border-slate-100 dark:border-slate-700">
-              <div class="flex items-baseline gap-1">
-                <span class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight">{{course.price | currency:'ARS':'symbol':'1.0-0'}}</span>
-                <span class="text-sm font-bold text-slate-400">/ mes</span>
-              </div>
-              @if (course.sale_price) {
-                <div class="text-sm font-medium text-green-600 mt-2 flex items-center gap-1">
-                  <i class="fas fa-tag"></i> Precio Promocional (Antes {{course.sale_price | currency}})
-                </div>
-              }
-            </div>
-
-            <div class="space-y-5 mb-8">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800/50">
-                  <i class="fas fa-calendar-alt text-lg"></i>
-                </div>
-                <div>
-                  <h4 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">Duración del Programa</h4>
-                  <p class="font-bold text-gray-900 dark:text-white text-sm">{{course.duration}}</p>
-                </div>
+        <!-- Right Sidebar (Mobile Floating / Desktop Sticky) -->
+        <div class="w-full md:w-1/3">
+           <div class="sticky top-24 space-y-6">
+              
+              <!-- Mobile Only CTA Card -->
+              <div class="md:hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 mb-6">
+                 <div class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+                    {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                 </div>
+                 <button (click)="openRegistration()" class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3">
+                    Empieza ya
+                 </button>
               </div>
 
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0 border border-purple-100 dark:border-purple-800/50">
-                  <i class="fas fa-clock text-lg"></i>
-                </div>
-                <div>
-                  <h4 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">Carga Horaria Semanal</h4>
-                  <p class="font-bold text-gray-900 dark:text-white text-sm">{{course.schedule}}</p>
-                </div>
+              <!-- Related Plans Block -->
+              <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                 <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Elige el plan ideal para ti</h3>
+                 
+                 <!-- Plan Expert -->
+                 <div class="border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 mb-4 relative overflow-hidden bg-blue-50/50 dark:bg-blue-900/10">
+                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">RECOMENDADO</div>
+                    <div class="font-black text-gray-900 dark:text-white mb-1">Plan Profesional</div>
+                    <div class="text-xs text-gray-500 mb-3 leading-relaxed">Un año de acceso con cursos ilimitados y soporte prioritario. Ahorras 7 meses.</div>
+                    <div class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">
+                       {{ course.price * 2.5 | currency:'ARS':'symbol':'1.0-0' }} <span class="text-xs text-gray-500 font-normal">/año</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline btn-primary w-full rounded-lg">Suscríbete a Plan Pro</button>
+                 </div>
+
+                 <!-- Plan Basic -->
+                 <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+                    <div class="font-bold text-gray-900 dark:text-white mb-1">Curso Individual</div>
+                    <div class="text-xs text-gray-500 mb-3 leading-relaxed">Acceso de por vida únicamente a este curso y sus actualizaciones.</div>
+                    <div class="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                       {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                    </div>
+                    <button (click)="openRegistration()" class="btn btn-sm bg-gray-900 hover:bg-gray-800 text-white w-full rounded-lg border-none">Comprar Curso</button>
+                 </div>
               </div>
 
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-100 dark:border-emerald-800/50">
-                  <i class="fas fa-map-marker-alt text-lg"></i>
-                </div>
-                <div>
-                  <h4 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">Modalidad Híbrida</h4>
-                  <p class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1">
-                    Sede Física <span class="text-slate-300 mx-1">+</span> Aula Virtual
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button (click)="openRegistration()" class="w-full btn border-none bg-blue-600 hover:bg-blue-700 text-white h-14 rounded-xl text-base font-bold shadow-[0_8px_20px_-4px_rgba(37,99,235,0.4)] flex justify-between items-center px-6 group transition-all">
-              <span>Aplicar a la Capacitación</span>
-              <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-            </button>
-            <p class="text-[11px] text-center text-slate-500 mt-4 flex items-center justify-center gap-1.5 font-medium">
-              <i class="fas fa-lock text-slate-400"></i> Reserva 100% Segura online
-            </p>
-          </div>
-
-          <!-- Contact Widget (Only visible on MD+) -->
-          <div class="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl shadow-lg p-6 text-white border border-slate-700 hidden lg:block">
-            <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-xl mb-4 border border-white/20">
-              <i class="fas fa-headset"></i>
-            </div>
-            <h3 class="font-bold text-lg mb-2">¿Necesitas ayuda?</h3>
-            <p class="text-slate-300 text-sm mb-6 leading-relaxed border-b border-white/10 pb-4">Nuestros asesores educativos están listos para guiar tu inscripción a la academia.</p>
-            <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20info%20del%20curso:%20' + course.title" target="_blank" class="btn bg-green-500 hover:bg-green-600 border-none text-white w-full rounded-xl flex items-center gap-2 font-bold group">
-              <i class="fab fa-whatsapp text-lg group-hover:scale-110 transition-transform"></i> Consultar por WhatsApp
-            </a>
-          </div>
+           </div>
         </div>
       </div>
     </div>
   }
+</div>
 
-  <!-- Registration Modal (DaisyUI) -->
-  @if (showRegistrationModal) {
+<!-- Modal Registration (Unchanged Logic, Adapted Styling) -->
+@if (showRegistrationModal) {
     <dialog class="modal modal-open modal-bottom sm:modal-middle" (click)="closeRegistration()">
-      <div class="modal-box bg-white dark:bg-gray-800 text-left relative" (click)="$event.stopPropagation()">
+      <div class="modal-box bg-white dark:bg-gray-800 text-left relative shadow-2xl" (click)="$event.stopPropagation()">
         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-500" (click)="closeRegistration()">✕</button>
-
+        
         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
-          Inscripción al curso
+          Inscripción Directa
         </h3>
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{course?.title}}</p>
 
@@ -609,24 +284,24 @@
               <i class="fas fa-check-circle text-5xl mb-4 text-green-500"></i>
               <h3 class="text-xl font-bold mb-2">¡Pre-inscripción realizada!</h3>
               <p class="mb-4">Para confirmar tu vacante, por favor realiza el pago:</p>
-
+              
               <div class="bg-white p-4 rounded-lg shadow-xs border border-green-100 mb-6 text-left">
                 <p class="font-bold text-gray-800 mb-1">Datos Bancarios:</p>
                 <p class="text-gray-600 mb-1">Alias: <span class="font-mono font-bold text-gray-900 select-all">arecofix</span></p>
                 <p class="text-gray-600">CBU: <span class="font-mono font-bold text-gray-900 select-all">ecocell</span></p>
               </div>
-
+              
               <p class="text-sm mb-4">
-                Una vez realizado el pago, envía el comprobante al: <br>
-                <strong class="text-lg">+54 9 11 2596-0900</strong>
+                Envía el comprobante por WhatsApp al:
+                <strong class="text-lg block mt-1">+54 9 11 2596-0900</strong>
               </p>
 
-              <a [href]="'https://wa.me/5491125960900?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20curso%20' + (course?.title || '')"
+              <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20acabo%20de%20inscribirme%20al%20curso:%20' + course?.title + '.%20Aquí%20envío%20mi%20comprobante.'" 
                 target="_blank"
-                class="btn btn-success w-full text-white no-underline hover:bg-green-600 border-none">
+                class="btn bg-green-500 hover:bg-green-600 w-full text-white no-underline border-none">
                 <i class="fab fa-whatsapp mr-2 text-xl"></i> Enviar Comprobante
               </a>
-
+              
               <button (click)="closeRegistration()" class="btn btn-ghost w-full mt-4">Cerrar</button>
             </div>
           } @else {
@@ -647,40 +322,26 @@
                 <p class="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-100">{{registrationError}}</p>
               }
             </form>
-
+          }
+        </div>
+        
+        @if (!registrationSuccess) {
             <div class="modal-action flex flex-col sm:flex-row-reverse gap-2 mt-6">
               <button type="button" (click)="submitRegistration()" [disabled]="registering"
-                class="btn btn-primary w-full sm:w-auto">
-                @if(registering) {
+                class="btn bg-blue-600 hover:bg-blue-700 border-none text-white w-full sm:w-auto">
+                @if (registering) {
                   <span class="loading loading-spinner loading-xs"></span>
                 }
-                {{ registering ? 'Enviando...' : 'Confirmar Inscripción' }}
+                Confirmar Inscripción
               </button>
               <button type="button" (click)="closeRegistration()" class="btn btn-ghost w-full sm:w-auto">
                 Cancelar
               </button>
             </div>
-          }
-        </div>
+        }
       </div>
       <form method="dialog" class="modal-backdrop">
         <button (click)="closeRegistration()">close</button>
       </form>
     </dialog>
-  }
-
-  @if (course) {
-  <!-- Floating CTAs (Mobile Bar & Desktop Button) -->
-  <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 p-4 pb-6 flex items-center justify-between shadow-[0_-15px_40px_rgba(0,0,0,0.1)] md:hidden">
-    <div class="flex flex-col">
-      <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Inversión</span>
-      <span class="text-xl font-black text-gray-900 dark:text-white leading-none tracking-tight">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
-    </div>
-    <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20quiero%20inscribirme%20al%20curso:%20' + course.title"
-       target="_blank"
-       class="btn bg-green-500 hover:bg-green-600 border-none text-white rounded-xl shadow-lg shadow-green-500/30 px-5 font-bold flex items-center gap-2">
-      <i class="fab fa-whatsapp text-lg animate-pulse"></i> Inscribirme 
-    </a>
-  </div>
-  }
-</div>
+}

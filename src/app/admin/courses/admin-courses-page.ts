@@ -166,7 +166,7 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
 
               <!-- Admin Actions -->
               <div class="col-span-6 md:col-span-2 flex justify-end items-center gap-1 md:gap-2">
-                @if (course.status === 'pending') {
+                @if (course.status === 'PENDING') {
                   <!-- Approve Button -->
                   <button (click)="approveCourse(course)" 
                           class="btn btn-sm btn-circle bg-emerald-50 dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 border-none tooltip" data-tip="Aprobar">
@@ -186,7 +186,7 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
                 </a>
                 <!-- Delete / Reject -->
                 <button (click)="deleteCourse(course)" 
-                        class="btn btn-sm btn-circle bg-red-50 dark:bg-slate-700 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 border-none transition-colors" [attr.data-tip]="course.status === 'pending' ? 'Rechazar' : 'Eliminar'">
+                        class="btn btn-sm btn-circle bg-red-50 dark:bg-slate-700 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 border-none transition-colors" [attr.data-tip]="course.status === 'PENDING' ? 'Rechazar' : 'Eliminar'">
                   <i class="fas fa-times text-xs"></i>
                 </button>
               </div>
@@ -207,14 +207,14 @@ export class AdminCoursesPage implements OnInit {
   activeTab = signal<'activos' | 'pendientes'>('activos');
 
   // Dashboards computed metrics
-  activeCoursesCount = computed(() => this.courses().filter(c => c.status !== 'pending').length);
-  pendingCoursesCount = computed(() => this.courses().filter(c => c.status === 'pending').length);
+  activeCoursesCount = computed(() => this.courses().filter(c => c.status !== 'PENDING').length);
+  pendingCoursesCount = computed(() => this.courses().filter(c => c.status === 'PENDING').length);
   
   filteredCourses = computed(() => {
     if (this.activeTab() === 'pendientes') {
-      return this.courses().filter(c => c.status === 'pending');
+      return this.courses().filter(c => c.status === 'PENDING');
     }
-    return this.courses().filter(c => c.status !== 'pending');
+    return this.courses().filter(c => c.status !== 'PENDING');
   });
 
   totalMonthlyRevenue = computed(() => this.courses().reduce((sum, c) => sum + (c.is_active ? Number(c.price || 0) : 0), 0));
@@ -252,7 +252,7 @@ export class AdminCoursesPage implements OnInit {
       if (error) throw error;
       
       this.courses.update(current => current.map(c => 
-        c.id === course.id ? { ...c, status: 'published', is_active: true } : c
+        c.id === course.id ? { ...c, status: 'PUBLISHED', is_active: true } as Course : c
       ));
       this.cdr.markForCheck();
     } catch (err: any) {
@@ -261,7 +261,7 @@ export class AdminCoursesPage implements OnInit {
   }
 
   async deleteCourse(course: Course) {
-    const action = course.status === 'pending' ? 'rechazar' : 'eliminar';
+    const action = course.status === 'PENDING' ? 'rechazar' : 'eliminar';
     if (!confirm(`¿Estás seguro de ${action} el curso "${course.title}"?`)) return;
 
     // For rejection, we simply delete it or set status to rejected. We will use delete per standard.

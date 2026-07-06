@@ -54,7 +54,7 @@ export class ProductsStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.LIST_TTL)) {
-      console.log(`[ProductsStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
+      // console.log(`[ProductsStore] 🎯 Cache HIT (List) para clave: "${cacheKey}". Evitando petición a Supabase.`);
       this.loading.set(false);
       return of({
         pages: cached.totalPages ?? 1,
@@ -68,7 +68,7 @@ export class ProductsStore {
       return of({ pages: 1, items: 0, data: [] } as unknown as ProductsResponse);
     }
 
-    console.log(`[ProductsStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
+    // console.log(`[ProductsStore] 🌐 Cache MISS (List) para clave: "${cacheKey}". Consultando Supabase...`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -102,12 +102,12 @@ export class ProductsStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.DETAIL_TTL)) {
-      console.log(`[ProductsStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
+      // console.log(`[ProductsStore] 🎯 Cache HIT (Detail) para ID: "${id}". Evitando petición a Supabase.`);
       this.loading.set(false);
       return of(cached.data);
     }
 
-    console.log(`[ProductsStore] 🌐 Cache MISS (Detail) para ID: "${id}". Consultando Supabase...`);
+    // console.log(`[ProductsStore] 🌐 Cache MISS (Detail) para ID: "${id}". Consultando Supabase...`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -137,7 +137,7 @@ export class ProductsStore {
    * Limpia la caché (por ejemplo, después de una inserción, modificación o eliminación).
    */
   clearCache(): void {
-    console.log('[ProductsStore] 🧹 Limpiando caché de productos.');
+    // console.log('[ProductsStore] 🧹 Limpiando caché de productos.');
     this.listCache.set({});
     this.detailCache.set({});
   }

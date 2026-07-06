@@ -44,7 +44,7 @@ export class BranchService {
     const path = window.location.pathname;
     const pathSegments = path.split('/').filter(s => s);
     if (pathSegments.length > 0 && pathSegments[0] === 'admin') {
-      console.log('[BranchService] Sede Central URL detected on initialization, bypassing localStorage hydration.');
+      // console.log('[BranchService] Sede Central URL detected on initialization, bypassing localStorage hydration.');
       this.setCurrentBranch(null);
       return;
     }
@@ -54,7 +54,7 @@ export class BranchService {
       try {
         // We do it asynchronously to not block constructor, but set signal asap
         await this.setBranchById(savedId);
-        console.log('[BranchService] Context hydrated from storage:', this._currentBranch()?.name);
+        // console.log('[BranchService] Context hydrated from storage:', this._currentBranch()?.name);
       } catch (e) {
         console.warn('[BranchService] Hydration failed:', e);
       }
@@ -121,8 +121,9 @@ export class BranchService {
     const profile = inputProfile || this.auth.getCurrentProfile();
     if (profile?.branch_id) return profile.branch_id;
 
-    // 3. SuperAdmin Fallback to Central Branch
-    if (this.auth.isSuperAdmin()) {
+    // 3. SuperAdmin or Admin/Owner Fallback to Central Branch
+    const role = profile?.role;
+    if (this.auth.isSuperAdmin() || role === 'tenant_owner' || role === 'admin') {
       try {
         const branches = await this.getAllAdminBranches();
         const central = branches.find(b => b.name?.toLowerCase().includes('central')) || branches[0];

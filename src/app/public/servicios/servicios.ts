@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -48,7 +48,7 @@ export class ServiciosComponent implements OnInit {
         this.seoService.setPageData({
             title: 'Soluciones Tecnológicas Integrales | Arecofix Servicios',
             description: 'Experiencia y tecnología al servicio de tu empresa. Desarrollo de Software, Soporte IT, Ciberseguridad y Reparación de Hardware Especializada.',
-            imageUrl: 'assets/img/branding/og-services.jpg'
+            imageUrl: 'assets/img/branding/og-services.png'
         });
     }
 

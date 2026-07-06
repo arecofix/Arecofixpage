@@ -26,7 +26,9 @@ export interface Course {
     rating?: number;
     students?: number;
     is_active?: boolean;
-    status?: string;
+    status?: 'DRAFT' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'PUBLISHED';
+    admin_feedback?: string;
+    preview_video_url?: string;
     author_id?: string;
     tenant_id?: string;
     created_at?: string;

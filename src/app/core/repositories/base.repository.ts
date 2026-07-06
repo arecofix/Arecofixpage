@@ -120,7 +120,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
                 throw error;
             }
 
-            const batch = data || [];
+            const batch = Array.isArray(data) ? data : (data ? [data] : []);
             allData = [...allData, ...batch];
             
             if (batch.length < CHUNK) {

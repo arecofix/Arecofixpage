@@ -93,31 +93,31 @@ export class AdminPostFormPage implements OnInit {
 
     async onSubmit() {
         if (this.form.invalid) {
-            console.log('Form is invalid', this.form.errors, this.form.value);
+            // console.log('Form is invalid', this.form.errors, this.form.value);
             return;
         }
 
         try {
-            console.log('Starting form submission...');
+            // console.log('Starting form submission...');
             this.submitting = true;
             this.cdr.markForCheck();
             const payload = this.form.value;
 
             if (this.isEdit && this.postId) {
-                console.log('Updating post...', payload);
+                // console.log('Updating post...', payload);
                 await this.postService.updatePost(this.postId, payload);
             } else {
-                console.log('Creating post...', payload);
+                // console.log('Creating post...', payload);
                 await this.postService.createPost(payload);
             }
 
-            console.log('Post saved successfully, navigating...');
+            // console.log('Post saved successfully, navigating...');
             await this.router.navigate(['/admin/posts']);
         } catch (error: any) {
             console.error('Error saving post', error);
             alert('Error al guardar: ' + (error.message || error));
         } finally {
-            console.log('Finishing form submission...');
+            // console.log('Finishing form submission...');
             this.submitting = false;
             this.cdr.markForCheck();
         }

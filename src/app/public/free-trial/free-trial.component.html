@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl">
+        Prueba gratuita <span class="text-blue-600">72 h</span>
+      </h1>
+      <p class="mt-4 text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+        Crea tu Sistema Taller con tu logo y probalo gratis. La prueba se genera personalizada con tus datos.
+      </p>
+      <p class="mt-2 text-md text-gray-500 dark:text-gray-400 max-w-3xl mx-auto">
+        Queda habilitada por 72 horas en una sola PC. Si después pagas, se convierte en licencia definitiva con hasta 10 PC autorizadas.
+      </p>
+    </div>
+
+    <!-- Error/Success Alerts -->
+    <div *ngIf="errorMessage" class="mb-8 alert alert-error shadow-lg max-w-3xl mx-auto">
+      <div>
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="mb-8 alert alert-success shadow-lg max-w-3xl mx-auto">
+      <div>
+        <i class="fas fa-check-circle text-white"></i>
+        <span class="text-white font-bold">{{ successMessage }}</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <!-- Form Section -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 border border-gray-100 dark:border-slate-700">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Completa tus datos</h2>
+        
+        <form [formGroup]="trialForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          
+          <!-- Business Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del negocio *</label>
+            <input type="text" formControlName="businessName" placeholder="Ej: FixCell" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+            <span *ngIf="trialForm.get('businessName')?.touched && trialForm.get('businessName')?.invalid" class="text-xs text-red-500 mt-1 block">
+              Requerido (mínimo 3 caracteres)
+            </span>
+          </div>
+
+          <!-- Subtitle -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subtítulo / rubro</label>
+            <input type="text" formControlName="subtitle" placeholder="Ej: Reparación de celulares y PCs" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+          </div>
+
+          <!-- WhatsApp -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">WhatsApp con código de país *</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
+                <i class="fab fa-whatsapp"></i>
+              </span>
+              <input type="text" formControlName="whatsapp" placeholder="Ej: +541125960900" class="input input-bordered w-full pl-10 bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Debe incluir código de país (ej. +54, +595, +52)</span>
+            <span *ngIf="trialForm.get('whatsapp')?.touched && trialForm.get('whatsapp')?.invalid" class="text-xs text-red-500 mt-1 block">
+              Debe ser un número válido con el prefijo (+).
+            </span>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correo electrónico *</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
+                <i class="far fa-envelope"></i>
+              </span>
+              <input type="email" formControlName="email" placeholder="ejemplo@correo.com" class="input input-bordered w-full pl-10 bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+            </div>
+            <span *ngIf="trialForm.get('email')?.touched && trialForm.get('email')?.invalid" class="text-xs text-red-500 mt-1 block">
+              Correo inválido.
+            </span>
+          </div>
+
+          <!-- Currency/Country -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">País / moneda *</label>
+            <select formControlName="currency" class="select select-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+              <option value="ARS">Argentina - ARS ($)</option>
+              <option value="USD">Internacional - USD ($)</option>
+              <option value="MXN">México - MXN ($)</option>
+              <option value="CLP">Chile - CLP ($)</option>
+              <option value="COP">Colombia - COP ($)</option>
+              <option value="PYG">Paraguay - PYG (Gs)</option>
+              <option value="UYU">Uruguay - UYU ($)</option>
+            </select>
+          </div>
+
+          <!-- Logo Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Logotipo (opcional)</label>
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-slate-600 border-dashed rounded-md bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" (click)="fileInput.click()">
+              <div class="space-y-1 text-center">
+                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                  <span class="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
+                    Haz clic para cargar tu logo
+                  </span>
+                  <input #fileInput type="file" class="sr-only" accept="image/*" (change)="onLogoSelected($event)">
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, WEBP hasta 2MB</p>
+              </div>
+            </div>
+            <span *ngIf="uploadingLogo" class="text-xs text-blue-500 mt-2 block"><i class="fas fa-spinner fa-spin"></i> Subiendo logo...</span>
+          </div>
+
+          <!-- Information Panel -->
+          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800/30">
+            <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+              <li class="flex items-center gap-2"><i class="fas fa-desktop w-4"></i> 1 PC en prueba gratuita</li>
+              <li class="flex items-center gap-2"><i class="fas fa-clock w-4"></i> 72 horas desde la creación</li>
+              <li class="flex items-center gap-2"><i class="fas fa-lock w-4"></i> Bloqueo por hardware y licencia registrada</li>
+              <li class="flex items-center gap-2"><i class="fas fa-ban w-4"></i> No se crea otra prueba con el mismo WhatsApp o correo</li>
+            </ul>
+          </div>
+
+          <button type="submit" [disabled]="trialForm.invalid || isLoading || hasClaimedTrial" class="btn btn-primary w-full shadow-lg text-lg h-14">
+            <i class="fas fa-rocket mr-2" *ngIf="!isLoading"></i>
+            <i class="fas fa-spinner fa-spin mr-2" *ngIf="isLoading"></i>
+            {{ isLoading ? 'Preparando sistema...' : 'Crear mi prueba gratis 72 h' }}
+          </button>
+          
+          <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
+            Descarga segura lista. Completa tus datos para preparar tu prueba gratis 72 h.
+          </p>
+
+        </form>
+      </div>
+
+      <!-- Preview Section -->
+      <div class="sticky top-24">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Vista previa de tu Taller</h2>
+        
+        <div class="rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700">
+          
+          <!-- Toggle Background Preview -->
+          <div class="flex">
+            <button (click)="previewMode = 'light'" [class.bg-white]="previewMode === 'light'" [class.text-blue-600]="previewMode === 'light'" [class.bg-gray-100]="previewMode !== 'light'" class="flex-1 py-3 text-sm font-bold text-gray-500 transition border-b-2" [class.border-blue-600]="previewMode === 'light'" [class.border-transparent]="previewMode !== 'light'">
+              <i class="fas fa-sun mr-1"></i> Modo Claro
+            </button>
+            <button (click)="previewMode = 'dark'" [class.bg-slate-900]="previewMode === 'dark'" [class.text-blue-400]="previewMode === 'dark'" [class.bg-slate-800]="previewMode !== 'dark'" class="flex-1 py-3 text-sm font-bold text-gray-400 transition border-b-2" [class.border-blue-400]="previewMode === 'dark'" [class.border-transparent]="previewMode !== 'dark'">
+              <i class="fas fa-moon mr-1"></i> Modo Oscuro
+            </button>
+          </div>
+
+          <!-- Preview Content -->
+          <div class="p-8 h-96 flex flex-col items-center justify-center transition-colors duration-500" [ngClass]="{'bg-slate-50': previewMode === 'light', 'bg-slate-900': previewMode === 'dark'}">
+            
+            <div class="w-32 h-32 rounded-2xl flex items-center justify-center overflow-hidden mb-6 shadow-md transition-colors" [ngClass]="{'bg-white': previewMode === 'light', 'bg-slate-800': previewMode === 'dark'}">
+              <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo preview" class="max-w-full max-h-full object-contain p-2">
+              <span *ngIf="!logoUrl" class="text-6xl font-bold font-serif opacity-30" [ngClass]="{'text-slate-900': previewMode === 'light', 'text-white': previewMode === 'dark'}">
+                {{ ((trialForm.get('businessName')?.value || 'Logo') + '') | slice:0:1 | uppercase }}
+              </span>
+            </div>
+
+            <h3 class="text-3xl font-extrabold text-center mb-2" [ngClass]="{'text-slate-900': previewMode === 'light', 'text-white': previewMode === 'dark'}">
+              {{ trialForm.get('businessName')?.value || 'Nombre del Negocio' }}
+            </h3>
+            
+            <p class="text-lg text-center mb-6" [ngClass]="{'text-slate-500': previewMode === 'light', 'text-slate-400': previewMode === 'dark'}">
+              {{ trialForm.get('subtitle')?.value || 'Subtítulo / Rubro' }}
+            </p>
+
+            <div class="badge badge-lg gap-2 shadow-sm" [ngClass]="{'badge-primary': previewMode === 'light', 'bg-blue-600 text-white border-none': previewMode === 'dark'}">
+              <i class="fas fa-lock"></i> Licencia: PRUEBA 72H
+            </div>
+
+          </div>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-4">Vista previa grande con fondo claro/oscuro para ver textos blancos, negros y logos transparentes.</p>
+      </div>
+    </div>
+  </div>
+</div>

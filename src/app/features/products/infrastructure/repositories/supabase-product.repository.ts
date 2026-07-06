@@ -107,12 +107,13 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     if (params.q) {
       const queryStr = params.q.trim();
       if (queryStr) {
-        // Separamos por espacios y buscamos que el nombre contenga todas las palabras
-        // Esto permite coincidencias parciales y desordenadas (ej: "pantalla 11" encuentra "Pantalla original iphone 11")
-        const words = queryStr.split(/\s+/).filter(w => w.length > 0);
-        words.forEach(word => {
-          query = query.ilike('name', `%${word}%`);
-        });
+        // Sanitizamos para evitar errores de sintaxis tsquery y mantenemos espacios
+        const safeQuery = queryStr.replace(/[^\p{L}\p{N}\s]/gu, '');
+        const words = safeQuery.split(/\s+/).filter(w => w.length > 0);
+        if (words.length > 0) {
+          const tsQuery = words.map(w => `'${w}':*`).join(' & ');
+          query = query.textSearch('search_tsv', tsQuery, { config: 'spanish' });
+        }
       }
     }
 
@@ -307,6 +308,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   search(query: string, categoryId?: string): Observable<Product[]> {
     const queryStr = query.trim();
     if (!queryStr) return of([]);
+    
+    const safeQuery = queryStr.replace(/[^\p{L}\p{N}\s]/gu, '');
+    const words = safeQuery.split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) return of([]);
+    
+    const tsQuery = words.map(w => `'${w}':*`).join(' & ');
 
     const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
     let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
@@ -316,18 +323,34 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       supabaseQuery = supabaseQuery.eq('category_id', categoryId);
     }
 
-    // Use PostgreSQL Full Text Search for high-performance search
-    supabaseQuery = supabaseQuery.textSearch('search_tsv', queryStr, { 
-      config: 'spanish', 
-      type: 'websearch' 
-    });
+    // Use PostgreSQL Full Text Search for high-performance search with prefix wildcard
+    supabaseQuery = supabaseQuery.textSearch('search_tsv', tsQuery, { config: 'spanish' });
 
-    return from(supabaseQuery as any).pipe(
-      map(({ data, error }: any) => {
-        if (error) this.errorHandler.handleError(error, 'search');
-        return (data || []).map((p: any) => ProductMapper.mapFromDb(p));
-      })
-    );
+    return new Observable<Product[]>(subscriber => {
+      let isSubscribed = true;
+      
+      Promise.resolve(supabaseQuery).then(({ data, error }: any) => {
+        if (!isSubscribed) return;
+        
+        if (error) {
+          try {
+            this.errorHandler.handleError(error, 'search');
+          } catch (e) {
+            subscriber.error(e);
+          }
+        } else {
+          subscriber.next((data || []).map((p: any) => ProductMapper.mapFromDb(p)));
+          subscriber.complete();
+        }
+      }).catch((err: any) => {
+        if (!isSubscribed) return;
+        subscriber.error(err);
+      });
+
+      return () => {
+        isSubscribed = false;
+      };
+    });
   }
 
   getPendingApprovals(): Observable<Product[]> {

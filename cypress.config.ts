@@ -1,11 +1,14 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+  projectId: 'hfghsi',
   e2e: {
+    testIsolation: false,
+    trashAssetsBeforeRuns: false,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
-    baseUrl: "http://127.0.0.1:4200",
+    baseUrl: "http://localhost:4200",
     supportFile: "cypress/support/e2e.ts",
   },
 

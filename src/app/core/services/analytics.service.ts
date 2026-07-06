@@ -20,10 +20,13 @@ export class AnalyticsService {
 
     constructor() {
         if (this.isBrowser) {
-            this.initPostHog();
-            this.initFirebase();
-            this.initGoogleAnalytics();
-            this.initMetaPixel();
+            // Defer analytics initialization to prevent main thread blocking (Improves FCP & TBT)
+            setTimeout(() => {
+                this.initPostHog();
+                this.initFirebase();
+                this.initGoogleAnalytics();
+                this.initMetaPixel();
+            }, 3500);
             this.setupRouterTracking();
         }
     }

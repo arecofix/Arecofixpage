@@ -25,7 +25,7 @@ export class BlogComponent {
     this.seoService.setPageData({
       title: 'Blog de Tecnología y Reparación',
       description: 'Novedades, guías de reparación y noticias del mundo tecnológico de Marcos Paz. Mantente actualizado con Arecofix.',
-      imageUrl: 'assets/img/branding/og-blog.jpg'
+      imageUrl: 'assets/img/branding/og-blog.png'
     });
     try {
       const allPosts = await this.postService.getRecentPosts(100);

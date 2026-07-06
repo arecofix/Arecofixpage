@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, inject, OnInit } from '@angular/core';
+import { Component, PLATFORM_ID, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { BugReportModalComponent } from '../bug-report-modal/bug-report-modal.component';
@@ -67,8 +67,8 @@ import { BugReportModalComponent } from '../bug-report-modal/bug-report-modal.co
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 60px;
-      height: 55px;
+      width: 45px;
+      height: 45px;
       border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.2s ease;
@@ -79,12 +79,12 @@ import { BugReportModalComponent } from '../bug-report-modal/bug-report-modal.co
     }
 
     .ribbon-btn .icon {
-      font-size: 20px;
-      margin-bottom: 4px;
+      font-size: 13px;
+      margin-bottom: 2px;
     }
 
     .ribbon-btn .text {
-      font-size: 11px;
+      font-size: 9px;
       font-family: sans-serif;
     }
 
@@ -127,21 +127,24 @@ export class RibbonMenuComponent implements OnInit {
   showHelpModal = false;
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   async ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       import('@tauri-apps/api/core').then(({ isTauri }) => {
         this.isTauri = isTauri();
+        if (this.isTauri) {
+          document.body.classList.add('is-tauri');
+          document.body.style.paddingTop = '65px';
+        }
+        this.cdr.detectChanges();
       }).catch(() => {
         this.isTauri = false;
+        this.cdr.detectChanges();
       });
-      if (this.isTauri) {
-        document.body.classList.add('is-tauri');
-        // Add padding to body to avoid content overlapping with the fixed titlebar
-        document.body.style.paddingTop = '65px';
-      }
     }
   }
+
 
   navigate(path: string) {
     this.router.navigate([path]);
