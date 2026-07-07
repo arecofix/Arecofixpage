@@ -35,20 +35,21 @@ export class SupabaseService {
           });
         }
       }
-
-      const isOffline = (typeof navigator !== 'undefined' && !navigator.onLine) || (typeof window !== 'undefined' && (window as any).forceOffline);
+      const isOffline = false; // Hardcoded for testing
 
       if (isOffline) {
-        if (isCacheable) {
-           const cachedDB = await this.syncService.getCachedRequest(urlStr);
-           if (cachedDB) {
-             this.logger.info(`[OfflineSync] Serving from IndexedDB cache: ${urlStr}`);
-             return new Response(cachedDB.data, {
-               status: cachedDB.status,
-               statusText: cachedDB.statusText,
-               headers: new Headers(cachedDB.headers)
-             });
-           }
+         if (isCacheable) {
+           try {
+             const cachedDB = await this.syncService.getCachedRequest(urlStr);
+             if (cachedDB) {
+               this.logger.info(`[OfflineSync] Serving from IndexedDB cache: ${urlStr}`);
+               return new Response(cachedDB.data, {
+                 status: cachedDB.status,
+                 statusText: cachedDB.statusText,
+                 headers: new Headers(cachedDB.headers)
+               });
+             }
+           } catch (e) {}
            throw new Error('No internet connection and no offline cache available');
         } else if (isMutation) {
            this.logger.info(`[OfflineSync] Offline detected. Queueing mutation: ${method} ${urlStr}`);

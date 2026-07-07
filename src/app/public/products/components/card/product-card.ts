@@ -44,6 +44,11 @@ export class ProductCard {
   showWholesaleGate = computed(() => this.strategicService.shouldShowWholesaleGate(this.product()));
   showWishlist = computed(() => this.strategicService.canShowWishlist(this.product()));
   valueProposition = computed(() => this.strategicService.getValueProposition(this.product()));
+  
+  isInStock = computed(() => {
+    const p = this.product();
+    return (p.stock ?? 0) > 0 || p.is_active;
+  });
 
   toggleFav(event: Event) {
     event.preventDefault();

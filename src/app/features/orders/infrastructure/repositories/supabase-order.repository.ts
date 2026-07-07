@@ -123,7 +123,12 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
       await this._upsertOrderItems(id, order.items);
     }
 
-    return OrderMapper.toDomain({ ...order, id });
+    // Mantenemos los items originales (que incluyen los objetos product)
+    const domainOrder = OrderMapper.toDomain({ ...order, id });
+    if (order.items) {
+        domainOrder.items = [...order.items];
+    }
+    return domainOrder;
   }
 
   private async _upsertOrderItems(orderId: string, items: OrderItem[]): Promise<void> {

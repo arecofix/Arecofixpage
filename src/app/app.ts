@@ -10,6 +10,7 @@ import { ThemeService } from './core/services/theme.service';
 import { TenantService } from './core/services/tenant.service';
 import { ScannerService } from './core/services/scanner.service';
 import { ShortcutService } from './core/services/shortcut.service';
+import { SupabaseService } from './core/services/supabase.service';
 
 @Component({
 
@@ -36,6 +37,8 @@ export class App implements OnInit {
   private scannerService = inject(ScannerService);
   private shortcutService = inject(ShortcutService);
 
+  private supabase = inject(SupabaseService);
+
   ngOnInit() {
     this.seoService.initialize();
 
@@ -50,9 +53,42 @@ export class App implements OnInit {
       // Check for Tauri environment
       if ((window as any).__TAURI_INTERNALS__) {
         this.startSidecar();
+        this.setupDeepLinks();
       }
     }
   }
+
+  private async setupDeepLinks() {
+    try {
+      // @ts-ignore
+      const { onOpenUrl } = await import(/* @vite-ignore */ '@tauri-apps/plugin-deep-link');
+
+      await onOpenUrl((urls: string[]) => {
+        if (!urls || urls.length === 0) return;
+        try {
+          const urlStr = urls[0];
+          if (urlStr.startsWith('arecofix://login')) {
+            const urlObj = new URL(urlStr);
+            const token = urlObj.searchParams.get('token');
+            if (token) {
+              // Set the session
+              this.supabase.getClient().auth.setSession({ access_token: token, refresh_token: token }).then(({ error }) => {
+                if (!error) {
+                  // Redirect to admin or show a toast
+                  window.location.href = '/admin/dashboard';
+                }
+              });
+            }
+          }
+        } catch (e) {
+          this.logger.error('Error handling deep link:', e);
+        }
+      });
+    } catch (e) {
+      this.logger.warn('Deep link plugin not available or failed to initialize:', e);
+    }
+  }
+
 
   private async checkBackendStatus(): Promise<boolean> {
     try {

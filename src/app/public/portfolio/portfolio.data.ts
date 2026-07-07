@@ -370,11 +370,11 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
 
       workExperience: [
         {
-          position: 'Profesor de Microelectrónica',
-          company: 'IAP Marcos Paz',
+          position: 'Formación & Educación (Instructor)',
+          company: 'IAP Marcos Paz & Arecofix Academy',
           period: '2025 - Presente',
-          description: 'Liderazgo técnico y mentoría en equipos de desarrollo, potenciando la comunicación de objetivos arquitectónicos, resolución de bloqueos complejos y elevando los estándares técnicos del equipo para acelerar la entrega de valor.',
-          techStack: ['Electrónica', 'Troubleshooting', 'Liderazgo', 'Análisis Lógico']
+          description: 'Apasionado por la enseñanza y el aprendizaje continuo. Formando a la próxima generación de profesionales en tecnología y reparación a través de Arecofix Academy.\n\nProfesor de Microelectrónica (IAP Marcos Paz):\nLiderazgo técnico y mentoría en equipos de desarrollo, potenciando la comunicación de objetivos arquitectónicos, resolución de bloqueos complejos y elevando los estándares técnicos del equipo para acelerar la entrega de valor.',
+          techStack: ['Electrónica', 'Troubleshooting', 'Liderazgo Técnico', 'Educación']
         },
         {
           position: 'Instructor de Desarrollo de Software',

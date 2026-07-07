@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BranchService, Branch } from '@app/core/services/branch.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { SupabaseService } from '@app/core/services/supabase.service';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
     selector: 'app-admin-branches-page',
@@ -14,6 +16,8 @@ import { TenantService } from '@app/core/services/tenant.service';
 export class AdminBranchesPage implements OnInit {
     public branchService = inject(BranchService);
     private tenantService = inject(TenantService);
+    private supabase = inject(SupabaseService);
+    public auth = inject(AuthService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
 
@@ -219,8 +223,26 @@ export class AdminBranchesPage implements OnInit {
                 await this.branchService.updateBranch(payload as Branch);
                 this.success.set('Sucursal actualizada con éxito');
             } else {
-                await this.branchService.addBranch(payload, slug);
-                this.success.set('Sucursal creada con éxito');
+                if (this.auth.isSuperAdmin()) {
+                    // Si es SuperAdmin, creamos un nuevo Tenant y Sucursal usando la Edge Function
+                    const response = await this.supabase.getClient().functions.invoke('create-trial-tenant', {
+                        body: {
+                            email: payload.contact_email || 'admin@arecofix.com',
+                            businessName: payload.name,
+                            subtitle: payload.official_name || '',
+                            whatsapp: payload.whatsapp_number || '+5491100000000',
+                            currency: 'ARS',
+                            logo_url: payload.branding_settings?.logo_url || null
+                        }
+                    });
+                    if (response.error || (response.data && !response.data.success)) {
+                        throw new Error(response.error?.message || response.data?.error || 'Error creando tenant.');
+                    }
+                    this.success.set('Nuevo Tenant/Sucursal creado con éxito. El usuario recibirá un correo.');
+                } else {
+                    await this.branchService.addBranch(payload, slug);
+                    this.success.set('Sucursal creada con éxito');
+                }
             }
             this.showForm.set(false);
             await this.loadBranches();
