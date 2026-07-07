@@ -1,0 +1,102 @@
+describe('Flujo Completo de la Academia (Cursos)', () => {
+    beforeEach(() => {
+        const mockSession = {
+            access_token: 'fake-jwt-token',
+            refresh_token: 'fake-refresh-token',
+            user: {
+                id: 'admin-user-123',
+                email: 'admin@arecofix.com',
+                role: 'authenticated'
+            }
+        };
+        
+        window.localStorage.setItem('sb-arecofix-auth-token', JSON.stringify(mockSession));
+        
+        cy.intercept('GET', '**/rest/v1/profiles*', {
+            statusCode: 200,
+            body: [{
+                id: 'admin-user-123',
+                first_name: 'Admin',
+                last_name: 'User',
+                role: 'super_admin'
+            }]
+        }).as('getProfile');
+
+        cy.intercept('GET', '**/rest/v1/courses*', {
+            statusCode: 200,
+            body: [{
+                id: 'mock-course-1',
+                title: 'Curso Mock 1',
+                slug: 'curso-mock-1',
+                description: 'Test course',
+                duration: '4 weeks',
+                schedule: 'Mondays',
+                instructor_name: 'Test Instructor',
+                students: 42,
+                price: 10000,
+                image_url: 'https://via.placeholder.com/150',
+                is_active: true
+            }]
+        }).as('getCourses');
+
+        cy.intercept('POST', '**/rest/v1/courses*', {
+            statusCode: 201,
+            body: [{
+                id: 'mock-course-new',
+                title: 'Nuevo Curso E2E',
+                slug: 'nuevo-curso-e2e'
+            }]
+        }).as('postCourse');
+
+        // Force angular state removal
+        cy.intercept('GET', '/academy', (req) => {
+            req.continue((res) => {
+                if (typeof res.body === 'string') {
+                    res.body = res.body.replace(/<script id="(angular|ng)-state" type="application\/json">[\s\S]*?<\/script>/, '');
+                }
+            });
+        }).as('academyHtml');
+    });
+
+    it('1. El administrador ingresa a la lista de cursos', () => {
+        cy.visit('/admin/courses');
+        cy.url().should('include', '/admin/courses');
+        cy.contains('Curso Mock 1', { timeout: 10000 }).should('be.visible');
+    });
+
+    it('2. El administrador crea un nuevo curso', () => {
+        cy.visit('/admin/courses/new');
+        cy.url().should('include', '/admin/courses/new');
+        
+        cy.get('input[formControlName="title"]').type('Nuevo Curso E2E', { delay: 10 });
+        cy.get('input[formControlName="slug"]').clear().type('nuevo-curso-e2e', { delay: 10 });
+        cy.get('textarea[formControlName="description"]').type('Descripción E2E', { delay: 10 });
+        cy.get('input[formControlName="duration"]').type('4 weeks', { delay: 10 });
+        cy.get('input[formControlName="schedule"]').type('Mondays', { delay: 10 });
+        cy.get('input[formControlName="instructor_name"]').type('Instructor E2E', { delay: 10 });
+        cy.get('input[formControlName="students"]').clear().type('42');
+        cy.get('input[formControlName="price"]').clear().type('10000');
+        cy.get('input[formControlName="image_url"]').type('https://via.placeholder.com/150');
+        
+        cy.get('button[type="submit"]').click();
+        cy.wait('@postCourse');
+        cy.contains('guardado correctamente', { timeout: 5000 }).should('exist');
+    });
+
+    it('3. El alumno visualiza el curso público', () => {
+        cy.visit('/academy');
+        cy.get('app-cursos', { timeout: 10000 }).should('be.visible');
+        
+        cy.get('#cursos-list').within(() => {
+            cy.contains('Curso Mock 1').should('exist');
+            cy.contains('4 weeks').should('exist');
+            cy.contains('Mondays').should('exist');
+        });
+
+        // Visitar detalle
+        cy.visit('/academy/curso-mock-1');
+        cy.get('app-course-detail', { timeout: 10000 }).should('be.visible');
+        cy.contains('Curso Mock 1').should('exist');
+        cy.contains('Test course').should('exist');
+    });
+});

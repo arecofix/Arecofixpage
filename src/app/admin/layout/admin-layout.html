@@ -45,7 +45,7 @@
                             }
                         </div>
                     </div>
-                    <div tabindex="0" class="mt-3 z-50 card card-compact dropdown-content w-80 bg-white dark:bg-slate-900 shadow-2xl border border-gray-100 dark:border-slate-800 rounded-3xl overflow-hidden animate-slide-up">
+                    <div tabindex="0" class="mt-3 z-50 card card-compact dropdown-content w-80 max-w-[90vw] bg-white dark:bg-slate-900 shadow-2xl border border-gray-100 dark:border-slate-800 rounded-3xl overflow-hidden animate-slide-up">
                         <div class="card-body p-0 max-h-96 overflow-y-auto">
                             <div class="px-5 py-4 border-b border-gray-50 dark:border-slate-800 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50 backdrop-blur sticky top-0 z-10">
                                 <span class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider">Alertas</span>
@@ -79,7 +79,7 @@
                             {{ (authService.getCurrentUser()?.email || '??').substring(0,2).toUpperCase() }}
                         </div>
                     </div>
-                    <ul tabindex="0" class="mt-3 z-50 p-2 shadow-2xl menu menu-sm dropdown-content bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl w-52 animate-slide-up">
+                    <ul tabindex="0" class="mt-3 z-50 p-2 shadow-2xl menu menu-sm dropdown-content bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl w-52 max-w-[90vw] animate-slide-up">
                         <li class="menu-title px-4 py-2 text-[10px] uppercase font-bold text-gray-400">Mi Cuenta</li>
                         <li><a routerLink="/perfil" class="py-2.5 rounded-xl"><i class="fas fa-user-circle"></i> Mi Perfil</a></li>
                         <li><a (click)="toggleSidebar()" class="py-2.5 rounded-xl cursor-pointer"><i class="fas fa-cog"></i> Ajustes</a></li>
