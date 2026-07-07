@@ -153,7 +153,7 @@ describe('Admin Forms Integration Flow', () => {
     cy.wait('@getCourses', { timeout: 10000 });
 
     // Wait for the course card link to be rendered in the DOM
-    cy.get('a[href^="/academy/"]', { timeout: 8000 }).first().click();
+    cy.contains('a', 'Ver más', { timeout: 8000 }).first().click();
 
     // Give Angular time to load the course detail component
     cy.wait(1500);
