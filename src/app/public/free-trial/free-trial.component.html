@@ -33,7 +33,7 @@
       <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 border border-gray-100 dark:border-slate-700">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Completa tus datos</h2>
         
-        <form [formGroup]="trialForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <form *ngIf="!showDownloadStep" [formGroup]="trialForm" (ngSubmit)="onSubmit()" class="space-y-6">
           
           <!-- Business Name -->
           <div>
@@ -132,6 +132,38 @@
           </p>
 
         </form>
+
+        <div *ngIf="showDownloadStep" class="text-center py-8 animate-fade-in space-y-8">
+            <div class="w-24 h-24 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-lg shadow-green-500/20">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white">¡Tu sistema está listo!</h3>
+            <p class="text-slate-500 dark:text-slate-400">Hemos enviado las credenciales a tu correo, pero no las necesitarás si utilizas la vinculación automática.</p>
+            
+            <div class="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-left space-y-4">
+                <h4 class="font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">Pasos a seguir:</h4>
+                <ol class="list-decimal pl-5 text-slate-600 dark:text-slate-400 space-y-3 font-medium">
+                    <li>
+                        Descarga e instala la aplicación oficial para Windows.<br>
+                        <a [href]="exeDownloadUrl" target="_blank" class="btn btn-sm btn-outline mt-2 border-slate-300 dark:border-slate-700">
+                            <i class="fab fa-windows mr-1"></i> Descargar Arecofix.exe
+                        </a>
+                    </li>
+                    <li>Termina la instalación y asegúrate de que la aplicación esté abierta.</li>
+                    <li>
+                        Vuelve aquí y haz clic en el siguiente botón para iniciar sesión automáticamente.<br>
+                        <a [href]="'arecofix://login?token=' + accessToken" class="btn btn-primary mt-4 shadow-lg shadow-blue-500/30">
+                            <i class="fas fa-link mr-1"></i> Vincular mi cuenta en la app
+                        </a>
+                    </li>
+                </ol>
+            </div>
+            <div class="pt-4 border-t border-slate-200 dark:border-slate-800">
+                <a routerLink="/admin/dashboard" class="text-sm text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 font-bold">
+                    O continuar a la versión web (limitada) <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
       </div>
 
       <!-- Preview Section -->

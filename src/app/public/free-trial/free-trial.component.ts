@@ -30,6 +30,10 @@ export class FreeTrialPageComponent implements OnInit {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
+  showDownloadStep = false;
+  accessToken: string | null = null;
+  exeDownloadUrl = 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'; // Reemplazar luego con la URL real
+
   ngOnInit() {
     this.checkHardwareLock();
     
@@ -103,7 +107,7 @@ export class FreeTrialPageComponent implements OnInit {
         throw new Error(result.error || 'No se pudo crear la prueba gratuita.');
       }
 
-      this.successMessage = '¡Prueba creada! Iniciando sesión y preparando tu taller...';
+      this.successMessage = '¡Prueba creada! Iniciando sesión y preparando tu descarga...';
       
       // Hardware lock
       if (isPlatformBrowser(this.platformId)) {
@@ -112,7 +116,7 @@ export class FreeTrialPageComponent implements OnInit {
 
       // Log in with the generated credentials
       const { email, password } = result.credentials;
-      const { error: signInError } = await this.supabase.getClient().auth.signInWithPassword({
+      const { error: signInError, data: signInData } = await this.supabase.getClient().auth.signInWithPassword({
         email,
         password
       });
@@ -121,10 +125,9 @@ export class FreeTrialPageComponent implements OnInit {
         throw new Error('Cuenta creada, pero hubo un error al iniciar sesión. Por favor, revisa tu correo electrónico.');
       }
 
-      // Delay briefly so auth state propagates and user sees the success message
-      setTimeout(() => {
-        this.router.navigate(['/admin/dashboard']);
-      }, 2000);
+      this.accessToken = signInData.session?.access_token || null;
+      this.showDownloadStep = true;
+      this.successMessage = null;
 
     } catch (e: any) {
       console.error(e);

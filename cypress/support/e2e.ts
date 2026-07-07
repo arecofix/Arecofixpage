@@ -14,7 +14,22 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands';
+import './commands'
+
+Cypress.on('window:before:load', (win) => {
+  cy.stub(win.console, 'error').callsFake((msg) => {
+    cy.log('CONSOLE ERROR', msg);
+    // Don't log to Cypress terminal here, log normally to win.console
+  });
+  
+  cy.stub(win.console, 'log').callsFake((...args) => {
+    Cypress.log({
+        name: 'console.log',
+        message: args
+    });
+    // This will print to terminal if we use a task or just appear in command log
+  });
+});;
 
 // Ignorar errores no controlados de la aplicación (como "document is null")
 // Esto evita que Cypress falle si la app Angular o Vite lanza un error asíncrono

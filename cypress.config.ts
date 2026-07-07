@@ -4,6 +4,7 @@ export default defineConfig({
   projectId: 'hfghsi',
   e2e: {
     testIsolation: false,
+    video: true,
     trashAssetsBeforeRuns: false,
     setupNodeEvents(on, config) {
       // implement node event listeners here
