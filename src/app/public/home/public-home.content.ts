@@ -380,9 +380,9 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
                 },
                 {
                     title: 'IT Academy',
-                    description: 'Training the next generation of developers in LatAm.',
+                    description: 'High-level training for the tech industry. Practical courses in software development, electronics and IT trades.',
                     icon: 'fas fa-graduation-cap',
-                    image: 'assets/img/services/academy-illustration.webp',
+                    image: 'assets/img/cursos/profesor.png',
                     cta: 'View Academy',
                     link: '/academy',
                     colorClass: 'green'
@@ -439,7 +439,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             title: 'Arecofix Academy',
             description: 'Preparate para la industria tecnológica con capacitación de alto nivel. Cursos prácticos de desarrollo de software, programación y distintos oficios.',
             icon: 'fas fa-graduation-cap',
-            image: 'assets/img/cursos/clase1.webp',
+            image: 'assets/img/cursos/profesor.png',
             cta: 'Ver Academia',
             link: '/academy',
             colorClass: 'green'
