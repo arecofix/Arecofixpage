@@ -37,8 +37,8 @@ declare global {
 }
 
 Cypress.Commands.add('loginRealAdmin', (url = '/') => {
-  const email = 'zaona@arecofix.com.ar';
-  const password = 'zaona2026';
+  const email = 'admin@arecofix.com.ar';
+  const password = 'admin2026';
   const supabaseUrl = 'https://jftiyfnnaogmgvksgkbn.supabase.co';
   const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
 
@@ -61,8 +61,8 @@ Cypress.Commands.add('loginRealAdmin', (url = '/') => {
         win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
         win.localStorage.setItem('supabase-remember-me', 'true');
         // Pre-set branch so the admin guard doesn't bounce back to /
-        win.localStorage.setItem('arecofix_current_branch_id', 'ae0776b7-2034-4baf-acf3-a9dab87a1e51');
-        win.localStorage.setItem('arecofix_admin_branch_id', 'ae0776b7-2034-4baf-acf3-a9dab87a1e51');
+        win.localStorage.setItem('arecofix_current_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
+        win.localStorage.setItem('arecofix_admin_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
       }
     });
   });

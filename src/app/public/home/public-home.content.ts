@@ -181,6 +181,7 @@ export interface HomeContent {
       cta: string;
       link: string;
       colorClass: string;
+      imagePositionClass?: string;
     }[];
   };
   valueProposition: {
@@ -376,7 +377,8 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
                     image: 'assets/img/services/repair-illustration.webp',
                     cta: 'Go to Lab',
                     link: '/celular',
-                    colorClass: 'blue'
+                    colorClass: 'blue',
+                    imagePositionClass: 'object-[center_35%]'
                 },
                 {
                     title: 'IT Academy',
@@ -385,7 +387,8 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
                     image: 'assets/img/cursos/profesor.png',
                     cta: 'View Academy',
                     link: '/academy',
-                    colorClass: 'green'
+                    colorClass: 'green',
+                    imagePositionClass: 'object-[center_20%]'
                 }
             ]
         },
@@ -433,7 +436,8 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             image: 'assets/img/cursos/medicion.png',
             cta: 'Solicitar un presupuesto',
             link: '/celular',
-            colorClass: 'blue'
+            colorClass: 'blue',
+            imagePositionClass: 'object-[center_60%]'
           },
           {
             title: 'Arecofix Academy',
@@ -442,7 +446,8 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             image: 'assets/img/cursos/profesor.png',
             cta: 'Ver Academia',
             link: '/academy',
-            colorClass: 'green'
+            colorClass: 'green',
+            imagePositionClass: 'object-[center_20%]'
           }
         ]
       },

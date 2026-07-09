@@ -18,7 +18,7 @@ import { RouterLink } from '@angular/router';
               </div>
               @if (pillar.image) {
                 <div class="relative h-48 overflow-hidden">
-                  <img [ngSrc]="pillar.image" [alt]="pillar.title" class="object-cover object-[center_15%] transform group-hover:scale-110 transition-transform duration-700" fill sizes="(max-width: 768px) 100vw, 50vw">
+                  <img [ngSrc]="pillar.image" [alt]="pillar.title" class="object-cover transform group-hover:scale-110 transition-transform duration-700" [ngClass]="pillar.imagePositionClass || 'object-[center_15%]'" fill sizes="(max-width: 768px) 100vw, 50vw">
                   <div class="absolute inset-0 bg-linear-to-t from-white dark:from-[#1a1a1a] to-transparent opacity-80"></div>
                 </div>
               }
