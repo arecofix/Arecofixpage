@@ -5,10 +5,10 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function fixUserRole() {
-  const email = 'zaona@arecofix.com.ar';
-  const password = 'zaona2026';
+  const email = 'admin@arecofix.com.ar';
+  const password = 'admin2026';
   
-  console.log('Logging in as Zaona...');
+  console.log('Logging in as Admin...');
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -20,16 +20,20 @@ async function fixUserRole() {
   }
   
   console.log('Logged in successfully. User ID:', authData.user.id);
+  console.log('User metadata:', authData.user.user_metadata);
   
-  console.log('Attempting to update profile role to "admin"...');
-  const { data: profileData, error: profileError } = await supabase.from('profiles').update({
-    role: 'admin'
-  }).eq('id', authData.user.id).select();
-  
-  if (profileError) {
-    console.error('Error updating profile:', profileError.message);
+  console.log('Fetching latest repair order...');
+  const { data: repair, error: repairError } = await supabase.from('repairs').select('*').limit(1).maybeSingle();
+  if (repairError) {
+    console.error('Error fetching repair:', repairError.message);
+  } else if (repair) {
+    console.log('Repair details:', {
+      id: repair.id,
+      current_status_id: repair.current_status_id,
+      type_of_status_id: typeof repair.current_status_id
+    });
   } else {
-    console.log('Profile updated successfully:', profileData);
+    console.log('No repairs found in database.');
   }
 }
 

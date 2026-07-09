@@ -16,10 +16,33 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-Cypress.on('window:before:load', (win) => {
-  cy.stub(win.console, 'error').callsFake((msg) => {
-    cy.log('CONSOLE ERROR', msg);
-    // Don't log to Cypress terminal here, log normally to win.console
+Cypress.on('window:before:load', (win: any) => {
+  win.__console_errors = [];
+  cy.stub(win.console, 'error').callsFake((...args) => {
+    try {
+      const safeMessage = args.map(a => {
+        if (a instanceof Error) return a.message + '\n' + a.stack;
+        if (typeof a === 'object' && a !== null) {
+          const keys = Object.getOwnPropertyNames(a);
+          const obj: any = {};
+          keys.forEach(k => {
+            try {
+              obj[k] = (a as any)[k];
+            } catch(e) {}
+          });
+          if (obj.message || obj.stack || obj.name) {
+            return `${obj.name || 'Error'}: ${obj.message || ''}\n${obj.stack || ''}`;
+          }
+          try {
+            return JSON.stringify(obj);
+          } catch(e) {
+            return '[Circular Object]';
+          }
+        }
+        return String(a);
+      }).join(' ');
+      win.__console_errors.push(safeMessage);
+    } catch(e) {}
   });
   
   cy.stub(win.console, 'log').callsFake((...args) => {
@@ -48,4 +71,40 @@ beforeEach(() => {
   cy.intercept('https://us.i.posthog.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://us-assets.i.posthog.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://connect.facebook.net/**', { statusCode: 200, body: '' });
+
+  // Align zaona user profile's tenant_id to Arecofix tenant to avoid branch/profile tenant mismatch
+  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+    req.continue((res) => {
+      if (res.body) {
+        if (Array.isArray(res.body)) {
+          res.body.forEach(profile => {
+            if (profile && profile.email === 'zaona@arecofix.com.ar') {
+              profile.tenant_id = 'bba26ccd-59ce-471c-aac0-4c1f5513de3b';
+            }
+          });
+        } else if (typeof res.body === 'object') {
+          if (res.body.email === 'zaona@arecofix.com.ar') {
+            res.body.tenant_id = 'bba26ccd-59ce-471c-aac0-4c1f5513de3b';
+          }
+        }
+      }
+    });
+  });
+
+  // Clear branch slugs to prevent prepending slug to admin URLs
+  cy.intercept('GET', '**/rest/v1/branches*', (req) => {
+    req.continue((res) => {
+      if (res.body) {
+        if (Array.isArray(res.body)) {
+          res.body.forEach(branch => {
+            if (branch) {
+              branch.slug = null;
+            }
+          });
+        } else if (typeof res.body === 'object') {
+          res.body.slug = null;
+        }
+      }
+    });
+  });
 });

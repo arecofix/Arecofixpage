@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 
 
 @Component({
@@ -15,7 +15,8 @@ import { Component, Input } from '@angular/core';
     
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           @for (image of images; track image) {
-            <div class="group relative aspect-4/3 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
+            <div class="group relative aspect-4/3 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                 (click)="openImage(image.src)">
               <img [src]="image.src"
                 [alt]="'Certificate ' + image.id"
                 class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
@@ -27,6 +28,24 @@ import { Component, Input } from '@angular/core';
           </div>
         </div>
       </section>
+
+      <!-- Lightbox Modal -->
+      @if (selectedImage()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md transition-all duration-300"
+             (click)="closeImage()">
+          <!-- Close Button -->
+          <button type="button" class="absolute top-6 right-6 text-white/80 hover:text-white text-3xl transition-colors p-2 z-60"
+                  (click)="closeImage()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+          
+          <!-- Image Container -->
+          <div class="relative max-w-4xl max-h-[85vh] mx-4 overflow-hidden rounded-2xl border border-white/10 shadow-2xl flex items-center justify-center"
+               (click)="$event.stopPropagation()">
+            <img [src]="selectedImage()!" class="max-w-full max-h-[85vh] object-contain rounded-2xl" alt="Certificate enlarged">
+          </div>
+        </div>
+      }
     `,
   styles: []
 })
@@ -40,4 +59,14 @@ export class CertificateGalleryComponent {
     { id: 4, src: 'assets/img/cursos/certiicate/4.jpg' },
     { id: 5, src: 'assets/img/cursos/certiicate/python.jpg' }
   ];
+
+  selectedImage = signal<string | null>(null);
+
+  openImage(src: string) {
+    this.selectedImage.set(src);
+  }
+
+  closeImage() {
+    this.selectedImage.set(null);
+  }
 }

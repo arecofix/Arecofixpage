@@ -87,7 +87,11 @@
                     {{ r.status_label }}
                 </h2>
                 <p class="text-sm font-medium opacity-80 leading-relaxed">
-                    Tu {{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
+                    @if (r.current_status_id === 2) {
+                        Estamos gestionando los repuestos necesarios para la reparación de tu equipo.
+                    } @else {
+                        Tu {{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
+                    }
                 </p>
             </div>
             }
@@ -161,6 +165,18 @@
                                 <span class="text-neutral-400 font-medium">Fecha de Ingreso</span>
                                 <span class="text-neutral-800 font-bold uppercase">{{ r.received_at | date:'dd MMM yyyy' }}</span>
                             </div>
+                            @if (r.imei) {
+                            <div class="flex justify-between text-xs" id="tracking-imei-row">
+                                <span class="text-neutral-400 font-medium">IMEI / Serie</span>
+                                <span class="text-neutral-800 font-bold font-mono">{{ r.imei }}</span>
+                            </div>
+                            }
+                            @if (r.checklist && (r.checklist.charger || r.checklist.battery || r.checklist.chip || r.checklist.sd || r.checklist.case)) {
+                            <div class="flex justify-between text-xs" id="tracking-checklist-row">
+                                <span class="text-neutral-400 font-medium">Accesorios Dejados</span>
+                                <span class="text-neutral-800 font-bold text-right max-w-[180px]">{{ getChecklistSummary(r.checklist) }}</span>
+                            </div>
+                            }
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Falla Declarada</span>
                                 <span class="text-neutral-600 font-medium wrap-break-word text-right max-w-[180px]">"{{ r.issue_description }}"</span>
@@ -189,7 +205,7 @@
                         </div>
                         <div class="flex gap-2">
                             <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white/10 border-none text-white hover:bg-white/20 text-[10px] font-black uppercase" id="btn-imprimir-talon">
-                                <i class="fas fa-print"></i> Talón
+                                <i class="fas fa-download mr-1"></i> Descargar Talón
                             </button>
                             <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase" id="btn-chat-whatsapp">
                                 <i class="fab fa-whatsapp"></i> Chat

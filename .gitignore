@@ -152,3 +152,7 @@ bower_components/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/

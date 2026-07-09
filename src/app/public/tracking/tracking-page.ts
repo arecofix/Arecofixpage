@@ -366,4 +366,15 @@ export class TrackingPage implements OnInit {
             this.buyingAccessory.set(null);
         }
     }
+
+    getChecklistSummary(checklist: any): string {
+        if (!checklist) return 'Ninguno';
+        const items = [];
+        if (checklist.charger) items.push('Cargador');
+        if (checklist.battery) items.push('Batería');
+        if (checklist.chip) items.push('Chip/SIM');
+        if (checklist.sd) items.push('MicroSD');
+        if (checklist.case) items.push('Funda');
+        return items.length > 0 ? items.join(', ') : 'Ninguno';
+    }
 }

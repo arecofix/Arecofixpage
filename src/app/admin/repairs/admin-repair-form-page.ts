@@ -119,8 +119,18 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     notifyStatuses = signal([
         { id: 5, label: 'Listo', sublabel: 'Avisa que puede retirar', icon: 'fas fa-check-circle', color: 'text-green-500', activeClass: 'border-green-500 bg-green-50/50 dark:bg-green-500/10', iconBgActive: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400' },
         { id: 6, label: 'Entregado', sublabel: 'Marca como retirado', icon: 'fas fa-box-open', color: 'text-blue-500', activeClass: 'border-blue-500 bg-blue-50/50 dark:bg-blue-500/10', iconBgActive: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' },
-        { id: 2, label: 'En Presupuesto', sublabel: 'Notifica presupuesto', icon: 'fas fa-search-dollar', color: 'text-yellow-500', activeClass: 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-500/10', iconBgActive: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400' }
+        { id: 2, label: 'En Presupuesto', sublabel: 'Notifica presupuesto', icon: 'fas fa-search-dollar', color: 'text-yellow-500', activeClass: 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-500/10', iconBgActive: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-green-400' }
     ]);
+
+    statusOptions = [
+        { id: 1, label: 'Recibido / Pendiente', icon: 'fas fa-clipboard-list', color: 'text-amber-500' },
+        { id: 2, label: 'Gestión de Repuestos', icon: 'fas fa-boxes', color: 'text-cyan-500' },
+        { id: 3, label: 'En Reparación', icon: 'fas fa-tools', color: 'text-blue-500' },
+        { id: 4, label: 'Control de Calidad', icon: 'fas fa-clipboard-check', color: 'text-indigo-500' },
+        { id: 5, label: 'Listo para Entregar', icon: 'fas fa-check-circle', color: 'text-green-500' },
+        { id: 6, label: 'Entregado', icon: 'fas fa-box-open', color: 'text-slate-500' },
+        { id: 7, label: 'Cancelado', icon: 'fas fa-times-circle', color: 'text-rose-500' }
+    ];
 
     notifyPreviewMessage = computed(() => {
         const statusId = this.selectedNotifyStatus();
@@ -270,7 +280,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             whatsapp_notifications: [true],
             costo_repuesto: [0],
             tracking_code: [''],
-            repair_number: [0]
+            repair_number: [0],
+            payment_method: ['efectivo'],
+            warranty: [''],
+            supplier: ['']
         });
     }
 
@@ -496,7 +509,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     upsell_vidrio: data.upsell_vidrio,
                     glass_upsell: data.glass_upsell,
                     whatsapp_notifications: data.whatsapp_notifications,
-                    costo_repuesto: data.costo_repuesto
+                    costo_repuesto: data.costo_repuesto,
+                    payment_method: (data as any).payment_method || 'efectivo',
+                    warranty: (data as any).warranty || '',
+                    supplier: (data as any).supplier || ''
                 });
 
                 if (data.checklist) {
