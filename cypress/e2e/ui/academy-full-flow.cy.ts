@@ -1,16 +1,26 @@
 describe('Flujo Completo de la Academia (Cursos)', () => {
     beforeEach(() => {
         const mockSession = {
-            access_token: 'fake-jwt-token',
+            access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoiYWRtaW4tdXNlci0xMjMifQ.signature',
+            expires_in: 3600,
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
             refresh_token: 'fake-refresh-token',
+            token_type: 'bearer',
             user: {
                 id: 'admin-user-123',
+                aud: 'authenticated',
+                role: 'authenticated',
                 email: 'admin@arecofix.com',
-                role: 'authenticated'
+                email_confirmed_at: new Date().toISOString(),
+                app_metadata: { provider: 'email', providers: ['email'] },
+                user_metadata: { role: 'super_admin' },
+                identities: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             }
         };
         
-        window.localStorage.setItem('sb-arecofix-auth-token', JSON.stringify(mockSession));
+        window.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
         
         cy.intercept('GET', '**/rest/v1/profiles*', {
             statusCode: 200,

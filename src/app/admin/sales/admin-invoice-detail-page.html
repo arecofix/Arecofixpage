@@ -20,6 +20,9 @@
           <button (click)="print()" class="btn btn-outline bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all">
               <i class="fas fa-print"></i> Imprimir / PDF
           </button>
+          <button (click)="printTicketPOS()" class="btn bg-slate-800 hover:bg-slate-700 text-white border-none rounded-xl shadow-sm transition-all">
+              <i class="fas fa-receipt"></i> Ticket POS
+          </button>
       </div>
     </div>
 
@@ -165,3 +168,79 @@
     </div>
   </div>
 </div>
+
+<!-- ============================================================ -->
+<!-- POS TICKET SECTION (visible only when printMode() === 'pos') -->
+<!-- ============================================================ -->
+@if (invoice() && printMode() === 'pos') {
+<div id="pos-ticket-print" class="hidden print:block" style="width:80mm; margin:0 auto; font-family:'Courier New',Courier,monospace; font-size:10px; color:#000; background:#fff;">
+    <!-- Header -->
+    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+        <p style="font-size:14px; font-weight:900; letter-spacing:2px; margin:0;">ARECOFIX</p>
+        @if (company()?.name && company()?.name !== 'Arecofix') {
+            <p style="font-size:10px; margin:2px 0;">{{ company()?.name }}</p>
+        }
+        @if (company()?.address) {
+            <p style="font-size:9px; margin:1px 0;">{{ company()?.address }}</p>
+        }
+        @if (company()?.phone) {
+            <p style="font-size:9px; margin:1px 0;">Tel: {{ company()?.phone }}</p>
+        }
+        @if (company()?.tax_id) {
+            <p style="font-size:9px; margin:1px 0;">CUIT: {{ company()?.tax_id }}</p>
+        }
+    </div>
+
+    <!-- Invoice Number and Type -->
+    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+        <p style="font-size:12px; font-weight:900; margin:0;">COMPROBANTE {{ invoice()?.type || 'B' }}</p>
+        <p style="font-size:11px; font-weight:bold; margin:2px 0;">N° {{ invoice()?.invoice_number || '---' }}</p>
+        <p style="font-size:9px; margin:1px 0;">Fecha: {{ invoice()?.issued_at | date:'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+
+    <!-- Customer -->
+    <div style="border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+        <p style="margin:1px 0;">Cliente: <strong>{{ invoice()?.customer_name || 'Consumidor Final' }}</strong></p>
+    </div>
+
+    <!-- Items -->
+    <div style="border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+        <p style="font-weight:bold; text-transform:uppercase; margin:0 0 4px;">DETALLE</p>
+        @for (item of items(); track $index) {
+            <div style="margin-bottom:4px;">
+                <p style="margin:0; word-wrap:break-word;">{{ item.description || 'Producto/Servicio' }}</p>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>{{ item.quantity }}x {{ item.unit_price | currency:'ARS':'$':'1.0-0' }}</span>
+                    <span style="font-weight:bold;">{{ item.subtotal | currency:'ARS':'$':'1.0-0' }}</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Totals -->
+    <div style="border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+        @if (invoice()?.discount && invoice()!.discount! > 0) {
+            <div style="display:flex; justify-content:space-between;">
+                <span>Descuento:</span>
+                <span>-{{ invoice()?.discount | currency:'ARS':'$':'1.0-0' }}</span>
+            </div>
+        }
+        @if (invoice()?.tax_amount && invoice()!.tax_amount! > 0) {
+            <div style="display:flex; justify-content:space-between;">
+                <span>IVA:</span>
+                <span>{{ invoice()?.tax_amount | currency:'ARS':'$':'1.0-0' }}</span>
+            </div>
+        }
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:900; margin-top:4px;">
+            <span>TOTAL:</span>
+            <span>{{ invoice()?.total_amount | currency:'ARS':'$':'1.0-0' }}</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center; font-size:9px;">
+        <p style="margin:2px 0;">¡Gracias por su preferencia!</p>
+        <p style="margin:2px 0;">arecofix.com.ar</p>
+    </div>
+</div>
+}

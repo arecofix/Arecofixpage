@@ -2,6 +2,8 @@ import { Component, PLATFORM_ID, inject, OnInit, ChangeDetectorRef } from '@angu
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { BugReportModalComponent } from '../bug-report-modal/bug-report-modal.component';
+import { AuthService } from '@app/core/services/auth.service';
+import { BranchService } from '@app/core/services/branch.service';
 
 @Component({
   selector: 'app-ribbon-menu',
@@ -14,7 +16,7 @@ import { BugReportModalComponent } from '../bug-report-modal/bug-report-modal.co
           <span class="icon">🏠</span>
           <span class="text">Inicio</span>
         </button>
-        <button class="ribbon-btn" (click)="navigate('/admin/company')">
+        <button class="ribbon-btn" (click)="navigateToSettings()">
           <span class="icon">⚙️</span>
           <span class="text">Ajustes</span>
         </button>
@@ -128,6 +130,8 @@ export class RibbonMenuComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private branchService = inject(BranchService);
 
   async ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -150,21 +154,54 @@ export class RibbonMenuComponent implements OnInit {
     this.router.navigate([path]);
   }
 
+  navigateToSettings() {
+    // SuperAdmins go to company settings; branch admins go to their branch settings
+    if (this.authService.isSuperAdmin()) {
+      this.router.navigate(['/admin/company']);
+    } else {
+      const branch = this.branchService.currentBranch();
+      if (branch?.slug) {
+        this.router.navigate([`/${branch.slug}/admin/company`]);
+      } else {
+        this.router.navigate(['/admin/company']);
+      }
+    }
+  }
+
   async minimize() {
     if (!this.isTauri) return;
-    const { getCurrentWindow } = await import('@tauri-apps/api/window');
-    getCurrentWindow().minimize();
+    try {
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      await getCurrentWindow().minimize();
+    } catch (e) {
+      console.error('[RibbonMenu] minimize error:', e);
+    }
   }
 
   async toggleMaximize() {
     if (!this.isTauri) return;
-    const { getCurrentWindow } = await import('@tauri-apps/api/window');
-    getCurrentWindow().toggleMaximize();
+    try {
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      await getCurrentWindow().toggleMaximize();
+    } catch (e) {
+      console.error('[RibbonMenu] toggleMaximize error:', e);
+    }
   }
 
   async close() {
     if (!this.isTauri) return;
-    const { getCurrentWindow } = await import('@tauri-apps/api/window');
-    getCurrentWindow().close();
+    try {
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      await getCurrentWindow().close();
+    } catch (e) {
+      console.error('[RibbonMenu] close error:', e);
+      // Fallback: destroy current window
+      try {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        await getCurrentWindow().destroy();
+      } catch {
+        console.error('[RibbonMenu] destroy also failed');
+      }
+    }
   }
 }

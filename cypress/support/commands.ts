@@ -92,12 +92,9 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
 
   // 1. PRIMERO definimos los interceptores
 
-  // Catch-all for ANY rest/v1 request (prevents 401 leaks). Definido primero para que sea pisado por los específicos.
-  cy.intercept('**/rest/v1/**', (req) => {
-    req.reply({
-      statusCode: 200,
-      body: []
-    });
+  cy.intercept('**/rest/v1/**', {
+    statusCode: 200,
+    body: []
   }).as('catchAllSupabase');
 
   // Intercept the /auth/v1/user call
@@ -106,29 +103,23 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
     body: session.user
   }).as('getUser');
 
-  // Intercept the profile fetch and upsert
-  cy.intercept('**/rest/v1/profiles*', (req) => {
-    const profile = {
-      id: 'mock-admin-id',
-      email: 'admin@arecofix.com',
-      role: 'super_admin',
-      first_name: 'Admin',
-      last_name: 'Test',
-      is_active: true
-    };
+  const mockProfile = {
+    id: 'mock-admin-id',
+    email: 'admin@arecofix.com',
+    role: 'super_admin',
+    first_name: 'Admin',
+    last_name: 'Test',
+    is_active: true
+  };
 
-    if (req.url.includes('id=eq.mock-admin-id') || req.url.includes('maybeSingle')) {
-      req.reply({
-        statusCode: 200,
-        body: profile
-      });
-      return;
-    }
+  cy.intercept('GET', '**/rest/v1/profiles?id=eq.mock-admin-id*', {
+    statusCode: 200,
+    body: mockProfile
+  }).as('getProfileSingle');
 
-    req.reply({
-      statusCode: 200,
-      body: [profile]
-    });
+  cy.intercept('GET', '**/rest/v1/profiles', {
+    statusCode: 200,
+    body: [mockProfile]
   }).as('getProfile');
 
   // Mock Dashboard RPCs
@@ -169,44 +160,30 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
 
 
   // Mock tenants
-  cy.intercept('**/rest/v1/tenants*', (req) => {
-    const tenant = {
-      id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b',
-      name: 'Arecofix',
-      slug: 'arecofix',
-      is_active: true
-    };
+  cy.intercept('GET', '**/rest/v1/tenants?*select=*&slug=eq.*', {
+    statusCode: 200,
+    body: { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }
+  });
 
-    if (req.url.includes('custom_domain=eq.127.0.0.1') || req.url.includes('id=eq.bba26ccd-59ce-471c-aac0-4c1f5513de3b') || req.url.includes('slug=eq.arecofix') || req.url.includes('maybeSingle')) {
-      req.reply({
-        statusCode: 200,
-        body: tenant
-      });
-      return;
-    }
+  cy.intercept('GET', '**/rest/v1/tenants?*select=*&id=eq.*', {
+    statusCode: 200,
+    body: { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }
+  });
 
-    req.reply({
-      statusCode: 200,
-      body: [tenant]
-    });
+  cy.intercept('GET', '**/rest/v1/tenants*', {
+    statusCode: 200,
+    body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }]
   }).as('getTenants');
 
   // Mock branches
-  cy.intercept('**/rest/v1/branches*', (req) => {
-    const branch = { id: 'branch-1', name: 'Sede Central' };
+  cy.intercept('GET', '**/rest/v1/branches?*id=eq.*', {
+    statusCode: 200,
+    body: { id: 'branch-1', name: 'Sede Central' }
+  });
 
-    if (req.url.includes('id=eq.branch-1') || req.url.includes('maybeSingle')) {
-      req.reply({
-        statusCode: 200,
-        body: branch
-      });
-      return;
-    }
-
-    req.reply({
-      statusCode: 200,
-      body: [branch]
-    });
+  cy.intercept('GET', '**/rest/v1/branches*', {
+    statusCode: 200,
+    body: [{ id: 'branch-1', name: 'Sede Central' }]
   }).as('getBranches');
 
   // 2. Ejecutamos un cy.visit rápido a la raíz con onBeforeLoad

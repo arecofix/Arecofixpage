@@ -153,8 +153,8 @@ export class AdminPurchaseFormPage implements OnInit {
             
             this.isNewProductModalOpen.set(false);
             this.searchQuery.set('');
-        } catch (e: any) {
-            this.error.set('Error al crear producto rápido: ' + e.message);
+        } catch (e: unknown) {
+            this.error.set('Error al crear producto rápido: ' + (e instanceof Error ? e.message : String(e)));
         } finally {
             this.newProductSaving.set(false);
         }
@@ -175,8 +175,8 @@ export class AdminPurchaseFormPage implements OnInit {
         try {
             await this.purchaseService.createPurchase(this.form(), this.items(), this.total());
             this.router.navigate(['/admin/purchases']);
-        } catch (e: any) {
-            this.error.set(e.message);
+        } catch (e: unknown) {
+            this.error.set(e instanceof Error ? e.message : String(e));
         } finally {
             this.saving.set(false);
         }

@@ -104,8 +104,8 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
           };
         }
       }
-    } catch (e: any) {
-      this.error.set(e.message || 'Error al cargar datos');
+    } catch (e: unknown) {
+      this.error.set((e instanceof Error ? e.message : String(e)) || 'Error al cargar datos');
       this.notificationService.showError(this.error() || '');
     } finally {
       this.loading.set(false);
@@ -204,8 +204,8 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
         this.notificationService.showSuccess('Producto creado correctamente');
       }
       this.router.navigate(['/admin/products']);
-    } catch (e: any) {
-      this.error.set(e.message || 'Error al guardar producto');
+    } catch (e: unknown) {
+      this.error.set((e instanceof Error ? e.message : String(e)) || 'Error al guardar producto');
       this.notificationService.showError(this.error() || '');
       console.error('Save error:', e);
     } finally {

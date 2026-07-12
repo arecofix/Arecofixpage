@@ -13,14 +13,25 @@
                  <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">Búsqueda rápida y facturación</p>
             </div>
             
-            <div class="w-full sm:max-w-xs md:max-w-sm relative group">
-                <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors text-sm"></i>
-                <input type="text" #searchInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-                   placeholder="Escanear o buscar producto... (F3)" 
-                   autofocus
-                   class="w-full pl-9 pr-3 py-2 bg-gray-50/50 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner" />
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <!-- Invoice History Link -->
+                <a routerLink="/admin/sales/invoices"
+                   class="btn btn-sm btn-ghost border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 text-gray-500 rounded-xl gap-1.5 shrink-0 transition-all text-xs font-bold"
+                   title="Ver historial de comprobantes emitidos">
+                    <i class="fas fa-history text-xs"></i>
+                    <span class="hidden sm:inline">Historial</span>
+                </a>
+
+                <div class="flex-1 sm:max-w-xs md:max-w-sm relative group">
+                    <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors text-sm"></i>
+                    <input type="text" #searchInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                       placeholder="Escanear o buscar producto... (F3)" 
+                       autofocus
+                       class="w-full pl-9 pr-3 py-2 bg-gray-50/50 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner" />
+                </div>
             </div>
         </div>
+
 
         <!-- Scrollable Product Grid -->
         <div class="flex-1 overflow-y-auto p-3 custom-scrollbar bg-[#f8fafc]">

@@ -3,8 +3,8 @@ import { Routes } from '@angular/router';
 export const ADMIN_CLIENTS_ROUTES: Routes = [
   {
     path: '',
-    title: 'Clientes',
-    loadComponent: () => import('./admin-clients-page').then(m => m.AdminClientsPage)
+    pathMatch: 'full',
+    redirectTo: '/admin/users'
   },
   {
     path: 'new',

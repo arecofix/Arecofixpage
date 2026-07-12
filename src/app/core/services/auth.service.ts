@@ -5,6 +5,7 @@ import {
   Session,
   AuthChangeEvent,
   AuthResponse,
+  AuthError,
 } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
@@ -275,12 +276,25 @@ export class AuthService {
       }
 
       const existingProfile = await this.profileService.getProfile(session.user.id);
+      const meta = session.user.user_metadata || {};
+      const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+
       if (existingProfile) {
+         if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
+             const { data: updatedProfile, error } = await this.supabase
+                 .from('profiles')
+                 .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
+                 .eq('id', session.user.id)
+                 .select()
+                 .maybeSingle();
+             if (!error && updatedProfile) {
+                 localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
+                 return updatedProfile as UserProfile;
+             }
+         }
          localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
          return existingProfile;
       }
-
-      const meta = session.user.user_metadata || {};
       const tenantId = this.tenantService.getTenantId();
       const isFallback = tenantId === TENANT_CONSTANTS.FALLBACK_ID;
 
@@ -475,8 +489,10 @@ export class AuthService {
 
         return { data: { user: mockUser, session: mockSession }, error: null };
 
-      } catch (error: any) {
-        return { data: { user: null, session: null }, error: error };
+      } catch (error: unknown) {
+        const authError = error as AuthError;
+        if (!authError.message) authError.message = String(error);
+        return { data: { user: null, session: null }, error: authError };
       }
     }
 

@@ -10,6 +10,24 @@ import { Invoice, InvoiceItem } from '@app/features/sales/domain/entities/invoic
     standalone: true,
     imports: [CommonModule, RouterLink],
     templateUrl: './admin-invoice-detail-page.html',
+    styles: [`
+        @media print {
+            /* Default (A4 mode): hide the no-print wrapper */
+            .no-print { display: none !important; }
+
+            /* POS mode: hide the A4 content, show only ticket */
+            body.print-pos-mode .px-6 { display: none !important; }
+            body.print-pos-mode #pos-ticket-print { display: block !important; }
+            body.print-pos-mode {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            @page {
+                /* Will be overridden per mode via JS */
+                margin: 5mm;
+            }
+        }
+    `]
 })
 export class AdminInvoiceDetailPage implements OnInit {
     private route = inject(ActivatedRoute);
@@ -20,9 +38,11 @@ export class AdminInvoiceDetailPage implements OnInit {
     items = signal<InvoiceItem[]>([]);
     company = signal<CompanySettings | null>(null);
     loading = signal(true);
-
     error = signal('');
-    
+
+    /** Controls print rendering mode: 'a4' for full invoice, 'pos' for 80mm ticket */
+    printMode = signal<'a4' | 'pos'>('a4');
+
     async ngOnInit() {
         const id = this.route.snapshot.paramMap.get('id');
         
@@ -51,7 +71,25 @@ export class AdminInvoiceDetailPage implements OnInit {
         }
     }
 
+    /** Print in A4/PDF format (full invoice layout) */
     print() {
-        window.print();
+        this.printMode.set('a4');
+        document.body.classList.remove('print-pos-mode');
+        setTimeout(() => window.print(), 100);
+    }
+
+    /** Print in 80mm POS ticket format */
+    printTicketPOS() {
+        this.printMode.set('pos');
+        document.body.classList.add('print-pos-mode');
+        setTimeout(() => {
+            window.print();
+            // Reset after print dialog closes
+            setTimeout(() => {
+                document.body.classList.remove('print-pos-mode');
+                this.printMode.set('a4');
+            }, 1000);
+        }, 150);
     }
 }
+

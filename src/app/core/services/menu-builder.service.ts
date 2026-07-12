@@ -42,7 +42,6 @@ export class MenuBuilderService {
 
     if (isGlobalAdmin && isCentral) {
       companyChildren.push({ title: 'Gestión Red de Sucursales', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
-      companyChildren.push({ title: 'Gestión de Personas', path: `${basePrefix}/users`, icon: 'fa-user-cog' });
     }
 
     const baseItems: MenuItem[] = [
@@ -84,7 +83,7 @@ export class MenuBuilderService {
         ]
       },
       { title: 'Servicio Técnico', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
-      { title: 'Gestión de Clientes', path: `${basePrefix}/clients`, icon: 'fa-users', module: 'customers' },
+      { title: 'Gestión de Personas y Clientes', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
       {
         title: 'Configuración Empresa',
         icon: 'fa-building',

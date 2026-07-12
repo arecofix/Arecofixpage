@@ -1,15 +1,18 @@
 import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { FavoritesService } from '@app/shared/services/favorites.service';
+import { CartService } from '@app/shared/services/cart.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   form: FormGroup;
@@ -21,6 +24,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   isEditing = false;
   isLoggedIn = false;
 
+  public favoritesService = inject(FavoritesService);
+  private cartService = inject(CartService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -150,5 +155,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.isEditing = false;
       this.cdr.markForCheck();
     }
+  }
+
+  addToCart(product: any) {
+    this.cartService.addToCart(product);
+  }
+
+  removeFavorite(productId: string) {
+    this.favoritesService.removeFavorite(productId);
   }
 }

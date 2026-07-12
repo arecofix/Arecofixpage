@@ -113,14 +113,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     // Keep some UI-only signals
     showProductModal = signal(false);
-    showNotifyModal = signal(false);
-    selectedNotifyStatus = signal<number | null>(null);
-
-    notifyStatuses = signal([
-        { id: 5, label: 'Listo', sublabel: 'Avisa que puede retirar', icon: 'fas fa-check-circle', color: 'text-green-500', activeClass: 'border-green-500 bg-green-50/50 dark:bg-green-500/10', iconBgActive: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400' },
-        { id: 6, label: 'Entregado', sublabel: 'Marca como retirado', icon: 'fas fa-box-open', color: 'text-blue-500', activeClass: 'border-blue-500 bg-blue-50/50 dark:bg-blue-500/10', iconBgActive: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' },
-        { id: 2, label: 'En Presupuesto', sublabel: 'Notifica presupuesto', icon: 'fas fa-search-dollar', color: 'text-yellow-500', activeClass: 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-500/10', iconBgActive: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-green-400' }
-    ]);
 
     statusOptions = [
         { id: 1, label: 'Recibido / Pendiente', icon: 'fas fa-clipboard-list', color: 'text-amber-500' },
@@ -131,23 +123,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         { id: 6, label: 'Entregado', icon: 'fas fa-box-open', color: 'text-slate-500' },
         { id: 7, label: 'Cancelado', icon: 'fas fa-times-circle', color: 'text-rose-500' }
     ];
-
-    notifyPreviewMessage = computed(() => {
-        const statusId = this.selectedNotifyStatus();
-        const customerName = this.repairForm?.get('customer_name')?.value || 'Cliente';
-        const device = this.repairForm?.get('device_model')?.value || 'Equipo';
-        const cost = this.repairForm?.get('final_cost')?.value || 0;
-        
-        if (!statusId) return 'Selecciona un estado para ver la vista previa...';
-        
-        if (statusId === 5) {
-            return `¡Hola ${customerName}! Te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost}. ¡Te esperamos!`;
-        }
-        if (statusId === 2) {
-            return `¡Hola ${customerName}! Tenemos el presupuesto para tu ${device}. Por favor comunicate con nosotros para confirmarlo.`;
-        }
-        return `Notificación para el estado seleccionado...`;
-    });
 
     readonly TAX_RATE = 0.21;
     searchQuery = signal('');
@@ -536,23 +511,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         });
     }
 
-    sendStatusNotification() {
-        const statusId = this.selectedNotifyStatus();
-        if (!statusId) return;
-        
-        const phone = this.repairForm.get('customer_phone')?.value;
-        if (!phone) {
-            this.notificationService.showWarning('El cliente no tiene teléfono cargado.');
-            return;
-        }
-
-        this.repairForm.patchValue({ current_status_id: statusId });
-        this.save();
-        this.showNotifyModal.set(false);
-    }
-    
     openNotifyModal() {
-        this.showNotifyModal.set(true);
+        this.shareWhatsApp();
     }
     
     async save() {
@@ -709,22 +669,52 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     shareWhatsApp() {
         const data = this.repairForm.getRawValue();
-        if (!data.tracking_code) return;
+        if (!data.customer_phone) {
+            this.notificationService.showWarning('El cliente no tiene teléfono cargado.');
+            return;
+        }
+        if (!data.tracking_code) {
+            this.notificationService.showWarning('Falta el código de seguimiento. Guardá la orden primero.');
+            return;
+        }
 
-        const customerName = data.customer_name;
-        const device = data.device_model;
+        const customerName = data.customer_name || 'Cliente';
+        const device = data.device_model || 'Equipo';
         const url = this.getTrackingUrl();
+        const cost = data.final_cost || data.estimated_cost || 0;
+        const statusId = Number(data.current_status_id);
 
-        let message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
+        let message = '';
+        const reviewUrl = environment.contact.socialMedia.googleMaps;
 
-        if (data.current_status_id === RepairStatus.READY_FOR_PICKUP) {
-            // Use configured Google Map Review URL
-            const reviewLink = environment.contact.socialMedia.googleMaps;
-            message = `Hola ${customerName}, su reparación del ${device} ya está lista. Agradecemos su reseña en el siguiente enlace: ${reviewLink}`;
+        switch (statusId) {
+            case RepairStatus.PENDING_DIAGNOSIS:
+                message = `📦 *Arecofix - Equipo Recibido*\n\nHola ${customerName}, recibimos tu ${device}. Podés seguir el estado de tu reparación en tiempo real aquí:\n\n🔗 ${url}\n\n¡Gracias por elegirnos!`;
+                break;
+            case RepairStatus.SUPPLY_MANAGEMENT:
+                message = `⏳ *Arecofix - Presupuesto / Repuestos*\n\nHola ${customerName}, tenemos novedades sobre el presupuesto o repuestos para tu ${device}. Podés ver los detalles aquí:\n\n🔗 ${url}\n\nPor favor comunícate con nosotros para coordinar. ¡Gracias!`;
+                break;
+            case RepairStatus.IN_PROGRESS:
+                message = `⚙️ *Arecofix - En Reparación*\n\nHola ${customerName}, te informamos que tu ${device} ya se encuentra en servicio técnico. Podés seguir el progreso en tiempo real aquí:\n\n🔗 ${url}`;
+                break;
+            case RepairStatus.QUALITY_CONTROL:
+                message = `🔍 *Arecofix - Control de Calidad*\n\nHola ${customerName}, tu ${device} está siendo evaluado en el control de calidad final. Seguí el estado aquí:\n\n🔗 ${url}`;
+                break;
+            case RepairStatus.READY_FOR_PICKUP:
+                message = `✅ *Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\n📍 Te esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n🔗 ${url}`;
+                break;
+            case RepairStatus.DELIVERED:
+                message = `🌟 *Arecofix - ¡Equipo Entregado!*\n\nHola ${customerName}, fue un gusto ayudarte con la reparación de tu ${device}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n⭐⭐⭐⭐⭐\n🔗 ${reviewUrl}\n\n¡Muchas gracias!`;
+                break;
+            case RepairStatus.CANCELLED:
+                message = `❌ *Arecofix - Reparación Cancelada*\n\nHola ${customerName}, te informamos que la orden para tu ${device} fue cancelada. Podés ver los detalles aquí:\n\n🔗 ${url}`;
+                break;
+            default:
+                message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
+                break;
         }
 
         const whatsappUrl = `https://wa.me/${data.customer_phone}?text=${encodeURIComponent(message)}`;
-
         window.open(whatsappUrl, '_blank');
     }
 

@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -166,6 +166,20 @@ export class ProductsDetailsPage {
           this.newReview.set({ name: '', comment: '', rating: 5 });
           this.loadReviews(product.id);
           this.notificationService.showSuccess("¡Gracias por tu comentario! Será revisado pronto.");
+      }
+  }
+
+  async markReviewHelpful(reviewId: string) {
+      if (!reviewId) return;
+      try {
+          await this.reviewRepository.incrementHelpful(reviewId);
+          this.reviews.update(list =>
+              list.map(r => r.id === reviewId ? { ...r, helpful_count: (r.helpful_count || 0) + 1 } : r)
+          );
+          this.notificationService.showSuccess("¡Gracias! Marcaste esta opinión como útil.");
+      } catch (err: any) {
+          console.error("Error marking review as helpful:", err);
+          this.notificationService.showError("No se pudo registrar tu voto.");
       }
   }
 

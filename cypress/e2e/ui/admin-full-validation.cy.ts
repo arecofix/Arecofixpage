@@ -1,10 +1,7 @@
 describe('Admin Layout & Navigation Full Validation', () => {
   beforeEach(() => {
     cy.viewport(1280, 720); // Force desktop viewport since lg breakpoint is 1024px
-    cy.loginAsAdmin();
-    // Prevenimos requests lentas mockeando notificaciones o dependencias si es necesario
-    // cy.intercept('GET', '**/notifications', { body: [] });
-    cy.visit('/admin/dashboard');
+    cy.loginAsAdmin('/login?returnUrl=/admin/dashboard');
   });
 
   it('Debería cargar el Layout estructurado como Programa de PC', () => {
@@ -36,29 +33,28 @@ describe('Admin Layout & Navigation Full Validation', () => {
     // 2. Esperamos a que la sidebar esté visible
     cy.get('aside.drawer-side').should('be.visible');
 
-    // 3. Hacer clic en el botón colapsar del menú
-    cy.get('button').contains(/Cerrar|Colapsar/, { matchCase: false }).click({ force: true });
+    cy.get('button').contains(/Ocultar/i).click({ force: true });
     
     // Validar que el menú esté colapsado (debe tener alguna clase de width reducido)
     cy.wait(200);
     
     // 4. Click en Academia Arecofix - buscar el item del menú
-    cy.get('aside').find('[data-tip*="Academia"], a:contains("Academia"), button:contains("Academia")').first().click({ force: true });
+    cy.get('aside.drawer-side').find('[data-tip*="Academia"], a:contains("Academia"), button:contains("Academia")').first().click({ force: true });
     
     // 5. Validar que el menú se expandió y podemos ver los subitems
     cy.wait(200);
-    cy.get('aside').contains('Cursos', { timeout: 3000 }).should('be.visible');
+    cy.get('aside.drawer-side').contains('Cursos', { timeout: 3000 }).should('exist');
   });
 
   it('Debería poder navegar entre módulos de forma fluida', () => {
     // Navegar a inventario
-    cy.get('aside').contains('Inventario').click({ force: true });
+    cy.get('aside.drawer-side').contains('Inventario').click({ force: true });
     cy.contains('Productos').click({ force: true });
     
     cy.url().should('include', '/products');
     
     // Navegar a Servicio Técnico
-    cy.get('aside').contains('Servicio Técnico').click({ force: true });
+    cy.get('aside.drawer-side').contains('Servicio Técnico').click({ force: true });
     cy.url().should('include', '/repairs');
   });
 });

@@ -349,9 +349,9 @@ export class AdminOrderFormPage implements OnInit {
 
             this.router.navigate(['/admin/orders']);
             
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('💥 Save method error:', e);
-            this.error = e.message || 'Error al guardar pedido';
+            this.error = (e instanceof Error ? e.message : String(e)) || 'Error al guardar pedido';
             this.saving = false;
             this.cdr.markForCheck();
         }
