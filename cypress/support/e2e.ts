@@ -65,6 +65,8 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 });
 
 beforeEach(() => {
+  cy.clearLocalStorage();
+  cy.clearCookies();
   // Bloquear llamadas a Google Analytics, Tag Manager y PostHog para evitar timeouts y datos de test
   cy.intercept('https://www.google-analytics.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://www.googletagmanager.com/**', { statusCode: 200, body: '' });

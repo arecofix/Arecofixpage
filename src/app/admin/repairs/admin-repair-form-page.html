@@ -13,27 +13,27 @@
                 <button type="button" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(52,199,89,0.2)] rounded-lg">
                     <i class="fas fa-plus"></i> Nueva orden
                 </button>
-                <button type="button" routerLink="/admin/repairs" class="btn btn-sm bg-[#1F2937] hover:bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-600 rounded-lg">
+                <button type="button" routerLink="/admin/repairs" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
                     <i class="fas fa-list"></i> Órdenes guardadas
                 </button>
-                <button type="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-600 rounded-lg">
+                <button type="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
                     <i class="fas fa-chart-line"></i> Contabilidad
                 </button>
                 
                 <div class="divider divider-horizontal mx-0 before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 hidden xl:flex"></div>
                 
-                @if (id && repairForm.value.tracking_code) {
-                    <button type="button" (click)="printOrder()" class="btn btn-sm bg-[#1F2937] hover:bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-600 rounded-lg" [disabled]="saving()">
-                        <i class="fas fa-file-pdf text-red-400"></i> Imprimir PDF
-                    </button>
-                    <button type="button" (click)="printOrder()" class="btn btn-sm bg-[#3498DB] hover:bg-blue-500 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(52,152,219,0.2)] rounded-lg" [disabled]="saving()">
-                        <i class="fas fa-receipt"></i> Ticket 80mm
-                    </button>
-                    <button type="button" (click)="shareWhatsApp()" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(52,199,89,0.2)] rounded-lg">
-                        <i class="fab fa-whatsapp"></i> WhatsApp PDF
-                    </button>
-                    <button type="button" (click)="openNotifyModal()" class="btn btn-sm bg-[#25D366] hover:bg-green-400 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(37,211,102,0.3)] rounded-lg font-bold animate-pulse-once" id="btn-notificar-cliente">
-                        <i class="fas fa-bell"></i> Notificar Cliente
+                @if (id) {
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" role="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
+                            <i class="fas fa-print"></i> Imprimir <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-2">
+                            <li><a (click)="printOrder()"><i class="fas fa-receipt text-blue-500"></i> Ticket 80mm</a></li>
+                            <li><a (click)="printOrder()"><i class="fas fa-file-pdf text-red-500"></i> Factura A4 PDF</a></li>
+                        </ul>
+                    </div>
+                    <button type="button" (click)="shareWhatsApp()" class="btn btn-sm bg-[#25D366] hover:bg-green-400 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(37,211,102,0.3)] rounded-lg font-bold animate-pulse-once" id="btn-notificar-cliente">
+                        <i class="fas fa-bell"></i> Notificar
                     </button>
                 }
             </div>
@@ -98,7 +98,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-user text-indigo-400"></i> Nombre Completo *</label>
-                                    <input type="text" formControlName="customer_name" list="repair-clients-list" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched" placeholder="Buscar o escribir nombre..." autocomplete="off">
+                                    <input type="text" formControlName="customer_name" list="repair-clients-list" (input)="onSelectClient($any($event.target).value)" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched" placeholder="Buscar o escribir nombre..." autocomplete="off">
                                     @if (repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched) {
                                         <p class="text-[10px] text-red-500 mt-1 font-semibold">El nombre es obligatorio (mín. 3 letras).</p>
                                     }
@@ -188,18 +188,18 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Accesorios Dejados</label>
-                                    <div class="relative group" formGroupName="checklist">
-                                        <button type="button" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-700 dark:text-gray-300 text-sm focus:outline-none text-left flex justify-between items-center hover:bg-gray-100 dark:hover:bg-gray-800">
+                                    <div class="dropdown w-full" formGroupName="checklist">
+                                        <div id="btn-accesorios-toggle" tabindex="0" role="button" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-700 dark:text-gray-300 text-sm focus:outline-none text-left flex justify-between items-center hover:bg-gray-100 dark:hover:bg-gray-800">
                                             <span>Seleccionar</span>
                                             <i class="fas fa-chevron-down text-xs"></i>
-                                        </button>
-                                        <div class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-3 hidden group-hover:block z-10">
-                                            <label class="flex items-center gap-3 text-sm p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"><input type="checkbox" formControlName="charger" class="checkbox checkbox-sm checkbox-primary"> Cargador</label>
-                                            <label class="flex items-center gap-3 text-sm p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"><input type="checkbox" formControlName="battery" class="checkbox checkbox-sm checkbox-primary"> Batería</label>
-                                            <label class="flex items-center gap-3 text-sm p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"><input type="checkbox" formControlName="chip" class="checkbox checkbox-sm checkbox-primary"> Chip/SIM</label>
-                                            <label class="flex items-center gap-3 text-sm p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"><input type="checkbox" formControlName="sd" class="checkbox checkbox-sm checkbox-primary"> MicroSD</label>
-                                            <label class="flex items-center gap-3 text-sm p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"><input type="checkbox" formControlName="case" class="checkbox checkbox-sm checkbox-primary"> Funda</label>
                                         </div>
+                                        <ul tabindex="0" class="dropdown-content z-50 menu p-3 shadow-xl bg-white dark:bg-[#101828] rounded-xl w-full mt-1 border border-gray-200 dark:border-gray-700">
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="charger" class="checkbox checkbox-sm checkbox-primary"> Cargador</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="battery" class="checkbox checkbox-sm checkbox-primary"> Batería</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="chip" class="checkbox checkbox-sm checkbox-primary"> Chip/SIM</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="sd" class="checkbox checkbox-sm checkbox-primary"> MicroSD</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="case" class="checkbox checkbox-sm checkbox-primary"> Funda</label></li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -288,16 +288,11 @@
                         </div>
                     </div>
 
-                    <!-- Finanzas y Resumen (Bottom) -->
                     <div class="bg-gray-50 dark:bg-[#1A253A] rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-inner">
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Fecha Entrada</label>
                                 <input type="text" [value]="date | date:'dd/MM/yyyy HH:mm'" readonly class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Fecha Entrega</label>
-                                <input type="text" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Presupuesto Estimado</label>
@@ -516,100 +511,4 @@
 </div>
 }
 
-<!-- Modal: Notificar Estado al Cliente -->
-@if (showNotifyModal()) {
-<div class="fixed inset-0 z-70 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4" id="notify-modal-overlay">
-    <div class="bg-gray-50 dark:bg-[#1A253A] border border-gray-200 dark:border-gray-700/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.6)] w-full max-w-lg overflow-hidden animate-fade-in-up relative" id="notify-modal">
-        
-        <!-- Header del Modal -->
-        <div class="p-5 border-b border-gray-200 dark:border-gray-700/50 flex justify-between items-center bg-white dark:bg-[#101828]">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-[#25D366]/20 border border-[#25D366]/30 flex items-center justify-center">
-                    <i class="fab fa-whatsapp text-[#25D366] text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-gray-900 dark:text-white text-base">Notificar Estado al Cliente</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Seleccioná el paso actual de la reparación</p>
-                </div>
-            </div>
-            <button type="button" (click)="showNotifyModal.set(false)" class="btn btn-sm btn-circle btn-ghost text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:bg-gray-700 hover:text-gray-900 dark:hover:text-white border-none" id="btn-cerrar-notify-modal">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
 
-        <!-- Cuerpo del Modal -->
-        <div class="p-5 flex flex-col gap-4">
-
-            <!-- Info del cliente -->
-            <div class="bg-white dark:bg-[#101828] rounded-xl p-3 border border-gray-200 dark:border-gray-700/50 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-[#3498DB]/20 border border-[#3498DB]/30 flex items-center justify-center shrink-0">
-                    <i class="fas fa-user text-[#3498DB] text-sm"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-gray-900 dark:text-white font-bold text-sm truncate">{{ repairForm.value.customer_name || 'Cliente sin nombre' }}</p>
-                    <p class="text-gray-500 dark:text-gray-400 text-xs font-mono">{{ repairForm.value.customer_phone || 'Sin teléfono' }} &bull; Cód: <span class="text-[#34C759] font-bold">{{ repairForm.value.tracking_code }}</span></p>
-                </div>
-            </div>
-
-            <!-- Selector de estado -->
-            <div>
-                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Seleccioná el estado a notificar:</p>
-                <div class="flex flex-col gap-2" id="notify-status-list">
-                    @for (st of notifyStatuses(); track st.id) {
-                        <button type="button"
-                            (click)="selectedNotifyStatus.set(st.id)"
-                            [id]="'notify-status-' + st.id"
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left font-semibold text-sm"
-                            [ngClass]="[
-                                selectedNotifyStatus() !== st.id ? 'border-gray-200 dark:border-gray-700 bg-transparent text-gray-700 dark:text-gray-300 opacity-70' : '',
-                                selectedNotifyStatus() === st.id ? st.activeClass : ''
-                            ]">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-base"
-                                [ngClass]="selectedNotifyStatus() === st.id ? st.iconBgActive : 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400'">
-                                <i [class]="st.icon"></i>
-                            </div>
-                            <div class="flex-1">
-                                <span class="block">{{ st.label }}</span>
-                                <span class="text-xs font-normal opacity-70">{{ st.sublabel }}</span>
-                            </div>
-                            @if (selectedNotifyStatus() === st.id) {
-                                <i class="fas fa-check-circle text-current text-lg ml-auto"></i>
-                            }
-                        </button>
-                    }
-                </div>
-            </div>
-
-            <!-- Preview del mensaje -->
-            @if (selectedNotifyStatus()) {
-                <div class="bg-white dark:bg-[#101828] rounded-xl p-4 border border-[#25D366]/20" id="notify-message-preview">
-                    <p class="text-xs font-semibold text-[#25D366] uppercase tracking-wider mb-2 flex items-center gap-2">
-                        <i class="fab fa-whatsapp"></i> Preview del Mensaje
-                    </p>
-                    <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed italic">&quot;{{ notifyPreviewMessage() }}&quot;</p>
-                </div>
-            }
-
-            <!-- Botones de acción -->
-            <div class="flex gap-3 pt-2">
-                <button type="button" (click)="showNotifyModal.set(false)" class="btn flex-1 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-none rounded-xl">
-                    Cancelar
-                </button>
-                <button type="button"
-                    (click)="sendStatusNotification()"
-                    [disabled]="!selectedNotifyStatus() || !repairForm.value.customer_phone"
-                    class="btn flex-1 bg-[#25D366] hover:bg-green-400 text-gray-900 dark:text-white border-none rounded-xl font-bold shadow-[0_0_15px_rgba(37,211,102,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
-                    id="btn-enviar-notificacion">
-                    <i class="fab fa-whatsapp mr-1"></i> Enviar Notificación
-                </button>
-            </div>
-
-            @if (!repairForm.value.customer_phone) {
-                <p class="text-amber-400 text-xs text-center">
-                    <i class="fas fa-exclamation-triangle mr-1"></i> El cliente no tiene teléfono registrado. Guardá la orden primero o añadí el teléfono.
-                </p>
-            }
-        </div>
-    </div>
-</div>
-}

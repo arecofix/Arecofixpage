@@ -122,6 +122,11 @@ export const publicRoutes: Routes = [
         loadComponent: () => import('@app/public/repuestos/repuestos').then((m) => m.RepuestosComponent),
       },
       {
+        title: 'Prueba Gratis | Arecofix',
+        path: 'prueba-gratis',
+        loadComponent: () => import('@app/public/prueba-gratis/prueba-gratis.component').then((m) => m.PruebaGratisComponent),
+      },
+      {
         title: 'Login',
         path: 'login',
         loadComponent: () =>

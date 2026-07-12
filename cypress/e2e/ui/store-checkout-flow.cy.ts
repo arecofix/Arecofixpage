@@ -2,17 +2,27 @@ describe('Carrito y Checkout (E2E)', () => {
   beforeEach(() => {
     // 1. Simular sesión de usuario común
     const mockSession = {
-      access_token: 'fake-jwt-token',
+      access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoiY29tbW9uLXVzZXItMTIzIn0.signature',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
       refresh_token: 'fake-refresh-token',
+      token_type: 'bearer',
       user: {
         id: 'common-user-123',
+        aud: 'authenticated',
+        role: 'authenticated',
         email: 'user@example.com',
-        role: 'authenticated'
+        email_confirmed_at: new Date().toISOString(),
+        app_metadata: { provider: 'email', providers: ['email'] },
+        user_metadata: { role: 'user' },
+        identities: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
     };
     
     // Inyectar estado en localStorage
-    window.localStorage.setItem('sb-arecofix-auth-token', JSON.stringify(mockSession));
+    window.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
     
     // 2. Mock de perfil
     cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
@@ -222,34 +232,20 @@ describe('Carrito y Checkout (E2E)', () => {
     cy.wait('@saveOrder');
     
     // Validar UI de éxito (Redirección a Mercado Pago porque es el primer método por defecto)
-    // El toast tiene pointer-events-none en el contenedor, usar .should('exist') en vez de 'be.visible'
-    cy.get('app-toast span').contains(/Redirigiendo a Pago Seguro|Error al procesar/i, { timeout: 8000 }).should('exist');
+    cy.contains(/Redirigiendo a Pago Seguro/i, { timeout: 8000 }).should('be.visible');
   });
 
   it('debería mostrar mensaje de error claro si falla por permisos en checkout', () => {
-    // Forzamos error 42501 (RLS Permisos) en la confirmación de orden (PATCH)
-    cy.intercept('PATCH', '**/rest/v1/orders*', (req) => {
-      // Only mock it if it's the confirmation request (status = pending_payment)
-      if (req.body && req.body.status === 'pending_payment') {
-        req.reply({
-          statusCode: 403,
-          body: {
-            code: '42501',
-            message: 'new row violates row-level security policy for table "orders"',
-            details: 'No tienes permisos'
-          }
-        });
-      } else {
-        // Otherwise return normally like saveOrder
-        req.reply({
-          statusCode: 200,
-          body: [{
-            id: 'mock-cart-id',
-            status: 'cart',
-            ...req.body
-          }]
-        });
-      }
+    // Forzamos error 42501 (RLS Permisos) en la creación de orden (POST)
+    cy.intercept('POST', '**/rest/v1/order*', (req) => {
+      req.reply({
+        statusCode: 403,
+        body: {
+          code: '42501',
+          message: 'new row violates row-level security policy for table "orders"',
+          details: 'No tienes permisos'
+        }
+      });
     }).as('createOrderFail');
     
     // 1. Ir a la página de productos

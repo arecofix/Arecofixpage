@@ -1,6 +1,9 @@
 describe('Tauri Desktop App - Offline First Sync Engine & Responsiveness', () => {
 
   beforeEach(() => {
+    // Limpiar storage para evitar tokens falsos de pruebas anteriores
+    cy.clearLocalStorage();
+    cy.clearCookies();
     // Simular la ventana de escritorio inicial de Tauri
     cy.viewport(1280, 720);
   });

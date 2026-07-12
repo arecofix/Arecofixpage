@@ -34,7 +34,7 @@ export class TenantIsolationGuard implements CanActivate {
     const reservedSlugs = [
       'admin', 'login', 'register', 'perfil', 'nosotros', 'contacto', 
       'servicios', 'academy', 'checkout', 'posts', 'tracking', 'blog', 
-      'portfolio', 'productos', 'categories', 'repuestos', 'gsm', 'fixtecnicos', 'recursos'
+      'portfolio', 'productos', 'categories', 'repuestos', 'gsm', 'fixtecnicos', 'recursos', 'prueba-gratis', 'prueba'
     ];
 
     // 4. Verificación de Sucursal por Ruta

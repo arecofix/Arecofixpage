@@ -18,9 +18,13 @@ export class AdminServiceFormPage implements OnInit {
     id: string | null = null;
     form = signal({
         name: '',
+        slug: '',
         description: '',
         price: 0,
         duration_minutes: 60,
+        image_url: '',
+        icon: 'fa-tools',
+        features: '',
         is_active: true
     });
 
@@ -34,11 +38,30 @@ export class AdminServiceFormPage implements OnInit {
             try {
                 const data = await this.catalogService.getById(this.id);
                 if (data) {
+                    let desc = data.description || '';
+                    let icon = 'fa-tools';
+                    let features = '';
+
+                    if (desc.trim().startsWith('{') && desc.trim().endsWith('}')) {
+                        try {
+                            const parsed = JSON.parse(desc);
+                            desc = parsed.description || '';
+                            icon = parsed.icon || 'fa-tools';
+                            features = parsed.features ? parsed.features.join('\n') : '';
+                        } catch (e) {
+                            // fallback to plain text
+                        }
+                    }
+
                     this.form.set({
                         name: data.name,
-                        description: data.description || '',
+                        slug: data.slug || '',
+                        description: desc,
                         price: data.price || 0,
                         duration_minutes: data.duration_minutes || 60,
+                        image_url: data.image_url || '',
+                        icon: icon,
+                        features: features,
                         is_active: data.is_active
                     });
                 }
@@ -50,16 +73,39 @@ export class AdminServiceFormPage implements OnInit {
         this.loading.set(false);
     }
 
+    slugify(text: string): string {
+        return text
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    }
+
     async save() {
         this.saving.set(true);
         this.error.set(null);
 
         const rawForm = this.form();
+        const featuresArray = rawForm.features
+            ? rawForm.features.split('\n').map(f => f.trim()).filter(f => f.length > 0)
+            : [];
+        
+        const serializedDescription = JSON.stringify({
+            description: rawForm.description,
+            icon: rawForm.icon || 'fa-tools',
+            features: featuresArray
+        });
+
         const payload = {
             name: rawForm.name,
-            description: rawForm.description,
+            slug: rawForm.slug.trim() || this.slugify(rawForm.name),
+            description: serializedDescription,
             price: Number(rawForm.price),
             duration_minutes: Number(rawForm.duration_minutes),
+            image_url: rawForm.image_url.trim() || undefined,
             is_active: rawForm.is_active
         };
 
@@ -70,11 +116,12 @@ export class AdminServiceFormPage implements OnInit {
                 await this.catalogService.create(payload);
             }
             this.router.navigate(['/admin/services']);
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('Error saving service:', e);
-            this.error.set(e.message || 'Error al guardar el servicio. Verifica los datos.');
+            this.error.set((e instanceof Error ? e.message : String(e)) || 'Error al guardar el servicio. Verifica los datos.');
         } finally {
             this.saving.set(false);
         }
     }
 }
+

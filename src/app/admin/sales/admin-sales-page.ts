@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, computed, effect, untracked, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { Params } from '@angular/router';
 
@@ -24,7 +24,7 @@ interface CartItem extends Product {
 @Component({
     selector: 'app-admin-sales-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, Pagination],
+    imports: [CommonModule, FormsModule, Pagination, RouterLink],
     templateUrl: './admin-sales-page.html',
     host: {
         class: 'flex flex-col flex-1 h-full min-h-0'

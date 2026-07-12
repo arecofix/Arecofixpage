@@ -217,8 +217,8 @@ export class BranchService {
   // --- ADMIN SETTINGS METHODS ---
 
   async getAllAdminBranches(): Promise<Branch[]> {
-    const tenantId = this.tenantService.getTenantId();
     if (!this.auth.isSuperAdmin()) {
+      // Non-superadmins only see their own branch
       const branchId = this.getCurrentBranchId() || this.auth.getCurrentProfile()?.branch_id;
       if (branchId) {
         const { data, error } = await this.supabase
@@ -226,10 +226,17 @@ export class BranchService {
           .select('*')
           .eq('id', branchId);
         if (error) throw error;
-        return data as Branch[] || [];
+        return (data as Branch[]) || [];
       }
+      return [];
     }
-    return (await firstValueFrom(this.branchRepo.getAll({ column: 'name' }))) as Branch[];
+    // SuperAdmin: fetch ALL branches across ALL tenants without tenant_id filter
+    const { data, error } = await this.supabase
+      .from('branches')
+      .select('*')
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return (data as Branch[]) || [];
   }
 
   async addBranch(payload: Partial<Branch>, slug: string): Promise<void> {

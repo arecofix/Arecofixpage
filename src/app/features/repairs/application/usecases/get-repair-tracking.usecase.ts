@@ -12,7 +12,8 @@ export class GetRepairTrackingUseCase {
   private repository = inject(RepairRepository);
 
   execute(code: string): Observable<PublicRepairDto | null> {
-    return this.repository.getByTrackingCode(code).pipe(
+    const cleanCode = code ? code.trim().toUpperCase() : '';
+    return this.repository.getByTrackingCode(cleanCode).pipe(
       map(repair => repair ? this.mapToPublicDto(repair) : null)
     );
   }

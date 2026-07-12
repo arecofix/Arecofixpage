@@ -206,14 +206,19 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
 
     getByTrackingCode(code: string): Observable<Repair | null> {
+        const cleanCode = code ? code.trim().toUpperCase() : '';
         return from(
             // Utilizamos la RPC segura sin maybeSingle() para evitar el error 406 de PostgREST
-            this.supabase.rpc('get_repair_tracking', { p_code: code })
+            this.supabase.rpc('get_repair_tracking', { p_code: cleanCode })
         ).pipe(
             map(({ data, error }) => {
                 if (error) return null;
-                // Extraemos el primer resultado del array si existe
-                return data && data.length > 0 ? this.mapFromDb(data[0]) : null;
+                // Extraemos el primer resultado del array si existe y validamos coincidencia exacta
+                const record = data && data.length > 0 ? this.mapFromDb(data[0]) : null;
+                if (record && record.tracking_code?.toLowerCase() !== cleanCode.toLowerCase()) {
+                    return null;
+                }
+                return record;
             })
         );
     }

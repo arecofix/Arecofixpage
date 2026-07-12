@@ -91,6 +91,48 @@ export class CustomerService {
   }
 
   async getUnifiedClients(): Promise<any[]> {
-    return firstValueFrom(this.repository.getUnifiedClients());
+    const profiles = await firstValueFrom(this.repository.getUnifiedClients());
+    const supabase = this.authService.getSupabaseClient();
+    
+    // Fetch standalone orders (guest buyers)
+    const { data: standaloneOrders } = await supabase
+      .from('orders')
+      .select('customer_name, customer_email, customer_phone, created_at')
+      .is('user_id', null);
+
+    const merged = [...(profiles || [])];
+
+    if (standaloneOrders) {
+      // Group by email or phone
+      const guestMap = new Map<string, any>();
+      for (const order of standaloneOrders) {
+        const key = order.customer_email || order.customer_phone;
+        if (!key) continue;
+        
+        // Skip if this email/phone is already in profiles
+        if (merged.some(p => p.email === order.customer_email || p.phone === order.customer_phone)) continue;
+
+        if (!guestMap.has(key)) {
+          guestMap.set(key, {
+            id: 'guest_' + key,
+            first_name: order.customer_name?.split(' ')[0] || 'Invitado',
+            last_name: order.customer_name?.split(' ').slice(1).join(' ') || '',
+            full_name: order.customer_name,
+            email: order.customer_email,
+            phone: order.customer_phone,
+            source: 'order',
+            repair_count: 0,
+            order_count: 1,
+            created_at: order.created_at
+          });
+        } else {
+          guestMap.get(key).order_count++;
+        }
+      }
+      
+      merged.push(...Array.from(guestMap.values()));
+    }
+
+    return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 }

@@ -23,4 +23,9 @@ export class SupabaseProductReviewRepository extends ProductReviewBaseRepository
 
     return { error };
   }
+
+  async incrementHelpful(reviewId: string): Promise<void> {
+    const { error } = await this.scoped.client.rpc('increment_review_helpful', { review_id: reviewId });
+    if (error) throw error;
+  }
 }

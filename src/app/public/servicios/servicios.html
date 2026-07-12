@@ -71,7 +71,7 @@
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-            @for (service of content().services; track service.id) {
+            @for (service of (dbServices().length > 0 ? dbServices() : content().services); track service.id) {
                 <!-- Service Card -->
                 <div class="group bg-white dark:bg-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col h-full hover:-translate-y-1">
                     

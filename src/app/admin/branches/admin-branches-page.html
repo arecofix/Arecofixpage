@@ -84,7 +84,15 @@
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="text-[10px] text-slate-500 font-mono">id: {{ branch.slug }}</span>
                                     </div>
+                                    @if (auth.isSuperAdmin() && branch.tenant_id) {
+                                        <div class="mt-1 flex items-center gap-1">
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 leading-none">
+                                                tenant: {{ branch.tenant_id.substring(0, 8) }}…
+                                            </span>
+                                        </div>
+                                    }
                                 </div>
+
                             </div>
                             
                             <!-- Badges -->

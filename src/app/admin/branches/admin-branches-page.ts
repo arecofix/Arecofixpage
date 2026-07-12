@@ -96,9 +96,9 @@ export class AdminBranchesPage implements OnInit {
             const data = await this.branchService.getAllAdminBranches();
             this.branches.set(data || []);
 
-            // Auto-open specific branch if we are in its context
+            // Auto-open specific branch if we are in its context (and not a Super Admin)
             const activeBranch = this.branchService.currentBranch();
-            if (activeBranch) {
+            if (activeBranch && !this.auth.isSuperAdmin()) {
                 this.openEditForm(activeBranch);
             }
         } catch (e: any) {
@@ -235,6 +235,7 @@ export class AdminBranchesPage implements OnInit {
                             logo_url: payload.branding_settings?.logo_url || null
                         }
                     });
+                    console.log('DEBUG [create-trial-tenant] response:', JSON.stringify(response));
                     if (response.error || (response.data && !response.data.success)) {
                         throw new Error(response.error?.message || response.data?.error || 'Error creando tenant.');
                     }
@@ -264,7 +265,12 @@ export class AdminBranchesPage implements OnInit {
             await this.loadBranches();
             setTimeout(() => this.success.set(null), 3000);
         } catch (e: any) {
-            this.error.set(e.message);
+            const errorMsg = e.message || '';
+            if (errorMsg.includes('23503') || errorMsg.includes('foreign key')) {
+                this.error.set('No se puede eliminar la sucursal porque tiene datos asociados (productos, reparaciones, etc.). Por favor, desactívela en su lugar.');
+            } else {
+                this.error.set('Error al eliminar: ' + errorMsg);
+            }
         } finally {
             this.cdr.markForCheck();
         }

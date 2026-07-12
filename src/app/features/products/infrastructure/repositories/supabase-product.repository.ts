@@ -16,6 +16,7 @@ import { BaseRepository } from '@app/core/repositories/base.repository';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,11 +50,11 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       slug,
       min_price,
       max_price,
-      minimal = true,
-      branch_id: paramBranchId
+      minimal = true
     } = params;
     
-    const branch_id = paramBranchId || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
+    const hasExplicitBranch = 'branch_id' in params;
+    const branch_id = hasExplicitBranch ? params.branch_id : (this.branchContextService?.getBranchId() || undefined);
 
     const start = (_page - 1) * _per_page;
     const end = start + _per_page - 1;

@@ -159,14 +159,15 @@ export class AdminEmployeeFormPage implements OnInit {
         });
     }
 
-    async onFileChange(event: any) {
-        const file: File = event.target.files?.[0];
+    async onFileChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file: File | undefined = input.files?.[0];
         if (!file) return;
         try {
             const publicUrl = await this.storageService.uploadFile(file, 'avatars');
             this.form.update((f) => ({ ...f, avatar_url: publicUrl }));
-        } catch (error: any) {
-            this.error.set(error.message || 'Error al subir la imagen.');
+        } catch (error: unknown) {
+            this.error.set((error instanceof Error ? error.message : String(error)) || 'Error al subir la imagen.');
         }
     }
 
@@ -198,8 +199,8 @@ export class AdminEmployeeFormPage implements OnInit {
                 }
             }
             this.router.navigate(['/admin/employees']);
-        } catch (e: any) {
-            this.error.set(e.message || 'Error al guardar el empleado.');
+        } catch (e: unknown) {
+            this.error.set((e instanceof Error ? e.message : String(e)) || 'Error al guardar el empleado.');
             console.error('Employee Save Error:', e);
         } finally {
             this.saving.set(false);

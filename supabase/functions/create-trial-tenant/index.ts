@@ -71,7 +71,6 @@ serve(async (req: Request) => {
         plan_type: 'basic',
         is_active: true,
         currency: currency || 'ARS',
-        usd_rate: 1000,
         tax_percentage: 21,
         contact_email: email,
         contact_phone: whatsapp,
@@ -80,32 +79,27 @@ serve(async (req: Request) => {
           company_name: businessName,
           whatsapp: whatsapp,
           subtitle: subtitle
-        },
-        features: {
-          hasProducts: true,
-          hasServices: true,
-          hasRepairs: true,
-          hasCourses: false,
-          hasBlog: false
-        },
-        // Using subscription_status to mark it as trial
-        subscription_status: 'active'
+        }
       })
       .select()
       .single();
 
-    if (tenantErr) throw tenantErr;
+    if (tenantErr) {
+        console.error("Tenant insertion error:", tenantErr);
+        throw tenantErr;
+    }
 
     // 2. Create Branch
+    const branchSlug = `sede-principal-${tenantSlug}`;
     const { data: branch, error: branchErr } = await supabaseAdmin
       .from('branches')
       .insert({
         tenant_id: tenant.id,
         name: 'Sede Principal',
-        slug: 'sede-principal',
+        slug: branchSlug,
         is_active: true,
         address: 'Dirección por definir',
-        phone: whatsapp
+        contact_phone: whatsapp
       })
       .select()
       .single();
@@ -125,7 +119,7 @@ serve(async (req: Request) => {
       user_metadata: {
         tenant_id: tenant.id,
         branch_id: branch.id,
-        role: 'admin'
+        role: 'tenant_owner'
       }
     });
 
@@ -145,7 +139,7 @@ serve(async (req: Request) => {
         id: userId,
         tenant_id: tenant.id,
         branch_id: branch.id,
-        role: 'admin',
+        role: 'tenant_owner',
         email: email,
         full_name: businessName + ' Admin',
         phone: whatsapp,

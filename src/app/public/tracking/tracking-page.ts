@@ -102,8 +102,9 @@ export class TrackingPage implements OnInit {
 
     ngOnInit() {
         this.route.paramMap.subscribe(async (params) => {
-            this.code = params.get('code');
-            if (this.code && this.code !== 'consulta') {
+            const rawCode = params.get('code');
+            this.code = rawCode ? rawCode.trim().toUpperCase() : null;
+            if (this.code && this.code !== 'CONSULTA') {
                 this.isLookupMode.set(false);
                 this.loading.set(true);
                 this.error.set(null);
@@ -157,24 +158,36 @@ export class TrackingPage implements OnInit {
 
     private async updateSeo(r: PublicRepairDto) {
         const statusName = r.status_label;
-        let imageUrl = 'assets/img/branding/og-services.png';
+        // Default: branded tracking image (absolute URL, required for WhatsApp/Telegram previews)
+        const trackingOgImage = `${this.baseUrl}/assets/img/branding/og-tracking.png`;
+        let imageUrl = trackingOgImage;
 
         try {
             const settings = await this.companyService.getSettings();
             if (settings?.logo_url) {
-                imageUrl = settings.logo_url;
+                const raw = settings.logo_url;
+                // Ensure URL is absolute — bots require absolute URLs for OG images
+                if (raw.startsWith('http://') || raw.startsWith('https://')) {
+                    imageUrl = raw;
+                } else if (raw.startsWith('/') || raw.startsWith('assets/')) {
+                    imageUrl = `${this.baseUrl}/${raw.replace(/^\//, '')}`;
+                }
+                // If logo_url looks like a generic small icon, prefer the branded OG image
+                const tooSmall = raw.includes('16x16') || raw.includes('32x32') || raw.includes('favicon');
+                if (tooSmall) imageUrl = trackingOgImage;
             }
         } catch (e) {
             this.logger.warn('Could not fetch company settings for SEO image', e);
         }
 
         this.seoService.setPageData({
-            title: `${statusName} - Tu ${r.device_model}`,
-            description: `Gracias por confiar en Arecofix. Tu equipo está en etapa de ${statusName}.`,
-            imageUrl: imageUrl,
+            title: `${statusName} - Tu ${r.device_model} | Arecofix`,
+            description: `Tu equipo está en etapa de ${statusName}. Seguí el avance de tu reparación en tiempo real con Arecofix.`,
+            imageUrl,
             type: 'article'
         });
     }
+
 
     // Removed old calculation methods as they are now in the logic layer
 

@@ -22,18 +22,17 @@ async function fixUserRole() {
   console.log('Logged in successfully. User ID:', authData.user.id);
   console.log('User metadata:', authData.user.user_metadata);
   
-  console.log('Fetching latest repair order...');
-  const { data: repair, error: repairError } = await supabase.from('repairs').select('*').limit(1).maybeSingle();
-  if (repairError) {
-    console.error('Error fetching repair:', repairError.message);
-  } else if (repair) {
-    console.log('Repair details:', {
-      id: repair.id,
-      current_status_id: repair.current_status_id,
-      type_of_status_id: typeof repair.current_status_id
-    });
+  console.log('Updating profile role to super_admin...');
+  const { data: updatedProfile, error: updateError } = await supabase
+    .from('profiles')
+    .update({ role: 'super_admin' })
+    .eq('id', authData.user.id)
+    .select();
+    
+  if (updateError) {
+    console.error('Error updating profile:', updateError.message);
   } else {
-    console.log('No repairs found in database.');
+    console.log('Profile updated successfully:', updatedProfile);
   }
 }
 

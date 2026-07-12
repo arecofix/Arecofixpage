@@ -13,8 +13,21 @@ export class PostService {
       .eq('status', 'published')
       .maybeSingle();
 
-    if (error) throw error;
-    if (!data) return null;
+    if (error || !data) {
+      try {
+        if (typeof window !== 'undefined') {
+          const response = await fetch('/assets/data/fallback_blog_posts.json');
+          if (response.ok) {
+            const fallbackData = await response.json();
+            const found = fallbackData.find((p: any) => p.slug === slug);
+            if (found) return this.mapToEntity(found);
+          }
+        }
+      } catch (e) {
+        console.warn('Fallback failed', e);
+      }
+      return null;
+    }
 
     return this.mapToEntity(data);
   }
@@ -26,8 +39,22 @@ export class PostService {
       .order('created_at', { ascending: false })
       .limit(limit);
 
-    if (error) throw error;
-    return (data || []).map((item) => this.mapToEntity(item));
+    if (error || !data || data.length === 0) {
+      try {
+        if (typeof window !== 'undefined') {
+          const response = await fetch('/assets/data/fallback_blog_posts.json');
+          if (response.ok) {
+            const fallbackData = await response.json();
+            return fallbackData.slice(0, limit).map((d: any) => this.mapToEntity(d));
+          }
+        }
+      } catch (e) {
+        console.warn('Fallback failed', e);
+      }
+      return [];
+    }
+
+    return data.map((d: any) => this.mapToEntity(d));
   }
 
   async getComments(postId: string): Promise<PostComment[]> {

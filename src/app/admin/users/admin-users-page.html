@@ -1,11 +1,21 @@
 <!-- ─── Header ──────────────────────────────────────────────────────────── -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <div>
-        <h1 class="text-2xl font-black text-base-content">Gestión de Personas</h1>
-        <p class="text-sm text-base-content/60">Usuarios, staff y proveedores del negocio.</p>
+        <h1 class="text-2xl font-black text-base-content">Gestión de Personas y Clientes</h1>
+        <p class="text-sm text-base-content/60">Clientes unificados, usuarios registrados, personal y proveedores.</p>
     </div>
     <!-- Context-sensitive action button -->
-    @if (activeTab() === 'staff') {
+    @if (activeTab() === 'clients') {
+        <div class="flex items-center gap-3 flex-wrap">
+            <button (click)="downloadCSV()"
+                class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all">
+                <i class="fas fa-file-csv"></i> Exportar CSV
+            </button>
+            <a routerLink="/admin/clients/new" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-md">
+                <i class="fas fa-plus"></i> Nuevo Cliente
+            </a>
+        </div>
+    } @else if (activeTab() === 'staff') {
         <a routerLink="/admin/employees/new" class="btn btn-primary shadow-lg">
             <i class="fas fa-plus mr-2"></i> Nuevo Empleado
         </a>
@@ -28,34 +38,263 @@
 
 <!-- ─── Tabs ───────────────────────────────────────────────────────────── -->
 <div role="tablist" class="tabs tabs-bordered mb-6">
-    <button id="tab-users" role="tab" class="tab text-base font-semibold gap-2"
-        [class.tab-active]="activeTab() === 'users'"
-        (click)="setTab('users')">
+    <button id="tab-clients" role="tab" class="tab text-base font-semibold gap-2"
+        [class.tab-active]="activeTab() === 'clients'"
+        (click)="setTab('clients')">
         <i class="fas fa-users text-sm"></i> Clientes
-        @if (users().length > 0) {
-            <span class="badge badge-sm badge-neutral">{{ users().length }}</span>
+        @if (clients().length > 0) {
+            <span class="badge badge-sm badge-neutral">{{ filteredClients().length }}</span>
         }
     </button>
-    <button id="tab-staff" role="tab" class="tab text-base font-semibold gap-2"
-        [class.tab-active]="activeTab() === 'staff'"
-        (click)="setTab('staff')">
-        <i class="fas fa-id-badge text-sm"></i> Staff
-        @if (employees().length > 0) {
-            <span class="badge badge-sm badge-primary">{{ employees().length }}</span>
-        }
-    </button>
-    <button id="tab-suppliers" role="tab" class="tab text-base font-semibold gap-2"
-        [class.tab-active]="activeTab() === 'suppliers'"
-        (click)="setTab('suppliers')">
-        <i class="fas fa-truck text-sm"></i> Proveedores
-        @if (suppliers().length > 0) {
-            <span class="badge badge-sm badge-accent">{{ suppliers().length }}</span>
-        }
-    </button>
+    @if (isGlobalAdmin()) {
+        <button id="tab-users" role="tab" class="tab text-base font-semibold gap-2"
+            [class.tab-active]="activeTab() === 'users'"
+            (click)="setTab('users')">
+            <i class="fas fa-user-lock text-sm"></i> Usuarios
+            @if (users().length > 0) {
+                <span class="badge badge-sm badge-neutral">{{ users().length }}</span>
+            }
+        </button>
+        <button id="tab-staff" role="tab" class="tab text-base font-semibold gap-2"
+            [class.tab-active]="activeTab() === 'staff'"
+            (click)="setTab('staff')">
+            <i class="fas fa-id-badge text-sm"></i> Staff
+            @if (employees().length > 0) {
+                <span class="badge badge-sm badge-primary">{{ employees().length }}</span>
+            }
+        </button>
+        <button id="tab-suppliers" role="tab" class="tab text-base font-semibold gap-2"
+            [class.tab-active]="activeTab() === 'suppliers'"
+            (click)="setTab('suppliers')">
+            <i class="fas fa-truck text-sm"></i> Proveedores
+            @if (suppliers().length > 0) {
+                <span class="badge badge-sm badge-accent">{{ suppliers().length }}</span>
+            }
+        </button>
+    }
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- TAB 1: CLIENTES / USUARIOS                                             -->
+<!-- TAB: CLIENTES UNIFICADOS                                                -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+@if (activeTab() === 'clients') {
+    <!-- Barra de búsqueda -->
+    <div class="mb-4">
+        <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input
+                type="text"
+                [ngModel]="clientsSearchTerm()"
+                (ngModelChange)="clientsSearchTerm.set($event)"
+                placeholder="Buscar por nombre, email, teléfono o DNI..."
+                class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-250 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+        </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="flex items-center gap-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
+        <span><strong class="text-gray-800 dark:text-white">{{ filteredClients().length }}</strong> clientes encontrados</span>
+        <span class="text-gray-300 dark:text-gray-600">|</span>
+        <span>Página <strong class="text-gray-800 dark:text-white">{{ clientsCurrentPage() }}</strong> de {{ totalClientsPages() }}</span>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800/50 rounded-2xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[400px]">
+        <!-- Desktop Table Layout -->
+        <div class="hidden sm:block overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-gray-800/80">
+                    <tr>
+                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Cliente</th>
+                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Contacto</th>
+                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden md:table-cell">Ubicación</th>
+                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Fuente</th>
+                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden lg:table-cell">Reparac.</th>
+                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (clientsLoading()) {
+                        @for (i of [1,2,3,4,5]; track i) {
+                            <tr class="border-t border-gray-50 dark:border-gray-800">
+                                <td class="px-4 py-4"><div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div></td>
+                                <td class="px-4 py-4">
+                                    <div class="flex flex-col gap-2">
+                                        <div class="h-3 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                                        <div class="h-3 w-36 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 hidden md:table-cell"><div class="h-3 w-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div></td>
+                                <td class="px-4 py-4 text-center"><div class="h-5 w-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mx-auto"></div></td>
+                                <td class="px-4 py-4 text-center hidden lg:table-cell"><div class="h-4 w-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mx-auto"></div></td>
+                                <td class="px-4 py-4 text-center"><div class="h-8 w-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mx-auto"></div></td>
+                            </tr>
+                        }
+                    } @else if (filteredClients().length === 0) {
+                        <tr>
+                            <td colspan="6" class="text-center py-12 text-gray-400">
+                                <i class="fas fa-users text-3xl mb-2 opacity-30 block"></i>
+                                {{ clientsSearchTerm() ? 'No se encontraron clientes con esa búsqueda.' : 'No hay clientes registrados.' }}
+                            </td>
+                        </tr>
+                    } @else {
+                        @for (client of paginatedClients(); track client.id) {
+                            <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                                <td class="px-4 py-3">
+                                    <div class="font-bold text-gray-800 dark:text-white">
+                                        {{ client.full_name || (client.first_name + ' ' + client.last_name) }}
+                                    </div>
+                                    @if (client.dni) {
+                                        <div class="text-xs text-gray-400">DNI: {{ client.dni }}</div>
+                                    }
+                                </td>
+                                <td class="px-4 py-3">
+                                    @if (client.email) {
+                                        <div class="flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                                            <i class="fas fa-envelope text-xs text-gray-400"></i>
+                                            <a [href]="'mailto:' + client.email" class="hover:text-blue-500 transition-colors text-xs">{{ client.email }}</a>
+                                        </div>
+                                    }
+                                    @if (client.phone) {
+                                        <div class="flex items-center gap-1 text-gray-600 dark:text-gray-300 mt-0.5">
+                                            <i class="fas fa-phone text-xs text-gray-400"></i>
+                                            <a [href]="'https://wa.me/' + client.phone.replace(/\D/g, '')" target="_blank" class="hover:text-green-500 transition-colors text-xs">{{ client.phone }}</a>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">
+                                    {{ client.address || '—' }}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    @if (client.source === 'profile') {
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                            <i class="fas fa-user-check"></i> Sistema
+                                        </span>
+                                    } @else {
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                            <i class="fas fa-tools"></i> Taller
+                                        </span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-bold hidden lg:table-cell">
+                                    {{ client.repair_count ?? '—' }}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    @if (client.source === 'profile') {
+                                        <a [routerLink]="['/admin/clients', client.id]"
+                                            class="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 text-gray-400 hover:text-blue-500 transition-all inline-block">
+                                            <i class="fas fa-edit text-sm"></i>
+                                        </a>
+                                    } @else {
+                                        <a [href]="'https://wa.me/' + (client.phone || '').replace(/\D/g, '')" target="_blank"
+                                            class="p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-500/10 text-gray-400 hover:text-green-500 transition-all inline-block"
+                                            title="Contactar por WhatsApp">
+                                            <i class="fab fa-whatsapp text-sm"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Card Layout -->
+        <div class="block sm:hidden divide-y divide-gray-100 dark:divide-gray-800">
+            @if (clientsLoading()) {
+                @for (i of [1,2,3]; track i) {
+                    <div class="p-4 space-y-3">
+                        <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                        <div class="h-3 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                        <div class="h-3 w-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                    </div>
+                }
+            } @else if (filteredClients().length === 0) {
+                <div class="text-center py-12 text-gray-400">
+                    <i class="fas fa-users text-3xl mb-2 opacity-30 block"></i>
+                    {{ clientsSearchTerm() ? 'No se encontraron clientes.' : 'No hay clientes registrados.' }}
+                </div>
+            } @else {
+                @for (client of paginatedClients(); track client.id) {
+                    <div class="p-4 flex flex-col gap-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-bold text-gray-800 dark:text-white">
+                                    {{ client.full_name || (client.first_name + ' ' + client.last_name) }}
+                                </div>
+                                @if (client.dni) {
+                                    <div class="text-xs text-gray-400">DNI: {{ client.dni }}</div>
+                                }
+                            </div>
+                            <!-- Source Badge -->
+                            <div>
+                                @if (client.source === 'profile') {
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                        Sistema
+                                    </span>
+                                } @else {
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                        Taller
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div class="text-xs space-y-1 text-gray-600 dark:text-gray-300">
+                            @if (client.email) {
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-envelope text-gray-400 w-3"></i>
+                                    <a [href]="'mailto:' + client.email" class="hover:text-blue-500 transition-colors">{{ client.email }}</a>
+                                </div>
+                            }
+                            @if (client.phone) {
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-phone text-gray-400 w-3"></i>
+                                    <a [href]="'https://wa.me/' + client.phone.replace(/\D/g, '')" target="_blank" class="hover:text-green-500 transition-colors">{{ client.phone }}</a>
+                                </div>
+                            }
+                            @if (client.address) {
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-map-marker-alt text-gray-400 w-3"></i>
+                                    <span>{{ client.address }}</span>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800/30">
+                            @if (client.source === 'profile') {
+                                <a [routerLink]="['/admin/clients', client.id]"
+                                    class="btn btn-xs btn-outline border-slate-200 dark:border-slate-700 hover:bg-blue-500 hover:text-white rounded-lg flex items-center gap-1">
+                                    <i class="fas fa-edit text-xs"></i> Editar
+                                </a>
+                            } @else {
+                                <a [href]="'https://wa.me/' + (client.phone || '').replace(/\D/g, '')" target="_blank"
+                                    class="btn btn-xs bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-lg flex items-center gap-1">
+                                    <i class="fab fa-whatsapp text-xs"></i> WhatsApp
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalClientsPages() > 1) {
+        <div class="mt-6 flex justify-center gap-1">
+            <button [disabled]="clientsCurrentPage() === 1" (click)="clientsCurrentPage.set(clientsCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default">{{ clientsCurrentPage() }} / {{ totalClientsPages() }}</span>
+            <button [disabled]="clientsCurrentPage() === totalClientsPages()" (click)="clientsCurrentPage.set(clientsCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+        </div>
+    }
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: USUARIOS REGISTRADOS                                              -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 @if (activeTab() === 'users') {
 <div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">

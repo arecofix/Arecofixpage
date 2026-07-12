@@ -29,8 +29,13 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
         errorMsg = 'Fallo crítico en el servidor de destino.';
       }
 
-      // Notificación inmediata sin frenar el flujo del GlobalErrorHandler principal
-      notification.showError(errorMsg);
+      // Avoid showing global notification for silent fire-and-forget endpoints
+      const silentEndpoints = ['/functions/v1/send-whatsapp', '/functions/v1/create-employee'];
+      const isSilent = silentEndpoints.some(endpoint => req.url.includes(endpoint));
+
+      if (!isSilent) {
+        notification.showError(errorMsg);
+      }
 
       // Relanzar para que lo atrape y registre el GlobalErrorHandler final
       return throwError(() => error);

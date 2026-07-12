@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -9,12 +9,28 @@ import { AdminUsersService } from './services/admin-users.service';
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
 import { EmployeeService } from '@app/features/customers/application/services/employee.service';
 import { SupplierService } from '@app/features/customers/application/services/supplier.service';
+import { CustomerService } from '@app/features/customers/application/services/customer.service';
 import { Supplier } from '@app/features/customers/domain/entities/supplier.entity';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 import { NotificationService } from '@app/core/services/notification.service';
 
-export type PeopleTab = 'users' | 'staff' | 'suppliers';
+export type PeopleTab = 'clients' | 'users' | 'staff' | 'suppliers';
+
+export interface ClientRow {
+  id: string;
+  first_name: string;
+  last_name: string;
+  full_name?: string;
+  email: string;
+  phone: string;
+  address?: string;
+  dni?: string;
+  source: 'profile' | 'repair' | 'order';
+  repair_count?: number;
+  order_count?: number;
+  created_at?: string;
+}
 
 @Component({
     selector: 'app-admin-users-page',
@@ -29,9 +45,36 @@ export class AdminUsersPage implements OnInit {
     private notificationService = inject(NotificationService);
     private employeeService = inject(EmployeeService);
     private supplierService = inject(SupplierService);
+    private customerService = inject(CustomerService);
 
     // --- Tab State ---
-    activeTab = signal<PeopleTab>('users');
+    activeTab = signal<PeopleTab>('clients');
+
+    // --- Clients Tab ---
+    clients = signal<ClientRow[]>([]);
+    clientsLoading = signal<boolean>(false);
+    clientsSearchTerm = signal<string>('');
+    clientsPageSize = signal(15);
+    clientsCurrentPage = signal(1);
+
+    filteredClients = computed(() => {
+        const term = this.clientsSearchTerm().toLowerCase().trim();
+        if (!term) return this.clients();
+        return this.clients().filter(c =>
+            (c.first_name + ' ' + c.last_name).toLowerCase().includes(term) ||
+            (c.full_name || '').toLowerCase().includes(term) ||
+            (c.email || '').toLowerCase().includes(term) ||
+            (c.phone || '').toLowerCase().includes(term) ||
+            (c.dni || '').toLowerCase().includes(term)
+        );
+    });
+
+    totalClientsPages = computed(() => Math.ceil(this.filteredClients().length / this.clientsPageSize()));
+
+    paginatedClients = computed(() => {
+        const start = (this.clientsCurrentPage() - 1) * this.clientsPageSize();
+        return this.filteredClients().slice(start, start + this.clientsPageSize());
+    });
 
     // --- Users Tab ---
     users = signal<UserProfile[]>([]);
@@ -54,16 +97,35 @@ export class AdminUsersPage implements OnInit {
     isMessageModalOpen = signal(false);
     bulkMessage = signal<string>('Hola {nombre}, te contacto desde Arecofix. ');
 
+    userProfile = signal<UserProfile | null>(null);
+
     async ngOnInit() {
-        await Promise.all([
-            this.loadBranches(),
-            this.loadUsers(),
-        ]);
+        this.authService.authState$.subscribe(state => {
+            this.userProfile.set(state.profile);
+        });
+        await this.loadClients();
+    }
+
+    isGlobalAdmin(): boolean {
+        return this.authService.isSuperAdmin() || this.userProfile()?.role === 'tenant_owner';
     }
 
     // ─── Tab Switch ────────────────────────────────────────────────────────
     async setTab(tab: PeopleTab) {
+        if (!this.isGlobalAdmin() && tab !== 'clients') {
+            this.notificationService.showError('No tienes permisos para acceder a esta pestaña.');
+            return;
+        }
         this.activeTab.set(tab);
+        if (tab === 'clients' && this.clients().length === 0) {
+            await this.loadClients();
+        }
+        if (tab === 'users' && this.users().length === 0) {
+            await Promise.all([
+                this.loadBranches(),
+                this.loadUsers()
+            ]);
+        }
         if (tab === 'staff' && this.employees().length === 0) {
             await this.loadEmployees();
         }
@@ -209,5 +271,80 @@ export class AdminUsersPage implements OnInit {
         }
         this.isMessageModalOpen.set(false);
         this.selectedSupplierIds.set(new Set());
+    }
+
+    // ─── Clients Tab Logic ─────────────────────────────────────────────────
+    async loadClients() {
+        this.clientsLoading.set(true);
+        try {
+            const unifiedData = await this.customerService.getUnifiedClients();
+            this.clients.set(
+                unifiedData.map((c: any) => ({
+                    id: c.id,
+                    first_name: c.first_name || '',
+                    last_name: c.last_name || '',
+                    full_name: c.full_name || '',
+                    email: c.email || '',
+                    phone: c.phone || '',
+                    address: c.address,
+                    dni: c.dni,
+                    source: c.source as any,
+                    repair_count: c.repair_count || 0,
+                    order_count: c.order_count || 0,
+                    created_at: c.created_at
+                }))
+            );
+        } catch (error) {
+            console.error('Error loading unified clients:', error);
+        } finally {
+            this.clientsLoading.set(false);
+        }
+    }
+
+    downloadCSV(): void {
+        const rows = this.filteredClients();
+        const header = ['Nombre', 'Apellido', 'Email', 'Teléfono', 'Dirección', 'DNI', 'Fuente', 'Reparaciones', 'Pedidos'];
+        const csvRows = rows.map(c => [
+            this.csvEscape(c.first_name),
+            this.csvEscape(c.last_name),
+            this.csvEscape(c.email),
+            this.csvEscape(c.phone),
+            this.csvEscape(c.address ?? ''),
+            this.csvEscape(c.dni ?? ''),
+            this.translateSource(c.source),
+            c.repair_count ?? 0,
+            c.order_count ?? 0
+        ]);
+
+        const content = [
+            'Arecofix - Listado de Clientes Centralizado',
+            `Exportado: ${new Date().toLocaleDateString('es-AR')}`,
+            '',
+            header.join(';'),
+            ...csvRows.map(r => r.join(';'))
+        ].join('\n');
+
+        const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `arecofix-clientes-completo-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    private translateSource(source: string): string {
+        switch(source) {
+            case 'profile': return 'Sistema';
+            case 'repair': return 'Taller';
+            case 'order': return 'Tienda';
+            default: return source;
+        }
+    }
+
+    private csvEscape(value: string): string {
+        if (!value) return '';
+        const str = String(value).replace(/"/g, '""');
+        return str.includes(';') || str.includes('"') || str.includes('\n') ? `"${str}"` : str;
     }
 }

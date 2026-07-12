@@ -19,9 +19,9 @@ export const adminRoutes: Routes = [
     children: [
         { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
-      // Employees and Suppliers are now unified in /admin/users
+      // Note: /admin/suppliers is the dedicated supplier manager (ABM)
+      // /admin/users has a 'suppliers' tab for a unified people view
       { path: 'employees', redirectTo: 'users', pathMatch: 'full' },
-      { path: 'suppliers', redirectTo: 'users', pathMatch: 'full' },
       {
         title: 'Dashboard',
         path: 'dashboard',

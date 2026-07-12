@@ -62,6 +62,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   currentAssignedBranch = signal<Branch | null>(null);
   userProfile = signal<UserProfile | null>(null);
   isMainMenuOpen = signal(true);
+  isNotifOpen = signal(false);
   branchBranding = signal<{ logo: string; name: string }>({
     logo: '/assets/img/brands/logo/logo-normal.PNG',
     name: 'Arecofix'
@@ -177,7 +178,17 @@ export class AdminLayout implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
+  toggleNotif(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.isNotifOpen.update(v => !v);
+  }
+
+  closeNotif() {
+    this.isNotifOpen.set(false);
+  }
+
   async handleNotificationClick(notif: any) {
+    this.closeNotif();
     await this.notificationService.markAsRead(notif.id);
     if (notif.payload?.route) {
       this.router.navigate([notif.payload.route]);
