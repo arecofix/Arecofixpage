@@ -34,80 +34,193 @@
         </div>
       </div>
 
-      <!-- Form Section -->
+      <!-- Form / Success Section -->
       <div class="p-8 md:w-3/5">
         
-        <!-- SUCCESS STATE -->
-        <div *ngIf="success()" class="text-center py-8">
+        <!-- ===================== SUCCESS STATE ===================== -->
+        <div *ngIf="success()" class="text-center py-4" id="trial-success-panel">
           <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
             <i class="fas fa-check"></i>
           </div>
-          <h3 class="text-3xl font-bold text-gray-900 mb-4">¡Tu sucursal ha sido creada!</h3>
-          <p class="text-gray-600 mb-6 text-lg">
-            Revisa tu correo electrónico (<strong>{{ generatedEmail() }}</strong>) para obtener tu contraseña temporal de administrador.
-          </p>
+          <h3 class="text-3xl font-bold text-gray-900 mb-2">¡Tu sucursal ha sido creada!</h3>
+          <p class="text-gray-500 mb-6">Ya tienes acceso a Arecofix. Guarda bien tus credenciales.</p>
           
-          <div class="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8 text-left">
-            <h4 class="font-bold text-blue-900 mb-2">Siguientes pasos:</h4>
-            <ol class="list-decimal list-inside space-y-2 text-blue-800">
+          <!-- Credentials Box -->
+          <div class="bg-slate-900 rounded-2xl p-5 mb-6 text-left relative overflow-hidden" id="credentials-box">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-500 rounded-t-2xl"></div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-widest text-slate-400">🔑 Credenciales de acceso</span>
+              <button
+                type="button"
+                (click)="copyCredentials()"
+                id="copy-credentials-btn"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                [class]="credentialsCopied() ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 hover:bg-slate-600 text-slate-300'">
+                <i [class]="credentialsCopied() ? 'fas fa-check' : 'fas fa-copy'"></i>
+                {{ credentialsCopied() ? '¡Copiado!' : 'Copiar' }}
+              </button>
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-3">
+                <i class="fas fa-envelope text-blue-400 w-4"></i>
+                <div>
+                  <p class="text-[10px] text-slate-500 uppercase tracking-wider">Email</p>
+                  <p class="text-white font-mono text-sm font-bold" id="generated-email">{{ generatedEmail() }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-3">
+                <i class="fas fa-key text-yellow-400 w-4"></i>
+                <div>
+                  <p class="text-[10px] text-slate-500 uppercase tracking-wider">Contraseña temporal</p>
+                  <p class="text-yellow-300 font-mono text-sm font-bold tracking-widest" id="generated-password">{{ generatedPassword() }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Steps -->
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-left">
+            <div class="flex items-start gap-3">
+              <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+              <div>
+                <p class="text-sm font-bold text-amber-800 mb-1">Acción requerida en el primer inicio de sesión</p>
+                <p class="text-xs text-amber-700">Al ingresar por primera vez, el sistema te pedirá <strong>cambiar tu contraseña</strong> por una de tu elección. Esto es obligatorio por seguridad.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-8 text-left">
+            <h4 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+              <i class="fas fa-list-ol text-blue-500"></i> Siguientes pasos:
+            </h4>
+            <ol class="list-decimal list-inside space-y-2 text-blue-800 text-sm">
               <li>Descarga la aplicación Arecofix Desktop.</li>
               <li>Instala el software en tu PC.</li>
-              <li>Inicia sesión con tu correo y la contraseña que te enviamos.</li>
+              <li>Inicia sesión con las credenciales mostradas arriba.</li>
+              <li>Cambia tu contraseña cuando el sistema te lo solicite.</li>
             </ol>
           </div>
 
-          <button type="button" class="btn btn-primary btn-lg w-full gap-2 shadow-lg shadow-blue-500/30" (click)="downloadApp()">
+          <button type="button" id="download-app-btn" class="btn btn-primary btn-lg w-full gap-2 shadow-lg shadow-blue-500/30" (click)="downloadApp()">
             <i class="fas fa-download"></i> Descargar Arecofix Desktop (.exe)
           </button>
         </div>
 
-        <!-- FORM STATE -->
+        <!-- ===================== FORM STATE ===================== -->
         <div *ngIf="!success()">
           <h3 class="text-2xl font-bold text-gray-800 mb-6">Solicitar Licencia</h3>
           
-          <div *ngIf="errorMsg()" class="alert alert-error mb-6 shadow-sm">
+          <div *ngIf="errorMsg()" class="alert alert-error mb-6 shadow-sm" id="trial-error-msg">
             <i class="fas fa-exclamation-triangle"></i>
             <span>{{ errorMsg() }}</span>
           </div>
 
           <form [formGroup]="trialForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <!-- Business Name -->
             <div class="form-control">
-              <label class="label"><span class="label-text font-medium text-gray-700">Nombre de tu Taller / Local</span></label>
-              <input type="text" formControlName="businessName" placeholder="Ej: FixCell" class="input input-bordered w-full bg-white text-gray-800" [class.input-error]="trialForm.get('businessName')?.invalid && trialForm.get('businessName')?.touched" />
+              <label class="label"><span class="label-text font-medium text-gray-700">Nombre de tu Taller / Local *</span></label>
+              <input
+                type="text"
+                id="input-businessName"
+                formControlName="businessName"
+                placeholder="Ej: FixCell"
+                class="input input-bordered w-full bg-white text-gray-800"
+                [class.input-error]="trialForm.get('businessName')?.invalid && trialForm.get('businessName')?.touched" />
               <label class="label" *ngIf="trialForm.get('businessName')?.invalid && trialForm.get('businessName')?.touched">
                 <span class="label-text-alt text-red-500">Mínimo 3 caracteres.</span>
               </label>
             </div>
             
+            <!-- Name + WhatsApp -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-control">
-                <label class="label"><span class="label-text font-medium text-gray-700">Tu Nombre</span></label>
-                <input type="text" formControlName="userName" placeholder="Juan Pérez" class="input input-bordered w-full bg-white text-gray-800" [class.input-error]="trialForm.get('userName')?.invalid && trialForm.get('userName')?.touched" />
+                <label class="label"><span class="label-text font-medium text-gray-700">Tu Nombre *</span></label>
+                <input
+                  type="text"
+                  id="input-userName"
+                  formControlName="userName"
+                  placeholder="Juan Pérez"
+                  class="input input-bordered w-full bg-white text-gray-800"
+                  [class.input-error]="trialForm.get('userName')?.invalid && trialForm.get('userName')?.touched" />
                 <label class="label" *ngIf="trialForm.get('userName')?.invalid && trialForm.get('userName')?.touched">
                   <span class="label-text-alt text-red-500">Obligatorio.</span>
                 </label>
               </div>
               <div class="form-control">
-                <label class="label"><span class="label-text font-medium text-gray-700">WhatsApp</span></label>
-                <input type="tel" formControlName="whatsapp" placeholder="+54 9..." class="input input-bordered w-full bg-white text-gray-800" [class.input-error]="trialForm.get('whatsapp')?.invalid && trialForm.get('whatsapp')?.touched" />
+                <label class="label"><span class="label-text font-medium text-gray-700">WhatsApp *</span></label>
+                <input
+                  type="tel"
+                  id="input-whatsapp"
+                  formControlName="whatsapp"
+                  placeholder="+54 9..."
+                  class="input input-bordered w-full bg-white text-gray-800"
+                  [class.input-error]="trialForm.get('whatsapp')?.invalid && trialForm.get('whatsapp')?.touched" />
                 <label class="label" *ngIf="trialForm.get('whatsapp')?.invalid && trialForm.get('whatsapp')?.touched">
                   <span class="label-text-alt text-red-500">Ingresa un WhatsApp válido.</span>
                 </label>
               </div>
             </div>
 
+            <!-- Email -->
             <div class="form-control">
-              <label class="label"><span class="label-text font-medium text-gray-700">Correo Electrónico</span></label>
-              <input type="email" formControlName="email" placeholder="tucorreo@ejemplo.com" class="input input-bordered w-full bg-white text-gray-800" [class.input-error]="trialForm.get('email')?.invalid && trialForm.get('email')?.touched" />
+              <label class="label"><span class="label-text font-medium text-gray-700">Correo Electrónico *</span></label>
+              <input
+                type="email"
+                id="input-email"
+                formControlName="email"
+                placeholder="tucorreo@ejemplo.com"
+                class="input input-bordered w-full bg-white text-gray-800"
+                [class.input-error]="trialForm.get('email')?.invalid && trialForm.get('email')?.touched" />
               <label class="label" *ngIf="trialForm.get('email')?.invalid && trialForm.get('email')?.touched">
                 <span class="label-text-alt text-red-500">Ingresa un correo válido.</span>
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary w-full mt-6 gap-2" [disabled]="loading()">
-              <span *ngIf="loading()" class="loading loading-spinner loading-sm"></span>
-              <i *ngIf="!loading()" class="fas fa-paper-plane"></i> 
-              {{ loading() ? 'Creando tu sucursal...' : 'Solicitar Prueba Gratis' }}
+            <!-- Logo Upload (opcional) -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-medium text-gray-700">Logo de la Empresa</span>
+                <span class="label-text-alt text-gray-400">(Opcional · Máx. 2MB)</span>
+              </label>
+
+              <!-- Logo Preview -->
+              <div *ngIf="logoPreviewUrl()" class="mb-3 flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <img [src]="logoPreviewUrl()!" alt="Vista previa del logo" class="w-14 h-14 object-contain rounded-lg border border-slate-200 bg-white p-1" id="logo-preview">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-slate-700 truncate">{{ selectedLogoFile?.name }}</p>
+                  <p class="text-xs text-slate-400">{{ ((selectedLogoFile?.size ?? 0) / 1024).toFixed(1) }} KB</p>
+                </div>
+                <button type="button" (click)="removeLogo()" class="btn btn-sm btn-ghost btn-circle text-red-400 hover:text-red-600 hover:bg-red-50" title="Quitar logo">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <!-- Upload Zone -->
+              <label *ngIf="!logoPreviewUrl()"
+                for="logo-upload-input"
+                class="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                  <i class="fas fa-image text-slate-400 group-hover:text-blue-500 transition-colors"></i>
+                </div>
+                <span class="text-sm text-slate-500 group-hover:text-blue-600 font-medium">Haz clic para subir tu logo</span>
+                <span class="text-xs text-slate-400">PNG, JPG, SVG, WebP</span>
+              </label>
+              <input
+                id="logo-upload-input"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                (change)="onLogoSelected($event)" />
+            </div>
+
+            <button
+              type="submit"
+              id="btn-submit-trial"
+              class="btn btn-primary w-full mt-6 gap-2"
+              [disabled]="loading() || uploadingLogo()">
+              <span *ngIf="loading() || uploadingLogo()" class="loading loading-spinner loading-sm"></span>
+              <i *ngIf="!loading() && !uploadingLogo()" class="fas fa-paper-plane"></i>
+              {{ uploadingLogo() ? 'Subiendo logo...' : loading() ? 'Creando tu sucursal...' : 'Solicitar Prueba Gratis' }}
             </button>
           </form>
         </div>

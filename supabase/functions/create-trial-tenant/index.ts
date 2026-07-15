@@ -9,7 +9,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Generate random password
+// Generate random password (12 chars, mixed)
 function generatePassword(length = 12) {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
     let retVal = "";
@@ -34,7 +34,7 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { email, businessName, subtitle, whatsapp, currency, logo_url } = await req.json();
+    const { email, businessName, userName, subtitle, whatsapp, currency, logo_url } = await req.json();
 
     if (!email || !businessName || !whatsapp) {
       return new Response(
@@ -110,8 +110,10 @@ serve(async (req: Request) => {
         throw branchErr;
     }
 
-    // 3. Create Auth User
+    // 3. Create Auth User with must_change_password flag
     const generatedPassword = generatePassword();
+    const ownerName = userName || businessName + ' Admin';
+
     const { data: authUser, error: authErr } = await supabaseAdmin.auth.admin.createUser({
       email: email,
       password: generatedPassword,
@@ -119,7 +121,9 @@ serve(async (req: Request) => {
       user_metadata: {
         tenant_id: tenant.id,
         branch_id: branch.id,
-        role: 'tenant_owner'
+        role: 'tenant_owner',
+        full_name: ownerName,
+        must_change_password: true
       }
     });
 
@@ -132,7 +136,7 @@ serve(async (req: Request) => {
 
     const userId = authUser.user.id;
 
-    // 4. Create Profile (will be upserted via triggers usually, so we update it or insert if missing)
+    // 4. Create Profile (upsert – may be auto-created by trigger)
     const { error: updateProfileErr } = await supabaseAdmin
       .from('profiles')
       .upsert({
@@ -141,12 +145,43 @@ serve(async (req: Request) => {
         branch_id: branch.id,
         role: 'tenant_owner',
         email: email,
-        full_name: businessName + ' Admin',
+        full_name: ownerName,
         phone: whatsapp,
-        is_active: true
+        is_active: true,
+        must_change_password: true
       });
 
     if (updateProfileErr) console.warn("Could not upsert profile (might be created by trigger):", updateProfileErr);
+
+    // 5. Create admin notification so the super admin is alerted
+    const notificationPayload = {
+      tenant_id: null,           // system-level: no tenant isolation
+      user_id: null,             // broadcast to all super admins
+      scope: 'admin',
+      type: 'info',
+      title: '🆕 Nueva Prueba Gratuita Registrada',
+      message: `${ownerName} (${businessName}) se registró con el email ${email}. WhatsApp: ${whatsapp}.`,
+      is_read: false,
+      payload: {
+        route: '/admin/branches',
+        tenant_id: tenant.id,
+        branch_id: branch.id,
+        business_name: businessName,
+        owner_name: ownerName,
+        owner_email: email,
+        owner_whatsapp: whatsapp,
+        logo_url: logo_url || null
+      }
+    };
+
+    const { error: notifErr } = await supabaseAdmin
+      .from('notifications')
+      .insert(notificationPayload);
+
+    if (notifErr) {
+      // Non-critical: log but don't fail the request
+      console.warn("Could not create admin notification:", notifErr.message);
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -155,7 +190,9 @@ serve(async (req: Request) => {
           credentials: {
               email: email,
               password: generatedPassword
-          }
+          },
+          tenantId: tenant.id,
+          branchId: branch.id
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
