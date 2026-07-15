@@ -90,12 +90,12 @@ serve(async (req: Request) => {
     }
 
     // 2. Create Branch
-    const branchSlug = `sede-principal-${tenantSlug}`;
+    const branchSlug = generateSlug('sede-' + businessName);
     const { data: branch, error: branchErr } = await supabaseAdmin
       .from('branches')
       .insert({
         tenant_id: tenant.id,
-        name: 'Sede Principal',
+        name: `Sede ${businessName}`,
         slug: branchSlug,
         is_active: true,
         address: 'Dirección por definir',
