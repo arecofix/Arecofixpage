@@ -452,12 +452,21 @@ export class AuthService {
 
     if (runningInTauri) {
       try {
-        // Offline Login via Flask Sidecar
-        const response = await fetch('http://localhost:5000/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: email, password: password })
-        });
+        // Offline Login via Flask Sidecar with 3 second timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        let response;
+        try {
+          response = await fetch('http://localhost:5000/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: email, password: password }),
+            signal: controller.signal
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
 
         if (!response.ok) {
           throw new Error('Credenciales inválidas');
