@@ -427,9 +427,29 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string): Promise<AuthResponse> {
-    const { isTauri } = await import('@tauri-apps/api/core');
-    const runningInTauri = isTauri();
+    let runningInTauri = false;
+    try {
+      const { isTauri } = await import('@tauri-apps/api/core');
+      runningInTauri = isTauri();
+    } catch (e) {
+      runningInTauri = false;
+    }
     
+    const isOffline = typeof navigator !== 'undefined' && (!navigator.onLine || (window as any).forceOffline);
+    let onlineResponse: AuthResponse | null = null;
+
+    if (!isOffline) {
+      try {
+        onlineResponse = await this.supabase.auth.signInWithPassword({ email, password });
+        if (!onlineResponse.error) {
+          return onlineResponse;
+        }
+      } catch (e) {
+        // Continue to offline fallback if running in Tauri
+        this.logger.warn('Online login threw error', e);
+      }
+    }
+
     if (runningInTauri) {
       try {
         // Offline Login via Flask Sidecar
@@ -440,7 +460,7 @@ export class AuthService {
         });
 
         if (!response.ok) {
-          throw new Error('Invalid offline credentials');
+          throw new Error('Credenciales inválidas');
         }
 
         const data = await response.json();
@@ -490,13 +510,20 @@ export class AuthService {
         return { data: { user: mockUser, session: mockSession }, error: null };
 
       } catch (error: unknown) {
+        if (onlineResponse && onlineResponse.error) {
+          return onlineResponse;
+        }
         const authError = error as AuthError;
         if (!authError.message) authError.message = String(error);
         return { data: { user: null, session: null }, error: authError };
       }
     }
 
-    return this.supabase.auth.signInWithPassword({ email, password });
+    if (onlineResponse) {
+      return onlineResponse;
+    }
+    
+    return { data: { user: null, session: null }, error: { message: 'Sin conexión a internet' } as AuthError };
   }
 
   async signUp(
