@@ -11,6 +11,7 @@ export default defineConfig({
     },
     baseUrl: "http://localhost:4200",
     supportFile: "cypress/support/e2e.ts",
+    numTestsKeptInMemory: 0,
   },
 
   env: {

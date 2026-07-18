@@ -92,7 +92,7 @@
                       <p class="text-sm text-amber-900/70 dark:text-amber-500/80 mb-6 leading-tight">
                         Los precios de repuestos y microelectrónica son exclusivos para profesionales registrados en nuestra plataforma.
                       </p>
-                      <a routerLink="/login" class="btn btn-md w-full bg-amber-500 hover:bg-amber-600 border-none text-amber-950 font-black shadow-lg shadow-amber-500/20 rounded-xl">
+                      <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }" class="btn btn-md w-full bg-amber-500 hover:bg-amber-600 border-none text-amber-950 font-black shadow-lg shadow-amber-500/20 rounded-xl">
                         <i class="fas fa-sign-in-alt mr-2"></i> INGRESAR / REGISTRARSE
                       </a>
                       <p class="text-[10px] text-center mt-3 text-amber-800/60 dark:text-amber-500/40 italic">

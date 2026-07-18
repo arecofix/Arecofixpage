@@ -6,6 +6,7 @@ import { CartService } from '@app/shared/services/cart.service';
 import { FavoritesService } from '@app/shared/services/favorites.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { ProductStrategicService } from '@app/core/services/product-strategic.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'product-card',
@@ -36,6 +37,7 @@ export class ProductCard {
   private cartService = inject(CartService);
   private favoritesService = inject(FavoritesService);
   private strategicService = inject(ProductStrategicService);
+  router = inject(Router);
 
   isFavorite = computed(() => this.favoritesService.isFavorite(this.product().id));
 

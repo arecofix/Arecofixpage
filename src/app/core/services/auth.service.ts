@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal, Injector, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
   User,
@@ -17,7 +17,6 @@ import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
-import { NgZone } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { TENANT_CONSTANTS } from '../constants/tenant.constants';
 
@@ -31,6 +30,7 @@ export class AuthService {
   private profileService = inject(ProfileService);
   private tenantService = inject(TenantService);
   private ngZone = inject(NgZone);
+  private injector = inject(Injector);
   
   // Súper Administrador Global
   public isSuperAdmin = signal<boolean>(false);
@@ -207,6 +207,18 @@ export class AuthService {
           } else {
             // Keep existing profile if we failed to fetch
             this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
+          }
+
+          if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
+            const returnUrl = localStorage.getItem('arecofix_return_url');
+            if (returnUrl) {
+              localStorage.removeItem('arecofix_return_url');
+              setTimeout(async () => {
+                const { Router } = await import('@angular/router');
+                const router = this.injector.get(Router);
+                router.navigateByUrl(returnUrl);
+              }, 100);
+            }
           }
 
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {

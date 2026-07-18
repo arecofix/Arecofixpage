@@ -385,7 +385,7 @@
       <div class="mt-8 text-center">
         <p class="text-sm text-slate-500">
           ¿Ya tienes cuenta?
-          <a routerLink="/login" class="font-medium text-slate-900 dark:text-white hover:underline transition-all">Inicia sesión</a>
+          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: returnUrl }" class="font-medium text-slate-900 dark:text-white hover:underline transition-all">Inicia sesión</a>
         </p>
       </div>
     </div>

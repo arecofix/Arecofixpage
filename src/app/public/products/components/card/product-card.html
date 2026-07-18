@@ -96,7 +96,7 @@
               ¿Sos técnico? Accedé a precios preferenciales autogestionando tu compra.
             </p>
           </div>
-          <a [routerLink]="['/login']" 
+          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }"
              class="w-full btn btn-sm bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 border-none rounded-lg h-10">
             Ingresar / Registrarse
           </a>

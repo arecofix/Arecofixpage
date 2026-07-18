@@ -516,7 +516,7 @@ export const HOME_CONTENT: { en: HomeContent; es: HomeContent } = {
             {
                 title: 'Fintech & Cripto',
                 description: 'Seguridad y transacciones rápidas.',
-                icon: 'fab fa-bitcoin',
+                icon: 'fas fa-coins',
                 examples: ['Wallets', 'Bots de Trading']
             },
             {
