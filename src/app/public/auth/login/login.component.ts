@@ -45,6 +45,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.document.body.classList.add('hide-floating-widgets');
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
+    if (typeof window !== 'undefined' && this.route.snapshot.queryParams['returnUrl']) {
+        localStorage.setItem('arecofix_return_url', this.returnUrl);
+    }
     
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))

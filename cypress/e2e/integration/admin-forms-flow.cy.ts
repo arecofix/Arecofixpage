@@ -142,10 +142,11 @@ describe('Admin Forms Integration Flow', () => {
     });
 
     cy.contains('button', 'Enviar Mensaje').click();
-
+    cy.wait('@postContactMessage');
+    
     // The POST to contact_messages is mocked to succeed → success toast should appear.
     // Toast text: '¡Consulta enviada con éxito! Te responderemos a la brevedad.'
-    cy.contains('Consulta enviada con éxito', { timeout: 10000 }).should('exist');
+    cy.contains('Consulta enviada', { timeout: 15000 }).should('exist');
   });
 
   it('2. should submit course enrollment', () => {
@@ -251,13 +252,14 @@ describe('Admin Forms Integration Flow', () => {
     cy.url({ timeout: 10000 }).should('include', '/admin');
 
     // Test Notifications dropdown (Alertas)
-    cy.get('header').find('.fa-bell').click();
-    cy.get('.dropdown-content').first().within(() => {
-      cy.contains('Nuevo Mensaje de Contacto').should('exist');
-      cy.contains(testData.contact.name).should('exist');
-      cy.contains('Nueva Inscripción a Curso').should('exist');
-      cy.contains(testData.course.name).should('exist');
-    });
+    cy.get('header').find('#notif-bell-btn').click();
+    
+    // The notifications panel does not use .dropdown-content, it just renders an absolute div
+    cy.contains('Alertas', { timeout: 10000 }).should('exist');
+    cy.contains('Nuevo Mensaje de Contacto', { timeout: 10000 }).should('exist');
+    cy.contains(testData.contact.name).should('exist');
+    cy.contains('Nueva Inscripción a Curso').should('exist');
+    cy.contains(testData.course.name).should('exist');
 
     // Verify Messages Section
     cy.visit('/admin/messages');

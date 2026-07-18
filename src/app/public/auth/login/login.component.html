@@ -58,15 +58,15 @@
   <!-- Right Panel: Login Form -->
   <div class="w-full lg:w-[55%] flex items-center justify-center p-6 sm:p-12 relative">
     
-    <!-- Mobile/Tablet Logo (Hidden on Desktop) -->
-    <div class="absolute top-8 left-8 lg:hidden flex items-center gap-2">
-      <div class="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center">
-        <i class="fas fa-layer-group text-white text-sm"></i>
-      </div>
-      <span class="text-slate-900 dark:text-white font-bold tracking-tight">Arecofix</span>
-    </div>
-
     <div class="w-full max-w-[400px]">
+      <!-- Mobile/Tablet Logo (Hidden on Desktop) -->
+      <div class="lg:hidden flex items-center gap-2 mb-10">
+        <div class="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center">
+          <i class="fas fa-layer-group text-white text-sm"></i>
+        </div>
+        <span class="text-slate-900 dark:text-white font-bold tracking-tight">Arecofix</span>
+      </div>
+
       <div class="mb-8 text-left">
         <h2 class="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">Iniciar sesión</h2>
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Ingresá tus credenciales para acceder al sistema.</p>
@@ -232,7 +232,7 @@
         <div class="mt-8 text-center">
           <p class="text-sm text-slate-500">
             ¿No tienes cuenta?
-            <a routerLink="/register" class="font-medium text-slate-900 dark:text-white hover:underline transition-all inline-block p-1 -m-1">Regístrate</a>
+            <a [routerLink]="['/register']" [queryParams]="{ returnUrl: returnUrl }" class="font-medium text-slate-900 dark:text-white hover:underline transition-all inline-block p-1 -m-1">Regístrate</a>
           </p>
         </div>
     </div>

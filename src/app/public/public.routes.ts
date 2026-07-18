@@ -174,7 +174,7 @@ export const publicRoutes: Routes = [
             seo: {
                 title: 'Ezequiel Enrico Areco - Java Backend Engineer | Portfolio',
                 description: 'Desarrollador Backend enfocado en APIs robustas con Java, Spring Boot y Project Loom. Con experiencia en persistencia JPA/Hibernate, bases de datos SQL, Docker y Git.',
-                imageUrl: 'assets/img/branding/logo/Logo (2).png',
+                imageUrl: 'assets/img/portfolio/ezequiel-enrico-areco.jpeg',
                 keywords: 'java developer, spring boot, project loom, hibernate, jpa, backend engineer, databases, docker, git, ezequiel enrico areco',
                 type: 'profile',
                 schema: {
@@ -183,7 +183,7 @@ export const publicRoutes: Routes = [
                   'name': 'Ezequiel Enrico Areco',
                   'jobTitle': 'Java Backend Engineer',
                   'url': 'https://arecofix.com.ar/portfolio',
-                  'image': 'https://arecofix.com.ar/assets/img/branding/logo/Logo (2).png',
+                  'image': 'https://arecofix.com.ar/assets/img/portfolio/ezequiel-enrico-areco.jpeg',
                   'sameAs': [
                     'https://www.linkedin.com/in/ezequiel-enrico/',
                     'https://github.com/arecofix'

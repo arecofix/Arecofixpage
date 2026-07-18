@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -20,6 +20,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   showPassword = false;
   showConfirmPassword = false;
   agreedToTerms = false;
+  returnUrl = '';
   passwordStrengthRequirements = {
     hasUpperCase: false,
     hasLowerCase: false,
@@ -36,6 +37,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
 
   constructor() {
@@ -51,12 +53,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
+    if (typeof window !== 'undefined' && this.route.snapshot.queryParams['returnUrl']) {
+        localStorage.setItem('arecofix_return_url', this.returnUrl);
+    }
+    
     // If user is already logged in, redirect
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
         if (state.user) {
-          this.router.navigate(['/']);
+          this.router.navigate([this.returnUrl || '/']);
         }
       });
 
@@ -163,7 +170,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
         this.success = '¡Cuenta creada exitosamente! Redirigiendo...';
       }
       setTimeout(() => {
-        this.router.navigate(['/login']);
+        if (this.returnUrl) {
+            this.router.navigate(['/login'], { queryParams: { returnUrl: this.returnUrl } });
+        } else {
+            this.router.navigate(['/login']);
+        }
       }, 2000);
     } catch (err) {
       this.loading = false;

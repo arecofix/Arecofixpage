@@ -3,11 +3,7 @@ describe('SaaS Architecture Audit: Tenant Isolation and Plan Security', () => {
   const MOCK_TENANT_ID = 'bba26ccd-59ce-471c-aac0-4c1f5513de3b';
 
   beforeEach(() => {
-    // 1. Iniciar sesión como administrador (evitando auth real)
-    cy.loginAsAdmin();
-
-    // 2. IMPORTANTE: Sobrescribir el profile para que el rol sea 'admin' y NO 'super_admin'.
-    // Si es super_admin, el moduleGuard deja pasar todo sin importar el plan.
+    // Definimos los interceptores ANTES del login personalizado
     cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
       req.reply({
         statusCode: 200,
@@ -21,6 +17,40 @@ describe('SaaS Architecture Audit: Tenant Isolation and Plan Security', () => {
         }]
       });
     }).as('getAdminProfile');
+
+    cy.intercept('GET', '**/rest/v1/tenants*', {
+      statusCode: 200,
+      body: [{ id: MOCK_TENANT_ID, name: 'Arecofix', slug: 'arecofix', is_active: true }]
+    }).as('getTenants');
+
+    const session = {
+      provider_token: null,
+      access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoibW9jay1hZG1pbi1pZCJ9.signature',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      refresh_token: 'fake-refresh',
+      token_type: 'bearer',
+      user: {
+        id: 'mock-admin-id',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'admin@arecofix.com',
+        user_metadata: { role: 'admin' }, // IMPORTANT: NOT super_admin
+      }
+    };
+
+    cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: session.user });
+    
+    // Set custom session
+    cy.visit('/', { 
+      failOnStatusCode: false,
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('supabase-remember-me', 'true');
+        win.localStorage.setItem('arecofix_current_branch_id', 'branch-isolation-1');
+        win.localStorage.setItem('arecofix_admin_branch_id', 'branch-isolation-1');
+      }
+    });
   });
 
   context('1. Data Isolation (Aislamiento Total entre Sucursales)', () => {

@@ -61,6 +61,7 @@ export class ProductsDetailsPage {
   private categoryService: CategoryService = inject(CategoryService);
   private productService: ProductService = inject(ProductService);
   private location: Location = inject(Location);
+  public router: Router = inject(Router);
 
   private fallbackService = inject(FallbackService);
   private seoService = inject(SeoService);
