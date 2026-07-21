@@ -144,7 +144,7 @@
               @for (item of cartService.cartItems(); track item.product.id) {
                 <li class="flex items-center gap-4">
                   <div class="w-16 h-16 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-hidden shrink-0">
-                    <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.png'" [alt]="item.product.name" class="w-full h-full object-cover" />
+                    <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.svg'" [alt]="item.product.name" class="w-full h-full object-cover" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ item.product.name }}</h4>

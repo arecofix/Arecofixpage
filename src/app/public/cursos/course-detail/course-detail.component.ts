@@ -78,8 +78,8 @@ export class CourseDetailComponent implements OnInit {
 
   // Sales Content Types
   audienceList: string[] = [];
-  benefitsList: any[] = [];
-  faqs: any[] = [];
+  benefitsList: string[] = [];
+  faqs: { question: string; answer: string }[] = [];
   
   // Dynamic Platzi-like Data
   rating: number = 4.8;
@@ -88,8 +88,8 @@ export class CourseDetailComponent implements OnInit {
   classesCount: number = 24;
   hoursContent: number = 2;
   hoursPractice: number = 12;
-  courseModules: any[] = [];
-  courseReviews: any[] = [];
+  courseModules: { title: string; lessons: { name: string; duration: string }[] }[] = [];
+  courseReviews: { name: string; avatar: string; rating: number; date: string; comment: string }[] = [];
   instructorProfile = {
       name: 'Instructor a designar',
       role: 'Experto en la materia',
@@ -137,7 +137,7 @@ export class CourseDetailComponent implements OnInit {
         return this.coursesService.getCourseBySlug(slug);
       })
     ).subscribe({
-      next: (response: { data: Course | null, error: any }) => {
+      next: (response: { data: Course | null, error: unknown }) => {
         if (response.error || !response.data) {
            const currentSlug = this.route.snapshot.paramMap.get('slug') || '';
            const mockCourse = this.getMockCourseBySlug(currentSlug);
@@ -153,7 +153,7 @@ export class CourseDetailComponent implements OnInit {
         }
         if (releaseTask) releaseTask();
       },
-      error: (err: any) => {
+      error: (err: unknown) => {
         const currentSlug = this.route.snapshot.paramMap.get('slug') || '';
         const mockCourse = this.getMockCourseBySlug(currentSlug);
         if (mockCourse) {
@@ -379,12 +379,12 @@ export class CourseDetailComponent implements OnInit {
 
       this.loadingModules = true;
       this.coursesService.getModulesByCourseId(courseId).subscribe({
-          next: (res: { data: Module[], error: any }) => {
+          next: (res: { data: Module[], error: unknown }) => {
               this.modules = res.data || [];
               this.loadingModules = false;
               this.cd.detectChanges();
           },
-          error: (err: any) => {
+          error: (err: unknown) => {
               this.loadingModules = false;
               this.cd.detectChanges();
           }

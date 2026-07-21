@@ -326,7 +326,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             const currentImages = this.images();
             this.images.set([...currentImages, ...uploadedUrls]);
             this.notificationService.showSuccess('Imágenes subidas correctamente.');
-        } catch (e: unknown) {
+        } catch (e: any) {
             console.error('Error uploading images:', e);
             const message = e instanceof Error ? e.message : 'Unknown error';
             this.notificationService.showError('Error al subir imágenes: ' + message);
@@ -497,7 +497,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 this.parts.set(data.parts || []);
                 this.images.set(data.images || []);
             }
-        } catch (e: unknown) {
+        } catch (e: any) {
             const message = e instanceof Error ? e.message : 'Unknown error';
             this.error.set('Error cargando reparación: ' + message);
         }
@@ -517,7 +517,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     
     async save() {
         console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
-        (window as any).saveCalled = true;
+        window.saveCalled = true;
         this.saving.set(true);
         this.error.set(null);
 
@@ -593,7 +593,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             
             console.log('📤 [AdminRepairForm] Enviando a servicio...', this.id ? 'UPDATE' : 'CREATE');
             
-            const isOffline = !navigator.onLine || (window as any).forceOffline;
+            const isOffline = !navigator.onLine || window.forceOffline;
             if (!this.id && typeof navigator !== 'undefined' && isOffline) {
                 console.log('📶 [AdminRepairForm] Sin conexión, guardando offline...');
                 this.offlineSyncService.saveOfflineRepair(payload);
@@ -630,7 +630,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
             console.log('🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...');
             this.router.navigate(['/admin/repairs']);
-        } catch (e: unknown) {
+        } catch (e: any) {
             console.error('💥 [AdminRepairForm] Error crítico en save():', e);
             const message = e instanceof Error ? e.message : ((e as { error?: { message?: string } })?.error?.message) || 'Error desconocido al procesar la solicitud.';
             this.notificationService.showError('Error al guardar: ' + message);
@@ -660,7 +660,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 id: this.id || 'new'
             };
             await this.repairPdfService.generateOrderPdf(repairData as import('../../features/repairs/domain/entities/repair.entity').Repair, this.company());
-        } catch (e: unknown) {
+        } catch (e: any) {
             console.error('PDF Error:', e);
             const message = e instanceof Error ? e.message : 'Error desconocido al generar PDF';
             this.notificationService.showError('Error al generar PDF: ' + message);

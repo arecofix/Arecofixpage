@@ -239,13 +239,13 @@
             <nav class="flex-1 px-2 py-1 overflow-y-auto overflow-x-hidden custom-sidebar-scrollbar space-y-2" [ngClass]="isMainMenuOpen() ? 'px-4' : ''">
                 
                 <!-- Favorites -->
-                @if ((favoritesService.favorites$ | async)?.length) {
+                @if (favoritesService.favorites().length) {
                 <div>
                     @if (isMainMenuOpen()) {
                     <p class="text-[10px] uppercase font-bold text-amber-500 tracking-[0.2em] mb-4 ml-4">FAVORITOS</p>
                     }
                     <div class="space-y-1">
-                        @for (fav of (favoritesService.favorites$ | async); track fav.url) {
+                        @for (fav of favoritesService.favorites(); track fav.url) {
                             <a [routerLink]="fav.url" routerLinkActive="bg-white/10 text-white shadow-lg"
                                class="flex items-center gap-3 py-3 rounded-2xl text-sm font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-all group"
                                [ngClass]="isMainMenuOpen() ? 'px-4' : 'px-0 justify-center tooltip tooltip-right'" [attr.data-tip]="!isMainMenuOpen() ? fav.title : null">

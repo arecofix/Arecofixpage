@@ -54,7 +54,7 @@ export class CompanyService {
             address: data.location || '',
             email: data.contact_email || '',
             phone: data.contact_phone || '',
-            logo_url: (data.branding_settings as any)?.logo_url || ''
+            logo_url: ((data.branding_settings as Record<string, unknown>)?.['logo_url'] as string) || ''
         } as CompanySettings;
 
         // Si tenemos un contexto de sucursal, sobreescribimos con los datos específicos
@@ -64,7 +64,7 @@ export class CompanyService {
                 settings = {
                     ...settings,
                     name: branch.official_name || branch.name || settings.name,
-                    owner_name: (branch.branding_settings as any)?.owner_name || settings.owner_name || '',
+                    owner_name: ((branch.branding_settings as Record<string, unknown>)?.['owner_name'] as string) || settings.owner_name || '',
                     location: branch.address || settings.location || '',
                     address: branch.address || settings.address || '',
                     contact_email: branch.contact_email || settings.contact_email || '',
@@ -72,8 +72,8 @@ export class CompanyService {
                     contact_phone: branch.contact_phone || branch.whatsapp_number || settings.contact_phone || '',
                     phone: branch.contact_phone || branch.whatsapp_number || settings.phone || '',
                     tax_id: branch.tax_id || settings.tax_id || '',
-                    branding_settings: branch.branding_settings as any || settings.branding_settings,
-                    logo_url: (branch.branding_settings as any)?.logo_url || settings.logo_url || ''
+                    branding_settings: (branch.branding_settings as Record<string, unknown>) || settings.branding_settings,
+                    logo_url: ((branch.branding_settings as Record<string, unknown>)?.['logo_url'] as string) || settings.logo_url || ''
                 };
             }
         }
@@ -92,11 +92,11 @@ export class CompanyService {
             contact_phone: updateData.contact_phone,
             tax_id: updateData.tax_id,
             branding_settings: {
-                ...(updateData.branding_settings as any || {}),
+                ...((updateData.branding_settings as Record<string, unknown>) || {}),
                 owner_name: updateData.owner_name
-            }
+            } as any
         };
-        const updatedBranch = await firstValueFrom(this.branchRepo.update(branchId, branchPayload as any)); // Repo might need any if Partial doesn't match perfectly, but let's try to remove it
+        const updatedBranch = await firstValueFrom(this.branchRepo.update(branchId, branchPayload as Partial<Branch>));
         
         // Sincronizar el estado del branchService si es la sucursal actual
         const currentBranch = this.branchService.currentBranch();

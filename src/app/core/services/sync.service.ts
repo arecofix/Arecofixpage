@@ -16,7 +16,7 @@ export class SyncService {
 
   private async initDatabase() {
     try {
-      if ((window as any).__TAURI__) {
+      if (window.__TAURI__) {
         this.db = await Database.load('sqlite:arecofix.db');
         await this.db.execute('CREATE TABLE IF NOT EXISTS pending_sync (id INTEGER PRIMARY KEY AUTOINCREMENT, payload TEXT, table_name TEXT, operation TEXT)');
       }

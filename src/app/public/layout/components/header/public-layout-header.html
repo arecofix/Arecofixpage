@@ -307,7 +307,7 @@
                   <a (click)="selectCourse(course)"
                      class="flex items-center gap-3 p-2 rounded-xl cursor-pointer
                             hover:bg-blue-50 dark:hover:bg-white/5 transition-colors">
-                    <img [src]="course.image_url || '/assets/img/no-image.png'" [alt]="course.title"
+                    <img [src]="course.image_url || '/assets/img/no-image.svg'" [alt]="course.title"
                          class="w-9 h-9 object-cover rounded-lg bg-white dark:bg-white/5
                                 border border-gray-100 dark:border-white/10" />
                     <div class="flex-1 min-w-0">
@@ -323,7 +323,7 @@
                   <a (click)="selectProduct(product)"
                      class="flex items-center gap-3 p-2 rounded-xl cursor-pointer
                             hover:bg-blue-50 dark:hover:bg-white/5 transition-colors">
-                    <img [src]="product.image_url || '/assets/img/no-image.png'" [alt]="product.name"
+                    <img [src]="product.image_url || '/assets/img/no-image.svg'" [alt]="product.name"
                          class="w-9 h-9 object-contain rounded-lg bg-white dark:bg-white/5
                                 border border-gray-100 dark:border-white/10" />
                     <div class="flex-1 min-w-0">
@@ -493,7 +493,7 @@
             <a (click)="selectCourse(course)"
                class="flex items-center gap-2 p-2 hover:bg-blue-50 dark:hover:bg-white/5
                       transition-colors cursor-pointer border-b border-gray-100 dark:border-white/5 last:border-none">
-              <img [src]="course.image_url || '/assets/img/no-image.png'" [alt]="course.title"
+              <img [src]="course.image_url || '/assets/img/no-image.svg'" [alt]="course.title"
                    class="w-7 h-7 object-cover rounded bg-white border" />
               <div class="flex-1 min-w-0">
                 <span class="block text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-1">{{ course.title }}</span>
@@ -506,7 +506,7 @@
             <a (click)="selectProduct(product)"
                class="flex items-center gap-2 p-2 hover:bg-blue-50 dark:hover:bg-white/5
                       transition-colors cursor-pointer border-b border-gray-100 dark:border-white/5 last:border-none">
-              <img [src]="product.image_url || '/assets/img/no-image.png'" [alt]="product.name"
+              <img [src]="product.image_url || '/assets/img/no-image.svg'" [alt]="product.name"
                    class="w-7 h-7 object-contain rounded bg-white border" />
               <div class="flex-1 min-w-0">
                 <span class="block text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-1">{{ product.name }}</span>
@@ -623,7 +623,7 @@
                     @for (item of cartService.cartItems(); track item.product.id) {
                       <li class="flex gap-3 pb-4 border-b border-gray-100 dark:border-white/5 last:border-none">
                         <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-gray-100 dark:border-white/10">
-                          <img [src]="item.product.image_url || '/assets/img/no-image.png'"
+                          <img [src]="item.product.image_url || '/assets/img/no-image.svg'"
                                [alt]="item.product.name" class="w-full h-full object-cover" />
                         </div>
                         <div class="flex-1 min-w-0">

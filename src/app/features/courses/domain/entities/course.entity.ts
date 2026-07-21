@@ -56,3 +56,22 @@ export interface StudentEnrollment {
     created_at?: string;
     course?: { id?: string; title: string; };
 }
+
+export interface CourseInstructor {
+    course_id: string;
+    instructor_id: string;
+    tenant_id?: string;
+    assigned_at?: string;
+}
+
+export interface CourseModuleContent {
+    id: string;
+    lesson_id: string; // References CourseModule.id
+    tenant_id?: string;
+    type: 'video' | 'image' | 'document' | 'link' | 'text';
+    url: string;
+    metadata?: any;
+    title?: string;
+    order_index: number;
+    created_at?: string;
+}

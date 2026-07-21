@@ -14,30 +14,32 @@ import { LoggerService } from '@app/core/services/logger.service';
  * }
  */
 export function CatchAndNotify(friendlyMessage?: string) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (this: unknown, ...args: unknown[]) {
       try {
         return await originalMethod.apply(this, args);
       } catch (error: any) {
         // En Angular, dado que los decoradores no tienen acceso al contexto del DI fácilmente
         // la mejor práctica para Service Locator temporal en métodos de UI es:
         try {
-          const notification = (this as any).notificationService || (this as any).notification;
-          const logger = (this as any).loggerService || (this as any).logger || console;
+          const targetInstance = this as Record<string, unknown>;
+          const notification = targetInstance['notificationService'] || targetInstance['notification'];
+          const logger = targetInstance['loggerService'] || targetInstance['logger'] || console;
+          const errMsg = error instanceof Error ? error.message : String(error);
           
-          if (logger && typeof logger.error === 'function') {
-             logger.error(friendlyMessage || `Error in ${propertyKey}`, error);
+          if (logger && typeof (logger as any).error === 'function') {
+             (logger as any).error(friendlyMessage || `Error in ${propertyKey}`, error);
           }
-          if (notification && typeof notification.showError === 'function') {
-             notification.showError(friendlyMessage || error.message || 'Ocurrió un problema inesperado.');
+          if (notification && typeof (notification as any).showError === 'function') {
+             (notification as any).showError(friendlyMessage || errMsg || 'Ocurrió un problema inesperado.');
           } else {
              // Fallback si la clase no tiene inyectado el NotificationService
              console.error('[QA Boundary Fallback]', error);
              alert(friendlyMessage || 'Ha ocurrido un error (Ver consola)');
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error('Decorator failed to handle error boundary', e);
         }
         

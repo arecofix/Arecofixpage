@@ -26,7 +26,7 @@ export class CategoryService {
     this.supabase = this.authService.getSupabaseClient();
   }
 
-  private processResponse(data: any[], count: number | null, params: { _page: number; _per_page: number }): iCategoriesResponse {
+  private processResponse(data: iCategory[], count: number | null, params: { _page: number; _per_page: number }): iCategoriesResponse {
     const totalItems = count || data.length;
     const perPage = params._per_page > 0 ? params._per_page : totalItems;
     const pages = Math.max(1, Math.ceil(totalItems / (perPage || 1)));
@@ -38,7 +38,7 @@ export class CategoryService {
       last: pages,
       pages,
       items: totalItems,
-      data: data as iCategory[],
+      data,
     };
   }
 

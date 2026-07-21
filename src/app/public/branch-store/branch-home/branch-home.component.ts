@@ -33,7 +33,7 @@ function isLegacyConfig(cfg: BranchLandingConfig): boolean {
  */
 function isCatalogBranch(branch: Branch, cfg: BranchLandingConfig): boolean {
   // 1. Si tiene inventory: true en el config legacy
-  if ((cfg as any).inventory === true) return true;
+  if ((cfg as Record<string, unknown>)['inventory'] === true) return true;
   
   // 2. Casos especiales por slug (Lubreze es una tienda de tecnología/librería)
   const slug = (branch.slug || '').toLowerCase().trim();
@@ -235,7 +235,7 @@ export class BranchHomeComponent implements OnInit {
       const to   = from + this.pageSize - 1;
 
       const config        = this.landing();
-      const includeGlobal = (config as any).inventory !== false;
+      const includeGlobal = (config as Record<string, unknown>)['inventory'] !== false;
       const filter        = includeGlobal
         ? `branch_id.eq.${branch.id},is_global.eq.true`
         : `branch_id.eq.${branch.id}`;
@@ -262,7 +262,7 @@ export class BranchHomeComponent implements OnInit {
           return {
             ...p,
             convertedPrice: p.price * rate
-          } as any;
+          } as Product;
         }
         return p;
       });
