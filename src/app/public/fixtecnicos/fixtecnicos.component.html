@@ -222,7 +222,7 @@
           @for (post of posts(); track post.id) {
             <article class="card bg-base-100 shadow-lg hover:shadow-xl transition-all border border-gray-100">
               <figure class="h-48 overflow-hidden">
-                <img [src]="post.image || 'assets/img/no-image.png'" [alt]="post.title" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                <img [src]="post.image || 'assets/img/no-image.svg'" [alt]="post.title" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
               </figure>
               <div class="card-body">
                 <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">

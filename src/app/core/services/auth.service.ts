@@ -423,7 +423,7 @@ export class AuthService {
     }
 
     // Cast correctly according to Supabase v2 structure
-    return { data, error } as any as AuthResponse;
+    return { data, error } as unknown as AuthResponse;
   }
 
   async signInWithGoogle(): Promise<AuthResponse> {
@@ -447,7 +447,7 @@ export class AuthService {
       runningInTauri = false;
     }
     
-    const isOffline = typeof navigator !== 'undefined' && (!navigator.onLine || (window as any).forceOffline);
+    const isOffline = typeof navigator !== 'undefined' && (!navigator.onLine || window.forceOffline);
     let onlineResponse: AuthResponse | null = null;
 
     if (!isOffline) {
@@ -515,7 +515,7 @@ export class AuthService {
               role: role, 
               email: email,
               branch_id: data.admin.branch_id
-          } as any,
+          } as UserProfile,
           isInitialized: true
         });
         
@@ -530,7 +530,7 @@ export class AuthService {
 
         return { data: { user: mockUser, session: mockSession }, error: null };
 
-      } catch (error: unknown) {
+      } catch (error: any) {
         if (onlineResponse && onlineResponse.error) {
           return onlineResponse;
         }

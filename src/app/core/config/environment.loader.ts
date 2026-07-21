@@ -54,8 +54,8 @@ export interface AppConfig {
  */
 export function getEnvVariable(key: string, defaultValue: string = ''): string {
   // Check browser window first
-  if (typeof window !== 'undefined' && (window as any).__env__) {
-    return (window as any).__env__[key] || defaultValue;
+  if (typeof window !== 'undefined' && window.__env__) {
+    return window.__env__[key] || defaultValue;
   }
 
   // Check process.env for SSR

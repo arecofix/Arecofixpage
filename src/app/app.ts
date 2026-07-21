@@ -51,7 +51,7 @@ export class App implements OnInit {
       }
 
       // Check for Tauri environment
-      if ((window as any).__TAURI_INTERNALS__) {
+      if (window.__TAURI_INTERNALS__) {
         this.startSidecar();
         this.setupDeepLinks();
       }

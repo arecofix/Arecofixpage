@@ -163,8 +163,8 @@ export class CursosComponent implements OnInit {
         if (!data || typeof data !== 'object' || !('data' in data)) return null;
         
         // Helper to safely extract pagination info
-        const { data: items, ...meta } = data as any; 
-        return meta as iPagination;
+        const { data: items, ...meta } = data as { data: unknown[], [key: string]: unknown }; 
+        return meta as unknown as iPagination;
     });
 
     ngOnInit() {
@@ -231,7 +231,7 @@ export class CursosComponent implements OnInit {
                 return of({ data: null, error: err });
             })
         ).subscribe({
-            next: (res: { data: Course[] | null, error: any }) => {
+            next: (res: { data: Course[] | null, error: unknown }) => {
                 const coursesData = res.data || [];
                 
                 // Enhance data if needed and filter out pending/inactive

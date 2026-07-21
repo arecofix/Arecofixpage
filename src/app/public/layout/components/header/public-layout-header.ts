@@ -193,7 +193,7 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     // Defer product loading to idle time — not needed until search
     if (isPlatformBrowser(this.platformId)) {
       if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(() => {
+        window.requestIdleCallback(() => {
           this.loadProducts();
           this.loadDynamicCategories();
         }, { timeout: 4000 });

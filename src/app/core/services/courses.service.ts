@@ -155,4 +155,46 @@ export class CoursesService {
             })
         );
     }
+
+    assignInstructors(courseId: string, instructorIds: string[]): Observable<{ error: any }> {
+        const tenantId = this.tenantService.getTenantId();
+        return from(this.repository.assignInstructors(courseId, instructorIds, tenantId)).pipe(
+            map(() => ({ error: null })),
+            catchError(error => {
+                this.logger.error(`Failed to assign instructors to course: ${courseId}`, error);
+                return of({ error });
+            })
+        );
+    }
+
+    getCourseInstructors(courseId: string): Observable<{ data: any[], error: any }> {
+        return from(this.repository.getCourseInstructors(courseId)).pipe(
+            map(data => ({ data, error: null })),
+            catchError(error => {
+                this.logger.error(`Failed to fetch instructors for course: ${courseId}`, error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+    getModuleContents(moduleId: string): Observable<{ data: any[], error: any }> {
+        return from(this.repository.getModuleContents(moduleId)).pipe(
+            map(data => ({ data, error: null })),
+            catchError(error => {
+                this.logger.error(`Failed to fetch contents for module: ${moduleId}`, error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+    saveModuleContents(moduleId: string, contents: any[]): Observable<{ data: any[], error: any }> {
+        const tenantId = this.tenantService.getTenantId();
+        return from(this.repository.saveModuleContents(moduleId, contents, tenantId)).pipe(
+            map(data => ({ data, error: null })),
+            catchError(error => {
+                this.logger.error(`Failed to save contents for module: ${moduleId}`, error);
+                return of({ data: [], error });
+            })
+        );
+    }
 }

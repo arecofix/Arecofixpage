@@ -60,12 +60,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              "src/assets"
+              }
             ],
             "styles": [
               "src/styles.css",
-              "src/assets/css/fontawesome.css"
+              "public/assets/css/fontawesome.css"
             ],
             "allowedCommonJsDependencies": [
               "jspdf",
@@ -85,7 +84,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": {
-                  "inlineCritical": true,
+                  "inlineCritical": false,
                   "minify": true
                 },
                 "fonts": {
@@ -152,8 +151,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              "src/assets"
+              }
             ],
             "styles": [
               "src/styles.css"

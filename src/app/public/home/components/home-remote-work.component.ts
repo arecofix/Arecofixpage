@@ -8,7 +8,7 @@ import { RouterLink } from '@angular/router';
   imports: [CommonModule, RouterLink],
   template: `
     <section class="py-24 relative overflow-hidden bg-linear-to-br from-blue-900 via-blue-950 to-black">
-      <div class="absolute inset-0 bg-[url('assets/img/pattern-grid.svg')] opacity-10"></div>
+      <div class="absolute inset-0 bg-[url('/assets/img/pattern-grid.svg')] opacity-10"></div>
       <div class="container mx-auto px-4 relative z-10 text-center text-white">
         <span class="inline-block py-1 px-3 rounded glass-panel text-blue-200 text-xs font-bold uppercase tracking-wider mb-6">Global Reach</span>
         <h2 class="text-4xl lg:text-5xl font-bold mb-6 max-w-3xl mx-auto font-heading">{{ remoteWork().title }}</h2>

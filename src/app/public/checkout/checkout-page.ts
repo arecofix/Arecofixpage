@@ -246,7 +246,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
         phone:   formVal.phone,
         subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
         message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : (method === 'credit_card' ? 'Mercado Pago' : 'Efectivo (Rapipago/PagoFácil)')}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
-      }).catch((e: unknown) => console.warn('Contact message error (non-fatal):', e));
+      }).catch ((e: any) => console.warn('Contact message error (non-fatal):', e));
 
       if (method === 'cash') {
         const ticket = this.paymentService.buildPaymentTicket(
@@ -322,7 +322,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
       await this.paymentService.uploadPaymentProof(order.id, file);
       this.notificationService.showSuccess('Comprobante enviado. ¡Te avisamos cuando lo validemos!');
       this.step.set('awaiting_verification');
-    } catch (err: unknown) {
+    } catch (err: any) {
       const errorObj = err as { message?: string };
       this.notificationService.showError(`No se pudo enviar el comprobante: ${errorObj?.message || 'Error desconocido'}`);
     }

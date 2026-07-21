@@ -1,4 +1,4 @@
-import { Course, CourseModule, StudentEnrollment } from '../entities/course.entity';
+import { Course, CourseModule, StudentEnrollment, CourseInstructor, CourseModuleContent } from '../entities/course.entity';
 
 export abstract class CourseRepository {
     abstract getAll(): Promise<Course[]>;
@@ -15,4 +15,12 @@ export abstract class CourseRepository {
     // Enrollments
     abstract enrollStudent(enrollment: StudentEnrollment): Promise<StudentEnrollment>;
     abstract getEnrollments(): Promise<StudentEnrollment[]>;
+
+    // Instructors
+    abstract assignInstructors(courseId: string, instructorIds: string[], tenantId?: string): Promise<void>;
+    abstract getCourseInstructors(courseId: string): Promise<CourseInstructor[]>;
+
+    // Module Contents
+    abstract getModuleContents(moduleId: string): Promise<CourseModuleContent[]>;
+    abstract saveModuleContents(moduleId: string, contents: Partial<CourseModuleContent>[], tenantId?: string): Promise<CourseModuleContent[]>;
 }

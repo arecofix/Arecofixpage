@@ -98,8 +98,8 @@ export class AnalyticsService {
                     setUserProperties(this.firebaseAnalytics, properties);
                 } catch (e) {}
             }
-            if ((window as any).gtag) {
-                (window as any).gtag('set', 'user_properties', properties);
+            if (window.gtag) {
+                window.gtag('set', 'user_properties', properties);
             }
         }
     }
@@ -114,23 +114,23 @@ export class AnalyticsService {
                 try { logEvent(this.firebaseAnalytics, eventName, properties); } catch (e) {}
             }
             
-            if ((window as any).gtag) {
-                (window as any).gtag('event', eventName, properties);
+            if (window.gtag) {
+                window.gtag('event', eventName, properties);
             }
 
-            if ((window as any).fbq) {
-                (window as any).fbq('track', eventName, properties);
+            if (window.fbq) {
+                window.fbq('track', eventName, properties);
             }
         }
     }
 
     trackPageView() {
         if (this.isBrowser) {
-            if ((window as any).fbq) {
-                (window as any).fbq('track', 'PageView');
+            if (window.fbq) {
+                window.fbq('track', 'PageView');
             }
-            if ((window as any).gtag) {
-                (window as any).gtag('event', 'page_view');
+            if (window.gtag) {
+                window.gtag('event', 'page_view');
             }
         }
     }
