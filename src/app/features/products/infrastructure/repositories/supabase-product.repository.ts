@@ -211,7 +211,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         const { data, error } = res;
         if (error) this.errorHandler.handleError(error, 'getTopSellers');
 
-        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, activeBranchId));
+        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, activeBranchId || undefined));
         products = products.filter((p: Product) => (p.stock || 0) > 0);
         
         return products.slice(0, limit);
