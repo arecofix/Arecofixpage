@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -159,8 +159,10 @@ import { Course } from '@app/features/courses/domain/entities/course.entity';
   `
 })
 export class CourseBuilderComponent {
-  private submitUseCase = inject(SubmitCourseProposalUseCase);
   private router = inject(Router);
+  route = inject(ActivatedRoute);
+  submitUseCase = inject(SubmitCourseProposalUseCase);
+  cd = inject(ChangeDetectorRef);
   
   isEdit = signal(false);
   saving = signal(false);
@@ -218,9 +220,11 @@ export class CourseBuilderComponent {
 
   async handleFiles(files: FileList, mod: any) {
     mod.uploading = true;
+    this.cd.detectChanges();
     // Simulate upload progress
     for (let i = 0; i <= 100; i += 10) {
       mod.uploadProgress = i;
+      this.cd.detectChanges();
       await new Promise(r => setTimeout(r, 200));
     }
     
@@ -240,6 +244,7 @@ export class CourseBuilderComponent {
     
     mod.uploading = false;
     mod.uploadProgress = 0;
+    this.cd.detectChanges();
   }
 
   removeContent(mod: any, content: any) {

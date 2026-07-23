@@ -73,10 +73,10 @@
               <h3 class="text-slate-300 font-bold text-sm uppercase tracking-wider">Tus Puntos</h3>
             </div>
             <div class="flex items-baseline gap-2">
-              <span class="text-4xl font-extrabold text-white tracking-tight">1,250</span>
+              <span class="text-4xl font-extrabold text-white tracking-tight">{{ user?.points || 0 | number }}</span>
               <span class="text-amber-500 font-semibold text-sm">pts</span>
             </div>
-            <p class="text-slate-400 text-xs mt-3">Utilizalos para obtener repuestos o accesorios gratis en el taller.</p>
+            <p class="text-slate-400 text-xs mt-3">Acumulá puntos refiriendo amigos. Utilizalos para obtener descuentos en tus compras.</p>
           </div>
         </div>
 
@@ -96,8 +96,12 @@
             <p class="text-emerald-50 text-sm leading-relaxed opacity-90 mb-4">
               Compartí tu código. Si tu amigo repara su equipo con nosotros, tu próxima reparación tiene 15% de descuento directo.
             </p>
-            <button class="bg-white text-emerald-700 font-bold px-4 py-2 rounded-lg text-sm shadow-md hover:bg-slate-50 transition-colors">
-              Obtener mi código
+            <button (click)="generateReferralCode()" class="bg-white text-emerald-700 font-bold px-4 py-2 rounded-lg text-sm shadow-md hover:bg-slate-50 transition-colors">
+              @if (user?.referral_code) {
+                Tu código: {{ user?.referral_code }}
+              } @else {
+                Obtener mi código
+              }
             </button>
           </div>
         </div>

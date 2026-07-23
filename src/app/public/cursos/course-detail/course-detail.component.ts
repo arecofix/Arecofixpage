@@ -88,6 +88,7 @@ export class CourseDetailComponent implements OnInit {
   classesCount: number = 24;
   hoursContent: number = 2;
   hoursPractice: number = 12;
+  hoursPerWeek: string = 'A tu ritmo';
   courseModules: { title: string; lessons: { name: string; duration: string }[] }[] = [];
   courseReviews: { name: string; avatar: string; rating: number; date: string; comment: string }[] = [];
   instructorProfile = {
@@ -181,41 +182,39 @@ export class CourseDetailComponent implements OnInit {
           return Math.abs((Math.sin(x) * 10000) - Math.floor(Math.sin(x) * 10000));
       };
 
-      this.rating = 4.5 + (seededRandom(t) * 0.5); // 4.5 to 5.0
-      this.rating = Math.round(this.rating * 10) / 10;
-      this.reviewsCount = Math.floor(100 + (seededRandom(t + 'rev') * 800));
-      this.classesCount = Math.floor(10 + (seededRandom(t + 'cls') * 40));
-      this.hoursContent = Math.floor(2 + (seededRandom(t + 'hrs') * 10));
-      this.hoursPractice = this.hoursContent * 2;
+      this.rating = this.course.rating || 5.0;
+      this.reviewsCount = this.course.reviews_count || 120;
+      this.classesCount = this.course.classes_count || 12;
+      this.hoursContent = this.course.hours_content || 10;
+      this.hoursPractice = this.course.hours_practice || 20;
+      this.hoursPerWeek = this.course.hours_per_week || 'A tu ritmo';
       this.publishDate = this.course.created_at ? new Date(this.course.created_at).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recientemente actualizado';
 
       // Instructor
-      if (t.includes('barber') || t.includes('corte')) {
-          this.instructorProfile = {
-              name: 'Agustin Burgos',
-              role: 'Experto en Cursos de Estetica',
-              bio: 'Profesional destacado en el área de Curso de Barberia, con amplia trayectoria enseñando metodologías prácticas aplicadas al mercado laboral actual.',
-              avatar: this.course.image_url || 'assets/img/branding/og-academy.jpg'
-          };
-          this.audienceList = [
-              'Buscás una salida laboral rápida y rentable.',
-              'Querés emprender tu propio negocio.',
-              'Te gusta la estética y el cuidado personal.'
-          ];
+      this.instructorProfile = {
+          name: this.course.instructor_name || 'Profesor Especializado',
+          role: this.course.instructor_role || 'Experto en la materia',
+          bio: this.course.instructor_bio || 'Profesional destacado con amplia trayectoria enseñando metodologías prácticas aplicadas al mercado laboral actual.',
+          avatar: this.course.instructor_avatar || this.course.image_url || 'assets/img/branding/og-academy.jpg'
+      };
+      
+      // Audience
+      if (this.course.audience_list && Array.isArray(this.course.audience_list) && this.course.audience_list.length > 0) {
+          this.audienceList = this.course.audience_list;
       } else {
-          this.instructorProfile = {
-              name: this.course.instructor_name || 'Profesor Especializado',
-              role: 'Experto en ' + (t.includes('reparación') ? 'Hardware y Microelectrónica' : (t.includes('programación') || t.includes('angular') ? 'Desarrollo y Arquitectura de Software' : 'Tecnología y Oficios')),
-              bio: 'Profesional destacado en el área de ' + title + ', con amplia trayectoria enseñando metodologías prácticas aplicadas al mercado laboral actual.',
-              avatar: 'assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg'
-          };
-          
+          // Fallbacks for older courses without audience set
           if (t.includes('celular') || t.includes('microelectr')) {
               this.audienceList = [
                   'Querés aprender desde cero sin conocimientos previos.',
                   'Ya reparás celulares pero querés subir de nivel.',
                   'Buscás alta rentabilidad (Cambio de Módulo, Pines, etc.).',
                   'Querés practicar en un laboratorio real equipado con microscopios y estaciones.'
+              ];
+          } else if (t.includes('barber') || t.includes('corte')) {
+              this.audienceList = [
+                  'Buscás una salida laboral rápida y rentable.',
+                  'Querés emprender tu propio negocio.',
+                  'Te gusta la estética y el cuidado personal.'
               ];
           } else {
               this.audienceList = [

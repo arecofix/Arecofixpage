@@ -108,7 +108,7 @@ import { NotificationService } from '@app/core/services/notification.service';
                   </label>
                   <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
                     <i class="fas fa-hourglass-half text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="duration" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 3 meses (12 clases)" />
+                    <input type="text" formControlName="duration" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 3 meses" />
                   </label>
                   @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
                     <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> La duración es obligatoria</span>
@@ -127,25 +127,113 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> Los horarios son obligatorios</span>
                   }
                 </div>
+                <!-- Horas por Semana -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas por Semana</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-business-time text-slate-400 dark:text-slate-500"></i>
+                    <input type="text" formControlName="hours_per_week" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 6 horas semanales" />
+                  </label>
+                </div>
+                <!-- Cantidad de Clases -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Cantidad de Clases</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-chalkboard text-slate-400 dark:text-slate-500"></i>
+                    <input type="number" formControlName="classes_count" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 24" />
+                  </label>
+                </div>
+                <!-- Horas Contenido -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas de Contenido</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-video text-slate-400 dark:text-slate-500"></i>
+                    <input type="number" formControlName="hours_content" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 12" />
+                  </label>
+                </div>
+                <!-- Horas Práctica -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas de Práctica</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-tools text-slate-400 dark:text-slate-500"></i>
+                    <input type="number" formControlName="hours_practice" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 36" />
+                  </label>
+                </div>
               </div>
             </div>
 
             <!-- Bloque 3: Staff & Social Proof (Métricas Semilla) -->
             <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
               <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-star text-yellow-500"></i> Marketing y Prestigio</h3>
+                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-star text-yellow-500"></i> Marketing, Prestigio e Instructor</h3>
               </div>
-              <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Instructor -->
-                <div class="form-control md:col-span-1">
+              <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Instructor Name -->
+                <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Instructor</span>
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Nombre del Instructor</span>
                   </label>
                   <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
                     <i class="fas fa-chalkboard-teacher text-slate-400 dark:text-slate-500"></i>
                     <input type="text" formControlName="instructor_name" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Ezequiel" />
                   </label>
                 </div>
+                <!-- Instructor Role -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Rol del Instructor</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-user-tag text-slate-400 dark:text-slate-500"></i>
+                    <input type="text" formControlName="instructor_role" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Experto en Microelectrónica" />
+                  </label>
+                </div>
+                <!-- Instructor Avatar -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Foto del Instructor (URL)</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-image text-slate-400 dark:text-slate-500"></i>
+                    <input type="text" formControlName="instructor_avatar" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: assets/img/profe.jpg" />
+                  </label>
+                </div>
+                <!-- Reviews Count -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Cantidad de Opiniones</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-comments text-slate-400 dark:text-slate-500"></i>
+                    <input type="number" formControlName="reviews_count" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 371" />
+                  </label>
+                </div>
+                <!-- Instructor Bio -->
+                <div class="form-control md:col-span-2">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Biografía del Instructor</span>
+                  </label>
+                  <textarea formControlName="instructor_bio" class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-24 resize-none" placeholder="Profesional destacado con más de 10 años de experiencia..."></textarea>
+                </div>
+                <!-- Audiencia / Beneficios -->
+                <div class="form-control md:col-span-2">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Este curso es para ti si: (Uno por línea)</span>
+                  </label>
+                  <textarea formControlName="audience_list" class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-28 resize-none" placeholder="Querés aprender desde cero...&#10;Buscás alta rentabilidad..."></textarea>
+                  <span class="text-[10px] text-slate-500 mt-1">Escribe cada punto en una nueva línea.</span>
+                </div>
+                
+                <div class="col-span-1 md:col-span-2 border-t border-slate-100 dark:border-slate-700 my-2"></div>
+                
                 <!-- Alumnos Ficticios -->
                 <div class="form-control">
                   <label class="label">
@@ -155,18 +243,16 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <i class="fas fa-users text-slate-400 dark:text-slate-500"></i>
                     <input type="number" formControlName="students" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 120" />
                   </label>
-                  <span class="text-[10px] text-slate-500 mt-1">Sirve para generar prueba social.</span>
                 </div>
                 <!-- Calificación -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Rating</span>
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Rating (0 - 5.0)</span>
                   </label>
                   <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
                     <i class="fas fa-star text-yellow-500"></i>
                     <input type="number" step="0.1" max="5.0" formControlName="rating" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 4.9" />
                   </label>
-                  <span class="text-[10px] text-slate-500 mt-1">Sugerido: 4.8 a 5.0</span>
                 </div>
               </div>
             </div>
@@ -358,6 +444,15 @@ export class AdminCourseFormPage implements OnInit {
       short_description: [''],
       students: [0],
       rating: [5.0],
+      classes_count: [0],
+      hours_content: [0],
+      hours_practice: [0],
+      hours_per_week: [''],
+      instructor_role: [''],
+      instructor_bio: [''],
+      instructor_avatar: [''],
+      audience_list: [''],
+      reviews_count: [0],
       modules: this.fb.array([])
     }, { validators: this.priceValidator });
   }
@@ -444,6 +539,10 @@ export class AdminCourseFormPage implements OnInit {
     this.coursesService.getCourseById(id).subscribe({
       next: (response: { data: any, error: any }) => {
         if (response.data) {
+          // Join audience_list array to string for the textarea
+          if (response.data.audience_list && Array.isArray(response.data.audience_list)) {
+              response.data.audience_list = response.data.audience_list.join('\n');
+          }
           this.form.patchValue(response.data);
         }
       },
@@ -491,7 +590,18 @@ export class AdminCourseFormPage implements OnInit {
     }
 
     this.saving = true;
-    const { modules, rating, students, ...courseData } = this.form.value;
+    const { modules, rating, students, audience_list, ...courseData } = this.form.value;
+    
+    // Convert string separated by newlines back to jsonb array
+    if (audience_list && typeof audience_list === 'string') {
+        courseData.audience_list = audience_list.split('\n').map((i: string) => i.trim()).filter((i: string) => i.length > 0);
+    } else {
+        courseData.audience_list = [];
+    }
+    
+    // Retain these in courseData as well so they are saved
+    courseData.rating = rating;
+    courseData.students = students;
     
     // Convert empty strings to null to prevent Postgres type casting errors (UUID, Date, etc.)
     Object.keys(courseData).forEach(key => {

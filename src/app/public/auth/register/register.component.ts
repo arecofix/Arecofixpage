@@ -48,6 +48,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       phone: ['', [Validators.required, Validators.pattern(/^[0-9\-\+\s\(\)]+$/)]],
       password: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]],
       confirmPassword: ['', [Validators.required]],
+      referral_code: [''],
       terms: [false, [Validators.requiredTrue]],
     }, { validators: this.passwordMatchValidator });
   }
@@ -140,12 +141,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    const { email, password, first_name, last_name, phone } = this.form.value as {
+    const { email, password, first_name, last_name, phone, referral_code } = this.form.value as {
       email: string;
       password: string;
       first_name: string;
       last_name: string;
       phone: string;
+      referral_code?: string;
     };
 
     try {
@@ -168,6 +170,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
         this.success = 'Te enviamos un enlace de acceso por correo. Revisa tu bandeja de entrada para confirmar tu cuenta.';
       } else {
         this.success = '¡Cuenta creada exitosamente! Redirigiendo...';
+        
+        // Aplicar código de referido si se proporcionó
+        if (referral_code && referral_code.trim() !== '') {
+          try {
+            const supabase = this.authService.getSupabaseClient();
+            await supabase.rpc('apply_referral', {
+              new_user_id: res.data.user.id,
+              ref_code: referral_code.trim()
+            });
+          } catch (rpcErr) {
+            console.error('Error aplicando código de referido:', rpcErr);
+          }
+        }
       }
       setTimeout(() => {
         if (this.returnUrl) {

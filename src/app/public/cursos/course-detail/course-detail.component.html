@@ -51,10 +51,14 @@
           </div>
 
           <!-- Highlight Stats Grid -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5 w-fit backdrop-blur-sm">
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5 w-fit backdrop-blur-sm">
             <div class="flex flex-col">
               <span class="text-[10px] uppercase text-slate-400 font-bold">Nivel</span>
               <span class="font-bold text-white capitalize">{{course.level === 'basic' ? 'Básico' : (course.level === 'intermediate' ? 'Intermedio' : 'Avanzado')}}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase text-slate-400 font-bold">Dedicación</span>
+              <span class="font-bold text-white">{{hoursPerWeek}}</span>
             </div>
             <div class="flex flex-col">
               <span class="text-[10px] uppercase text-slate-400 font-bold">Clases</span>
@@ -77,7 +81,12 @@
               <img [src]="course.image_url" [alt]="course.title" fetchpriority="high" class="w-full h-48 object-cover">
               <div class="p-6">
                  <div class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                    {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                    @if (course.sale_price) {
+                       <span class="text-emerald-500">{{ course.sale_price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                       <span class="text-sm text-slate-400 line-through ml-2 font-normal">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                    } @else {
+                       {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                    }
                  </div>
                  <button (click)="openRegistration()" class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3 shadow-lg shadow-blue-500/30">
                     Empieza ya
@@ -227,7 +236,12 @@
               <!-- Mobile Only CTA Card -->
               <div class="md:hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 mb-6">
                  <div class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                    {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                    @if (course.sale_price) {
+                       <span class="text-emerald-500">{{ course.sale_price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                       <span class="text-sm text-slate-400 line-through ml-2 font-normal">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                    } @else {
+                       {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                    }
                  </div>
                  <button (click)="openRegistration()" class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3">
                     Empieza ya
@@ -254,7 +268,12 @@
                     <div class="font-bold text-gray-900 dark:text-white mb-1">Curso Individual</div>
                     <div class="text-xs text-gray-500 mb-3 leading-relaxed">Acceso de por vida únicamente a este curso y sus actualizaciones.</div>
                     <div class="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                       {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                       @if (course.sale_price) {
+                          <span class="text-emerald-500">{{ course.sale_price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                          <span class="text-xs text-slate-400 line-through ml-2 font-normal">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                       } @else {
+                          {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
+                       }
                     </div>
                     <button (click)="openRegistration()" class="btn btn-sm bg-gray-900 hover:bg-gray-800 text-white w-full rounded-lg border-none">Comprar Curso</button>
                  </div>

@@ -196,6 +196,29 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     return from(fetchAll());
   }
 
+  getTopSellers(limit: number = 10, branch_id?: string): Observable<Product[]> {
+    const activeBranchId = branch_id || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
+    const selectFields = `id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, total_units_sold, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
+
+    let query = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
+      .eq('is_active', true)
+      .gt('total_units_sold', 0)
+      .order('total_units_sold', { ascending: false })
+      .limit(limit * 2);
+
+    return from(query as any).pipe(
+      map((res: any) => {
+        const { data, error } = res;
+        if (error) this.errorHandler.handleError(error, 'getTopSellers');
+
+        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, activeBranchId));
+        products = products.filter((p: Product) => (p.stock || 0) > 0);
+        
+        return products.slice(0, limit);
+      })
+    );
+  }
+
     override getAll(params?: any): Observable<Product[]> {
     const paramBranchId = typeof params === 'string' ? params : (params?.branch_id || undefined);
     const branch_id = paramBranchId || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);

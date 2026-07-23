@@ -86,6 +86,19 @@ export class CheckoutPage implements OnInit, OnDestroy {
   // Cross-selling
   recommendedProducts = signal<Product[]>([]);
 
+  // Points & Discounts
+  availablePoints = signal<number>(0);
+  usePoints = signal<boolean>(false);
+  pointsDiscountValue = computed(() => {
+    // Definir el valor de los puntos. Ej: 100 puntos = $100 de descuento. (1 punto = $1)
+    if (this.usePoints()) {
+      const maxDiscount = this.cartService.totalPrice(); // No descontar más del total
+      const potentialDiscount = this.availablePoints(); 
+      return Math.min(potentialDiscount, maxDiscount);
+    }
+    return 0;
+  });
+
   // ── Reservation countdown (15 min = 900 s) ─────────────
   reservationSeconds = signal(900);
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
@@ -108,6 +121,12 @@ export class CheckoutPage implements OnInit, OnDestroy {
     const user = this.authService.getCurrentUser();
     if (user?.email) {
       this.checkoutForm.patchValue({ email: user.email });
+      // Fetch fresh profile to get exact points
+      this.profileService.getProfile(user.id).then(profile => {
+        if (profile?.points) {
+          this.availablePoints.set(profile.points);
+        }
+      });
     }
 
     // Subscribe to postal code changes to calculate shipping
@@ -179,6 +198,12 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this._startCountdown();
   }
 
+  toggleUsePoints(): void {
+    if (this.availablePoints() > 0) {
+      this.usePoints.set(!this.usePoints());
+    }
+  }
+
   selectMethod(method: PaymentMethodChoice): void {
     this.selectedMethod.set(method);
   }
@@ -197,7 +222,8 @@ export class CheckoutPage implements OnInit, OnDestroy {
     const cartItems  = this.cartService.cartItems();
     const subtotal   = this.cartService.totalPrice();
     const shippingCost = this.shippingQuote()?.cost || 0;
-    const total      = subtotal + shippingCost;
+    const discount   = this.pointsDiscountValue();
+    const total      = Math.max(0, subtotal + shippingCost - discount);
 
     const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city} (CP: ${formVal.address.postal_code})`;
 
@@ -209,7 +235,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
       status:           'pending_payment',
       subtotal:         subtotal,
       tax:              0,
-      discount:         0,
+      discount:         discount,
       total,
       total_amount:     total,
       payment_method:   method,
@@ -270,6 +296,18 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
       // Start polling for payment confirmation (every 20s)
       this.paymentService.startPolling(created.id!, 20000);
+
+      // Deduct points from user if they were used
+      if (discount > 0 && order.user_id) {
+        const remainingPoints = this.availablePoints() - discount;
+        try {
+          await this.authService.updateUserProfile(order.user_id, { points: remainingPoints });
+          this.availablePoints.set(remainingPoints);
+          this.usePoints.set(false);
+        } catch (e) {
+          console.warn('Could not deduct points from profile', e);
+        }
+      }
 
     } catch (error: any) {
       console.error('Checkout error:', error);

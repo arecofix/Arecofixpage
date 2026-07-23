@@ -73,7 +73,11 @@ serve(async (req: Request) => {
 
     // 4. Create the Auth User securely using the Admin API
     // We inject tenant_id and branch_id into user_metadata in case a database trigger requires them.
-    let targetTenantId = tenant_id || invokerProfile.tenant_id;
+    // 🛡️ SECURITY FIX: Only super_admin can inject a custom tenant_id. All others are forced to their own.
+    let targetTenantId = invokerProfile.tenant_id;
+    if (invokerProfile.role === 'super_admin' && tenant_id) {
+        targetTenantId = tenant_id;
+    }
     
     // 🛡️ SANITIZATION: Prevent trigger failures (Foreign Key or Casting errors)
     if (
