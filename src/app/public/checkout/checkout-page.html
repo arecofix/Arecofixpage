@@ -178,10 +178,31 @@
                 </div>
               }
 
+              <!-- Points System -->
+              @if (availablePoints() > 0) {
+                <div class="flex justify-between items-center bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3 border border-emerald-100 dark:border-emerald-800 mt-2">
+                  <div>
+                    <span class="block text-emerald-800 dark:text-emerald-400 font-bold">Mis Puntos</span>
+                    <span class="block text-xs text-emerald-600 dark:text-emerald-500">Tienes {{ availablePoints() | number }} pts = ${{ availablePoints() | number }} dto.</span>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" [checked]="usePoints()" (change)="toggleUsePoints()">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
+                  </label>
+                </div>
+              }
+              
+              @if (usePoints() && pointsDiscountValue() > 0) {
+                <div class="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span>Descuento por Puntos</span>
+                  <span>-${{ pointsDiscountValue() | number:'1.2-2' }}</span>
+                </div>
+              }
+
               <div class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
                 <span class="text-base font-bold text-gray-900 dark:text-white">Total</span>
                 <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                  ${{ (cartService.totalPrice() + (shippingQuote()?.cost || 0)) | number:'1.2-2' }}
+                  ${{ (cartService.totalPrice() + (shippingQuote()?.cost || 0) - pointsDiscountValue()) | number:'1.2-2' }}
                 </span>
               </div>
             </div>
@@ -229,7 +250,7 @@
     <div class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-3xl border border-gray-100 dark:border-gray-700 p-6 sm:p-10">
       <div class="text-center mb-10">
         <h2 class="text-2xl font-black text-gray-900 dark:text-white">¿Cómo querés pagar?</h2>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">Monto total: <strong class="text-emerald-600 dark:text-emerald-400 text-xl">${{ (cartService.totalPrice() + (shippingQuote()?.cost || 0)) | number:'1.2-2' }}</strong></p>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Monto total: <strong class="text-emerald-600 dark:text-emerald-400 text-xl">${{ (cartService.totalPrice() + (shippingQuote()?.cost || 0) - pointsDiscountValue()) | number:'1.2-2' }}</strong></p>
       </div>
 
       <div class="space-y-4 mb-10">

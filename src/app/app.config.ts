@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideRouter, withInMemoryScrolling, TitleStrategy } from '@angular/router';
+import { provideRouter, withInMemoryScrolling, TitleStrategy, withHashLocation } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
@@ -54,6 +54,8 @@ import { NotificationBaseRepository } from './features/messages/domain/repositor
 import { SupabaseNotificationRepository } from './features/messages/infrastructure/repositories/supabase-notification.repository';
 import { TenantService } from './core/services/tenant.service';
 
+const isTauri = typeof window !== 'undefined' && (!!(window as any)['__TAURI_INTERNALS__'] || !!(window as any)['__TAURI__']);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     // Locale provider
@@ -92,14 +94,15 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         anchorScrolling: 'enabled',
         scrollPositionRestoration: 'enabled'
-      })
+      }),
+      ...(isTauri ? [withHashLocation()] : [])
     ),
     provideHttpClient(
       withFetch(),
       withInterceptors([timeoutInterceptor, globalErrorInterceptor])
     ),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: !isDevMode() && !isTauri,
       registrationStrategy: 'registerWhenStable:30000'
     }),
 

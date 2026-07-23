@@ -122,6 +122,19 @@ export class AdminProductService {
     }
 
     async getBranches(): Promise<Branch[]> {
+        if (this.auth.isSuperAdmin()) {
+            // Bypass tenant filter for SuperAdmins so they can see all created branches
+            const supabase = (this.auth as any).supabase || this.branchRepo['supabase'];
+            const { data, error } = await supabase
+                .from('branches')
+                .select('*')
+                .eq('is_active', true)
+                .order('name');
+            
+            if (!error && data) {
+                return data as Branch[];
+            }
+        }
         return firstValueFrom(this.branchRepo.getActiveBranches());
     }
 

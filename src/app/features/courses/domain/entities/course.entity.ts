@@ -25,6 +25,18 @@ export interface Course {
     benefits?: any;
     rating?: number;
     students?: number;
+    
+    // Customization fields
+    classes_count?: number;
+    hours_content?: number;
+    hours_practice?: number;
+    hours_per_week?: string;
+    instructor_role?: string;
+    instructor_bio?: string;
+    instructor_avatar?: string;
+    audience_list?: string[];
+    reviews_count?: number;
+
     is_active?: boolean;
     status?: 'DRAFT' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'PUBLISHED';
     admin_feedback?: string;

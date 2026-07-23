@@ -31,4 +31,6 @@ export interface UserProfile {
   branch_id?: string;
   notes?: string | null;
   is_guest?: boolean | null;
+  referral_code?: string | null;
+  points?: number;
 }

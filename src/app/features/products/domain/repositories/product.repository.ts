@@ -29,6 +29,7 @@ export abstract class ProductRepository {
 
     abstract findLowStock(threshold?: number): Observable<Product[]>;
     abstract findAvailable(): Observable<Product[]>;
+    abstract getTopSellers(limit?: number, branch_id?: string): Observable<Product[]>;
 
     abstract getAll(branch_id?: string): Observable<Product[]>;
     abstract getAllForImport(): Observable<ImportProductSummary[]>;

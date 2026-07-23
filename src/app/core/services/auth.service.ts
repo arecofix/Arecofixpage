@@ -582,6 +582,11 @@ export class AuthService {
     return error ? error.message : null;
   }
 
+  async verifyOtpRecovery(email: string, token: string): Promise<string | null> {
+    const { error } = await this.supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+    return error ? error.message : null;
+  }
+
   async updatePassword(newPassword: string): Promise<string | null> {
     const { error } = await this.supabase.auth.updateUser({
       password: newPassword,

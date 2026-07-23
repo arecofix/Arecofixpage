@@ -7,7 +7,12 @@ const WHATSAPP_FUNC_URL = `${SUPABASE_URL}/functions/v1/send-whatsapp`;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const COMPLETED_STATUSES = new Set(['completed', 'COMPLETADO', 'completado']);
+const COMPLETED_STATUSES = new Set([
+  'completed', 'COMPLETADO', 'completado', 
+  'paid', 'PAID', 'pagado', 'PAGADO', 
+  'shipped', 'SHIPPED', 'enviado', 'ENVIADO', 
+  'entregado', 'ENTREGADO'
+]);
 
 serve(async (req) => {
   try {
@@ -29,6 +34,21 @@ serve(async (req) => {
           .eq('order_id', orderId);
 
         if (itemsError) throw itemsError;
+
+        // INCREMENTAR VENTAS REALES (Top Sellers)
+        const productsToUpdate = (items ?? []).filter((i: any) => i.product_id != null);
+        for (const item of productsToUpdate) {
+            try {
+                // Call RPC to increment atomically
+                const { error: rpcError } = await supabase.rpc('increment_product_sales', {
+                    p_product_id: item.product_id,
+                    amount: item.quantity
+                });
+                if (rpcError) console.error(`Error incrementing sales for product ${item.product_id}:`, rpcError);
+            } catch (e) {
+                console.error(`Exception incrementing sales for product ${item.product_id}:`, e);
+            }
+        }
 
         const productosListStr = (items ?? [])
           .map((i: { quantity: number; product_name: string }) => `${i.quantity}x ${i.product_name}`)

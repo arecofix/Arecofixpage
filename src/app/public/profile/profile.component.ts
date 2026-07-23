@@ -164,4 +164,39 @@ export class ProfileComponent implements OnInit, OnDestroy {
   removeFavorite(productId: string) {
     this.favoritesService.removeFavorite(productId);
   }
+
+  async generateReferralCode() {
+    if (!this.user) return;
+    
+    // Si ya tiene código, no generamos uno nuevo
+    if (this.user.referral_code) {
+      this.success = 'Tu código de referido es: ' + this.user.referral_code;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.loading = true;
+    this.cdr.markForCheck();
+    
+    try {
+      const prefix = (this.user.first_name || 'AFX').substring(0, 3).toUpperCase();
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const newCode = `${prefix}${randomNum}`;
+
+      const updated = await this.authService.updateUserProfile(this.user.id, { referral_code: newCode });
+      
+      this.loading = false;
+      if (updated) {
+        this.user = updated;
+        this.success = '¡Código generado exitosamente! Tu código es: ' + newCode;
+      } else {
+        this.error = 'Error al generar el código de referido.';
+      }
+      this.cdr.markForCheck();
+    } catch (err) {
+      this.loading = false;
+      this.error = 'Error al generar el código de referido.';
+      this.cdr.markForCheck();
+    }
+  }
 }

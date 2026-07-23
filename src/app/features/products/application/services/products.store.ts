@@ -134,6 +134,23 @@ export class ProductsStore {
   }
 
   /**
+   * Obtiene los productos más vendidos
+   */
+  getTopSellers(limit: number = 10, branch_id?: string): Observable<Product[]> {
+    this.loading.set(true);
+    this.error.set(null);
+    return this.repository.getTopSellers(limit, branch_id).pipe(
+      catchError((err) => {
+        this.error.set(err.message || 'Error al obtener top sellers.');
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        this.loading.set(false);
+      })
+    );
+  }
+
+  /**
    * Limpia la caché (por ejemplo, después de una inserción, modificación o eliminación).
    */
   clearCache(): void {

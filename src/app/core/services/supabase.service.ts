@@ -35,7 +35,7 @@ export class SupabaseService {
           });
         }
       }
-      const isOffline = false; // Hardcoded for testing
+      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
       if (isOffline) {
          if (isCacheable) {
