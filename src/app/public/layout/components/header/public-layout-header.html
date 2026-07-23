@@ -656,9 +656,13 @@
                     <span>{{ cartService.totalPrice() | currency }}</span>
                   </div>
                   <a (click)="toggleCart()" routerLink="/checkout"
-                     class="btn btn-primary w-full rounded-xl font-medium">
+                     class="btn btn-primary w-full rounded-xl font-medium mb-2">
                     Finalizar Compra
                   </a>
+                  <button (click)="cartService.clearCart()"
+                          class="btn btn-outline btn-error btn-sm w-full rounded-xl font-medium">
+                    <i class="fas fa-trash-alt mr-2"></i> Vaciar Carrito
+                  </button>
                   <button (click)="toggleCart()"
                           class="btn btn-ghost btn-sm w-full mt-2 text-blue-600 dark:text-blue-400 font-medium">
                     Continuar Comprando →

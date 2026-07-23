@@ -35,7 +35,11 @@
           <i class="fas fa-star mr-1 text-[8px]"></i> Destacado
         </span>
       }
-      @if ((product().stock ?? 0) <= 5 && (product().stock ?? 0) > 0) {
+      @if (!isInStock()) {
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gray-500 text-white shadow-sm uppercase tracking-wider">
+          <i class="fas fa-ban mr-1 text-[8px]"></i> Agotado
+        </span>
+      } @else if ((product().stock ?? 0) <= 5 && (product().stock ?? 0) > 0) {
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-500 text-white shadow-sm uppercase tracking-wider">
           🔥 ¡Últimos!
         </span>
@@ -133,11 +137,19 @@
 
           <!-- Direct Purchase Action -->
           <div class="flex flex-col gap-2">
-            <button (click)="addToCart($event)" 
-                    class="w-full btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-lg h-10 shadow-lg shadow-indigo-500/20 group/buy">
-              <i class="fas fa-cart-plus mr-2 group-hover/buy:scale-110 transition-transform"></i>
-              Añadir al Carrito
-            </button>
+            @if (isInStock()) {
+              <button (click)="addToCart($event)" 
+                      class="w-full btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-lg h-10 shadow-lg shadow-indigo-500/20 group/buy">
+                <i class="fas fa-cart-plus mr-2 group-hover/buy:scale-110 transition-transform"></i>
+                Añadir al Carrito
+              </button>
+            } @else {
+              <button disabled
+                      class="w-full btn btn-sm bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-none rounded-lg h-10 cursor-not-allowed">
+                <i class="fas fa-times-circle mr-2"></i>
+                Agotado
+              </button>
+            }
             <p class="text-[10px] text-center text-gray-400 dark:text-gray-500 italic leading-tight">
               {{ valueProposition() }}
             </p>

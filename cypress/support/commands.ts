@@ -25,6 +25,13 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
+import { 
+  buildMockSession, 
+  buildMockProfile, 
+  buildMockTenant, 
+  buildMockBranch 
+} from './mock-factories';
+
 export {};
 
 declare global {
@@ -32,6 +39,7 @@ declare global {
     interface Chainable<Subject = any> {
       loginAsAdmin(url?: string): Chainable<void>;
       loginRealAdmin(url?: string): Chainable<void>;
+      setupCheckoutSession(): Chainable<void>;
     }
   }
 }
@@ -199,3 +207,45 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
     }
   });
 });
+
+Cypress.Commands.add('setupCheckoutSession', () => {
+  const session = buildMockSession();
+  const profile = buildMockProfile();
+  const tenant = buildMockTenant();
+  const branch = buildMockBranch();
+
+  // Inject session into local storage BEFORE anything loads
+  cy.on('window:before:load', (win) => {
+    win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+    win.localStorage.setItem('arecofix_current_branch_id', branch.id);
+  });
+
+  // Basic intercepts required for the app to function
+  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+    req.reply({
+      statusCode: 200,
+      body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? profile : [profile]
+    });
+  }).as('getProfile');
+
+  cy.intercept('GET', '**/rest/v1/tenants*', {
+    statusCode: 200,
+    body: [tenant]
+  }).as('getTenant');
+
+  cy.intercept('GET', '**/rest/v1/companies*', {
+    statusCode: 200,
+    body: [{ id: 'company-1', name: 'Arecofix' }]
+  }).as('getCompany');
+
+  cy.intercept('GET', '**/rest/v1/branches*', {
+    statusCode: 200,
+    body: [branch]
+  }).as('getBranch');
+
+  // Supabase auth user
+  cy.intercept('GET', '**/auth/v1/user', {
+    statusCode: 200,
+    body: session.user
+  }).as('getUser');
+});
