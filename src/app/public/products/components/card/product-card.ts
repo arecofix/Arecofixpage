@@ -49,7 +49,7 @@ export class ProductCard {
   
   isInStock = computed(() => {
     const p = this.product();
-    return (p.stock ?? 0) > 0 || p.is_active;
+    return (p.stock ?? 0) > 0;
   });
 
   toggleFav(event: Event) {

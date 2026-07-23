@@ -189,6 +189,13 @@ export class CartService {
             const items = order.items ? [...order.items] : [];
 
             const existingItem = items.find(item => item.product_id === product.id);
+            
+            const currentQty = existingItem ? existingItem.quantity : 0;
+            if (product.stock !== undefined && product.stock !== null && (currentQty + 1) > product.stock) {
+                this.toastService.show('Se alcanzó el límite máximo de stock', 'error');
+                return;
+            }
+
             if (existingItem) {
                 existingItem.quantity += 1;
                 existingItem.subtotal = existingItem.quantity * existingItem.unit_price;

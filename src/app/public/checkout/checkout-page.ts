@@ -204,6 +204,11 @@ export class CheckoutPage implements OnInit, OnDestroy {
     }
   }
 
+  applyCoupon(code: string): void {
+    if (!code || code.trim() === '') return;
+    this.notificationService.showError('Cupón inválido o expirado.');
+  }
+
   selectMethod(method: PaymentMethodChoice): void {
     this.selectedMethod.set(method);
   }

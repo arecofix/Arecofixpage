@@ -9,6 +9,7 @@ import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
+import { BranchContextService } from '@app/core/services/branch-context.service';
 
 @Component({
   selector: 'app-admin-product-form-page',
@@ -24,6 +25,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private notificationService = inject(NotificationService);
   private adminLayout = inject(AdminLayout, { optional: true });
+  private branchContextService = inject(BranchContextService);
 
   id: string | null = null;
   
@@ -40,7 +42,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     brand_id: '',
     category_id: '',
     is_active: true,
-    is_global: true,
+    is_global: false,
     branch_id: '',
     model_id: '',
     specifications: {} as Record<string, any>,
@@ -103,6 +105,9 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             unit_cost_at_time: data.unit_cost_at_time || 0,
           };
         }
+      } else {
+        // En creación de producto, asignar la sucursal actual por defecto
+        this.formVal.branch_id = this.branchContextService.getBranchId() || '';
       }
     } catch (e: unknown) {
       this.error.set((e instanceof Error ? e.message : String(e)) || 'Error al cargar datos');
