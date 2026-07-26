@@ -1,0 +1,15 @@
+# robots.txt — Arecofix
+# https://www.robotstxt.org/
+
+# ─── Reglas generales para todos los bots ───────────────────────────────────
+User-agent: *
+Disallow: /login
+Disallow: /register
+Crawl-delay: 10
+
+# ─── Regla específica para Meta External Agent ───────────────────────────────
+User-agent: meta-externalagent
+Crawl-delay: 30
+
+# ─── Sitemap ─────────────────────────────────────────────────────────────────
+Sitemap: https://arecofix.com/sitemap.xml

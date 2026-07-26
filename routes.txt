@@ -1,0 +1,16 @@
+/
+/celular
+/servicios
+/academy
+/blog
+/contacto
+/nosotros
+/fixtecnicos
+/recursos
+/productos
+/productos/destacados
+/portfolio
+/gsm
+/privacy
+/terms
+/not-found
