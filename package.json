@@ -6,6 +6,7 @@
     "dev": "node -e \"require('fs').rmSync('.angular',{recursive:true,force:true})\" && ng serve --host 127.0.0.1",
     "start": "ng serve --host 127.0.0.1",
     "build": "ng build --configuration production",
+    "build:cloudflare": "ng build --configuration cloudflare",
     "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
