@@ -110,11 +110,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       if (queryStr) {
         const safeQuery = queryStr.replace(/[^\p{L}\p{N}\s-]/gu, '');
         const words = safeQuery.split(/\s+/).filter(w => w.length > 0);
-        if (words.length === 1) {
-          query = query.or(`name.ilike.%${words[0]}%,description.ilike.%${words[0]}%,sku.ilike.%${words[0]}%,barcode.ilike.%${words[0]}%`);
-        } else if (words.length > 1) {
+        if (words.length > 0) {
           words.forEach(w => {
-            query = query.ilike('name', `%${w}%`);
+            query = query.or(`name.ilike.%${w}%,description.ilike.%${w}%,sku.ilike.%${w}%,barcode.ilike.%${w}%`);
           });
         }
       }
