@@ -19,17 +19,17 @@
                  @if (isSuperAdmin()) {
                      Gestión central de todas las sucursales
                  } @else {
-                     Resumen general del negocio y rendimiento financiero.
+                     {{ t().repairs.dashboard.subtitleRegular || 'Resumen general del negocio y rendimiento financiero.' }}
                  }
              </p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
             <a routerLink="/admin/sales" class="btn btn-sm md:btn-md bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-2xl shadow-lg shadow-blue-500/30 transform hover:-translate-y-0.5 transition-all w-full sm:w-auto">
-                <i class="fas fa-cash-register mr-1 opacity-80"></i> Nueva Venta
+                <i class="fas fa-cash-register mr-1 opacity-80"></i> {{ t().repairs.dashboard.newSale || 'Nueva Venta' }}
             </a>
             <a routerLink="/admin/repairs/new" class="btn btn-sm md:btn-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all w-full sm:w-auto">
-                <i class="fas fa-tools mr-1 opacity-80"></i> Ingreso a Taller
+                <i class="fas fa-tools mr-1 opacity-80"></i> {{ t().repairs.dashboard.newRepair || 'Ingreso a Taller' }}
             </a>
         </div>
     </div>
@@ -85,7 +85,7 @@
                         <i class="fas fa-wallet"></i>
                     </div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ingresos Tienda</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.storeRevenue || 'Ingresos Tienda' }}</div>
                 <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().revenue | number:'1.0-0' }}</div>
             </div>
 
@@ -97,7 +97,7 @@
                         <i class="fas fa-tools"></i>
                     </div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ventas Taller</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.workshopSales || 'Ventas Taller' }}</div>
                 <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_revenue | number:'1.0-0' }}</div>
             </div>
 
@@ -108,9 +108,9 @@
                     <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
                         <i class="fas fa-hand-holding-usd"></i>
                     </div>
-                    <div class="badge badge-success text-[10px] text-white border-none font-bold">GANANCIA</div>
+                    <div class="badge badge-success text-[10px] text-white border-none font-bold">{{ t().repairs.dashboard.profit || 'GANANCIA' }}</div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Ganancia Estimada</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.estProfit || 'Ganancia Estimada' }}</div>
                 <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_profit | number:'1.0-0' }}</div>
             </div>
 
@@ -122,7 +122,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Equipos Fix.</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.devicesFixed || 'Equipos Fix.' }}</div>
                 <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().devices_fixed }}</div>
             </div>
 
@@ -140,7 +140,7 @@
 
         </div>
 
-        <!-- ── Sección Financiera: Ingresos Brutos vs Ganancia Real ────────── -->
+        <!-- ── Sección Financiera: {{ t().repairs.dashboard.grossRevenue || 'Ingresos Brutos' }} vs Ganancia Real ────────── -->
         <div class="mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 120ms;">
             <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
 
@@ -149,9 +149,9 @@
                     <div>
                         <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
                             <i class="fas fa-chart-line text-emerald-500"></i>
-                            Resumen Financiero
+                            {{ t().repairs.dashboard.financialSummary || 'Resumen Financiero' }}
                         </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ingresos brutos, costos reales y ganancia neta</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ t().repairs.dashboard.financialDesc }}</p>
                     </div>
                     
                     <div class="flex items-center gap-2 flex-wrap">
@@ -171,7 +171,7 @@
                         <!-- Inteligencia Financiera: Registro Manual de Ingresos/Gastos -->
                         <button (click)="openFinanceModal()"
                             class="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md shadow-violet-500/20 hover:shadow-violet-500/40 transition-all">
-                            <i class="fas fa-coins"></i> Registrar Gasto/Ingreso
+                            <i class="fas fa-coins"></i> {{ t().repairs.dashboard.recordExpense || 'Registrar Gasto/Ingreso' }}
                         </button>
 
                         <!-- Botones de descarga global -->
@@ -189,18 +189,18 @@
                 <!-- KPIs del mes seleccionado -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                     <div class="bg-blue-50 dark:bg-blue-500/10 rounded-3xl p-4 border border-blue-100 dark:border-blue-500/20">
-                        <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Ingresos Brutos ({{ selectedMonthData().label }})</div>
+                        <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">{{ t().repairs.dashboard.grossRevenue || 'Ingresos Brutos' }} ({{ selectedMonthData().label }})</div>
                         <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ selectedMonthGross() | number:'1.0-0' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ventas + Reparaciones cobradas</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ t().repairs.dashboard.grossRevDesc || 'Ventas + Reparaciones cobradas' }}</div>
                     </div>
                     <div class="bg-red-50 dark:bg-red-500/10 rounded-3xl p-4 border border-red-100 dark:border-red-500/20">
-                        <div class="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Costos Reales ({{ selectedMonthData().label }})</div>
+                        <div class="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">{{ t().repairs.dashboard.realCosts || 'Costos Reales' }} ({{ selectedMonthData().label }})</div>
                         <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ selectedMonthCost() | number:'1.0-0' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Repuestos usados + Costo productos</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ t().repairs.dashboard.realCostsDesc || 'Repuestos usados + Costo productos' }}</div>
                     </div>
                     <div class="bg-emerald-50 dark:bg-emerald-500/10 rounded-3xl p-4 border border-emerald-100 dark:border-emerald-500/20">
                         <div class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1 flex items-center justify-between">
-                            Ganancia Neta ({{ selectedMonthData().label }})
+                            {{ t().repairs.dashboard.netProfit || 'Ganancia Neta' }} ({{ selectedMonthData().label }})
                             <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600">{{ currentMonthMargin() }}%</span>
                         </div>
                         <div class="text-2xl font-black" [ngClass]="selectedMonthProfit() >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
@@ -208,7 +208,7 @@
                         </div>
                         <div class="flex flex-col gap-1 mt-2 pt-2 border-t border-emerald-200 dark:border-emerald-500/20">
                             <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                                <span><i class="fas fa-store mr-1 text-purple-500"></i> 50% Taller:</span>
+                                <span><i class="fas fa-store mr-1 text-purple-500"></i> {{ t().repairs.dashboard.workshop50 || '50% Taller:' }}</span>
                                 <span class="font-bold">${{ (selectedMonthProfit() * 0.5) | number:'1.0-0' }}</span>
                             </div>
                             <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
@@ -249,12 +249,12 @@
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50 dark:bg-gray-800/80">
                                 <tr>
-                                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Mes</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Ingresos Brutos</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">Taller</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">Tienda</th>
+                                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().repairs.dashboard.month || 'Mes' }}</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().repairs.dashboard.grossRevenue || 'Ingresos Brutos' }}</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">{{ t().repairs.dashboard.workshop || 'Taller' }}</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">{{ t().repairs.dashboard.store || 'Tienda' }}</th>
                                     <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden md:table-cell">Costos</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Ganancia Neta</th>
+                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().repairs.dashboard.netProfit || 'Ganancia Neta' }}</th>
                                     <th class="text-center px-3 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">PDF</th>
                                 </tr>
                             </thead>
@@ -300,7 +300,7 @@
                             Gestión de Sucursales
                         </h2>
                         <span class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ branches().length }} sucursales activas
+                            {{ branches().length }} {{ t().repairs.dashboard.activeBranches || 'sucursales activas' }}
                         </span>
                     </div>
                     
@@ -414,7 +414,7 @@
             <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 flex flex-col">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-star text-amber-500"></i> Prod. Estrella
+                        <i class="fas fa-star text-amber-500"></i> {{ t().repairs.dashboard.starProd || 'Prod. Estrella' }}
                     </h2>
                 </div>
                 <div class="h-56 sm:h-64 w-full flex-1 relative flex items-center justify-center">
@@ -472,7 +472,7 @@
             <!-- Quick Access Menu -->
             <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
                 <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                    <i class="fas fa-bolt text-yellow-500"></i> Accesos Directos
+                    <i class="fas fa-bolt text-yellow-500"></i> {{ t().repairs.dashboard.shortcuts || 'Accesos Directos' }}
                 </h2>
                 <div class="grid grid-cols-2 gap-3">
                     <a routerLink="/admin/products" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:border-blue-200 dark:hover:border-blue-500/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-gray-600 dark:text-gray-300 group">
@@ -482,7 +482,7 @@
                     
                     <a routerLink="/admin/repairs" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all text-gray-600 dark:text-gray-300 group">
                         <i class="fas fa-tools text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-emerald-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">Taller</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-center">{{ t().repairs.dashboard.workshop || 'Taller' }}</span>
                     </a>
 
                     <a routerLink="/admin/users" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:border-purple-200 dark:hover:border-purple-500/30 hover:text-purple-600 dark:hover:text-purple-400 transition-all text-gray-600 dark:text-gray-300 group">
@@ -521,7 +521,7 @@
                 
                 <div class="relative z-10 flex flex-col h-full mt-auto">
                     <h2 class="text-base sm:text-lg font-black text-white mb-6 flex items-center gap-2">
-                        <i class="fas fa-server text-emerald-400"></i> Sistema & Salud
+                        <i class="fas fa-server text-emerald-400"></i> {{ t().repairs.dashboard.sysHealth || 'Sistema & Salud' }}
                     </h2>
                     
                     <div class="space-y-3 sm:space-y-4 flex-1">
@@ -673,3 +673,5 @@
     </div>
 </div>
 }
+
+

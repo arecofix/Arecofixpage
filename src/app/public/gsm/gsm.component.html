@@ -1,4 +1,4 @@
-<div class="min-h-screen font-sans transition-colors duration-300"
+﻿<div class="min-h-screen font-sans transition-colors duration-300"
   [class.bg-gray-50]="(preferencesService.theme$ | async) === 'light'"
   [class.bg-gray-900]="(preferencesService.theme$ | async) === 'dark'"
   [class.bg-black]="(preferencesService.theme$ | async) === 'high-contrast'"
@@ -57,7 +57,7 @@
               [class.bg-none]="theme === 'high-contrast'">ARECOFIX</span>
             <br>
             <span class="text-2xl lg:text-3xl font-normal"
-              [class.text-gray-300]="theme !== 'high-contrast'"
+              [class.text-blue-100]="theme !== 'high-contrast'"
               [class.text-white]="theme === 'high-contrast'">{{ translations[lang].title_sub }}</span>
           </h1>
           
@@ -75,7 +75,7 @@
             </div>
             <div class="flex items-center gap-2 text-sm text-blue-200">
                <i class="fas fa-shield-alt"></i>
-               <span>Servicio Seguro & Privado</span>
+               <span>{{ translations[lang].trust_secure }}</span>
             </div>
           </div>
           
@@ -102,9 +102,9 @@
         <!-- Offer Card (Right) -->
         <div class="lg:w-1/2 w-full max-w-md">
           <div class="backdrop-blur-md border rounded-2xl p-6 lg:p-8 shadow-2xl relative overflow-hidden group transition-all duration-300"
-            [class.bg-white-10]="theme !== 'high-contrast'"
-            [class.border-white-20]="theme !== 'high-contrast'"
-            [class.hover-border-white-30]="theme !== 'high-contrast'"
+            [class.bg-white/10]="theme !== 'high-contrast'"
+            [class.border-white/20]="theme !== 'high-contrast'"
+            [class.hover:border-white/30]="theme !== 'high-contrast'"
             [class.bg-black]="theme === 'high-contrast'"
             [class.border-white]="theme === 'high-contrast'"
             [class.border-2]="theme === 'high-contrast'">
@@ -132,7 +132,7 @@
                 <div class="text-xs uppercase tracking-wider"
                   [class.text-gray-400]="theme !== 'high-contrast'"
                   [class.text-white]="theme === 'high-contrast'">{{ translations[lang].region }}</div>
-                <div class="font-bold text-white">TODOS LOS MODELOS</div>
+                <div class="font-bold text-white">{{ translations[lang].region_all }}</div>
               </div>
             </div>
             
@@ -140,15 +140,15 @@
             <div class="mb-6 rounded-xl overflow-hidden border border-white/10 relative h-32">
                <img src="/assets/img/gsm/iphone-bypass.png" alt="Vista previa de Bypass en iPhone 16 Pro Max" class="w-full h-full object-cover">
                <div class="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-3">
-                  <span class="text-xs text-white font-medium">Soporte hasta iPhone 16 Pro Max</span>
+                  <span class="text-xs text-white font-medium">{{ translations[lang].support_limit }}</span>
                </div>
             </div>
 
             <!-- Countdown -->
             <div class="grid grid-cols-4 gap-2 mb-6">
               <div class="rounded-lg p-2 text-center border"
-                [class.bg-black-40]="theme !== 'high-contrast'"
-                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.bg-black/40]="theme !== 'high-contrast'"
+                [class.border-white/10]="theme !== 'high-contrast'"
                 [class.border-white]="theme === 'high-contrast'">
                 <div class="text-2xl font-bold font-mono text-white">{{ countdown().days }}</div>
                 <div class="text-[10px] uppercase"
@@ -156,8 +156,8 @@
                   [class.text-white]="theme === 'high-contrast'">{{ translations[lang].days }}</div>
               </div>
               <div class="rounded-lg p-2 text-center border"
-                [class.bg-black-40]="theme !== 'high-contrast'"
-                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.bg-black/40]="theme !== 'high-contrast'"
+                [class.border-white/10]="theme !== 'high-contrast'"
                 [class.border-white]="theme === 'high-contrast'">
                 <div class="text-2xl font-bold font-mono text-white">{{ countdown().hours | number:'2.0' }}</div>
                 <div class="text-[10px] uppercase"
@@ -165,8 +165,8 @@
                   [class.text-white]="theme === 'high-contrast'">{{ translations[lang].hours }}</div>
               </div>
               <div class="rounded-lg p-2 text-center border"
-                [class.bg-black-40]="theme !== 'high-contrast'"
-                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.bg-black/40]="theme !== 'high-contrast'"
+                [class.border-white/10]="theme !== 'high-contrast'"
                 [class.border-white]="theme === 'high-contrast'">
                 <div class="text-2xl font-bold font-mono text-white">{{ countdown().minutes | number:'2.0' }}</div>
                 <div class="text-[10px] uppercase"
@@ -174,8 +174,8 @@
                   [class.text-white]="theme === 'high-contrast'">{{ translations[lang].min }}</div>
               </div>
               <div class="rounded-lg p-2 text-center border"
-                [class.bg-black-40]="theme !== 'high-contrast'"
-                [class.border-white-10]="theme !== 'high-contrast'"
+                [class.bg-black/40]="theme !== 'high-contrast'"
+                [class.border-white/10]="theme !== 'high-contrast'"
                 [class.border-white]="theme === 'high-contrast'">
                 <div class="text-2xl font-bold font-mono"
                   [class.text-red-400]="theme !== 'high-contrast'"
@@ -188,18 +188,18 @@
 
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-sm p-3 rounded-xl bg-blue-500/10 border border-blue-500/20"
-                [class.text-blue-100]="theme !== 'light'"
-                [class.text-blue-700]="theme === 'light'">
+                [class.text-blue-100]="theme !== 'high-contrast'"
+                [class.text-white]="theme === 'light'">
                 <i class="fas fa-unlock-alt text-lg"></i>
                 <div>
-                  <div class="font-bold">Bypass Remoto 100% Garantizado</div>
-                  <div class="text-[10px] opacity-80 italic">Desbloqueos y bypass 100% remotos</div>
+                  <div class="font-bold">{{ translations[lang].remote_bypass }}</div>
+                  <div class="text-[10px] opacity-80 italic">{{ translations[lang].remote_bypass_desc }}</div>
                 </div>
               </div>
               
               <div class="flex items-center gap-3 text-sm p-3 rounded-lg"
-                 [class.text-gray-300]="theme !== 'high-contrast'"
-                 [class.bg-black-20]="theme !== 'high-contrast'"
+                 [class.text-blue-100]="theme !== 'high-contrast'"
+                 [class.bg-black/20]="theme !== 'high-contrast'"
                  [class.text-white]="theme === 'high-contrast'"
                  [class.border]="theme === 'high-contrast'"
                  [class.border-white]="theme === 'high-contrast'">
@@ -215,7 +215,7 @@
                 [class.text-white]="theme === 'high-contrast'"
                 [class.border-2]="theme === 'high-contrast'"
                 [class.border-white]="theme === 'high-contrast'">
-                REPETIR OFERTA AHORA
+                {{ translations[lang].btn_repeat_offer }}
                 <i class="fas fa-bolt ml-2 text-yellow-500"></i>
               </a>
           </div>
@@ -232,8 +232,8 @@
            <img src="/assets/img/gsm/slider-web1.png" alt="Banner de servicios de plataforma GSM Arecofix" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
            <div class="absolute inset-0 bg-linear-to-r from-black/60 via-transparent to-transparent flex items-center p-8 md:p-16">
               <div class="max-w-md space-y-4">
-                 <h2 class="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg">LO MEJOR EN <span class="text-blue-400">GSM</span></h2>
-                 <p class="text-gray-200 md:text-lg">Acceso instantáneo a los mejores servicios del mercado.</p>
+                 <h2 class="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg">{{ translations[lang].banner_title }} <span class="text-blue-400">GSM</span></h2>
+                 <p class="text-gray-200 md:text-lg">{{ translations[lang].banner_desc }}</p>
                  <a [href]="telegramUrl" target="_blank" class="btn btn-primary gap-2">
                     <i class="fab fa-telegram"></i> {{ translations[lang].official_channel }}
                  </a>
@@ -254,12 +254,12 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-6 p-5 rounded-2xl bg-blue-600/5 border border-blue-500/10 shadow-sm overflow-hidden">
            <div class="flex flex-wrap justify-center sm:justify-start gap-2 w-full sm:w-auto">
               <button class="btn btn-sm btn-ghost gap-2 font-bold text-blue-600 border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-user-circle"></i> Panel</button>
-              <button class="btn btn-sm btn-ghost gap-2 hover:bg-black/5 dark:hover:bg-white/5">Orden</button>
-              <button class="btn btn-sm btn-ghost gap-2 hover:bg-black/5 dark:hover:bg-white/5">Historial</button>
-              <button class="btn btn-sm btn-ghost gap-2 text-green-600 font-bold bg-green-500/10 hover:bg-green-500 hover:text-white transition-all"><i class="fas fa-bolt"></i> RECARGA</button>
+              <button class="btn btn-sm btn-ghost gap-2 hover:bg-black/5 dark:hover:bg-white/5">{{ translations[lang].dash_order }}</button>
+              <button class="btn btn-sm btn-ghost gap-2 hover:bg-black/5 dark:hover:bg-white/5">{{ translations[lang].dash_history }}</button>
+              <button class="btn btn-sm btn-ghost gap-2 text-green-600 font-bold bg-green-500/10 hover:bg-green-500 hover:text-white transition-all"><i class="fas fa-bolt"></i> {{ translations[lang].dash_recharge }}</button>
            </div>
            <a [href]="telegramUrl" target="_blank" class="text-sm font-bold text-blue-500 flex items-center gap-2 hover:text-blue-700 transition-colors bg-white dark:bg-white/5 px-4 py-2 rounded-xl border border-blue-100 dark:border-white/10 shadow-sm w-full sm:w-auto justify-center">
-              <i class="fab fa-telegram-plane"></i> CANAL OFICIAL
+              <i class="fab fa-telegram-plane"></i> {{ translations[lang].official_channel }}
            </a>
         </div>
 
@@ -275,10 +275,10 @@
                     </div>
                  </div>
                  <div class="space-y-1">
-                    <div class="text-[10px] uppercase tracking-widest opacity-80">TU SALDO ACTUAL</div>
+                    <div class="text-[10px] uppercase tracking-widest opacity-80">{{ translations[lang].dash_balance_title }}</div>
                     <div class="text-3xl font-black text-white">$ 0.00 <span class="text-sm font-medium">USDT</span></div>
                  </div>
-                 <button class="btn btn-sm btn-block mt-4 bg-white/20 border-none text-white hover:bg-white/30">RECARGAR SALDO</button>
+                 <button class="btn btn-sm btn-block mt-4 bg-white/20 border-none text-white hover:bg-white/30">{{ translations[lang].dash_recharge_btn }}</button>
               </div>
 
               <!-- Quick Action Boxes -->
@@ -286,21 +286,21 @@
                  <a routerLink="/gsm/imei" class="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 transition-all hover:translate-x-1">
                     <div class="flex items-center gap-3">
                        <i class="fas fa-mobile-alt text-blue-500"></i>
-                       <span class="text-sm font-bold uppercase">ORDEN FRP F4</span>
+                       <span class="text-sm font-bold uppercase">{{ translations[lang].dash_order_frp }}</span>
                     </div>
                     <i class="fas fa-chevron-right text-xs opacity-30"></i>
                  </a>
                  <a routerLink="/gsm/server" class="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 transition-all hover:translate-x-1">
                     <div class="flex items-center gap-3">
                        <i class="fas fa-key text-purple-500"></i>
-                       <span class="text-sm font-bold uppercase">LICENCIAS Y CRÉDITOS</span>
+                       <span class="text-sm font-bold uppercase">{{ translations[lang].dash_licenses }}</span>
                     </div>
                     <i class="fas fa-chevron-right text-xs opacity-30"></i>
                  </a>
                  <a routerLink="/gsm/remote" class="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 transition-all hover:translate-x-1">
                     <div class="flex items-center gap-3">
                        <i class="fas fa-clock text-orange-500"></i>
-                       <span class="text-sm font-bold uppercase">Renta de Herramientas</span>
+                       <span class="text-sm font-bold uppercase">{{ translations[lang].dash_rentals }}</span>
                     </div>
                     <i class="fas fa-chevron-right text-xs opacity-30"></i>
                  </a>
@@ -311,28 +311,28 @@
            <div class="lg:col-span-9 space-y-6">              <!-- Order Stats Header -->
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div class="p-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/2 text-center shadow-sm">
-                     <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 tracking-wider">EXITOSAS</div>
+                     <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 tracking-wider">{{ translations[lang].dash_success }}</div>
                      <div class="text-2xl font-black text-green-500">0</div>
                   </div>
                   <div class="p-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/2 text-center shadow-sm">
-                     <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 tracking-wider">EN PROCESO</div>
+                     <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 tracking-wider">{{ translations[lang].dash_process }}</div>
                      <div class="text-2xl font-black text-blue-500">0</div>
                   </div>
                   <div class="p-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/2 text-center shadow-sm">
-                     <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 tracking-wider">FALLIDAS</div>
+                     <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 tracking-wider">{{ translations[lang].dash_failed }}</div>
                      <div class="text-2xl font-black text-red-500">0</div>
                   </div>
                   <div class="p-4 rounded-2xl bg-green-500 text-white text-center shadow-lg shadow-green-500/20 hover:bg-green-600 transition-colors cursor-pointer">
-                     <div class="text-[10px] uppercase font-bold mb-1 tracking-wider">QR ALIAS</div>
-                     <div class="text-sm font-bold">RECARGAR SALDO</div>
+                     <div class="text-[10px] uppercase font-bold mb-1 tracking-wider">{{ translations[lang].dash_qr }}</div>
+                     <div class="text-sm font-bold">{{ translations[lang].dash_recharge_btn }}</div>
                   </div>
               </div>
 
               <!-- News & Feed Section -->
               <div class="rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/2 overflow-hidden flex flex-col h-[400px]">
                  <div class="p-4 bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex items-center gap-3">
-                    <div class="btn btn-xs btn-primary gap-1"><i class="fas fa-bullhorn"></i> NOVEDADES/OFERTAS</div>
-                    <div class="text-xs font-bold text-gray-400">Actualizado ahora</div>
+                    <div class="btn btn-xs btn-primary gap-1"><i class="fas fa-bullhorn"></i> {{ translations[lang].dash_news }}</div>
+                    <div class="text-xs font-bold text-gray-400">{{ translations[lang].dash_updated }}</div>
                  </div>
                  <div class="flex-1 overflow-y-auto p-2 space-y-1">
                     @for (offer of offers(); track offer.name) {
@@ -348,7 +348,7 @@
                           </div>
                           <div class="text-right">
                              <div class="text-sm font-black text-green-600 dark:text-green-400">$ {{ offer.price }} <span class="text-[10px]">USDT</span></div>
-                             <div class="text-[10px] text-gray-400">Instantáneo</div>
+                             <div class="text-[10px] text-gray-400">{{ translations[lang].dash_instant }}</div>
                           </div>
                        </div>
                     }
@@ -388,7 +388,7 @@
             [class.text-white]="theme === 'high-contrast'">{{ translations[lang].calc_desc }}</p>
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-              [class.bg-white-20]="theme !== 'high-contrast'"
+              [class.bg-white/20]="theme !== 'high-contrast'"
               [class.border]="theme === 'high-contrast'"
               [class.border-white]="theme === 'high-contrast'">
               <i class="fas fa-calculator"></i>
@@ -507,7 +507,7 @@
                 [class.bg-black]="theme === 'high-contrast'"
                 [class.text-white]="theme === 'high-contrast'"
                 [class.border]="theme === 'high-contrast'"
-                [class.border-white]="theme === 'high-contrast'">Software</span>
+                [class.border-white]="theme === 'high-contrast'">{{ translations[lang].software }}</span>
             </div>
             
             <h3 class="text-xl font-bold mb-2 transition-colors"
@@ -518,7 +518,7 @@
             <p class="text-sm mb-6 line-clamp-2"
               [class.text-gray-500]="theme === 'light'"
               [class.text-gray-400]="theme === 'dark'"
-              [class.text-white]="theme === 'high-contrast'">{{ tool.description }}</p>
+              [class.text-white]="theme === 'high-contrast'">{{ translations[lang].tool_desc[tool.name] || tool.description }}</p>
             
             <a [href]="tool.loginUrl" class="btn btn-outline btn-sm w-full"
               [class.group-hover-btn-primary]="theme !== 'high-contrast'"
@@ -634,7 +634,7 @@
             @if (download.description) {
               <p class="text-sm mb-4 line-clamp-2"
                 [class.text-gray-400]="theme !== 'high-contrast'"
-                [class.text-white]="theme === 'high-contrast'">{{ download.description }}</p>
+                [class.text-white]="theme === 'high-contrast'">{{ translations[lang].dl_desc[download.name] || download.description }}</p>
             }
             <a [href]="download.downloadUrl" class="flex items-center text-sm font-medium transition-colors"
               [class.text-blue-400]="theme !== 'high-contrast'"
@@ -728,12 +728,13 @@
       <i class="fas fa-project-diagram text-[20rem] absolute -bottom-20 -right-20"></i>
     </div>
     <div class="container mx-auto px-4 relative z-10 space-y-8">
-      <h2 class="text-3xl md:text-5xl font-black">¿Listo para empezar?</h2>
-      <p class="text-xl opacity-90">Unite hoy a la red de revendedores más grande de la región.</p>
+      <h2 class="text-3xl md:text-5xl font-black">{{ translations[lang].footer_title }}</h2>
+      <p class="text-xl opacity-90">{{ translations[lang].footer_desc }}</p>
       <div class="flex justify-center gap-4">
-        <a [href]="telegramUrl" target="_blank" class="btn btn-lg bg-white text-blue-600 border-none px-12 hover:bg-gray-100">Registrarme</a>
+        <a [href]="telegramUrl" target="_blank" class="btn btn-lg bg-white text-blue-600 border-none px-12 hover:bg-gray-100">{{ translations[lang].footer_btn }}</a>
       </div>
     </div>
   </section>
 
 </div>
+

@@ -1,36 +1,36 @@
-<!-- ─── Header ──────────────────────────────────────────────────────────── -->
+﻿<!-- ─── Header ──────────────────────────────────────────────────────────── -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <div>
-        <h1 class="text-2xl font-black text-base-content">Gestión de Personas y Clientes</h1>
-        <p class="text-sm text-base-content/60">Clientes unificados, usuarios registrados, personal y proveedores.</p>
+        <h1 class="text-2xl font-black text-base-content">{{ t().crm.title || 'Gestión de Personas y Clientes' }}</h1>
+        <p class="text-sm text-base-content/60">{{ t().crm.subtitle || 'Clientes unificados, usuarios registrados, personal y proveedores.' }}</p>
     </div>
     <!-- Context-sensitive action button -->
     @if (activeTab() === 'clients') {
         <div class="flex items-center gap-3 flex-wrap">
             <button (click)="downloadCSV()"
                 class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all">
-                <i class="fas fa-file-csv"></i> Exportar CSV
+                <i class="fas fa-file-csv"></i> {{ t().crm.exportCsv || 'Exportar CSV' }}
             </button>
             <a routerLink="/admin/clients/new" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-md">
-                <i class="fas fa-plus"></i> Nuevo Cliente
+                <i class="fas fa-plus"></i> {{ t().crm.newClient || 'Nuevo Cliente' }}
             </a>
         </div>
     } @else if (activeTab() === 'staff') {
         <a routerLink="/admin/employees/new" class="btn btn-primary shadow-lg">
-            <i class="fas fa-plus mr-2"></i> Nuevo Empleado
+            <i class="fas fa-plus mr-2"></i> {{ t().crm.newEmployee || 'Nuevo Empleado' }}
         </a>
     } @else if (activeTab() === 'suppliers') {
         <div class="flex gap-2">
             @if (selectedSupplierIds().size > 0) {
                 <button (click)="isMessageModalOpen.set(true)" class="btn bg-green-500 hover:bg-green-600 text-white border-none shadow-lg">
-                    <i class="fab fa-whatsapp text-lg"></i> Msj a {{ selectedSupplierIds().size }}
+                    <i class="fab fa-whatsapp text-lg"></i> {{ t().crm.msgTo || 'Msj a' }} {{ selectedSupplierIds().size }}
                 </button>
             }
             <button (click)="openTracker()" class="btn btn-outline border-blue-500 text-blue-500 hover:bg-blue-600 hover:text-white">
                 <i class="fas fa-truck-fast mr-1"></i> Tracking
             </button>
             <a routerLink="/admin/suppliers/new" class="btn btn-primary shadow-lg">
-                <i class="fas fa-plus mr-1"></i> Nuevo Proveedor
+                <i class="fas fa-plus mr-1"></i> {{ t().crm.newSupplier || 'Nuevo Proveedor' }}
             </a>
         </div>
     }
@@ -86,7 +86,7 @@
                 type="text"
                 [ngModel]="clientsSearchTerm()"
                 (ngModelChange)="clientsSearchTerm.set($event)"
-                placeholder="Buscar por nombre, email, teléfono o DNI..."
+                placeholder="{{ t().crm.clients.searchPlaceholder || 'Buscar por nombre, email, teléfono o DNI...' }}"
                 class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-250 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
         </div>
@@ -94,9 +94,9 @@
 
     <!-- Estadísticas rápidas -->
     <div class="flex items-center gap-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
-        <span><strong class="text-gray-800 dark:text-white">{{ filteredClients().length }}</strong> clientes encontrados</span>
+        <span><strong class="text-gray-800 dark:text-white">{{ filteredClients().length }}</strong> {{ t().crm.clients.clientsFound || 'clientes encontrados' }}</span>
         <span class="text-gray-300 dark:text-gray-600">|</span>
-        <span>Página <strong class="text-gray-800 dark:text-white">{{ clientsCurrentPage() }}</strong> de {{ totalClientsPages() }}</span>
+        <span>{{ t().crm.clients.page || 'Página' }} <strong class="text-gray-800 dark:text-white">{{ clientsCurrentPage() }}</strong> {{ t().crm.clients.of || 'de' }} {{ totalClientsPages() }}</span>
     </div>
 
     <div class="bg-white dark:bg-gray-800/50 rounded-2xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[400px]">
@@ -105,12 +105,12 @@
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 dark:bg-gray-800/80">
                     <tr>
-                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Cliente</th>
-                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Contacto</th>
-                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden md:table-cell">Ubicación</th>
-                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Fuente</th>
-                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden lg:table-cell">Reparac.</th>
-                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Acciones</th>
+                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.client || 'Cliente' }}</th>
+                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.contact || 'Contacto' }}</th>
+                        <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden md:table-cell">{{ t().crm.clients.table.location || 'Ubicación' }}</th>
+                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.source || 'Fuente' }}</th>
+                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden lg:table-cell">{{ t().crm.clients.table.repairs || 'Reparac.' }}</th>
+                        <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.actions || 'Acciones' }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -134,7 +134,7 @@
                         <tr>
                             <td colspan="6" class="text-center py-12 text-gray-400">
                                 <i class="fas fa-users text-3xl mb-2 opacity-30 block"></i>
-                                {{ clientsSearchTerm() ? 'No se encontraron clientes con esa búsqueda.' : 'No hay clientes registrados.' }}
+                                {{ clientsSearchTerm() ? (t().crm.clients.emptySearch || 'No se encontraron clientes con esa búsqueda.') : (t().crm.clients.emptyState || 'No hay clientes registrados.') }}
                             </td>
                         </tr>
                     } @else {
@@ -145,7 +145,7 @@
                                         {{ client.full_name || (client.first_name + ' ' + client.last_name) }}
                                     </div>
                                     @if (client.dni) {
-                                        <div class="text-xs text-gray-400">DNI: {{ client.dni }}</div>
+                                        <div class="text-xs text-gray-400">{{ t().crm.clients.dni || 'DNI:' }} {{ client.dni }}</div>
                                     }
                                 </td>
                                 <td class="px-4 py-3">
@@ -188,7 +188,7 @@
                                     } @else {
                                         <a [href]="'https://wa.me/' + (client.phone || '').replace(/\D/g, '')" target="_blank"
                                             class="p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-500/10 text-gray-400 hover:text-green-500 transition-all inline-block"
-                                            title="Contactar por WhatsApp">
+                                            title="{{ t().crm.clients.contactWhatsapp || 'Contactar por WhatsApp' }}">
                                             <i class="fab fa-whatsapp text-sm"></i>
                                         </a>
                                     }
@@ -213,7 +213,7 @@
             } @else if (filteredClients().length === 0) {
                 <div class="text-center py-12 text-gray-400">
                     <i class="fas fa-users text-3xl mb-2 opacity-30 block"></i>
-                    {{ clientsSearchTerm() ? 'No se encontraron clientes.' : 'No hay clientes registrados.' }}
+                    {{ clientsSearchTerm() ? 'No se encontraron clientes.' : (t().crm.clients.emptyState || 'No hay clientes registrados.') }}
                 </div>
             } @else {
                 @for (client of paginatedClients(); track client.id) {
@@ -224,7 +224,7 @@
                                     {{ client.full_name || (client.first_name + ' ' + client.last_name) }}
                                 </div>
                                 @if (client.dni) {
-                                    <div class="text-xs text-gray-400">DNI: {{ client.dni }}</div>
+                                    <div class="text-xs text-gray-400">{{ t().crm.clients.dni || 'DNI:' }} {{ client.dni }}</div>
                                 }
                             </div>
                             <!-- Source Badge -->
@@ -302,10 +302,10 @@
         <table class="table w-full">
             <thead class="bg-base-200/50">
                 <tr class="text-base-content/70 text-xs uppercase tracking-wider">
-                    <th>Usuario</th>
-                    <th>Rol</th>
-                    <th>Sucursal Asignada</th>
-                    <th>Registro</th>
+                    <th>{{ t().crm.users.table.user || 'Usuario' }}</th>
+                    <th>{{ t().crm.users.table.role || 'Rol' }}</th>
+                    <th>{{ t().crm.users.table.branch || 'Sucursal Asignada' }}</th>
+                    <th>{{ t().crm.users.table.registration || 'Registro' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -313,14 +313,14 @@
                     <tr>
                         <td colspan="4" class="text-center py-12">
                             <span class="loading loading-spinner loading-md text-primary"></span>
-                            <p class="text-sm text-base-content/50 mt-2">Cargando usuarios...</p>
+                            <p class="text-sm text-base-content/50 mt-2">{{ t().crm.users.loading || 'Cargando usuarios...' }}</p>
                         </td>
                     </tr>
                 } @else if (users().length === 0) {
                     <tr>
                         <td colspan="4" class="text-center py-12 text-base-content/40">
                             <i class="fas fa-users text-4xl mb-3 block"></i>
-                            No hay usuarios registrados.
+                            {{ t().crm.users.emptyState || 'No hay usuarios registrados.' }}
                         </td>
                     </tr>
                 } @else {
@@ -343,8 +343,8 @@
                             <select class="select select-sm select-bordered w-full max-w-xs"
                                     [ngModel]="user.role"
                                     (ngModelChange)="updateUserRole(user, $event)">
-                                <option value="user">Cliente</option>
-                                <option value="staff">Staff</option>
+                                <option value="user">{{ t().crm.clients.table.client || 'Cliente' }}</option>
+                                <option value="staff">{{ t().crm.users.roles.staff || 'Staff' }}</option>
                                 <option value="admin">Admin de Sucursal</option>
                             </select>
                         </td>
@@ -390,11 +390,11 @@
         <table class="table w-full">
             <thead class="bg-base-200/50">
                 <tr class="text-base-content/70 text-xs uppercase tracking-wider">
-                    <th>Empleado</th>
-                    <th>Cargo / Rol</th>
-                    <th>Contacto</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <th>{{ t().crm.staff.table.employee || 'Empleado' }}</th>
+                    <th>{{ t().crm.staff.table.role || 'Cargo / Rol' }}</th>
+                    <th>{{ t().crm.clients.table.contact || 'Contacto' }}</th>
+                    <th>{{ t().crm.staff.table.status || 'Estado' }}</th>
+                    <th>{{ t().crm.clients.table.actions || 'Acciones' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -402,17 +402,17 @@
                     <tr>
                         <td colspan="5" class="text-center py-12">
                             <span class="loading loading-spinner loading-md text-primary"></span>
-                            <p class="text-sm text-base-content/50 mt-2">Cargando staff...</p>
+                            <p class="text-sm text-base-content/50 mt-2">{{ t().crm.staff.loading || 'Cargando staff...' }}</p>
                         </td>
                     </tr>
                 } @else if (employees().length === 0) {
                     <tr>
                         <td colspan="5" class="text-center py-12 text-base-content/40">
                             <i class="fas fa-id-badge text-4xl mb-3 block"></i>
-                            No hay empleados registrados.
+                            {{ t().crm.staff.emptyState || 'No hay empleados registrados.' }}
                             <div class="mt-4">
                                 <a routerLink="/admin/employees/new" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus mr-1"></i> Agregar primer empleado
+                                    <i class="fas fa-plus mr-1"></i> {{ t().crm.staff.addFirst || 'Agregar primer empleado' }}
                                 </a>
                             </div>
                         </td>
@@ -471,11 +471,11 @@
                             [checked]="selectedSupplierIds().size > 0 && selectedSupplierIds().size === suppliers().length"
                             (change)="toggleAll($event)">
                     </th>
-                    <th>Nombre</th>
-                    <th>Rubro / Tipo</th>
-                    <th>Contacto</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <th>{{ t().crm.suppliers.table.name || 'Nombre' }}</th>
+                    <th>{{ t().crm.suppliers.table.type || 'Rubro / Tipo' }}</th>
+                    <th>{{ t().crm.clients.table.contact || 'Contacto' }}</th>
+                    <th>{{ t().crm.staff.table.status || 'Estado' }}</th>
+                    <th>{{ t().crm.clients.table.actions || 'Acciones' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -483,17 +483,17 @@
                     <tr>
                         <td colspan="6" class="text-center py-12">
                             <span class="loading loading-spinner loading-md text-primary"></span>
-                            <p class="text-sm text-base-content/50 mt-2">Cargando proveedores...</p>
+                            <p class="text-sm text-base-content/50 mt-2">{{ t().crm.suppliers.loading || 'Cargando proveedores...' }}</p>
                         </td>
                     </tr>
                 } @else if (suppliers().length === 0) {
                     <tr>
                         <td colspan="6" class="text-center py-12 text-base-content/40">
                             <i class="fas fa-truck text-4xl mb-3 block"></i>
-                            No hay proveedores registrados.
+                            {{ t().crm.suppliers.emptyState || 'No hay proveedores registrados.' }}
                             <div class="mt-4">
                                 <a routerLink="/admin/suppliers/new" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus mr-1"></i> Agregar primer proveedor
+                                    <i class="fas fa-plus mr-1"></i> {{ t().crm.suppliers.addFirst || 'Agregar primer proveedor' }}
                                 </a>
                             </div>
                         </td>
@@ -507,7 +507,7 @@
                                     [checked]="selectedSupplierIds().has(supplier.id)"
                                     (change)="toggleSupplier(supplier.id)">
                             } @else {
-                                <div class="tooltip tooltip-right" data-tip="Sin teléfono">
+                                <div class="tooltip tooltip-right" [attr.data-tip]="t().crm.suppliers.noPhone || 'Sin teléfono'">
                                     <i class="fas fa-exclamation-triangle text-warning text-xs"></i>
                                 </div>
                             }

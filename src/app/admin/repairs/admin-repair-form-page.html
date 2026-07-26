@@ -314,11 +314,13 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Recargo %</span>
-                                <span class="text-xl font-bold text-gray-900 dark:text-white">0%</span>
+                                <div class="relative w-full max-w-[80px]">
+                                    <input type="number" formControlName="surcharge_percentage" class="bg-transparent text-xl font-bold text-gray-900 dark:text-white text-center w-full focus:outline-none border-b border-gray-300 dark:border-gray-600 focus:border-indigo-500">
+                                </div>
                             </div>
                             <div class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Recargo</span>
-                                <span class="text-xl font-bold text-gray-900 dark:text-white">$ 0</span>
+                                <span class="text-xl font-bold text-gray-900 dark:text-white">$ {{ ((repairForm.value.estimated_cost || 0) * (repairForm.value.surcharge_percentage || 0)) / 100 }}</span>
                             </div>
                             <div class="bg-white dark:bg-[#101828] border border-[#3498DB]/50 shadow-[0_0_15px_rgba(52,152,219,0.15)] rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-[#3498DB] uppercase tracking-wider mb-1">Total Servicio</span>
@@ -326,7 +328,7 @@
                             </div>
                             <div class="bg-white dark:bg-[#101828] border border-[#F39C12]/50 shadow-[0_0_15px_rgba(243,156,18,0.15)] rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-[#F39C12] uppercase tracking-wider mb-1">Saldo a Cobrar</span>
-                                <span class="text-2xl font-black text-gray-900 dark:text-white">$ {{ (repairForm.value.final_cost > 0 ? repairForm.value.final_cost : (repairForm.value.estimated_cost || 0)) - (repairForm.value.deposit_amount || 0) }}</span>
+                                <span class="text-2xl font-black text-gray-900 dark:text-white">$ {{ (repairForm.value.final_cost || 0) - (repairForm.value.deposit_amount || 0) }}</span>
                             </div>
                         </div>
                     </div>

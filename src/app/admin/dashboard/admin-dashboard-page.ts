@@ -9,6 +9,7 @@ import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { AnalyticsRepository, DashboardStats, MonthlyRevenue } from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
 import { AuthService } from '@app/core/services/auth.service';
+import { TranslationService } from '@app/core/services/translation.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { AnalyticsService } from '@app/core/services/analytics.service';
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
@@ -31,6 +32,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   private analyticsRepo = inject(AnalyticsRepository);
   private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
+  public t = inject(TranslationService).t;
   private tenantService = inject(TenantService);
   private adminProductService = inject(AdminProductService);
   private reportService = inject(FinanceReportService);
@@ -437,3 +439,6 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+
+

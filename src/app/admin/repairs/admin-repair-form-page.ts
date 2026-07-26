@@ -259,17 +259,25 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             repair_number: [0],
             payment_method: ['efectivo'],
             warranty: [''],
-            supplier: ['']
+            supplier: [''],
+            surcharge_percentage: [0]
         });
 
-        // Automatically sync final_cost when estimated_cost changes if no parts/labor are added
-        this.repairForm.get('estimated_cost')?.valueChanges
+        // Automatically recalculate final_cost based on estimated_cost and surcharge_percentage
+        this.repairForm.valueChanges
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(val => {
-                const currentParts = this.parts();
-                const labor = this.repairForm.get('technical_labor_cost')?.value || 0;
-                if (currentParts.length === 0 && labor === 0) {
-                    this.repairForm.patchValue({ final_cost: val || 0 }, { emitEvent: false });
+                const estimated = Number(val.estimated_cost) || 0;
+                const surchargePct = Number(val.surcharge_percentage) || 0;
+                
+                // El Total del Servicio SIEMPRE debe ser igual al presupuestoEstimado + el valor del recargo calculado. NUNCA puede ser menor al presupuestoEstimado.
+                // El Recargo en Dinero se calcula así: (presupuestoEstimado * recargoPorcentaje) / 100
+                const surchargeAmount = (estimated * surchargePct) / 100;
+                const newFinalCost = estimated + surchargeAmount;
+
+                // Solo actualizar si el valor cambió para evitar loops infinitos
+                if (this.repairForm.get('final_cost')?.value !== newFinalCost) {
+                    this.repairForm.patchValue({ final_cost: newFinalCost }, { emitEvent: false });
                 }
             });
     }
@@ -443,27 +451,31 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     calculateFinalCost() {
         const laborCost = Number(this.repairForm.get('technical_labor_cost')?.value) || 0;
         
+        // This calculates the parts cost and suggestions, but we do NOT override final_cost or deposit_amount
+        // based on parts, as per the user's explicit request.
         const result = this.repairCalculator.calculateFinancials(this.parts(), laborCost);
 
         this.parts.set(result.updatedParts);
+        
+        // Recalculate final_cost based strictly on estimated_cost + surcharge
+        const estimated = Number(this.repairForm.get('estimated_cost')?.value) || 0;
+        const surchargePct = Number(this.repairForm.get('surcharge_percentage')?.value) || 0;
+        const newFinalCost = estimated + (estimated * surchargePct / 100);
+        
         this.repairForm.patchValue({
-            final_cost: result.finalCost,
-            deposit_amount: result.suggestedDeposit
-        });
+            final_cost: newFinalCost
+        }, { emitEvent: false });
     }
 
     onEstimatedCostChange(value: number) {
         this.repairForm.patchValue({
-            estimated_cost: value,
-            deposit_amount: Math.round(value * 0.5)
+            estimated_cost: value
         });
     }
 
     onFinalCostChange(value: number) {
         this.repairForm.patchValue({
-            final_cost: value,
-            technical_labor_cost: Math.round(value * 0.5),
-            deposit_amount: Math.round(value * 0.5)
+            final_cost: value
         });
     }
 

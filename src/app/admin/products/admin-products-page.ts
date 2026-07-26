@@ -13,6 +13,7 @@ import { MetaValidationModalComponent } from './components/meta-validation-modal
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
+import { TranslationService } from '@app/core/services/translation.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { BranchService } from '@app/core/services/branch.service';
 
@@ -29,6 +30,7 @@ export class AdminProductsPage implements OnInit {
   private route = inject(ActivatedRoute);
   private branchContextService = inject(BranchContextService);
   private branchService = inject(BranchService);
+  public t = inject(TranslationService).t;
 
   public isLibreriaZaona = computed(() => {
     const branch = this.branchService.currentBranch();

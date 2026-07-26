@@ -7,8 +7,7 @@ import { Repair } from '@app/features/repairs/domain/entities/repair.entity';
 import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
 import { RepairStatusUtils } from '@app/features/repairs/domain/utils/repair-status.utils';
 import { BranchContextService } from '@app/core/services/branch-context.service';
-
-
+import { TranslationService } from '@app/core/services/translation.service';
 import { OfflineSyncService } from '@app/core/services/offline-sync.service';
 
 @Component({
@@ -21,6 +20,7 @@ export class AdminRepairsPage implements OnInit {
   private repairService = inject(AdminRepairService);
   private branchContextService = inject(BranchContextService);
   offlineSyncService = inject(OfflineSyncService); // Injected to manage offline form submissions
+  public t = inject(TranslationService).t;
 
   constructor() {
     // React to branch changes globally

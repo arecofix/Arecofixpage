@@ -7,6 +7,7 @@ import { BranchService } from '@app/core/services/branch.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { AuthService } from '@app/core/services/auth.service';
+import { TranslationService } from '@app/core/services/translation.service';
 
 @Component({
     selector: 'app-admin-company-settings-page',
@@ -21,6 +22,9 @@ export class AdminCompanySettingsPage implements OnInit {
     private route = inject(ActivatedRoute);
     private cdr = inject(ChangeDetectorRef);
     private authService = inject(AuthService);
+    private translationService = inject(TranslationService);
+
+    t = this.translationService.t;
 
     canManageBranches = computed(() => {
         const profile = this.authService.getCurrentProfile();

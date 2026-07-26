@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
@@ -46,7 +46,8 @@ import { PublicRepairDto } from '../../features/repairs/domain/dtos/public-repai
         }
     `]
 })
-export class TrackingPage implements OnInit {
+export class TrackingPage implements OnInit, OnDestroy {
+    private document = inject(DOCUMENT);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private trackingService = inject(TrackingService);
@@ -102,6 +103,8 @@ export class TrackingPage implements OnInit {
     });
 
     ngOnInit() {
+        this.document.body.classList.add('hide-floating-widgets');
+        
         this.route.paramMap.subscribe(async (params) => {
             const rawCode = params.get('code');
             this.code = rawCode ? rawCode.trim().toUpperCase() : null;
@@ -117,6 +120,10 @@ export class TrackingPage implements OnInit {
                 this.repair.set(null);
             }
         });
+    }
+
+    ngOnDestroy() {
+        this.document.body.classList.remove('hide-floating-widgets');
     }
 
     async loadRepair() {

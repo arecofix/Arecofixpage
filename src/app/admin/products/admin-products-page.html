@@ -4,9 +4,9 @@
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4 sticky top-0 z-30 bg-gray-50/95 dark:bg-[#0f172a]/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 px-4">
     <div>
       <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-500 to-teal-400">
-        Gestión de Productos
+        {{ t().products.title }}
       </h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 hidden md:block">Gestiona tu catálogo completo desde aquí.</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 hidden md:block">{{ t().products.subtitle }}</p>
     </div>
 
     <div class="flex items-center gap-2 w-full md:w-auto shrink-0 flex-wrap justify-end">
@@ -19,7 +19,7 @@
         @if (importing()) {
           <span class="loading loading-spinner loading-xs mr-1"></span> Imp...
         } @else {
-          <i class="fas fa-file-import md:mr-2"></i> <span class="hidden md:inline">Importar</span>
+          <i class="fas fa-file-import md:mr-2"></i> <span class="hidden md:inline">{{ t().products.actions.import }}</span>
         }
       </button>
 
@@ -32,14 +32,14 @@
 
       <!-- Advanced Tools Dropdown -->
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-outline btn-sm md:btn-md tooltip tooltip-bottom" data-tip="Herramientas Avanzadas">
+        <div tabindex="0" role="button" class="btn btn-outline btn-sm md:btn-md tooltip tooltip-bottom" [attr.data-tip]="t().products.actions.advancedTools">
           <i class="fas fa-ellipsis-v"></i>
         </div>
         <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-2xl bg-white dark:bg-gray-800 rounded-2xl w-60 border border-gray-100 dark:border-gray-700 mt-2 font-bold text-gray-700 dark:text-gray-200">
-          <li class="menu-title px-4 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Herramientas</li>
+          <li class="menu-title px-4 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t().products.actions.tools }}</li>
           <li>
             <a (click)="exportProducts()" [class.opacity-50]="loading() || importing()" class="py-3">
-              <i class="fas fa-file-export w-5 text-gray-400"></i> Exportar a CSV
+              <i class="fas fa-file-export w-5 text-gray-400"></i> {{ t().products.actions.exportCsv }}
             </a>
           </li>
           <li>
@@ -50,7 +50,7 @@
           <li>
             <a (click)="runMetaValidation()" [class.opacity-50]="loading() || validating()" class="py-3">
               @if (validating()) {
-                <span class="loading loading-spinner loading-xs w-5"></span> Validando Feed...
+                <span class="loading loading-spinner loading-xs w-5"></span> {{ t().products.actions.validatingFeed }}
               } @else {
                 <i class="fas fa-shield-check w-5 text-emerald-500"></i> Auditoría de Integración
               }
@@ -66,7 +66,7 @@
 
       <!-- Primary Action: New -->
       <a routerLink="/admin/products/new" class="btn btn-primary btn-sm md:btn-md shadow-lg shadow-indigo-500/20 whitespace-nowrap ml-1 px-6">
-        <i class="fas fa-plus mr-2"></i> Nuevo
+        <i class="fas fa-plus mr-2"></i> {{ t().products.newProduct }}
       </a>
     </div>
   </div>
@@ -79,7 +79,7 @@
         <div class="relative flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <i class="fas fa-search px-4 text-gray-400"></i>
           <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)"
-            placeholder="Buscar por nombre, SKU, marca..."
+            [placeholder]="t().products.searchPlaceholder"
             class="input input-ghost w-full focus:bg-transparent text-lg h-12" />
           </div>
         </div>
@@ -97,13 +97,13 @@
         </div>
 
         <div class="flex items-center gap-2 w-full lg:w-48">
-          <span class="text-xs font-bold text-gray-500 hidden xl:block">Ordenar:</span>
+          <span class="text-xs font-bold text-gray-500 hidden xl:block">{{ t().products.filters.sortBy }}</span>
           <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800">
-            <option value="name_asc">A-Z Nombre</option>
-            <option value="price_asc">Precio: Bajo a Alto</option>
-            <option value="price_desc">Precio: Alto a Bajo</option>
-            <option value="stock_asc">Stock: Bajo a Alto</option>
-            <option value="stock_desc">Stock: Alto a Bajo</option>
+            <option value="name_asc">{{ t().products.filters.azName }}</option>
+            <option value="price_asc">{{ t().products.filters.priceLowHigh }}</option>
+            <option value="price_desc">{{ t().products.filters.priceHighLow }}</option>
+            <option value="stock_asc">{{ t().products.filters.stockLowHigh }}</option>
+            <option value="stock_desc">{{ t().products.filters.stockHighLow }}</option>
           </select>
         </div>
       </div>
@@ -114,14 +114,14 @@
       <div class="fixed bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto z-40 animate-fade-in-up">
         <div class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-full shadow-2xl px-6 py-3 flex items-center justify-between gap-4 border border-gray-700 dark:border-gray-200">
           <div class="font-bold whitespace-nowrap">
-            <span class="badge badge-primary mr-2">{{ selectedIds().size }}</span> seleccionados
+            <span class="badge badge-primary mr-2">{{ selectedIds().size }}</span> {{ t().products.selection.selected }}
           </div>
           <div class="flex items-center gap-2">
             <button (click)="openBulkEdit()" class="btn btn-sm btn-ghost hover:bg-white/20 dark:hover:bg-black/10 text-white dark:text-gray-900 whitespace-nowrap">
-              <i class="fas fa-pen mr-1.5"></i> Editar
+              <i class="fas fa-pen mr-1.5"></i> {{ t().common.edit }}
             </button>
             <button (click)="openBulkDelete()" class="btn btn-sm btn-ghost hover:bg-error/30 text-error whitespace-nowrap">
-              <i class="fas fa-trash-alt mr-1.5"></i> Eliminar
+              <i class="fas fa-trash-alt mr-1.5"></i> {{ t().common.delete }}
             </button>
             <button (click)="clearSelection()" class="btn btn-circle btn-xs btn-ghost text-white dark:text-gray-900 opacity-70 hover:opacity-100">
               <i class="fas fa-times"></i>
@@ -160,12 +160,12 @@
                     (change)="toggleSelectAll()" />
                   </label>
                 </th>
-                <th>Producto</th>
-                <th>SKU / Marca</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Estado</th>
-                <th class="text-right">Acciones</th>
+                <th>{{ t().products.table.product }}</th>
+                <th>{{ t().products.table.skuBrand }}</th>
+                <th>{{ t().products.table.price }}</th>
+                <th>{{ t().products.table.stock }}</th>
+                <th>{{ t().products.table.status }}</th>
+                <th class="text-right">{{ t().products.table.actions }}</th>
               </tr>
             </thead>
             <tbody>
@@ -190,11 +190,11 @@
                             <div class="font-bold text-gray-900 dark:text-white line-clamp-1">{{ product.name }}</div>
                             @if (product.is_global) {
                               <span class="badge badge-xs badge-info text-white font-bold">
-                                <i class="fas fa-globe text-xs mr-1"></i>Global
+                                <i class="fas fa-globe text-xs mr-1"></i>{{ t().products.table.global }}
                               </span>
                             } @else {
                               <span class="badge badge-xs badge-outline text-gray-500 font-bold">
-                                <i class="fas fa-store text-xs mr-1"></i>Local
+                                <i class="fas fa-store text-xs mr-1"></i>{{ t().products.table.local }}
                               </span>
                             }
                           </div>
@@ -208,8 +208,8 @@
                         <span class="text-xs text-gray-500">
                           @if(product.brand_id) {
                             <!-- Ideally fetch brand name map, keeping simple for now -->
-                            Marca ID: {{ product.brand_id | slice:0:5 }}...
-                          } @else { Generic }
+                            {{ t().products.table.brandId }} {{ product.brand_id | slice:0:5 }}...
+                          } @else { {{ t().products.table.generic }} }
                           </span>
                         </div>
                       </td>
@@ -249,7 +249,7 @@
                                 style="--size:2rem;">
                                 {{ product.stock || 0 }}
                               </div>
-                              @if(product.stock === 0) { <span class="badge badge-error badge-xs">Agotado</span> }
+                              @if(product.stock === 0) { <span class="badge badge-error badge-xs">{{ t().products.table.outOfStock }}</span> }
                               <i class="fas fa-edit text-xs text-gray-400"></i>
                             </div>
                           }
@@ -258,7 +258,7 @@
                       <td>
                         <div class="badge badge-sm gap-2" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
                           <div class="w-2 h-2 rounded-full" [class.bg-white]="product.is_active" [class.bg-gray-500]="!product.is_active"></div>
-                          {{ product.is_active ? 'Activo' : 'Borrador' }}
+                          {{ product.is_active ? t().products.table.active : t().products.table.draft }}
                         </div>
                       </td>
                       <td class="text-right" (click)="$event.stopPropagation()">
@@ -305,7 +305,7 @@
                           <div class="flex justify-between items-start">
                             <h3 class="font-bold text-gray-900 dark:text-white truncate pr-2">{{ product.name }}</h3>
                             <div class="badge badge-xs" [class.badge-success]="product.is_active" [class.badge-ghost]="!product.is_active">
-                              {{ product.is_active ? 'ON' : 'OFF' }}
+                              {{ product.is_active ? t().products.table.active : t().products.table.draft }}
                             </div>
                           </div>
 
@@ -313,11 +313,11 @@
 
                           <div class="flex justify-between items-end mt-2">
                             <div>
-                              <span class="block text-xs text-gray-400">Precio</span>
+                              <span class="block text-xs text-gray-400">{{ t().products.table.price }}</span>
                               <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">{{ product.price | currency: product.currency || 'ARS' }}</span>
                             </div>
                             <div class="text-right">
-                              <span class="block text-xs text-gray-400">Stock</span>
+                              <span class="block text-xs text-gray-400">{{ t().products.table.stock }}</span>
                               <span class="font-mono font-bold" [class.text-error]="product.stock === 0">{{ product.stock || 0 }}</span>
                             </div>
                           </div>
@@ -326,7 +326,7 @@
                       <!-- Card Actions -->
                       <div class="card-actions border-t border-gray-100 dark:border-gray-700 p-2 flex justify-end bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
                         <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost w-full">
-                          Editar Detalle <i class="fas fa-arrow-right ml-2 opacity-50"></i>
+                          {{ t().products.mobile.editDetails }} <i class="fas fa-arrow-right ml-2 opacity-50"></i>
                         </a>
                       </div>
                     </div>
@@ -337,7 +337,7 @@
                 @if (paginatedProducts().length === 0) {
                   <div class="flex flex-col items-center justify-center py-20 text-center opacity-50">
                     <i class="fas fa-box-open text-6xl mb-4 text-gray-300"></i>
-                    <p class="text-xl">No se encontraron productos.</p>
+                    <p class="text-xl">{{ t().products.mobile.noProducts }}</p>
                   </div>
                 }
 
@@ -422,5 +422,7 @@
                 </div>
               </div>
             }
+
+
 
 

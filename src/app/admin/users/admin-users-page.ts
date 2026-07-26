@@ -14,6 +14,7 @@ import { Supplier } from '@app/features/customers/domain/entities/supplier.entit
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 import { NotificationService } from '@app/core/services/notification.service';
+import { TranslationService } from '@app/core/services/translation.service';
 
 export type PeopleTab = 'clients' | 'users' | 'staff' | 'suppliers';
 
@@ -46,6 +47,8 @@ export class AdminUsersPage implements OnInit {
     private employeeService = inject(EmployeeService);
     private supplierService = inject(SupplierService);
     private customerService = inject(CustomerService);
+    private translationService = inject(TranslationService);
+    t = this.translationService.t;
 
     // --- Tab State ---
     activeTab = signal<PeopleTab>('clients');

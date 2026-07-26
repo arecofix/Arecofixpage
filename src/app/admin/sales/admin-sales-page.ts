@@ -14,6 +14,7 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { Order, OrderItem } from '@app/features/orders/domain/entities/order.entity';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 
+import { TranslationService } from '@app/core/services/translation.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
@@ -38,6 +39,7 @@ export class AdminSalesPage implements OnInit {
     private checkoutUseCase = inject(CheckoutUseCase);
     public tenantService = inject(TenantService);
     private notificationService = inject(NotificationService);
+    public t = inject(TranslationService).t;
 
     private branchContextService = inject(BranchContextService);
 
@@ -228,3 +230,4 @@ export class AdminSalesPage implements OnInit {
         }
     }
 }
+
