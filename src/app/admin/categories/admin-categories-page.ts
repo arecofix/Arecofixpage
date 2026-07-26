@@ -1,37 +1,63 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
 import { Category } from '@app/features/products/domain/entities/category.entity';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
+import { Pagination } from '@app/shared/components/pagination/pagination';
 
 @Component({
     selector: 'app-admin-categories-page',
     standalone: true,
-    imports: [RouterLink],
+    imports: [RouterLink, Pagination],
     templateUrl: './admin-categories-page.html',
 })
 export class AdminCategoriesPage implements OnInit {
     private categoryRepo = inject(CategoryRepository);
+    private route = inject(ActivatedRoute);
+
     categories = signal<Category[]>([]);
     loading = signal(true);
+    
+    currentPage = signal(1);
+    itemsPerPage = signal(24);
+    totalItems = signal(0);
+    totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())));
+
+    private querySub?: Subscription;
 
     async ngOnInit() {
-        await this.loadCategories();
+        this.querySub = this.route.queryParams.subscribe(params => {
+            const page = parseInt(params['_page']) || 1;
+            if (this.currentPage() !== page || this.categories().length === 0) {
+                this.currentPage.set(page);
+                this.loadCategories();
+            }
+        });
+    }
+
+    ngOnDestroy() {
+        this.querySub?.unsubscribe();
     }
 
     async loadCategories() {
         this.loading.set(true);
         try {
-            const data = await firstValueFrom(this.categoryRepo.getAll({ column: 'created_at', ascending: false }));
-            if (data) {
-                this.categories.set(data);
+            const res = await firstValueFrom(this.categoryRepo.getPaginated(this.currentPage(), this.itemsPerPage(), { column: 'created_at', ascending: false }));
+            if (res) {
+                this.categories.set(res.data);
+                this.totalItems.set(res.total);
             }
         } catch (error) {
             console.error('Error loading categories:', error);
         } finally {
             this.loading.set(false);
         }
+    }
+
+    changePage(page: number) {
+        this.currentPage.set(page);
+        this.loadCategories();
     }
 
     async toggleStatus(category: any) {

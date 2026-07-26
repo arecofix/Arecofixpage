@@ -2,17 +2,18 @@ import { Component, inject, OnInit, signal, computed, effect, untracked, HostLis
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Params } from '@angular/router';
 
-import { OrderService } from '@app/features/orders/application/services/order.service';
-import { InvoiceService } from '@app/features/sales/application/invoice.service';
+import { CheckoutUseCase } from '@app/features/sales/application/usecases/checkout.usecase';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
+import { AdminProductService } from '@app/admin/products/services/admin-product.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import { Order, OrderItem } from '@app/features/orders/domain/entities/order.entity';
 import { Pagination } from '@app/shared/components/pagination/pagination';
-import { FinanceService } from '@app/features/finance/application/services/finance.service';
+
 import { TenantService } from '@app/core/services/tenant.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
@@ -33,10 +34,8 @@ interface CartItem extends Product {
 export class AdminSalesPage implements OnInit {
     private router = inject(Router);
     private logger = inject(LoggerService);
-    private productRepository = inject(ProductRepository);
-    private orderService = inject(OrderService);
-    private invoiceService = inject(InvoiceService);
-    private financeService = inject(FinanceService);
+    private productService = inject(AdminProductService);
+    private checkoutUseCase = inject(CheckoutUseCase);
     public tenantService = inject(TenantService);
     private notificationService = inject(NotificationService);
 
@@ -49,7 +48,9 @@ export class AdminSalesPage implements OnInit {
     cart = signal<CartItem[]>([]);
     
     // UI State Signals
-    searchQuery = signal('');
+    searchQuery = signal(''); // Backend query
+    searchInputText = signal(''); // UI input
+    searchSubject = new Subject<string>();
     loading = signal(false);
     processing = signal(false);
     isCartOpenMobile = signal(false); // For mobile responsiveness
@@ -60,25 +61,18 @@ export class AdminSalesPage implements OnInit {
     // Pagination Signals
     currentPage = signal(1);
     itemsPerPage = signal(24);
+    totalItems = signal(0);
+    totalPages = signal(1);
 
     // Computed: Filtered Products
     filteredProducts = computed(() => {
-        const query = this.searchQuery().toLowerCase();
-        return this.products().filter(p =>
-            p.name.toLowerCase().includes(query) ||
-            p.sku?.toLowerCase().includes(query) ||
-            p.barcode?.toLowerCase().includes(query)
-        );
+        return this.products();
     });
 
-    // ... (paginatedProducts, totalPages remain same)
     paginatedProducts = computed(() => {
-        const all = this.filteredProducts();
-        const start = (this.currentPage() - 1) * this.itemsPerPage();
-        return all.slice(start, start + this.itemsPerPage());
+        // Since backend already paginates, we just return the current array
+        return this.products();
     });
-
-    totalPages = computed(() => Math.ceil(this.filteredProducts().length / this.itemsPerPage()));
 
     cartSubtotal = computed(() => {
         const rate = this.tenantService.currentTenant()?.usd_rate || 1;
@@ -91,17 +85,23 @@ export class AdminSalesPage implements OnInit {
     cartCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
 
     constructor() {
-        // Reset pagination on search
-        effect(() => {
-            const query = this.searchQuery();
-            untracked(() => {
-                // Remove page from URL so it defaults to 1 cleanly
-                this.router.navigate([], {
-                    relativeTo: this.route,
-                    queryParams: { _page: null },
-                    queryParamsHandling: 'merge'
-                });
+        // Setup search debounce for server-side search
+        this.searchSubject.pipe(
+            debounceTime(300),
+            distinctUntilChanged()
+        ).subscribe(query => {
+            this.searchQuery.set(query);
+            this.searchInputText.set(query); // Sync UI
+            this.currentPage.set(1);
+            
+            // Remove page from URL so it defaults to 1 cleanly
+            this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: { _page: null },
+                queryParamsHandling: 'merge'
             });
+            
+            this.loadProducts();
         });
 
         // RE-LOAD products on branch change!
@@ -130,22 +130,27 @@ export class AdminSalesPage implements OnInit {
 
     async loadProducts() {
         this.loading.set(true);
-        const branch_id = this.branchContextService.getBranchId() || undefined;
+        const q = this.searchQuery();
 
-        // Properly typing the query without any
-        this.productRepository.findWithFilters({ 
-            branch_id, 
-            is_paginated: false 
-        }).subscribe({
-            next: (res: any) => {
-                this.products.set(res.data || []);
-                this.loading.set(false);
-            },
-            error: (err) => {
-                this.logger.error('Error loading products', err);
-                this.loading.set(false);
-            }
-        });
+        try {
+            const res = await this.productService.getProductsPaginated({
+                q,
+                _page: this.currentPage(),
+                _per_page: this.itemsPerPage(),
+                include_inactive: false
+            });
+            this.products.set((res.data || []) as unknown as Product[]);
+            this.totalItems.set(res.items || 0);
+            this.totalPages.set(res.pages || 1);
+        } catch (err) {
+            this.logger.error('Error loading products', err);
+        } finally {
+            this.loading.set(false);
+        }
+    }
+
+    onSearchChange(query: string) {
+        this.searchSubject.next(query);
     }
 
     addToCart(product: Product) {
@@ -201,71 +206,16 @@ export class AdminSalesPage implements OnInit {
         this.processing.set(true);
 
         try {
-            const branch_id = this.branchContextService.getBranchId() || undefined;
-
-            // 1. Create Order
-            const order: Order = {
-                customer_name: this.customerName() || 'Consumidor Final',
-                customer_email: undefined,
-                status: 'completed',
-                subtotal: this.cartSubtotal(),
-                tax: 0,
+            await this.checkoutUseCase.execute({
+                cartItems: this.cart(),
+                customerName: this.customerName(),
                 discount: this.discount(),
-                total: this.finalTotal(),
-                branch_id: branch_id, // CRITICAL: Assign the branch!
-                payment_method: this.paymentMethod()
-            };
-
-            const rate = this.tenantService.currentTenant()?.usd_rate || 1;
-            const items: OrderItem[] = this.cart().map(item => {
-                const finalUnitPrice = item.currency === 'USD' ? (item.price * rate) : item.price;
-                return {
-                    product_id: item.id,
-                    product_name: item.name,
-                    unit_price: finalUnitPrice,
-                    unit_cost_at_time: item.unit_cost_at_time || 0,
-                    quantity: item.quantity,
-                    subtotal: finalUnitPrice * item.quantity
-                };
+                paymentMethod: this.paymentMethod(),
+                cartSubtotal: this.cartSubtotal(),
+                finalTotal: this.finalTotal()
             });
 
-            order.items = items;
-
-            const createdOrder = await firstValueFrom(this.orderService.createOrder(order));
-            if (!createdOrder) throw new Error('Order creation failed');
-
-            // 2. Generate Invoice
-            const invoiceResult = await this.invoiceService.generateInvoice({
-                order_id:      createdOrder.id,
-                customer_name: this.customerName() || 'Consumidor Final',
-                type:          'B',
-                origin:        'sale',
-                subtotal:      this.cartSubtotal(),
-                tax_amount:    0,
-                discount:      this.discount(),
-                total_amount:  this.finalTotal(),
-            });
-
-            if (invoiceResult.error) {
-                this.logger.error('Invoice creation failed after sale', invoiceResult.error);
-                this.notificationService.showWarning('La venta fue exitosa pero hubo un problema al generar el comprobante.');
-            } else {
-                this.notificationService.showSuccess('✅ Venta procesada correctamente.');
-            }
-
-            // 4. Record Cash Movement
-            if (this.paymentMethod() === 'efectivo' && createdOrder?.id) {
-                await this.financeService.recordMovement({
-                    amount: this.finalTotal(),
-                    type: 'income',
-                    category: 'sale',
-                    payment_method: 'cash',
-                    reference_id: createdOrder.id,
-                    notes: `Venta POS - Ticket #${createdOrder.id.substring(0,8)}`,
-                    branch_id: branch_id // Also attribute movement to branch
-                });
-            }
-
+            this.notificationService.showSuccess('Venta procesada con éxito');
             this.clearCart();
             this.router.navigate(['/admin/sales/invoices']);
 

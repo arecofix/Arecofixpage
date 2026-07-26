@@ -42,4 +42,28 @@ export class SupabaseEmployeeRepository extends BaseRepository<UserProfile> {
         })
     );
   }
+
+  getPaginatedEmployees(page: number, limit: number): Observable<{ data: UserProfile[], total: number }> {
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    let query = this.supabase
+        .from(this.tableName)
+        .select('*', { count: 'exact' })
+        .in('role', ['admin', 'staff'])
+        .order('created_at', { ascending: false })
+        .range(start, end);
+
+    query = this.applyTenantFilter(query);
+
+    return from(query).pipe(
+        map(({ data, count, error }) => {
+            if (error) {
+                this.logger.error(`Error fetching paginated employees`, error);
+                throw new DatabaseError(error.message, error);
+            }
+            return { data: (data as UserProfile[]) || [], total: count || 0 };
+        })
+    );
+  }
 }

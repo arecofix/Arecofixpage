@@ -12,8 +12,8 @@ describe('globalErrorInterceptor (QA Network Protection)', () => {
   let mockLogger: any;
 
   beforeEach(() => {
-    mockNotification = { showError: jasmine.createSpy('showError') };
-    mockLogger = { error: jasmine.createSpy('error') };
+    mockNotification = { showError: jest.fn() };
+    mockLogger = { error: jest.fn() };
 
     TestBed.configureTestingModule({
       providers: [

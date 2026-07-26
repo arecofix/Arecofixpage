@@ -1,8 +1,8 @@
-
 import { Observable } from 'rxjs';
 import { Brand } from '../entities/brand.entity';
 
 export abstract class BrandRepository {
+    abstract getPaginated(page: number, limit: number, options?: { column?: string; ascending?: boolean; select?: string }): Observable<{ data: Brand[]; total: number }>;
     abstract getAll(orderBy?: { column: string; ascending?: boolean }): Observable<Brand[]>;
     abstract getById(id: string): Observable<Brand | null>;
     abstract create(brand: Partial<Brand>): Observable<Brand>;

@@ -139,6 +139,33 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         ));
     }
 
+    getPaginated(
+        page: number = 1,
+        limit: number = 10,
+        options?: { column?: string; ascending?: boolean; select?: string }
+    ): Observable<{ data: T[]; total: number }> {
+        const start = (page - 1) * limit;
+        const end = start + limit - 1;
+
+        let query = this.supabase.from(this.tableName).select(options?.select || '*', { count: 'exact' });
+        query = this.applyTenantFilter(query);
+
+        if (options?.column) {
+            query = query.order(options.column, { ascending: options.ascending ?? true });
+        }
+
+        query = query.range(start, end);
+
+        return from(query).pipe(
+            map(({ data, count, error }) => {
+                if (error) {
+                    this.errorHandler.handleError(error, `getPaginated ${this.tableName}`, this.suppressAuthNotifications);
+                }
+                return { data: (data || []) as unknown as T[], total: count || 0 };
+            })
+        );
+    }
+
     getById(id: string, options?: { select?: string }): Observable<T | null> {
         let query = this.supabase.from(this.tableName).select(options?.select || '*').eq('id', id);
         query = this.applyTenantFilter(query);

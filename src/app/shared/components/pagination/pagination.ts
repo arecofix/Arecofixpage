@@ -3,7 +3,10 @@ import {
   Component,
   computed,
   input,
+  output,
   linkedSignal,
+  Output,
+  EventEmitter
 } from '@angular/core';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { inject } from '@angular/core';
@@ -19,6 +22,7 @@ import { inject } from '@angular/core';
 export class Pagination {
   pages = input<number>(0);
   currentPage = input<number>(1);
+  @Output() pageChange = new EventEmitter<number>();
 
   activePage = linkedSignal(this.currentPage);
 
@@ -65,6 +69,7 @@ export class Pagination {
     if (typeof page === 'string') return;
     if (page < 1 || page > this.pages()) return;
     this.activePage.set(page);
+    this.pageChange.emit(page);
   }
 
   private router = inject(Router);
@@ -73,6 +78,8 @@ export class Pagination {
   next() {
     const nextP = this.activePage() + 1;
     if (nextP <= this.pages()) {
+        this.activePage.set(nextP);
+        this.pageChange.emit(nextP);
         this.navigateTo(nextP);
     }
   }
@@ -80,6 +87,8 @@ export class Pagination {
   prev() {
     const prevP = this.activePage() - 1;
     if (prevP >= 1) {
+        this.activePage.set(prevP);
+        this.pageChange.emit(prevP);
         this.navigateTo(prevP);
     }
   }

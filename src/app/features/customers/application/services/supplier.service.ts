@@ -13,6 +13,10 @@ export class SupplierService {
     return firstValueFrom(this.repository.getAll());
   }
 
+  async getPaginated(page: number, limit: number): Promise<{ data: Supplier[], total: number }> {
+    return firstValueFrom(this.repository.getPaginated(page, limit));
+  }
+
   async getById(id: string): Promise<Supplier | null> {
     return firstValueFrom(this.repository.getById(id));
   }

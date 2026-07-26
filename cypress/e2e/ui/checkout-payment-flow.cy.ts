@@ -30,8 +30,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     // Wait for the UI to update the shipping cost instead of waiting for a network request
     cy.contains('Ingresá tu CP').should('not.exist');
     
-    cy.get('#btn-go-payment').should('not.be.disabled');
-    cy.get('form').first().submit();
+    cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
   };
 
   it('debería procesar orden exitosa y generar ID único (QA #84-85)', () => {

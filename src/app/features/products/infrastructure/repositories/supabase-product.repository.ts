@@ -108,18 +108,23 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     if (params.q) {
       const queryStr = params.q.trim();
       if (queryStr) {
-        // Sanitizamos para evitar errores de sintaxis tsquery y mantenemos espacios
-        const safeQuery = queryStr.replace(/[^\p{L}\p{N}\s]/gu, '');
+        const safeQuery = queryStr.replace(/[^\p{L}\p{N}\s-]/gu, '');
         const words = safeQuery.split(/\s+/).filter(w => w.length > 0);
-        if (words.length > 0) {
-          const tsQuery = words.map(w => `'${w}':*`).join(' & ');
-          query = query.textSearch('search_tsv', tsQuery, { config: 'spanish' });
+        if (words.length === 1) {
+          query = query.or(`name.ilike.%${words[0]}%,description.ilike.%${words[0]}%,sku.ilike.%${words[0]}%,barcode.ilike.%${words[0]}%`);
+        } else if (words.length > 1) {
+          words.forEach(w => {
+            query = query.ilike('name', `%${w}%`);
+          });
         }
       }
     }
 
     query = query.order(params._sort || 'created_at', { ascending: params._order === 'asc' });
-    query = query.range(start, end);
+    
+    if (params.is_paginated !== false) {
+      query = query.range(start, end);
+    }
 
     return from(query as any).pipe(
       map((res: any) => {

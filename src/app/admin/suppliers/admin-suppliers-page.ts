@@ -1,18 +1,21 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Supplier } from '@app/features/customers/domain/entities/supplier.entity';
 import { SupplierService } from '@app/features/customers/application/services/supplier.service';
+import { Pagination } from '@app/shared/components/pagination/pagination';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-admin-suppliers-page',
     standalone: true,
-    imports: [RouterLink, FormsModule],
+    imports: [RouterLink, FormsModule, Pagination],
     templateUrl: './admin-suppliers-page.html',
 })
 export class AdminSuppliersPage implements OnInit {
     private supplierService = inject(SupplierService);
+    private route = inject(ActivatedRoute);
     suppliers = signal<Supplier[]>([]);
     loading = signal(true);
 
@@ -26,22 +29,44 @@ export class AdminSuppliersPage implements OnInit {
     isMessageModalOpen = signal(false);
     bulkMessage = signal<string>('Hola {nombre}, te contacto desde Arecofix. ');
 
+    currentPage = signal(1);
+    itemsPerPage = signal(24);
+    totalItems = signal(0);
+    totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())));
+
+    private querySub?: Subscription;
+
     async ngOnInit() {
-        await this.loadSuppliers();
+        this.querySub = this.route.queryParams.subscribe(params => {
+            const page = parseInt(params['_page']) || 1;
+            if (this.currentPage() !== page || this.suppliers().length === 0) {
+                this.currentPage.set(page);
+                this.loadSuppliers();
+            }
+        });
+    }
+
+    ngOnDestroy() {
+        this.querySub?.unsubscribe();
     }
 
     async loadSuppliers() {
         this.loading.set(true);
         try {
-            const data = await this.supplierService.getAll();
-            // Default order by name in service is better, but sorting here in memory for now
-            const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
+            const res = await this.supplierService.getPaginated(this.currentPage(), this.itemsPerPage());
+            const sortedData = res.data.sort((a, b) => a.name.localeCompare(b.name));
             this.suppliers.set(sortedData);
+            this.totalItems.set(res.total);
         } catch (error) {
             console.error('Error loading suppliers:', error);
         } finally {
             this.loading.set(false);
         }
+    }
+
+    changePage(page: number) {
+        this.currentPage.set(page);
+        this.loadSuppliers();
     }
 
     openTracker() {

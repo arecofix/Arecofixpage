@@ -13,6 +13,10 @@ export class AppCatalogService {
     return firstValueFrom(this.repository.getAll({ column: 'created_at', ascending: false }));
   }
 
+  async getPaginated(page: number, limit: number): Promise<{ data: AppServiceEntity[], total: number }> {
+    return firstValueFrom(this.repository.getPaginated(page, limit, { column: 'created_at', ascending: false }));
+  }
+
   async getById(id: string): Promise<AppServiceEntity | null> {
     return firstValueFrom(this.repository.getById(id));
   }

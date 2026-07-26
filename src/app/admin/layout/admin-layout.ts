@@ -55,6 +55,7 @@ export class AdminLayout implements OnInit, OnDestroy {
   // Convert observables to signals for easier template usage and type safety
   public highContrast = toSignal(this.preferencesService.highContrast$, { initialValue: false });
   public fontSize = toSignal(this.preferencesService.fontSize$, { initialValue: 16 });
+  public currentLang = toSignal(this.preferencesService.language$, { initialValue: 'es' as 'es' | 'en' });
 
   navigationItems: MenuItem[] = [];
   branches = signal<Branch[]>([]);
@@ -73,8 +74,9 @@ export class AdminLayout implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       const branch = this.branchService.currentBranch();
+      const lang = this.currentLang();
       // console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
-      this.updateBranchMenu(branch);
+      this.updateBranchMenu(branch, lang);
       this.updateBranding(branch);
     });
   }
@@ -150,8 +152,8 @@ export class AdminLayout implements OnInit, OnDestroy {
     );
   }
 
-  updateBranchMenu(branch: Branch | null) {
-    this.navigationItems = this.menuBuilder.buildMenuForBranch(branch, this.navigationItems);
+  updateBranchMenu(branch: Branch | null, lang: 'es' | 'en') {
+    this.navigationItems = this.menuBuilder.buildMenuForBranch(branch, lang, this.navigationItems);
     this.cdr.markForCheck();
   }
 

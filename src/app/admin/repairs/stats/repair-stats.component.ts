@@ -112,60 +112,67 @@ import { BranchService } from '@app/core/services/branch.service';
                 </div>
             </div>
 
-            <!-- Gráfico de Rendimiento Mensual -->
-            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 mb-8 overflow-hidden group">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <!-- Gráfico de Rendimiento Mensual (Horizontal & Siempre Visible) -->
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <h3 class="text-lg font-black text-gray-900 dark:text-white">Rendimiento Mensual</h3>
+                        <h3 class="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-indigo-500"></i> Rendimiento Mensual
+                        </h3>
                         <p class="text-xs text-gray-500">Comparativa histórica de ingresos vs. costos operativos</p>
                     </div>
-                    <div class="flex items-center gap-5">
+                    <div class="flex items-center gap-5 bg-gray-50 dark:bg-gray-900/50 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-700">
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-indigo-600"></span>
-                            <span class="text-[10px] font-black uppercase text-gray-500">Ingresos</span>
+                            <span class="w-3 h-3 rounded-full bg-indigo-600 shadow-sm shadow-indigo-500/50"></span>
+                            <span class="text-[10px] font-black uppercase text-gray-600 dark:text-gray-300 tracking-wider">Ingresos</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-                            <span class="text-[10px] font-black uppercase text-gray-500">Costos</span>
+                            <span class="w-3 h-3 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50"></span>
+                            <span class="text-[10px] font-black uppercase text-gray-600 dark:text-gray-300 tracking-wider">Costos</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chart Container with dynamic scaling -->
-                <div class="relative pt-8 pb-4">
-                    <!-- Grid Lines (Horizontal Background Axis) -->
-                    <div class="absolute inset-x-0 top-8 bottom-12 flex flex-col justify-between pointer-events-none px-2 md:px-6">
-                        <div class="border-t border-gray-300 dark:border-gray-600 w-full"></div>
-                        <div class="border-t border-gray-200 dark:border-gray-700/50 w-full"></div>
-                        <div class="border-t border-gray-200 dark:border-gray-700/50 w-full"></div>
-                        <div class="border-t border-gray-200 dark:border-gray-700/50 w-full"></div>
-                        <div class="border-t border-gray-400 dark:border-gray-500 w-full opacity-30"></div>
-                    </div>
+                <!-- Horizontal Bars Container -->
+                <div class="flex flex-col gap-6">
+                    @for(month of s.monthly_data.slice().reverse(); track month.mes) {
+                        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 group">
+                            <!-- Month Label -->
+                            <div class="w-full md:w-24 shrink-0 flex md:flex-col justify-between md:justify-center items-center md:items-start border-b md:border-b-0 border-gray-100 dark:border-gray-700 pb-2 md:pb-0">
+                                <span class="text-xs font-black uppercase tracking-widest text-gray-800 dark:text-gray-200">{{ month.label }}</span>
+                                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-900 md:mt-1">
+                                    Neto: {{ formatCompact(month.ganancia) }}
+                                </span>
+                            </div>
 
-                    <div class="relative flex items-end justify-between h-64 md:h-80 gap-2 md:gap-8 px-2 md:px-6 z-10">
-                        @for(month of s.monthly_data.slice().reverse(); track month.mes) {
-                            <div class="flex-1 flex flex-col items-center group/bar relative">
-                                <!-- Bars Container -->
-                                <div class="w-full flex items-end justify-center gap-1.5 md:gap-3 h-full pb-2">
-                                    <!-- Revenue Bar -->
-                                    <div class="w-2.5 md:w-5 bg-indigo-600 rounded-t-lg transition-all duration-500 hover:brightness-110 shadow-lg shadow-indigo-600/20" 
-                                         [style.height.%]="getPercentage(month.ingreso, maxMonthlyValue())">
-                                        <div class="opacity-0 group-hover/bar:opacity-100 absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] py-1.5 px-3 rounded-xl font-bold whitespace-nowrap z-50 shadow-xl transition-all pointer-events-none">
-                                            Ingreso: {{ formatARS(month.ingreso) }}
+                            <!-- Bars Area -->
+                            <div class="flex-1 w-full space-y-2.5">
+                                <!-- Revenue Bar -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex-1 h-6 bg-gray-50 dark:bg-gray-900 rounded-r-xl rounded-l-sm overflow-hidden flex items-center relative">
+                                        <div class="h-full bg-linear-to-r from-indigo-500 to-indigo-600 rounded-r-xl transition-all duration-1000 ease-out shadow-sm"
+                                             [style.width.%]="getPercentage(month.ingreso, maxMonthlyValue())">
                                         </div>
                                     </div>
-                                    <!-- Cost Bar -->
-                                    <div class="w-2.5 md:w-5 bg-rose-500 rounded-t-lg transition-all duration-500 hover:brightness-110 shadow-lg shadow-rose-500/20" 
-                                         [style.height.%]="getPercentage(month.costo, maxMonthlyValue())">
-                                         <div class="opacity-0 group-hover/bar:opacity-100 absolute -top-20 left-1/2 -translate-x-1/2 bg-rose-600 text-white text-[10px] py-1.5 px-3 rounded-xl font-bold whitespace-nowrap z-50 shadow-xl transition-all pointer-events-none">
-                                            Insumos: {{ formatARS(month.costo) }}
-                                        </div>
+                                    <div class="w-20 shrink-0 text-right">
+                                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">{{ formatCompact(month.ingreso) }}</span>
                                     </div>
                                 </div>
-                                <div class="mt-4 text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter">{{ month.label }}</div>
+
+                                <!-- Cost Bar -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex-1 h-4 bg-gray-50 dark:bg-gray-900 rounded-r-lg rounded-l-sm overflow-hidden flex items-center relative">
+                                        <div class="h-full bg-linear-to-r from-rose-400 to-rose-500 rounded-r-lg transition-all duration-1000 ease-out opacity-90 shadow-sm"
+                                             [style.width.%]="getPercentage(month.costo, maxMonthlyValue())">
+                                        </div>
+                                    </div>
+                                    <div class="w-20 shrink-0 text-right">
+                                        <span class="text-[10px] font-black text-rose-500 dark:text-rose-400">{{ formatCompact(month.costo) }}</span>
+                                    </div>
+                                </div>
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -287,6 +294,13 @@ export class AdminRepairStatsComponent implements OnInit {
             maximumFractionDigits: 0
         }).format(amount);
         return `ARS ${formatted}`;
+    }
+
+    formatCompact(amount: number): string {
+        if (!amount) return '$0';
+        if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
+        if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}k`;
+        return `$${amount}`;
     }
 
     getPercentage(value: number, total: number): number {
