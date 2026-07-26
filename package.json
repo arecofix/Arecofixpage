@@ -6,7 +6,7 @@
     "dev": "node -e \"require('fs').rmSync('.angular',{recursive:true,force:true})\" && ng serve --host 127.0.0.1",
     "start": "ng serve --host 127.0.0.1",
     "build": "ng build --configuration production",
-    "build:cloudflare": "ng build --configuration cloudflare",
+    "build:cloudflare": "ng build --configuration cloudflare && node -e \"const fs=require('fs'),path=require('path');function clean(d){fs.readdirSync(d).forEach(f=>{const p=path.join(d,f);const s=fs.statSync(p);if(s.isDirectory())clean(p);else if(s.size>25*1024*1024){fs.unlinkSync(p);console.log('CF: removed oversized file: '+p);}});}clean('dist/arecofix/browser');\"",
     "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
