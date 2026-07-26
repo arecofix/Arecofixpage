@@ -1,0 +1,5 @@
+# Cloudflare Pages ignora estos archivos al subir los assets.
+# Cloudflare Pages tiene un límite de 25 MiB por archivo.
+# Los videos pesados deben servirse desde un CDN externo (R2, YouTube, etc.)
+
+assets/img/repair/4.mp4
