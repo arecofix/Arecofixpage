@@ -1,4 +1,4 @@
-@import "tailwindcss";
+ï»¿@import "tailwindcss";
 @import "../public/assets/css/react-mfe.css";
 
 @plugin "daisyui" {
@@ -428,11 +428,11 @@ details > summary::-webkit-details-marker {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 30px, 0);
+    margin-top: 30px;
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    margin-top: 0;
   }
 }
 
@@ -440,22 +440,22 @@ details > summary::-webkit-details-marker {
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translate3d(0, -30px, 0);
+    margin-top: -30px;
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    margin-top: 0;
   }
 }
 
 .animate-fade-in-up {
   animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
+  
 }
 
 .animate-fade-in-down {
   animation: fadeInDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
+  
 }
 
 /* Simple Fade In */
@@ -486,7 +486,7 @@ details > summary::-webkit-details-marker {
   to {
     opacity: 1;
     max-height: 500px;
-    transform: translateY(0);
+    margin-top: 0;
   }
 }
 .animate-accordion-open {
@@ -636,10 +636,31 @@ react-mfe-app {
 }
 
 
-/* Ocultar widgets flotantes globales en páginas específicas */
+/* Ocultar widgets flotantes globales en pï¿½ginas especï¿½ficas */
 body.hide-floating-widgets react-mfe-app,
 body.hide-floating-widgets app-accessibility-sidebar > button,
 body.hide-floating-widgets .floating-whatsapp {
   display: none !important;
 }
+
+body.hide-floating-widgets app-whatsapp-button { display: none !important; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Global Chromium Font Detach Bug Fix */
+i[class*='fa-'] { position: relative; z-index: 2; }
+.btn, .w-12.h-12.flex { position: relative; z-index: 1; }
+
 

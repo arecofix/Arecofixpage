@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { TranslationService } from '@app/core/services/translation.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { LoggerService } from '@app/core/services/logger.service';
@@ -51,6 +52,7 @@ const DEFAULT_ITEM: ManualItemRow = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminInvoicesPage implements OnInit {
+  public t = inject(TranslationService).t;
   private invoiceService = inject(InvoiceService);
   private notificationService = inject(NotificationService);
   private logger = inject(LoggerService);
@@ -264,3 +266,4 @@ export class AdminInvoicesPage implements OnInit {
     0.21:  'IVA 21%',
   };
 }
+

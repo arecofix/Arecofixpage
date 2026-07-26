@@ -8,7 +8,7 @@
         <div class="bg-white/80 backdrop-blur-xl px-4 py-3 border-b border-gray-100 z-20 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3 animate-fade-in-down shrink-0 sticky top-0">
             <div>
                  <h1 class="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600 flex items-center gap-2 tracking-tight leading-none">
-                    <i class="fas fa-cash-register text-blue-500"></i> Punto de Venta
+                    <i class="fas fa-cash-register text-blue-500"></i> {{ t().sales.title || 'Punto de Venta' }}
                  </h1>
                  <p class="text-[10px] text-gray-400 font-black uppercase tracking-wider mt-1 ml-8">Facturación rápida</p>
             </div>
@@ -19,7 +19,7 @@
                    class="btn btn-sm btn-ghost border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 text-gray-500 rounded-xl gap-2 shrink-0 transition-all text-xs font-bold shadow-[0_2px_10px_rgb(0,0,0,0.02)]"
                    title="Ver historial de comprobantes emitidos">
                     <i class="fas fa-history text-xs"></i>
-                    <span class="hidden sm:inline">Historial</span>
+                    <span class="hidden sm:inline">{{ t().sales.history || 'Historial' }}</span>
                 </a>
 
                 <div class="flex-1 sm:max-w-xs md:max-w-sm relative group">
@@ -48,7 +48,7 @@
                     <div class="w-24 h-24 mb-4 rounded-3xl bg-white flex items-center justify-center border border-gray-100 shadow-xl shadow-gray-200/50">
                         <i class="fas fa-box-open text-4xl text-gray-300"></i>
                     </div>
-                    <p class="text-sm font-black uppercase tracking-widest text-gray-400">Sin resultados.</p>
+                    <p class="text-sm font-black uppercase tracking-widest text-gray-400">{{ t().sales.noResults || 'Sin resultados.' }}</p>
                  </div>
             } @else {
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
@@ -117,14 +117,14 @@
         <div class="px-5 py-4 border-b border-gray-100 bg-white flex justify-between items-center relative z-10 shrink-0 shadow-sm">
             <div>
                 <h2 class="text-sm font-black text-gray-800 tracking-widest uppercase flex items-center gap-2">
-                    <i class="fas fa-receipt text-indigo-500 text-lg"></i> Detalle de Ticket
+                    <i class="fas fa-receipt text-indigo-500 text-lg"></i> {{ t().sales.ticketDetail || 'Detalle de Ticket' }}
                 </h2>
-                <div class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">Items en carrito: <span class="text-indigo-500 font-black">{{ cartCount() }}</span></div>
+                <div class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">{{ t().sales.itemsInCart || 'Items en carrito:' }} <span class="text-indigo-500 font-black">{{ cartCount() }}</span></div>
             </div>
             
             <div class="flex items-center gap-2">
                 <button (click)="clearCart()" class="btn btn-sm btn-ghost text-rose-500 font-black hover:bg-rose-50 hover:text-rose-600 rounded-xl px-3 transition-colors" [disabled]="cart().length === 0">
-                    <i class="fas fa-trash-alt"></i> Vaciar
+                    <i class="fas fa-trash-alt"></i> {{ t().sales.emptyCartBtn || 'Vaciar' }}
                 </button>
                 <button (click)="isCartOpenMobile.set(false)" class="btn btn-circle btn-sm btn-ghost lg:hidden bg-gray-100 hover:bg-gray-200">
                     <i class="fas fa-times"></i>
@@ -191,13 +191,13 @@
             
             <div class="space-y-3 mb-5 text-gray-300">
                 <div class="flex justify-between items-center text-xs font-bold">
-                    <span class="uppercase tracking-widest text-gray-400 text-[10px]">Subtotal</span>
+                    <span class="uppercase tracking-widest text-gray-400 text-[10px]">{{ t().sales.subtotal || 'Subtotal' }}</span>
                     <span class="text-white tracking-tight">{{ cartSubtotal() | currency:'ARS':'symbol':'1.0-0' }}</span>
                 </div>
                 
                 <div class="flex justify-between items-center text-xs font-bold">
                     <span class="flex items-center gap-2 uppercase tracking-widest text-gray-400 text-[10px]">
-                        Descuento
+                        {{ t().sales.discount || 'Descuento' }}
                         <div class="relative w-20">
                             <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">$</span>
                             <input type="number" [ngModel]="discount()" (ngModelChange)="updateDiscount($event)" class="w-full bg-black/50 border border-gray-700 rounded-lg py-1 pl-5 pr-2 text-white text-xs font-black focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none placeholder-gray-600 transition-all" placeholder="0" />
@@ -210,16 +210,16 @@
                     <span class="flex items-center gap-2 uppercase tracking-widest text-gray-400 text-[10px]">Método</span>
                     <select [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" 
                             class="bg-black/50 border border-gray-700 rounded-lg py-1 px-2 text-white text-[10px] font-black focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none cursor-pointer transition-all uppercase tracking-wider">
-                        <option value="efectivo">Efectivo 💵</option>
-                        <option value="transferencia">Transfer. 🏦</option>
-                        <option value="tarjeta">Tarjeta 💳</option>
+                        <option value="{{ t().sales.cash || 'Efectivo' }}">{{ t().sales.cash || 'Efectivo' }} 💵</option>
+                        <option value="{{ t().sales.transfer || 'Transfer.' }}ncia">{{ t().sales.transfer || 'Transfer.' }} 🏦</option>
+                        <option value="{{ t().sales.card || 'Tarjeta' }}">{{ t().sales.card || 'Tarjeta' }} 💳</option>
                     </select>
                 </div>
 
                 <div class="h-px w-full bg-gray-800 border-b border-black/50 my-4"></div>
                 
                 <div class="flex justify-between items-end">
-                    <span class="text-xs font-black text-gray-500 uppercase tracking-widest">Total Venta</span>
+                    <span class="text-xs font-black text-gray-500 uppercase tracking-widest">{{ t().sales.totalSale || 'Total Venta' }}</span>
                     <div class="text-right">
                         <span class="text-3xl font-black text-white tracking-tighter flex items-baseline gap-1 drop-shadow-md">
                             <span class="text-sm text-emerald-400 font-bold">$</span>{{ finalTotal() | number:'1.0-0' }}
@@ -231,9 +231,9 @@
             <button (click)="checkout()" [disabled]="cart().length === 0 || processing()" 
                     class="btn w-full btn-lg bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white border-none rounded-2xl shadow-[0_8px_20px_rgba(16,185,129,0.25)] hover:shadow-[0_12px_30px_rgba(16,185,129,0.35)] transform hover:-translate-y-1 active:scale-[0.98] transition-all text-sm font-black group disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest min-h-14">
                 @if(processing()) {
-                    <span class="loading loading-spinner loading-md text-white opacity-80"></span> <span class="ml-2">Facturando...</span>
+                    <span class="loading loading-spinner loading-md text-white opacity-80"></span> <span class="ml-2">{{ t().sales.billing || 'Facturando...' }}</span>
                 } @else {
-                    <i class="fas fa-print mr-3 text-lg opacity-80 group-hover:scale-110 transition-transform"></i> Emitir Ticket
+                    <i class="fas fa-print mr-3 text-lg opacity-80 group-hover:scale-110 transition-transform"></i> {{ t().sales.issueTicket || 'Emitir Ticket' }}
                 }
             </button>
         </div>

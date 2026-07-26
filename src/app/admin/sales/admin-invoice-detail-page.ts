@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslationService } from '@app/core/services/translation.service';
 import { CompanyService, CompanySettings } from '@app/core/services/company.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
 import { Invoice, InvoiceItem } from '@app/features/sales/domain/entities/invoice.entity';
@@ -33,6 +34,7 @@ export class AdminInvoiceDetailPage implements OnInit {
     private route = inject(ActivatedRoute);
     private companyService = inject(CompanyService);
     private invoiceService = inject(InvoiceService);
+    public t = inject(TranslationService).t;
 
     invoice = signal<Invoice | null>(null);
     items = signal<InvoiceItem[]>([]);
@@ -92,4 +94,5 @@ export class AdminInvoiceDetailPage implements OnInit {
         }, 150);
     }
 }
+
 

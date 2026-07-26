@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto">
+﻿<div class="max-w-4xl mx-auto">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Configuración de Empresa</h1>
     </div>
@@ -23,7 +23,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
                         <label for="comp-name" class="label">
-                            <span class="label-text font-medium">Nombre de la Empresa</span>
+                            <span class="label-text font-medium">{{ t().config.form.name || 'Nombre de la Empresa' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-building text-gray-400"></i>
@@ -53,7 +53,7 @@
                     </div>
                     <div class="form-control">
                         <label for="comp-address" class="label">
-                            <span class="label-text font-medium">Dirección</span>
+                            <span class="label-text font-medium">{{ t().config.form.address || 'Dirección' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-map-marker-alt text-gray-400"></i>
@@ -66,7 +66,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
                         <label for="comp-email" class="label">
-                            <span class="label-text font-medium">Email</span>
+                            <span class="label-text font-medium">{{ t().config.form.email || 'Email' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-envelope text-gray-400"></i>
@@ -75,7 +75,7 @@
                     </div>
                     <div class="form-control">
                         <label for="comp-phone" class="label">
-                            <span class="label-text font-medium">Teléfono</span>
+                            <span class="label-text font-medium">{{ t().config.form.phone || 'Teléfono' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-phone text-gray-400"></i>
@@ -86,7 +86,7 @@
 
                 <div class="form-control">
                     <label for="comp-location" class="label">
-                        <span class="label-text font-medium">Ubicación</span>
+                        <span class="label-text font-medium">{{ t().config.form.location || 'Ubicación' }}</span>
                     </label>
                     <label class="input input-bordered flex items-center gap-2">
                         <i class="fas fa-globe text-gray-400"></i>
@@ -95,12 +95,12 @@
                     </label>
                 </div>
 
-                <div class="divider text-sm font-medium text-gray-500">Configuración Fiscal</div>
+                <div class="divider text-sm font-medium text-gray-500">{{ t().config.form.taxConfig || 'Configuración Fiscal' }}</div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Porcentaje Impuesto (%)</span>
+                            <span class="label-text font-medium">{{ t().config.form.taxPercentage || 'Porcentaje Impuesto (%)' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-percent text-gray-400"></i>
@@ -109,7 +109,7 @@
                     </div>
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Nombre del Impuesto</span>
+                            <span class="label-text font-medium">{{ t().config.form.taxName || 'Nombre del Impuesto' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-tag text-gray-400"></i>
@@ -119,7 +119,7 @@
                     </div>
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-medium">Nombre de Identificación</span>
+                            <span class="label-text font-medium">{{ t().config.form.rucName || 'Nombre de Identificación' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-fingerprint text-gray-400"></i>
@@ -128,7 +128,7 @@
                         </label>
                     </div>
                     <div class="form-control">
-                  <label class="label font-bold text-gray-700 dark:text-gray-300">Moneda Base</label>
+                  <label class="label font-bold text-gray-700 dark:text-gray-300">{{ t().config.form.currency || 'Moneda Base' }}</label>
                   <select [(ngModel)]="form().currency" name="currency" class="select select-bordered w-full">
                     <option value="ARS">ARS - Peso Argentino</option>
                     <option value="USD">USD - Dólar Estadounidense</option>
@@ -146,15 +146,15 @@
                     <input type="number" [(ngModel)]="form().usd_rate" name="usd_rate" step="0.01"
                       class="input input-bordered w-full font-bold text-indigo-600 dark:text-indigo-400 text-lg relative" placeholder="1.00" />
                   </div>
-                  <p class="text-[10px] text-gray-400 mt-1">Este valor se usará para convertir precios de productos en USD al vender en ARS o calcular reparaciones.</p>
+                  <p class="text-[10px] text-gray-400 mt-1">{{ t().config.form.usdHelp || 'Este valor se usará para convertir precios de productos en USD al vender en ARS o calcular reparaciones.' }}</p>
                 </div>
                 </div>
 
-                <div class="divider text-sm font-medium text-gray-500">Branding</div>
+                <div class="divider text-sm font-medium text-gray-500">{{ t().config.form.branding || 'Branding' }}</div>
 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">Logo de la Empresa</span>
+                        <span class="label-text font-medium">{{ t().config.form.logo || 'Logo de la Empresa' }}</span>
                     </label>
                     <input type="file" (change)="onFileChange($event)" class="file-input file-input-bordered w-full"
                         accept="image/*">
@@ -170,7 +170,7 @@
                         @if (saving()) {
                         <span class="loading loading-spinner"></span>
                         }
-                        Guardar Configuración
+                        {{ t().config.form.save || 'Guardar Configuración' }}
                     </button>
                 </div>
             </form>
@@ -180,8 +180,8 @@
     <!-- ACCOUNT SECURITY -->
     <div class="card bg-base-100 shadow-lg mt-8">
         <div class="card-body p-6">
-            <h2 class="text-xl font-bold mb-4">Seguridad de la Cuenta</h2>
-            <p class="text-gray-500 mb-6 text-sm">Actualiza la contraseña de tu cuenta de administrador o empleado. Por razones de seguridad, asegúrate de utilizar una contraseña fuerte.</p>
+            <h2 class="text-xl font-bold mb-4">{{ t().config.security || 'Seguridad de la Cuenta' }}</h2>
+            <p class="text-gray-500 mb-6 text-sm">{{ t().config.securityForm.help || 'Actualiza la contraseña de tu cuenta de administrador o empleado. Por razones de seguridad, asegúrate de utilizar una contraseña fuerte.' }}</p>
 
             @if (passwordError()) {
             <div class="alert alert-error mb-4 shadow-sm">
@@ -200,7 +200,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
                         <label for="new-password" class="label">
-                            <span class="label-text font-medium">Nueva Contraseña</span>
+                            <span class="label-text font-medium">{{ t().config.securityForm.newPassword || 'Nueva Contraseña' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-lock text-gray-400"></i>
@@ -209,7 +209,7 @@
                     </div>
                     <div class="form-control">
                         <label for="confirm-password" class="label">
-                            <span class="label-text font-medium">Confirmar Contraseña</span>
+                            <span class="label-text font-medium">{{ t().config.securityForm.confirmPassword || 'Confirmar Contraseña' }}</span>
                         </label>
                         <label class="input input-bordered flex items-center gap-2">
                             <i class="fas fa-lock text-gray-400"></i>
@@ -223,7 +223,7 @@
                         @if (updatingPassword()) {
                         <span class="loading loading-spinner"></span>
                         }
-                        Cambiar Contraseña
+                        {{ t().config.securityForm.changePassword || 'Cambiar Contraseña' }}
                     </button>
                 </div>
             </form>
@@ -234,19 +234,19 @@
     @if (canManageBranches()) {
     <div class="card bg-base-100 shadow-lg mt-8">
         <div class="card-body p-6">
-            <h2 class="text-xl font-bold mb-4">Gestión de Sucursales</h2>
-            <p class="text-gray-500 mb-6 text-sm">Administra las ubicaciones físicas de tu negocio. Estas podrán ser asignadas a reparaciones o inventario.</p>
+            <h2 class="text-xl font-bold mb-4">{{ t().config.branches || 'Gestión de Sucursales' }}</h2>
+            <p class="text-gray-500 mb-6 text-sm">{{ t().config.branchesForm.help || 'Administra las ubicaciones físicas de tu negocio. Estas podrán ser asignadas a reparaciones o inventario.' }}</p>
 
             <!-- Listado de Sucursales -->
             <div class="overflow-x-auto border rounded-xl mb-8">
                 <table class="table table-zebra w-full">
                     <thead>
                         <tr class="bg-base-200">
-                            <th>Nombre / Enlace</th>
-                            <th>Dirección / Slug</th>
-                            <th class="text-center">Recargo (%)</th>
-                            <th>Estado</th>
-                            <th class="text-right">Acciones</th>
+                            <th>{{ t().config.branchesForm.table.name || 'Nombre / Enlace' }}</th>
+                            <th>{{ t().config.branchesForm.table.address || 'Dirección / Slug' }}</th>
+                            <th class="text-center">{{ t().config.branchesForm.table.markup || 'Recargo (%)' }}</th>
+                            <th>{{ t().config.branchesForm.table.status || 'Estado' }}</th>
+                            <th class="text-right">{{ t().config.branchesForm.table.actions || 'Acciones' }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -267,14 +267,14 @@
                                     [class.badge-success]="branch.is_active" 
                                     [class.badge-ghost]="!branch.is_active"
                                     (click)="toggleBranchStatus(branch)">
-                                    {{ branch.is_active ? 'Activa' : 'Inactiva' }}
+                                    {{ branch.is_active ? (t().config.branchesForm.active || 'Activa') : (t().config.branchesForm.inactive || 'Inactiva') }}
                                 </button>
                             </td>
                             <td class="text-right">
                                 <div class="flex justify-end gap-1">
                                     <a [routerLink]="'/' + branch.slug + '/admin'" class="btn btn-primary btn-sm rounded-xl gap-2 shadow-sm font-bold" title="Administrar Panel de Sucursal">
                                         <i class="fas fa-external-link-alt text-xs"></i>
-                                        <span>Administrar</span>
+                                        <span>{{ t().config.branchesForm.manage || 'Administrar' }}</span>
                                     </a>
                                     <button class="btn btn-ghost btn-sm text-blue-500" (click)="openEditBranchModal(branch)" title="Editar">
                                         <i class="fas fa-edit"></i>
@@ -288,7 +288,7 @@
                         }
                         @if (branches().length === 0) {
                         <tr>
-                            <td colspan="4" class="text-center py-4 text-gray-500">No hay sucursales registradas.</td>
+                            <td colspan="4" class="text-center py-4 text-gray-500">{{ t().config.branchesForm.empty || 'No hay sucursales registradas.' }}</td>
                         </tr>
                         }
                     </tbody>
@@ -297,33 +297,33 @@
 
             <!-- Formulario para agregar Nueva Sucursal -->
             <div class="bg-base-200 p-6 rounded-xl border border-base-300">
-                <h3 class="font-bold text-lg mb-4"><i class="fas fa-plus-circle text-primary mr-2"></i>Agregar Nueva Sucursal</h3>
+                <h3 class="font-bold text-lg mb-4"><i class="fas fa-plus-circle text-primary mr-2"></i>{{ t().config.branchesForm.addTitle || 'Agregar Nueva Sucursal' }}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
                     <div class="form-control">
-                        <label for="branch-name" class="label"><span class="label-text">Nombre Sucursal</span></label>
+                        <label for="branch-name" class="label"><span class="label-text">{{ t().config.branchesForm.name || 'Nombre Sucursal' }}</span></label>
                         <input id="branch-name" type="text" [(ngModel)]="newBranch().name" name="branch_name" autocomplete="off" class="input input-bordered w-full" placeholder="Ej: Zona Centro" />
                     </div>
                     <div class="form-control">
-                        <label for="branch-slug" class="label"><span class="label-text">Slug (URL)</span></label>
+                        <label for="branch-slug" class="label"><span class="label-text">{{ t().config.branchesForm.slug || 'Slug (URL)' }}</span></label>
                         <input id="branch-slug" type="text" [(ngModel)]="newBranch().slug" name="branch_slug" autocomplete="off" class="input input-bordered w-full font-mono text-xs" placeholder="zona-centro" />
                     </div>
                     <div class="form-control">
-                        <label for="branch-markup" class="label"><span class="label-text">Recargo Global (%)</span></label>
+                        <label for="branch-markup" class="label"><span class="label-text">{{ t().config.branchesForm.markup || 'Recargo Global (%)' }}</span></label>
                         <input id="branch-markup" type="number" [(ngModel)]="newBranch().global_markup_percentage" name="branch_markup" autocomplete="off" class="input input-bordered w-full" placeholder="0" />
                     </div>
                     <div class="form-control">
-                        <label for="branch-address" class="label"><span class="label-text">Dirección (Opcional)</span></label>
+                        <label for="branch-address" class="label"><span class="label-text">{{ t().config.branchesForm.address || 'Dirección (Opcional)' }}</span></label>
                         <input id="branch-address" type="text" [(ngModel)]="newBranch().address" name="branch_address" autocomplete="off" class="input input-bordered w-full" placeholder="Ej: San Martin 123" />
                     </div>
                 </div>
                 <div class="mt-4 flex items-center justify-between">
                     <label class="cursor-pointer label flex gap-2">
                         <input type="checkbox" [(ngModel)]="newBranch().is_active" class="checkbox checkbox-primary" />
-                        <span class="label-text">Sucursal Activa</span>
+                        <span class="label-text">{{ t().config.branchesForm.isActive || 'Sucursal Activa' }}</span>
                     </label>
                     <button class="btn btn-primary" (click)="addBranch()" [disabled]="savingBranch() || !newBranch().name">
                         @if(savingBranch()) { <span class="loading loading-spinner"></span> }
-                        Agregar Sucursal
+                        {{ t().config.branchesForm.addBtn || 'Agregar Sucursal' }}
                     </button>
                 </div>
             </div>
@@ -338,7 +338,7 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm animate-fade-in px-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up border border-gray-100 dark:border-gray-700">
         <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-            <h3 class="font-bold text-xl">Editar Sucursal</h3>
+            <h3 class="font-bold text-xl">{{ t().config.branchesForm.editTitle || 'Editar Sucursal' }}</h3>
             <button class="btn btn-sm btn-circle btn-ghost" (click)="editingBranch.set(null)">✕</button>
         </div>
         <div class="p-6 space-y-4">
@@ -351,20 +351,20 @@
                 <input type="text" [(ngModel)]="tempBranch.slug" name="edit_slug" class="input input-bordered w-full font-mono" />
             </div>
             <div class="form-control">
-                <label class="label"><span class="label-text font-bold">Recargo Global (%)</span></label>
+                <label class="label"><span class="label-text font-bold">{{ t().config.branchesForm.markup || 'Recargo Global (%)' }}</span></label>
                 <input type="number" [(ngModel)]="tempBranch.global_markup_percentage" name="edit_markup" class="input input-bordered w-full" />
-                <p class="text-[10px] text-gray-500 mt-1">Este porcentaje se sumará al precio de costo de los productos en esta sucursal.</p>
+                <p class="text-[10px] text-gray-500 mt-1">{{ t().config.branchesForm.markupHelp || 'Este porcentaje se sumará al precio de costo de los productos en esta sucursal.' }}</p>
             </div>
             <div class="form-control">
-                <label class="label"><span class="label-text font-bold">Dirección</span></label>
+                <label class="label"><span class="label-text font-bold">{{ t().config.form.address || 'Dirección' }}</span></label>
                 <input type="text" [(ngModel)]="tempBranch.address" name="edit_address" class="input input-bordered w-full" />
             </div>
         </div>
         <div class="bg-gray-50 dark:bg-gray-900/50 p-6 flex justify-end gap-3">
-            <button class="btn btn-ghost" (click)="editingBranch.set(null)">Cancelar</button>
+            <button class="btn btn-ghost" (click)="editingBranch.set(null)">{{ t().config.branchesForm.cancel || 'Cancelar' }}</button>
             <button class="btn btn-primary px-8" (click)="updateBranch()" [disabled]="savingBranch()">
                 @if(savingBranch()) { <span class="loading loading-spinner"></span> }
-                Guardar Cambios
+                {{ t().config.branchesForm.saveChanges || 'Guardar Cambios' }}
             </button>
         </div>
     </div>

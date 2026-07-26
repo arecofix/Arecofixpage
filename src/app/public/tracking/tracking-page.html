@@ -14,7 +14,7 @@
             </div>
             } @else if (isLookupMode()) {
             <div class="p-8 sm:p-10 text-center animate-fade-in">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-6" aria-hidden="true">
                     <i class="fas fa-search text-2xl"></i>
                 </div>
                 <h2 class="text-2xl font-black text-neutral-800 dark:text-neutral-100 mb-2">Seguimiento de Reparación</h2>
@@ -23,7 +23,7 @@
                 </p>
                 <form (submit)="onSearchCode($event)" class="space-y-4 max-w-md mx-auto">
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400" aria-hidden="true">
                             <i class="fas fa-barcode text-lg"></i>
                         </span>
                         <input 
@@ -31,31 +31,33 @@
                             [ngModel]="searchCodeInput()"
                             (ngModelChange)="searchCodeInput.set($event)"
                             [ngModelOptions]="{standalone: true}"
-                            placeholder="Ej: AF-123" 
-                            class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 focus:border-primary focus:bg-white dark:bg-neutral-800 focus:ring-4 focus:ring-primary/10 rounded-2xl text-base font-bold text-neutral-800 dark:text-neutral-100 placeholder-neutral-300 outline-none transition-all duration-300 min-h-[48px]"
+                            placeholder="Ej: AF-123"
+                            aria-label="Código de seguimiento"
+                            class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 focus:border-primary focus:bg-white dark:focus:bg-neutral-800 focus:ring-4 focus:ring-primary/10 rounded-2xl text-base font-bold text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 outline-none transition-all duration-300 min-h-[48px]"
                         />
                     </div>
                     <button 
                         type="submit" 
                         [disabled]="!searchCodeInput().trim()"
-                        class="w-full btn btn-primary py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] transition-all duration-300 min-h-[48px]"
+                        aria-label="Consultar el estado de reparación"
+                        class="w-full btn btn-primary py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 dark:shadow-none active:scale-[0.98] transition-all duration-300 min-h-[48px]"
                     >
-                        Consultar Estado <i class="fas fa-chevron-right ml-2 text-xs"></i>
+                        Consultar Estado <i class="fas fa-chevron-right ml-2 text-xs" aria-hidden="true"></i>
                     </button>
                 </form>
             </div>
             } @else if (error()) {
-            <div class="p-12 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-rose-50 text-rose-500 rounded-full mb-6">
+            <div class="p-12 text-center" aria-live="polite">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-rose-50 dark:bg-rose-900/30 text-rose-500 rounded-full mb-6" aria-hidden="true">
                     <i class="fas fa-exclamation-triangle text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-black text-neutral-800 dark:text-neutral-100 mb-2">{{ error() }}</h2>
-                <p class="text-sm text-neutral-400 mb-8 font-medium">Verificá tu código o contactanos por WhatsApp.</p>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-8 font-medium">Verificá tu código o contactanos por WhatsApp.</p>
                 <div class="flex flex-col gap-3">
-                    <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-success text-white rounded-2xl">
-                        <i class="fab fa-whatsapp text-lg"></i> Soporte Directo
+                    <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" aria-label="Contactar soporte directo por WhatsApp" class="btn btn-success text-white rounded-2xl">
+                        <i class="fab fa-whatsapp text-lg" aria-hidden="true"></i> Soporte Directo
                     </a>
-                    <a routerLink="/" class="btn btn-ghost btn-sm text-neutral-400">Volver al inicio</a>
+                    <a routerLink="/" class="btn btn-ghost btn-sm text-neutral-500 dark:text-neutral-400" aria-label="Volver a la página principal">Volver al inicio</a>
                 </div>
             </div>
             } @else if (repair(); as r) {
@@ -100,7 +102,7 @@
 
                 <!-- Progress Steps (only for non-cancelled) -->
                 @if (r.current_status_id !== 7) {
-                <div class="relative" id="tracking-progress-steps">
+                <div class="relative" id="tracking-progress-steps" role="status" aria-label="Progreso de la reparación">
                     <!-- Step labels row -->
                     <div class="flex justify-between items-start gap-1 mb-2">
                         @for (step of trackingSteps; track step.id) {
@@ -138,11 +140,11 @@
                 <div class="grid grid-cols-1 gap-6">
                     <div class="bg-neutral-50 dark:bg-neutral-900 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-700" id="tracking-device-info">
                         <div class="flex items-center gap-4 mb-4">
-                            <div class="w-10 h-10 bg-white dark:bg-neutral-800 rounded-xl flex items-center justify-center shadow-sm text-primary">
+                            <div class="w-10 h-10 bg-white dark:bg-neutral-800 rounded-xl flex items-center justify-center shadow-sm text-primary border border-neutral-100 dark:border-neutral-700" aria-hidden="true">
                                 <i class="fas fa-microchip"></i>
                             </div>
                             <div>
-                                <h4 class="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none mb-1">Equipo en Taller</h4>
+                                <h4 class="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-widest leading-none mb-1">Equipo en Taller</h4>
                                 <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100">{{ r.device_model }}</p>
                             </div>
                         </div>
@@ -204,11 +206,11 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white dark:bg-neutral-800/10 border-none text-white hover:bg-white dark:bg-neutral-800/20 text-[10px] font-black uppercase" id="btn-imprimir-talon">
-                                <i class="fas fa-download mr-1"></i> Descargar Talón
+                            <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white text-neutral-800 hover:bg-neutral-100 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600 border-none text-[10px] font-black uppercase" id="btn-imprimir-talon" aria-label="Descargar talón de la reparación">
+                                <i class="fas fa-download mr-1" aria-hidden="true"></i> Descargar Talón
                             </button>
-                            <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase" id="btn-chat-whatsapp">
-                                <i class="fab fa-whatsapp"></i> Chat
+                            <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase" id="btn-chat-whatsapp" aria-label="Abrir chat de WhatsApp">
+                                <span><i class="fab fa-whatsapp" aria-hidden="true"></i></span> Chat
                             </a>
                         </div>
                     </div>
@@ -235,7 +237,7 @@
                 
                 <!-- Smart Cross-Selling / Recommended Accessories -->
                 @if (recommendedAccessories().length > 0) {
-                <div class="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-700 animate-fade-in-up" style="animation-delay: 300ms;">
+                <div class="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-700 " style="animation-delay: 300ms;">
                     <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest leading-none mb-6 flex items-center gap-2 px-2">
                         <i class="fas fa-magic"></i> Sugerencias para {{ r.device_model }}
                     </h4>
@@ -246,7 +248,7 @@
                                     <div class="aspect-square w-full rounded-2xl bg-white dark:bg-neutral-800 mb-3 overflow-hidden relative border border-neutral-50 shadow-[inset_0_0_10px_rgba(0,0,0,0.02)] flex items-center justify-center p-2">
                                         <img [src]="prod.image_url || 'assets/img/misc/placeholder.jpg'" [alt]="prod.name" loading="lazy" decoding="async" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
                                     </div>
-                                    <h5 class="text-xs font-bold text-gray-800 leading-tight mb-2 line-clamp-2 h-8" [title]="prod.name">{{ prod.name }}</h5>
+                                    <h5 class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight mb-2 line-clamp-2 h-8" [title]="prod.name">{{ prod.name }}</h5>
                                     <div class="flex items-center gap-2 mb-4">
                                         <span class="text-sm font-black text-indigo-600">{{ prod.price | currency:'ARS':'symbol':'1.0-0' }}</span>
                                         @if (prod.price < prod.original_price) {
@@ -257,11 +259,12 @@
                                 
                                 <button (click)="buyAccessory(prod)" 
                                         [disabled]="buyingAccessory() === prod.id"
-                                        class="btn w-full bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-xl text-xs font-bold border-none transition-all active:scale-95 disabled:opacity-50 h-10 min-h-0">
+                                        aria-label="Agregar accesorio al total"
+                                        class="btn w-full bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 hover:text-white dark:hover:text-white rounded-xl text-xs font-bold border-none transition-all active:scale-95 disabled:opacity-50 h-10 min-h-0">
                                     @if(buyingAccessory() === prod.id) {
-                                        <span class="loading loading-spinner loading-xs"></span>
+                                        <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
                                     } @else {
-                                        <i class="fas fa-cart-plus mr-1"></i> Sumar
+                                        <i class="fas fa-cart-plus mr-1" aria-hidden="true"></i> Sumar
                                     }
                                 </button>
                             </div>
@@ -281,7 +284,7 @@
         <!-- Upsell Modal -->
         @if (showUpsellModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in no-print">
-            <div class="bg-white dark:bg-neutral-800 rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full animate-fade-in-up border border-indigo-100 relative">
+            <div class="bg-white dark:bg-neutral-800 rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full  border border-indigo-100 relative">
                 <button (click)="dismissUpsell()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors z-10">
                     <i class="fas fa-times"></i>
                 </button>
@@ -308,5 +311,7 @@
         }
     </div>
 </div>
+
+
 
 
