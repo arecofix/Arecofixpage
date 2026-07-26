@@ -37,11 +37,13 @@ export class PublicLayout implements OnInit, OnDestroy {
   private subscription = new Subscription();
 
   public isPortfolioRoute = signal(false);
+  public isTrackingRoute = signal(false);
 
   constructor(public preferencesService: PreferencesService) {}
 
   ngOnInit(): void {
     this.isPortfolioRoute.set(this.router.url.includes('/portfolio'));
+    this.isTrackingRoute.set(this.router.url.includes('/tracking'));
 
     // Cerrar sidebar de accesibilidad automáticamente al navegar
     this.subscription.add(
@@ -52,6 +54,9 @@ export class PublicLayout implements OnInit, OnDestroy {
           if (event.urlAfterRedirects) {
             this.isPortfolioRoute.set(
               event.urlAfterRedirects.includes('/portfolio'),
+            );
+            this.isTrackingRoute.set(
+              event.urlAfterRedirects.includes('/tracking')
             );
           }
         }),

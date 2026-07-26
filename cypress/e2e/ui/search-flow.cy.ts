@@ -8,19 +8,18 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
   });
 
   it('should find products using partial words (e.g. "th" -> "thinkpad")', () => {
-    // Intercept only requests containing search_tsv
-    cy.intercept({ method: 'GET', url: /search_tsv/ }).as('getSearchProducts1');
+    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts1');
 
     cy.get('.mobile-search-input').clear().type('th', { delay: 0 });
     cy.wait('@getSearchProducts1').then((interception) => {
-      expect(interception.request.url).to.include('search_tsv');
+      expect(interception.request.url).to.match(/ilike|or=/);
     });
 
     cy.get('.mobile-search-input').should('have.value', 'th');
   });
 
   it('should ignore accents and find products (e.g. "modulo" -> "módulo")', () => {
-    cy.intercept({ method: 'GET', url: /search_tsv/ }).as('getSearchProducts2');
+    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts2');
 
     // Type without accent
     cy.get('.mobile-search-input').invoke('val', 'modulo').trigger('input');
@@ -34,16 +33,16 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
   });
 
   it('should refine the search progressively with more words (e.g. "lenovo th")', () => {
-    cy.intercept({ method: 'GET', url: /search_tsv/ }).as('getSearchProducts3');
+    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts3');
 
     cy.get('.mobile-search-input').clear().type('lenovo th', { delay: 0 });
     cy.wait('@getSearchProducts3').then((interception) => {
-      expect(interception.request.url).to.include('search_tsv');
+      expect(interception.request.url).to.match(/ilike|or=/);
     });
   });
 
   it('should handle special characters safely without breaking', () => {
-    cy.intercept({ method: 'GET', url: /search_tsv/ }).as('getSearchProducts4');
+    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts4');
 
     cy.get('.mobile-search-input').clear().type('iphone 11!@#', { delay: 0 });
     
@@ -54,7 +53,7 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
   });
 
   it('should show empty state when no products match', () => {
-    cy.intercept({ method: 'GET', url: /search_tsv/ }, {
+    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }, {
       statusCode: 200,
       body: [],
       headers: {

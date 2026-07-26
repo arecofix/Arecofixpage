@@ -1,12 +1,12 @@
-<div class="py-10 px-4 min-h-screen bg-neutral-50 no-print">
+<div class="py-10 px-4 min-h-screen bg-neutral-50 dark:bg-neutral-900 no-print">
     <div class="max-w-xl mx-auto">
         <!-- Header -->
         <div class="mb-8 text-center">
-            <h1 class="text-2xl font-black text-neutral-800 tracking-tighter uppercase mb-1">Arecofix <span class="text-primary">Tracking</span></h1>
+            <h1 class="text-2xl font-black text-neutral-800 dark:text-neutral-100 tracking-tighter uppercase mb-1">Arecofix <span class="text-primary">Tracking</span></h1>
             <p class="text-xs text-neutral-400 font-medium uppercase tracking-widest">Estado Técnico en Tiempo Real</p>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-2xl shadow-neutral-200/50 overflow-hidden border border-neutral-100">
+        <div class="bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl shadow-neutral-200/50 overflow-hidden border border-neutral-100 dark:border-neutral-700">
             @if (loading()) {
             <div class="p-12 flex flex-col items-center">
                 <span class="loading loading-ring loading-lg text-primary"></span>
@@ -17,7 +17,7 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-6">
                     <i class="fas fa-search text-2xl"></i>
                 </div>
-                <h2 class="text-2xl font-black text-neutral-800 mb-2">Seguimiento de Reparación</h2>
+                <h2 class="text-2xl font-black text-neutral-800 dark:text-neutral-100 mb-2">Seguimiento de Reparación</h2>
                 <p class="text-sm text-neutral-400 mb-8 font-medium max-w-sm mx-auto leading-relaxed">
                     Ingresá el código de seguimiento (ej: AF-123) provisto en tu talón para conocer el estado actual de tu dispositivo en tiempo real.
                 </p>
@@ -32,7 +32,7 @@
                             (ngModelChange)="searchCodeInput.set($event)"
                             [ngModelOptions]="{standalone: true}"
                             placeholder="Ej: AF-123" 
-                            class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-200 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 rounded-2xl text-base font-bold text-neutral-800 placeholder-neutral-300 outline-none transition-all duration-300 min-h-[48px]"
+                            class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 focus:border-primary focus:bg-white dark:bg-neutral-800 focus:ring-4 focus:ring-primary/10 rounded-2xl text-base font-bold text-neutral-800 dark:text-neutral-100 placeholder-neutral-300 outline-none transition-all duration-300 min-h-[48px]"
                         />
                     </div>
                     <button 
@@ -49,7 +49,7 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-rose-50 text-rose-500 rounded-full mb-6">
                     <i class="fas fa-exclamation-triangle text-2xl"></i>
                 </div>
-                <h2 class="text-xl font-black text-neutral-800 mb-2">{{ error() }}</h2>
+                <h2 class="text-xl font-black text-neutral-800 dark:text-neutral-100 mb-2">{{ error() }}</h2>
                 <p class="text-sm text-neutral-400 mb-8 font-medium">Verificá tu código o contactanos por WhatsApp.</p>
                 <div class="flex flex-col gap-3">
                     <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-success text-white rounded-2xl">
@@ -109,7 +109,7 @@
                                 [id]="'tracking-step-' + step.id"
                                 [ngClass]="r.current_status_id >= step.id
                                     ? 'border-primary bg-primary text-white scale-110 shadow-lg shadow-primary/30'
-                                    : 'bg-white border-neutral-200 text-neutral-300'">
+                                    : 'bg-white dark:bg-neutral-800 border-neutral-200 text-neutral-300'">
                                 <i [class]="step.icon"></i>
                             </div>
                             <span class="text-[9px] font-bold text-center leading-tight hidden sm:block"
@@ -120,7 +120,7 @@
                         }
                     </div>
                     <!-- Progress bar -->
-                    <div class="relative h-1 bg-neutral-100 rounded-full mx-4 mt-1">
+                    <div class="relative h-1 bg-neutral-100 dark:bg-neutral-700 rounded-full mx-4 mt-1">
                         <div class="absolute inset-y-0 left-0 bg-primary rounded-full transition-all duration-1000"
                             [style.width.%]="getProgressPercent(r.current_status_id)">
                         </div>
@@ -136,25 +136,25 @@
 
                 <!-- Device Info Grid -->
                 <div class="grid grid-cols-1 gap-6">
-                    <div class="bg-neutral-50 rounded-2xl p-5 border border-neutral-100" id="tracking-device-info">
+                    <div class="bg-neutral-50 dark:bg-neutral-900 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-700" id="tracking-device-info">
                         <div class="flex items-center gap-4 mb-4">
-                            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary">
+                            <div class="w-10 h-10 bg-white dark:bg-neutral-800 rounded-xl flex items-center justify-center shadow-sm text-primary">
                                 <i class="fas fa-microchip"></i>
                             </div>
                             <div>
                                 <h4 class="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none mb-1">Equipo en Taller</h4>
-                                <p class="text-sm font-bold text-neutral-800">{{ r.device_model }}</p>
+                                <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100">{{ r.device_model }}</p>
                             </div>
                         </div>
                         <div class="space-y-3">
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Cliente</span>
-                                <span class="text-neutral-800 font-bold uppercase truncate max-w-[180px] text-right">{{ r.customer_name || 'Particular' }}</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold uppercase truncate max-w-[180px] text-right">{{ r.customer_name || 'Particular' }}</span>
                             </div>
                             @if (r.repair_number) {
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Nro. de Orden</span>
-                                <span class="text-neutral-800 font-bold font-mono">#{{ r.repair_number }}</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold font-mono">#{{ r.repair_number }}</span>
                             </div>
                             }
                             <div class="flex justify-between text-xs">
@@ -163,23 +163,23 @@
                             </div>
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Fecha de Ingreso</span>
-                                <span class="text-neutral-800 font-bold uppercase">{{ r.received_at | date:'dd MMM yyyy' }}</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold uppercase">{{ r.received_at | date:'dd MMM yyyy' }}</span>
                             </div>
                             @if (r.imei) {
                             <div class="flex justify-between text-xs" id="tracking-imei-row">
                                 <span class="text-neutral-400 font-medium">IMEI / Serie</span>
-                                <span class="text-neutral-800 font-bold font-mono">{{ r.imei }}</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold font-mono">{{ r.imei }}</span>
                             </div>
                             }
                             @if (r.checklist && (r.checklist.charger || r.checklist.battery || r.checklist.chip || r.checklist.sd || r.checklist.case)) {
                             <div class="flex justify-between text-xs" id="tracking-checklist-row">
                                 <span class="text-neutral-400 font-medium">Accesorios Dejados</span>
-                                <span class="text-neutral-800 font-bold text-right max-w-[180px]">{{ getChecklistSummary(r.checklist) }}</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold text-right max-w-[180px]">{{ getChecklistSummary(r.checklist) }}</span>
                             </div>
                             }
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Falla Declarada</span>
-                                <span class="text-neutral-600 font-medium wrap-break-word text-right max-w-[180px]">"{{ r.issue_description }}"</span>
+                                <span class="text-neutral-600 dark:text-neutral-300 font-medium wrap-break-word text-right max-w-[180px]">"{{ r.issue_description }}"</span>
                             </div>
                         </div>
                     </div>
@@ -190,7 +190,7 @@
                              <span class="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
                              Reporte Técnico
                         </h4>
-                        <p class="text-xs font-medium text-neutral-700 leading-relaxed italic">
+                        <p class="text-xs font-medium text-neutral-700 dark:text-neutral-200 leading-relaxed italic">
                             "{{ r.technician_report }}"
                         </p>
                     </div>
@@ -204,7 +204,7 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white/10 border-none text-white hover:bg-white/20 text-[10px] font-black uppercase" id="btn-imprimir-talon">
+                            <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white dark:bg-neutral-800/10 border-none text-white hover:bg-white dark:bg-neutral-800/20 text-[10px] font-black uppercase" id="btn-imprimir-talon">
                                 <i class="fas fa-download mr-1"></i> Descargar Talón
                             </button>
                             <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase" id="btn-chat-whatsapp">
@@ -216,13 +216,13 @@
 
                 <!-- Evidence / Photos -->
                 @if (r.images && r.images.length > 0) {
-                <div class="bg-white rounded-3xl p-6 border border-neutral-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] opacity-100 transition-all duration-500 delay-200">
+                <div class="bg-white dark:bg-neutral-800 rounded-3xl p-6 border border-neutral-100 dark:border-neutral-700 shadow-[0_4px_20px_rgb(0,0,0,0.03)] opacity-100 transition-all duration-500 delay-200">
                     <h4 class="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none mb-4 flex items-center gap-2">
                          <i class="fas fa-camera text-primary"></i> Evidencia Técnica
                     </h4>
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
                         @for (img of r.images; track img) {
-                            <div class="aspect-square rounded-2xl overflow-hidden bg-neutral-100 cursor-pointer border border-neutral-100 group relative shadow-inner" (click)="openImage(img)">
+                            <div class="aspect-square rounded-2xl overflow-hidden bg-neutral-100 dark:bg-neutral-700 cursor-pointer border border-neutral-100 dark:border-neutral-700 group relative shadow-inner" (click)="openImage(img)">
                                 <img [src]="img" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Evidencia Técnica"/>
                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <i class="fas fa-expand text-white text-xl drop-shadow-lg"></i>
@@ -235,15 +235,15 @@
                 
                 <!-- Smart Cross-Selling / Recommended Accessories -->
                 @if (recommendedAccessories().length > 0) {
-                <div class="mt-8 pt-6 border-t border-neutral-100 animate-fade-in-up" style="animation-delay: 300ms;">
+                <div class="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-700 animate-fade-in-up" style="animation-delay: 300ms;">
                     <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest leading-none mb-6 flex items-center gap-2 px-2">
                         <i class="fas fa-magic"></i> Sugerencias para {{ r.device_model }}
                     </h4>
                     <div class="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbars no-print" style="scrollbar-width: none;">
                         @for (prod of recommendedAccessories(); track prod.id) {
-                            <div class="min-w-[180px] w-[180px] bg-white border border-neutral-100 shadow-sm rounded-3xl p-3 flex flex-col justify-between group shrink-0 snap-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                            <div class="min-w-[180px] w-[180px] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm rounded-3xl p-3 flex flex-col justify-between group shrink-0 snap-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                 <div>
-                                    <div class="aspect-square w-full rounded-2xl bg-white mb-3 overflow-hidden relative border border-neutral-50 shadow-[inset_0_0_10px_rgba(0,0,0,0.02)] flex items-center justify-center p-2">
+                                    <div class="aspect-square w-full rounded-2xl bg-white dark:bg-neutral-800 mb-3 overflow-hidden relative border border-neutral-50 shadow-[inset_0_0_10px_rgba(0,0,0,0.02)] flex items-center justify-center p-2">
                                         <img [src]="prod.image_url || 'assets/img/misc/placeholder.jpg'" [alt]="prod.name" loading="lazy" decoding="async" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
                                     </div>
                                     <h5 class="text-xs font-bold text-gray-800 leading-tight mb-2 line-clamp-2 h-8" [title]="prod.name">{{ prod.name }}</h5>
@@ -275,13 +275,13 @@
         </div>
         
         <div class="mt-10 text-center">
-            <p class="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.3em]">ArecoFix &copy; 2024</p>
+            <p class="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.3em]">ArecoFix &copy; {{ currentYear }}</p>
         </div>
 
         <!-- Upsell Modal -->
         @if (showUpsellModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in no-print">
-            <div class="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full animate-fade-in-up border border-indigo-100 relative">
+            <div class="bg-white dark:bg-neutral-800 rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full animate-fade-in-up border border-indigo-100 relative">
                 <button (click)="dismissUpsell()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors z-10">
                     <i class="fas fa-times"></i>
                 </button>

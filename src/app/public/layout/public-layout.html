@@ -12,5 +12,7 @@
 </div>
 
 <app-accessibility-sidebar></app-accessibility-sidebar>
-<app-whatsapp-button></app-whatsapp-button>
+@if (!isTrackingRoute()) {
+  <app-whatsapp-button></app-whatsapp-button>
+}
 <app-footer></app-footer>

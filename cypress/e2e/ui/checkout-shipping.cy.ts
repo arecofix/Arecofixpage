@@ -48,8 +48,7 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
     
     // Ahora debería dejar avanzar sin errores
-    cy.get('#btn-go-payment').should('not.be.disabled');
-    cy.get('form').first().submit();
+    cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
     cy.get('input[type="radio"][name="payment"]').should('exist');
   });
 
@@ -71,8 +70,7 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     // Verificamos que desaparezca el texto "Ingresá tu CP"
     cy.contains('Ingresá tu CP').should('not.exist');
     // Verificamos que el botón no esté disabled y permita avanzar
-    cy.get('#btn-go-payment').should('not.be.disabled');
-    cy.get('form').first().submit();
+    cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
     
     // Verificamos el avance al paso de pago
     cy.contains(/¿Cómo querés pagar?/i, { matchCase: false }).should('be.visible');

@@ -11,11 +11,11 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
 
   beforeEach(() => {
     mockSupabase = {
-      rpc: jasmine.createSpy('rpc')
+      rpc: jest.fn()
     };
 
     mockTenantService = {
-      getTenantId: jasmine.createSpy('getTenantId').and.returnValue('mock-tenant-id')
+      getTenantId: jest.fn().mockReturnValue('mock-tenant-id')
     };
 
     TestBed.configureTestingModule({
@@ -29,12 +29,12 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
     repository = TestBed.inject(SupabaseAnalyticsRepository);
     
     // Simulate current month to avoid "mes actual" mismatch in tests
-    jasmine.clock().install();
-    jasmine.clock().mockDate(new Date('2026-04-10T12:00:00Z'));
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-04-10T12:00:00Z'));
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
+    jest.useRealTimers();
   });
 
   it('should format labels, map RPC data and calculate correct totals instead of defaulting to 100% margin', async () => {
@@ -65,19 +65,31 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
       products: 10
     };
 
-    mockSupabase.rpc.and.callFake((fnName: string) => {
+    mockSupabase.rpc.mockImplementation((fnName: string) => {
       if (fnName === 'get_financial_analytics_v3') return Promise.resolve({ data: mockFinanceData, error: null });
       if (fnName === 'get_dashboard_stats_v2') return Promise.resolve({ data: mockLegacyData, error: null });
       return Promise.resolve({ data: null, error: null });
     });
 
+    const mockQueryBuilder = {
+      select: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null })),
+          in: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null }))
+        }),
+        in: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null }))
+      })
+    };
+    
+    mockSupabase.from = jest.fn().mockReturnValue(mockQueryBuilder);
+
     // Act
     const stats = await firstValueFrom(repository.getDashboardStats());
 
     // Assert Data Mapping
-    expect(stats.total_gross_revenue).withContext('Debe sumar ingresos brutos').toBe(34900);
-    expect(stats.total_cost).withContext('Debe deducir costos de insumos correctamente').toBe(15000);
-    expect(stats.total_net_profit).withContext('Debe devolver la ganancia neta real, no 100%').toBe(19900); 
+    expect(stats.total_gross_revenue).toBe(34900);
+    expect(stats.total_cost).toBe(15000);
+    expect(stats.total_net_profit).toBe(19900); 
     
     // Assert Current Month Extractions
     expect(stats.current_month_gross).toBe(34900);
@@ -91,7 +103,18 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
 
   it('should handle missing DB rows safely with $0 fallback margins', async () => {
     // Arrange: No finance data provided
-    mockSupabase.rpc.and.returnValue(Promise.resolve({ data: null, error: null }));
+    mockSupabase.rpc.mockReturnValue(Promise.resolve({ data: null, error: null }));
+
+    const mockQueryBuilder = {
+      select: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null })),
+          in: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null }))
+        }),
+        in: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null }))
+      })
+    };
+    mockSupabase.from = jest.fn().mockReturnValue(mockQueryBuilder);
 
     // Act
     const stats = await firstValueFrom(repository.getDashboardStats());

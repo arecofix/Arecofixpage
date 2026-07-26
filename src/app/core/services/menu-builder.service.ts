@@ -19,6 +19,7 @@ export class MenuBuilderService {
 
   public buildMenuForBranch(
     branch: Branch | null, 
+    lang: 'es' | 'en' = 'es',
     currentItemsState: MenuItem[] = []
   ): MenuItem[] {
     const basePrefix = branch?.slug ? `/${branch.slug}/admin` : '/admin';
@@ -37,77 +38,77 @@ export class MenuBuilderService {
     const isCentral = !branch || branch.slug === 'arecofix' || branch.id === 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
 
     const companyChildren: MenuItem[] = [
-      { title: 'Identidad de Empresa', path: `${basePrefix}/company`, icon: 'fa-id-badge' }
+      { title: lang === 'es' ? 'Identidad de Empresa' : 'Company Identity', path: `${basePrefix}/company`, icon: 'fa-id-badge' }
     ];
 
     if (isGlobalAdmin && isCentral) {
-      companyChildren.push({ title: 'Gestión Red de Sucursales', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
+      companyChildren.push({ title: lang === 'es' ? 'Gestión Red de Sucursales' : 'Branch Network Management', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
     }
 
     const baseItems: MenuItem[] = [
-      { title: 'Panel de Control', path: `${basePrefix}/dashboard`, icon: 'fa-chart-line', module: 'dashboard' },
+      { title: lang === 'es' ? 'Panel de Control' : 'Dashboard', path: `${basePrefix}/dashboard`, icon: 'fa-chart-line', module: 'dashboard' },
       { 
-        title: 'Inventario & Catálogo', 
+        title: lang === 'es' ? 'Inventario & Catálogo' : 'Inventory & Catalog', 
         path: `${basePrefix}/products`,
         icon: 'fa-cubes', 
         module: 'inventory',
         expanded: true,
         children: [
-          { title: 'Gestión de Productos', path: `${basePrefix}/products`, icon: 'fa-barcode' },
-          { title: 'Stock & Almacén', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
-          { title: 'Auditar Catálogo', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
-          { title: 'Categorías de Venta', path: `${basePrefix}/categories`, icon: 'fa-tags' },
-          { title: 'Marcas / Fabricantes', path: `${basePrefix}/brands`, icon: 'fa-copyright' },
+          { title: lang === 'es' ? 'Gestión de Productos' : 'Product Management', path: `${basePrefix}/products`, icon: 'fa-barcode' },
+          { title: lang === 'es' ? 'Stock & Almacén' : 'Stock & Warehouse', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
+          { title: lang === 'es' ? 'Auditar Catálogo' : 'Audit Catalog', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
+          { title: lang === 'es' ? 'Categorías de Venta' : 'Sales Categories', path: `${basePrefix}/categories`, icon: 'fa-tags' },
+          { title: lang === 'es' ? 'Marcas / Fabricantes' : 'Brands / Manufacturers', path: `${basePrefix}/brands`, icon: 'fa-copyright' },
         ]
       },
       { 
-        title: 'Ventas & Operaciones', 
+        title: lang === 'es' ? 'Ventas & Operaciones' : 'Sales & Operations', 
         path: `${basePrefix}/sales`,
         icon: 'fa-cash-register', 
         module: 'inventory',
         expanded: false,
         children: [
-          { title: 'Terminal de Venta', path: `${basePrefix}/sales`, icon: 'fa-plus-circle' },
-          { title: 'Pedidos & E-commerce', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart' },
-          { title: 'Historial de Facturación', path: `${basePrefix}/sales/invoices`, icon: 'fa-file-invoice-dollar' },
-          { title: 'Egresos / Compras', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag' },
+          { title: lang === 'es' ? 'Terminal de Venta' : 'Point of Sale (POS)', path: `${basePrefix}/sales`, icon: 'fa-plus-circle' },
+          { title: lang === 'es' ? 'Pedidos & E-commerce' : 'Orders & E-commerce', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart' },
+          { title: lang === 'es' ? 'Historial de Facturación' : 'Billing History', path: `${basePrefix}/sales/invoices`, icon: 'fa-file-invoice-dollar' },
+          { title: lang === 'es' ? 'Egresos / Compras' : 'Expenses / Purchases', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag' },
         ]
       },
       {
-        title: 'Gestión Financiera',
+        title: lang === 'es' ? 'Gestión Financiera' : 'Financial Management',
         icon: 'fa-chart-pie',
         expanded: false,
         children: [
-          { title: 'Dashboard Contable', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
-          { title: 'Movimientos de Caja', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' }
+          { title: lang === 'es' ? 'Dashboard Contable' : 'Accounting Dashboard', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
+          { title: lang === 'es' ? 'Movimientos de Caja' : 'Cash Movements', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' }
         ]
       },
-      { title: 'Servicio Técnico', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
-      { title: 'Gestión de Personas y Clientes', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
+      { title: lang === 'es' ? 'Servicio Técnico' : 'Technical Service', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
+      { title: lang === 'es' ? 'Gestión de Personas y Clientes' : 'People & Customer Management', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
       {
-        title: 'Configuración Empresa',
+        title: lang === 'es' ? 'Configuración Empresa' : 'Company Settings',
         icon: 'fa-building',
         expanded: false,
         children: companyChildren
       },
       { 
-        title: 'Marketing & Contenido', 
+        title: lang === 'es' ? 'Marketing & Contenido' : 'Marketing & Content', 
         icon: 'fa-bullhorn', 
         expanded: false, 
         children: [
-          { title: 'Servicios Web', path: `${basePrefix}/services`, icon: 'fa-tools' },
-          { title: 'Blog & Noticias', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
-          { title: 'Mensajes Recibidos', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
+          { title: lang === 'es' ? 'Servicios Web' : 'Web Services', path: `${basePrefix}/services`, icon: 'fa-tools' },
+          { title: lang === 'es' ? 'Blog & Noticias' : 'Blog & News', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
+          { title: lang === 'es' ? 'Mensajes Recibidos' : 'Received Messages', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
         ]
       },
       { 
-        title: 'Academia Arecofix', 
+        title: lang === 'es' ? 'Academia Arecofix' : 'Arecofix Academy', 
         icon: 'fa-graduation-cap', 
         module: 'academia',
         expanded: false,
         children: [
-          { title: 'Cursos', path: `${basePrefix}/courses`, icon: 'fa-book' },
-          { title: 'Solicitudes', path: `${basePrefix}/courses/solicitudes`, icon: 'fa-user-graduate' }
+          { title: lang === 'es' ? 'Cursos' : 'Courses', path: `${basePrefix}/courses`, icon: 'fa-book' },
+          { title: lang === 'es' ? 'Solicitudes' : 'Requests', path: `${basePrefix}/courses/solicitudes`, icon: 'fa-user-graduate' }
         ]
       },
     ];

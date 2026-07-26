@@ -17,6 +17,10 @@ export class EmployeeService {
     return firstValueFrom(this.repository.getEmployees());
   }
 
+  async getPaginated(page: number, limit: number): Promise<{ data: UserProfile[], total: number }> {
+    return firstValueFrom(this.repository.getPaginatedEmployees(page, limit));
+  }
+
   async getById(id: string): Promise<UserProfile | null> {
     return firstValueFrom(this.repository.getById(id));
   }

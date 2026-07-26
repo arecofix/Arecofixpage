@@ -113,6 +113,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     // Keep some UI-only signals
     showProductModal = signal(false);
+    activeSecurityTab = signal<'pin' | 'pattern' | 'passcode'>('pin');
 
     statusOptions = [
         { id: 1, label: 'Recibido / Pendiente', icon: 'fas fa-clipboard-list', color: 'text-amber-500' },
@@ -260,6 +261,17 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             warranty: [''],
             supplier: ['']
         });
+
+        // Automatically sync final_cost when estimated_cost changes if no parts/labor are added
+        this.repairForm.get('estimated_cost')?.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(val => {
+                const currentParts = this.parts();
+                const labor = this.repairForm.get('technical_labor_cost')?.value || 0;
+                if (currentParts.length === 0 && labor === 0) {
+                    this.repairForm.patchValue({ final_cost: val || 0 }, { emitEvent: false });
+                }
+            });
     }
 
     onSelectClient(clientName: string) {
@@ -492,6 +504,14 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
                 if (data.checklist) {
                     this.repairForm.get('checklist')?.patchValue(data.checklist);
+                }
+
+                if (data.security_pattern) {
+                    this.activeSecurityTab.set('pattern');
+                } else if (data.device_passcode) {
+                    this.activeSecurityTab.set('passcode');
+                } else {
+                    this.activeSecurityTab.set('pin');
                 }
 
                 this.parts.set(data.parts || []);

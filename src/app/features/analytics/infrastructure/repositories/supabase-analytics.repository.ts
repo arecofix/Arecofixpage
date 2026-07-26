@@ -13,6 +13,12 @@ function formatPeriodLabel(period: string): string {
   return `${capitalized.replace('.', '')} ${year}`;
 }
 
+interface ChartItem {
+  name: string;
+  count?: number;
+  quantity?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,9 +40,11 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
       }),
       this.supabase.rpc('get_dashboard_stats_v2', {
         p_branch_id: branchId || null
-      })
+      }),
+      this.fetchManualExpenses(tenantId, branchId || null),
+      this.fetchProductsAndCategoryStats(tenantId, branchId || null)
     ])).pipe(
-      map(([financeRes, legacyDashRes]: [any, any]) => {
+      map(([financeRes, legacyDashRes, manualExpenses, statsData]: [any, any, number, any]) => {
         if (financeRes.error) throw financeRes.error;
         if (legacyDashRes.error) console.error('[RPC ERROR] legacy_stats:', legacyDashRes.error);
 
@@ -56,10 +64,15 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
             safe_cm_cost = cm.repairs_cost + cm.sales_cost;
         }
 
+        // Add manual expenses (cash_movements of type expense) to costs
+        safe_cm_cost += manualExpenses;
+
         let total_cost_safe = Number(rawFinance.total_cost || 0);
         if (total_cost_safe === 0) {
             total_cost_safe = monthlyBreakdown.reduce((s, m) => s + m.repairs_cost + m.sales_cost, 0);
         }
+        
+        total_cost_safe += manualExpenses;
 
         const safe_total_net = Number(rawFinance.total_gross_revenue || 0) - total_cost_safe;
         const safe_cm_net = safe_cm_gross - safe_cm_cost;
@@ -90,12 +103,103 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
           current_month_profit: safe_cm_net,
           monthly_breakdown: monthlyBreakdown,
           sales_chart: monthlyBreakdown.map(m => ({ period: m.period, total: m.gross_revenue })),
-          products_chart: legacyData.products_chart || [],
-          category_chart: legacyData.category_chart || [],
+          products_chart: statsData.products_chart.length > 0 ? statsData.products_chart : (legacyData.products_chart || []),
+          category_chart: statsData.category_chart.length > 0 ? statsData.category_chart : (legacyData.category_chart || []),
           profit_chart: monthlyBreakdown.map(m => ({ period: m.period, total: m.net_profit }))
         } as DashboardStats;
       })
     );
+  }
+
+  private async fetchManualExpenses(tenantId: string, branchId: string | null): Promise<number> {
+    try {
+      let query = this.supabase
+        .from('cash_movements')
+        .select('amount, type')
+        .eq('tenant_id', tenantId)
+        .eq('type', 'expense');
+        
+      if (branchId) {
+        query = query.eq('branch_id', branchId);
+      }
+      
+      const { data, error } = await query;
+      if (error) return 0;
+      
+      return (data || []).reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+    } catch (e) {
+      console.error('Error fetching manual expenses', e);
+      return 0;
+    }
+  }
+
+  private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[]}> {
+    try {
+      // First, get all orders that are completed or paid
+      let ordersQuery = this.supabase
+        .from('orders')
+        .select('id')
+        .eq('tenant_id', tenantId)
+        .in('status', ['pending', 'pending_payment', 'awaiting_verification', 'paid', 'preparing', 'shipped', 'completed', 'delivered']);
+        
+      if (branchId) {
+        ordersQuery = ordersQuery.eq('branch_id', branchId);
+      }
+      
+      const { data: orders, error: ordersError } = await ordersQuery;
+      
+      if (ordersError || !orders || orders.length === 0) {
+        return { products_chart: [], category_chart: [] };
+      }
+      
+      const orderIds = orders.map(o => o.id);
+      
+      // Get all order items for these orders with product and category details
+      const { data: orderItems, error: itemsError } = await this.supabase
+        .from('order_items')
+        .select('quantity, product_id, product_name, products(category_id, categories(name))')
+        .eq('tenant_id', tenantId)
+        .in('order_id', orderIds);
+        
+      if (itemsError || !orderItems || orderItems.length === 0) {
+        return { products_chart: [], category_chart: [] };
+      }
+      
+      const productStats = new Map<string, number>();
+      const categoryStats = new Map<string, number>();
+      
+      orderItems.forEach((item: any) => {
+        const qty = item.quantity || 1;
+        const pName = item.product_name || 'Desconocido';
+        
+        productStats.set(pName, (productStats.get(pName) || 0) + qty);
+        
+        // Handle category
+        let cName = 'Otros';
+        if (item.products && item.products.categories && item.products.categories.name) {
+            cName = item.products.categories.name;
+        }
+        
+        categoryStats.set(cName, (categoryStats.get(cName) || 0) + qty);
+      });
+      
+      // Sort and take top 5 products
+      const products_chart = Array.from(productStats.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, quantity]) => ({ name, quantity }));
+        
+      // Sort and take top 5 categories
+      const category_chart = Array.from(categoryStats.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+        
+      return { products_chart, category_chart };
+    } catch (e) {
+      console.error('Error fetching stats data', e);
+      return { products_chart: [], category_chart: [] };
+    }
   }
 
   private mapMonthlyBreakdown(data: any[]): MonthlyRevenue[] {

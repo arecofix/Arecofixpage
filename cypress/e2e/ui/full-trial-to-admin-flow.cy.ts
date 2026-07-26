@@ -63,6 +63,12 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
       body: [] // Empezamos sin reparaciones
     }).as('getRepairs');
 
+    cy.intercept('GET', '**/rest/v1/brands?*', { statusCode: 200, body: [] }).as('getBrands');
+    cy.intercept('GET', '**/rest/v1/company_settings?*', { statusCode: 200, body: [] }).as('getCompanySettings');
+    cy.intercept('GET', '**/rest/v1/profiles?*', { statusCode: 200, body: [] }).as('getProfilesFallback');
+    cy.intercept('GET', '**/rest/v1/products?*', { statusCode: 200, body: [], headers: { 'Content-Range': '0-0/1' } }).as('getProducts');
+
+
     cy.intercept('POST', '**/rest/v1/repairs*', {
       statusCode: 201,
       body: [{ id: 'mock-repair-id', customer_name: 'Cliente Mock', status: 'pending' }]
@@ -139,8 +145,8 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
     cy.url().should('include', '/admin/repairs/new');
 
     const setInputValue = (selector: string, value: string) => {
-        cy.get(selector).first().clear({ force: true });
-        cy.get(selector).first().invoke('val', value).trigger('input').blur();
+        cy.get(selector, { timeout: 10000 }).first().clear({ force: true });
+        cy.get(selector, { timeout: 10000 }).first().invoke('val', value).trigger('input').blur();
     };
 
     setInputValue('input[formControlName="customer_name"]', 'Cliente Offline Tauri');

@@ -6,12 +6,12 @@ import { Observable, of } from 'rxjs';
 
 describe('ConfirmCheckoutUseCase', () => {
   let useCase: ConfirmCheckoutUseCase;
-  let orderRepoSpy: jasmine.SpyObj<OrderRepository>;
-  let messageRepoSpy: jasmine.SpyObj<MessageRepository>;
+  let orderRepoSpy: jest.Mocked<OrderRepository>;
+  let messageRepoSpy: jest.Mocked<MessageRepository>;
 
   beforeEach(() => {
-    const orderSpy = jasmine.createSpyObj('OrderRepository', ['createOrder']);
-    const messageSpy = jasmine.createSpyObj('MessageRepository', ['saveMessage']);
+    const orderSpy = { createOrder: jest.fn() };
+    const messageSpy = { saveMessage: jest.fn() };
 
     TestBed.configureTestingModule({
       providers: [
@@ -22,14 +22,14 @@ describe('ConfirmCheckoutUseCase', () => {
     });
 
     useCase = TestBed.inject(ConfirmCheckoutUseCase);
-    orderRepoSpy = TestBed.inject(OrderRepository) as jasmine.SpyObj<OrderRepository>;
-    messageRepoSpy = TestBed.inject(MessageRepository) as jasmine.SpyObj<MessageRepository>;
+    orderRepoSpy = TestBed.inject(OrderRepository) as jest.Mocked<OrderRepository>;
+    messageRepoSpy = TestBed.inject(MessageRepository) as jest.Mocked<MessageRepository>;
   });
 
   it('debe completar el checkout creando una orden y guardando un mensaje en el CRM', (done) => {
     const mockOrder = { id: 'order-123', customer_name: 'Ezequiel Test', total: 500 } as any;
-    orderRepoSpy.createOrder.and.returnValue(of(mockOrder));
-    messageRepoSpy.saveMessage.and.returnValue(Promise.resolve({ success: true }) as any);
+    orderRepoSpy.createOrder.mockReturnValue(of(mockOrder));
+    messageRepoSpy.saveMessage.mockReturnValue(Promise.resolve({ success: true }) as any);
 
     const checkoutParams = {
       customer: {
@@ -53,14 +53,14 @@ describe('ConfirmCheckoutUseCase', () => {
       expect(orderRepoSpy.createOrder).toHaveBeenCalled();
       
       // Verificar que los datos pasados al repositorio de órdenes coincidan
-      const orderArg = orderRepoSpy.createOrder.calls.mostRecent().args[0];
+      const orderArg = orderRepoSpy.createOrder.mock.calls[0][0];
       expect(orderArg.customer_name).toBe('Ezequiel Test');
       expect(orderArg.items!.length).toBe(1);
       expect(orderArg.items![0].subtotal).toBe(500);
 
       // Verificar que se guardó el mensaje en el CRM
       expect(messageRepoSpy.saveMessage).toHaveBeenCalled();
-      const messageArg = messageRepoSpy.saveMessage.calls.mostRecent().args[0];
+      const messageArg = messageRepoSpy.saveMessage.mock.calls[0][0];
       expect(messageArg.name).toBe('Ezequiel Test');
       expect(messageArg.notes).toContain('Pedido Web');
 
@@ -69,7 +69,7 @@ describe('ConfirmCheckoutUseCase', () => {
   });
 
   it('debe manejar errores si la creación de la orden falla', (done) => {
-    orderRepoSpy.createOrder.and.returnValue(new Observable(subscriber => {
+    orderRepoSpy.createOrder.mockReturnValue(new Observable(subscriber => {
         subscriber.error(new Error('DB Error'));
     }));
 

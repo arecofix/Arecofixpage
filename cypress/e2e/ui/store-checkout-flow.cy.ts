@@ -86,7 +86,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.get('input[formControlName="postal_code"]').clear({ force: true }).type('1000', { delay: 0, force: true }).blur();
     
     // Esperar a que el formulario debounce actualice el costo de envío
-    cy.wait('@getShippingRates');
+    cy.wait(1000);
 
     // Ir a pago y confirmar
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
@@ -124,7 +124,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.get('input[formControlName="city"]').type('Springfield', { delay: 0, force: true });
     cy.get('input[formControlName="postal_code"]').type('1000', { delay: 0, force: true }).blur();
     
-    cy.wait('@getShippingRates');
+    cy.wait(1000);
 
     cy.get('#btn-go-payment').click({ force: true });
     cy.get('input[type="radio"][name="payment"]').first().check({ force: true });

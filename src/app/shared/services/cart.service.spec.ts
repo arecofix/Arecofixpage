@@ -23,36 +23,36 @@ describe('CartService (QA & Testing)', () => {
     fakeOrder = null;
 
     loggerMock = {
-      debug: jasmine.createSpy('debug'),
-      error: jasmine.createSpy('error')
+      debug: jest.fn(),
+      error: jest.fn()
     };
 
     toastMock = {
-      show: jasmine.createSpy('show')
+      show: jest.fn()
     };
 
     authMock = {
       authState$: new BehaviorSubject({ isInitialized: true }),
-      getCurrentUser: jasmine.createSpy('getCurrentUser').and.returnValue(null),
-      getCurrentProfile: jasmine.createSpy('getCurrentProfile').and.returnValue(null)
+      getCurrentUser: jest.fn().mockReturnValue(null),
+      getCurrentProfile: jest.fn().mockReturnValue(null)
     };
 
     orderMock = {
-      getActiveCart: jasmine.createSpy('getActiveCart').and.callFake(() => of(fakeOrder)),
-      createOrder: jasmine.createSpy('createOrder').and.callFake((order: any) => {
+      getActiveCart: jest.fn().mockImplementation(() => of(fakeOrder)),
+      createOrder: jest.fn().mockImplementation((order: any) => {
         fakeOrder = { ...order, id: 'fake-order-id' };
         return of(fakeOrder);
       }),
-      updateOrder: jasmine.createSpy('updateOrder').and.callFake((id: string, order: any) => {
+      updateOrder: jest.fn().mockImplementation((id: string, order: any) => {
         fakeOrder = { ...order, id };
         return of(fakeOrder);
       })
     };
 
     supabaseMock = {
-      from: jasmine.createSpy('from').and.returnValue({
-        delete: jasmine.createSpy('delete').and.returnValue({
-          eq: jasmine.createSpy('eq').and.returnValue(Promise.resolve({ error: null }))
+      from: jest.fn().mockReturnValue({
+        delete: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue(Promise.resolve({ error: null }))
         })
       })
     };

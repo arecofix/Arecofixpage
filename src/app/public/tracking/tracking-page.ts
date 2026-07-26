@@ -56,6 +56,7 @@ export class TrackingPage implements OnInit {
     private getRepairTrackingUseCase = inject(GetRepairTrackingUseCase);
     
     whatsappNumber = environment.contact.whatsappNumber;
+    currentYear = new Date().getFullYear();
 
     code: string | null = null;
     repair = signal<PublicRepairDto | null>(null);

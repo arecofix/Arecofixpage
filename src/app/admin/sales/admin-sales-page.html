@@ -5,18 +5,18 @@
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
         
         <!-- Header & Search Bar -->
-        <div class="bg-white px-4 py-3 border-b border-gray-100 z-10 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3 animate-fade-in-down shrink-0">
+        <div class="bg-white/80 backdrop-blur-xl px-4 py-3 border-b border-gray-100 z-20 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3 animate-fade-in-down shrink-0 sticky top-0">
             <div>
-                 <h1 class="text-xl font-black bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600 flex items-center gap-2 tracking-tight leading-none">
-                    <i class="fas fa-desktop text-blue-500"></i> Punto de Venta
+                 <h1 class="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600 flex items-center gap-2 tracking-tight leading-none">
+                    <i class="fas fa-cash-register text-blue-500"></i> Punto de Venta
                  </h1>
-                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">Búsqueda rápida y facturación</p>
+                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-wider mt-1 ml-8">Facturación rápida</p>
             </div>
             
-            <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
                 <!-- Invoice History Link -->
                 <a routerLink="/admin/sales/invoices"
-                   class="btn btn-sm btn-ghost border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 text-gray-500 rounded-xl gap-1.5 shrink-0 transition-all text-xs font-bold"
+                   class="btn btn-sm btn-ghost border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 text-gray-500 rounded-xl gap-2 shrink-0 transition-all text-xs font-bold shadow-[0_2px_10px_rgb(0,0,0,0.02)]"
                    title="Ver historial de comprobantes emitidos">
                     <i class="fas fa-history text-xs"></i>
                     <span class="hidden sm:inline">Historial</span>
@@ -24,7 +24,7 @@
 
                 <div class="flex-1 sm:max-w-xs md:max-w-sm relative group">
                     <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors text-sm"></i>
-                    <input type="text" #searchInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                    <input type="text" #searchInput [ngModel]="searchInputText()" (ngModelChange)="searchInputText.set($event); onSearchChange($event)"
                        placeholder="Escanear o buscar producto... (F3)" 
                        autofocus
                        class="w-full pl-9 pr-3 py-2 bg-gray-50/50 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner" />
@@ -34,55 +34,55 @@
 
 
         <!-- Scrollable Product Grid -->
-        <div class="flex-1 overflow-y-auto p-3 custom-scrollbar bg-[#f8fafc]">
+        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50/50">
             
             @if(loading()) {
                 <div class="flex justify-center items-center h-full">
-                    <div class="flex flex-col items-center gap-3">
-                        <span class="loading loading-spinner loading-lg text-blue-500"></span>
-                        <span class="text-sm font-medium text-gray-500 animate-pulse">Cargando inventario...</span>
+                    <div class="flex flex-col items-center gap-4">
+                        <span class="loading loading-ring loading-lg text-blue-500 scale-150"></span>
+                        <span class="text-xs font-black uppercase tracking-widest text-gray-400 animate-pulse">Cargando catálogo...</span>
                     </div>
                 </div>
             } @else if(paginatedProducts().length === 0) {
                  <div class="flex flex-col items-center justify-center h-full text-gray-400 animate-fade-in">
-                    <div class="w-24 h-24 mb-4 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm">
+                    <div class="w-24 h-24 mb-4 rounded-3xl bg-white flex items-center justify-center border border-gray-100 shadow-xl shadow-gray-200/50">
                         <i class="fas fa-box-open text-4xl text-gray-300"></i>
                     </div>
-                    <p class="text-lg font-medium text-gray-600">No hay productos asocidos a la búsqueda.</p>
+                    <p class="text-sm font-black uppercase tracking-widest text-gray-400">Sin resultados.</p>
                  </div>
             } @else {
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                     @for (product of paginatedProducts(); track product.id) {
                         <div (click)="addToCart(product)"
-                             class="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 hover:shadow-[0_4px_15px_rgb(0,0,0,0.05)] hover:border-blue-200 transition-all duration-300 cursor-pointer group flex flex-col overflow-hidden relative active:scale-95 animate-fade-in-up"
-                             [style.animation-delay]="($index * 30) + 'ms'">
+                             class="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(59,130,246,0.12)] hover:border-blue-300 transition-all duration-300 cursor-pointer group flex flex-col overflow-hidden relative active:scale-95 animate-fade-in-up"
+                             [style.animation-delay]="($index * 20) + 'ms'">
                             
                             <!-- Stock Badge -->
-                            <div class="absolute top-2 right-2 z-10 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider shadow-sm uppercase backdrop-blur-md" 
-                                 [ngClass]="product.stock < 5 ? 'bg-red-500/90 text-white' : 'bg-emerald-500/90 text-white'">
+                            <div class="absolute top-2 right-2 z-10 px-2 py-1 rounded-lg text-[9px] font-black tracking-widest shadow-md uppercase backdrop-blur-xl border border-white/20" 
+                                 [ngClass]="product.stock < 5 ? 'bg-rose-500/90 text-white' : 'bg-emerald-500/90 text-white'">
                                 {{ product.stock }} ud.
                             </div>
 
                             <!-- Image Container -->
-                            <div class="p-2 bg-gray-50/50 flex items-center justify-center h-20 md:h-24 relative overflow-hidden">
+                            <div class="p-4 bg-linear-to-b from-gray-50/50 to-white flex items-center justify-center h-28 md:h-32 relative overflow-hidden group-hover:bg-blue-50/30 transition-colors">
                                 <img [src]="product.image_url || 'assets/img/no-image.svg'" 
                                      alt="Product"
-                                     class="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500 drop-shadow-sm" />
+                                     class="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500 drop-shadow-md" />
                             </div>
                             
                             <!-- Body -->
-                            <div class="p-3 flex flex-col flex-1 bg-white">
-                                <div class="text-[9px] font-mono text-gray-400 mb-0.5 flex items-center gap-1">
-                                    <i class="fas fa-tag text-[7px]"></i> {{ product.sku || 'N/A' }}
+                            <div class="p-4 flex flex-col flex-1 bg-white">
+                                <div class="text-[9px] font-mono font-bold text-gray-400 mb-1 flex items-center gap-1">
+                                    <i class="fas fa-tag text-[8px] text-gray-300"></i> {{ product.sku || 'N/A' }}
                                 </div>
-                                <h3 class="font-bold text-xs text-gray-800 leading-tight line-clamp-2 h-8 group-hover:text-blue-600 transition-colors">{{ product.name }}</h3>
+                                <h3 class="font-black text-xs text-gray-700 leading-tight line-clamp-2 h-8 group-hover:text-blue-600 transition-colors">{{ product.name }}</h3>
                                 
-                                <div class="mt-auto pt-2 flex justify-between items-end">
-                                    <div class="text-blue-600 font-extrabold text-sm tracking-tight">
+                                <div class="mt-auto pt-3 flex justify-between items-end border-t border-gray-50 mt-3">
+                                    <div class="text-blue-600 font-black text-sm md:text-base tracking-tighter">
                                         {{ product.price | currency:'ARS':'symbol':'1.0-0' }}
                                     </div>
-                                    <button class="w-6 h-6 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors shadow-sm">
-                                        <i class="fas fa-plus text-[10px]"></i>
+                                    <button class="w-7 h-7 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-blue-500/30 group-active:scale-90">
+                                        <i class="fas fa-cart-plus text-[10px]"></i>
                                     </button>
                                 </div>
                             </div>
@@ -111,72 +111,72 @@
 
     <!-- RIGHT/OVERLAY: POS Ticket / Shopping Cart -->
     <div [class.translate-x-full]="!isCartOpenMobile()" [class.lg:translate-x-0]="true"
-         class="fixed inset-y-0 right-0 z-40 w-full lg:relative lg:w-[340px] bg-white shadow-[-5px_0_15px_rgb(0,0,0,0.03)] border-l border-gray-100 transform transition-transform duration-300 ease-in-out flex flex-col h-full shrink-0">
+         class="fixed inset-y-0 right-0 z-40 w-full lg:relative lg:w-[360px] bg-white shadow-[-10px_0_30px_rgb(0,0,0,0.05)] border-l border-gray-100 transform transition-transform duration-300 ease-in-out flex flex-col h-full shrink-0">
         
         <!-- Cart Header -->
-        <div class="px-4 py-3 border-b border-gray-100 bg-white flex justify-between items-center relative z-10 shrink-0">
+        <div class="px-5 py-4 border-b border-gray-100 bg-white flex justify-between items-center relative z-10 shrink-0 shadow-sm">
             <div>
-                <h2 class="text-base font-black text-gray-800 tracking-tight flex items-center gap-2">
-                    <i class="fas fa-receipt text-gray-400"></i> Detalle de Venta
+                <h2 class="text-sm font-black text-gray-800 tracking-widest uppercase flex items-center gap-2">
+                    <i class="fas fa-receipt text-indigo-500 text-lg"></i> Detalle de Ticket
                 </h2>
-                <div class="text-[10px] text-gray-500 font-bold mt-0.5 uppercase">Items en ticket: {{ cartCount() }}</div>
+                <div class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">Items en carrito: <span class="text-indigo-500 font-black">{{ cartCount() }}</span></div>
             </div>
             
-            <div class="flex items-center gap-1">
-                <button (click)="clearCart()" class="btn btn-xs btn-ghost text-red-500 font-bold hover:bg-red-50 hover:text-red-600 rounded-lg px-2" [disabled]="cart().length === 0">
+            <div class="flex items-center gap-2">
+                <button (click)="clearCart()" class="btn btn-sm btn-ghost text-rose-500 font-black hover:bg-rose-50 hover:text-rose-600 rounded-xl px-3 transition-colors" [disabled]="cart().length === 0">
                     <i class="fas fa-trash-alt"></i> Vaciar
                 </button>
-                <button (click)="isCartOpenMobile.set(false)" class="btn btn-circle btn-xs btn-ghost lg:hidden bg-gray-100">
+                <button (click)="isCartOpenMobile.set(false)" class="btn btn-circle btn-sm btn-ghost lg:hidden bg-gray-100 hover:bg-gray-200">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
 
         <!-- Customer Input -->
-        <div class="px-4 py-2 border-b border-gray-100 bg-gray-50/50 shrink-0">
+        <div class="px-5 py-3 border-b border-gray-100 bg-slate-50/50 shrink-0">
             <div class="relative group">
-                <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs group-focus-within:text-indigo-500 transition-colors"></i>
                 <input type="text" [ngModel]="customerName()" (ngModelChange)="customerName.set($event)"
                    placeholder="Cliente (Opcional)" 
-                   class="w-full pl-8 pr-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold" />
+                   class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-bold shadow-inner" />
             </div>
         </div>
 
         <!-- Cart Items Detail -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar bg-white">
+        <div class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar bg-slate-50/30">
             @if(cart().length === 0) {
                 <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                    <div class="w-16 h-16 mb-3 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center">
-                        <i class="fas fa-shopping-basket text-2xl text-gray-300"></i>
+                    <div class="w-20 h-20 mb-4 rounded-3xl bg-gray-50 border border-gray-100 flex items-center justify-center shadow-inner">
+                        <i class="fas fa-shopping-basket text-3xl text-gray-300"></i>
                     </div>
-                    <p class="font-bold text-xs text-gray-500 uppercase tracking-wide">El ticket de venta está vacío.</p>
+                    <p class="font-black text-[10px] text-gray-400 uppercase tracking-widest">El ticket de venta está vacío.</p>
                 </div>
             } @else {
                 @for(item of cart(); track item.id) {
-                    <div class="flex items-start gap-2 bg-white p-2.5 rounded-xl border border-gray-100 shadow-[0_2px_8px_rgb(0,0,0,0.01)] group hover:shadow-sm hover:border-blue-100 transition-all animate-fade-in relative">
-                        <div class="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-gray-100">
-                             <img [src]="item.image_url || 'assets/img/no-image.svg'" class="w-8 h-8 object-contain" />
+                    <div class="flex items-start gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-[0_2px_15px_rgb(0,0,0,0.02)] group hover:shadow-[0_4px_20px_rgb(99,102,241,0.08)] hover:border-indigo-100 transition-all animate-fade-in relative">
+                        <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-gray-100">
+                             <img [src]="item.image_url || 'assets/img/no-image.svg'" class="w-10 h-10 object-contain drop-shadow-sm" />
                         </div>
                         
-                        <div class="flex-1 min-w-0 pr-2">
-                            <div class="font-bold text-xs text-gray-800 line-clamp-2 leading-tight mb-0.5" [title]="item.name">{{ item.name }}</div>
+                        <div class="flex-1 min-w-0 pr-1">
+                            <div class="font-black text-xs text-gray-700 line-clamp-2 leading-tight mb-1" [title]="item.name">{{ item.name }}</div>
                             <div class="flex items-center justify-between">
-                                <div class="text-blue-600 font-black text-xs">{{ item.price | currency:'ARS':'symbol':'1.0-0' }}</div>
+                                <div class="text-indigo-600 font-black text-sm tracking-tight">{{ item.price | currency:'ARS':'symbol':'1.0-0' }}</div>
                                 @if (item.quantity > 1) {
-                                    <div class="text-[9px] text-gray-800 font-black bg-gray-100 px-1.5 rounded">= {{ item.price * item.quantity | currency:'ARS':'symbol':'1.0-0' }}</div>
+                                    <div class="text-[9px] text-indigo-800 font-black bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">= {{ item.price * item.quantity | currency:'ARS':'symbol':'1.0-0' }}</div>
                                 }
                             </div>
                         </div>
 
                         <div class="flex flex-col items-end justify-between h-full gap-2 relative">
-                            <button (click)="removeFromCart(item.id)" class="text-gray-300 hover:text-red-500 transition-colors p-1 absolute -top-1 -right-1">
+                            <button (click)="removeFromCart(item.id)" class="text-gray-300 hover:text-rose-500 transition-colors p-1 absolute -top-1 -right-1 bg-white rounded-full hover:bg-rose-50 w-6 h-6 flex items-center justify-center">
                                  <i class="fas fa-times text-[10px]"></i>
                             </button>
                             
-                            <div class="flex items-center bg-gray-50 rounded border border-gray-200 p-0.5 shadow-inner mt-5">
-                                <button (click)="updateQuantity(item.id, -1)" class="w-5 h-5 flex items-center justify-center text-gray-500 hover:bg-white hover:text-red-500 rounded-sm transition-colors"><i class="fas fa-minus text-[8px]"></i></button>
-                                <span class="w-5 text-center text-[10px] font-black text-gray-800">{{ item.quantity }}</span>
-                                <button (click)="updateQuantity(item.id, 1)" class="w-5 h-5 flex items-center justify-center text-gray-500 hover:bg-white hover:text-blue-500 rounded-sm transition-colors shadow-[0_1px_3px_rgb(0,0,0,0.05)] bg-white border border-gray-100"><i class="fas fa-plus text-[8px]"></i></button>
+                            <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200 p-0.5 shadow-inner mt-6">
+                                <button (click)="updateQuantity(item.id, -1)" class="w-6 h-6 flex items-center justify-center text-gray-500 hover:bg-white hover:text-rose-500 hover:shadow-sm rounded-md transition-all"><i class="fas fa-minus text-[8px]"></i></button>
+                                <span class="w-6 text-center text-[10px] font-black text-gray-700">{{ item.quantity }}</span>
+                                <button (click)="updateQuantity(item.id, 1)" class="w-6 h-6 flex items-center justify-center text-gray-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm rounded-md transition-all bg-white shadow-[0_1px_3px_rgb(0,0,0,0.05)] border border-gray-100"><i class="fas fa-plus text-[8px]"></i></button>
                             </div>
                         </div>
                     </div>
@@ -185,41 +185,43 @@
         </div>
 
         <!-- POS Totals & Actions -->
-        <div class="bg-gray-900 rounded-t-3xl p-5 shadow-[0_-5px_20px_rgb(0,0,0,0.1)] relative z-20 mt-auto shrink-0">
+        <div class="bg-gray-900 rounded-t-[2rem] p-6 shadow-[0_-10px_40px_rgb(0,0,0,0.15)] relative z-20 mt-auto shrink-0 border-t border-gray-800">
+            <!-- Ticket tear effect decoration -->
+            <div class="absolute -top-3 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxNCIgcj0iNiIgZmlsbD0iI2Y4ZmFmYyIvPjwvc3ZnPg==')] bg-repeat-x"></div>
             
-            <div class="space-y-2 mb-4 text-gray-300">
+            <div class="space-y-3 mb-5 text-gray-300">
                 <div class="flex justify-between items-center text-xs font-bold">
-                    <span>Subtotal</span>
-                    <span class="text-white">{{ cartSubtotal() | currency:'ARS':'symbol':'1.0-0' }}</span>
+                    <span class="uppercase tracking-widest text-gray-400 text-[10px]">Subtotal</span>
+                    <span class="text-white tracking-tight">{{ cartSubtotal() | currency:'ARS':'symbol':'1.0-0' }}</span>
                 </div>
                 
                 <div class="flex justify-between items-center text-xs font-bold">
-                    <span class="flex items-center gap-2">
+                    <span class="flex items-center gap-2 uppercase tracking-widest text-gray-400 text-[10px]">
                         Descuento
                         <div class="relative w-20">
-                            <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">$</span>
-                            <input type="number" [ngModel]="discount()" (ngModelChange)="updateDiscount($event)" class="w-full bg-gray-800 border border-gray-700 rounded py-0.5 pl-4 pr-1 text-white text-[10px] font-black focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder-gray-600" placeholder="0" />
+                            <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">$</span>
+                            <input type="number" [ngModel]="discount()" (ngModelChange)="updateDiscount($event)" class="w-full bg-black/50 border border-gray-700 rounded-lg py-1 pl-5 pr-2 text-white text-xs font-black focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none placeholder-gray-600 transition-all" placeholder="0" />
                         </div>
                     </span>
-                    <span class="text-red-400">-{{ discount() | currency:'ARS':'symbol':'1.0-0' }}</span>
+                    <span class="text-rose-400">-{{ discount() | currency:'ARS':'symbol':'1.0-0' }}</span>
                 </div>
 
                 <div class="flex justify-between items-center text-xs font-bold">
-                    <span class="flex items-center gap-2">Pago</span>
+                    <span class="flex items-center gap-2 uppercase tracking-widest text-gray-400 text-[10px]">Método</span>
                     <select [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" 
-                            class="bg-gray-800 border border-gray-700 rounded py-0.5 px-1 text-white text-[10px] font-black focus:ring-1 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                            class="bg-black/50 border border-gray-700 rounded-lg py-1 px-2 text-white text-[10px] font-black focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none cursor-pointer transition-all uppercase tracking-wider">
                         <option value="efectivo">Efectivo 💵</option>
-                        <option value="transferencia">Transferencia 🏦</option>
+                        <option value="transferencia">Transfer. 🏦</option>
                         <option value="tarjeta">Tarjeta 💳</option>
                     </select>
                 </div>
 
-                <div class="h-px w-full bg-gray-800 my-2"></div>
+                <div class="h-px w-full bg-gray-800 border-b border-black/50 my-4"></div>
                 
                 <div class="flex justify-between items-end">
-                    <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Total Venta</span>
+                    <span class="text-xs font-black text-gray-500 uppercase tracking-widest">Total Venta</span>
                     <div class="text-right">
-                        <span class="text-2xl font-black text-white tracking-tight flex items-baseline gap-1">
+                        <span class="text-3xl font-black text-white tracking-tighter flex items-baseline gap-1 drop-shadow-md">
                             <span class="text-sm text-emerald-400 font-bold">$</span>{{ finalTotal() | number:'1.0-0' }}
                         </span>
                     </div>
@@ -227,11 +229,11 @@
             </div>
 
             <button (click)="checkout()" [disabled]="cart().length === 0 || processing()" 
-                    class="btn w-full btn-md bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none rounded-xl shadow-[0_4px_15px_rgba(16,185,129,0.3)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.4)] transform hover:-translate-y-0.5 active:scale-[0.98] transition-all text-sm font-black group disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider">
+                    class="btn w-full btn-lg bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white border-none rounded-2xl shadow-[0_8px_20px_rgba(16,185,129,0.25)] hover:shadow-[0_12px_30px_rgba(16,185,129,0.35)] transform hover:-translate-y-1 active:scale-[0.98] transition-all text-sm font-black group disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest min-h-14">
                 @if(processing()) {
-                    <span class="loading loading-spinner loading-sm text-white opacity-80"></span> Facturando...
+                    <span class="loading loading-spinner loading-md text-white opacity-80"></span> <span class="ml-2">Facturando...</span>
                 } @else {
-                    <i class="fas fa-print mr-2 opacity-80 group-hover:scale-110 transition-transform"></i> Emitir Ticket
+                    <i class="fas fa-print mr-3 text-lg opacity-80 group-hover:scale-110 transition-transform"></i> Emitir Ticket
                 }
             </button>
         </div>

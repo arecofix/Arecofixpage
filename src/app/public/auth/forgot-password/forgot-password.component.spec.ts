@@ -7,11 +7,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
   let fixture: ComponentFixture<ForgotPasswordComponent>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let authServiceSpy: jest.Mocked<AuthService>;
 
   beforeEach(async () => {
     // 1. Creamos un mock estricto del servicio
-    const spy = jasmine.createSpyObj('AuthService', ['resetPassword']);
+    const spy = { resetPassword: jest.fn() };
 
     await TestBed.configureTestingModule({
       imports: [ForgotPasswordComponent, ReactiveFormsModule, RouterTestingModule],
@@ -20,7 +20,7 @@ describe('ForgotPasswordComponent', () => {
       ]
     }).compileComponents();
 
-    authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    authServiceSpy = TestBed.inject(AuthService) as jest.Mocked<AuthService>;
     fixture = TestBed.createComponent(ForgotPasswordComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -44,38 +44,36 @@ describe('ForgotPasswordComponent', () => {
     expect(emailControl?.valid).toBeTruthy();
   });
 
-  it('debe ejecutar el escenario de ÉXITO correctamente', fakeAsync(() => {
+  it('debe ejecutar el escenario de ÉXITO correctamente', async () => {
     // Arrange: Simulamos que Supabase responde sin error
-    authServiceSpy.resetPassword.and.returnValue(Promise.resolve(null));
+    authServiceSpy.resetPassword.mockReturnValue(Promise.resolve(null));
     
     component.form.controls['email'].setValue('test@correo.com');
     
     // Act
-    component.resetPassword();
-    tick(); // Resolvemos la promesa
+    await component.resetPassword();
 
     // Assert
     expect(authServiceSpy.resetPassword).toHaveBeenCalledWith('test@correo.com');
-    expect(component.loading).toBeFalse();
-    expect(component.success).toContain('Te enviamos un email');
+    expect(component.loading).toBeFalsy();
+    expect(component.success).toContain('Código enviado');
     expect(component.error).toBe('');
-  }));
+  });
 
-  it('debe manejar el escenario de ERROR (usuario no encontrado)', fakeAsync(() => {
+  it('debe manejar el escenario de ERROR (usuario no encontrado)', async () => {
     // Arrange: Simulamos error
     const mockError = { message: 'User not found' };
-    authServiceSpy.resetPassword.and.returnValue(Promise.resolve(mockError.message));
+    authServiceSpy.resetPassword.mockReturnValue(Promise.resolve(mockError.message));
     
     component.form.controls['email'].setValue('fake@correo.com');
     
     // Act
-    component.resetPassword();
-    tick();
+    await component.resetPassword();
 
     // Assert
     expect(authServiceSpy.resetPassword).toHaveBeenCalledWith('fake@correo.com');
-    expect(component.loading).toBeFalse();
+    expect(component.loading).toBeFalsy();
     expect(component.success).toBe('');
     expect(component.error).toContain('No existe una cuenta');
-  }));
+  });
 });

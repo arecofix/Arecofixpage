@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,11 +6,12 @@ import { BranchService, Branch } from '@app/core/services/branch.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { SupabaseService } from '@app/core/services/supabase.service';
 import { AuthService } from '@app/core/services/auth.service';
+import { Pagination } from '@app/shared/components/pagination/pagination';
 
 @Component({
     selector: 'app-admin-branches-page',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, Pagination],
     templateUrl: './admin-branches-page.html',
 })
 export class AdminBranchesPage implements OnInit {
@@ -26,6 +27,14 @@ export class AdminBranchesPage implements OnInit {
     saving = signal(false);
     error = signal<string | null>(null);
     success = signal<string | null>(null);
+
+    currentPage = signal(1);
+    itemsPerPage = signal(10);
+    totalPages = computed(() => Math.max(1, Math.ceil(this.branches().length / this.itemsPerPage())));
+    paginatedBranches = computed(() => {
+        const start = (this.currentPage() - 1) * this.itemsPerPage();
+        return this.branches().slice(start, start + this.itemsPerPage());
+    });
 
     // Form states
     showForm = signal(false);
@@ -107,6 +116,10 @@ export class AdminBranchesPage implements OnInit {
             this.loading.set(false);
             this.cdr.markForCheck();
         }
+    }
+
+    changePage(page: number) {
+        this.currentPage.set(page);
     }
 
     openCreateForm() {

@@ -93,6 +93,10 @@
     </div>
 </div>
 
+<div class="mt-4 flex justify-center pb-6">
+    <pagination [pages]="totalPages()" [currentPage]="currentPage()" (pageChange)="changePage($event)" />
+</div>
+
 <!-- ANDREANI TRACKING MODAL -->
 @if (isTrackingModalOpen()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
