@@ -37,7 +37,7 @@ export class AiChatbotComponent implements AfterViewChecked, OnDestroy {
   private http = inject(HttpClient);
   private destroy$ = new Subject<void>();
 
-  private readonly API_URL = 'https://ragchat-carreras.onrender.com/generate-api';
+  private readonly API_URL = '/api/generate-api';
   private readonly TOP_K = 5;
 
   @ViewChild('chatBody') chatBodyRef!: ElementRef<HTMLDivElement>;
