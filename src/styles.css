@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @import "../public/assets/css/react-mfe.css";
 
 @plugin "daisyui" {
@@ -644,6 +644,7 @@ body.hide-floating-widgets .floating-whatsapp {
 }
 
 body.hide-floating-widgets app-whatsapp-button { display: none !important; }
+body.hide-floating-widgets app-ai-chatbot { display: none !important; }
 
 
 

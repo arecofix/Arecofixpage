@@ -1,0 +1,118 @@
+<!-- Botón flotante -->
+<div class="chatbot-wrapper">
+  <button
+    id="ai-chatbot-toggle-btn"
+    class="chatbot-fab"
+    [class.is-open]="isOpen()"
+    (click)="toggleChat()"
+    aria-label="Abrir asistente virtual"
+    type="button"
+  >
+    @if (!isOpen()) {
+      <!-- Ícono bot -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="2"/>
+        <path d="M12 11V7"/>
+        <circle cx="12" cy="5" r="2"/>
+        <path d="M8 15h.01M16 15h.01"/>
+        <path d="M3 16h18"/>
+      </svg>
+    } @else {
+      <!-- Ícono cerrar -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    }
+    <span class="chatbot-fab-pulse"></span>
+  </button>
+  <span class="chatbot-tooltip">Hablá con nuestro asistente</span>
+</div>
+
+<!-- Ventana de chat -->
+@if (isOpen()) {
+  <div class="chatbot-window" role="dialog" aria-label="Asistente virtual Arecofix" aria-modal="true">
+    <!-- Header -->
+    <div class="chatbot-header">
+      <div class="chatbot-header-info">
+        <div class="chatbot-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"/>
+            <path d="M12 11V7"/>
+            <circle cx="12" cy="5" r="2"/>
+            <path d="M8 15h.01M16 15h.01"/>
+            <path d="M3 16h18"/>
+          </svg>
+        </div>
+        <div>
+          <p class="chatbot-name">Asistente Arecofix</p>
+          <p class="chatbot-status">
+            <span class="status-dot"></span>
+            En línea
+          </p>
+        </div>
+      </div>
+      <button id="ai-chatbot-close-btn" class="chatbot-close-btn" (click)="toggleChat()" aria-label="Cerrar chat" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="chatbot-body" #chatBody>
+      @if (messages().length === 0) {
+        <div class="chatbot-welcome">
+          <div class="chatbot-welcome-icon">👋</div>
+          <p>¡Hola! Soy el asistente virtual de <strong>Arecofix</strong>. ¿En qué te puedo ayudar hoy?</p>
+        </div>
+      }
+      @for (msg of messages(); track $index) {
+        <div class="chatbot-message" [class.user]="msg.from === 'user'" [class.bot]="msg.from === 'bot'">
+          <div class="message-bubble">{{ msg.text }}</div>
+        </div>
+      }
+      @if (isLoading()) {
+        <div class="chatbot-message bot">
+          <div class="message-bubble typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Input -->
+    <div class="chatbot-footer">
+      @if (inputError()) {
+        <p class="chatbot-error">{{ inputError() }}</p>
+      }
+      <div class="chatbot-input-row">
+        <textarea
+          id="ai-chatbot-input"
+          class="chatbot-input"
+          [value]="inputText()"
+          (input)="onInputChange($any($event.target).value)"
+          (keydown)="onKeydown($event)"
+          placeholder="Escribí tu consulta..."
+          rows="1"
+          [disabled]="isLoading()"
+          aria-label="Escribí tu mensaje"
+          maxlength="500"
+        ></textarea>
+        <button
+          id="ai-chatbot-send-btn"
+          class="chatbot-send-btn"
+          (click)="sendMessage()"
+          [disabled]="isLoading() || !inputText().trim()"
+          aria-label="Enviar mensaje"
+          type="button"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+}

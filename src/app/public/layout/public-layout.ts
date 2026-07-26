@@ -15,7 +15,7 @@ import { PreferencesService } from '../../shared/services/preferences.service';
 import { SeoService } from '@app/core/services/seo.service';
 import { Subscription, filter } from 'rxjs';
 
-import { WhatsappButton } from '../../shared/whatsapp-button/whatsapp-button';
+import { AiChatbotComponent } from '../../shared/ai-chatbot/ai-chatbot.component';
 
 @Component({
   selector: 'app-public-layout',
@@ -26,7 +26,7 @@ import { WhatsappButton } from '../../shared/whatsapp-button/whatsapp-button';
     PublicLayoutHeader,
     AccessibilitySidebarComponent,
     Footer,
-    WhatsappButton,
+    AiChatbotComponent,
   ],
   templateUrl: './public-layout.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
