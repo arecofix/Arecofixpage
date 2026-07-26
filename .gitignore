@@ -55,8 +55,8 @@ build/Release/
 # -------------------------------------------------------------------------
 .angular/
 www/
-routes.txt
-
+# routes.txt is committed as a static baseline for CI/CD (Cloudflare Pages)
+# Dynamic routes are generated locally before Firebase deploy via `pnpm run routes:update`
 
 # -------------------------------------------------------------------------
 # FIREBASE & DATACONNECT
