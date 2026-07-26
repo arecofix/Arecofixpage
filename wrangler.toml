@@ -1,0 +1,6 @@
+# Cloudflare Pages configuration
+# https://developers.cloudflare.com/pages/configuration/wrangler-configuration/
+
+name = "arecofix"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "dist/arecofix/browser"
