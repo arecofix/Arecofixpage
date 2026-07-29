@@ -79,27 +79,23 @@
               <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{{ item.name }}</h1>
               
               <div class="mt-4 flex flex-col gap-2">
-                 @if (showWholesaleGate()) {
-                    <!-- GATE UNIFICADO PARA GREMIO -->
-                    <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 p-6 rounded-2xl">
-                      <div class="flex items-center text-amber-800 dark:text-amber-400 mb-4">
-                        <i class="fas fa-tools text-3xl mr-4"></i>
-                        <div>
-                          <p class="font-black text-xl leading-none uppercase tracking-tighter italic">¿Sos técnico?</p>
-                          <p class="text-xs font-bold opacity-80 mt-1 uppercase tracking-widest">Accedé a precios de Gremio</p>
-                        </div>
+                 @if (!showPriceAndBuy()) {
+                    <!-- CAPTURA DE LEAD (USUARIO NO LOGUEADO) -->
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 p-6 rounded-2xl mb-4 text-center">
+                      <div class="w-16 h-16 bg-white dark:bg-indigo-900/50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <i class="fas fa-lock text-2xl text-indigo-500"></i>
                       </div>
-                      <p class="text-sm text-amber-900/70 dark:text-amber-500/80 mb-6 leading-tight">
-                        Los precios de repuestos y microelectrónica son exclusivos para profesionales registrados en nuestra plataforma.
+                      <p class="font-black text-xl leading-tight text-indigo-900 dark:text-indigo-400 mb-2 uppercase tracking-tighter">Iniciá sesión para ver precios</p>
+                      <p class="text-sm text-indigo-800/70 dark:text-indigo-400/80 mb-6 font-medium">
+                        Registrate de forma gratuita para acceder al catálogo completo y realizar tus compras online.
                       </p>
-                      <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }" class="btn btn-md w-full bg-amber-500 hover:bg-amber-600 border-none text-amber-950 font-black shadow-lg shadow-amber-500/20 rounded-xl">
-                        <i class="fas fa-sign-in-alt mr-2"></i> INGRESAR / REGISTRARSE
+                      <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }" class="btn btn-md w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold border-none shadow-lg shadow-indigo-500/30 rounded-xl">
+                        <i class="fas fa-sign-in-alt mr-2"></i> INICIA SESIÓN O REGÍSTRATE
                       </a>
-                      <p class="text-[10px] text-center mt-3 text-amber-800/60 dark:text-amber-500/40 italic">
-                        * Precios promocionales válidos únicamente para pedidos autogestionados vía web.
-                      </p>
                     </div>
-                 } @else if (showPriceAndBuy()) {
+                 }
+                 
+                 @if (showPriceAndBuy()) {
                     <!-- BLOQUE DE PRECIO UNIFICADO -->
                     <div class="flex items-end justify-between bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
                       <div class="flex flex-col">
