@@ -88,11 +88,13 @@ export class ProductsDetailsPage {
   newReview = signal({ name: '', comment: '', rating: 5 });
   isSubmittingReview = signal(false);
 
-  // Auth-aware review: auto-detect logged-in user for reviews
-  isLoggedIn = computed(() => !!this.authService.getCurrentUser());
+  // Auth-aware state (Reactive to support login on same page without refresh)
+  authState = toSignal(this.authService.authState$);
+
+  isLoggedIn = computed(() => !!this.authState()?.user);
   
   currentUserName = computed(() => {
-    const profile = this.authService.getCurrentProfile();
+    const profile = this.authState()?.profile;
     if (profile) {
       return profile.full_name || profile.display_name || 
              [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
@@ -290,13 +292,10 @@ export class ProductsDetailsPage {
   // Strategic Computeds
   showPriceAndBuy = computed(() => {
       const p = this.product();
+      this.authState(); // Track auth state for reactivity
       return p ? this.strategicService.canViewPriceAndBuy(p) : false;
   });
 
-  showWholesaleGate = computed(() => {
-      const p = this.product();
-      return p ? this.strategicService.shouldShowWholesaleGate(p) : false;
-  });
 
   valueProposition = computed(() => {
       const p = this.product();

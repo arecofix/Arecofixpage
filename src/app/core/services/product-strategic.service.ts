@@ -33,32 +33,12 @@ export class ProductStrategicService {
   }
 
   /**
-   * Verifica si el usuario actual tiene permisos de Gremio o superior.
-   */
-  isWholesaleAuthorized(): boolean {
-    const profile = this.authService.getCurrentProfile();
-    if (!profile) return false;
-    const allowedRoles = ['gremio', 'tecnico', 'admin', 'super_admin'];
-    return allowedRoles.includes(profile.role?.toLowerCase() || '');
-  }
-
-  /**
-   * REGLAS DE NEGOCIO ESTRATÉGICAS:
-   * 1. Repuestos: Solo Gremio/Técnicos pueden ver precios y comprar.
-   * 2. Accesorios/Retail: Abierto a todo el público.
+   * REGLAS DE NEGOCIO ESTRATÉGICAS (Lead Generation):
+   * Todos los usuarios deben iniciar sesión para ver precios y comprar.
+   * No importa el rol (user, gremio, admin), solo se requiere tener una sesión activa.
    */
   canViewPriceAndBuy(product: Product): boolean {
-    if (this.isTechnicalCategory(product)) {
-      return this.isWholesaleAuthorized();
-    }
-    return true;
-  }
-
-  /**
-   * Muestra si se debe presentar el "Gate" de autenticación para técnicos.
-   */
-  shouldShowWholesaleGate(product: Product): boolean {
-    return this.isTechnicalCategory(product) && !this.isWholesaleAuthorized();
+    return !!this.authService.getCurrentProfile();
   }
 
   /**
