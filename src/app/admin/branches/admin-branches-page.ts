@@ -30,11 +30,9 @@ export class AdminBranchesPage implements OnInit {
 
     currentPage = signal(1);
     itemsPerPage = signal(10);
-    totalPages = computed(() => Math.max(1, Math.ceil(this.branches().length / this.itemsPerPage())));
-    paginatedBranches = computed(() => {
-        const start = (this.currentPage() - 1) * this.itemsPerPage();
-        return this.branches().slice(start, start + this.itemsPerPage());
-    });
+    totalItems = signal(0);
+    totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())));
+    paginatedBranches = computed(() => this.branches());
 
     // Form states
     showForm = signal(false);
@@ -102,8 +100,9 @@ export class AdminBranchesPage implements OnInit {
     async loadBranches() {
         this.loading.set(true);
         try {
-            const data = await this.branchService.getAllAdminBranches();
-            this.branches.set(data || []);
+            const result = await this.branchService.getPaginatedAdminBranches(this.currentPage(), this.itemsPerPage());
+            this.branches.set(result.data || []);
+            this.totalItems.set(result.total || 0);
 
             // Auto-open specific branch if we are in its context (and not a Super Admin)
             const activeBranch = this.branchService.currentBranch();
@@ -118,8 +117,9 @@ export class AdminBranchesPage implements OnInit {
         }
     }
 
-    changePage(page: number) {
+    async changePage(page: number) {
         this.currentPage.set(page);
+        await this.loadBranches();
     }
 
     openCreateForm() {

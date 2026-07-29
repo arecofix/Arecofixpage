@@ -41,6 +41,10 @@ export interface Product {
     tenant_id?: string;
     deleted_at?: string;
     search_tsv?: string;
+    // SEO fields
+    meta_title?: string;
+    meta_description?: string;
+    og_image?: string;
     // strategic fields for UI
     discount_percentage?: number;
     category_name?: string;
@@ -73,6 +77,9 @@ export interface CreateProductDto {
     barcode?: string;
     currency?: 'ARS' | 'USD';
     unit_cost_at_time?: number;
+    meta_title?: string;
+    meta_description?: string;
+    og_image?: string;
 }
 
 /**

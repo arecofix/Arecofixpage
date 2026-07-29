@@ -239,6 +239,26 @@ export class BranchService {
     return (data as Branch[]) || [];
   }
 
+  async getPaginatedAdminBranches(page: number, limit: number): Promise<{ data: Branch[], total: number }> {
+    if (!this.auth.isSuperAdmin()) {
+      // Non-superadmins only see their own branch
+      const branches = await this.getAllAdminBranches();
+      return { data: branches, total: branches.length };
+    }
+    
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    const { data, count, error } = await this.supabase
+      .from('branches')
+      .select('*', { count: 'exact' })
+      .order('name', { ascending: true })
+      .range(start, end);
+      
+    if (error) throw error;
+    return { data: (data as Branch[]) || [], total: count || 0 };
+  }
+
   async addBranch(payload: Partial<Branch>, slug: string): Promise<void> {
     const branding = payload.branding_settings || {
         logo_url: null,

@@ -48,6 +48,9 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     specifications: {} as Record<string, any>,
     images: [] as any[], // Now holds { url: string, color?: string }
     unit_cost_at_time: 0,
+    meta_title: '',
+    meta_description: '',
+    og_image: '',
   };
 
   // Resources
@@ -103,6 +106,9 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
                     ? data.media_metadata 
                     : (data.gallery_urls || (data.image_url ? [data.image_url] : [])).map(url => ({ url, color: '' })),
             unit_cost_at_time: data.unit_cost_at_time || 0,
+            meta_title: data.meta_title || '',
+            meta_description: data.meta_description || '',
+            og_image: data.og_image || '',
           };
         }
       } else {
@@ -185,6 +191,9 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       specifications: formVal.specifications,
       image_url: formVal.images.length > 0 ? formVal.images[0].url : null, // Main image
       unit_cost_at_time: formVal.unit_cost_at_time || 0,
+      meta_title: formVal.meta_title || null,
+      meta_description: formVal.meta_description || null,
+      og_image: formVal.og_image || null,
     };
 
     // Add optional fields only if they have values
