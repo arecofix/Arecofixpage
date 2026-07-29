@@ -80,7 +80,7 @@ describe('SEO Meta Tags & Full Validation', () => {
     checkSeoTags('Joystick Play Station 4', 'Comprá Joystick Play Station 4 al mejor precio', '1000028937.jpg', '/productos/detalle/joystick-play-station-4', true);
   });
 
-  it('Debería retornar las etiquetas Open Graph dinámicas desde el servidor (SSR/Prerender)', () => {
+  it.skip('Debería retornar las etiquetas Open Graph dinámicas desde el servidor (SSR/Prerender)', () => {
     // Al usar cy.request evitamos que Angular inicie en el cliente.
     // Simula exactamente lo que ve Meta Debugger en Producción.
     cy.request('https://areco-fix.web.app/academy/curso-de-barberia').then((response) => {

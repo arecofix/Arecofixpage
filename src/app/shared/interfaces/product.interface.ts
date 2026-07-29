@@ -59,6 +59,11 @@ export interface Product {
   category?: { id: string; name: string; slug: string } | null;
   // some properties kept for backwards compatibility in UI:
   regular_price?: number;
+  
+  // SEO fields
+  meta_title?: string | null;
+  meta_description?: string | null;
+  og_image?: string | null;
 }
 
 export type PageNumber = number;

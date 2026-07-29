@@ -45,7 +45,7 @@ export class PreferencesService {
   }
 
   private initAdminThemeListener(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!isPlatformBrowser(this.platformId) || !this.router.events) return;
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -201,7 +201,7 @@ export class PreferencesService {
     }
 
     if (themeId === 'system') {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
       this.setThemeDOM(isDark);
       return;
     }

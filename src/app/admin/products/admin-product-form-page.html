@@ -195,6 +195,36 @@
         </div>
       </div>
     </div>
+    
+    <!-- Section SEO: Custom Meta Tags -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
+        <i class="fas fa-search text-orange-500"></i> Configuración SEO Custom (Opcional)
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+          <div class="form-control">
+            <label class="label font-semibold">Meta Title</label>
+            <input type="text" [(ngModel)]="formVal.meta_title" name="meta_title"
+              class="input input-bordered w-full" placeholder="Ej: Comprar iPhone 14 Pro - Mejor Precio" />
+            <p class="text-xs text-gray-400 mt-1">Si lo dejas vacío, se usará el nombre del producto.</p>
+          </div>
+          <div class="form-control">
+            <label class="label font-semibold">OG Image URL</label>
+            <input type="text" [(ngModel)]="formVal.og_image" name="og_image"
+              class="input input-bordered w-full" placeholder="https://..." />
+            <p class="text-xs text-gray-400 mt-1">Si lo dejas vacío, se usará la imagen principal.</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="form-control h-full">
+            <label class="label font-semibold">Meta Description</label>
+            <textarea [(ngModel)]="formVal.meta_description" name="meta_description"
+              class="textarea textarea-bordered h-full flex-1 min-h-[120px]" placeholder="Breve descripción para los resultados de búsqueda..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Section 3: Media -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">

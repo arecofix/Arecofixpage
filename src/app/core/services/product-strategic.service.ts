@@ -33,12 +33,15 @@ export class ProductStrategicService {
   }
 
   /**
-   * REGLAS DE NEGOCIO ESTRATÉGICAS (Lead Generation):
-   * Todos los usuarios deben iniciar sesión para ver precios y comprar.
-   * No importa el rol (user, gremio, admin), solo se requiere tener una sesión activa.
+   * REGLAS DE NEGOCIO ESTRATÉGICAS (Lead Generation / Guest Checkout):
+   * Los repuestos y microelectrónica requieren sesión activa para comprar.
+   * El resto de productos (Fundas, Cargadores, etc.) pueden comprarse como invitado.
    */
   canViewPriceAndBuy(product: Product): boolean {
-    return !!this.authService.getCurrentProfile();
+    if (this.isTechnicalCategory(product)) {
+      return !!this.authService.getCurrentProfile();
+    }
+    return true; // Guest Checkout allowed for non-technical
   }
 
   /**

@@ -733,7 +733,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 message = `🔍 *Arecofix - Control de Calidad*\n\nHola ${customerName}, tu ${device} está siendo evaluado en el control de calidad final. Seguí el estado aquí:\n\n🔗 ${url}`;
                 break;
             case RepairStatus.READY_FOR_PICKUP:
-                message = `✅ *Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\n📍 Te esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n🔗 ${url}`;
+                message = `✅ *Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\n📍 Te esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n🔗 ${url}\n\n¿Qué te pareció nuestro servicio? Déjanos tu reseña: ${reviewUrl}`;
                 break;
             case RepairStatus.DELIVERED:
                 message = `🌟 *Arecofix - ¡Equipo Entregado!*\n\nHola ${customerName}, fue un gusto ayudarte con la reparación de tu ${device}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n⭐⭐⭐⭐⭐\n🔗 ${reviewUrl}\n\n¡Muchas gracias!`;

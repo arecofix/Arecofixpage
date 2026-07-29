@@ -312,7 +312,7 @@ export class ProductsDetailsPage {
 
   updateSeoTags(product: Product) {
     // â”€â”€ SEO / Open Graph / WhatsApp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    let absoluteImageUrl = product.image_url || '';
+    let absoluteImageUrl = product.og_image || product.image_url || '';
     
     // Validation: Ensure we don't use detail pages OR non-images as OG images
     const isRecursive = absoluteImageUrl.includes('/detalle/') || absoluteImageUrl.includes('/posts/');
@@ -321,9 +321,12 @@ export class ProductsDetailsPage {
       absoluteImageUrl = `assets/img/branding/og-services.png`;
     }
 
-    const productDescription = product.description
+    const defaultDescription = product.description
       ? product.description.slice(0, 155) + (product.description.length > 155 ? '...' : '')
       : `Comprá ${product.name} al mejor precio en Arecofix. Stock disponible con garantía.`;
+      
+    const productDescription = product.meta_description || defaultDescription;
+    const productTitle = product.meta_title || product.name;
 
     const nameKeywords = product.name
       .toLowerCase()
@@ -334,7 +337,7 @@ export class ProductsDetailsPage {
 
     // Set all standard + social meta tags via SeoService
     this.seoService.setPageData({
-      title: product.name,
+      title: productTitle,
       description: productDescription,
       imageUrl: absoluteImageUrl,
       type: 'product',
