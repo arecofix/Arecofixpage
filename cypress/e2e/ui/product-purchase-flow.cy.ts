@@ -1,6 +1,5 @@
 describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () => {
   const PRODUCT_URL = '/productos/detalle/modulo-ejemplo-123'; // Ajustar a un slug real o interceptar
-  const LOGIN_URL = '/login';
 
   beforeEach(() => {
     // Interceptar peticiones para aislar el flujo
@@ -11,15 +10,15 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
     cy.clearLocalStorage();
   });
 
-  it('Demuestra el bug del Bucle de Login para usuarios sin rol técnico', () => {
+  it('Demuestra el nuevo flujo UX: Captura de Lead y Compra Autónoma', () => {
     // 1. Visitamos como invitado
     cy.visit(PRODUCT_URL);
 
-    // Vemos el gate de Gremio
-    cy.contains('¿Sos técnico?').should('be.visible');
-    cy.contains('INGRESAR / REGISTRARSE').should('be.visible');
+    // Vemos el Call to Action para loguearse (Captura de Lead)
+    cy.contains('Iniciá sesión para ver precios', { matchCase: false }).should('be.visible');
+    cy.contains('INICIA SESIÓN O REGÍSTRATE', { matchCase: false }).should('be.visible');
 
-    // 2. Iniciamos sesión con un usuario común (no gremio)
+    // 2. Iniciamos sesión con un usuario común
     // Para simplificar el test, mockeamos el login
     cy.window().then((win) => {
       win.localStorage.setItem('arecofix_profile_mock', JSON.stringify({
@@ -36,11 +35,13 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
     // 3. Volvemos al producto
     cy.visit(PRODUCT_URL);
     
-    // El usuario está logueado pero NO es gremio.
-    // BUG ACTUAL: Ve el botón de "INGRESAR / REGISTRARSE" otra vez, lo que causa el loop.
-    cy.contains('¿Sos técnico?').should('be.visible');
+    // El usuario está logueado, por lo que debería ver directamente el precio y el botón de comprar.
+    // Ya no debe ver el mensaje de iniciar sesión.
+    cy.contains('Iniciá sesión para ver precios', { matchCase: false }).should('not.exist');
+    cy.contains('INICIA SESIÓN O REGÍSTRATE', { matchCase: false }).should('not.exist');
     
-    // La prueba pasará si el botón de login sigue ahí a pesar de estar logueado, demostrando el error de UX.
-    cy.contains('INGRESAR / REGISTRARSE').should('be.visible');
+    // La prueba pasará si el bloque de precios y botón de comprar están visibles
+    cy.contains('Precio Web Autogestionado', { matchCase: false }).should('be.visible');
+    cy.contains('AGREGAR AL CARRITO', { matchCase: false }).should('be.visible');
   });
 });

@@ -89,23 +89,23 @@
     <!-- Strategic Action Block (Unified UI) -->
     <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
       
-      @if (showWholesaleGate()) {
-        <!-- B2B GATE: Ingresar para ver precios -->
+      @if (!showPriceAndBuy()) {
+        <!-- CAPTURA DE LEAD: Ingresar para ver precios -->
         <div class="flex flex-col gap-3">
-          <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-xl p-3">
-            <p class="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-tight flex items-center mb-1">
-              <i class="fas fa-lock mr-2"></i> Exclusivo Gremio
+          <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 rounded-xl p-3 text-center">
+            <p class="text-[10px] font-bold text-indigo-800 dark:text-indigo-400 uppercase tracking-tight flex justify-center items-center mb-1">
+              <i class="fas fa-lock mr-2"></i> Iniciá Sesión
             </p>
-            <p class="text-[11px] leading-tight text-amber-700 dark:text-amber-500">
-              ¿Sos técnico? Accedé a precios preferenciales autogestionando tu compra.
+            <p class="text-[11px] leading-tight text-indigo-700 dark:text-indigo-500">
+              Registrate gratis para ver precios y comprar online.
             </p>
           </div>
           <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }"
-             class="w-full btn btn-sm bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 border-none rounded-lg h-10">
+             class="w-full btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-lg h-10 shadow-sm">
             Ingresar / Registrarse
           </a>
         </div>
-      } @else if (showPriceAndBuy()) {
+      } @else {
         <!-- CONVERSION BLOCK: Price + Buy -->
         <div class="flex flex-col gap-3">
           <div class="flex justify-between items-end">

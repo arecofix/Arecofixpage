@@ -43,7 +43,6 @@ export class ProductCard {
 
   // Strategic Computeds
   showPriceAndBuy = computed(() => this.strategicService.canViewPriceAndBuy(this.product()));
-  showWholesaleGate = computed(() => this.strategicService.shouldShowWholesaleGate(this.product()));
   showWishlist = computed(() => this.strategicService.canShowWishlist(this.product()));
   valueProposition = computed(() => this.strategicService.getValueProposition(this.product()));
   
