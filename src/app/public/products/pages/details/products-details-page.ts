@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of } from 'rxjs';
-import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Location, NgOptimizedImage, CommonModule, DecimalPipe } from '@angular/common';
 /*  */
 import {
