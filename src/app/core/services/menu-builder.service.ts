@@ -83,7 +83,16 @@ export class MenuBuilderService {
           { title: lang === 'es' ? 'Movimientos de Caja' : 'Cash Movements', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' }
         ]
       },
-      { title: lang === 'es' ? 'Servicio Técnico' : 'Technical Service', path: `${basePrefix}/repairs`, icon: 'fa-wrench', module: 'repairs' },
+      {
+        title: lang === 'es' ? 'Servicio Técnico' : 'Technical Service',
+        icon: 'fa-wrench',
+        module: 'repairs',
+        expanded: false,
+        children: [
+          { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' },
+          { title: lang === 'es' ? 'Reservas de Turno' : 'Reservations', path: `${basePrefix}/reservations`, icon: 'fa-calendar-check' }
+        ]
+      },
       { title: lang === 'es' ? 'Gestión de Personas y Clientes' : 'People & Customer Management', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
       {
         title: lang === 'es' ? 'Configuración Empresa' : 'Company Settings',

@@ -85,10 +85,26 @@ export class ContactService {
             .from('contact_messages')
             .select('*')
             .eq('tenant_id', this.tenantService.getTenantId())
+            .neq('subject', 'Solicitud de Turno: Reparación') // filter out reservations
             .order('created_at', { ascending: false });
         
         if (error) {
             this.logger.error('Error fetching messages:', error);
+            throw error;
+        }
+        return data || [];
+    }
+
+    async getReservations(): Promise<any[]> {
+        const { data, error } = await this.supabase
+            .from('contact_messages')
+            .select('*')
+            .eq('tenant_id', this.tenantService.getTenantId())
+            .eq('subject', 'Solicitud de Turno: Reparación')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            this.logger.error('Error fetching reservations:', error);
             throw error;
         }
         return data || [];
@@ -128,7 +144,7 @@ export class ContactService {
                 email: reservation.email || 'N/A',
                 phone: reservation.phone,
                 subject: 'Solicitud de Turno: Reparación',
-                message: `Se ha solicitado un nuevo turno.\nFecha: ${reservation.date}\nHora: ${reservation.slot}\nCliente: ${reservation.name}\nTeléfono: ${reservation.phone}\nDescuento aplicado: ${reservation.discount}%`,
+                message: `Se ha solicitado un nuevo turno.\nFecha: ${reservation.date}\nHora: ${reservation.slot}\nCliente: ${reservation.name}\nTeléfono: ${reservation.phone}\nEquipo: ${reservation.deviceModel || 'N/A'}\nFalla: ${reservation.issueDescription || 'N/A'}\nDescuento aplicado: ${reservation.discount}%`,
                 is_read: false,
                 tenant_id: this.tenantService.getTenantId()
             };
@@ -143,7 +159,7 @@ export class ContactService {
                 // Insert explicit notification for admins
                 await this.supabase.from('notifications').insert({
                     title: '🔧 Nuevo Turno Solicitado',
-                    message: `${reservation.name} ha solicitado un turno para el ${reservation.date} a las ${reservation.slot}.`,
+                    message: `${reservation.name} solicitó un turno el ${reservation.date} a las ${reservation.slot} para reparar un ${reservation.deviceModel || 'equipo'}.`,
                     type: 'info',
                     scope: 'admin',
                     is_read: false,

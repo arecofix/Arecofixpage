@@ -37,6 +37,8 @@ export class ReservationCalendar implements OnInit {
   // Form Fields
   customerName = signal('');
   customerPhone = signal('');
+  deviceModel = signal('');
+  issueDescription = signal('');
   agreeTerms = signal(false);
 
   // ===== COMPUTED VALUES =====
@@ -68,6 +70,8 @@ export class ReservationCalendar implements OnInit {
     !!this.selectedSlot() && 
     this.customerName().trim().length > 0 && 
     this.customerPhone().trim().length > 0 &&
+    this.deviceModel().trim().length > 0 &&
+    this.issueDescription().trim().length > 0 &&
     this.agreeTerms()
   );
 
@@ -122,6 +126,8 @@ export class ReservationCalendar implements OnInit {
     this.currentStep.set(1);
     this.customerName.set('');
     this.customerPhone.set('');
+    this.deviceModel.set('');
+    this.issueDescription.set('');
     this.agreeTerms.set(false);
   }
 
@@ -190,6 +196,8 @@ export class ReservationCalendar implements OnInit {
         slot: this.selectedSlot(),
         name: this.customerName(),
         phone: this.customerPhone(),
+        deviceModel: this.deviceModel(),
+        issueDescription: this.issueDescription(),
         discount: this.config.DISCOUNT_PERCENTAGE
       };
 
@@ -224,6 +232,6 @@ export class ReservationCalendar implements OnInit {
   }
 
   private _buildWhatsAppMessage(reservation: any): string {
-    return `¡Hola Arecofix! 🔧\n\n*Solicito agendar mi turno:*\n\n📅 *Fecha:* ${this.formattedSelectedDate()}\n⏰ *Hora:* ${reservation.slot}\n👤 *Nombre:* ${reservation.name}\n📱 *Teléfono:* ${reservation.phone}\n\n✅ Confirmo el ${this.config.DISCOUNT_PERCENTAGE}% de descuento en mano de obra.\n🔒 Mi repuesto será reservado en el taller.\n\n¡Gracias!`;
+    return `¡Hola Arecofix! 🔧\n\n*Solicito agendar mi turno:*\n\n📅 *Fecha:* ${this.formattedSelectedDate()}\n⏰ *Hora:* ${reservation.slot}\n👤 *Nombre:* ${reservation.name}\n📱 *Teléfono:* ${reservation.phone}\n📱 *Equipo:* ${reservation.deviceModel}\n⚠️ *Falla:* ${reservation.issueDescription}\n\n✅ Confirmo el ${this.config.DISCOUNT_PERCENTAGE}% de descuento en mano de obra.\n🔒 Mi repuesto será reservado en el taller.\n\n¡Gracias!`;
   }
 }
