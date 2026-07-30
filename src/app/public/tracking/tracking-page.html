@@ -241,7 +241,7 @@
                     <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest leading-none mb-6 flex items-center gap-2 px-2">
                         <i class="fas fa-magic"></i> Sugerencias para {{ r.device_model }}
                     </h4>
-                    <div class="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbars no-print" style="scrollbar-width: none;">
+                    <div class="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory no-print">
                         @for (prod of recommendedAccessories(); track prod.id) {
                             <div class="min-w-[180px] w-[180px] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm rounded-3xl p-3 flex flex-col justify-between group shrink-0 snap-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                 <div>
