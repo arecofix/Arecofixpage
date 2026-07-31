@@ -71,15 +71,5 @@ export const environment: Environment = {
     portfolio: {
       cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
     }
-  },
-  firebase: {
-    apiKey: "AIzaSyDyX9CdSDY8gGKetZZdcq1aOhEWMdqLWyI",
-    authDomain: "arecofix-20698.firebaseapp.com",
-    databaseURL: "https://arecofix-20698-default-rtdb.firebaseio.com",
-    projectId: "arecofix-20698",
-    storageBucket: "arecofix-20698.firebasestorage.app",
-    messagingSenderId: "106654865765",
-    appId: "1:106654865765:web:7dc07179d0f67536e2e98c",
-    measurementId: "G-812SLQ7KEJ"
   }
 };

@@ -4,8 +4,6 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import posthog from 'posthog-js';
-import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getAnalytics, logEvent, setUserId, setUserProperties } from 'firebase/analytics';
 
 @Injectable({
     providedIn: 'root'
@@ -14,8 +12,6 @@ export class AnalyticsService {
     private platformId = inject(PLATFORM_ID);
     private router = inject(Router);
     private isBrowser = isPlatformBrowser(this.platformId);
-    private firebaseApp: any;
-    private firebaseAnalytics: any;
     private posthogInitialized = false;
 
     constructor() {
@@ -23,7 +19,6 @@ export class AnalyticsService {
             // Defer analytics initialization to prevent main thread blocking (Improves FCP & TBT)
             setTimeout(() => {
                 this.initPostHog();
-                this.initFirebase();
                 this.initGoogleAnalytics();
                 this.initMetaPixel();
             }, 3500);
@@ -64,19 +59,6 @@ export class AnalyticsService {
         }
     }
 
-    private initFirebase() {
-        if (environment.firebase?.apiKey && !this.isPlaceholder(environment.firebase.apiKey)) {
-            try {
-                this.firebaseApp = !getApps().length ? initializeApp(environment.firebase) : getApp();
-                if (environment.firebase.measurementId && !this.isPlaceholder(environment.firebase.measurementId)) {
-                    this.firebaseAnalytics = getAnalytics(this.firebaseApp);
-                }
-            } catch (err) {
-                console.warn('Firebase analytics initialization deferred', err);
-            }
-        }
-    }
-
     private initGoogleAnalytics() {
         // GTAG initialization logic can go here if needed dynamically, 
         // but typically we target the global gtag function if loaded via index.html
@@ -92,12 +74,6 @@ export class AnalyticsService {
             if (this.posthogInitialized) {
                 try { posthog.identify(userId, properties); } catch (e) {}
             }
-            if (this.firebaseAnalytics) {
-                try {
-                    setUserId(this.firebaseAnalytics, userId);
-                    setUserProperties(this.firebaseAnalytics, properties);
-                } catch (e) {}
-            }
             if (window.gtag) {
                 window.gtag('set', 'user_properties', properties);
             }
@@ -108,10 +84,6 @@ export class AnalyticsService {
         if (this.isBrowser) {
             if (this.posthogInitialized) {
                 try { posthog.capture(eventName, properties); } catch (e) {}
-            }
-            
-            if (this.firebaseAnalytics) {
-                try { logEvent(this.firebaseAnalytics, eventName, properties); } catch (e) {}
             }
             
             if (window.gtag) {
@@ -139,9 +111,6 @@ export class AnalyticsService {
         if (this.isBrowser) {
             if (this.posthogInitialized) {
                 try { posthog.reset(); } catch (e) {}
-            }
-            if (this.firebaseAnalytics) {
-                try { setUserId(this.firebaseAnalytics, null); } catch (e) {}
             }
         }
     }

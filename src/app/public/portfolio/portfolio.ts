@@ -210,7 +210,6 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     if (t.includes('docker') || t.includes('contenedores') || t.includes('virtualización')) return 'fab fa-docker text-[#2496ed]';
     if (t.includes('typescript')) return 'fas fa-code text-[#3178c6]';
     if (t.includes('tailwind')) return 'fab fa-css3-alt text-[#38bdf8]';
-    if (t.includes('firebase')) return 'fas fa-fire text-[#ffca28]';
     if (t.includes('rxjs')) return 'fas fa-sync text-[#c2185b]';
     if (t.includes('python')) return 'fa-brands fa-python fa-fw text-[#3776ab]';
     if (t.includes('flask')) return 'fas fa-flask text-[#e5e5e5]';
