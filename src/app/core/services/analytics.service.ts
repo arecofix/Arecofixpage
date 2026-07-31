@@ -3,7 +3,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import posthog from 'posthog-js';
+
+let posthogInstance: any;
 
 @Injectable({
     providedIn: 'root'
@@ -42,10 +43,13 @@ export class AnalyticsService {
         });
     }
 
-    private initPostHog() {
+    private async initPostHog() {
         if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey)) {
             try {
-                posthog.init(environment.posthogKey as string, {
+                const ph = await import('posthog-js');
+                posthogInstance = ph.default || ph;
+                
+                posthogInstance.init(environment.posthogKey as string, {
                     api_host: environment.posthogHost || 'https://us.i.posthog.com',
                     person_profiles: 'identified_only',
                     autocapture: true,
@@ -71,8 +75,8 @@ export class AnalyticsService {
 
     identify(userId: string, properties: Record<string, unknown> = {}) {
         if (this.isBrowser) {
-            if (this.posthogInitialized) {
-                try { posthog.identify(userId, properties); } catch (e) {}
+            if (this.posthogInitialized && posthogInstance) {
+                try { posthogInstance.identify(userId, properties); } catch (e) {}
             }
             if (window.gtag) {
                 window.gtag('set', 'user_properties', properties);
@@ -82,8 +86,8 @@ export class AnalyticsService {
 
     capture(eventName: string, properties: Record<string, unknown> = {}) {
         if (this.isBrowser) {
-            if (this.posthogInitialized) {
-                try { posthog.capture(eventName, properties); } catch (e) {}
+            if (this.posthogInitialized && posthogInstance) {
+                try { posthogInstance.capture(eventName, properties); } catch (e) {}
             }
             
             if (window.gtag) {
@@ -109,8 +113,8 @@ export class AnalyticsService {
 
     reset() {
         if (this.isBrowser) {
-            if (this.posthogInitialized) {
-                try { posthog.reset(); } catch (e) {}
+            if (this.posthogInitialized && posthogInstance) {
+                try { posthogInstance.reset(); } catch (e) {}
             }
         }
     }
@@ -120,10 +124,10 @@ export class AnalyticsService {
     }
 
     getDistinctId(): string {
-        return this.isBrowser && this.posthogInitialized ? posthog.get_distinct_id() : '';
+        return this.isBrowser && this.posthogInitialized && posthogInstance ? posthogInstance.get_distinct_id() : '';
     }
 
     getSessionId(): string {
-        return this.isBrowser && this.posthogInitialized ? posthog.get_session_id() : '';
+        return this.isBrowser && this.posthogInitialized && posthogInstance ? posthogInstance.get_session_id() : '';
     }
 }

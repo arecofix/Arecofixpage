@@ -105,10 +105,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         technical_labor_cost: 0,
         technical_report: '',
         parts: [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
-        upsell_vidrio: false,
         glass_upsell: false,
         whatsapp_notifications: true,
-        costo_repuesto: 0
+        spare_part_cost: 0
     };
 
     // Keep some UI-only signals
@@ -251,10 +250,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             deposit_amount: [0],
             technical_labor_cost: [0],
             technical_report: [''],
-            upsell_vidrio: [false],
             glass_upsell: [false],
             whatsapp_notifications: [true],
-            costo_repuesto: [0],
+            spare_part_cost: [0],
             tracking_code: [''],
             repair_number: [0],
             payment_method: ['efectivo'],
@@ -403,7 +401,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 name: manualName,
                 price: 0,
                 stock: 9999, // Ensures it's not disabled
-                unit_cost_at_time: 0,
+                cost_price: 0,
                 is_active: true,
                 is_global: false,
                 sku: '',
@@ -505,10 +503,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     repair_number: data.repair_number,
                     technical_labor_cost: data.technical_labor_cost,
                     technical_report: data.technical_report,
-                    upsell_vidrio: data.upsell_vidrio,
                     glass_upsell: data.glass_upsell,
                     whatsapp_notifications: data.whatsapp_notifications,
-                    costo_repuesto: data.costo_repuesto,
+                    spare_part_cost: data.spare_part_cost,
                     payment_method: (data as any).payment_method || 'efectivo',
                     warranty: (data as any).warranty || '',
                     supplier: (data as any).supplier || ''

@@ -82,7 +82,7 @@ export interface Database {
           product_sku: string | null;
           quantity: number;
           unit_price: number;
-          unit_cost_at_time: number;
+          cost_price: number;
           subtotal: number;
           created_at: string;
         };

@@ -17,7 +17,7 @@ export class TrackingService {
 
     async acceptUpsell(code: string) {
         const supabase = this.auth.getSupabaseClient();
-        return await supabase.rpc('accept_upsell_vidrio', { p_tracking_code: code });
+        return await supabase.rpc('accept_glass_upsell', { p_tracking_code: code });
     }
 
     async getRecommendedAccessories(code: string, brand?: string) {

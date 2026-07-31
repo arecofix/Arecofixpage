@@ -153,7 +153,7 @@ export class TrackingPage implements OnInit, OnDestroy {
                     this.error.set(null);
                     
                     if (isPlatformBrowser(this.platformId)) {
-                        if (!repairData.upsell_vidrio && !localStorage.getItem(`upsellDismissed_${code}`)) {
+                        if (!repairData.glass_upsell && !localStorage.getItem(`upsellDismissed_${code}`)) {
                             setTimeout(() => this.showUpsellModal.set(true), 2500);
                         }
                     }
@@ -347,7 +347,7 @@ export class TrackingPage implements OnInit, OnDestroy {
         if (!this.code) return;
         try {
             await this.trackingService.acceptUpsell(this.code);
-            this.repair.update(r => r ? { ...r, upsell_vidrio: true } : r);
+            this.repair.update(r => r ? { ...r, glass_upsell: true } : r);
             this.showUpsellModal.set(false);
             
             const r = this.repair();

@@ -35,7 +35,7 @@ export interface Product {
     barcode?: string;
     currency?: 'ARS' | 'USD';
     convertedPrice?: number;
-    unit_cost_at_time?: number;
+    cost_price?: number;
     created_at: string;
     updated_at: string;
     tenant_id?: string;
@@ -76,7 +76,7 @@ export interface CreateProductDto {
     sku?: string;
     barcode?: string;
     currency?: 'ARS' | 'USD';
-    unit_cost_at_time?: number;
+    cost_price?: number;
     meta_title?: string;
     meta_description?: string;
     og_image?: string;

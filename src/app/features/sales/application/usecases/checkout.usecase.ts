@@ -55,7 +55,7 @@ export class CheckoutUseCase {
                 product_id: item.id,
                 product_name: item.name,
                 unit_price: finalUnitPrice,
-                unit_cost_at_time: item.unit_cost_at_time || 0,
+                cost_price: item.cost_price || 0,
                 quantity: item.quantity,
                 subtotal: finalUnitPrice * item.quantity
             };

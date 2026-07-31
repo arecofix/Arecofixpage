@@ -379,7 +379,7 @@
         @let activeUser = (user$ | async);
         @if (activeUser) {
           <li>
-            <a (click)="goToRoute('/perfil')" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5">
+            <a routerLink="/perfil" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
               <i class="fas fa-user-circle"></i>
               <span class="flex-1 min-w-0">
                 <span class="block text-sm leading-tight">Mi Perfil</span>
@@ -394,19 +394,19 @@
           </li>
           @if (activeUser?.role === 'instructor' || activeUser?.role === 'super_admin' || activeUser?.role === 'admin') {
             <li>
-              <a (click)="goToRoute((activeUser?.role === 'instructor' || isAcademyMode) ? '/instructor' : '/admin/dashboard')" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5">
+              <a [routerLink]="(activeUser?.role === 'instructor' || isAcademyMode) ? '/instructor' : '/admin/dashboard'" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
                 <i [class]="(activeUser?.role === 'instructor' || isAcademyMode) ? 'fas fa-chalkboard-teacher' : 'fas fa-shield-alt'"></i> {{ (activeUser?.role === 'instructor' || isAcademyMode) ? 'Panel Instructor' : 'Admin' }}
               </a>
             </li>
           }
         } @else {
           <li>
-            <a (click)="goToRoute('/login')" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
+            <a routerLink="/login" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
               <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </a>
           </li>
           <li>
-            <a (click)="goToRoute('/register')" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
+            <a routerLink="/register" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
               <i class="fas fa-user-plus"></i> Registrarse
             </a>
           </li>
@@ -574,10 +574,10 @@
         <i class="fas fa-sign-out-alt text-[10px]"></i> Cerrar Sesión
       </button>
     } @else {
-      <button (click)="goToRoute('/login')"
+      <a routerLink="/login" (click)="closeMobileMenu()"
          class="btn btn-xs btn-primary w-full rounded-lg gap-2 font-medium">
         <i class="fas fa-sign-in-alt text-[10px]"></i> Iniciar Sesión
-      </button>
+      </a>
     }
   </div>
 </aside>

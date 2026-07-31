@@ -36,7 +36,7 @@ describe('Admin Tenant Flow (Multi-tenant & RLS Isolation)', () => {
 
     cy.intercept('GET', '**/rest/v1/profiles?*', {
       statusCode: 200,
-      body: [{ id: 'super-admin-id', role: 'super_admin', full_name: 'Super Admin' }]
+      body: [{ id: 'super-admin-id', role: 'super_admin', first_name: 'Super', last_name: 'Admin' }]
     }).as('getProfile');
 
     cy.intercept('GET', '**/rest/v1/tenants?*', {

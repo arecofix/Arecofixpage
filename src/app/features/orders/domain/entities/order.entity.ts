@@ -35,7 +35,7 @@ export interface OrderItem {
   product_sku?: string;
   quantity: number;
   unit_price: number;
-  unit_cost_at_time?: number;
+  cost_price?: number;
   subtotal: number;
   tenant_id?: string;
   created_at?: string;

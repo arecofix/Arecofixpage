@@ -28,7 +28,7 @@ describe('Repair Tracking Flow', () => {
             customer_name: 'Juan Perez',
             technical_report: 'Se cambió módulo completo.',
             technician_notes: null,
-            upsell_vidrio: true,
+            glass_upsell: true,
             imei: '358910000000000',
             checklist: {}
           }]

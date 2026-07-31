@@ -5,7 +5,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 
 export interface RepairStatsDto {
     total_facturado: number;
-    costo_repuestos: number;
+    spare_part_costs: number;
     ganancia_neta: number;
     margen_porcentaje: number;
     ticket_promedio: number;
@@ -54,15 +54,15 @@ export class RepairStatsService {
                 current_status_id,
                 created_at,
                 completed_at,
-                upsell_vidrio,
+                glass_upsell,
                 repair_parts_used (
                     quantity,
-                    unit_cost_at_time,
+                    cost_price,
                     unit_price_at_time,
                     cost_at_time,
                     created_at
                 ),
-                costo_repuesto
+                spare_part_cost
             `)
             .eq('tenant_id', tenantId);
 
@@ -89,7 +89,7 @@ export class RepairStatsService {
 
         // 3. Process calculations
         let total_facturado = 0;
-        let costo_repuestos = 0;
+        let spare_part_costs = 0;
         let reparaciones_vidrio = 0;
         let equipos_entregados = 0;
         let equipos_espera = 0;
@@ -118,14 +118,14 @@ export class RepairStatsService {
             // Solo contabilizamos ingreso y costo cuando la reparación está facturada (Lista o Entregada)
             if (r.current_status_id === 5 || r.current_status_id === 6) {
                 const pIngreso = Number(r.final_cost || 0);
-                const pCosto = Number(r.costo_repuesto || 0);
+                const pCosto = Number(r.spare_part_cost || 0);
 
                 monthlyMap.get(revenuePeriod)!.ingreso += pIngreso;
                 monthlyMap.get(revenuePeriod)!.costo += pCosto;
 
                 if (isPeriodMatch(revenueDate)) {
                     total_facturado += pIngreso;
-                    costo_repuestos += pCosto;
+                    spare_part_costs += pCosto;
                     if (r.current_status_id === 6) equipos_entregados++;
                 }
             }
@@ -134,7 +134,7 @@ export class RepairStatsService {
                 if (isPeriodMatch(r.created_at)) equipos_espera++;
             }
             
-            if (r.upsell_vidrio && isPeriodMatch(r.created_at)) reparaciones_vidrio++;
+            if (r.glass_upsell && isPeriodMatch(r.created_at)) reparaciones_vidrio++;
         }
 
         const filteredOrders = (orders || []).filter((o: any) => isPeriodMatch(o.created_at));
@@ -160,9 +160,9 @@ export class RepairStatsService {
 
         return {
             total_facturado,
-            costo_repuestos,
-            ganancia_neta: total_facturado - costo_repuestos,
-            margen_porcentaje: total_facturado > 0 ? ((total_facturado - costo_repuestos) / total_facturado) * 100 : 0,
+            spare_part_costs,
+            ganancia_neta: total_facturado - spare_part_costs,
+            margen_porcentaje: total_facturado > 0 ? ((total_facturado - spare_part_costs) / total_facturado) * 100 : 0,
             ticket_promedio: total_reparaciones > 0 ? total_facturado / total_reparaciones : 0,
             total_reparaciones,
             reparaciones_vidrio,

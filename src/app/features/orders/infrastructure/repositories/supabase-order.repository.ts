@@ -143,7 +143,7 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
         product_name: item.product_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
-        unit_cost_at_time: item.unit_cost_at_time || 0,
+        cost_price: item.cost_price || 0,
         subtotal: item.subtotal,
       } as any);
       sanitized.tenant_id = tenantId;
