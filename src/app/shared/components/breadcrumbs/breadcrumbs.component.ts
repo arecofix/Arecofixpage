@@ -12,8 +12,8 @@ export interface BreadcrumbItem {
   standalone: true,
   imports: [RouterModule],
   template: `
-    <nav aria-label="Breadcrumb" class="container mx-auto px-4 py-4">
-      <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 flex-nowrap overflow-hidden">
+    <nav aria-label="Breadcrumb" [class]="'container mx-auto px-4 py-4 ' + wrapperClasses">
+      <ol [class]="'flex items-center space-x-2 text-sm flex-nowrap overflow-hidden ' + (classes || 'text-gray-500 dark:text-gray-400')">
         @for (item of items; track trackByBreadcrumb($index, item); let last = $last) {
           <li class="flex items-center min-w-0 shrink" [class.shrink-0]="last" [class.shrink]="!last">
             @if (!last) {
@@ -22,7 +22,7 @@ export interface BreadcrumbItem {
               </a>
               <i class="fas fa-chevron-right text-xs mx-2 opacity-50 shrink-0"></i>
             } @else {
-              <span class="font-semibold text-gray-900 dark:text-gray-200 truncate block" aria-current="page">
+              <span [class]="'font-semibold truncate block ' + (activeClasses || 'text-gray-900 dark:text-gray-200')" aria-current="page">
                 {{ item.label }}
               </span>
             }
@@ -35,6 +35,9 @@ export interface BreadcrumbItem {
 })
 export class BreadcrumbsComponent {
   @Input() items: BreadcrumbItem[] = [];
+  @Input() wrapperClasses: string = '';
+  @Input() classes: string = '';
+  @Input() activeClasses: string = '';
 
   trackByBreadcrumb(index: number, item: BreadcrumbItem): string {
     return `${item.label}-${item.url || ''}`;
