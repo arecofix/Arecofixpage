@@ -67,7 +67,7 @@ export class ProductMapper {
           sku: p['sku'] as string || '',
           barcode: p['barcode'] as string || '',
           currency: p['currency'] as 'ARS' | 'USD' || 'ARS',
-          unit_cost_at_time: p['unit_cost_at_time'] ? Number(p['unit_cost_at_time']) : 0,
+          cost_price: p['cost_price'] ? Number(p['cost_price']) : 0,
           min_stock_alert: p['min_stock_alert'] ? Number(p['min_stock_alert']) : undefined,
           is_global: Boolean(p['is_global']),
           created_at: p['created_at'] as string,

@@ -10,7 +10,7 @@ export interface SupabaseProductRow {
   slug?: string;
   price?: number | string;
   currency?: string;
-  unit_cost_at_time?: number | string;
+  cost_price?: number | string;
   image_url?: string;
   category_id?: string;
   brand_id?: string;
@@ -58,8 +58,8 @@ export interface SupabaseRepairRow {
   repair_number?: number;
   technical_labor_cost?: number;
   technical_report?: string;
-  upsell_vidrio?: boolean;
-  costo_repuesto?: number;
+  glass_upsell?: boolean;
+  spare_part_cost?: number;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

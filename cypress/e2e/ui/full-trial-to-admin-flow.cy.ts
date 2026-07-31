@@ -44,7 +44,7 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
 
     cy.intercept('GET', '**/rest/v1/profiles?*', {
       statusCode: 200,
-      body: [{ id: mockUser.id, role: 'tenant_owner', full_name: 'Usuario Mock' }]
+      body: [{ id: mockUser.id, role: 'tenant_owner', first_name: 'Usuario', last_name: 'Mock' }]
     }).as('getProfile');
 
     cy.intercept('GET', '**/rest/v1/tenants?*', {

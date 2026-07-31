@@ -49,7 +49,7 @@ interface CsvRow {
     brand_id?: string;
     image_url?: string;
     slug?: string;
-    unit_cost_at_time?: number;
+    cost_price?: number;
     is_active?: boolean;
     is_featured?: boolean;
 }
@@ -360,7 +360,7 @@ export class AdminProductService {
                 let v = values[i]?.trim();
                 if (v === '' || v === undefined) {
                     raw[h] = null;
-                } else if (['price', 'stock', 'min_stock_alert', 'unit_cost_at_time'].includes(h)) {
+                } else if (['price', 'stock', 'min_stock_alert', 'cost_price'].includes(h)) {
                     raw[h] = Number(v);
                 } else if (['is_active', 'is_featured'].includes(h)) {
                     raw[h] = v.toLowerCase() === 'true';
@@ -389,7 +389,7 @@ export class AdminProductService {
                 brand_id: raw['brand_id'] || undefined,
                 image_url: raw['image_url'] || undefined,
                 slug: raw['slug'] || undefined,
-                unit_cost_at_time: raw['unit_cost_at_time'] != null ? Number(raw['unit_cost_at_time']) : undefined,
+                cost_price: raw['cost_price'] != null ? Number(raw['cost_price']) : undefined,
                 is_active: raw['is_active'] != null ? Boolean(raw['is_active']) : true,
                 is_featured: raw['is_featured'] != null ? Boolean(raw['is_featured']) : false,
             } as CsvRow;
@@ -543,7 +543,7 @@ export class AdminProductService {
                     category_id: catId || undefined,
                     brand_id: brandId || undefined,
                     image_url: row.image_url || undefined,
-                    unit_cost_at_time: row.unit_cost_at_time || 0,
+                    cost_price: row.cost_price || 0,
                     is_active: row.is_active ?? true,
                     is_featured: row.is_featured ?? false,
                 });

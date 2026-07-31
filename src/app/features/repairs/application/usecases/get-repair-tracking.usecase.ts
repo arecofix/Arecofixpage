@@ -44,7 +44,7 @@ export class GetRepairTrackingUseCase {
       customer_name: repair.customer_name,
       technician_report: repair.technical_report || repair.technician_notes,
       images: repair.images,
-      upsell_vidrio: repair.upsell_vidrio,
+      glass_upsell: repair.glass_upsell,
       imei: repair.imei,
       checklist: repair.checklist
     };

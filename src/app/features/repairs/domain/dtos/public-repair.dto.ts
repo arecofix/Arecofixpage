@@ -19,7 +19,7 @@ export interface PublicRepairDto {
     readonly customer_name?: string;
     readonly technician_report?: string;
     readonly images?: string[];
-    readonly upsell_vidrio?: boolean;
+    readonly glass_upsell?: boolean;
     readonly imei?: string;
     readonly checklist?: {
         charger: boolean;

@@ -7,11 +7,12 @@
 :host {
   display: block;
   position: fixed;
-  bottom: 25px;
-  right: 25px;
+  bottom: max(25px, env(safe-area-inset-bottom));
+  right: max(25px, env(safe-area-inset-right));
   z-index: 99999;
   isolation: isolate;
   font-family: 'Inter', system-ui, sans-serif;
+  transform: translateZ(0); /* Fixes mobile scroll jumpiness */
 }
 
 /* ── FAB (Botón flotante) ─────────────────────────── */

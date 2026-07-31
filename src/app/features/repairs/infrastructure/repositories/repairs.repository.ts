@@ -66,7 +66,7 @@ export interface RepairDetailDto {
   security_pin?: string;
   security_pattern?: string;
   device_passcode?: string;
-  upsell_vidrio?: boolean;
+  glass_upsell?: boolean;
   spare_part_cost?: number;
   // Relaciones relacionales pesadas, cargadas solo en detalle
   images?: { image_url: string }[];
@@ -105,7 +105,7 @@ export class RepairsRepository {
     let query = this.supabase
       .from(this.tableName)
       .select(
-        'id, tracking_code, customer_name, device_brand, device_model, current_status_id, created_at, final_cost, branch_id, tenant_id',
+        'id, tracking_code, current_status_id, created_at, final_cost, branch_id, tenant_id, client:profiles!repairs_client_id_fkey(first_name, last_name), device:customer_devices!device_id(custom_model_name, model:models(name, brand_id))',
         { count: 'exact' }
       );
 
@@ -126,7 +126,7 @@ export class RepairsRepository {
     if (filters?.searchTerm) {
       const term = `%${filters.searchTerm}%`;
       query = query.or(
-        `customer_name.ilike.${term},tracking_code.ilike.${term},device_model.ilike.${term}`
+        `tracking_code.ilike.${term}`
       );
     }
 
@@ -143,7 +143,18 @@ export class RepairsRepository {
         }
 
         return {
-          data: (data || []) as RepairListDto[],
+          data: (data || []).map((r: any) => ({
+            id: r.id,
+            tracking_code: r.tracking_code,
+            customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : 'Cliente',
+            device_brand: '', 
+            device_model: r.device?.custom_model_name || r.device?.model?.name || 'Equipo Genérico',
+            current_status_id: r.current_status_id,
+            created_at: r.created_at,
+            final_cost: r.final_cost,
+            branch_id: r.branch_id,
+            tenant_id: r.tenant_id
+          })) as RepairListDto[],
           totalCount: count || 0
         };
       })
@@ -159,15 +170,16 @@ export class RepairsRepository {
     let query = this.supabase
       .from(this.tableName)
       .select(`
-        id, tracking_code, customer_id, customer_name, customer_phone,
-        device_type, device_brand, device_model, imei, repair_number,
+        id, tracking_code, customer_id, 
         issue_description, current_status_id, estimated_cost, final_cost,
         deposit_amount, technical_labor_cost, technician_notes, notes,
         technical_report, received_at, created_at, updated_at, completed_at,
         branch_id, tenant_id, checklist, security_pin, security_pattern,
-        device_passcode, upsell_vidrio, spare_part_cost,
+        glass_upsell, spare_part_cost,
         parts:repair_parts_used(id, product_id, quantity, unit_price_at_time, cost_at_time),
-        images:repair_images(id, image_url)
+        images:repair_images(id, image_url),
+        client:profiles!repairs_client_id_fkey(first_name, last_name, phone),
+        device:customer_devices!device_id(imei, passcode, custom_model_name, type, model:models(name, brand_id))
       `)
       .eq('id', id);
 
@@ -182,7 +194,17 @@ export class RepairsRepository {
           this.errorHandler.handleError(error, `getOptimizedDetail ${this.tableName}`);
           throw error;
         }
-        return data as RepairDetailDto | null;
+        const r = data as any;
+        return {
+          ...r,
+          customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : 'Cliente',
+          customer_phone: r.client?.phone,
+          device_type: r.device?.type,
+          device_brand: '',
+          device_model: r.device?.custom_model_name || r.device?.model?.name || 'Equipo Genérico',
+          imei: r.device?.imei,
+          device_passcode: r.device?.passcode
+        } as RepairDetailDto | null;
       })
     );
   }

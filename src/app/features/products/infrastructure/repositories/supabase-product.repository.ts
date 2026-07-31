@@ -60,7 +60,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const end = start + _per_page - 1;
 
     let selectFields = `
-      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      id, name, slug, price, currency, cost_price, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id`;
 
     selectFields += `, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
@@ -153,7 +153,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   findLowStock(threshold: number = 5): Observable<Product[]> {
     const selectFields = `
-      id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, 
+      id, name, slug, price, currency, cost_price, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id,
       branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
     `;
@@ -201,7 +201,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   getTopSellers(limit: number = 10, branch_id?: string): Observable<Product[]> {
     const activeBranchId = branch_id || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
-    const selectFields = `id, name, slug, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, total_units_sold, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
+    const selectFields = `id, name, slug, price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, total_units_sold, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
 
     let query = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true)
@@ -230,7 +230,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       let fromIdx = 0;
       let hasMore = true;
       const CHUNK = 1000;
-      const select = `id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id)`;
+      const select = `id, name, slug, description, price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id)`;
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
@@ -342,7 +342,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     
     const tsQuery = words.map(w => `'${w}':*`).join(' & ');
 
-    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
+    const selectFields = 'id, name, slug, description, price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
     let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true);
     
@@ -381,7 +381,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   getPendingApprovals(): Observable<Product[]> {
-    const selectFields = 'id, name, slug, description, price, currency, unit_cost_at_time, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
+    const selectFields = 'id, name, slug, description, price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
     let query = this.applyTenantFilter(
       this.supabase.from(this.tableName)
         .select(selectFields)

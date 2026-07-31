@@ -20,8 +20,8 @@ export class RepairCalculatorService {
       : Number(product.price || 0);
       
     const unitCost = isUsd 
-      ? this.pricingService.convertToLocal(Number(product.unit_cost_at_time || 0)) 
-      : Number(product.unit_cost_at_time || 0);
+      ? this.pricingService.convertToLocal(Number(product.cost_price || 0)) 
+      : Number(product.cost_price || 0);
 
     return {
       repair_id: repairId,
@@ -31,7 +31,7 @@ export class RepairCalculatorService {
       current_stock: product.stock || 0,
       quantity: 1,
       unit_price_at_time: unitPrice,
-      unit_cost_at_time: unitCost,
+      cost_price: unitCost,
       cost_at_time: unitCost,
     };
   }
@@ -43,7 +43,7 @@ export class RepairCalculatorService {
   calculateFinancials(parts: RepairPart[], laborCost: number) {
     const updatedParts = parts.map(p => ({
         ...p,
-        cost_at_time: (Number(p.unit_cost_at_time) || 0) * (Number(p.quantity) || 1)
+        cost_at_time: (Number(p.cost_price) || 0) * (Number(p.quantity) || 1)
     }));
 
     const partsTotal = updatedParts.reduce((acc, p) => acc + (p.unit_price_at_time * p.quantity), 0);

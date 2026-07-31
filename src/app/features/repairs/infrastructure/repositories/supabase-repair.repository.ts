@@ -178,7 +178,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const criticalKeys = [
             'current_status_id', 'final_cost', 'estimated_cost', 'technician_notes',
             'technical_report', 'technical_labor_cost', 'deposit_amount',
-            'completed_at', 'assigned_technician_id', 'upsell_vidrio',
+            'completed_at', 'assigned_technician_id', 'glass_upsell',
             'security_pin', 'security_pattern', 'device_passcode', 'checklist',
         ];
         for (const key of criticalKeys) {
@@ -230,10 +230,11 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         let query = this.supabase.from(this.tableName)
             .select(`
                 *,
-                client:profiles!repairs_client_id_fkey(id, full_name, phone),
-                assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, full_name),
+                client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone),
+                assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name),
                 status:repair_status_types(id, name, color, icon),
-                brand:brands(id, name)
+                brand:brands(id, name),
+                device:customer_devices!device_id(id, imei, passcode, custom_model_name, model:models(name, brand_id))
             `)
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });
@@ -248,7 +249,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         }
         
         if (params.searchTerm) {
-            query = query.or(`customer_name.ilike.%${params.searchTerm}%,tracking_code.ilike.%${params.searchTerm}%,device_model.ilike.%${params.searchTerm}%`);
+            query = query.or(`tracking_code.ilike.%${params.searchTerm}%`);
         }
 
         return from(query).pipe(
@@ -307,7 +308,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 quantity: Number(p.quantity) || 1,
                 unit_price_at_time: Number(p.unit_price_at_time) || 0,
                 cost_at_time: Number(p.cost_at_time) || 0,
-                unit_cost_at_time: (Number(p.cost_at_time) || 0) / (Number(p.quantity) || 1),
+                cost_price: (Number(p.cost_at_time) || 0) / (Number(p.quantity) || 1),
                 tenant_id: tenantId
             }));
             await this.supabase.from('repair_parts_used').insert(partsToInsert);
@@ -343,14 +344,14 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         return {
             id: p.id,
             tracking_code: p.tracking_code,
-            customer_id: p.client_id, // Match database column 'client_id'
-            customer_name: p.customer_name,
-            customer_phone: p.customer_phone,
-            device_type: p.device_type,
-            brand_id: p.brand_id,
-            brand_name: p.brand?.name || undefined,
-            device_model: p.device_model,
-            imei: p.imei,
+            customer_id: p.client_id,
+            customer_name: p.client ? `${p.client.first_name || ''} ${p.client.last_name || ''}`.trim() : (p.customer_name || 'Cliente'),
+            customer_phone: p.client?.phone || p.customer_phone,
+            device_type: p.device?.type || p.device_type,
+            brand_id: p.device?.brand_id || p.device?.model?.brand_id || p.brand_id,
+            brand_name: p.brand?.name || p.device_brand || undefined,
+            device_model: p.device?.custom_model_name || p.device?.model?.name || p.device_model || 'Equipo Genérico',
+            imei: p.device?.imei || p.imei,
             repair_number: p.repair_number,
             issue_description: p.issue_description,
             current_status_id: p.current_status_id,
@@ -373,8 +374,8 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             checklist: p.checklist,
             security_pin: p.security_pin,
             security_pattern: p.security_pattern,
-            device_passcode: p.device_passcode,
-            upsell_vidrio: p.upsell_vidrio,
+            device_passcode: p.device?.passcode,
+            glass_upsell: p.glass_upsell,
             spare_part_cost: Number(p.spare_part_cost || 0)
         };
     }
@@ -382,12 +383,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     private mapToDb(r: any): any {
         return {
             client_id: r.customer_id || null, 
-            customer_name: r.customer_name,
-            customer_phone: r.customer_phone,
-            device_type: r.device_type,
-            brand_id: r.brand_id,
-            device_model: r.device_model,
-            imei: r.imei,
+            device_id: r.device_id || null,
             issue_description: r.issue_description,
             current_status_id: r.current_status_id,
             estimated_cost: r.estimated_cost,
@@ -403,8 +399,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             checklist: r.checklist,
             security_pin: r.security_pin || null,
             security_pattern: r.security_pattern || null,
-            device_passcode: r.device_passcode || null,
-            upsell_vidrio: r.upsell_vidrio || false,
+            glass_upsell: r.glass_upsell || false,
             spare_part_cost: r.spare_part_cost || 0,
             whatsapp_notifications: r.whatsapp_notifications ?? true
         };

@@ -21,7 +21,7 @@ interface ProductOption {
     name: string;
     sku: string;
     price: number;
-    unit_cost_at_time: number;
+    cost_price: number;
     stock: number;
 }
 
@@ -146,7 +146,7 @@ export class AdminOrderFormPage implements OnInit {
                         name: p.name,
                         sku: p.sku || '',
                         price: p.price,
-                        unit_cost_at_time: p.unit_cost_at_time || 0,
+                        cost_price: p.cost_price || 0,
                         stock: p.stock || 0
                     })));
                     resolve();
@@ -213,7 +213,7 @@ export class AdminOrderFormPage implements OnInit {
             product_sku: [item?.product_sku || ''],
             quantity: [item?.quantity || 1, [Validators.required, Validators.min(1)]],
             unit_price: [item?.unit_price || 0, [Validators.required, Validators.min(0)]],
-            unit_cost_at_time: [item?.unit_cost_at_time || 0],
+            cost_price: [item?.cost_price || 0],
             subtotal: [item?.subtotal || 0]
         });
     }
@@ -238,7 +238,7 @@ export class AdminOrderFormPage implements OnInit {
                 product_name: product.name,
                 product_sku: product.sku,
                 unit_price: product.price,
-                unit_cost_at_time: product.unit_cost_at_time,
+                cost_price: product.cost_price,
                 subtotal: product.price * itemGroup.get('quantity')?.value
             });
         } else {
@@ -402,7 +402,7 @@ export class AdminOrderFormPage implements OnInit {
             product_name: product.name,
             product_sku: product.sku,
             unit_price: product.price,
-            unit_cost_at_time: product.unit_cost_at_time,
+            cost_price: product.cost_price,
             subtotal: product.price * itemGroup.get('quantity')?.value
         });
 

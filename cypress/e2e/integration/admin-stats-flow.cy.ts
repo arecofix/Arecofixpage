@@ -69,31 +69,31 @@ describe('Admin Statistics computational and rendering audit', () => {
         {
           id: 'repair-1',
           final_cost: 10000,
-          costo_repuesto: 2000,
+          spare_part_cost: 2000,
           current_status_id: 5, // Lista (Counts as revenue)
           created_at: new Date().toISOString(),
           completed_at: new Date().toISOString(),
-          upsell_vidrio: false,
+          glass_upsell: false,
           tenant_id: 'tenant-1'
         },
         {
           id: 'repair-2',
           final_cost: 20000,
-          costo_repuesto: 5000,
+          spare_part_cost: 5000,
           current_status_id: 6, // Entregada (Counts as revenue)
           created_at: new Date().toISOString(),
           completed_at: new Date().toISOString(),
-          upsell_vidrio: true,
+          glass_upsell: true,
           tenant_id: 'tenant-1'
         },
         {
           id: 'repair-3',
           final_cost: 50000,
-          costo_repuesto: 15000,
+          spare_part_cost: 15000,
           current_status_id: 1, // Recibida/Pendiente (Does NOT count as revenue)
           created_at: new Date().toISOString(),
           completed_at: null,
-          upsell_vidrio: false,
+          glass_upsell: false,
           tenant_id: 'tenant-1'
         }
       ]

@@ -139,7 +139,7 @@ describe('Flujo Completo de Reparación y Seguimiento', () => {
                     received_at: new Date().toISOString(),
                     technical_report: null,
                     repair_number: 104,
-                    upsell_vidrio: false,
+                    glass_upsell: false,
                     images: [],
                     warranty: null,
                     tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b',

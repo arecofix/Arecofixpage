@@ -75,7 +75,7 @@ import { BranchService } from '@app/core/services/branch.service';
                         <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400">Costo Insumos</div>
                         <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 flex items-center justify-center"><i class="fas fa-microchip"></i></div>
                     </div>
-                    <div class="text-3xl font-black text-rose-500 tracking-tighter">-{{ formatARS(s.costo_repuestos) }}</div>
+                    <div class="text-3xl font-black text-rose-500 tracking-tighter">-{{ formatARS(s.spare_part_costs) }}</div>
                     <div class="text-xs text-gray-500 mt-2 font-medium">Inversión en repuestos utilizados</div>
                 </div>
 
