@@ -191,8 +191,10 @@ export class AdminRepairsPage implements OnInit {
 
   onScroll(index: number) {
     const total = this.mappedRepairs().length;
-    // Trigger load more when we are 5 items away from current end
-    if (index >= total - 5 && this.hasMore() && !this.loadingMore() && !this.loading()) {
+    // index is the first visible item. Viewport shows ~6 items (600px / 100px).
+    // We trigger when the last visible item is within 5 items of the total.
+    const lastVisibleItem = index + 6;
+    if (lastVisibleItem >= total - 5 && this.hasMore() && !this.loadingMore() && !this.loading()) {
       this.loadMore();
     }
   }

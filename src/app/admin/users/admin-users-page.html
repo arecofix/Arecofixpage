@@ -1,4 +1,4 @@
-﻿<!-- ─── Header ──────────────────────────────────────────────────────────── -->
+<!-- ─── Header ──────────────────────────────────────────────────────────── -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <div>
         <h1 class="text-2xl font-black text-base-content">{{ t().crm.title || 'Gestión de Personas y Clientes' }}</h1>
@@ -42,8 +42,8 @@
         [class.tab-active]="activeTab() === 'clients'"
         (click)="setTab('clients')">
         <i class="fas fa-users text-sm"></i> Clientes
-        @if (clients().length > 0) {
-            <span class="badge badge-sm badge-neutral">{{ filteredClients().length }}</span>
+        @if (clientsTotal() > 0) {
+            <span class="badge badge-sm badge-neutral">{{ clientsTotal() }}</span>
         }
     </button>
     @if (isGlobalAdmin()) {
@@ -51,24 +51,24 @@
             [class.tab-active]="activeTab() === 'users'"
             (click)="setTab('users')">
             <i class="fas fa-user-lock text-sm"></i> Usuarios
-            @if (users().length > 0) {
-                <span class="badge badge-sm badge-neutral">{{ users().length }}</span>
+            @if (usersTotal() > 0) {
+                <span class="badge badge-sm badge-neutral">{{ usersTotal() }}</span>
             }
         </button>
         <button id="tab-staff" role="tab" class="tab text-base font-semibold gap-2"
             [class.tab-active]="activeTab() === 'staff'"
             (click)="setTab('staff')">
             <i class="fas fa-id-badge text-sm"></i> Staff
-            @if (employees().length > 0) {
-                <span class="badge badge-sm badge-primary">{{ employees().length }}</span>
+            @if (staffTotal() > 0) {
+                <span class="badge badge-sm badge-primary">{{ staffTotal() }}</span>
             }
         </button>
         <button id="tab-suppliers" role="tab" class="tab text-base font-semibold gap-2"
             [class.tab-active]="activeTab() === 'suppliers'"
             (click)="setTab('suppliers')">
             <i class="fas fa-truck text-sm"></i> Proveedores
-            @if (suppliers().length > 0) {
-                <span class="badge badge-sm badge-accent">{{ suppliers().length }}</span>
+            @if (suppliersTotal() > 0) {
+                <span class="badge badge-sm badge-accent">{{ suppliersTotal() }}</span>
             }
         </button>
     }
@@ -85,7 +85,7 @@
             <input
                 type="text"
                 [ngModel]="clientsSearchTerm()"
-                (ngModelChange)="clientsSearchTerm.set($event)"
+                (ngModelChange)="onClientSearchChange($event)"
                 placeholder="{{ t().crm.clients.searchPlaceholder || 'Buscar por nombre, email, teléfono o DNI...' }}"
                 class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-250 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
@@ -94,7 +94,7 @@
 
     <!-- Estadísticas rápidas -->
     <div class="flex items-center gap-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
-        <span><strong class="text-gray-800 dark:text-white">{{ filteredClients().length }}</strong> {{ t().crm.clients.clientsFound || 'clientes encontrados' }}</span>
+        <span><strong class="text-gray-800 dark:text-white">{{ clientsTotal() }}</strong> {{ t().crm.clients.clientsFound || 'clientes encontrados' }}</span>
         <span class="text-gray-300 dark:text-gray-600">|</span>
         <span>{{ t().crm.clients.page || 'Página' }} <strong class="text-gray-800 dark:text-white">{{ clientsCurrentPage() }}</strong> {{ t().crm.clients.of || 'de' }} {{ totalClientsPages() }}</span>
     </div>
@@ -130,7 +130,7 @@
                                 <td class="px-4 py-4 text-center"><div class="h-8 w-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mx-auto"></div></td>
                             </tr>
                         }
-                    } @else if (filteredClients().length === 0) {
+                    } @else if (clients().length === 0) {
                         <tr>
                             <td colspan="6" class="text-center py-12 text-gray-400">
                                 <i class="fas fa-users text-3xl mb-2 opacity-30 block"></i>
@@ -138,7 +138,7 @@
                             </td>
                         </tr>
                     } @else {
-                        @for (client of paginatedClients(); track client.id) {
+                        @for (client of clients(); track client.id) {
                             <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
                                 <td class="px-4 py-3">
                                     <div class="font-bold text-gray-800 dark:text-white">
@@ -210,13 +210,13 @@
                         <div class="h-3 w-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
                     </div>
                 }
-            } @else if (filteredClients().length === 0) {
+            } @else if (clients().length === 0) {
                 <div class="text-center py-12 text-gray-400">
                     <i class="fas fa-users text-3xl mb-2 opacity-30 block"></i>
                     {{ clientsSearchTerm() ? 'No se encontraron clientes.' : (t().crm.clients.emptyState || 'No hay clientes registrados.') }}
                 </div>
             } @else {
-                @for (client of paginatedClients(); track client.id) {
+                @for (client of clients(); track client.id) {
                     <div class="p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-start">
                             <div>
@@ -286,9 +286,9 @@
     <!-- Pagination -->
     @if (totalClientsPages() > 1) {
         <div class="mt-6 flex justify-center gap-1">
-            <button [disabled]="clientsCurrentPage() === 1" (click)="clientsCurrentPage.set(clientsCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
+            <button [disabled]="clientsCurrentPage() === 1" (click)="onClientsPageChange(clientsCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
             <span class="btn btn-sm btn-ghost cursor-default">{{ clientsCurrentPage() }} / {{ totalClientsPages() }}</span>
-            <button [disabled]="clientsCurrentPage() === totalClientsPages()" (click)="clientsCurrentPage.set(clientsCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+            <button [disabled]="clientsCurrentPage() === totalClientsPages()" (click)="onClientsPageChange(clientsCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
         </div>
     }
 }
@@ -309,7 +309,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (loading()) {
+                @if (usersLoading()) {
                     <tr>
                         <td colspan="4" class="text-center py-12">
                             <span class="loading loading-spinner loading-md text-primary"></span>
@@ -378,6 +378,15 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Users -->
+    @if (totalUsersPages() > 1) {
+        <div class="mt-4 mb-4 flex justify-center gap-1">
+            <button [disabled]="usersCurrentPage() === 1" (click)="onUsersPageChange(usersCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default">{{ usersCurrentPage() }} / {{ totalUsersPages() }}</span>
+            <button [disabled]="usersCurrentPage() === totalUsersPages()" (click)="onUsersPageChange(usersCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+        </div>
+    }
 </div>
 }
 
@@ -454,6 +463,15 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Staff -->
+    @if (totalStaffPages() > 1) {
+        <div class="mt-4 mb-4 flex justify-center gap-1">
+            <button [disabled]="staffCurrentPage() === 1" (click)="onStaffPageChange(staffCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default">{{ staffCurrentPage() }} / {{ totalStaffPages() }}</span>
+            <button [disabled]="staffCurrentPage() === totalStaffPages()" (click)="onStaffPageChange(staffCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+        </div>
+    }
 </div>
 }
 
@@ -542,6 +560,15 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Suppliers -->
+    @if (totalSuppliersPages() > 1) {
+        <div class="mt-4 mb-4 flex justify-center gap-1">
+            <button [disabled]="suppliersCurrentPage() === 1" (click)="onSuppliersPageChange(suppliersCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default">{{ suppliersCurrentPage() }} / {{ totalSuppliersPages() }}</span>
+            <button [disabled]="suppliersCurrentPage() === totalSuppliersPages()" (click)="onSuppliersPageChange(suppliersCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+        </div>
+    }
 </div>
 }
 

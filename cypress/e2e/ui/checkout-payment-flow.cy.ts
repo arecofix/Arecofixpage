@@ -33,7 +33,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
     
     // Wait for the payment method step to appear
-    cy.contains('¿Cómo querés pagar?').should('be.visible');
+    cy.contains(/c.mo quer.s pagar/i).should('be.visible');
   };
 
   it('debería procesar orden exitosa y generar ID único (QA #84-85)', () => {

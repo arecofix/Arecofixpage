@@ -26,7 +26,7 @@ describe('Performance & Infinite Loaders Audit', () => {
       cy.get('app-spinner, .loading-spinner, .skeleton', { timeout: 8000 }).should('not.exist');
       
       // Asegurar que el layout principal se renderiza
-      cy.get('app-public-layout, main, .main-content').should('be.visible').then(() => {
+      cy.get('app-public-layout, app-auth-layout, app-branch-layout, main, .main-content').should('be.visible').then(() => {
         const endTime = performance.now();
         const duration = endTime - startTime;
         

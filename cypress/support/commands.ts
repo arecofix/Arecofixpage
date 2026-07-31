@@ -130,6 +130,19 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
     body: [mockProfile]
   }).as('getProfile');
 
+  cy.intercept('GET', '**/rest/v1/v_unified_clients*', {
+    statusCode: 200,
+    headers: {
+      'content-range': '0-1/2'
+    },
+    body: [{
+      ...mockProfile,
+      source: 'profile',
+      repair_count: 0,
+      order_count: 0
+    }]
+  }).as('getUnifiedClientsGlobal');
+
   // Mock Dashboard RPCs
   cy.intercept('POST', '**/rest/v1/rpc/get_dashboard_stats_v2*', {
     statusCode: 200,

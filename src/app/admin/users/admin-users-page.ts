@@ -59,40 +59,36 @@ export class AdminUsersPage implements OnInit {
     clientsSearchTerm = signal<string>('');
     clientsPageSize = signal(15);
     clientsCurrentPage = signal(1);
+    clientsTotal = signal(0);
 
-    filteredClients = computed(() => {
-        const term = this.clientsSearchTerm().toLowerCase().trim();
-        if (!term) return this.clients();
-        return this.clients().filter(c =>
-            (c.first_name + ' ' + c.last_name).toLowerCase().includes(term) ||
-            (c.full_name || '').toLowerCase().includes(term) ||
-            (c.email || '').toLowerCase().includes(term) ||
-            (c.phone || '').toLowerCase().includes(term) ||
-            (c.dni || '').toLowerCase().includes(term)
-        );
-    });
-
-    totalClientsPages = computed(() => Math.ceil(this.filteredClients().length / this.clientsPageSize()));
-
-    paginatedClients = computed(() => {
-        const start = (this.clientsCurrentPage() - 1) * this.clientsPageSize();
-        return this.filteredClients().slice(start, start + this.clientsPageSize());
-    });
+    totalClientsPages = computed(() => Math.max(1, Math.ceil(this.clientsTotal() / this.clientsPageSize())));
 
     // --- Users Tab ---
     users = signal<UserProfile[]>([]);
     branches = signal<Branch[]>([]);
-    loading = signal<boolean>(true);
+    usersLoading = signal<boolean>(true);
     selectedUserForBranch = signal<UserProfile | null>(null);
     isUpdating = signal<boolean>(false);
+    usersPageSize = signal(15);
+    usersCurrentPage = signal(1);
+    usersTotal = signal(0);
+    totalUsersPages = computed(() => Math.max(1, Math.ceil(this.usersTotal() / this.usersPageSize())));
 
     // --- Staff Tab ---
     employees = signal<EmployeeProfile[]>([]);
     staffLoading = signal<boolean>(false);
+    staffPageSize = signal(15);
+    staffCurrentPage = signal(1);
+    staffTotal = signal(0);
+    totalStaffPages = computed(() => Math.max(1, Math.ceil(this.staffTotal() / this.staffPageSize())));
 
     // --- Suppliers Tab ---
     suppliers = signal<Supplier[]>([]);
     suppliersLoading = signal<boolean>(false);
+    suppliersPageSize = signal(15);
+    suppliersCurrentPage = signal(1);
+    suppliersTotal = signal(0);
+    totalSuppliersPages = computed(() => Math.max(1, Math.ceil(this.suppliersTotal() / this.suppliersPageSize())));
     isTrackingModalOpen = signal(false);
     andreaniTrackingCode = signal<string>('');
     trackingUrl = signal<string | null>(null);
@@ -148,15 +144,22 @@ export class AdminUsersPage implements OnInit {
     }
 
     async loadUsers() {
-        this.loading.set(true);
+        this.usersLoading.set(true);
         try {
-            const data = await firstValueFrom(this.adminUsersService.getUsers());
-            this.users.set(data);
+            const res = await firstValueFrom(this.adminUsersService.getPaginatedUsers(this.usersCurrentPage(), this.usersPageSize()));
+            this.users.set(res.data);
+            this.usersTotal.set(res.total);
         } catch (error: unknown) {
             console.error(error instanceof Error ? error.message : 'Error desconocido');
         } finally {
-            this.loading.set(false);
+            this.usersLoading.set(false);
         }
+    }
+
+    onUsersPageChange(page: number) {
+        if (page < 1 || page > this.totalUsersPages()) return;
+        this.usersCurrentPage.set(page);
+        this.loadUsers();
     }
 
     async updateUserRole(user: UserProfile, newRole: string) {
@@ -209,8 +212,9 @@ export class AdminUsersPage implements OnInit {
     async loadEmployees() {
         this.staffLoading.set(true);
         try {
-            const data = await this.employeeService.getAll();
-            this.employees.set(data);
+            const res = await this.employeeService.getPaginated(this.staffCurrentPage(), this.staffPageSize());
+            this.employees.set(res.data);
+            this.staffTotal.set(res.total);
         } catch (error) {
             console.error('Error loading employees:', error);
         } finally {
@@ -218,17 +222,30 @@ export class AdminUsersPage implements OnInit {
         }
     }
 
+    onStaffPageChange(page: number) {
+        if (page < 1 || page > this.totalStaffPages()) return;
+        this.staffCurrentPage.set(page);
+        this.loadEmployees();
+    }
+
     // ─── Suppliers Tab Logic ───────────────────────────────────────────────
     async loadSuppliers() {
         this.suppliersLoading.set(true);
         try {
-            const data = await this.supplierService.getAll();
-            this.suppliers.set(data.sort((a, b) => a.name.localeCompare(b.name)));
+            const res = await this.supplierService.getPaginated(this.suppliersCurrentPage(), this.suppliersPageSize());
+            this.suppliers.set(res.data); // Removed sorting locally since server should handle it, or we accept default order
+            this.suppliersTotal.set(res.total);
         } catch (error) {
             console.error('Error loading suppliers:', error);
         } finally {
             this.suppliersLoading.set(false);
         }
+    }
+
+    onSuppliersPageChange(page: number) {
+        if (page < 1 || page > this.totalSuppliersPages()) return;
+        this.suppliersCurrentPage.set(page);
+        this.loadSuppliers();
     }
 
     openTracker() {
@@ -280,9 +297,13 @@ export class AdminUsersPage implements OnInit {
     async loadClients() {
         this.clientsLoading.set(true);
         try {
-            const unifiedData = await this.customerService.getUnifiedClients();
+            const { data, total } = await this.customerService.getPaginatedUnifiedClients(
+                this.clientsCurrentPage(),
+                this.clientsPageSize(),
+                this.clientsSearchTerm()
+            );
             this.clients.set(
-                unifiedData.map((c: any) => ({
+                data.map((c: any) => ({
                     id: c.id,
                     first_name: c.first_name || '',
                     last_name: c.last_name || '',
@@ -297,6 +318,7 @@ export class AdminUsersPage implements OnInit {
                     created_at: c.created_at
                 }))
             );
+            this.clientsTotal.set(total);
         } catch (error) {
             console.error('Error loading unified clients:', error);
         } finally {
@@ -304,8 +326,40 @@ export class AdminUsersPage implements OnInit {
         }
     }
 
-    downloadCSV(): void {
-        const rows = this.filteredClients();
+    onClientSearchChange(term: string) {
+        this.clientsSearchTerm.set(term);
+        this.clientsCurrentPage.set(1);
+        this.loadClients();
+    }
+
+    onClientsPageChange(page: number) {
+        if (page < 1 || page > this.totalClientsPages()) return;
+        this.clientsCurrentPage.set(page);
+        this.loadClients();
+    }
+
+    async downloadCSV() {
+        let rows = this.clients();
+        
+        // Export current page only, or all up to 1000
+        try {
+            const { data } = await this.customerService.getPaginatedUnifiedClients(1, 1000, this.clientsSearchTerm());
+            rows = data.map((c: any) => ({
+                    id: c.id,
+                    first_name: c.first_name || '',
+                    last_name: c.last_name || '',
+                    full_name: c.full_name || '',
+                    email: c.email || '',
+                    phone: c.phone || '',
+                    address: c.address,
+                    dni: c.dni,
+                    source: c.source as any,
+                    repair_count: c.repair_count || 0,
+                    order_count: c.order_count || 0,
+                    created_at: c.created_at
+            }));
+        } catch (error) {}
+
         const header = ['Nombre', 'Apellido', 'Email', 'Teléfono', 'Dirección', 'DNI', 'Fuente', 'Reparaciones', 'Pedidos'];
         const csvRows = rows.map(c => [
             this.csvEscape(c.first_name),

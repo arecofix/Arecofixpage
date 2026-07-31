@@ -95,7 +95,9 @@ export class SupabaseService {
           clearTimeout(timeoutId);
           
           if (!response.ok && response.status >= 500) {
-              throw new Error(`Server Error: ${response.status}`);
+              const errorText = await response.text().catch(() => 'No error body');
+              console.error(`[Supabase] 500 on ${url} - Details:`, errorText);
+              throw new Error(`Server Error: ${response.status} - ${errorText}`);
           }
 
           if (isCacheable && response.ok) {

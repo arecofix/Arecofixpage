@@ -93,8 +93,6 @@ export class CustomerService {
   async getUnifiedClients(): Promise<any[]> {
     const profiles = await firstValueFrom(this.repository.getUnifiedClients());
     const supabase = this.authService.getSupabaseClient();
-    
-    // Fetch standalone orders (guest buyers)
     const { data: standaloneOrders } = await supabase
       .from('orders')
       .select('customer_name, customer_email, customer_phone, created_at')
@@ -134,5 +132,9 @@ export class CustomerService {
     }
 
     return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+
+  async getPaginatedUnifiedClients(page: number, limit: number, searchTerm?: string): Promise<{ data: any[], total: number }> {
+    return firstValueFrom(this.repository.getPaginatedUnifiedClients(page, limit, searchTerm));
   }
 }

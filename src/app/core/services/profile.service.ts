@@ -29,9 +29,15 @@ export class ProfileService {
     userId: string,
     profile: Partial<UserProfile>,
   ): Promise<UserProfile | null> {
+    const payload = { ...profile };
+    // referral_code column does not exist in DB schema, remove it to avoid PGRST204
+    if ('referral_code' in payload) {
+      delete payload.referral_code;
+    }
+
     const { data, error } = await this.supabase
       .from('profiles')
-      .update(profile)
+      .update(payload)
       .eq('id', userId)
       .select()
       .maybeSingle();
