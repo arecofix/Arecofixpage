@@ -156,6 +156,17 @@ export class SupabaseService {
       throw lastError;
     };
 
+    const isBrowser = typeof window !== 'undefined';
+    class DummyWebSocket {
+      CONNECTING = 0; OPEN = 1; CLOSING = 2; CLOSED = 3;
+      readyState = 3;
+      constructor() {}
+      close() {}
+      send() {}
+      addEventListener() {}
+      removeEventListener() {}
+      dispatchEvent() { return true; }
+    }
 
     this.client = createClient(
       environment.supabaseUrl,
@@ -168,6 +179,7 @@ export class SupabaseService {
           params: {
             eventsPerSecond: 2,
           },
+          transport: isBrowser ? undefined : (DummyWebSocket as any)
         },
         auth: {
           storage: {
