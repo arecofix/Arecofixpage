@@ -73,15 +73,16 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
     cy.visit('/checkout');
     cy.wait('@getPopulatedCart');
 
+    // Open the cart sidebar
+    cy.get('button[aria-label="Carrito"]').first().click({ force: true });
+
     // Subtotal esperado: (1000 * 2) + (2500 * 1) = 4500. Aceptamos coma o punto por el locale.
     cy.get('[aria-label="Carrito de compras"]').contains(/4[.,]500/i).should('exist');
 
     // Simular Vaciar Carrito (DELETE)
     cy.intercept('DELETE', '**/rest/v1/order*', { statusCode: 204 }).as('deleteOrder');
     
-    // Suponiendo que hay un botón de volver a la tienda / carrito
-    // Pero lo forzamos navegando al carrito otra vez
-    cy.get('button[aria-label="Carrito"]').click({ force: true });
+    // Click Vaciar Carrito
     cy.get('button').contains(/vaciar|limpiar/i, { matchCase: false }).click({ force: true });
     
     cy.wait('@deleteOrder');

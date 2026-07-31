@@ -10,7 +10,8 @@ export const branchSlugMatcher: UrlMatcher = (segments: UrlSegment[], group: Url
     'admin', 'login', 'register', 'perfil', 'nosotros', 'contacto', 
     'servicios', 'academy', 'checkout', 'posts', 'tracking', 'blog', 
     'portfolio', 'productos', 'categories', 'repuestos', 'gsm', 'fixtecnicos', 'recursos',
-    'celular', 'diagnostico', 'privacy', 'terms', 'sitemap', 'zona-norte', 'prueba-gratis', 'prueba'
+    'celular', 'diagnostico', 'privacy', 'terms', 'sitemap', 'zona-norte', 'prueba-gratis', 'prueba',
+    'forgot-password', '404'
   ];
 
   const slug = segments[0].path.toLowerCase();

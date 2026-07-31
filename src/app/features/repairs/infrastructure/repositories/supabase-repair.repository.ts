@@ -27,7 +27,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     override getById(id: string): Observable<Repair | null> {
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), brand:brands(id, name)')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
             .eq('id', id);
 
         return from((this.applyTenantFilter(query) as any)).pipe(
@@ -46,7 +46,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const offset = params?.offset || 0;
 
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), brand:brands(id, name)')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });
 
@@ -63,10 +63,17 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     override create(repair: CreateRepairDto): Observable<Repair> {
         const generatedId = crypto.randomUUID();
-        // Build the payload the same way mapToDb does, plus identity/tenant fields
+        const dbPayload = this.mapToDb(repair);
         const rpcPayload = this.sanitizePayload({
-            ...this.mapToDb(repair),
-            id: generatedId
+            ...dbPayload,
+            id: generatedId,
+            customer_name: repair.customer_name,
+            customer_phone: repair.customer_phone,
+            device_model: repair.device_model,
+            device_type: repair.device_type,
+            imei: repair.imei,
+            brand_id: repair.brand_id,
+            device_passcode: repair.device_passcode
         });
 
         // Use the existing SECURITY DEFINER RPC — bypasses RLS and skips the
@@ -92,7 +99,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 // Fetch full record with relations so return value is complete
                 const { data: fetchedData, error: fetchError } = await this.applyTenantFilter(
                     this.supabase.from(this.tableName)
-                        .select('*, parts:repair_parts_used(*), images:repair_images(image_url), brand:brands(id, name)')
+                        .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
                         .eq('id', generatedId)
                 );
 
@@ -233,8 +240,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone),
                 assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name),
                 status:repair_status_types(id, name, color, icon),
-                brand:brands(id, name),
-                device:customer_devices!device_id(id, imei, passcode, custom_model_name, model:models(name, brand_id))
+                device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))
             `)
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });

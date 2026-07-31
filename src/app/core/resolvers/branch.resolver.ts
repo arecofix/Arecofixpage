@@ -13,21 +13,21 @@ export const BranchResolver: ResolveFn<Branch | null> = async (
   const slug = route.params['branchSlug'] ?? route.paramMap.get('branchSlug');
 
   if (!slug) {
-    router.navigate(['/']);
+    router.navigate(['/404'], { skipLocationChange: true });
     return null;
   }
 
   try {
     const branch = await branchService.getBranchBySlug(slug);
     if (!branch) {
-      // Sucursal no encontrada o inactiva — redirigir a home limpiamente
-      router.navigate(['/']);
+      // Sucursal no encontrada o inactiva — redirigir a 404
+      router.navigate(['/404'], { skipLocationChange: true });
       return null;
     }
     return branch;
   } catch (error) {
     console.error('[BranchResolver] Error fetching branch data:', error);
-    router.navigate(['/']);
+    router.navigate(['/404'], { skipLocationChange: true });
     return null;
   }
 };

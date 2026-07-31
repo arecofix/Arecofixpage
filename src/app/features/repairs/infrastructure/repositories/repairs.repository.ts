@@ -105,7 +105,7 @@ export class RepairsRepository {
     let query = this.supabase
       .from(this.tableName)
       .select(
-        'id, tracking_code, current_status_id, created_at, final_cost, branch_id, tenant_id, client:profiles!repairs_client_id_fkey(first_name, last_name), device:customer_devices!device_id(custom_model_name, model:models(name, brand_id))',
+        'id, tracking_code, current_status_id, created_at, final_cost, branch_id, tenant_id, client:profiles!repairs_client_id_fkey(first_name, last_name), device:customer_devices!device_id(model:models(name, brand_id))',
         { count: 'exact' }
       );
 
@@ -179,7 +179,7 @@ export class RepairsRepository {
         parts:repair_parts_used(id, product_id, quantity, unit_price_at_time, cost_at_time),
         images:repair_images(id, image_url),
         client:profiles!repairs_client_id_fkey(first_name, last_name, phone),
-        device:customer_devices!device_id(imei, passcode, custom_model_name, type, model:models(name, brand_id))
+        device:customer_devices!device_id(imei, passcode, type, model:models(name, brand_id))
       `)
       .eq('id', id);
 

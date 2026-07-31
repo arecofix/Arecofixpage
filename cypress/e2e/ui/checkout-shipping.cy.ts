@@ -50,7 +50,7 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     // Verificamos que desaparezca el texto "Calculando envío..."
     cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
-    cy.contains('¿Cómo querés pagar?').should('exist');
+    cy.contains(/c.mo quer.s pagar/i).should('exist');
   });
 
   it('debería calcular y sumar el costo de envío correctamente (QA #63)', () => {
@@ -74,6 +74,6 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
     
     // Verificamos el avance al paso de pago
-    cy.contains(/¿Cómo querés pagar?/i, { matchCase: false }).should('be.visible');
+    cy.contains(/c.mo quer.s pagar/i, { matchCase: false }).should('be.visible');
   });
 });

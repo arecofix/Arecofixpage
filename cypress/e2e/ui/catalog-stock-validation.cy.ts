@@ -64,7 +64,7 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
     cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });
 
     // Debería aparecer una alerta o toast indicando el límite de stock
-    cy.get('app-toast').contains(/quedan|stock|máximo|límite/i, { timeout: 5000 }).should('be.visible');
+    cy.get('app-toast').contains(/stock/i, { timeout: 5000 }).should('be.visible');
   });
 
   it('debería reflejar stock de sucursal propietaria exclusivamente si no es global (QA #5 & #18)', () => {

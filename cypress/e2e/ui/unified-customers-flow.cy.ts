@@ -33,9 +33,12 @@ describe('Unified Customers Flow Validation', () => {
     
     cy.loginAsAdmin('/admin/clients');
 
-    // Interceptamos la llamada a `profiles` para el getUnifiedClients
-    cy.intercept('GET', '**/rest/v1/profiles*', {
+    // Interceptamos la llamada a `v_unified_clients` para el getPaginatedUnifiedClients
+    cy.intercept('GET', '**/rest/v1/v_unified_clients*', {
       statusCode: 200,
+      headers: {
+        'content-range': '0-1/2'
+      },
       body: [
         {
           id: 'mock-registered-user',
@@ -44,28 +47,23 @@ describe('Unified Customers Flow Validation', () => {
           email: 'registered@cypress.test',
           role: 'user',
           is_guest: false,
+          source: 'profile',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 'mock-guest-user',
+          first_name: 'Guest Buyer Cypress',
+          email: 'guestbuyer@cypress.test',
+          phone: '1122334455',
+          role: 'user',
+          is_guest: true,
+          source: 'order',
           created_at: new Date().toISOString()
         }
       ]
-    }).as('getProfiles');
+    }).as('getUnifiedClients');
 
-    // Interceptamos la llamada a `orders` para los invitados (cualquier GET a orders)
-    cy.intercept('GET', '**/rest/v1/orders*', (req) => {
-      req.reply({
-        statusCode: 200,
-        body: [
-          {
-            customer_name: 'Guest Buyer Cypress',
-            customer_email: 'guestbuyer@cypress.test',
-            customer_phone: '1122334455',
-            created_at: new Date().toISOString()
-          }
-        ]
-      });
-    }).as('getOrders');
-
-    cy.wait('@getProfiles');
-    cy.wait('@getOrders');
+    cy.wait('@getUnifiedClients');
 
     // Validar que ambos aparezcan en la tabla de clientes unificada
     cy.get('table').within(() => {

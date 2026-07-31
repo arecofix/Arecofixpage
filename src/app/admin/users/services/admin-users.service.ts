@@ -43,6 +43,38 @@ export class AdminUsersService {
     })());
   }
 
+  getPaginatedUsers(page: number, limit: number): Observable<{ data: UserProfile[], total: number }> {
+    return from((async () => {
+      const tenantId = this.tenantService.getTenantId();
+      let query = this.supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name, phone, role, avatar_url, created_at, updated_at, is_active, branch_id', { count: 'exact' })
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false });
+
+      const profile = this.authService.getCurrentProfile();
+      const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
+      const contextBranchId = this.branchContextService.getBranchId();
+      const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
+
+      if (!(isGlobalAdmin && isCentralBranch)) {
+        const branchId = contextBranchId || profile?.branch_id;
+        if (branchId) {
+          query = query.eq('branch_id', branchId);
+        }
+      }
+
+      const start = (page - 1) * limit;
+      const end = start + limit - 1;
+      query = query.range(start, end);
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+      return { data: (data || []) as UserProfile[], total: count || 0 };
+    })());
+  }
+
   updateRole(userId: string, newRole: string): Observable<void> {
     return from((async () => {
       const { error } = await this.supabase

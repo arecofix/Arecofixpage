@@ -57,8 +57,8 @@ describe('Flujo de Instructor en Academia', () => {
         cy.url().should('include', '/instructor/builder');
         
         // Agregar un módulo
-        cy.contains('Agregar Módulo').click();
-        cy.get('input[placeholder="Título del Módulo"]').type('Módulo 1: Introducción');
+        cy.contains('Agregar M').click();
+        cy.get('input[placeholder*="del M"]').first().type('Módulo 1: Introducción');
         
         // Verificar existencia del Dropzone
         cy.contains('Arrastra archivos aquí o haz clic para subir').should('exist');
@@ -66,8 +66,8 @@ describe('Flujo de Instructor en Academia', () => {
 
     it('2. El instructor simula la subida de un archivo al módulo', () => {
         cy.visit('/instructor/builder/curso-test-1');
-        cy.contains('Agregar Módulo').click();
-        cy.get('input[placeholder="Título del Módulo"]').type('Módulo 1: Introducción');
+        cy.contains('Agregar M').click();
+        cy.get('input[placeholder*="del M"]').first().type('Módulo 1: Introducción');
         
         // Simulamos elegir un archivo. En cypress se puede usar selectFile si el input[type=file] existe
         cy.get('input[type="file"]').first().selectFile({

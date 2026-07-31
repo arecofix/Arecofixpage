@@ -148,6 +148,35 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
     );
   }
 
+  getPaginatedUnifiedClients(page: number, limit: number, searchTerm?: string): Observable<{ data: any[], total: number }> {
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    let dbQuery = this.supabase
+      .from('v_unified_clients')
+      .select('*', { count: 'exact' });
+
+    dbQuery = this.applyTenantFilter(dbQuery);
+    dbQuery = this.applyBranchFilter(dbQuery);
+
+    if (searchTerm && searchTerm.trim()) {
+      const q = searchTerm.trim();
+      dbQuery = dbQuery.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%,dni.ilike.%${q}%`);
+    }
+
+    dbQuery = dbQuery.order('created_at', { ascending: false }).range(start, end);
+
+    return from(dbQuery as any).pipe(
+      map(({ data, error, count }: any) => {
+        if (error) {
+          this.logger.error(`Error fetching paginated unified clients from view`, error);
+          this.errorHandler.handleError(error, 'getPaginatedUnifiedClients');
+        }
+        return { data: data || [], total: count || 0 };
+      })
+    );
+  }
+
   private getUnifiedClientsFallback(): Observable<any[]> {
     let dbQuery = this.supabase
       .from(this.tableName)
