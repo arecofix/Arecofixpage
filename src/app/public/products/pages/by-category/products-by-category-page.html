@@ -45,7 +45,9 @@
              <div class="flex items-center gap-3">
                  <!-- Search in Category -->
                  <div class="relative hidden md:block">
-                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                         <i class="fas fa-search text-gray-400"></i>
+                     </div>
                      <input 
                          [defaultValue]="searchQuery()" 
                          (input)="onSearch($any($event.target).value)"
@@ -67,7 +69,9 @@
          <!-- Mobile Search Block (Visible only on mobile) -->
          <div class="md:hidden mb-6">
              <div class="relative">
-                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                     <i class="fas fa-search text-gray-400"></i>
+                 </div>
                  <input 
                      [defaultValue]="searchQuery()" 
                      (input)="onSearch($any($event.target).value)"
