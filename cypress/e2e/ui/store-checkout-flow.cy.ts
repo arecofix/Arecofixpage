@@ -101,7 +101,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     
     // Si la validación falla, markAllAsTouched muestra errores. Veamos cuáles son:
     cy.document().then(doc => {
-      const errors = doc.querySelectorAll('.text-red-500');
+      const errors = doc.querySelectorAll('p.text-red-500');
       if (errors.length > 0) {
         throw new Error('Form validation failed: ' + Array.from(errors).map(e => e.textContent).join(', '));
       }
@@ -112,7 +112,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.get('button').contains(/confirmar pedido/i, { matchCase: false }).click({ force: true });
     
     // Validaciones
-    cy.wait('@updateOrder');
+    cy.wait('@saveOrder');
     cy.contains(/Redirigiendo a Pago Seguro/i, { timeout: 8000 }).should('be.visible');
   });
 
@@ -152,7 +152,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     
     // Si la validación falla, markAllAsTouched muestra errores. Veamos cuáles son:
     cy.document().then(doc => {
-      const errors = doc.querySelectorAll('.text-red-500');
+      const errors = doc.querySelectorAll('p.text-red-500');
       if (errors.length > 0) {
         throw new Error('Form validation failed: ' + Array.from(errors).map(e => e.textContent).join(', '));
       }
