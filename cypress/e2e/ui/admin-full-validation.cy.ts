@@ -13,7 +13,7 @@ describe('Admin Layout & Navigation Full Validation', () => {
     cy.get('.drawer-side').should('exist');
     
     // Validar que el botón de hamburguesa móvil está oculto en desktop
-    cy.get('label[aria-label="open sidebar"]').should('not.be.visible');
+    cy.get('label[for="admin-drawer"]').should('not.be.visible');
   });
 
   it('Debería comportarse correctamente al achicar la ventana y evitar scrolls horizontales', () => {
@@ -55,6 +55,7 @@ describe('Admin Layout & Navigation Full Validation', () => {
     
     // Navegar a Servicio Técnico
     cy.get('aside.drawer-side').contains('Servicio Técnico').click({ force: true });
+    cy.contains('Lista de Reparaciones').click({ force: true });
     cy.url().should('include', '/repairs');
   });
 });

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -44,9 +44,22 @@ import { PublicRepairDto } from '../../features/repairs/domain/dtos/public-repai
         .print-only {
             display: none;
         }
+        /* Hide scrollbar for accessory carousel but allow custom styles if needed */
+        .accessory-carousel::-webkit-scrollbar {
+            height: 6px;
+        }
+        .accessory-carousel::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark .accessory-carousel::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
     `]
 })
 export class TrackingPage implements OnInit, OnDestroy {
+    @ViewChild('accessoryCarousel') accessoryCarousel?: ElementRef<HTMLDivElement>;
+
     private document = inject(DOCUMENT);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
@@ -360,6 +373,13 @@ export class TrackingPage implements OnInit, OnDestroy {
         } catch (e) {
             this.logger.error('Failed to load recommendations', e);
         }
+    }
+
+    scrollCarousel(direction: 'left' | 'right') {
+        if (!this.accessoryCarousel?.nativeElement) return;
+        const container = this.accessoryCarousel.nativeElement;
+        const scrollAmount = 300;
+        container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
     }
 
     async buyAccessory(product: any) {

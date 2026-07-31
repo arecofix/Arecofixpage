@@ -69,7 +69,7 @@
             
             <div class="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
                 <span class="text-sm text-gray-500 hidden sm:inline whitespace-nowrap">Ordenar por:</span>
-                <select class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 w-full sm:w-auto text-ellipsis"
+                <select class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 w-full sm:w-auto max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
                         [ngModel]="currentSort" 
                         (ngModelChange)="setSort($event.split('|')[0], $event.split('|')[1])">
                     <option value="created_at|desc">Más Recientes</option>
