@@ -125,7 +125,7 @@
 
     <!-- Preconnect to critical origins -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co" />
+    <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co" crossorigin />
 
     <!-- DNS-prefetch for deferred third-party origins -->
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -152,7 +152,7 @@
 
     <!-- Analytics Assets (GTAG & Facebook Pixel) - Deferred for performance -->
     <script>
-      setTimeout(function() {
+      const initAnalytics = function() {
         // GTAG Load
         var gtagScript = document.createElement('script');
         gtagScript.async = true;
@@ -176,7 +176,13 @@
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '1561498334311503');
         fbq('track', 'PageView');
-      }, 3500); // Delay load by 3.5s to free up main thread
+      }; 
+      
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(initAnalytics, { timeout: 3500 });
+      } else {
+        setTimeout(initAnalytics, 3500);
+      }
     </script>
     <!-- End Deferred Meta Pixel & GTAG Code -->
     <!-- Chatbot React Custom Element Bundle (data-cfasync=false prevents Rocket Loader interference with ES modules) -->
