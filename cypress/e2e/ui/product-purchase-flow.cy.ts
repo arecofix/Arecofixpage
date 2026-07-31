@@ -2,7 +2,6 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
   const PRODUCT_URL = '/productos/detalle/modulo-ejemplo-123'; // Ajustar a un slug real o interceptar
 
   beforeEach(() => {
-    // Interceptar peticiones para aislar el flujo
     cy.intercept('GET', '**/rest/v1/products**').as('getProduct');
     
     // Limpiar estado

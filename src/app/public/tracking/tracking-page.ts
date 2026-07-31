@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, inject, OnInit, OnDestroy, signal, computed, ViewChild, ElementRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
@@ -67,7 +67,9 @@ export class TrackingPage implements OnInit, OnDestroy {
     private logger = inject(LoggerService);
     private seoService = inject(SeoService);
     private companyService = inject(CompanyService);
-    private getRepairTrackingUseCase = inject(GetRepairTrackingUseCase);
+    // Services
+    platformId = inject(PLATFORM_ID);
+    getRepairTrackingUseCase = inject(GetRepairTrackingUseCase);
     
     whatsappNumber = environment.contact.whatsappNumber;
     currentYear = new Date().getFullYear();
@@ -150,8 +152,10 @@ export class TrackingPage implements OnInit, OnDestroy {
                     this.updateSeo(repairData);
                     this.error.set(null);
                     
-                    if (!repairData.upsell_vidrio && !localStorage.getItem(`upsellDismissed_${code}`)) {
-                        setTimeout(() => this.showUpsellModal.set(true), 2500);
+                    if (isPlatformBrowser(this.platformId)) {
+                        if (!repairData.upsell_vidrio && !localStorage.getItem(`upsellDismissed_${code}`)) {
+                            setTimeout(() => this.showUpsellModal.set(true), 2500);
+                        }
                     }
                     
                     this.loadRecommendations(code);
