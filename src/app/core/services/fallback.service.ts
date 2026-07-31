@@ -36,6 +36,16 @@ export class FallbackService {
             price: 149000,
             featured: true,
             image_url: 'assets/img/products/iphx.webp'
+        },
+        {
+            id: '999',
+            category_id: '1',
+            slug: 'modulo-ejemplo-123',
+            name: 'Módulo Repuesto Display',
+            description: 'Módulo de prueba para testing',
+            price: 5000,
+            featured: true,
+            image_url: 'assets/img/products/iph8plus.webp'
         }
     ];
 
