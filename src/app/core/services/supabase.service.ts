@@ -84,13 +84,15 @@ export class SupabaseService {
       let lastError: any;
 
        for (let i = 0; i < MAX_RETRIES; i++) {
+        let timeoutId: any;
         try {
           const fetchPromise = fetch(url, options);
           const timeoutPromise = new Promise<Response>((_, reject) => {
-              setTimeout(() => reject(new Error(`Fetch timeout (${url})`)), 15000);
+              timeoutId = setTimeout(() => reject(new Error(`Fetch timeout (${url})`)), 15000);
           });
           
           const response = await Promise.race([fetchPromise, timeoutPromise]);
+          clearTimeout(timeoutId);
           
           if (!response.ok && response.status >= 500) {
               throw new Error(`Server Error: ${response.status}`);
@@ -124,6 +126,7 @@ export class SupabaseService {
 
           return response;
         } catch (error: any) {
+          clearTimeout(timeoutId);
           lastError = error;
           this.logger.warn(`Supabase fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, error.message);
           
