@@ -138,7 +138,7 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
     cy.wait(500);
 
     // Intentar abrir el modal/pantalla de nueva reparación
-    cy.contains('Nuevo Ingreso').click({ force: true });
+    cy.get('a[routerLink="/admin/repairs/new"], a[href="/admin/repairs/new"]').first().click({ force: true });
     
     // Esperamos 500ms por si hay animaciones y verificamos la ruta
     cy.wait(500);

@@ -56,7 +56,7 @@
                  </div>
 
                 <select (change)="setSort($any($event.target).value.split('|')[0], $any($event.target).value.split('|')[1])"
-                    class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 min-w-[150px]">
+                    class="select select-bordered select-sm rounded-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 min-w-[150px] w-full sm:w-auto max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                     <option value="created_at|desc">Más Recientes</option>
                     <option value="price|asc">Precio: Menor a Mayor</option>
                     <option value="price|desc">Precio: Mayor a Menor</option>

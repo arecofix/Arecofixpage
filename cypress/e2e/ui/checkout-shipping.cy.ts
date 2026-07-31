@@ -47,9 +47,10 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.get('input[formControlName="city"]').type('Springfield', { force: true });
     cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
     
-    // Ahora debería dejar avanzar sin errores
+    // Verificamos que desaparezca el texto "Calculando envío..."
+    cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
-    cy.get('input[type="radio"][name="payment"]').should('exist');
+    cy.contains('¿Cómo querés pagar?').should('exist');
   });
 
   it('debería calcular y sumar el costo de envío correctamente (QA #63)', () => {
@@ -67,8 +68,8 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     // Al tipear el CP debería reflejarse el costo de envío (mockeado)
     cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
     
-    // Verificamos que desaparezca el texto "Ingresá tu CP"
-    cy.contains('Ingresá tu CP').should('not.exist');
+    // Verificamos que desaparezca el estado de calculando
+    cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
     // Verificamos que el botón no esté disabled y permita avanzar
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
     

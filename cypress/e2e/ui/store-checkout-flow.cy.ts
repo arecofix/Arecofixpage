@@ -90,7 +90,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
 
     // Ir a pago y confirmar
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
-    cy.get('input[type="radio"][name="payment"]').first().check({ force: true });
+    cy.contains('h4', 'Mercado Pago').click({ force: true });
     cy.get('button').contains(/confirmar pedido/i, { matchCase: false }).click({ force: true });
     
     // Validaciones

@@ -31,8 +31,17 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
       body: [buildMockOrder([buildMockOrderItem(productA, 1)])]
     }).as('createOrder');
 
+    cy.intercept('DELETE', '**/rest/v1/order_items*', { statusCode: 200, body: [] }).as('deleteOrderItems');
     cy.intercept('POST', '**/rest/v1/order_items*', { statusCode: 201, body: [] }).as('saveOrderItems');
-    cy.intercept('PATCH', '**/rest/v1/order*', { statusCode: 200, body: [buildMockOrder()] }).as('updateOrder');
+    cy.intercept('PATCH', '**/rest/v1/order*', (req) => {
+      req.reply({
+        statusCode: 200,
+        body: [{
+          id: 'mock-order-123',
+          ...req.body
+        }]
+      });
+    }).as('updateOrder');
   });
 
   it('debería calcular el subtotal correctamente y permitir vaciar el carrito (QA #26-36)', () => {

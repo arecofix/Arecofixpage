@@ -18,7 +18,7 @@ describe('Flujo Completo de Reparación y Seguimiento', () => {
             }
         });
 
-        cy.contains('Nuevo Ingreso').click({ force: true });
+        cy.get('a[routerLink="/admin/repairs/new"]').first().click({ force: true });
         cy.url().should('include', '/admin/repairs/new');
         cy.wait(1500);
 

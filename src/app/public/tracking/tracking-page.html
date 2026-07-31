@@ -241,34 +241,45 @@
                     <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest leading-none mb-6 flex items-center gap-2 px-2">
                         <i class="fas fa-magic"></i> Sugerencias para {{ r.device_model }}
                     </h4>
-                    <div class="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory no-print">
-                        @for (prod of recommendedAccessories(); track prod.id) {
-                            <div class="min-w-[180px] w-[180px] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm rounded-3xl p-3 flex flex-col justify-between group shrink-0 snap-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                                <div>
-                                    <div class="aspect-square w-full rounded-2xl bg-white dark:bg-neutral-800 mb-3 overflow-hidden relative border border-neutral-50 shadow-[inset_0_0_10px_rgba(0,0,0,0.02)] flex items-center justify-center p-2">
-                                        <img [src]="prod.image_url || 'assets/img/misc/placeholder.jpg'" [alt]="prod.name" loading="lazy" decoding="async" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                    <div class="relative group">
+                        <!-- Navigation Buttons (Desktop Only) -->
+                        <button (click)="scrollCarousel('left')" class="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-md border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div #accessoryCarousel class="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory no-print scroll-smooth accessory-carousel">
+                            @for (prod of recommendedAccessories(); track prod.id) {
+                                <div class="min-w-[180px] w-[180px] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm rounded-3xl p-3 flex flex-col justify-between group/card shrink-0 snap-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                    <div>
+                                        <div class="aspect-square w-full rounded-2xl bg-white dark:bg-neutral-800 mb-3 overflow-hidden relative border border-neutral-50 shadow-[inset_0_0_10px_rgba(0,0,0,0.02)] flex items-center justify-center p-2">
+                                            <img [src]="prod.image_url || 'assets/img/misc/placeholder.jpg'" [alt]="prod.name" loading="lazy" decoding="async" class="w-full h-full object-contain group-hover/card:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <h5 class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight mb-2 line-clamp-2 h-8" [title]="prod.name">{{ prod.name }}</h5>
+                                        <div class="flex items-center gap-2 mb-4">
+                                            <span class="text-sm font-black text-indigo-600">{{ prod.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                            @if (prod.price < prod.original_price) {
+                                                <span class="text-[10px] text-gray-400 line-through">{{ prod.original_price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                            }
+                                        </div>
                                     </div>
-                                    <h5 class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight mb-2 line-clamp-2 h-8" [title]="prod.name">{{ prod.name }}</h5>
-                                    <div class="flex items-center gap-2 mb-4">
-                                        <span class="text-sm font-black text-indigo-600">{{ prod.price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                                        @if (prod.price < prod.original_price) {
-                                            <span class="text-[10px] text-gray-400 line-through">{{ prod.original_price | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                    
+                                    <button (click)="buyAccessory(prod)" 
+                                            [disabled]="buyingAccessory() === prod.id"
+                                            aria-label="Agregar accesorio al total"
+                                            class="btn w-full bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 hover:text-white dark:hover:text-white rounded-xl text-xs font-bold border-none transition-all active:scale-95 disabled:opacity-50 h-10 min-h-0">
+                                        @if(buyingAccessory() === prod.id) {
+                                            <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+                                        } @else {
+                                            <i class="fas fa-cart-plus mr-1" aria-hidden="true"></i> Sumar
                                         }
-                                    </div>
+                                    </button>
                                 </div>
-                                
-                                <button (click)="buyAccessory(prod)" 
-                                        [disabled]="buyingAccessory() === prod.id"
-                                        aria-label="Agregar accesorio al total"
-                                        class="btn w-full bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 hover:text-white dark:hover:text-white rounded-xl text-xs font-bold border-none transition-all active:scale-95 disabled:opacity-50 h-10 min-h-0">
-                                    @if(buyingAccessory() === prod.id) {
-                                        <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
-                                    } @else {
-                                        <i class="fas fa-cart-plus mr-1" aria-hidden="true"></i> Sumar
-                                    }
-                                </button>
-                            </div>
-                        }
+                            }
+                        </div>
+                        
+                        <button (click)="scrollCarousel('right')" class="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-md border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
                 }

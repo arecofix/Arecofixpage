@@ -22,11 +22,11 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
     cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts2');
 
     // Type without accent
-    cy.get('.mobile-search-input').invoke('val', 'modulo').trigger('input');
+    cy.get('.mobile-search-input').clear().type('modulo', { delay: 0 });
     cy.wait('@getSearchProducts2');
     
     // Type with accent
-    cy.get('.mobile-search-input').invoke('val', 'módulo').trigger('input');
+    cy.get('.mobile-search-input').clear().type('módulo', { delay: 0 });
     cy.wait('@getSearchProducts2');
 
     cy.get('.mobile-search-input').should('have.value', 'módulo');

@@ -28,9 +28,12 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
     
     // Wait for the UI to update the shipping cost instead of waiting for a network request
-    cy.contains('Ingresá tu CP').should('not.exist');
+    cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
     
     cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
+    
+    // Wait for the payment method step to appear
+    cy.contains('¿Cómo querés pagar?').should('be.visible');
   };
 
   it('debería procesar orden exitosa y generar ID único (QA #84-85)', () => {
@@ -39,7 +42,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     
     fillShippingForm();
 
-    cy.get('input[type="radio"][name="payment"]').first().check({ force: true });
+    cy.contains('h4', 'Mercado Pago').click({ force: true });
     
     // Mockear la creación de orden como Completada o Pendiente de Pago
     cy.intercept('PATCH', '**/rest/v1/order*', (req) => {
@@ -63,7 +66,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     
     fillShippingForm();
 
-    cy.get('input[type="radio"][name="payment"]').first().check({ force: true });
+    cy.contains('h4', 'Mercado Pago').click({ force: true });
     
     // Mockear un fallo de red o servidor 500
     cy.intercept('PATCH', '**/rest/v1/order*', {
