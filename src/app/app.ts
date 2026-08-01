@@ -11,6 +11,7 @@ import { TenantService } from './core/services/tenant.service';
 import { ScannerService } from './core/services/scanner.service';
 import { ShortcutService } from './core/services/shortcut.service';
 import { SupabaseService } from './core/services/supabase.service';
+import { SwUpdate } from '@angular/service-worker';
 
 @Component({
 
@@ -38,11 +39,27 @@ export class App implements OnInit {
   private shortcutService = inject(ShortcutService);
 
   private supabase = inject(SupabaseService);
+  private swUpdate = inject(SwUpdate, { optional: true });
 
   ngOnInit() {
     this.seoService.initialize();
 
     if (isPlatformBrowser(this.platformId)) {
+      // Auto-recarga cuando hay una nueva versión (evita errores MIME y ChunkLoad)
+      if (this.swUpdate?.isEnabled) {
+        this.swUpdate.versionUpdates.subscribe(evt => {
+          if (evt.type === 'VERSION_READY') {
+            this.logger.info('Nueva versión detectada. Recargando la aplicación...');
+            window.location.reload();
+          }
+        });
+        
+        this.swUpdate.unrecoverable.subscribe(evt => {
+          this.logger.error('Estado irrecuperable de caché, recargando...', evt.reason);
+          window.location.reload();
+        });
+      }
+
       // SEO Redirection Rule Heredada
       const currentHost = window.location.hostname;
       if (currentHost === 'celulares.arecofix.com.ar') {
