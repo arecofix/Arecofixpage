@@ -88,7 +88,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
 
     if (query && query.trim()) {
       const q = query.trim();
-      dbQuery = dbQuery.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%,full_name.ilike.%${q}%`);
+      dbQuery = dbQuery.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
     }
 
     return from(dbQuery.limit(limit) as any).pipe(
