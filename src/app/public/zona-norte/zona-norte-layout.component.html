@@ -41,7 +41,7 @@
         </div>
 
         <!-- Botón menú móvil -->
-        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" aria-label="Alternar menú móvil">
           <i class="fas" [class]="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
         </button>
       </nav>
@@ -155,13 +155,13 @@
             </div>
           </div>
           <div class="footer-social">
-            <button class="social-btn whatsapp" (click)="contactarWhatsApp()">
+            <button class="social-btn whatsapp" (click)="contactarWhatsApp()" aria-label="Contactar por WhatsApp">
               <i class="fab fa-whatsapp"></i>
             </button>
-            <button class="social-btn phone" (click)="llamarTelefono()">
+            <button class="social-btn phone" (click)="llamarTelefono()" aria-label="Llamar por teléfono">
               <i class="fas fa-phone"></i>
             </button>
-            <button class="social-btn email" (click)="enviarEmail()">
+            <button class="social-btn email" (click)="enviarEmail()" aria-label="Enviar Email">
               <i class="fas fa-envelope"></i>
             </button>
           </div>
@@ -198,12 +198,12 @@
   </footer>
 
   <!-- Botón flotante WhatsApp -->
-  <button class="floating-whatsapp" (click)="contactarWhatsApp()" title="Contactar por WhatsApp">
+  <button class="floating-whatsapp" (click)="contactarWhatsApp()" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </button>
 
   <!-- Botón scroll to top -->
-  <button class="scroll-to-top" (click)="scrollToTop()" title="Volver arriba">
+  <button class="scroll-to-top" (click)="scrollToTop()" title="Volver arriba" aria-label="Volver arriba">
     <i class="fas fa-arrow-up"></i>
   </button>
 

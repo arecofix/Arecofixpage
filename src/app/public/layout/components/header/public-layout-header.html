@@ -304,7 +304,7 @@
             @if (isAcademyMode) {
               @for (course of coursesResults(); track course.id) {
                 <li>
-                  <a (click)="selectCourse(course)"
+                  <a href="javascript:void(0)" (click)="selectCourse(course)"
                      class="flex items-center gap-3 p-2 rounded-xl cursor-pointer
                             hover:bg-blue-50 dark:hover:bg-white/5 transition-colors">
                     <img [src]="course.image_url || '/assets/img/no-image.svg'" [alt]="course.title"
@@ -320,7 +320,7 @@
             } @else {
               @for (product of filteredProducts(); track product.id) {
                 <li>
-                  <a (click)="selectProduct(product)"
+                  <a href="javascript:void(0)" (click)="selectProduct(product)"
                      class="flex items-center gap-3 p-2 rounded-xl cursor-pointer
                             hover:bg-blue-50 dark:hover:bg-white/5 transition-colors">
                     <img [src]="product.image_url || '/assets/img/no-image.svg'" [alt]="product.name"
@@ -490,7 +490,7 @@
         } @else {
           @if (isAcademyMode) {
             @for (course of coursesResults(); track course.id) {
-            <a (click)="selectCourse(course)"
+            <a href="javascript:void(0)" (click)="selectCourse(course)"
                class="flex items-center gap-2 p-2 hover:bg-blue-50 dark:hover:bg-white/5
                       transition-colors cursor-pointer border-b border-gray-100 dark:border-white/5 last:border-none">
               <img [src]="course.image_url || '/assets/img/no-image.svg'" [alt]="course.title"
@@ -503,7 +503,7 @@
             }
           } @else {
             @for (product of filteredProducts(); track product.id) {
-            <a (click)="selectProduct(product)"
+            <a href="javascript:void(0)" (click)="selectProduct(product)"
                class="flex items-center gap-2 p-2 hover:bg-blue-50 dark:hover:bg-white/5
                       transition-colors cursor-pointer border-b border-gray-100 dark:border-white/5 last:border-none">
               <img [src]="product.image_url || '/assets/img/no-image.svg'" [alt]="product.name"

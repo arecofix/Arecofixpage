@@ -5,6 +5,8 @@
       <div class="carousel-slide" *ngFor="let image of carouselImages; let i = index" 
            [class.active]="i === currentImageIndex">
         <img [src]="image.url" [alt]="image.alt" 
+             [attr.fetchpriority]="i === 0 ? 'high' : 'auto'"
+             [attr.loading]="i === 0 ? 'eager' : 'lazy'"
              onerror="this.src='assets/img/placeholder/bathroom-placeholder.jpg'">
         <div class="carousel-overlay">
           <div class="hero-content">
@@ -21,10 +23,10 @@
       </div>
       
       <!-- Controles del carousel -->
-      <button class="carousel-control prev" (click)="prevImage()">
+      <button class="carousel-control prev" (click)="prevImage()" aria-label="Imagen anterior">
         <i class="fas fa-chevron-left"></i>
       </button>
-      <button class="carousel-control next" (click)="nextImage()">
+      <button class="carousel-control next" (click)="nextImage()" aria-label="Siguiente imagen">
         <i class="fas fa-chevron-right"></i>
       </button>
       
@@ -32,6 +34,7 @@
       <div class="carousel-indicators">
         <button *ngFor="let image of carouselImages; let i = index"
                 class="indicator"
+                [attr.aria-label]="'Ir a imagen ' + (i + 1)"
                 [class.active]="i === currentImageIndex"
                 (click)="goToImage(i)"></button>
       </div>
@@ -115,21 +118,21 @@
             <div class="feature-icon">
               <i class="fas fa-award"></i>
             </div>
-            <h4>15+ Años de Experiencia</h4>
+            <h3>15+ Años de Experiencia</h3>
             <p>Garantía y profesionalismo en cada trabajo</p>
           </div>
           <div class="feature-item">
             <div class="feature-icon">
               <i class="fas fa-users"></i>
             </div>
-            <h4>Personal Capacitado</h4>
+            <h3>Personal Capacitado</h3>
             <p>Equipo especializado en cada área</p>
           </div>
           <div class="feature-item">
             <div class="feature-icon">
               <i class="fas fa-building"></i>
             </div>
-            <h4>Clientes Corporativos</h4>
+            <h3>Clientes Corporativos</h3>
             <p>Hoteles 5 estrellas, inmobiliarias y consorcios</p>
           </div>
         </div>
