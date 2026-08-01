@@ -26,7 +26,13 @@ export class GlobalErrorHandler implements ErrorHandler {
         const errorString = String(error?.message || error || '').toLowerCase();
         
         // 1. Detect Chunk Loading Errors (Common after new deploys in idle sessions)
-        if (errorString.includes('loading chunk') || errorString.includes('failed to fetch dynamically imported module') || errorString.includes('loading css chunk')) {
+        if (
+            errorString.includes('loading chunk') || 
+            errorString.includes('failed to fetch dynamically imported module') || 
+            errorString.includes('loading css chunk') ||
+            errorString.includes('expected a javascript-or-wasm module script') ||
+            errorString.includes('mime type of "text/html"')
+        ) {
             this.handleChunkError();
             return;
         }

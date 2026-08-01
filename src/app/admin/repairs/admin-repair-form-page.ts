@@ -611,10 +611,44 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             // brand_id se pasará directo al payload.
             const { device_type, ...validFormData } = rawData;
 
+            let finalClientId = validFormData.customer_id || validFormData.client_id || null;
+            let finalDeviceId = validFormData.device_id || null;
+
+            // Si es un cliente nuevo ingresado manualmente, crear perfil invitado
+            if (!finalClientId && validFormData.customer_name) {
+                const { data: newProfile, error: profileErr } = await this.supabaseService.getClient().from('profiles').insert({
+                    first_name: validFormData.customer_name,
+                    last_name: '',
+                    email: validFormData.customer_email || null,
+                    phone: validFormData.customer_phone || null,
+                    role: 'user',
+                    is_guest: true,
+                    tenant_id: this.tenantService.getTenantId(),
+                    branch_id: branchIdActual
+                }).select('id').single();
+
+                if (newProfile) finalClientId = newProfile.id;
+            }
+
+            // Si hay cliente pero no equipo asociado, crearlo
+            if (finalClientId && !finalDeviceId && validFormData.device_model) {
+                const { data: newDevice, error: devErr } = await this.supabaseService.getClient().from('customer_devices').insert({
+                    client_id: finalClientId,
+                    type: 'smartphone',
+                    custom_model_name: validFormData.device_model,
+                    imei: validFormData.imei || null,
+                    passcode: validFormData.device_passcode || null,
+                    tenant_id: this.tenantService.getTenantId()
+                }).select('id').single();
+
+                if (newDevice) finalDeviceId = newDevice.id;
+            }
+
             const payload = {
                 ...validFormData,
-                customer_id: validFormData.customer_id || null,
-                client_id: validFormData.customer_id || validFormData.client_id || null,
+                customer_id: finalClientId,
+                client_id: finalClientId,
+                device_id: finalDeviceId,
                 images: this.images(),
                 parts: this.parts(),
                 branch_id: branchIdActual

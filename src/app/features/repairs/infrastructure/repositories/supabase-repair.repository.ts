@@ -66,14 +66,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const dbPayload = this.mapToDb(repair);
         const rpcPayload = this.sanitizePayload({
             ...dbPayload,
-            id: generatedId,
-            customer_name: repair.customer_name,
-            customer_phone: repair.customer_phone,
-            device_model: repair.device_model,
-            device_type: repair.device_type,
-            imei: repair.imei,
-            brand_id: repair.brand_id,
-            device_passcode: repair.device_passcode
+            id: generatedId
         });
 
         // Use the existing SECURITY DEFINER RPC — bypasses RLS and skips the
