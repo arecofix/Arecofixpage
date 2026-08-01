@@ -291,6 +291,7 @@
                   <label class="block text-slate-300 text-sm font-semibold mb-2">Nombre y Apellido *</label>
                   <input 
                     type="text"
+                    name="name"
                     [(ngModel)]="customerName"
                     placeholder="Ej: Juan Pérez"
                     class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
@@ -301,6 +302,7 @@
                   <label class="block text-slate-300 text-sm font-semibold mb-2">WhatsApp / Teléfono *</label>
                   <input 
                     type="tel"
+                    name="phone"
                     [(ngModel)]="customerPhone"
                     placeholder="Ej: +54 9 11 1234 5678"
                     class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
@@ -311,6 +313,7 @@
                   <label class="block text-slate-300 text-sm font-semibold mb-2">Modelo del Equipo *</label>
                   <input 
                     type="text"
+                    name="deviceModel"
                     [(ngModel)]="deviceModel"
                     placeholder="Ej: iPhone 11, Samsung A54..."
                     class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
@@ -321,6 +324,7 @@
                   <label class="block text-slate-300 text-sm font-semibold mb-2">Falla Principal *</label>
                   <input 
                     type="text"
+                    name="issueDescription"
                     [(ngModel)]="issueDescription"
                     placeholder="Ej: Pantalla rota, no carga..."
                     class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
