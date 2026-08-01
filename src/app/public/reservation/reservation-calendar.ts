@@ -202,7 +202,12 @@ export class ReservationCalendar implements OnInit {
       };
 
       // Guardar reserva y enviar notificacion en BD
-      await this.contactService.createReservation(reservation);
+      const { error } = await this.contactService.createReservation(reservation);
+      
+      if (error) {
+        console.error('Error returned from contactService:', error);
+        throw new Error(error.message || 'Error al guardar reserva');
+      }
 
       // Simular éxito (1.5s delay para UX)
       await new Promise(resolve => setTimeout(resolve, 1500));
