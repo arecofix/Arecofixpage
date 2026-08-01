@@ -15,11 +15,11 @@
 
       <!-- Desktop links -->
       <div class="bl-nav__links">
-        <a (click)="scrollTo('hero')">Inicio</a>
-        <a *ngIf="hasAbout"    (click)="scrollTo('quienes-somos')">Quiénes somos</a>
-        <a *ngIf="hasServices" (click)="scrollTo('servicios')">Servicios</a>
-        <a *ngIf="hasCatalog"  (click)="scrollTo('catalogo')">Productos</a>
-        <a (click)="scrollTo('contacto')" class="bl-nav__cta-link">Contacto</a>
+        <a href="javascript:void(0)" (click)="scrollTo('hero')">Inicio</a>
+        <a href="javascript:void(0)" *ngIf="hasAbout"    (click)="scrollTo('quienes-somos')">Quiénes somos</a>
+        <a href="javascript:void(0)" *ngIf="hasServices" (click)="scrollTo('servicios')">Servicios</a>
+        <a href="javascript:void(0)" *ngIf="hasCatalog"  (click)="scrollTo('catalogo')">Productos</a>
+        <a href="javascript:void(0)" (click)="scrollTo('contacto')" class="bl-nav__cta-link">Contacto</a>
       </div>
 
       <!-- Mobile hamburger -->
@@ -30,11 +30,11 @@
 
     <!-- Mobile menu -->
     <div class="bl-nav__mobile" [class.visible]="menuOpen">
-      <a (click)="scrollTo('hero')">Inicio</a>
-      <a *ngIf="hasAbout"    (click)="scrollTo('quienes-somos')">Quiénes somos</a>
-      <a *ngIf="hasServices" (click)="scrollTo('servicios')">Servicios</a>
-      <a *ngIf="hasCatalog"  (click)="scrollTo('catalogo')">Productos</a>
-      <a (click)="scrollTo('contacto')">Contacto</a>
+      <a href="javascript:void(0)" (click)="scrollTo('hero')">Inicio</a>
+      <a href="javascript:void(0)" *ngIf="hasAbout"    (click)="scrollTo('quienes-somos')">Quiénes somos</a>
+      <a href="javascript:void(0)" *ngIf="hasServices" (click)="scrollTo('servicios')">Servicios</a>
+      <a href="javascript:void(0)" *ngIf="hasCatalog"  (click)="scrollTo('catalogo')">Productos</a>
+      <a href="javascript:void(0)" (click)="scrollTo('contacto')">Contacto</a>
     </div>
   </nav>
 
