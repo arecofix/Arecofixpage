@@ -20,7 +20,7 @@ const STATIC_ROUTES = [
   '/', '/celular', '/servicios', '/academy', '/blog',
   '/contacto', '/nosotros', '/fixtecnicos', '/recursos',
   '/productos', '/productos/destacados', '/portfolio',
-  '/gsm', '/privacy', '/terms', '/not-found'
+  '/gsm', '/privacy', '/terms', '/not-found', '/reserva'
 ];
 
 async function fetchAll(table, select = 'slug', filters = {}) {
@@ -89,6 +89,26 @@ async function run() {
     const routesContent = finalRoutes.join('\n');
     fs.writeFileSync(path.join(process.cwd(), 'routes.txt'), routesContent);
     console.log(`📄 Routes generated at routes.txt`);
+
+    // --- GENERATE _redirects (For Cloudflare Pages SPA Fallback) ---
+    // We need explicit rewrites for prerendered routes so Cloudflare serves them instead of the root SPA.
+    let redirectsContent = '';
+    STATIC_ROUTES.forEach(route => {
+        if (route === '/' || route === '/not-found') return;
+        redirectsContent += `${route} ${route}/index.html 200\n`;
+    });
+    
+    // Dynamic splats for Cloudflare
+    redirectsContent += `/productos/detalle/* /productos/detalle/:splat/index.html 200\n`;
+    redirectsContent += `/productos/categoria/* /productos/categoria/:splat/index.html 200\n`;
+    redirectsContent += `/posts/* /posts/:splat/index.html 200\n`;
+    redirectsContent += `/academy/* /academy/:splat/index.html 200\n\n`;
+    
+    // SPA Fallback
+    redirectsContent += `/* /index.html 200\n`;
+    
+    fs.writeFileSync(path.join(process.cwd(), 'public/_redirects'), redirectsContent);
+    console.log(`📄 _redirects generated at public/_redirects`);
 
     console.log('✨ SEO Sync completed successfully.');
 }
