@@ -130,8 +130,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "prerender": false,
-              "ssr": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
