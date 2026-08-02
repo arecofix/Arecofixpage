@@ -51,14 +51,22 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
       body: cartOrder
     }).as('getActiveCart');
 
-    // Intercept update to ensure we don't accidentally update it beyond limit
-    cy.intercept('PATCH', '**/rest/v1/order*', cy.spy().as('updateOrderSpy'));
+    // Mock update order to return the modified order
+    cy.intercept('PATCH', '**/rest/v1/orders*', (req) => {
+      req.reply({
+        statusCode: 200,
+        body: cartOrder // For the test, returning the same order structure is fine
+      });
+    }).as('updateOrderSpy');
 
     cy.visit('/productos');
     cy.wait('@getProductsLimited');
     
     // Agregamos la segunda unidad (ahora carrito = 2, stock = 2)
     cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });
+    
+    // Esperamos que el estado interno se actualice
+    cy.wait(500);
     
     // Tratamos de agregar una tercera unidad
     cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });

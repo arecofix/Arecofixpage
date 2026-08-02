@@ -183,7 +183,6 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this.paymentService.stopPolling();
   }
 
-  // ── Step: submit form → goto payment method selection ─
   async goToPaymentMethod(): Promise<void> {
     if (this.checkoutForm.invalid) {
       this.checkoutForm.markAllAsTouched();

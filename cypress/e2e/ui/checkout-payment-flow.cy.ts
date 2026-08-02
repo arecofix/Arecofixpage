@@ -8,8 +8,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     cy.setupCheckoutSession();
     
     cy.on('window:before:load', (win) => {
-      cy.stub(win.console, 'error').callsFake(() => {});
-      cy.stub(win.console, 'warn').callsFake(() => {});
+      // Allow logs for debugging
     });
 
     cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, {
@@ -19,19 +18,36 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
   });
 
   const fillShippingForm = () => {
-    cy.get('input[formControlName="name"]').type('Juan Perez', { force: true });
-    cy.get('input[formControlName="email"]').type('juan@ejemplo.com', { force: true });
-    cy.get('input[formControlName="phone"]').type('1122334455', { force: true });
-    cy.get('input[formControlName="street"]').type('Av. Siempreviva', { force: true });
-    cy.get('input[formControlName="number"]').type('742', { force: true });
-    cy.get('input[formControlName="city"]').type('Springfield', { force: true });
-    cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
+    // Wait for Angular SSR hydration to complete before typing!
+    cy.wait(1500);
+    cy.get('input[formControlName="name"]').clear().type('Juan Perez');
+    cy.get('input[formControlName="email"]').clear().type('juan@ejemplo.com');
+    cy.get('input[formControlName="phone"]').clear().type('1122334455');
+    cy.get('input[formControlName="street"]').clear().type('Av. Siempreviva');
+    cy.get('input[formControlName="number"]').clear().type('742');
+    cy.get('input[formControlName="city"]').clear().type('Springfield');
+    cy.get('input[formControlName="postal_code"]').clear().type('1000');
     
-    // Wait for the UI to update the shipping cost instead of waiting for a network request
+    cy.window().then((win: any) => {
+      win.captchaResolved = true; 
+    });
+
+    // Wait for shipping calculation to complete
     cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
     
-    cy.get('#btn-go-payment').should('not.be.disabled').click({ force: true });
+    // Instead of cy.get('form').submit(), click the button
+    cy.get('button[type="submit"]').click();
     
+    // Check if error toast appears
+    cy.get('body').then($body => {
+      if ($body.find('app-toast:contains("requeridos")').length > 0) {
+        throw new Error('FORM IS INVALID! Toast appeared.');
+      }
+      if ($body.find('app-toast:contains("vacío")').length > 0) {
+        throw new Error('CART IS EMPTY! Toast appeared.');
+      }
+    });
+
     // Wait for the payment method step to appear
     cy.contains(/c.mo quer.s pagar/i).should('be.visible');
   };

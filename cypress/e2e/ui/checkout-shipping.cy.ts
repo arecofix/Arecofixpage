@@ -39,13 +39,15 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.get('input[formControlName="email"]').should('have.class', 'ng-invalid');
     
     // Formato de email válido
-    cy.get('input[formControlName="email"]').clear({ force: true }).type('juan@ejemplo.com', { force: true });
-    cy.get('input[formControlName="name"]').type('Juan Perez', { force: true });
-    cy.get('input[formControlName="phone"]').type('1122334455', { force: true });
-    cy.get('input[formControlName="street"]').type('Av. Falsa', { force: true });
-    cy.get('input[formControlName="number"]').type('123', { force: true });
-    cy.get('input[formControlName="city"]').type('Springfield', { force: true });
-    cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
+    cy.wait(1500);
+    cy.get('input[formControlName="email"]').clear().type('juan@ejemplo.com');
+    cy.get('input[formControlName="name"]').clear().type('Juan Perez');
+    cy.get('input[formControlName="phone"]').clear().type('1122334455');
+    cy.get('input[formControlName="street"]').clear().type('Av. Falsa');
+    cy.get('input[formControlName="number"]').clear().type('123');
+    cy.get('input[formControlName="city"]').clear().type('Springfield');
+    
+    cy.get('input[formControlName="postal_code"]').clear().type('9999').blur();
     
     // Verificamos que desaparezca el texto "Calculando envío..."
     cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
@@ -58,15 +60,15 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.wait('@getCartForShipping');
     
     // Rellenar lo mínimo necesario
-    cy.get('input[formControlName="name"]').type('Juan Perez', { force: true });
-    cy.get('input[formControlName="email"]').type('juan@ejemplo.com', { force: true });
-    cy.get('input[formControlName="phone"]').type('1122334455', { force: true });
-    cy.get('input[formControlName="street"]').type('Av. Falsa', { force: true });
-    cy.get('input[formControlName="number"]').type('123', { force: true });
-    cy.get('input[formControlName="city"]').type('Springfield', { force: true });
+    cy.get('input[formControlName="name"]').clear().type('Juan Perez');
+    cy.get('input[formControlName="email"]').clear().type('juan@ejemplo.com');
+    cy.get('input[formControlName="phone"]').clear().type('1122334455');
+    cy.get('input[formControlName="street"]').clear().type('Av. Falsa');
+    cy.get('input[formControlName="number"]').clear().type('123');
+    cy.get('input[formControlName="city"]').clear().type('Springfield');
     
     // Al tipear el CP debería reflejarse el costo de envío (mockeado)
-    cy.get('input[formControlName="postal_code"]').type('1000', { force: true }).blur();
+    cy.get('input[formControlName="postal_code"]').clear().type('1000').blur();
     
     // Verificamos que desaparezca el estado de calculando
     cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
