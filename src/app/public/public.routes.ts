@@ -19,6 +19,11 @@ export const publicRoutes: Routes = [
     ]
   },
   {
+    path: 'reserva',
+    loadComponent: () => import('@app/public/standalone-reservation/standalone-reservation.component').then(m => m.StandaloneReservationComponent),
+    canActivate: [TenantIsolationGuard]
+  },
+  {
     title: 'Arecofix',
     path: '',
     component: PublicLayout,

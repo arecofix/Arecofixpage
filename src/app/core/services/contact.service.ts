@@ -141,7 +141,7 @@ export class ContactService {
             // Save reservation as a formatted contact message for simplicity and Admin visibility
             const payload = { 
                 name: reservation.name,
-                email: reservation.email || 'N/A',
+                email: reservation.email || 'no-reply@arecofix.com.ar',
                 phone: reservation.phone,
                 subject: 'Solicitud de Turno: Reparación',
                 message: `Se ha solicitado un nuevo turno.\nFecha: ${reservation.date}\nHora: ${reservation.slot}\nCliente: ${reservation.name}\nTeléfono: ${reservation.phone}\nEquipo: ${reservation.deviceModel || 'N/A'}\nFalla: ${reservation.issueDescription || 'N/A'}\nDescuento aplicado: ${reservation.discount}%`,
