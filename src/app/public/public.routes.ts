@@ -319,9 +319,10 @@ export const publicRoutes: Routes = [
           ),
         data: {
           seo: {
-            title: 'Seguimiento de Reparación | Arecofix',
-            description: 'Consultá el estado de tu reparación en tiempo real con tu código de seguimiento.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            title: 'Seguimiento de Reparación de tu Dispositivo | Arecofix',
+            description: 'Ingresa tu código para conocer el estado actual de la reparación de tu celular o equipo. Información detallada y en tiempo real.',
+            imageUrl: 'assets/img/branding/og-tracking.png',
+            keywords: 'seguimiento de reparacion, estado de reparacion, arecofix tracking, seguimiento celular'
           }
         }
       },
