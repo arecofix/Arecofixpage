@@ -64,8 +64,9 @@ async function run() {
     // 1. Fetch Products (Active & Not Deleted)
     console.log('📦 Fetching products...');
     const products = await fetchAll('products', 'slug', { is_active: true, deleted_at: null });
-    // Prerender all products so Facebook crawler sees the SEO tags
-    products.forEach(p => p.slug && routes.push(`/productos/detalle/${p.slug}`));
+    // TEMPORARY: Do not prerender all individual products to avoid OOM in GitHub Actions!
+    // Cloudflare Pages will serve these via SPA fallback correctly.
+    // products.forEach(p => p.slug && routes.push(`/productos/detalle/${p.slug}`));
 
     // 2. Fetch Blog Posts (Published)
     console.log('📝 Fetching blog posts...');
@@ -76,6 +77,13 @@ async function run() {
     console.log('📂 Fetching categories...');
     const categories = await fetchAll('categories', 'slug', { is_active: true });
     categories.forEach(c => c.slug && routes.push(`/productos/categoria/${c.slug}`));
+
+    // 3. Fetch Products
+    console.log('🛍️ Fetching products...');
+    // TEMPORARY: Do not add all individual products to routes.txt to avoid OOM in GitHub Actions!
+    // Cloudflare Pages will serve these via SPA fallback correctly thanks to our _redirects rules.
+    // const products = await fetchAll('products', 'slug', { is_active: true });
+    // products.forEach(p => p.slug && routes.push(`/productos/detalle/${p.slug}`));
 
     // 4. Fetch Courses
     console.log('🎓 Fetching courses...');
