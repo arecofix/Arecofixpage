@@ -31,7 +31,7 @@ jobs:
       - name: Build
         env:
           NODE_OPTIONS: "--max_old_space_size=6144"
-        run: pnpm run build
+        run: pnpm run build:cloudflare
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
