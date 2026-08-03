@@ -1,0 +1,26 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center pt-8 pb-12 px-4 sm:px-6 lg:px-8">
+  <!-- Minimal Header -->
+  <div class="w-full max-w-4xl flex justify-center mb-8">
+    <a routerLink="/" class="flex items-center gap-2">
+      <img src="assets/img/branding/logotipo-s-blanco.png" alt="Arecofix" class="h-10 w-auto hidden dark:block" />
+      <img src="assets/img/branding/logotipo-s-negro.png" alt="Arecofix" class="h-10 w-auto block dark:hidden" />
+    </a>
+  </div>
+
+  <!-- Main Container for Reservation -->
+  <div class="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+    <div class="p-6 sm:p-10 border-b border-gray-100 dark:border-gray-700">
+      <h1 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-2">
+        Reserva tu Turno
+      </h1>
+      <p class="text-center text-gray-500 dark:text-gray-400">
+        Seleccioná el día y horario que te quede más cómodo.
+      </p>
+    </div>
+    
+    <!-- Reservation Calendar Component -->
+    <div class="p-6 sm:p-10">
+      <app-reservation-calendar></app-reservation-calendar>
+    </div>
+  </div>
+</div>
