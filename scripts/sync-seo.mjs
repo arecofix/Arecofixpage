@@ -96,6 +96,7 @@ async function run() {
     STATIC_ROUTES.forEach(route => {
         if (route === '/' || route === '/not-found') return;
         redirectsContent += `${route} ${route}/index.html 200\n`;
+        redirectsContent += `${route}/ ${route}/index.html 200\n`;
     });
     
     // Dynamic splats for Cloudflare
