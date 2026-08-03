@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { filter, take, timeout, catchError } from 'rxjs/operators';
@@ -8,6 +9,14 @@ import { of, firstValueFrom } from 'rxjs';
 export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
+
+  // Bypass auth guard during Server-Side Rendering / Prerendering
+  // This allows crawlers (like Facebook) to see the SEO meta tags of protected pages.
+  // The guard will still run and protect the page when the app bootstraps in the browser.
+  if (isPlatformServer(platformId)) {
+    return true;
+  }
 
   try {
     const authState = await firstValueFrom(
