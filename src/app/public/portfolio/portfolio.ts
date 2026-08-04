@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, PLATFORM_ID } from '@angular/core';
 import { SystemStatus } from './portfolio.data';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
@@ -18,25 +18,20 @@ import { PortfolioContent, portfolioContent } from './portfolio.data';
 })
 export class PortfolioComponent implements OnInit, OnDestroy {
   public currentLanguage: 'es' | 'en' = 'es';
-  public showScrollTop = false;
   private platformId = inject(PLATFORM_ID);
+  isEmailVisible = false;
 
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    if (!isPlatformBrowser(this.platformId)) return;
-    this.showScrollTop = window.scrollY > 300;
+  get emailAddress(): string {
+    return atob('RXplcXVpZWxlbnJpY28xNUBnbWFpbC5jb20=');
   }
 
-  scrollToTop() {
-    if (!isPlatformBrowser(this.platformId)) return;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  revealEmail() {
+    this.isEmailVisible = true;
   }
-
-
 
   sendEmail() {
     if (!isPlatformBrowser(this.platformId)) return;
-    window.location.href = 'mailto:' + atob('ZXplcXVpZWxlbnJpY28xNUBnbWFpbC5jb20=');
+    window.location.href = 'mailto:' + this.emailAddress;
   }
   activeSnippetIndex = 0;
   terminalOutput: string[] = [];

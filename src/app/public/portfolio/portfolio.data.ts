@@ -47,6 +47,7 @@ export interface PortfolioContent {
   linkedin: string;
   github: string;
   cvUrl: string;
+  cvFilename: string;
   about: string;
   quickScan: QuickScan;
   backendHighlights: BackendHighlight[];
@@ -55,6 +56,8 @@ export interface PortfolioContent {
   projects: Project[];
   workExperience: WorkExperience[];
   downloadCvLabel: string;
+  viewCvLabel: string;
+  showEmailLabel: string;
   availableForHireLabel: string;
   projectsTitleHtml: string;
   projectsDescriptionHtml: string;
@@ -114,6 +117,10 @@ export interface Project {
       linkedin: environment.contact.socialMedia.linkedin,
       github: environment.contact.socialMedia.github,
       cvUrl: environment.externalUrls.portfolio.cv,
+      cvFilename: 'Ezequiel_Enrico_CV.pdf',
+      downloadCvLabel: 'Descargar CV',
+      viewCvLabel: 'Ver CV',
+      showEmailLabel: 'Mostrar Email',
       about: 'Soy Desarrollador Full Stack especializado en diseño de arquitecturas cloud, DevOps y Ciberseguridad. Cuento con sólida experiencia liderando la implementación de infraestructura como código, seguridad en bases de datos (políticas RLS/RBAC) y pipelines CI/CD complejos. Nivel de inglés C1 certificado, facilitando la comunicación estratégica en equipos globales.',
       quickScan: {
         title: 'Sobre mí',
@@ -400,7 +407,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
       ],
 
 
-      downloadCvLabel: 'Descargar CV',
+
       availableForHireLabel: 'Disponible para trabajar',
       projectsTitleHtml: 'Proyectos <span class="text-cyan-500">Realizados</span>',
       projectsDescriptionHtml: 'A continuación presento algunos de los proyectos que ya tengo desarrollados, mientras tanto estoy trabajando en otros proyectos para sumar a esta sección.',
@@ -430,7 +437,11 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\${RETENTION_DAYS} -delete
       email: '',
       linkedin: environment.contact.socialMedia.linkedin,
       github: environment.contact.socialMedia.github,
-      cvUrl: environment.externalUrls.portfolio.cv,
+      cvUrl: '/Ezequiel_Enrico_CV_EN.pdf',
+      cvFilename: 'Ezequiel_Enrico_CV_EN.pdf',
+      downloadCvLabel: 'Download CV',
+      viewCvLabel: 'View CV',
+      showEmailLabel: 'Show Email',
       about: 'I am a Full Stack Engineer specializing in cloud architectures, DevOps, and Cybersecurity. I have solid experience leading infrastructure-as-code implementations, database security (RLS/RBAC policies), and complex CI/CD pipelines. C1 English certified, facilitating strategic communication within global development teams.',
       quickScan: {
         title: 'About Me',
@@ -721,7 +732,7 @@ find "\${BACKUP_DIR}" -name "backup_*.sql.gz" -mtime +\dots\${RETENTION_DAYS} -d
           techStack: ['Node.js', 'Angular', 'Supabase', 'Docker']
         }
       ],
-      downloadCvLabel: 'Download CV',
+
       availableForHireLabel: 'Available for Hire',
       projectsTitleHtml: 'Deployed <span class="text-cyan-500">Systems</span>',
       projectsDescriptionHtml: 'Below are some of the projects I have developed so far. Meanwhile, I am currently working on other projects to add to this section.',
