@@ -9,9 +9,11 @@ describe('Aislamiento Multi-Tenant (Row Level Security)', () => {
             statusCode: 200,
             body: { id: 'user-empresa-b', email: 'user@empresab.com' }
         });
-        cy.intercept('GET', '**/rest/v1/profiles*', {
-            statusCode: 200,
-            body: [{ id: 'user-empresa-b', role: 'admin', is_active: true }]
+        cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+            req.reply({
+                statusCode: 200,
+                body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? { id: 'user-empresa-b', role: 'admin', is_active: true } : [{ id: 'user-empresa-b', role: 'admin', is_active: true }]
+            });
         });
         cy.intercept('GET', '**/rest/v1/branches*', {
             statusCode: 200,
@@ -42,6 +44,7 @@ describe('Aislamiento Multi-Tenant (Row Level Security)', () => {
                     }
                 };
                 win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
+                win.localStorage.setItem('arecofix_profile_user-empresa-b', JSON.stringify({ id: 'user-empresa-b', role: 'admin', is_active: true }));
                 win.localStorage.setItem('arecofix_admin_branch_id', 'branch-b');
             }
         });
