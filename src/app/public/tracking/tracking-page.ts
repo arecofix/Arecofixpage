@@ -183,31 +183,51 @@ export class TrackingPage implements OnInit, OnDestroy {
 
     private async updateSeo(r: PublicRepairDto) {
         const statusName = r.status_label;
-        // Default: branded tracking image (absolute URL, required for WhatsApp/Telegram previews)
-        const trackingOgImage = `${this.baseUrl}/assets/img/branding/og-tracking.png`;
-        let imageUrl = trackingOgImage;
+        const statusId = r.current_status_id;
+        
+        let customTitle = `${statusName} - Tu ${r.device_model} | Arecofix`;
+        let customDescription = `Tu equipo está en etapa de ${statusName}. Seguí el avance de tu reparación en tiempo real con Arecofix.`;
+        // Generamos una ruta para la imagen dependiendo del estado (ej: og-status-1.png, og-status-2.png, etc.)
+        // Para que esto funcione, en la carpeta public/assets/img/og/ deberás colocar las 7 imágenes.
+        let imageUrl = `${this.baseUrl}/assets/img/og/status-${statusId}.png`;
 
-        try {
-            const settings = await this.companyService.getSettings();
-            if (settings?.logo_url) {
-                const raw = settings.logo_url;
-                // Ensure URL is absolute — bots require absolute URLs for OG images
-                if (raw.startsWith('http://') || raw.startsWith('https://')) {
-                    imageUrl = raw;
-                } else if (raw.startsWith('/') || raw.startsWith('assets/')) {
-                    imageUrl = `${this.baseUrl}/${raw.replace(/^\//, '')}`;
-                }
-                // If logo_url looks like a generic small icon, prefer the branded OG image
-                const tooSmall = raw.includes('16x16') || raw.includes('32x32') || raw.includes('favicon');
-                if (tooSmall) imageUrl = trackingOgImage;
-            }
-        } catch (e) {
-            this.logger.warn('Could not fetch company settings for SEO image', e);
+        switch (statusId) {
+            case 1: // PENDING_DIAGNOSIS
+                customTitle = `Diagnóstico en Curso - ${r.device_model} | Arecofix`;
+                customDescription = `Estamos revisando tu ${r.device_model}. Ingresá para ver el estado del diagnóstico en Arecofix.`;
+                break;
+            case 2: // SUPPLY_MANAGEMENT
+                customTitle = `Esperando Repuestos - ${r.device_model} | Arecofix`;
+                customDescription = `Estamos gestionando los repuestos para tu ${r.device_model}. Seguí el progreso de tu reparación en Arecofix.`;
+                break;
+            case 3: // IN_PROGRESS
+                customTitle = `En Reparación - ${r.device_model} | Arecofix`;
+                customDescription = `Nuestros técnicos están trabajando en tu ${r.device_model}. Seguí el avance en tiempo real.`;
+                break;
+            case 4: // QUALITY_CONTROL
+                customTitle = `Control de Calidad - ${r.device_model} | Arecofix`;
+                customDescription = `Tu ${r.device_model} está siendo testeado para asegurar que todo funcione de manera perfecta.`;
+                break;
+            case 5: // READY_FOR_PICKUP
+                customTitle = `¡Listo para Retirar! - ${r.device_model} | Arecofix`;
+                customDescription = `Tu ${r.device_model} ya está reparado y listo para que lo pases a buscar. ¡Te esperamos en nuestra sucursal!`;
+                break;
+            case 6: // DELIVERED
+                customTitle = `Equipo Entregado - ${r.device_model} | Arecofix`;
+                customDescription = `Esta reparación ya fue entregada exitosamente. ¡Gracias por confiar en Arecofix!`;
+                break;
+            case 7: // CANCELLED
+                customTitle = `Reparación Cancelada - ${r.device_model} | Arecofix`;
+                customDescription = `El servicio para tu ${r.device_model} ha sido cancelado. Ingresá para ver los detalles.`;
+                break;
         }
 
+        // Ya no sobrescribimos con el logo del settings si el usuario quiere que la imagen dependa del estado.
+        // Si el día de mañana se quiere fallback, se podría hacer, pero la directiva es personalizarlo por estado.
+
         this.seoService.setPageData({
-            title: `${statusName} - Tu ${r.device_model} | Arecofix`,
-            description: `Tu equipo está en etapa de ${statusName}. Seguí el avance de tu reparación en tiempo real con Arecofix.`,
+            title: customTitle,
+            description: customDescription,
             imageUrl,
             type: 'article'
         });

@@ -120,14 +120,11 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
     is_active: true
   };
 
-  cy.intercept('GET', '**/rest/v1/profiles?id=eq.mock-admin-id*', {
-    statusCode: 200,
-    body: mockProfile
-  }).as('getProfileSingle');
-
-  cy.intercept('GET', '**/rest/v1/profiles', {
-    statusCode: 200,
-    body: [mockProfile]
+  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+    req.reply({
+      statusCode: 200,
+      body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mockProfile : [mockProfile]
+    });
   }).as('getProfile');
 
   cy.intercept('GET', '**/rest/v1/v_unified_clients*', {
@@ -213,6 +210,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/') => {
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
       win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('arecofix_profile_mock-admin-id', JSON.stringify(mockProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
       win.localStorage.setItem('arecofix_admin_branch_id', 'branch-1');

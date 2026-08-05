@@ -23,10 +23,10 @@ describe('Optimización Máxima Firebase - Control de Ancho de Banda', () => {
         });
     });
 
-    it('3. Las rutas no deben contener el estado TransferState (ng-state) bloqueante de ancho de banda', () => {
+    it('3. Las rutas deben contener el estado TransferState (ng-state) para evitar flickeos (SSR)', () => {
         cy.readFile('dist/arecofix/browser/index.html', 'utf8').then((html) => {
-            // No debe existir el script ng-state
-            expect(html).not.to.include('id="ng-state"');
+            // El script ng-state DEBE existir para pasar la hidratación de datos del servidor al cliente
+            expect(html).to.include('id="ng-state"');
         });
     });
 });
