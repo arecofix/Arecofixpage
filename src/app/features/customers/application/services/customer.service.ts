@@ -31,30 +31,19 @@ export class CustomerService {
     // 2. Usar la Edge Function para crear el cliente de forma segura en auth.users
     // Esto previene el error 23503 (Foreign Key Constraint) con profiles
     const tenantId = this.tenantService.getCurrentTenant()?.id || data.tenant_id;
-    const supabase = this.authService.getSupabaseClient();
-    
-    // Generar datos requeridos para auth.users
     const dummyEmail = data.email || `cliente_${data.phone?.replace(/\D/g, '') || Date.now()}@arecofix.com`;
     const dummyPassword = crypto.randomUUID(); // Contraseña segura al azar
     
+    const payload = {
+      ...data,
+      email: dummyEmail,
+      password: dummyPassword,
+      role: 'user', // Forzar rol
+      tenant_id: tenantId,
+    };
+
     try {
-      const { data: functionData, error } = await supabase.functions.invoke('create-employee', {
-        body: {
-          ...data,
-          email: dummyEmail,
-          password: dummyPassword,
-          role: 'user', // Forzar rol
-          tenant_id: tenantId,
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (functionData?.error) {
-        throw new Error(functionData.error);
-      }
+      const functionData = await this.invokeCreateEmployeeRecursive(payload);
 
       if (functionData?.user?.id) {
          // Marcarlo como invitado
@@ -64,10 +53,43 @@ export class CustomerService {
       }
     } catch (e: any) {
       console.warn('Error en Edge Function create-employee o en actualización posterior:', e);
-      throw e;
+      throw new Error(`Error del servidor al crear cliente: ${e.message || 'Desconocido'}`);
     }
 
     throw new Error('No se pudo crear el cliente, respuesta vacía del servidor.');
+  }
+
+  /**
+   * Recursive function to invoke the Edge Function with retries.
+   * Applying clean architecture and recursive retry pattern for resilience.
+   */
+  private async invokeCreateEmployeeRecursive(payload: any, retriesLeft: number = 2): Promise<any> {
+    const supabase = this.authService.getSupabaseClient();
+    
+    const { data: functionData, error } = await supabase.functions.invoke('create-employee', {
+      body: payload
+    });
+
+    if (error || functionData?.error) {
+      const errorMessage = error?.message || functionData?.error || 'Unknown edge function error';
+      
+      // Don't retry on 403 Forbidden or 400 Bad Request, as these are client errors
+      const isClientError = errorMessage.includes('Forbidden') || errorMessage.includes('Bad Request') || errorMessage.includes('non-2xx status code');
+      
+      if (retriesLeft > 0 && !isClientError) {
+        console.warn(`[CustomerService] Edge function failed, retrying... (${retriesLeft} retries left). Error: ${errorMessage}`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Delay before retry
+        return this.invokeCreateEmployeeRecursive(payload, retriesLeft - 1);
+      }
+      
+      // Throw clear error message to bubble up to the UI
+      if (errorMessage.includes('non-2xx status code')) {
+         throw new Error('Permisos insuficientes o error interno en el servidor al intentar registrar al usuario.');
+      }
+      throw new Error(errorMessage);
+    }
+
+    return functionData;
   }
 
   async update(id: string, data: any): Promise<UserProfile> {

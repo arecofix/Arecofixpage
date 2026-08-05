@@ -56,7 +56,7 @@ serve(async (req: Request) => {
     const { email, password, first_name, last_name, role, phone, avatar_url, tenant_id, branch_id } = reqBody;
 
     const allowedRoles = ['super_admin', 'tenant_owner', 'admin'];
-    const isStaffCreatingUser = invokerProfile.role === 'staff' && role === 'user';
+    const isStaffCreatingUser = (invokerProfile.role === 'staff' || invokerProfile.role === 'technician') && role === 'user';
     if (!allowedRoles.includes(invokerProfile.role) && !isStaffCreatingUser) {
        return new Response(JSON.stringify({ error: 'Forbidden: Insufficient permissions to create employees' }), {
          status: 403,
