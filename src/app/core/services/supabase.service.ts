@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PendingTasks } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '@env/environment';
 import { LoggerService } from './logger.service';
@@ -14,10 +14,14 @@ export class SupabaseService {
 
   private cacheMap = new Map<string, { data: string; headers: [string, string][]; status: number; statusText: string; expiresAt: number }>();
 
+  private pendingTasks = inject(PendingTasks);
+
   constructor() {
     // Custom fetch with cache and retry logic to reduce egress and handle network drops
     const customFetch = async (url: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
-      const urlStr = typeof url === 'string' ? url : (url as URL).toString();
+      const removeTask = this.pendingTasks.add();
+      try {
+        const urlStr = typeof url === 'string' ? url : (url as URL).toString();
       const method = (options?.method || 'GET').toUpperCase();
       const isCacheable = method === 'GET' && urlStr.includes('/rest/v1/');
       const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && urlStr.includes('/rest/v1/') && !urlStr.includes('/rpc/');
@@ -156,6 +160,9 @@ export class SupabaseService {
       
       this.logger.error('Supabase fetch critically failed after retries', lastError);
       throw lastError;
+      } finally {
+        removeTask();
+      }
     };
 
     const isBrowser = typeof window !== 'undefined';
