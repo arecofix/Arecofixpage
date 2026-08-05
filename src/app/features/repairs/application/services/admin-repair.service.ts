@@ -150,6 +150,11 @@ export class AdminRepairService {
                         throw new Error('Conflicto: El teléfono ya está registrado en el sistema. Intenta buscarlo en el selector de clientes.');
                     }
 
+                    // For the custom error thrown by CustomerService (Edge Function failures)
+                    if (err.message && err.message.includes('servidor al crear cliente')) {
+                        throw new Error(err.message);
+                    }
+
                     throw new Error(`Error en Registro: ${err.message || 'Error de comunicación con la base de datos'}`);
                 }
             }
