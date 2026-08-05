@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { combineLatest, map, switchMap, of } from 'rxjs';
 import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Location, NgOptimizedImage, CommonModule, DecimalPipe } from '@angular/common';
+import { environment } from '@env/environment';
 /*  */
 import {
   IsEmptyComponent,
@@ -278,7 +279,27 @@ export class ProductsDetailsPage {
     if (!data || !data.data || data.data.length === 0) return null;
 
     // Retornar el primer producto encontrado (debería ser único por slug)
-    const p = data.data[0];
+    const p = { ...data.data[0] };
+    
+    // Fix relative Supabase storage URLs for images
+    if (p.image_url && !p.image_url.startsWith('http') && p.image_url !== '_' && p.image_url !== 'null' && !p.image_url.startsWith('assets/')) {
+        const encodedPath = p.image_url.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+        p.image_url = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
+    }
+    if (p.og_image && !p.og_image.startsWith('http') && p.og_image !== '_' && p.og_image !== 'null' && !p.og_image.startsWith('assets/')) {
+        const encodedPath = p.og_image.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+        p.og_image = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
+    }
+    if (p.gallery_urls && p.gallery_urls.length > 0) {
+        p.gallery_urls = p.gallery_urls.map((img: string) => {
+            if (img && !img.startsWith('http') && img !== '_' && img !== 'null' && !img.startsWith('assets/')) {
+                const encodedPath = img.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+                return `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
+            }
+            return img;
+        });
+    }
+
     const rate = this.usdRate.value() || 1240;
     if (p.currency === 'USD') {
       return {
@@ -311,7 +332,7 @@ export class ProductsDetailsPage {
   selectedImage = signal<string | null>(null);
 
   updateSeoTags(product: Product) {
-    // â”€â”€ SEO / Open Graph / WhatsApp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── SEO / Open Graph / WhatsApp ──────────────────────────────────
     let absoluteImageUrl = product.og_image || product.image_url || '';
     
     // Validation: Ensure we don't use detail pages OR non-images as OG images
