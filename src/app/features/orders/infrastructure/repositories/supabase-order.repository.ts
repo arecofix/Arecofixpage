@@ -134,17 +134,17 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
   private async _upsertOrderItems(orderId: string, items: OrderItem[]): Promise<void> {
     const tenantId = this.tenantService.getTenantId();
     const branchId = this.branchContextService?.getBranchId();
-    
+
     const itemsPayload = items.map((item) => {
       const sanitized = this.sanitizePayload({
-        order_id: orderId,
-        product_id: item.product_id || null,
-        course_id: item.course_id || null,
+        order_id:     orderId,
+        product_id:   item.product_id  || null,
+        course_id:    item.course_id   || null,
         product_name: item.product_name,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        cost_price: item.cost_price || 0,
-        subtotal: item.subtotal,
+        quantity:     item.quantity,
+        unit_price:   item.unit_price,
+        // cost_price is a column on `products`, NOT on `order_items` — omitted intentionally
+        subtotal:     item.subtotal,
       } as any);
       sanitized.tenant_id = tenantId;
       if (branchId && !sanitized.branch_id) {

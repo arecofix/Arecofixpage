@@ -338,6 +338,12 @@ export class ProductsDetailsPage {
     // Validation: Ensure we don't use detail pages OR non-images as OG images
     const isRecursive = absoluteImageUrl.includes('/detalle/') || absoluteImageUrl.includes('/posts/');
 
+    // Fix relative Supabase storage URLs for images
+    if (absoluteImageUrl && !absoluteImageUrl.startsWith('http') && absoluteImageUrl !== '_' && absoluteImageUrl !== 'null' && !absoluteImageUrl.startsWith('assets/')) {
+        const encodedPath = absoluteImageUrl.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+        absoluteImageUrl = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
+    }
+
     if (!absoluteImageUrl || isRecursive) {
       absoluteImageUrl = `assets/img/branding/og-services.png`;
     }

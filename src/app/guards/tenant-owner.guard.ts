@@ -1,4 +1,5 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { ROLES } from '@app/core/constants/roles.constants';
@@ -7,11 +8,20 @@ import { of, firstValueFrom } from 'rxjs';
 
 /**
  * Guard that restricts access exclusively to Tenant Owners and Super Admins.
- * It prevents branch-specific roles (admin, staff, technician) from accessing global config pages like Branches management.
+ * It prevents branch-specific roles (admin, staff, technician) from accessing
+ * global config pages like Branches management.
  */
 export const tenantOwnerGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
+
+  // Skip guard on the server — let the browser enforce it after hydration.
+  if (isPlatformServer(platformId)) {
+    return true;
+  }
+
+  const isBrowser = isPlatformBrowser(platformId);
 
   try {
     const authState = await firstValueFrom(
@@ -24,10 +34,12 @@ export const tenantOwnerGuard: CanActivateFn = async (route, state) => {
     );
 
     const userProfile = authState.profile;
-    
+
     if (!userProfile) {
-      router.navigate(['/']);
-      return false;
+      if (isBrowser) {
+        console.warn('🚫 tenantOwnerGuard: userProfile is null, redirecting to /');
+      }
+      return router.createUrlTree(['/']);
     }
 
     const role = userProfile.role;
@@ -37,12 +49,10 @@ export const tenantOwnerGuard: CanActivateFn = async (route, state) => {
     }
 
     console.warn('🚫 tenantOwnerGuard: Access denied for role:', role);
-    router.navigate(['/']);
-    return false;
+    return router.createUrlTree(['/']);
 
   } catch (error) {
     console.error('❌ Error in tenantOwnerGuard:', error);
-    router.navigate(['/']);
-    return false;
+    return router.createUrlTree(['/']);
   }
 };

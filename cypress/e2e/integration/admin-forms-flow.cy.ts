@@ -131,10 +131,16 @@ describe('Admin Forms Integration Flow', () => {
     cy.visit('/celular');
     cy.wait('@getCategories', { timeout: 10000 });
 
-    // Fill contact form
-    cy.get('#contactName').invoke('val', testData.contact.name).trigger('input');
-    cy.get('#contactPhone').invoke('val', testData.contact.phone).trigger('input');
-    cy.get('#contactMessage').invoke('val', testData.contact.message).trigger('input');
+    // Wait for the contact form to be fully hydrated before interacting
+    cy.get('#contactName', { timeout: 10000 }).should('be.visible');
+
+    // Use .clear().type() so Angular's ngModel zone listeners pick up the keypress events.
+    // .invoke('val').trigger('input') sets the DOM value before SSR hydration re-registers
+    // Angular's change handlers, leaving this.contactName empty and causing the form to
+    // fall back to a native browser GET submission.
+    cy.get('#contactName').clear().type(testData.contact.name);
+    cy.get('#contactPhone').clear().type(testData.contact.phone);
+    cy.get('#contactMessage').clear().type(testData.contact.message);
 
     // Stub window.open BEFORE clicking submit (to catch the fallback WhatsApp redirect)
     cy.window().then((win) => {
@@ -142,12 +148,12 @@ describe('Admin Forms Integration Flow', () => {
     });
 
     cy.contains('button', 'Enviar Mensaje').click();
-    cy.wait('@postContactMessage');
+    cy.wait('@postContactMessage', { timeout: 10000 });
     
     // The POST to contact_messages is mocked to succeed → success toast should appear.
-    // Toast text: '¡Consulta enviada con éxito! Te responderemos a la brevedad.'
     cy.contains('Consulta enviada', { timeout: 15000 }).should('exist');
   });
+
 
   it('2. should submit course enrollment', () => {
     cy.visit('/academy');

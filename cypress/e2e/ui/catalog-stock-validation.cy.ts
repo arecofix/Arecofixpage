@@ -34,7 +34,7 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
 
   it('debería bloquear adición al carrito si supera stock máximo (QA #4)', () => {
     const productLimited = buildMockProduct({ id: 'prod-limit', stock: 2 });
-    
+
     // Supongamos que ya hay 1 en el carrito
     const cartOrder = buildMockOrder([buildMockOrderItem(productLimited, 1)]);
 
@@ -51,29 +51,43 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
       body: cartOrder
     }).as('getActiveCart');
 
-    // Mock update order to return the modified order
+    // Mock PATCH order (cart header update)
     cy.intercept('PATCH', '**/rest/v1/orders*', (req) => {
       req.reply({
         statusCode: 200,
-        body: cartOrder // For the test, returning the same order structure is fine
+        body: cartOrder
       });
     }).as('updateOrderSpy');
 
+    // Mock order_items DELETE (called before re-inserting all items on each cart update)
+    cy.intercept('DELETE', '**/rest/v1/order_items*', {
+      statusCode: 204,
+      body: null
+    }).as('deleteOrderItems');
+
+    // Mock order_items POST/INSERT (the actual item upsert)
+    cy.intercept('POST', '**/rest/v1/order_items*', {
+      statusCode: 201,
+      body: [{ id: 'item-1', order_id: cartOrder.id, product_id: productLimited.id, quantity: 2 }]
+    }).as('insertOrderItems');
+
     cy.visit('/productos');
     cy.wait('@getProductsLimited');
-    
-    // Agregamos la segunda unidad (ahora carrito = 2, stock = 2)
+
+    // Añadimos la segunda unidad (carrito pasa de 1 a 2, stock = 2)
     cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });
-    
-    // Esperamos que el estado interno se actualice
-    cy.wait(500);
-    
-    // Tratamos de agregar una tercera unidad
+
+    // Esperamos que la operación cart completa (PATCH + DELETE + INSERT) termine
+    cy.wait('@updateOrderSpy');
+    cy.wait(800);
+
+    // Intentamos añadir una tercera unidad (cart=2, stock=2 → debe bloquearse)
     cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });
 
     // Debería aparecer una alerta o toast indicando el límite de stock
     cy.get('app-toast').contains(/stock/i, { timeout: 5000 }).should('be.visible');
   });
+
 
   it('debería reflejar stock de sucursal propietaria exclusivamente si no es global (QA #5 & #18)', () => {
     // Si el producto pertenece a la sucursal activa, se muestra

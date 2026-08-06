@@ -1,4 +1,4 @@
-﻿import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, Inject, DOCUMENT } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, Inject, DOCUMENT } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -125,9 +125,13 @@ export class PostPage implements OnInit, OnDestroy {
 
             // Open Graph (Social)
             const postImage = post.image || 'assets/img/branding/og-services.png';
-            const absoluteImageUrl = postImage.startsWith('http') 
-                ? postImage 
-                : `${environment.baseUrl}/${postImage.startsWith('/') ? postImage.substring(1) : postImage}`;
+            let absoluteImageUrl = postImage;
+            if (postImage && !postImage.startsWith('http') && postImage !== '_' && postImage !== 'null' && !postImage.startsWith('assets/')) {
+                const encodedPath = postImage.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+                absoluteImageUrl = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
+            } else if (!postImage.startsWith('http')) {
+                absoluteImageUrl = `${environment.baseUrl}/${postImage.startsWith('/') ? postImage.substring(1) : postImage}`;
+            }
 
             this.metaService.updateTag({ property: 'og:title', content: post.title });
             this.metaService.updateTag({ property: 'og:description', content: post.meta_description || post.content.substring(0, 160) });

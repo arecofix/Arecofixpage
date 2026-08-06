@@ -9,6 +9,8 @@ describe('Flujo Completo de Reparación y Seguimiento', () => {
 
     it('1. El administrador ingresa una nueva reparación', () => {
         cy.loginRealAdmin('/login?returnUrl=/admin/repairs');
+        cy.url().should('include', '/admin/repairs');
+        cy.wait(1000); // Give it a bit to load the page
         cy.wait(1500);
 
         cy.url().then(url => {
@@ -18,7 +20,7 @@ describe('Flujo Completo de Reparación y Seguimiento', () => {
             }
         });
 
-        cy.get('a[routerLink="/admin/repairs/new"]').first().click({ force: true });
+        cy.get('a[href="/admin/repairs/new"]').first().click({ force: true });
         cy.url().should('include', '/admin/repairs/new');
         cy.wait(1500);
 
