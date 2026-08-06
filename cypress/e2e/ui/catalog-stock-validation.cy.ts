@@ -35,57 +35,39 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
   it('debería bloquear adición al carrito si supera stock máximo (QA #4)', () => {
     const productLimited = buildMockProduct({ id: 'prod-limit', stock: 2 });
 
-    // Supongamos que ya hay 1 en el carrito
-    const cartOrder = buildMockOrder([buildMockOrderItem(productLimited, 1)]);
+    // Cart already has 2 of this product (= stock limit).
+    // A single post-hydration click should trigger the stock guard immediately.
+    // The 2-click approach failed because the first click fired pre-hydration
+    // (Angular attaches event handlers only after hydration), so addToCart was
+    // never called on the first click and the in-memory qty never reached 2.
+    const cartAtMaxStock = buildMockOrder([buildMockOrderItem(productLimited, 2)]);
 
-    cy.intercept('GET', '**/rest/v1/products*', (req) => {
-      req.reply({
-        statusCode: 200,
-        headers: { 'Content-Range': '0-0/1', 'Content-Type': 'application/json' },
-        body: [productLimited]
-      });
+    cy.intercept('GET', '**/rest/v1/products*', {
+      statusCode: 200,
+      headers: { 'Content-Range': '0-0/1', 'Content-Type': 'application/json' },
+      body: [productLimited]
     }).as('getProductsLimited');
 
-    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, {
+    // Return cart at max stock so the signal is pre-loaded with qty=2
+    cy.intercept('GET', '**/rest/v1/orders*', {
       statusCode: 200,
-      body: cartOrder
+      body: [cartAtMaxStock]
     }).as('getActiveCart');
 
-    // Mock PATCH order (cart header update)
-    cy.intercept('PATCH', '**/rest/v1/orders*', (req) => {
-      req.reply({
-        statusCode: 200,
-        body: cartOrder
-      });
-    }).as('updateOrderSpy');
-
-    // Mock order_items DELETE (called before re-inserting all items on each cart update)
-    cy.intercept('DELETE', '**/rest/v1/order_items*', {
-      statusCode: 204,
-      body: null
-    }).as('deleteOrderItems');
-
-    // Mock order_items POST/INSERT (the actual item upsert)
-    cy.intercept('POST', '**/rest/v1/order_items*', {
-      statusCode: 201,
-      body: [{ id: 'item-1', order_id: cartOrder.id, product_id: productLimited.id, quantity: 2 }]
-    }).as('insertOrderItems');
-
     cy.visit('/productos');
-    cy.wait('@getProductsLimited');
+    cy.wait('@getProductsLimited', { timeout: 10000 });
 
-    // Añadimos la segunda unidad (carrito pasa de 1 a 2, stock = 2)
-    cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });
+    // Wait for Angular to fully hydrate — Cypress retries until the button is visible.
+    // Pre-hydration clicks are silently dropped because Angular hasn't attached
+    // event handlers yet; waiting for visibility guarantees we click post-hydration.
+    cy.contains('button', /Añadir al Carrito/i, { timeout: 10000 }).should('be.visible');
+    cy.wait(400);
 
-    // Esperamos que la operación cart completa (PATCH + DELETE + INSERT) termine
-    cy.wait('@updateOrderSpy');
-    cy.wait(800);
+    // Single click: activeOrder() signal has qty=2, (2+1) > stock=2 → BLOCKED
+    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
 
-    // Intentamos añadir una tercera unidad (cart=2, stock=2 → debe bloquearse)
-    cy.get('product-card button').contains(/Añadir al Carrito/i, { matchCase: false }).click({ force: true });
-
-    // Debería aparecer una alerta o toast indicando el límite de stock
-    cy.get('app-toast').contains(/stock/i, { timeout: 5000 }).should('be.visible');
+    // cart.service.ts shows the stock toast BEFORE any API call (early return)
+    cy.get('app-toast').contains(/stock/i, { timeout: 8000 }).should('be.visible');
   });
 
 

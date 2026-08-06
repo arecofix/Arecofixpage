@@ -22,74 +22,42 @@ export class CustomerService {
   }
 
   async create(data: any): Promise<UserProfile> {
-    // 1. Intentar encontrar cliente existente para evitar error 409 Conflict
-    const existing = await firstValueFrom(this.repository.findByEmailOrPhone(data.email, data.phone));
-    if (existing) {
-      return existing;
-    }
+    // 1. Re-use existing client to avoid duplicates
+    const existing = await firstValueFrom(
+      this.repository.findByEmailOrPhone(data.email, data.phone)
+    );
+    if (existing) return existing;
 
-    // 2. Usar la Edge Function para crear el cliente de forma segura en auth.users
-    // Esto previene el error 23503 (Foreign Key Constraint) con profiles
-    const tenantId = this.tenantService.getCurrentTenant()?.id || data.tenant_id;
-    const dummyEmail = data.email || `cliente_${data.phone?.replace(/\D/g, '') || Date.now()}@arecofix.com`;
-    const dummyPassword = crypto.randomUUID(); // Contraseña segura al azar
-    
-    const payload = {
-      ...data,
-      email: dummyEmail,
-      password: dummyPassword,
-      role: 'user', // Forzar rol
-      tenant_id: tenantId,
-    };
-
-    try {
-      const functionData = await this.invokeCreateEmployeeRecursive(payload);
-
-      if (functionData?.user?.id) {
-         // Marcarlo como invitado
-         await this.update(functionData.user.id, { is_guest: true });
-         const newProfile = await this.getById(functionData.user.id);
-         if (newProfile) return newProfile;
-      }
-    } catch (e: any) {
-      console.warn('Error en Edge Function create-employee o en actualización posterior:', e);
-      throw new Error(`Error del servidor al crear cliente: ${e.message || 'Desconocido'}`);
-    }
-
-    throw new Error('No se pudo crear el cliente, respuesta vacía del servidor.');
-  }
-
-  /**
-   * Recursive function to invoke the Edge Function with retries.
-   * Applying clean architecture and recursive retry pattern for resilience.
-   */
-  private async invokeCreateEmployeeRecursive(payload: any, retriesLeft: number = 2): Promise<any> {
+    // 2. Create guest profile via Postgres RPC (SECURITY DEFINER).
+    //    This bypasses the profiles.id → auth.users FK constraint, which blocked
+    //    direct INSERT of guest profiles (error 23503). The Edge Function approach
+    //    also failed because it needs service_role credentials not available client-side.
+    const tenantId = this.tenantService.getCurrentTenant()?.id ?? data.tenant_id;
     const supabase = this.authService.getSupabaseClient();
-    
-    const { data: functionData, error } = await supabase.functions.invoke('create-employee', {
-      body: payload
+
+    const { data: rpcResult, error } = await supabase.rpc('create_guest_profile', {
+      p_first_name: data.first_name   ?? '',
+      p_last_name:  data.last_name    ?? '',
+      p_email:      data.email        ?? '',
+      p_phone:      data.phone        ?? '',
+      p_address:    data.address      ?? '',
+      p_dni:        data.dni          ?? '',
+      p_tenant_id:  tenantId          ?? null,
+      p_branch_id:  data.branch_id    ?? null,
     });
 
-    if (error || functionData?.error) {
-      const errorMessage = error?.message || functionData?.error || 'Unknown edge function error';
-      
-      // Don't retry on 403 Forbidden or 400 Bad Request, as these are client errors
-      const isClientError = errorMessage.includes('Forbidden') || errorMessage.includes('Bad Request') || errorMessage.includes('non-2xx status code');
-      
-      if (retriesLeft > 0 && !isClientError) {
-        console.warn(`[CustomerService] Edge function failed, retrying... (${retriesLeft} retries left). Error: ${errorMessage}`);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Delay before retry
-        return this.invokeCreateEmployeeRecursive(payload, retriesLeft - 1);
-      }
-      
-      // Throw clear error message to bubble up to the UI
-      if (errorMessage.includes('non-2xx status code')) {
-         throw new Error('Permisos insuficientes o error interno en el servidor al intentar registrar al usuario.');
-      }
-      throw new Error(errorMessage);
+    if (error) {
+      console.error('[CustomerService] create_guest_profile RPC failed:', error);
+      throw new Error(`Error al crear el cliente: ${error.message}`);
     }
 
-    return functionData;
+    // rpcResult is the JSON of the inserted profile row
+    const profile = rpcResult as UserProfile;
+    if (!profile?.id) {
+      throw new Error('No se pudo crear el perfil del cliente (respuesta vacía).');
+    }
+
+    return profile;
   }
 
   async update(id: string, data: any): Promise<UserProfile> {
