@@ -1,4 +1,5 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 import { Router, CanActivateFn } from '@angular/router';
 import { BranchService } from '@app/core/services/branch.service';
 import { AuthService } from '@app/core/services/auth.service';
@@ -23,6 +24,11 @@ export const moduleGuard: CanActivateFn = async (route, state) => {
   const requiredModule = route.data['module'] as string;
   if (!requiredModule) {
     return true; // Si no hay módulo definido, permitimos el paso
+  }
+
+  const platformId = inject(PLATFORM_ID);
+  if (isPlatformServer(platformId)) {
+    return true;
   }
 
   // 3. Obtener la sucursal actual, esperando si es necesario

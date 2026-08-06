@@ -258,6 +258,11 @@ export const publicRoutes: Routes = [
           ),
       },
       {
+        path: 'cursos',
+        redirectTo: 'academy',
+        pathMatch: 'full'
+      },
+      {
         title: 'Academy',
         path: 'academy',
         loadComponent: () =>

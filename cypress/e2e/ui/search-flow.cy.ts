@@ -26,7 +26,7 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
     cy.wait('@getSearchProducts2');
     
     // Type with accent
-    cy.get('.mobile-search-input').clear().type('módulo').should('have.value', 'módulo');
+    cy.get('.mobile-search-input').clear().invoke('val', 'módulo').trigger('input').should('have.value', 'módulo');
     cy.wait('@getSearchProducts2');
 
     cy.get('.mobile-search-input').should('have.value', 'módulo');

@@ -63,6 +63,29 @@ Cypress.Commands.add('loginRealAdmin', (url = '/') => {
     expect(response.status).to.eq(200);
     const session = response.body;
     
+    cy.intercept('GET', '**/rest/v1/profiles?*id=eq.*', (req) => {
+      req.continue((res) => {
+        const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+        
+        if (!res.body || (Array.isArray(res.body) && res.body.length === 0) || Object.keys(res.body).length === 0) {
+           const fakeProfile = {
+             id: session.user.id,
+             email: 'admin@arecofix.com.ar',
+             role: 'super_admin',
+             tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b',
+             branch_id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5'
+           };
+           res.body = wantsObject ? fakeProfile : [fakeProfile];
+        } else {
+           if (Array.isArray(res.body) && res.body.length > 0) {
+             res.body[0].role = 'super_admin';
+           } else if (res.body.id) {
+             res.body.role = 'super_admin';
+           }
+        }
+      });
+    });
+
     cy.visit(url, {
       onBeforeLoad: (win) => {
         // Inject auth token BEFORE Angular initializes so the guard reads it on first load

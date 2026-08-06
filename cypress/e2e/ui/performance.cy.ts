@@ -2,7 +2,7 @@ describe('Performance & Infinite Loaders Audit', () => {
   const pagesToTest = [
     '/',
     '/login',
-    '/cursos',
+    '/academy',
     '/productos',
     '/servicios'
   ];

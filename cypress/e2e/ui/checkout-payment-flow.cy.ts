@@ -20,13 +20,13 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
   const fillShippingForm = () => {
     // Wait for Angular SSR hydration to complete before typing!
     cy.wait(1500);
-    cy.get('input[formControlName="name"]').clear().type('Juan Perez');
-    cy.get('input[formControlName="email"]').clear().type('juan@ejemplo.com');
-    cy.get('input[formControlName="phone"]').clear().type('1122334455');
-    cy.get('input[formControlName="street"]').clear().type('Av. Siempreviva');
-    cy.get('input[formControlName="number"]').clear().type('742');
-    cy.get('input[formControlName="city"]').clear().type('Springfield');
-    cy.get('input[formControlName="postal_code"]').clear().type('1000');
+    cy.get('input[formControlName="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
+    cy.get('input[formControlName="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
+    cy.get('input[formControlName="phone"]').clear().invoke('val', '1122334455').trigger('input');
+    cy.get('input[formControlName="street"]').clear().invoke('val', 'Av. Siempreviva').trigger('input');
+    cy.get('input[formControlName="number"]').clear().invoke('val', '742').trigger('input');
+    cy.get('input[formControlName="city"]').clear().invoke('val', 'Springfield').trigger('input');
+    cy.get('input[formControlName="postal_code"]').clear().invoke('val', '1000').trigger('input').trigger('blur');
     
     cy.window().then((win: any) => {
       win.captchaResolved = true; 
@@ -61,16 +61,30 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     cy.contains('h4', 'Mercado Pago').click({ force: true });
     
     // Mockear la creación de orden como Completada o Pendiente de Pago
-    cy.intercept('PATCH', '**/rest/v1/order*', (req) => {
+    cy.intercept('POST', '**/rest/v1/orders*', (req) => {
       req.reply({
         statusCode: 200,
         body: [{ ...cartOrder, ...req.body, status: 'pending', order_number: 'ORD-TEST999' }]
       });
     }).as('processOrder');
+    
+    // Mockear la inserción de order_items
+    cy.intercept('POST', '**/rest/v1/order_items*', {
+      statusCode: 200,
+      body: []
+    }).as('processOrderItems');
+
+    // Mockear Mercado Pago Preference creation
+    cy.intercept('POST', '**/functions/v1/mercadopago-preferences*', {
+      statusCode: 200,
+      body: { init_point: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=123' }
+    }).as('createPreference');
 
     cy.get('button').contains(/confirmar pedido/i, { matchCase: false }).click({ force: true });
     
     cy.wait('@processOrder');
+    cy.wait('@processOrderItems');
+    cy.wait('@createPreference');
     
     // Al finalizar debería ir a Mercado Pago o a la Thank You page
     cy.contains(/Redirigiendo|Gracias por tu compra/i, { timeout: 8000 }).should('be.visible');
@@ -82,12 +96,12 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     
     fillShippingForm();
 
-    cy.contains('h4', 'Mercado Pago').click({ force: true });
+    cy.contains('h4', 'Efectivo').click({ force: true });
     
-    // Mockear un fallo de red o servidor 500
-    cy.intercept('PATCH', '**/rest/v1/order*', {
+    // Mock error de red o de base de datos
+    cy.intercept('POST', '**/rest/v1/orders*', {
       statusCode: 500,
-      body: { message: 'Error interno procesando pago' }
+      body: { message: 'Internal Server Error' }
     }).as('processOrderFail');
 
     cy.get('button').contains(/confirmar pedido/i, { matchCase: false }).click({ force: true });
