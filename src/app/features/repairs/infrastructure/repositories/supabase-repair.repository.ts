@@ -110,6 +110,13 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const dbPayload = this.mapToDb(repair);
         delete (dbPayload as any).tenant_id;
         delete (dbPayload as any).id;
+        
+        // Remove device-specific columns that do not exist in the repairs table
+        // to prevent PostgREST from returning a 400 Bad Request.
+        delete (dbPayload as any).device_type;
+        delete (dbPayload as any).device_model;
+        delete (dbPayload as any).brand_id;
+        delete (dbPayload as any).imei;
 
         const tenantId = this.tenantService.getTenantId();
 
