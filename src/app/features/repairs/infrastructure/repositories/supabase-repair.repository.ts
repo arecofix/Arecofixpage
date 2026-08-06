@@ -383,6 +383,10 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         return {
             client_id: r.customer_id || null, 
             device_id: r.device_id || null,
+            device_type: r.device_type || null,
+            device_model: r.device_model || null,
+            brand_id: r.brand_id || null,
+            imei: r.imei || null,
             issue_description: r.issue_description,
             current_status_id: r.current_status_id,
             estimated_cost: r.estimated_cost,
