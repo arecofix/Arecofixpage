@@ -224,6 +224,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     private setupForm() {
         this.repairForm = this.fb.group({
             customer_id: [''],
+            device_id: [''],
             customer_name: ['', [Validators.required, Validators.minLength(3)]],
             customer_phone: [''],
             customer_email: ['', [Validators.email]],
@@ -484,6 +485,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             if (data) {
                 this.repairForm.patchValue({
                     customer_id: data.customer_id,
+                    device_id: data.device_id || '',
                     customer_name: data.customer_name,
                     customer_phone: data.customer_phone,
                     device_model: data.device_model,
@@ -614,34 +616,80 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             let finalClientId = validFormData.customer_id || validFormData.client_id || null;
             let finalDeviceId = validFormData.device_id || null;
 
-            // Si es un cliente nuevo ingresado manualmente, crear perfil invitado
+            // Si es un cliente nuevo ingresado manualmente, crear perfil invitado vía RPC
             if (!finalClientId && validFormData.customer_name) {
-                const { data: newProfile, error: profileErr } = await this.supabaseService.getClient().from('profiles').insert({
-                    first_name: validFormData.customer_name,
-                    last_name: '',
-                    email: validFormData.customer_email || null,
-                    phone: validFormData.customer_phone || null,
-                    role: 'user',
-                    is_guest: true,
-                    tenant_id: this.tenantService.getTenantId(),
-                    branch_id: branchIdActual
-                }).select('id').single();
-
-                if (newProfile) finalClientId = newProfile.id;
+                try {
+                    const client = await this.customerService.create({
+                        first_name: validFormData.customer_name,
+                        last_name: '',
+                        email: validFormData.customer_email || null,
+                        phone: validFormData.customer_phone || null,
+                        tenant_id: this.tenantService.getTenantId(),
+                        branch_id: branchIdActual
+                    });
+                    if (client && client.id) {
+                        finalClientId = client.id;
+                    }
+                } catch (err) {
+                    console.error('[AdminRepairForm] Error creating guest profile:', err);
+                }
             }
 
             // Si hay cliente pero no equipo asociado, crearlo
             if (finalClientId && !finalDeviceId && validFormData.device_model) {
-                const { data: newDevice, error: devErr } = await this.supabaseService.getClient().from('customer_devices').insert({
-                    client_id: finalClientId,
-                    type: 'smartphone',
-                    custom_model_name: validFormData.device_model,
-                    imei: validFormData.imei || null,
-                    passcode: validFormData.device_passcode || null,
-                    tenant_id: this.tenantService.getTenantId()
-                }).select('id').single();
+                let modelId: string | null = null;
+                try {
+                    // Buscar o crear modelo en la tabla 'models'
+                    const { data: existingModel } = await this.supabaseService.getClient()
+                        .from('models')
+                        .select('id')
+                        .ilike('name', validFormData.device_model.trim())
+                        .limit(1);
 
-                if (newDevice) finalDeviceId = newDevice.id;
+                    if (existingModel && existingModel.length > 0) {
+                        modelId = existingModel[0].id;
+                    } else {
+                        const { data: newModel } = await this.supabaseService.getClient()
+                            .from('models')
+                            .insert({
+                                name: validFormData.device_model.trim(),
+                                brand_id: validFormData.brand_id || null,
+                                tenant_id: this.tenantService.getTenantId()
+                            })
+                            .select('id')
+                            .single();
+                        if (newModel) modelId = newModel.id;
+                    }
+                } catch (modelErr) {
+                    console.error('[AdminRepairForm] Error resolving model:', modelErr);
+                }
+
+                try {
+                    const { data: newDevice, error: devErr } = await this.supabaseService.getClient().from('customer_devices').insert({
+                        user_id: finalClientId,
+                        model_id: modelId,
+                        imei: validFormData.imei || null,
+                        passcode: validFormData.device_passcode || null,
+                        tenant_id: this.tenantService.getTenantId()
+                    }).select('id').single();
+
+                    if (newDevice) finalDeviceId = newDevice.id;
+                    if (devErr) console.error('[AdminRepairForm] Error inserting device:', devErr);
+                } catch (devErr) {
+                    console.error('[AdminRepairForm] Exception inserting device:', devErr);
+                }
+            }
+
+            // Si hay un dispositivo asociado, actualizar sus datos
+            if (finalDeviceId) {
+                try {
+                    await this.supabaseService.getClient().from('customer_devices').update({
+                        imei: validFormData.imei || null,
+                        passcode: validFormData.device_passcode || null,
+                    }).eq('id', finalDeviceId);
+                } catch (devUpdateErr) {
+                    console.error('[AdminRepairForm] Error updating device:', devUpdateErr);
+                }
             }
 
             const payload = {
@@ -695,7 +743,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             this.router.navigate(['/admin/repairs']);
         } catch (e: any) {
             console.error('💥 [AdminRepairForm] Error crítico en save():', e);
-            const message = e instanceof Error ? e.message : ((e as { error?: { message?: string } })?.error?.message) || 'Error desconocido al procesar la solicitud.';
+            const message = e?.message || e?.error?.message || (typeof e === 'string' ? e : 'Error desconocido al procesar la solicitud.');
             this.notificationService.showError('Error al guardar: ' + message);
             this.error.set(message);
         } finally {
