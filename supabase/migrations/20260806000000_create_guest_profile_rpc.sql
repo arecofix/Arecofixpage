@@ -79,6 +79,7 @@ BEGIN
   );
 
   -- 4. Insert guest profile
+  -- Using ON CONFLICT because a Supabase auth trigger might have already inserted a row
   INSERT INTO public.profiles (
     id, first_name, last_name, email, phone,
     address, dni, is_guest, role,
@@ -88,7 +89,18 @@ BEGIN
     v_new_id, p_first_name, COALESCE(p_last_name, ''), COALESCE(p_email, ''),
     COALESCE(p_phone, ''), COALESCE(p_address, ''), COALESCE(p_dni, ''),
     true, 'user', v_tenant_id, p_branch_id, true, now(), now()
-  );
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    first_name = EXCLUDED.first_name,
+    last_name = EXCLUDED.last_name,
+    email = EXCLUDED.email,
+    phone = EXCLUDED.phone,
+    address = EXCLUDED.address,
+    dni = EXCLUDED.dni,
+    is_guest = EXCLUDED.is_guest,
+    role = EXCLUDED.role,
+    tenant_id = EXCLUDED.tenant_id,
+    branch_id = EXCLUDED.branch_id;
 
   -- 5. Return the created profile as JSON
   SELECT row_to_json(p)
