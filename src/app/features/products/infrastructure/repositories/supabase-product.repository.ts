@@ -69,11 +69,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       selectFields += ', description, media_metadata, gallery_urls';
     }
 
-    // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET para buscar/listar):
     // GET https://<TU_SUPABASE_URL>/rest/v1/products?select=...
     let baseQuery = this.supabase
       .from('products')
-      .select(selectFields, { count: 'exact' });
+      .select(selectFields, { count: 'estimated' });
       
     let query = this.applyTenantFilter(baseQuery);
 
