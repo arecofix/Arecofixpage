@@ -175,9 +175,14 @@ export class SeoService {
 
     // --- Critical Validation: Prevent Recursive or Broken URLs ---
     // 1. Never use the same URL for page and image (Facebook Crawler error)
-    const normalize = (u: string) => u.toLowerCase().replace(/\/$/, '');
+    const normalize = (u: string) => u.toLowerCase().replace(/\/$/, '').split('?')[0];
     
-    if (normalize(finalImageUrl) === normalize(finalUrl)) {
+    // Check if the image url is literally the current page url, or if it lacks common image extensions
+    // while containing paths that suggest it's an HTML page (like /detalle/, /posts/, /tracking/)
+    const isHtmlPath = finalImageUrl.includes('/detalle/') || finalImageUrl.includes('/posts/') || finalImageUrl.includes('/tracking/');
+    const hasImageExtension = /\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(finalImageUrl);
+    
+    if (normalize(finalImageUrl) === normalize(finalUrl) || (isHtmlPath && !hasImageExtension)) {
         if (isPlatformServer(this.platformId)) {
           console.warn(`[SEO] Warning: Invalid Image URL detected: ${finalImageUrl}. Falling back to default branding.`);
         }

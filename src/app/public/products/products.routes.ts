@@ -1,4 +1,5 @@
 import { Routes, UrlSegment } from '@angular/router';
+import { productSeoResolver } from '@app/core/resolvers/product-seo.resolver';
 
 /**
  * Products Routes — Supports hierarchical category paths.
@@ -122,6 +123,7 @@ export const productsRoutes: Routes = [
   {
     title: 'Detalle de Producto | Arecofix',
     path: 'detalle/:productSlug',
+    resolve: { productData: productSeoResolver },
     loadComponent: () =>
       import('@app/public/products/pages/details/products-details-page'),
   },
