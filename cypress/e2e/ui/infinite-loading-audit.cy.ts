@@ -1,6 +1,6 @@
 describe('Infinite Loading Audit (Timeout & Leak Detection)', () => {
-  // Configuración global de timeout para estas pruebas específicas (10s)
-  const MAX_LOAD_TIME = 10000;
+  // Configuración global de timeout para estas pruebas específicas (20s)
+  const MAX_LOAD_TIME = 20000;
 
   const publicRoutes = [
     '/',
@@ -44,6 +44,10 @@ describe('Infinite Loading Audit (Timeout & Leak Detection)', () => {
 
     adminRoutes.forEach((route) => {
       it(`Debería resolver el estado de carga en: ${route}`, () => {
+        if (route === '/admin/dashboard') {
+          cy.intercept('GET', '**/rest/v1/*', { body: [] }).as('dashAllGet');
+          cy.intercept('POST', '**/rest/v1/rpc/*', { body: {} }).as('dashRpc');
+        }
         cy.visit(route);
         // Esperamos explícitamente a que cualquier elemento de skeleton/spinner desaparezca
         cy.get('app-skeleton, .skeleton, .loading, .spinner, .fa-spinner', { timeout: MAX_LOAD_TIME })

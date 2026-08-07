@@ -413,7 +413,12 @@
 
                         <div>
                             <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><i class="fas fa-truck text-orange-400"></i> Proveedor de Repuesto</h3>
-                            <input type="text" formControlName="supplier" placeholder="Visible solo para el taller..." class="w-full bg-white dark:bg-[#101828] border border-orange-500/30 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-orange-500 shadow-[0_0_10px_rgba(243,156,18,0.05)]">
+                            <select formControlName="supplier_id" class="w-full bg-white dark:bg-[#101828] border border-orange-500/30 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-orange-500 shadow-[0_0_10px_rgba(243,156,18,0.05)]">
+                                <option [ngValue]="null">Sin proveedor / No aplica</option>
+                                @for (s of suppliers(); track s.id) {
+                                    <option [value]="s.id">{{ s.name }}</option>
+                                }
+                            </select>
                         </div>
 
                     </div>

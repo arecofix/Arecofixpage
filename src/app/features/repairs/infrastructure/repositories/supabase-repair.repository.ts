@@ -27,7 +27,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     override getById(id: string): Observable<Repair | null> {
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
+            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
             .eq('id', id);
 
         return from((this.applyTenantFilter(query) as any)).pipe(
@@ -81,6 +81,14 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 const parts = (repair as any).parts || [];
                 if (parts.length > 0) {
                     await this.syncParts(generatedId, parts);
+                }
+
+                // Ensure new fields are saved just in case RPC ignores them
+                if (dbPayload.supplier_id !== undefined || dbPayload.warranty !== undefined) {
+                    await this.supabase.from('repairs').update({
+                        supplier_id: dbPayload.supplier_id || null,
+                        warranty: dbPayload.warranty || null
+                    }).eq('id', generatedId);
                 }
 
                 // Sync images if provided
@@ -316,7 +324,10 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 cost_at_time: Number(p.cost_at_time) || 0,
                 tenant_id: tenantId
             }));
-            await this.supabase.from('repair_parts_used').insert(partsToInsert);
+            const { error: insertError } = await this.supabase.from('repair_parts_used').insert(partsToInsert);
+            if (insertError) {
+                console.error('❌ [syncParts] Error inserting repair parts:', insertError);
+            }
         }
 
         const totalCost = parts.reduce((acc: number, p: RepairPart) => acc + (Number(p.cost_at_time || 0)), 0);
@@ -352,6 +363,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             customer_id: p.client_id,
             customer_name: p.client ? `${p.client.first_name || ''} ${p.client.last_name || ''}`.trim() : (p.customer_name || 'Cliente'),
             customer_phone: p.client?.phone || p.customer_phone,
+            customer_dni: p.client?.dni || undefined,
             device_type: p.device?.type || p.device_type,
             brand_id: p.device?.brand_id || p.device?.model?.brand_id || p.brand_id,
             brand_name: p.brand?.name || p.device_brand || undefined,
@@ -385,7 +397,9 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             security_pattern: p.security_pattern,
             device_passcode: p.device?.passcode,
             glass_upsell: p.glass_upsell,
-            spare_part_cost: Number(p.spare_part_cost || 0)
+            spare_part_cost: Number(p.spare_part_cost || 0),
+            supplier_id: p.supplier_id,
+            warranty: p.warranty
         };
     }
 
@@ -414,7 +428,9 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             security_pattern: r.security_pattern || null,
             glass_upsell: r.glass_upsell || false,
             spare_part_cost: r.spare_part_cost || 0,
-            whatsapp_notifications: r.whatsapp_notifications ?? true
+            whatsapp_notifications: r.whatsapp_notifications ?? true,
+            supplier_id: r.supplier_id || null,
+            warranty: r.warranty || null
         };
     }
 

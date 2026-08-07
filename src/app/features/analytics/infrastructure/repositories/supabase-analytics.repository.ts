@@ -41,10 +41,10 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
       this.supabase.rpc('get_dashboard_stats_v2', {
         p_branch_id: branchId || null
       }),
-      this.fetchManualExpenses(tenantId, branchId || null),
+      this.fetchAdditionalCosts(tenantId, branchId || null),
       this.fetchProductsAndCategoryStats(tenantId, branchId || null)
     ])).pipe(
-      map(([financeRes, legacyDashRes, manualExpenses, statsData]: [any, any, number, any]) => {
+      map(([financeRes, legacyDashRes, additionalCosts, statsData]: [any, any, any, any]) => {
         if (financeRes.error) throw financeRes.error;
         if (legacyDashRes.error) console.error('[RPC ERROR] legacy_stats:', legacyDashRes.error);
 
@@ -53,49 +53,53 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
 
         const monthlyBreakdown: MonthlyRevenue[] = this.mapMonthlyBreakdown(rawFinance.monthly_breakdown);
 
-        // Fallback explicit verification to ensure parts costs are properly deducted
-        const cm = monthlyBreakdown.find(m => m.period === this.getCurrentPeriod());
-        
-        let safe_cm_gross = Number(rawFinance.current_month_gross || cm?.gross_revenue || 0);
-        let safe_cm_cost = Number(rawFinance.current_month_cost || 0);
-        
-        // Auto-fix if the RPC failed to aggregate repairs_cost into the global cost
-        if (cm && safe_cm_cost === 0 && (cm.repairs_cost > 0 || cm.sales_cost > 0)) {
-            safe_cm_cost = cm.repairs_cost + cm.sales_cost;
-        }
-
-        // Add manual expenses (cash_movements of type expense) to costs
-        safe_cm_cost += manualExpenses;
-
-        let total_cost_safe = Number(rawFinance.total_cost || 0);
-        if (total_cost_safe === 0) {
-            total_cost_safe = monthlyBreakdown.reduce((s, m) => s + m.repairs_cost + m.sales_cost, 0);
-        }
-        
-        total_cost_safe += manualExpenses;
-
-        const safe_total_net = Number(rawFinance.total_gross_revenue || 0) - total_cost_safe;
-        const safe_cm_net = safe_cm_gross - safe_cm_cost;
-
-        // Ensure the breakdown objects themselves accurately reflect the explicit deductions
+        // Explicitly merge the highly-accurate additional costs (parts & expenses) into each month
         monthlyBreakdown.forEach(m => {
-            const explicit_cost = m.repairs_cost + m.sales_cost;
-            if (m.cost === 0 && explicit_cost > 0) {
-                m.cost = explicit_cost;
+            const partsCost = additionalCosts.partsByMonth.get(m.period) || 0;
+            const expenses = additionalCosts.expensesByMonth.get(m.period) || 0;
+            
+            // Override repairs_cost with our explicit parts calculation if it's higher (fallback if RPC missed it)
+            if (partsCost > m.repairs_cost) {
+                m.repairs_cost = partsCost;
             }
+            
+            // Recalculate total cost explicitly for the month
+            m.cost = m.repairs_cost + m.sales_cost + expenses;
+            
+            // Recalculate net profit
             m.net_profit = m.gross_revenue - m.cost;
         });
+
+        const cm = monthlyBreakdown.find(m => m.period === this.getCurrentPeriod());
+        
+        const safe_cm_gross = cm ? cm.gross_revenue : Number(rawFinance.current_month_gross || 0);
+        const safe_cm_cost = cm ? cm.cost : 0;
+        const safe_cm_net = safe_cm_gross - safe_cm_cost;
+
+        // Recalculate global totals
+        const total_gross = Number(rawFinance.total_gross_revenue || 0);
+        let total_cost_safe = Number(rawFinance.total_cost || 0);
+        
+        // Ensure total_cost_safe includes our explicit totals at minimum
+        const explicit_total_cost = additionalCosts.partsTotal + additionalCosts.expensesTotal;
+        if (total_cost_safe < explicit_total_cost) {
+            // If the RPC completely missed parts/expenses, we fallback to the sum of all explicit costs + whatever sales costs we have in the breakdown
+            const total_sales_cost = monthlyBreakdown.reduce((s, m) => s + m.sales_cost, 0);
+            total_cost_safe = explicit_total_cost + total_sales_cost;
+        }
+
+        const safe_total_net = total_gross - total_cost_safe;
 
         return {
           users: legacyData.users || 0,
           products: legacyData.products || 0,
           sales: legacyData.sales || 0,
-          revenue: Number(rawFinance.total_gross_revenue || 0),
+          revenue: total_gross,
           repairs_month: cm ? cm.repairs_revenue : 0,
           repairs_revenue: monthlyBreakdown.reduce((s, m) => s + m.repairs_revenue, 0),
           repairs_profit: monthlyBreakdown.reduce((s, m) => s + (m.repairs_revenue - m.repairs_cost), 0),
           devices_fixed: legacyData.devices_fixed || 0,
-          total_gross_revenue: Number(rawFinance.total_gross_revenue || 0),
+          total_gross_revenue: total_gross,
           total_cost: total_cost_safe,
           total_net_profit: safe_total_net,
           current_month_gross: safe_cm_gross,
@@ -111,26 +115,56 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
     );
   }
 
-  private async fetchManualExpenses(tenantId: string, branchId: string | null): Promise<number> {
+  private async fetchAdditionalCosts(tenantId: string, branchId: string | null): Promise<{ partsByMonth: Map<string, number>, partsTotal: number, expensesByMonth: Map<string, number>, expensesTotal: number }> {
+    const result = {
+        partsByMonth: new Map<string, number>(),
+        partsTotal: 0,
+        expensesByMonth: new Map<string, number>(),
+        expensesTotal: 0
+    };
     try {
-      let query = this.supabase
-        .from('cash_movements')
-        .select('amount, type')
-        .eq('tenant_id', tenantId)
-        .eq('type', 'expense');
-        
-      if (branchId) {
-        query = query.eq('branch_id', branchId);
-      }
-      
-      const { data, error } = await query;
-      if (error) return 0;
-      
-      return (data || []).reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+        let expQuery = this.supabase
+            .from('cash_movements')
+            .select('amount, created_at')
+            .eq('tenant_id', tenantId)
+            .eq('type', 'expense');
+        if (branchId) expQuery = expQuery.eq('branch_id', branchId);
+
+        let partsQuery = this.supabase
+            .from('repairs')
+            .select(`created_at, repair_parts_used(quantity, cost_at_time, cost_price)`)
+            .eq('tenant_id', tenantId);
+        if (branchId) partsQuery = partsQuery.eq('branch_id', branchId);
+
+        const [expRes, partsRes] = await Promise.all([expQuery, partsQuery]);
+
+        if (!expRes.error && expRes.data) {
+            expRes.data.forEach((exp: any) => {
+                const date = new Date(exp.created_at);
+                const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const amount = Number(exp.amount || 0);
+                result.expensesTotal += amount;
+                result.expensesByMonth.set(period, (result.expensesByMonth.get(period) || 0) + amount);
+            });
+        }
+
+        if (!partsRes.error && partsRes.data) {
+            partsRes.data.forEach((repair: any) => {
+                if (!repair.repair_parts_used || repair.repair_parts_used.length === 0) return;
+                const date = new Date(repair.created_at);
+                const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                let cost = 0;
+                repair.repair_parts_used.forEach((part: any) => {
+                    cost += Number(part.quantity || 1) * Number(part.cost_at_time || part.cost_price || 0);
+                });
+                result.partsTotal += cost;
+                result.partsByMonth.set(period, (result.partsByMonth.get(period) || 0) + cost);
+            });
+        }
     } catch (e) {
-      console.error('Error fetching manual expenses', e);
-      return 0;
+        console.error('Error fetching additional costs', e);
     }
+    return result;
   }
 
   private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[]}> {

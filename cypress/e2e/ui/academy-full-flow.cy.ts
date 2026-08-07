@@ -78,18 +78,20 @@ describe('Flujo Completo de la Academia (Cursos)', () => {
         cy.visit('/admin/courses/new');
         cy.url().should('include', '/admin/courses/new');
         
-        cy.get('input[formControlName="title"]').type('Nuevo Curso E2E', { delay: 10 });
-        cy.get('input[formControlName="slug"]').clear().type('nuevo-curso-e2e', { delay: 10 });
-        cy.get('textarea[formControlName="description"]').type('Descripción E2E', { delay: 10 });
-        cy.get('input[formControlName="duration"]').type('4 weeks', { delay: 10 });
-        cy.get('input[formControlName="schedule"]').type('Mondays', { delay: 10 });
-        cy.get('input[formControlName="instructor_name"]').type('Instructor E2E', { delay: 10 });
+        cy.wait(1000); // Allow Angular to hydrate and valueChanges to initialize
+
+        cy.get('input[formControlName="title"]').clear().type('Nuevo Curso E2E');
+        cy.wait(500); // Allow auto-slug generation
+        cy.get('textarea[formControlName="description"]').clear().type('Descripción E2E');
+        cy.get('input[formControlName="duration"]').clear().type('4 weeks');
+        cy.get('input[formControlName="schedule"]').clear().type('Mondays');
+        cy.get('input[formControlName="instructor_name"]').clear().type('Instructor E2E');
         cy.get('input[formControlName="students"]').clear().type('42');
         cy.get('input[formControlName="price"]').clear().type('10000');
-        cy.get('input[formControlName="image_url"]').type('https://via.placeholder.com/150');
+        cy.get('input[formControlName="image_url"]').clear().type('https://via.placeholder.com/150');
         
-        cy.get('button[type="submit"]').click();
-        cy.wait('@postCourse');
+        cy.get('button[type="submit"]').should('not.be.disabled').click({ force: true });
+        cy.wait('@postCourse', { timeout: 10000 });
         cy.contains('guardado correctamente', { timeout: 5000 }).should('exist');
     });
 

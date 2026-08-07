@@ -41,6 +41,8 @@ export interface Repair {
     readonly customer_id?: string;
     readonly customer_name?: string;
     readonly customer_phone?: string;
+    readonly customer_email?: string;
+    readonly customer_dni?: string;
     readonly device_type: string;
     readonly brand_id?: string | null;
     readonly brand_name?: string;
@@ -71,6 +73,8 @@ export interface Repair {
     readonly whatsapp_notifications?: boolean;
     readonly glass_upsell?: boolean;
     readonly spare_part_cost?: number;
+    readonly supplier_id?: string;
+    readonly warranty?: string;
     
     // Additional fields from form
     readonly checklist?: RepairChecklist;
