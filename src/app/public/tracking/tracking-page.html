@@ -148,7 +148,7 @@
                                 <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100">
                                     {{ r.device_brand ? r.device_brand + ' ' : '' }}{{ r.device_model }}
                                     @if (r.imei) {
-                                        <span class="block text-xs font-mono font-medium text-neutral-500 mt-0.5">IMEI / Serie: {{ r.imei }}</span>
+                                        <span id="tracking-imei-row" class="block text-xs font-mono font-medium text-neutral-500 mt-0.5">IMEI / Serie: {{ r.imei }}</span>
                                     }
                                 </p>
                             </div>
@@ -228,6 +228,11 @@
                                 <h4 class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-1">Presupuesto Final</h4>
                                 <p class="text-3xl font-black tracking-tighter">${{ r.balance_to_pay }}</p>
                             </div>
+                        </div>
+                        <div class="mb-5 text-center">
+                            <p class="text-[9.5px] font-medium text-neutral-400 leading-tight">
+                                Al ver y descargar el talón, aceptas nuestros términos y condiciones. En caso de no estar de acuerdo, enviá la cancelación del servicio por WhatsApp.
+                            </p>
                         </div>
                         <div class="flex gap-2">
                             <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white text-neutral-800 hover:bg-neutral-100 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600 border-none text-[10px] font-black uppercase" id="btn-imprimir-talon" aria-label="Descargar talón de la reparación">
