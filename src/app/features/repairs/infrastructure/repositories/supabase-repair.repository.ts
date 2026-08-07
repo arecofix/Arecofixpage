@@ -363,13 +363,12 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             customer_id: p.client_id,
             customer_name: p.client ? `${p.client.first_name || ''} ${p.client.last_name || ''}`.trim() : (p.customer_name || 'Cliente'),
             customer_phone: p.client?.phone || p.customer_phone,
-            customer_dni: p.client?.dni || undefined,
+            customer_dni: p.client?.dni || p.customer_dni || undefined,
             device_type: p.device?.type || p.device_type,
             brand_id: p.device?.brand_id || p.device?.model?.brand_id || p.brand_id,
-            brand_name: p.brand?.name || p.device_brand || undefined,
+            brand_name: p.device?.model?.brand?.name || p.brand?.name || p.device_brand || undefined,
             device_model: (() => {
                 const resolved = p.device?.model?.name || p.device_model || 'Equipo Genérico';
-                console.log(`[mapFromDb] repair_id=${p.id}, p.device=`, JSON.stringify(p.device), 'resolved=', resolved);
                 return resolved;
             })(),
             imei: p.device?.imei || p.imei,
