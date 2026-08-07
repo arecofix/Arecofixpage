@@ -47,13 +47,15 @@ export class RepairCalculatorService {
     }));
 
     const partsTotal = updatedParts.reduce((acc, p) => acc + (p.unit_price_at_time * p.quantity), 0);
-    const subtotal = (Number(laborCost) || 0) + partsTotal;
+    const partsCostTotal = updatedParts.reduce((acc, p) => acc + p.cost_at_time, 0);
     
+    const subtotal = (Number(laborCost) || 0) + partsTotal;
     const calculatedFinalCost = this.pricingService.calculateFinalPrice(subtotal);
 
     return {
       updatedParts,
       finalCost: calculatedFinalCost,
+      partsCostTotal,
       suggestedDeposit: Math.round(calculatedFinalCost * 0.5)
     };
   }
