@@ -230,45 +230,35 @@ export class ProductsDetailsPage {
 
   productRs = rxResource({
     stream: () =>
-      combineLatest([
-        this.route.params.pipe(map(({ productSlug }) => productSlug)),
-        this.route.queryParams.pipe(map((params) => +params['_page'] || 1)),
-      ]).pipe(
-        switchMap(([slug]) => {
-          return this.productService.getData({
-            _page: 1,
-            slug: slug,
-          }).pipe(
-            map(response => {
-              const fallbackItem = this.fallbackService.getFallbackProduct(slug);
-              let productToUse = null;
+      this.route.data.pipe(
+        map(data => {
+          const productToUse = data['productData'];
+          if (!productToUse) {
+            this.router.navigate(['/404'], { skipLocationChange: true });
+            return {
+              data: [],
+              items: 0,
+              pages: 0,
+              first: 0,
+              last: 0,
+              prev: undefined,
+              next: undefined
+            } as ProductsResponse;
+          }
+          
+          // Note: SEO is already set by the product-seo.resolver.ts
+          // We can optionally call updateSeoTags here again for client-side navigation
+          this.updateSeoTags(productToUse);
 
-              if ((!response.data || response.data.length === 0) && fallbackItem) {
-                productToUse = fallbackItem;
-                const fallbackResponse: ProductsResponse = {
-                  data: [fallbackItem],
-                  items: 1,
-                  pages: 1,
-                  first: 1,
-                  last: 1,
-                  prev: undefined,
-                  next: undefined
-                };
-                response = fallbackResponse;
-              } else if (response.data && response.data.length > 0) {
-                productToUse = response.data[0];
-              }
-
-              if (!productToUse) {
-                const router = this.injector.get(Router);
-                router.navigate(['/404'], { skipLocationChange: true });
-              } else {
-                this.updateSeoTags(productToUse);
-              }
-              
-              return response;
-            })
-          );
+          return {
+            data: [productToUse],
+            items: 1,
+            pages: 1,
+            first: 1,
+            last: 1,
+            prev: undefined,
+            next: undefined
+          } as ProductsResponse;
         })
       ),
   });

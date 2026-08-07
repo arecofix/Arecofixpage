@@ -5,6 +5,7 @@ import { PublicHomePage } from './home/public-home-page';
 import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 import { BranchResolver } from '@app/core/resolvers/branch.resolver';
 import { tauriRootRedirectGuard } from '@app/guards/tauri-root-redirect.guard';
+import { trackingSeoResolver } from '@app/core/resolvers/tracking-seo.resolver';
 
 export const publicRoutes: Routes = [
   {
@@ -334,6 +335,7 @@ export const publicRoutes: Routes = [
       {
         title: 'Seguimiento de Reparación',
         path: 'tracking/:code',
+        resolve: { trackingData: trackingSeoResolver },
         loadComponent: () =>
           import('@app/public/tracking/tracking-page').then(
             (m) => m.TrackingPage

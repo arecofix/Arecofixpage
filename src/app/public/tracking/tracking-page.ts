@@ -120,20 +120,38 @@ export class TrackingPage implements OnInit, OnDestroy {
     ngOnInit() {
         this.document.body.classList.add('hide-floating-widgets');
         
-        this.route.paramMap.subscribe(async (params) => {
-            const rawCode = params.get('code');
-            this.code = rawCode ? rawCode.trim().toUpperCase() : null;
-            if (this.code && this.code !== 'CONSULTA') {
-                this.isLookupMode.set(false);
-                this.loading.set(true);
-                this.error.set(null);
-                await this.loadRepair();
-            } else {
-                this.isLookupMode.set(true);
-                this.loading.set(false);
-                this.error.set(null);
-                this.repair.set(null);
-            }
+        // Listen to data from the resolver
+        this.route.data.subscribe((data) => {
+             const repairData = data['trackingData'];
+             const rawCode = this.route.snapshot.paramMap.get('code');
+             this.code = rawCode ? rawCode.trim().toUpperCase() : null;
+             
+             if (this.code && this.code !== 'CONSULTA') {
+                 this.isLookupMode.set(false);
+                 this.error.set(null);
+                 
+                 if (repairData) {
+                     this.repair.set(repairData);
+                     this.updateSeo(repairData);
+                     
+                     if (isPlatformBrowser(this.platformId)) {
+                         if (!repairData.glass_upsell && !localStorage.getItem(`upsellDismissed_${this.code}`)) {
+                             setTimeout(() => this.showUpsellModal.set(true), 2500);
+                         }
+                     }
+                     this.loadRecommendations(this.code);
+                     this.loading.set(false);
+                 } else {
+                     // Fallback
+                     this.loading.set(true);
+                     this.loadRepair();
+                 }
+             } else {
+                 this.isLookupMode.set(true);
+                 this.loading.set(false);
+                 this.error.set(null);
+                 this.repair.set(null);
+             }
         });
     }
 
