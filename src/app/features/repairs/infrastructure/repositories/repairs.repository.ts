@@ -179,7 +179,7 @@ export class RepairsRepository {
         parts:repair_parts_used(id, product_id, quantity, unit_price_at_time, cost_at_time),
         images:repair_images(id, image_url),
         client:profiles!repairs_client_id_fkey(first_name, last_name, phone),
-        device:customer_devices!device_id(imei, passcode, type, model:models(name, brand_id))
+        device:customer_devices!device_id(imei, passcode, model:models(name, brand_id))
       `)
       .eq('id', id);
 
