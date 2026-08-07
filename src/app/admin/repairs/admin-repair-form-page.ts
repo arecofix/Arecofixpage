@@ -649,10 +649,14 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     if (existingModel && existingModel.length > 0) {
                         modelId = existingModel[0].id;
                     } else {
+                        const modelName = validFormData.device_model.trim();
+                        const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('model-' + Math.random().toString(36).substring(2, 9));
+                        
                         const { data: newModel } = await this.supabaseService.getClient()
                             .from('models')
                             .insert({
-                                name: validFormData.device_model.trim(),
+                                name: modelName,
+                                slug: generatedSlug,
                                 brand_id: validFormData.brand_id || null,
                                 tenant_id: this.tenantService.getTenantId()
                             })
