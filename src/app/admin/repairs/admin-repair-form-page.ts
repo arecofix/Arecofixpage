@@ -704,7 +704,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                         model_id: modelId,
                         imei: validFormData.imei || null,
                         passcode: validFormData.device_passcode || null,
-                        tenant_id: this.tenantService.getTenantId()
+                        tenant_id: this.tenantService.getTenantId(),
+                        type: device_type || 'smartphone'
                     }).select('id').single();
 
                     if (newDevice) finalDeviceId = newDevice.id;
@@ -720,6 +721,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     await this.supabaseService.getClient().from('customer_devices').update({
                         imei: validFormData.imei || null,
                         passcode: validFormData.device_passcode || null,
+                        type: device_type || 'smartphone'
                     }).eq('id', finalDeviceId);
                 } catch (devUpdateErr) {
                     console.error('[AdminRepairForm] Error updating device:', devUpdateErr);

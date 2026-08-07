@@ -145,7 +145,9 @@
                             </div>
                             <div>
                                 <h4 class="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-widest leading-none mb-1">Equipo en Taller</h4>
-                                <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100">{{ r.device_model }}</p>
+                                <p class="text-sm font-bold text-neutral-800 dark:text-neutral-100">
+                                    {{ r.device_brand ? r.device_brand + ' ' : '' }}{{ r.device_model }}
+                                </p>
                             </div>
                         </div>
                         <div class="space-y-3">
@@ -153,6 +155,12 @@
                                 <span class="text-neutral-400 font-medium">Cliente</span>
                                 <span class="text-neutral-800 dark:text-neutral-100 font-bold uppercase truncate max-w-[180px] text-right">{{ r.customer_name || 'Particular' }}</span>
                             </div>
+                            @if (r.customer_dni) {
+                            <div class="flex justify-between text-xs">
+                                <span class="text-neutral-400 font-medium">DNI</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold uppercase truncate max-w-[180px] text-right">{{ r.customer_dni }}</span>
+                            </div>
+                            }
                             @if (r.repair_number) {
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-400 font-medium">Nro. de Orden</span>
@@ -171,6 +179,14 @@
                             <div class="flex justify-between text-xs" id="tracking-imei-row">
                                 <span class="text-neutral-400 font-medium">IMEI / Serie</span>
                                 <span class="text-neutral-800 dark:text-neutral-100 font-bold font-mono">{{ r.imei }}</span>
+                            </div>
+                            }
+                            @if (r.security_pattern || r.device_passcode || r.security_pin) {
+                            <div class="flex justify-between text-xs">
+                                <span class="text-neutral-400 font-medium">Clave / Patrón</span>
+                                <span class="text-neutral-800 dark:text-neutral-100 font-bold uppercase max-w-[180px] text-right">
+                                    {{ r.security_pattern || r.device_passcode || r.security_pin }}
+                                </span>
                             </div>
                             }
                             @if (r.checklist && (r.checklist.charger || r.checklist.battery || r.checklist.chip || r.checklist.sd || r.checklist.case)) {
