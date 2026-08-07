@@ -76,10 +76,10 @@ describe('Admin Core Operations Flow (Products & Orders)', () => {
       cy.visit('/admin/products/new');
       cy.wait('@getCategories');
 
-      // Completamos el formulario básico
-      cy.get('input[name="name"]').type('Nuevo Producto Test', { delay: 50 });
-      cy.get('input[name="price"]').type('5000', { delay: 50 });
-      cy.get('input[name="stock"]').clear().type('5', { delay: 50 });
+      // Completamos el formulario básico con validación de valor para evitar race conditions de hidratación
+      cy.get('input[name="name"]').should('be.visible').clear().type('Nuevo Producto Test', { delay: 10 }).should('have.value', 'Nuevo Producto Test');
+      cy.get('input[name="price"]').should('be.visible').clear().type('5000', { delay: 10 }).should('have.value', '5000');
+      cy.get('input[name="stock"]').should('be.visible').clear().type('5', { delay: 10 }).should('have.value', '5');
       
       // Suponemos que hay un botón Guardar
       cy.contains('Guardar').click();

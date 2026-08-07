@@ -13,6 +13,8 @@ import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/re
 import { PricingService } from '@app/core/services/pricing.service';
 import { environment } from '@env/environment';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
+import { SupplierService } from '@app/features/customers/application/services/supplier.service';
+import { Supplier } from '@app/features/customers/domain/entities/supplier.entity';
 import { NotificationService } from '@app/core/services/notification.service';
 import { RepairPdfService } from '@app/features/repairs/application/services/repair-pdf.service';
 import { TenantService } from '@app/core/services/tenant.service';
@@ -57,6 +59,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     private pricingService = inject(PricingService);
     public tenantService = inject(TenantService);
     private customerService = inject(CustomerService);
+    private supplierService = inject(SupplierService);
     private notificationService = inject(NotificationService);
     private repairPdfService = inject(RepairPdfService);
     private fb = inject(FormBuilder);
@@ -129,6 +132,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     parts = signal<import('../../features/repairs/domain/entities/repair.entity').RepairPart[]>([]);
     images = signal<string[]>([]);
     brands = signal<{id: string, name: string}[]>([]);
+    suppliers = signal<Supplier[]>([]);
 
     // Reactive search streams
     private productSearch$ = new Subject<string>();
@@ -258,7 +262,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             repair_number: [0],
             payment_method: ['efectivo'],
             warranty: [''],
-            supplier: [''],
+            supplier_id: [null],
             surcharge_percentage: [0]
         });
 
@@ -315,6 +319,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         ]);
         
         this.loadInitialProducts();
+        this.loadSuppliers();
         this.loading.set(false);
     }
 
@@ -380,6 +385,17 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             }
         } catch (error) {
             console.error('Error loading brands', error);
+        }
+    }
+
+    async loadSuppliers() {
+        try {
+            const data = await this.supplierService.getAll();
+            if (data) {
+                this.suppliers.set(data);
+            }
+        } catch (error) {
+            console.error('Error loading suppliers', error);
         }
     }
 
@@ -489,6 +505,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     device_id: data.device_id || '',
                     customer_name: data.customer_name,
                     customer_phone: data.customer_phone,
+                    customer_email: data.customer_email || '',
+                    customer_dni: data.customer_dni || '',
                     device_model: data.device_model,
                     device_type: data.device_type,
                     brand_id: (data as any).brand_id || null,
@@ -511,7 +529,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     spare_part_cost: data.spare_part_cost,
                     payment_method: (data as any).payment_method || 'efectivo',
                     warranty: (data as any).warranty || '',
-                    supplier: (data as any).supplier || ''
+                    supplier_id: (data as any).supplier_id || null
                 });
 
                 if (data.checklist) {

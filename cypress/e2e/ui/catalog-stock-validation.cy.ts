@@ -35,39 +35,31 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
   it('debería bloquear adición al carrito si supera stock máximo (QA #4)', () => {
     const productLimited = buildMockProduct({ id: 'prod-limit', stock: 2 });
 
-    // Cart already has 2 of this product (= stock limit).
-    // A single post-hydration click should trigger the stock guard immediately.
-    // The 2-click approach failed because the first click fired pre-hydration
-    // (Angular attaches event handlers only after hydration), so addToCart was
-    // never called on the first click and the in-memory qty never reached 2.
-    const cartAtMaxStock = buildMockOrder([buildMockOrderItem(productLimited, 2)]);
-
     cy.intercept('GET', '**/rest/v1/products*', {
       statusCode: 200,
       headers: { 'Content-Range': '0-0/1', 'Content-Type': 'application/json' },
       body: [productLimited]
     }).as('getProductsLimited');
 
-    // Return cart at max stock so the signal is pre-loaded with qty=2
-    cy.intercept('GET', '**/rest/v1/orders*', {
-      statusCode: 200,
-      body: [cartAtMaxStock]
-    }).as('getActiveCart');
+    cy.intercept('GET', '**/rest/v1/orders*', { body: [] }).as('getActiveCart');
+    cy.intercept('POST', '**/rest/v1/orders*', { statusCode: 201, body: [{ id: 'mock-order-1' }] });
+    cy.intercept('POST', '**/rest/v1/order_items*', { statusCode: 201, body: [{}] });
+    cy.intercept('PATCH', '**/rest/v1/order_items*', { statusCode: 200, body: [{}] });
 
     cy.visit('/productos');
     cy.wait('@getProductsLimited', { timeout: 10000 });
 
-    // Wait for Angular to fully hydrate — Cypress retries until the button is visible.
-    // Pre-hydration clicks are silently dropped because Angular hasn't attached
-    // event handlers yet; waiting for visibility guarantees we click post-hydration.
     cy.contains('button', /Añadir al Carrito/i, { timeout: 10000 }).should('be.visible');
     cy.wait(400);
 
-    // Single click: activeOrder() signal has qty=2, (2+1) > stock=2 → BLOCKED
+    // Click 3 times. Stock is 2. 3rd click should trigger stock guard.
+    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
+    cy.wait(500); // Wait for state to update
+    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
+    cy.wait(500); // Wait for state to update
     cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
 
-    // cart.service.ts shows the stock toast BEFORE any API call (early return)
-    cy.get('app-toast').contains(/stock/i, { timeout: 8000 }).should('be.visible');
+    cy.get('app-toast').contains(/stock|máximo/i, { timeout: 8000 }).should('be.visible');
   });
 
 

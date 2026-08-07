@@ -246,7 +246,9 @@ export class AdminLayout implements OnInit, OnDestroy {
         logo: '/assets/img/brands/logo/logo-normal.PNG',
         name: tenantName
       });
-      document.documentElement.style.removeProperty('--primary-branch-color');
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.removeProperty('--primary-branch-color');
+      }
       return;
     }
 
@@ -257,9 +259,13 @@ export class AdminLayout implements OnInit, OnDestroy {
     });
 
     if (branding?.primary_color) {
-      document.documentElement.style.setProperty('--primary-branch-color', branding.primary_color);
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--primary-branch-color', branding.primary_color);
+      }
     } else {
-      document.documentElement.style.removeProperty('--primary-branch-color');
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.removeProperty('--primary-branch-color');
+      }
     }
   }
 
