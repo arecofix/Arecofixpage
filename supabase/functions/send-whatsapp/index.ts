@@ -8,6 +8,7 @@ declare const Deno: any;
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 };
 
 // DTO del cliente Angular
@@ -25,7 +26,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    const payload: MassMessagePayload = await req.json();
+    const payload = await req.json();
 
     const WHATSAPP_TOKEN = Deno.env.get('WHATSAPP_API_TOKEN');
     const WHATSAPP_PHONE_ID = Deno.env.get('WHATSAPP_PHONE_ID');
@@ -34,7 +35,52 @@ serve(async (req: Request) => {
         throw new Error("Missing WhatsApp API Configuration in environment variables.");
     }
 
-    // Inicializar Supabase Client
+    const apiUrl = `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`;
+
+    // ----------------------------------------------------
+    // FORMATO 1: Envío Directo (desde whatsapp.service.ts)
+    // ----------------------------------------------------
+    if (payload.to && payload.type) {
+        const formatPhone = payload.to.replace(/\D/g, '');
+        
+        const messageBody = {
+            messaging_product: "whatsapp",
+            to: formatPhone,
+            type: payload.type,
+            ...(payload.type === 'template' ? { template: payload.template } : {}),
+            ...(payload.type === 'text' ? { text: payload.text } : {})
+        };
+
+        const apiResp = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messageBody)
+        });
+
+        const respData = await apiResp.json();
+
+        if (apiResp.ok) {
+            return new Response(JSON.stringify({ success: true, data: respData }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 200,
+            });
+        } else {
+            return new Response(JSON.stringify({ success: false, error: respData }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            });
+        }
+    }
+
+    // ----------------------------------------------------
+    // FORMATO 2: Envío Masivo (MassMessagePayload)
+    // ----------------------------------------------------
+    const massPayload = payload as MassMessagePayload;
+    
+    // Inicializar Supabase Client para consultas a BDD
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -42,16 +88,18 @@ serve(async (req: Request) => {
     let recipients: string[] = [];
 
     // Recolectar a quienes se les enviará
-    if (payload.testNumber) {
-        recipients.push(payload.testNumber);
-    } else if (payload.targetType === 'suppliers') {
+    if (massPayload.testNumber) {
+        recipients.push(massPayload.testNumber);
+    } else if (massPayload.targetType === 'suppliers') {
         const { data: suppliers, error } = await supabase.from('suppliers').select('phone').eq('is_active', true);
         if (error) throw error;
         recipients = suppliers.map((s: any) => s.phone).filter((p: any) => !!p);
-    } else {
+    } else if (massPayload.targetType === 'clients') {
         const { data: clients, error } = await supabase.from('profiles').select('phone').eq('is_active', true).eq('role', 'user');
         if (error) throw error;
         recipients = clients.map((c: any) => c.phone).filter((p: any) => !!p);
+    } else {
+        throw new Error("Invalid payload format.");
     }
 
     if (recipients.length === 0) {
@@ -60,17 +108,12 @@ serve(async (req: Request) => {
             status: 200,
         });
     }
-
-    const apiUrl = `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`;
     
     const results = [];
     let successCount = 0;
     let errorCount = 0;
 
-    // Enviar batch a Meta (Se procesan en serie o batches pequeños para no saturar API Rate Limits)
-    // Para gran escala usar una cola/queue nativa de Supabase, aquí ilustramos envío directo
     for (const phone of recipients) {
-        // Limpiamos formato. WhatsApp API exige prefijo ej. 54 en Argentina sin +
         const formatPhone = phone.replace(/\D/g, ''); 
 
         const messageBody = {
@@ -78,14 +121,14 @@ serve(async (req: Request) => {
             to: formatPhone,
             type: "template",
             template: {
-                name: payload.messageTemplate,
+                name: massPayload.messageTemplate,
                 language: {
-                    code: payload.templateLanguage
+                    code: massPayload.templateLanguage
                 },
-                components: payload.variables ? [
+                components: massPayload.variables ? [
                   {
                     type: "body",
-                    parameters: payload.variables.map((v: any) => ({ type: "text", text: v }))
+                    parameters: massPayload.variables.map((v: any) => ({ type: "text", text: v }))
                   }
                 ] : []
             }
