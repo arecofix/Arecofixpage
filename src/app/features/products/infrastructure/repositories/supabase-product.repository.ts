@@ -114,7 +114,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
           words.forEach(w => {
             const equivalents = SearchUtils.getEquivalents(w);
             const orConditions = equivalents.map(eq => 
-              `name.ilike.%${eq}%,description.ilike.%${eq}%,sku.ilike.%${eq}%,barcode.ilike.%${eq}%`
+              `name.ilike.%${eq}%,sku.ilike.%${eq}%,barcode.ilike.%${eq}%`
             ).join(',');
             query = query.or(orConditions);
           });
