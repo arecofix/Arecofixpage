@@ -462,7 +462,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         const newFinalCost = estimated + (estimated * surchargePct / 100);
         
         this.repairForm.patchValue({
-            final_cost: newFinalCost
+            final_cost: newFinalCost,
+            spare_part_cost: result.partsCostTotal
         }, { emitEvent: false });
     }
 

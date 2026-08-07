@@ -238,7 +238,7 @@
                                                         <i class="fas fa-box text-emerald-500"></i> {{ part.name || part.product_name }} (x{{ part.quantity }})
                                                     </span>
                                                     <div class="flex items-center gap-3">
-                                                        <span class="font-bold text-gray-900 dark:text-white">{{ part.cost_at_time | currency:'ARS':'symbol':'1.0-0' }}</span>
+                                                        <span class="font-bold text-gray-900 dark:text-white">{{ (part.unit_price_at_time * part.quantity) | currency:'ARS':'symbol':'1.0-0' }}</span>
                                                         <button type="button" (click)="removePart(idx)" class="text-red-400 hover:text-red-500 p-1"><i class="fas fa-trash"></i></button>
                                                     </div>
                                                 </div>
