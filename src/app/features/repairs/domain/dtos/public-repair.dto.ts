@@ -23,6 +23,7 @@ export interface PublicRepairDto {
     readonly security_pin?: string;
     readonly device_passcode?: string;
     readonly technician_report?: string;
+    readonly technician_notes?: string;
     readonly images?: string[];
     readonly glass_upsell?: boolean;
     readonly imei?: string;
