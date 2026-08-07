@@ -92,7 +92,7 @@
                     @if (r.current_status_id === 2) {
                         Estamos gestionando los repuestos necesarios para la reparación de tu equipo.
                     } @else {
-                        Tu {{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
+                        Tu {{ r.device_brand ? r.device_brand + ' ' : '' }}{{ r.device_model }} está siendo gestionado con la máxima prioridad técnica.
                     }
                 </p>
             </div>
@@ -157,7 +157,7 @@
                             </div>
                             @if (r.customer_dni) {
                             <div class="flex justify-between text-xs">
-                                <span class="text-neutral-400 font-medium">DNI</span>
+                                <span class="text-neutral-400 font-medium">DNI / CUIL</span>
                                 <span class="text-neutral-800 dark:text-neutral-100 font-bold uppercase truncate max-w-[180px] text-right">{{ r.customer_dni }}</span>
                             </div>
                             }
@@ -225,8 +225,8 @@
                             <button (click)="printTicket()" class="btn btn-sm grow rounded-xl bg-white text-neutral-800 hover:bg-neutral-100 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600 border-none text-[10px] font-black uppercase" id="btn-imprimir-talon" aria-label="Descargar talón de la reparación">
                                 <i class="fas fa-download mr-1" aria-hidden="true"></i> Descargar Talón
                             </button>
-                            <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase" id="btn-chat-whatsapp" aria-label="Abrir chat de WhatsApp">
-                                <span><i class="fab fa-whatsapp" aria-hidden="true"></i></span> Chat
+                            <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="btn btn-sm grow rounded-xl bg-green-500 border-none text-white hover:bg-green-600 text-[10px] font-black uppercase flex items-center justify-center gap-1.5 flex-nowrap" id="btn-chat-whatsapp" aria-label="Abrir chat de WhatsApp">
+                                <i class="fab fa-whatsapp text-sm" aria-hidden="true"></i> Chat
                             </a>
                         </div>
                     </div>
@@ -304,7 +304,15 @@
             }
         </div>
         
-        <div class="mt-10 flex flex-col items-center text-center gap-2">
+        @if (repair()) {
+        <div class="mt-8 max-w-md mx-auto text-center px-4">
+            <p class="text-[10px] font-medium text-neutral-400 leading-relaxed">
+                Al utilizar este seguimiento o poseer el talón de servicio, usted acepta los <a routerLink="/terms" class="text-primary hover:underline">términos y condiciones</a>. En caso contrario, debe solicitar la cancelación inmediata del servicio vía WhatsApp.
+            </p>
+        </div>
+        }
+
+        <div class="mt-6 flex flex-col items-center text-center gap-2">
             <p class="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.3em]">ArecoFix &copy; {{ currentYear }}</p>
             <a routerLink="/terms" class="text-[10px] font-bold text-primary hover:underline uppercase tracking-widest">Términos y Condiciones</a>
         </div>
