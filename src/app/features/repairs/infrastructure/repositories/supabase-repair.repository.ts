@@ -314,7 +314,6 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 quantity: Number(p.quantity) || 1,
                 unit_price_at_time: Number(p.unit_price_at_time) || 0,
                 cost_at_time: Number(p.cost_at_time) || 0,
-                cost_price: (Number(p.cost_at_time) || 0) / (Number(p.quantity) || 1),
                 tenant_id: tenantId
             }));
             await this.supabase.from('repair_parts_used').insert(partsToInsert);
