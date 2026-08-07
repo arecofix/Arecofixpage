@@ -628,22 +628,26 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             console.log('📦 [AdminRepairForm] Preparando datos...');
             const rawData = this.repairForm.getRawValue();
             
-            // Destructuramos para extraer device_type que no existe en DB, 
-            // brand_id se pasará directo al payload.
-            const { device_type, ...validFormData } = rawData;
+            // Destructuramos para extraer campos del frontend que no existen en la tabla repairs
+            const { 
+                device_type, customer_name, customer_email, customer_phone, customer_dni, 
+                device_model, brand_id, imei, device_passcode, payment_method, surcharge_percentage, 
+                customer_id, 
+                ...validFormData 
+            } = rawData;
 
-            let finalClientId = validFormData.customer_id || validFormData.client_id || null;
+            let finalClientId = customer_id || validFormData.client_id || null;
             let finalDeviceId = validFormData.device_id || null;
 
             // Si es un cliente nuevo ingresado manualmente, crear perfil invitado vía RPC
-            if (!finalClientId && validFormData.customer_name) {
+            if (!finalClientId && customer_name) {
                 try {
                     const client = await this.customerService.create({
-                        first_name: validFormData.customer_name,
+                        first_name: customer_name,
                         last_name: '',
-                        email: validFormData.customer_email || null,
-                        phone: validFormData.customer_phone || null,
-                        dni: validFormData.customer_dni || null,
+                        email: customer_email || null,
+                        phone: customer_phone || null,
+                        dni: customer_dni || null,
                         tenant_id: this.tenantService.getTenantId(),
                         branch_id: branchIdActual
                     });
@@ -653,12 +657,12 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 } catch (err) {
                     console.error('[AdminRepairForm] Error creating guest profile:', err);
                 }
-            } else if (finalClientId && validFormData.customer_dni) {
+            } else if (finalClientId && customer_dni) {
                 // Actualizar DNI si se editó un cliente existente
                 try {
                     await this.supabaseService.getClient()
                         .from('profiles')
-                        .update({ dni: validFormData.customer_dni })
+                        .update({ dni: customer_dni })
                         .eq('id', finalClientId);
                 } catch (err) {
                     console.error('[AdminRepairForm] Error updating customer DNI:', err);
@@ -666,20 +670,20 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             }
 
             // Si hay cliente pero no equipo asociado, crearlo
-            if (finalClientId && !finalDeviceId && validFormData.device_model) {
+            if (finalClientId && !finalDeviceId && device_model) {
                 let modelId: string | null = null;
                 try {
                     // Buscar o crear modelo en la tabla 'models'
                     const { data: existingModel } = await this.supabaseService.getClient()
                         .from('models')
                         .select('id')
-                        .ilike('name', validFormData.device_model.trim())
+                        .ilike('name', device_model.trim())
                         .limit(1);
 
                     if (existingModel && existingModel.length > 0) {
                         modelId = existingModel[0].id;
                     } else {
-                        const modelName = validFormData.device_model.trim();
+                        const modelName = device_model.trim();
                         const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('model-' + Math.random().toString(36).substring(2, 9));
                         
                         const { data: newModel } = await this.supabaseService.getClient()
@@ -687,7 +691,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                             .insert({
                                 name: modelName,
                                 slug: generatedSlug,
-                                brand_id: validFormData.brand_id || null,
+                                brand_id: brand_id || null,
                                 tenant_id: this.tenantService.getTenantId()
                             })
                             .select('id')
@@ -702,10 +706,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     const { data: newDevice, error: devErr } = await this.supabaseService.getClient().from('customer_devices').insert({
                         user_id: finalClientId,
                         model_id: modelId,
-                        imei: validFormData.imei || null,
-                        passcode: validFormData.device_passcode || null,
-                        tenant_id: this.tenantService.getTenantId(),
-                        type: device_type || 'smartphone'
+                        imei: imei || null,
+                        passcode: device_passcode || null,
+                        tenant_id: this.tenantService.getTenantId()
                     }).select('id').single();
 
                     if (newDevice) finalDeviceId = newDevice.id;
@@ -719,9 +722,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             if (finalDeviceId) {
                 try {
                     await this.supabaseService.getClient().from('customer_devices').update({
-                        imei: validFormData.imei || null,
-                        passcode: validFormData.device_passcode || null,
-                        type: device_type || 'smartphone'
+                        imei: imei || null,
+                        passcode: device_passcode || null
                     }).eq('id', finalDeviceId);
                 } catch (devUpdateErr) {
                     console.error('[AdminRepairForm] Error updating device:', devUpdateErr);
