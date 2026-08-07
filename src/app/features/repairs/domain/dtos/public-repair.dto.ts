@@ -17,6 +17,11 @@ export interface PublicRepairDto {
     readonly balance_to_pay: number;
     readonly repair_number?: number;
     readonly customer_name?: string;
+    readonly customer_dni?: string;
+    readonly device_brand?: string;
+    readonly security_pattern?: string;
+    readonly security_pin?: string;
+    readonly device_passcode?: string;
     readonly technician_report?: string;
     readonly images?: string[];
     readonly glass_upsell?: boolean;

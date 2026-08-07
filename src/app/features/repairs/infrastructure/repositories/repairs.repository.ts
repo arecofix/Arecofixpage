@@ -23,6 +23,7 @@ export interface RepairListDto {
   final_cost: number;
   branch_id?: string;
   tenant_id?: string;
+  device_type?: string;
 }
 
 /**
@@ -105,7 +106,7 @@ export class RepairsRepository {
     let query = this.supabase
       .from(this.tableName)
       .select(
-        'id, tracking_code, current_status_id, created_at, final_cost, branch_id, tenant_id, client:profiles!repairs_client_id_fkey(first_name, last_name), device:customer_devices!device_id(model:models(name, brand_id))',
+        'id, tracking_code, current_status_id, created_at, final_cost, branch_id, tenant_id, client:profiles!repairs_client_id_fkey(first_name, last_name), device:customer_devices!device_id(type, model:models(name, brand_id))',
         { count: 'exact' }
       );
 
@@ -149,6 +150,7 @@ export class RepairsRepository {
             customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : 'Cliente',
             device_brand: '', 
             device_model: r.device?.model?.name || 'Equipo Genérico',
+            device_type: r.device?.type,
             current_status_id: r.current_status_id,
             created_at: r.created_at,
             final_cost: r.final_cost,
