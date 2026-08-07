@@ -148,7 +148,7 @@ export class RepairsRepository {
             tracking_code: r.tracking_code,
             customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : 'Cliente',
             device_brand: '', 
-            device_model: r.device?.custom_model_name || r.device?.model?.name || 'Equipo Genérico',
+            device_model: r.device?.model?.name || 'Equipo Genérico',
             current_status_id: r.current_status_id,
             created_at: r.created_at,
             final_cost: r.final_cost,
@@ -179,7 +179,7 @@ export class RepairsRepository {
         parts:repair_parts_used(id, product_id, quantity, unit_price_at_time, cost_at_time),
         images:repair_images(id, image_url),
         client:profiles!repairs_client_id_fkey(first_name, last_name, phone),
-        device:customer_devices!device_id(imei, passcode, custom_model_name, model:models(name, brand_id))
+        device:customer_devices!device_id(imei, passcode, model:models(name, brand_id))
       `)
       .eq('id', id);
 
@@ -201,7 +201,7 @@ export class RepairsRepository {
           customer_phone: r.client?.phone,
           device_type: r.device?.type,
           device_brand: '',
-          device_model: r.device?.custom_model_name || r.device?.model?.name || 'Equipo Genérico',
+          device_model: r.device?.model?.name || 'Equipo Genérico',
           imei: r.device?.imei,
           device_passcode: r.device?.passcode
         } as RepairDetailDto | null;
