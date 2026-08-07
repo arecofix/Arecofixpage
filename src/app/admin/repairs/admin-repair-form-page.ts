@@ -625,6 +625,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                         last_name: '',
                         email: validFormData.customer_email || null,
                         phone: validFormData.customer_phone || null,
+                        dni: validFormData.customer_dni || null,
                         tenant_id: this.tenantService.getTenantId(),
                         branch_id: branchIdActual
                     });
@@ -633,6 +634,16 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     }
                 } catch (err) {
                     console.error('[AdminRepairForm] Error creating guest profile:', err);
+                }
+            } else if (finalClientId && validFormData.customer_dni) {
+                // Actualizar DNI si se editó un cliente existente
+                try {
+                    await this.supabaseService.getClient()
+                        .from('profiles')
+                        .update({ dni: validFormData.customer_dni })
+                        .eq('id', finalClientId);
+                } catch (err) {
+                    console.error('[AdminRepairForm] Error updating customer DNI:', err);
                 }
             }
 
