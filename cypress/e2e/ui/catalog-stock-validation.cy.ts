@@ -42,9 +42,11 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
     }).as('getProductsLimited');
 
     cy.intercept('GET', '**/rest/v1/orders*', { body: [] }).as('getActiveCart');
-    cy.intercept('POST', '**/rest/v1/orders*', { statusCode: 201, body: [{ id: 'mock-order-1' }] });
+    cy.intercept('POST', '**/rest/v1/orders*', { statusCode: 201, body: [{ id: '35b91b9f-0c8a-49f2-84b2-26fbaf3be20e' }] });
+    cy.intercept('PATCH', '**/rest/v1/orders*', { statusCode: 200, body: [{ id: '35b91b9f-0c8a-49f2-84b2-26fbaf3be20e' }] });
     cy.intercept('POST', '**/rest/v1/order_items*', { statusCode: 201, body: [{}] });
     cy.intercept('PATCH', '**/rest/v1/order_items*', { statusCode: 200, body: [{}] });
+    cy.intercept('DELETE', '**/rest/v1/order_items*', { statusCode: 200, body: [{}] });
 
     cy.visit('/productos');
     cy.wait('@getProductsLimited', { timeout: 10000 });
