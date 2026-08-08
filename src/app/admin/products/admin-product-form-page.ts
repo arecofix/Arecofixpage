@@ -191,9 +191,9 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       specifications: formVal.specifications,
       image_url: formVal.images.length > 0 ? formVal.images[0].url : null, // Main image
       cost_price: formVal.cost_price || 0,
-      meta_title: formVal.meta_title || null,
-      meta_description: formVal.meta_description || null,
-      og_image: formVal.og_image || null,
+      meta_title: formVal.meta_title?.trim() || formVal.name?.trim() || null,
+      meta_description: formVal.meta_description?.trim() || (formVal.description ? formVal.description.substring(0, 160).trim() : null),
+      og_image: formVal.og_image?.trim() || (formVal.images.length > 0 ? formVal.images[0].url : null),
     };
 
     // Add optional fields only if they have values

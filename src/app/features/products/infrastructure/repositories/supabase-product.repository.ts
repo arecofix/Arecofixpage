@@ -26,7 +26,8 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   protected override isGlobalTable = false;
   protected override useSoftDeletes = true;
   protected override suppressAuthNotifications = true;
-  protected override useStrictBranchIsolation = true;
+  protected override useStrictBranchIsolation = false;
+  protected override useBranchIsolation = true;
 
   private stockService = inject(StockManagementService);
 
@@ -136,14 +137,6 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         const pages = Math.max(1, Math.ceil(totalItems / _per_page));
 
         let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, branch_id || undefined));
-        
-        if (params.q) {
-          products = products.sort((a: Product, b: Product) => {
-              const scoreA = SearchUtils.getRelevanceScore(a.name, params.q!);
-              const scoreB = SearchUtils.getRelevanceScore(b.name, params.q!);
-              return scoreB - scoreA;
-          });
-        }
 
         return {
           pages,
@@ -321,7 +314,13 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   updateMany(products: Partial<Product>[]): Observable<void> {
     const processPromise = async () => {
       for (const p of products) {
-        if (p.id) await firstValueFrom(this.update(p.id, p));
+        if (p.id) {
+          try {
+            await firstValueFrom(this.update(p.id, p));
+          } catch (e) {
+            this.logger.warn(`[SupabaseProductRepository] Failed to update product ${p.id}`, e);
+          }
+        }
       }
     };
     return from(processPromise()).pipe(map(() => void 0));

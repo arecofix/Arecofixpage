@@ -641,6 +641,17 @@ export class AdminProductService {
     async bulkCustomUpdate(updates: Array<{ id: string; payload: Record<string, any> }>): Promise<void> {
         const products = updates.map(u => ({ id: u.id, ...u.payload }));
         await firstValueFrom(this.productRepo.updateMany(products));
+        
+        // Ensure stock is updated correctly in the dedicated table per branch
+        const branchId = this.branchContextService.getBranchId();
+        if (branchId) {
+            for (const u of updates) {
+                if (u.payload['stock'] !== undefined) {
+                    await this.stockService.updateStock(u.id, branchId, u.payload['stock']);
+                }
+            }
+        }
+
         this.productsStore.clearCache();
     }
 
