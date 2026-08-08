@@ -278,4 +278,20 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     bulkSoftDeleteByIds(ids: string[]): Observable<void> {
         return this.bulkUpdateByIds(ids, { deleted_at: new Date().toISOString() } as unknown as Partial<T>);
     }
+
+    /** Hard-delete many rows with tenant scope. */
+    bulkHardDeleteByIds(ids: string[]): Observable<void> {
+        if (!ids.length) return from(Promise.resolve());
+
+        let query = this.supabase.from(this.tableName).delete().in('id', ids);
+        query = this.applyTenantFilter(query);
+
+        return from(query).pipe(
+            map(({ error }) => {
+                if (error) {
+                    this.errorHandler.handleError(error, `bulkDelete ${this.tableName}`, this.suppressAuthNotifications);
+                }
+            })
+        );
+    }
 }

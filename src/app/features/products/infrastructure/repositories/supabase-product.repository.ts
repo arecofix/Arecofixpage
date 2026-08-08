@@ -331,7 +331,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   bulkDelete(ids: string[]): Observable<void> {
-    return this.bulkSoftDeleteByIds(ids);
+    return this.bulkHardDeleteByIds(ids);
   }
 
   search(query: string, categoryId?: string): Observable<Product[]> {
