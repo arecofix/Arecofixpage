@@ -97,6 +97,16 @@
         </div>
 
         <div class="flex items-center gap-2 w-full lg:w-48">
+          <span class="text-xs font-bold text-gray-500 hidden xl:block">Marca:</span>
+          <select [ngModel]="selectedBrandId()" (change)="onBrandChange($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800">
+            <option value="all">Todas las Marcas</option>
+            @for (brand of brands(); track brand.id) {
+              <option [value]="brand.id">{{ brand.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 w-full lg:w-48">
           <span class="text-xs font-bold text-gray-500 hidden xl:block">{{ t().products.filters.sortBy }}</span>
           <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800">
             <option value="name_asc">{{ t().products.filters.azName }}</option>
