@@ -126,6 +126,8 @@
         <span class="text-xs font-bold text-gray-500 pl-1">Estado / SEO:</span>
         <select [ngModel]="completenessFilter()" (change)="onCompletenessFilterChange($event)" class="select select-bordered w-full bg-white dark:bg-gray-800 text-info" style="padding-right: 2rem; text-overflow: ellipsis;">
             <option value="all" class="text-base-content">Todos los estados</option>
+            <option value="active" class="text-success">Solo Activos</option>
+            <option value="inactive" class="text-error">Inactivos (Ocultos/Borrados)</option>
             <option value="missing_image">Falta Imagen (Revisar)</option>
             <option value="missing_desc">Falta Descripción</option>
             <option value="missing_seo">Falta Datos SEO</option>

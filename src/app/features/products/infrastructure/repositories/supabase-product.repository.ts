@@ -111,6 +111,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         case 'missing_codes':
           query = query.is('sku', null).is('barcode', null);
           break;
+        case 'active':
+          query = query.eq('is_active', true);
+          break;
+        case 'inactive':
+          query = query.eq('is_active', false);
+          break;
       }
     }
     
