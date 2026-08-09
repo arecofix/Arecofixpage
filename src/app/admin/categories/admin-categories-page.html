@@ -42,9 +42,14 @@
                         </button>
                     </td>
                     <td>
-                        <a [routerLink]="['/admin/categories', category.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
-                            <i class="fas fa-edit"></i>
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <a [routerLink]="['/admin/categories', category.id]" class="btn btn-sm btn-ghost hover:bg-base-300">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button (click)="deleteCategory(category)" class="btn btn-sm btn-ghost text-error hover:bg-error/10">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 }

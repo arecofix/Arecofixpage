@@ -5,6 +5,8 @@ import { CategoryRepository } from '@app/features/products/domain/repositories/c
 import { Category } from '@app/features/products/domain/entities/category.entity';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { LoggerService } from '@app/core/services/logger.service';
+import { NotificationService } from '@app/core/services/notification.service';
 
 @Component({
     selector: 'app-admin-categories-page',
@@ -15,6 +17,8 @@ import { Pagination } from '@app/shared/components/pagination/pagination';
 export class AdminCategoriesPage implements OnInit {
     private categoryRepo = inject(CategoryRepository);
     private route = inject(ActivatedRoute);
+    private logger = inject(LoggerService);
+    private notification = inject(NotificationService);
 
     categories = signal<Category[]>([]);
     loading = signal(true);
@@ -64,8 +68,29 @@ export class AdminCategoriesPage implements OnInit {
         try {
             await firstValueFrom(this.categoryRepo.update(category.id, { is_active: !category.is_active }));
             await this.loadCategories();
+            this.notification.showSuccess('Estado actualizado correctamente');
         } catch (error) {
-            console.error('Error updating category status:', error);
+            this.logger.error('Error updating category status', error);
+            this.notification.showError('Error al actualizar el estado');
+        }
+    }
+
+    async deleteCategory(category: Category) {
+        if (!confirm(`¿Estás seguro de que deseas eliminar la categoría "${category.name}"?`)) {
+            return;
+        }
+
+        try {
+            await firstValueFrom(this.categoryRepo.delete(category.id));
+            await this.loadCategories();
+            this.notification.showSuccess('Categoría eliminada correctamente');
+        } catch (error: any) {
+            this.logger.error('Failed to delete category', error);
+            if (error?.message?.includes('foreign key constraint') || error?.code === '23503') {
+                this.notification.showError('No se puede eliminar la categoría porque hay productos que la están usando.');
+            } else {
+                this.notification.showError('Error al eliminar la categoría');
+            }
         }
     }
 }

@@ -85,11 +85,34 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
     if (params.category_ids && params.category_ids.length > 0) {
       query = query.in('category_id', params.category_ids);
+    } else if (category_id === 'none') {
+      query = query.is('category_id', null);
     } else if (category_id) {
       query = query.eq('category_id', category_id);
     }
     
-    if (brand_id) query = query.eq('brand_id', brand_id);
+    if (brand_id === 'none') {
+      query = query.is('brand_id', null);
+    } else if (brand_id) {
+      query = query.eq('brand_id', brand_id);
+    }
+
+    if (params.completeness_filter) {
+      switch (params.completeness_filter) {
+        case 'missing_image':
+          query = query.is('image_url', null);
+          break;
+        case 'missing_desc':
+          query = query.or('description.is.null,description.eq.""');
+          break;
+        case 'missing_seo':
+          query = query.or('meta_title.is.null,meta_description.is.null');
+          break;
+        case 'missing_codes':
+          query = query.is('sku', null).is('barcode', null);
+          break;
+      }
+    }
     
     if (description) query = query.ilike('description', `%${description}%`);
     if (featured !== null && featured !== undefined) query = query.eq('is_featured', featured);
