@@ -43,6 +43,7 @@ export class AdminProductsPage implements OnInit {
   public categories = signal<Category[]>([]);
   public searchQuery = signal<string>('');
   public selectedCategoryId = signal<string>('all');
+  public selectedBrandId = signal<string>('all');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
   
   // Selection
@@ -171,6 +172,7 @@ export class AdminProductsPage implements OnInit {
           _per_page: this.itemsPerPage(),
           q: this.searchQuery(),
           category_id: this.selectedCategoryId() !== 'all' ? this.selectedCategoryId() : undefined,
+          brand_id: this.selectedBrandId() !== 'all' ? this.selectedBrandId() : undefined,
           _sort: currentSort.column,
           _order: currentSort.order as 'asc' | 'desc',
           include_inactive: true
@@ -202,6 +204,18 @@ export class AdminProductsPage implements OnInit {
   onCategoryChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.selectedCategoryId.set(target.value);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { _page: 1 },
+      queryParamsHandling: 'merge'
+    });
+    this.loadData();
+  }
+
+  onBrandChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.selectedBrandId.set(target.value);
     this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
