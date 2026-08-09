@@ -73,4 +73,23 @@ export class AdminBrandsPage implements OnInit {
             this.notification.showError('Error al actualizar el estado');
         }
     }
+
+    async deleteBrand(brand: Brand) {
+        if (!confirm(`¿Estás seguro de que deseas eliminar la marca "${brand.name}"?`)) {
+            return;
+        }
+
+        try {
+            await firstValueFrom(this.brandRepo.delete(brand.id));
+            await this.loadBrands();
+            this.notification.showSuccess('Marca eliminada correctamente');
+        } catch (error: any) {
+            this.logger.error('Failed to delete brand', error);
+            if (error?.message?.includes('foreign key constraint') || error?.code === '23503') {
+                this.notification.showError('No se puede eliminar la marca porque hay productos que la están usando.');
+            } else {
+                this.notification.showError('Error al eliminar la marca');
+            }
+        }
+    }
 }

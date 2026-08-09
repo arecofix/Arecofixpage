@@ -83,4 +83,5 @@ export interface ProductsParams extends Partial<Product> {
   minimal?: boolean;
   stock_status?: 'all' | 'low_stock' | 'out_of_stock';
   is_paginated?: boolean;
+  completeness_filter?: 'all' | 'missing_image' | 'missing_desc' | 'missing_seo' | 'missing_codes';
 }
