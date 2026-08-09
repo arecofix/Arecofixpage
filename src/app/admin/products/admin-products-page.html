@@ -85,10 +85,10 @@
         </div>
       </div>
 
-      <div class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
-        <div class="flex items-center gap-2 w-full lg:w-48">
+      <div class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto flex-1 justify-end">
+        <div class="flex items-center gap-2 w-full md:w-auto lg:flex-1 max-w-xs">
           <span class="text-xs font-bold text-gray-500 hidden xl:block">Categoría:</span>
-          <select [ngModel]="selectedCategoryId()" (change)="onCategoryChange($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800 pr-10 truncate">
+          <select [ngModel]="selectedCategoryId()" (change)="onCategoryChange($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800" style="padding-right: 2rem; text-overflow: ellipsis;">
             <option value="all">Todas las Categorías</option>
             @for (cat of categories(); track cat.id) {
               <option [value]="cat.id">{{ cat.name }}</option>
@@ -96,9 +96,9 @@
           </select>
         </div>
 
-        <div class="flex items-center gap-2 w-full lg:w-48">
+        <div class="flex items-center gap-2 w-full md:w-auto lg:flex-1 max-w-xs">
           <span class="text-xs font-bold text-gray-500 hidden xl:block">Marca:</span>
-          <select [ngModel]="selectedBrandId()" (change)="onBrandChange($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800 pr-10 truncate">
+          <select [ngModel]="selectedBrandId()" (change)="onBrandChange($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800" style="padding-right: 2rem; text-overflow: ellipsis;">
             <option value="all">Todas las Marcas</option>
             @for (brand of brands(); track brand.id) {
               <option [value]="brand.id">{{ brand.name }}</option>
@@ -106,9 +106,9 @@
           </select>
         </div>
 
-        <div class="flex items-center gap-2 w-full lg:w-48">
+        <div class="flex items-center gap-2 w-full md:w-auto lg:flex-1 max-w-xs">
           <span class="text-xs font-bold text-gray-500 hidden xl:block">{{ t().products.filters.sortBy }}</span>
-          <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800 pr-10 truncate">
+          <select [ngModel]="sortOrder()" (change)="updateSort($event)" class="select select-bordered select-sm md:select-md w-full bg-white dark:bg-gray-800" style="padding-right: 2rem; text-overflow: ellipsis;">
             <option value="name_asc">{{ t().products.filters.azName }}</option>
             <option value="price_asc">{{ t().products.filters.priceLowHigh }}</option>
             <option value="price_desc">{{ t().products.filters.priceHighLow }}</option>
