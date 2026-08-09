@@ -354,7 +354,27 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   bulkDelete(ids: string[]): Observable<void> {
-    return this.bulkHardDeleteByIds(ids);
+    if (!ids.length) return from(Promise.resolve());
+
+    const deletePromise = async () => {
+      let query = this.supabase.from(this.tableName).delete().in('id', ids);
+      query = this.applyTenantFilter(query);
+
+      const { error } = await query;
+      
+      if (error) {
+        // 23503 is foreign_key_violation
+        if (error.code === '23503' || error.message.includes('foreign key constraint')) {
+          this.logger.warn(`[SupabaseProductRepository] Foreign key constraint when deleting products. Falling back to soft-delete (is_active: false).`, error);
+          await firstValueFrom(this.bulkUpdateByIds(ids, { is_active: false } as Partial<Product>));
+        } else {
+          this.errorHandler.handleError(error, `bulkDelete products`);
+          throw error;
+        }
+      }
+    };
+
+    return from(deletePromise());
   }
 
   search(query: string, categoryId?: string): Observable<Product[]> {
