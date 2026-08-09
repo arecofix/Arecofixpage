@@ -100,16 +100,16 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     if (params.completeness_filter) {
       switch (params.completeness_filter) {
         case 'missing_image':
-          query = query.is('image_url', null);
+          query = query.or('image_url.is.null,image_url.eq.""');
           break;
         case 'missing_desc':
           query = query.or('description.is.null,description.eq.""');
           break;
         case 'missing_seo':
-          query = query.or('meta_title.is.null,meta_description.is.null');
+          query = query.or('meta_title.is.null,meta_title.eq."",meta_description.is.null,meta_description.eq.""');
           break;
         case 'missing_codes':
-          query = query.is('sku', null).is('barcode', null);
+          query = query.or('sku.is.null,sku.eq.""').or('barcode.is.null,barcode.eq.""');
           break;
         case 'active':
           query = query.eq('is_active', true);
@@ -371,7 +371,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       if (error) {
         // 23503 is foreign_key_violation
         if (error.code === '23503' || error.message.includes('foreign key constraint')) {
-          this.logger.warn(`[SupabaseProductRepository] Foreign key constraint when deleting products. Falling back to soft-delete (is_active: false).`, error);
+          this.logger.info(`[SupabaseProductRepository] Producto con historial detectado. Protegiendo datos históricos y pasando a estado Inactivo (soft-delete).`);
           await firstValueFrom(this.bulkUpdateByIds(ids, { is_active: false } as Partial<Product>));
         } else {
           this.errorHandler.handleError(error, `bulkDelete products`);
