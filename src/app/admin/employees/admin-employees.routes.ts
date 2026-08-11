@@ -3,8 +3,8 @@ import { Routes } from '@angular/router';
 export const ADMIN_EMPLOYEES_ROUTES: Routes = [
   {
     path: '',
-    title: 'Empleados',
-    loadComponent: () => import('./admin-employees-page').then(m => m.AdminEmployeesPage)
+    pathMatch: 'full',
+    redirectTo: '/admin/users'
   },
   {
     path: 'new',

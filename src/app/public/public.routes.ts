@@ -6,6 +6,7 @@ import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 import { BranchResolver } from '@app/core/resolvers/branch.resolver';
 import { tauriRootRedirectGuard } from '@app/guards/tauri-root-redirect.guard';
 import { trackingSeoResolver } from '@app/core/resolvers/tracking-seo.resolver';
+import { noAuthGuard } from '@app/guards/auth.guard';
 
 export const publicRoutes: Routes = [
   {
@@ -135,6 +136,7 @@ export const publicRoutes: Routes = [
       {
         title: 'Login',
         path: 'login',
+        canActivate: [noAuthGuard],
         loadComponent: () =>
           import('@app/public/auth/login/login.component').then(
             (m) => m.LoginComponent
@@ -143,6 +145,7 @@ export const publicRoutes: Routes = [
       {
         title: 'Register',
         path: 'register',
+        canActivate: [noAuthGuard],
         loadComponent: () =>
           import('@app/public/auth/register/register.component').then(
             (m) => m.RegisterComponent
@@ -151,6 +154,7 @@ export const publicRoutes: Routes = [
       {
         title: 'Recuperar Contraseña',
         path: 'forgot-password',
+        canActivate: [noAuthGuard],
         loadComponent: () =>
           import('@app/public/auth/forgot-password/forgot-password.component').then(
             (m) => m.ForgotPasswordComponent

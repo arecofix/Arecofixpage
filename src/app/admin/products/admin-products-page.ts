@@ -45,6 +45,7 @@ export class AdminProductsPage implements OnInit {
   public selectedCategoryId = signal<string>('all');
   public selectedBrandId = signal<string>('all');
   public completenessFilter = signal<string>('all');
+  public stockFilter = signal<string>('all');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
   
   // Selection
@@ -56,6 +57,7 @@ export class AdminProductsPage implements OnInit {
   public currentPage = signal<number>(1);
   public itemsPerPage = signal<number>(20); // Merged client per_page, let's use 20 for admin
   public totalItems = signal<number>(0);
+  public inventorySummary = signal({ totalItems: 0, totalValue: 0, lowStockCount: 0 });
   
   public loading = signal<boolean>(false);
   public importing = signal<boolean>(false);
@@ -147,6 +149,7 @@ export class AdminProductsPage implements OnInit {
     if (this.loading()) return;
     this.loading.set(true);
     try {
+      this.loadSummary();
       // 1. Fetch metadata (brands/categories) only once or if empty
       if (this.brands().length === 0 || this.categories().length === 0) {
         const [brands, categories] = await Promise.all([
@@ -175,6 +178,7 @@ export class AdminProductsPage implements OnInit {
           category_id: this.selectedCategoryId() !== 'all' ? this.selectedCategoryId() : undefined,
           brand_id: this.selectedBrandId() !== 'all' ? this.selectedBrandId() : undefined,
           completeness_filter: this.completenessFilter() !== 'all' ? this.completenessFilter() as any : undefined,
+          stock_status: this.stockFilter() !== 'all' ? this.stockFilter() as any : undefined,
           _sort: currentSort.column,
           _order: currentSort.order as 'asc' | 'desc',
           include_inactive: true
@@ -188,6 +192,15 @@ export class AdminProductsPage implements OnInit {
     } finally {
       this.loading.set(false);
       this.cdr.detectChanges();
+    }
+  }
+
+  async loadSummary() {
+    try {
+        const summary = await this.productService.getInventorySummary();
+        this.inventorySummary.set(summary);
+    } catch (e) {
+        console.error('Error loading inventory summary', e);
     }
   }
 
@@ -230,6 +243,18 @@ export class AdminProductsPage implements OnInit {
   onCompletenessFilterChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.completenessFilter.set(target.value);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { _page: 1 },
+      queryParamsHandling: 'merge'
+    });
+    this.loadData();
+  }
+
+  onStockFilterChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.stockFilter.set(target.value);
     this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,

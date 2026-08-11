@@ -73,7 +73,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     // GET https://<TU_SUPABASE_URL>/rest/v1/products?select=...
     let baseQuery = this.supabase
       .from('products')
-      .select(selectFields, { count: 'estimated' });
+      .select(selectFields, { count: 'exact' });
       
     let query = this.applyTenantFilter(baseQuery);
 
@@ -117,6 +117,16 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         case 'inactive':
           query = query.eq('is_active', false);
           break;
+      }
+    }
+
+    if (params.stock_status) {
+      if (params.stock_status === 'out_of_stock') {
+        // Query products with stock 0 or less
+        query = query.lte('stock', 0);
+      } else if (params.stock_status === 'low_stock') {
+        // Assume low stock is > 0 and <= 5
+        query = query.gt('stock', 0).lte('stock', 5);
       }
     }
     

@@ -37,12 +37,18 @@ export class MenuBuilderService {
     const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
     const isCentral = !branch || branch.slug === 'arecofix' || branch.id === 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
 
-    const companyChildren: MenuItem[] = [
-      { title: lang === 'es' ? 'Identidad de Empresa' : 'Company Identity', path: `${basePrefix}/company`, icon: 'fa-id-badge' }
+    const gestionChildren: MenuItem[] = [
+      { title: lang === 'es' ? 'Clientes & Usuarios' : 'Customers & Users', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
+      { title: lang === 'es' ? 'Identidad de Empresa' : 'Company Identity', path: `${basePrefix}/company`, icon: 'fa-id-badge' },
+      { title: lang === 'es' ? 'Dashboard Contable' : 'Accounting Dashboard', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
+      { title: lang === 'es' ? 'Movimientos de Caja' : 'Cash Movements', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' },
+      { title: lang === 'es' ? 'Servicios Web' : 'Web Services', path: `${basePrefix}/services`, icon: 'fa-tools' },
+      { title: lang === 'es' ? 'Blog & Noticias' : 'Blog & News', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
+      { title: lang === 'es' ? 'Mensajes Recibidos' : 'Received Messages', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
     ];
 
     if (isGlobalAdmin && isCentral) {
-      companyChildren.push({ title: lang === 'es' ? 'Gestión Red de Sucursales' : 'Branch Network Management', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
+      gestionChildren.splice(2, 0, { title: lang === 'es' ? 'Red de Sucursales' : 'Branch Network', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
     }
 
     const baseItems: MenuItem[] = [
@@ -55,8 +61,6 @@ export class MenuBuilderService {
         expanded: true,
         children: [
           { title: lang === 'es' ? 'Gestión de Productos' : 'Product Management', path: `${basePrefix}/products`, icon: 'fa-barcode' },
-          { title: lang === 'es' ? 'Stock & Almacén' : 'Stock & Warehouse', path: `${basePrefix}/inventory`, icon: 'fa-warehouse' },
-          { title: lang === 'es' ? 'Auditar Catálogo' : 'Audit Catalog', path: `${basePrefix}/products/approvals`, icon: 'fa-check-double' },
           { title: lang === 'es' ? 'Categorías de Venta' : 'Sales Categories', path: `${basePrefix}/categories`, icon: 'fa-tags' },
           { title: lang === 'es' ? 'Marcas / Fabricantes' : 'Brands / Manufacturers', path: `${basePrefix}/brands`, icon: 'fa-copyright' },
         ]
@@ -75,15 +79,6 @@ export class MenuBuilderService {
         ]
       },
       {
-        title: lang === 'es' ? 'Gestión Financiera' : 'Financial Management',
-        icon: 'fa-chart-pie',
-        expanded: false,
-        children: [
-          { title: lang === 'es' ? 'Dashboard Contable' : 'Accounting Dashboard', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
-          { title: lang === 'es' ? 'Movimientos de Caja' : 'Cash Movements', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' }
-        ]
-      },
-      {
         title: lang === 'es' ? 'Servicio Técnico' : 'Technical Service',
         icon: 'fa-wrench',
         module: 'repairs',
@@ -93,22 +88,11 @@ export class MenuBuilderService {
           { title: lang === 'es' ? 'Reservas de Turno' : 'Reservations', path: `${basePrefix}/reservations`, icon: 'fa-calendar-check' }
         ]
       },
-      { title: lang === 'es' ? 'Gestión de Personas y Clientes' : 'People & Customer Management', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
       {
-        title: lang === 'es' ? 'Configuración Empresa' : 'Company Settings',
-        icon: 'fa-building',
+        title: lang === 'es' ? 'Gestión & Ajustes' : 'Management & Settings',
+        icon: 'fa-cogs',
         expanded: false,
-        children: companyChildren
-      },
-      { 
-        title: lang === 'es' ? 'Marketing & Contenido' : 'Marketing & Content', 
-        icon: 'fa-bullhorn', 
-        expanded: false, 
-        children: [
-          { title: lang === 'es' ? 'Servicios Web' : 'Web Services', path: `${basePrefix}/services`, icon: 'fa-tools' },
-          { title: lang === 'es' ? 'Blog & Noticias' : 'Blog & News', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
-          { title: lang === 'es' ? 'Mensajes Recibidos' : 'Received Messages', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
-        ]
+        children: gestionChildren
       },
       { 
         title: lang === 'es' ? 'Academia Arecofix' : 'Arecofix Academy', 

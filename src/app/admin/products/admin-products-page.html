@@ -88,7 +88,7 @@
     </div>
 
     <!-- Filters Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
       <div class="flex flex-col gap-1 w-full">
         <span class="text-xs font-bold text-gray-500 pl-1">Categoría:</span>
         <select [ngModel]="selectedCategoryId()" (change)="onCategoryChange($event)" class="select select-bordered w-full bg-white dark:bg-gray-800" style="padding-right: 2rem; text-overflow: ellipsis;">
@@ -133,6 +133,51 @@
             <option value="missing_seo">Falta Datos SEO</option>
             <option value="missing_codes">Falta Código (SKU/Barras)</option>
           </select>
+        </div>
+
+      <div class="flex flex-col gap-1 w-full">
+        <span class="text-xs font-bold text-gray-500 pl-1">Inventario:</span>
+        <select [ngModel]="stockFilter()" (change)="onStockFilterChange($event)" class="select select-bordered w-full bg-white dark:bg-gray-800" style="padding-right: 2rem; text-overflow: ellipsis;">
+            <option value="all">Todos (Cualquier Stock)</option>
+            <option value="low_stock" class="text-warning">Bajo Stock (1 a 5)</option>
+            <option value="out_of_stock" class="text-error">Agotados (0 o menos)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+      <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="stat">
+          <div class="stat-figure text-primary">
+            <i class="fas fa-boxes text-3xl opacity-20"></i>
+          </div>
+          <div class="stat-title text-xs uppercase tracking-wider">Productos Totales</div>
+          <div class="stat-value text-primary">{{ inventorySummary().totalItems }}</div>
+          <div class="stat-desc">En toda la sucursal</div>
+        </div>
+      </div>
+
+      <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="stat">
+          <div class="stat-figure text-success">
+            <i class="fas fa-dollar-sign text-3xl opacity-20"></i>
+          </div>
+          <div class="stat-title text-xs uppercase tracking-wider">Valor de Inventario</div>
+          <div class="stat-value text-success text-2xl">$ {{ inventorySummary().totalValue | number:'1.0-0' }}</div>
+          <div class="stat-desc">Stock x Precio Venta</div>
+        </div>
+      </div>
+
+      <div class="stats shadow bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="stat">
+          <div class="stat-figure text-warning">
+            <i class="fas fa-exclamation-triangle text-3xl opacity-20"></i>
+          </div>
+          <div class="stat-title text-xs uppercase tracking-wider text-warning">Bajo Stock</div>
+          <div class="stat-value text-warning">{{ inventorySummary().lowStockCount }}</div>
+          <div class="stat-desc">Requieren reposición</div>
         </div>
       </div>
     </div>

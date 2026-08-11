@@ -64,7 +64,7 @@ export const noAuthGuard: CanActivateFn = async (route, state) => {
   );
 
   if (authState.session) {
-    return router.createUrlTree(['/']);
+    return router.createUrlTree(['/admin']);
   }
   return true;
 };
