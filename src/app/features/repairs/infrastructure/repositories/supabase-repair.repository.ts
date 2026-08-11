@@ -27,7 +27,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     override getById(id: string): Observable<Repair | null> {
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
+            .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
             .eq('id', id);
 
         return from((this.applyTenantFilter(query) as any)).pipe(
@@ -46,7 +46,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const offset = params?.offset || 0;
 
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
+            .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });
 
@@ -100,7 +100,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 // Fetch full record with relations so return value is complete
                 const { data: fetchedData, error: fetchError } = await this.applyTenantFilter(
                     this.supabase.from(this.tableName)
-                        .select('*, parts:repair_parts_used(*), images:repair_images(image_url)')
+                        .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url)')
                         .eq('id', generatedId)
                 );
 
@@ -387,7 +387,11 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             updated_at: p.updated_at,
             completed_at: p.completed_at,
             images: p.images?.map((img: any) => img.image_url) || [],
-            parts: p.parts || [],
+            parts: p.parts?.map((part: any) => ({
+                ...part,
+                name: part.product?.name || part.name || part.product_name || 'Repuesto (Sin nombre)',
+                product_name: part.product?.name || part.name || part.product_name || 'Repuesto (Sin nombre)'
+            })) || [],
             branch_id: p.branch_id,
             received_by: p.received_by,
             assigned_technician_id: p.assigned_technician_id,
