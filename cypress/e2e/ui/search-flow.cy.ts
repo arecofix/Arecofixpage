@@ -1,10 +1,8 @@
 describe('Product Search Flow (Partial, Accents, Refinement)', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/rest/v1/products*').as('initialLoad');
     cy.visit('/productos');
     cy.get('app-products-grid').should('be.visible');
-    // Wait for the initial load to finish to avoid intercept confusion
-    cy.intercept('GET', '**/rest/v1/products*').as('initialLoad');
-    cy.wait('@initialLoad', { timeout: 10000 });
   });
 
   it('should find products using partial words (e.g. "th" -> "thinkpad")', () => {

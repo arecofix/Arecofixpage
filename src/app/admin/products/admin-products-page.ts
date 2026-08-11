@@ -47,6 +47,7 @@ export class AdminProductsPage implements OnInit {
   public completenessFilter = signal<string>('all');
   public stockFilter = signal<string>('all');
   public sortOrder = signal<'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc'>('name_asc');
+  public combinedFilter = signal<string>('sort_name_asc');
   
   // Selection
   public selectedIds = signal<Set<string>>(new Set());
@@ -204,9 +205,19 @@ export class AdminProductsPage implements OnInit {
     }
   }
 
-  updateSort(event: Event) {
+  onCombinedFilterChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    this.sortOrder.set(target.value as any);
+    const val = target.value;
+    this.combinedFilter.set(val);
+
+    if (val.startsWith('sort_')) {
+      this.sortOrder.set(val.replace('sort_', '') as any);
+      this.stockFilter.set('all');
+    } else if (val.startsWith('filter_')) {
+      this.stockFilter.set(val.replace('filter_', ''));
+      this.sortOrder.set('name_asc');
+    }
+
     this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
@@ -252,17 +263,6 @@ export class AdminProductsPage implements OnInit {
     this.loadData();
   }
 
-  onStockFilterChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.stockFilter.set(target.value);
-    this.currentPage.set(1);
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { _page: 1 },
-      queryParamsHandling: 'merge'
-    });
-    this.loadData();
-  }
 
   toggleSelectAll() {
     const pageItems = this.paginatedProducts();

@@ -81,13 +81,6 @@
                                 }
                             </div>
                             
-                            <div class="w-full sm:w-64">
-                                <select formControlName="current_status_id" class="w-full bg-white dark:bg-[#101828] border border-emerald-500/50 rounded-xl px-3 py-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm focus:outline-none focus:border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.1)] select select-bordered">
-                                    @for (st of statusOptions; track st.id) {
-                                        <option [ngValue]="st.id">{{ st.label | uppercase }}</option>
-                                    }
-                                </select>
-                            </div>
                         </div>
 
                         <!-- Sección 1: Información del Cliente -->

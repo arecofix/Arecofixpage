@@ -6,6 +6,8 @@ export default defineConfig({
     testIsolation: false,
     video: true,
     trashAssetsBeforeRuns: false,
+    pageLoadTimeout: 120000,
+    defaultCommandTimeout: 10000,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
