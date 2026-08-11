@@ -57,7 +57,6 @@ export class RepairStatsService {
                 glass_upsell,
                 repair_parts_used (
                     quantity,
-                    cost_price,
                     unit_price_at_time,
                     cost_at_time,
                     created_at
@@ -110,13 +109,15 @@ export class RepairStatsService {
         };
 
         for (const r of (allRepairs as any[] || [])) {
-            const revenueDate = r.completed_at || r.created_at || '';
-            const revenuePeriod = revenueDate ? revenueDate.slice(0, 7) : '';
+            const revenueDate = r.completed_at || r.created_at || new Date().toISOString();
+            const revenuePeriod = revenueDate.slice(0, 7);
             
             if (!monthlyMap.has(revenuePeriod)) monthlyMap.set(revenuePeriod, { ingreso: 0, costo: 0 });
 
+            const statusId = Number(r.current_status_id);
+
             // Solo contabilizamos ingreso y costo cuando la reparación está facturada (Lista o Entregada)
-            if (r.current_status_id === 5 || r.current_status_id === 6) {
+            if (statusId === 5 || statusId === 6) {
                 const pIngreso = Number(r.final_cost || 0);
                 const pCosto = Number(r.spare_part_cost || 0);
 
@@ -126,20 +127,23 @@ export class RepairStatsService {
                 if (isPeriodMatch(revenueDate)) {
                     total_facturado += pIngreso;
                     spare_part_costs += pCosto;
-                    if (r.current_status_id === 6) equipos_entregados++;
+                    if (statusId === 6) equipos_entregados++;
                 }
             }
 
-            if (r.current_status_id === 1 || r.current_status_id === 2) {
-                if (isPeriodMatch(r.created_at)) equipos_espera++;
+            if (statusId === 1 || statusId === 2) {
+                if (isPeriodMatch(r.created_at || new Date().toISOString())) equipos_espera++;
             }
             
-            if (r.glass_upsell && isPeriodMatch(r.created_at)) reparaciones_vidrio++;
+            if (r.glass_upsell && isPeriodMatch(r.created_at || new Date().toISOString())) reparaciones_vidrio++;
         }
 
         const filteredOrders = (orders || []).filter((o: any) => isPeriodMatch(o.created_at));
         const total_orders_revenue = filteredOrders.reduce((acc: number, o: any) => acc + Number(o.total_amount), 0);
-        const total_reparaciones = (allRepairs || []).filter((r: any) => isPeriodMatch(r.completed_at || r.created_at) && (r.current_status_id === 6 || r.current_status_id === 5)).length;
+        const total_reparaciones = (allRepairs || []).filter((r: any) => {
+            const sId = Number(r.current_status_id);
+            return isPeriodMatch(r.completed_at || r.created_at || new Date().toISOString()) && (sId === 6 || sId === 5);
+        }).length;
         
         const equipos_recibidos = (allRepairs || []).filter((r: any) => isPeriodMatch(r.created_at)).length;
 

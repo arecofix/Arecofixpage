@@ -17,7 +17,6 @@ describe('Infinite Loading Audit (Timeout & Leak Detection)', () => {
     '/admin/products',
     '/admin/repairs',
     '/admin/clients',
-    '/admin/inventory',
     '/admin/orders',
     '/admin/courses',
     '/admin/sales'

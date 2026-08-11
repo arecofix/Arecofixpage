@@ -57,6 +57,13 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         monthlyBreakdown.forEach(m => {
             const partsCost = additionalCosts.partsByMonth.get(m.period) || 0;
             const expenses = additionalCosts.expensesByMonth.get(m.period) || 0;
+            const trueRepairsRev = additionalCosts.repairsRevenueByMonth.get(m.period) || 0;
+            
+            // Override repairs_revenue completely to ignore buggy RPC sum (which includes unfinished/cancelled repairs)
+            m.repairs_revenue = trueRepairsRev;
+            
+            // Recalculate gross revenue explicitly
+            m.gross_revenue = m.sales_revenue + m.repairs_revenue;
             
             // Override repairs_cost with our explicit parts calculation if it's higher (fallback if RPC missed it)
             if (partsCost > m.repairs_cost) {
@@ -76,8 +83,8 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         const safe_cm_cost = cm ? cm.cost : 0;
         const safe_cm_net = safe_cm_gross - safe_cm_cost;
 
-        // Recalculate global totals
-        const total_gross = Number(rawFinance.total_gross_revenue || 0);
+        // Recalculate global totals based on the corrected monthly breakdown
+        const total_gross = monthlyBreakdown.reduce((sum, m) => sum + m.gross_revenue, 0);
         let total_cost_safe = Number(rawFinance.total_cost || 0);
         
         // Ensure total_cost_safe includes our explicit totals at minimum
@@ -115,12 +122,14 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
     );
   }
 
-  private async fetchAdditionalCosts(tenantId: string, branchId: string | null): Promise<{ partsByMonth: Map<string, number>, partsTotal: number, expensesByMonth: Map<string, number>, expensesTotal: number }> {
+  private async fetchAdditionalCosts(tenantId: string, branchId: string | null): Promise<{ partsByMonth: Map<string, number>, partsTotal: number, expensesByMonth: Map<string, number>, expensesTotal: number, repairsRevenueByMonth: Map<string, number>, repairsRevenueTotal: number }> {
     const result = {
         partsByMonth: new Map<string, number>(),
         partsTotal: 0,
         expensesByMonth: new Map<string, number>(),
-        expensesTotal: 0
+        expensesTotal: 0,
+        repairsRevenueByMonth: new Map<string, number>(),
+        repairsRevenueTotal: 0
     };
     try {
         let expQuery = this.supabase
@@ -132,7 +141,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
 
         let partsQuery = this.supabase
             .from('repairs')
-            .select(`created_at, repair_parts_used(quantity, cost_at_time, cost_price)`)
+            .select(`created_at, current_status_id, final_cost, completed_at, repair_parts_used(quantity, cost_at_time)`)
             .eq('tenant_id', tenantId);
         if (branchId) partsQuery = partsQuery.eq('branch_id', branchId);
 
@@ -150,6 +159,17 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
 
         if (!partsRes.error && partsRes.data) {
             partsRes.data.forEach((repair: any) => {
+                const sId = Number(repair.current_status_id);
+                // Calculate true repairs revenue exactly like Inteligencia Financiera (only Lista or Entregada)
+                if (sId === 5 || sId === 6) {
+                    const revDate = repair.completed_at || repair.created_at || new Date().toISOString();
+                    const date = new Date(revDate);
+                    const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    const rev = Number(repair.final_cost || 0);
+                    result.repairsRevenueTotal += rev;
+                    result.repairsRevenueByMonth.set(period, (result.repairsRevenueByMonth.get(period) || 0) + rev);
+                }
+
                 if (!repair.repair_parts_used || repair.repair_parts_used.length === 0) return;
                 const date = new Date(repair.created_at);
                 const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;

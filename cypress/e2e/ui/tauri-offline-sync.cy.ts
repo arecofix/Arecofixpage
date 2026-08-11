@@ -26,11 +26,11 @@ describe('Tauri Desktop App - Offline First Sync Engine & Responsiveness', () =>
     // ── Paso 2: Login (evitando el 302 de SSR) ─────────────────────────────────
     // Usamos loginRealAdmin hacia /login con returnUrl para que el SSR devuelva 200 OK.
     // Esto permite que 'onBeforeLoad' inyecte el token, y luego Angular redirige al cliente.
-    cy.loginRealAdmin('/login?returnUrl=/admin/branches');
+    cy.loginRealAdmin('/login?returnUrl=/admin/dashboard');
     
     // Validar que estamos en el panel de administración
     cy.wait(3000);
-    cy.url({ timeout: 10000 }).should('include', '/admin/branches');
+    cy.url({ timeout: 10000 }).should('include', '/admin/dashboard');
     cy.get('body').should('be.visible');
 
     // ── Paso 3: Testing del Offline-First Sync Engine ──────────────────────────
