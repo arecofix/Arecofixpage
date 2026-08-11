@@ -21,7 +21,6 @@ export const adminRoutes: Routes = [
       { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
       // Note: /admin/suppliers is the dedicated supplier manager (ABM)
       // /admin/users has a 'suppliers' tab for a unified people view
-      { path: 'employees', redirectTo: 'users', pathMatch: 'full' },
       {
         title: 'Dashboard',
         path: 'dashboard',
@@ -69,12 +68,6 @@ export const adminRoutes: Routes = [
       {
         path: 'sales',
         loadChildren: () => import('@app/admin/sales/admin-sales.routes').then(m => m.ADMIN_SALES_ROUTES)
-      },
-      {
-        path: 'inventory',
-        canActivate: [moduleGuard],
-        data: { module: 'inventory' },
-        loadChildren: () => import('@app/admin/inventory/admin-inventory.routes').then(m => m.ADMIN_INVENTORY_ROUTES)
       },
       {
         path: 'purchases',

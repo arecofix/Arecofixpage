@@ -122,6 +122,12 @@ export class TenantService {
       if (error) {
         this.logger.error(`Database error resolving custom domain: ${error.message}`, error);
         // Do not throw, allow fallback mechanism below to handle offline/missing credentials
+        
+        // If it's a network error (offline), bail out immediately to prevent SSR timeouts
+        if (error.message?.includes('fetch failed') || error.message?.includes('Failed to fetch') || error.message?.includes('network')) {
+           this.logger.warn('Network error detected. Bailing out early to mock tenant.');
+           return this.loadMockTenant();
+        }
       }
 
       // 2. Si no es dominio custom, asumimos subdominio (Ej: mitienda.arecofix.com.ar)
@@ -166,21 +172,7 @@ export class TenantService {
                 data = fallbackData;
             } else {
                 this.logger.warn('No active tenants found in database. Loading mock tenant.');
-                const defaultTenant: Tenant = {
-                    id: TENANT_CONSTANTS.FALLBACK_ID,
-                    name: 'Arecofix Dev Local',
-                    slug: 'demo',
-                    is_active: true,
-                    plan_type: 'basic',
-                    currency: 'ARS',
-                    usd_rate: 1,
-                    tax_percentage: 21,
-                    branding_settings: {
-                        primary_color: '#3b82f6'
-                    }
-                };
-                this.setTenant(defaultTenant);
-                return defaultTenant;
+                return this.loadMockTenant();
             }
         }
       }
@@ -198,6 +190,27 @@ export class TenantService {
       // Ensure we always have a context even in catastrophic failure
       return null;
     }
+  }
+
+  /**
+   * Helper to load a fallback offline/dev mock tenant
+   */
+  private loadMockTenant(): Tenant {
+    const defaultTenant: Tenant = {
+      id: TENANT_CONSTANTS.FALLBACK_ID,
+      name: 'Arecofix Dev Local',
+      slug: 'demo',
+      is_active: true,
+      plan_type: 'basic',
+      currency: 'ARS',
+      usd_rate: 1,
+      tax_percentage: 21,
+      branding_settings: {
+          primary_color: '#3b82f6'
+      }
+    };
+    this.setTenant(defaultTenant);
+    return defaultTenant;
   }
 
   /**
