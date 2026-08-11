@@ -116,17 +116,40 @@ export class RepairStatsService {
 
             const statusId = Number(r.current_status_id);
 
-            // Solo contabilizamos ingreso y costo cuando la reparación está facturada (Lista o Entregada)
+            // Los costos de repuestos se asumen gastados desde que se asignan,
+            // siempre y cuando la reparación no esté cancelada (7).
+            if (statusId !== 7) {
+                const costDate = r.created_at || new Date().toISOString();
+                const costPeriod = costDate.slice(0, 7);
+                if (!monthlyMap.has(costPeriod)) monthlyMap.set(costPeriod, { ingreso: 0, costo: 0 });
+                
+                let calculatedCost = 0;
+                if (r.repair_parts_used && Array.isArray(r.repair_parts_used)) {
+                    r.repair_parts_used.forEach((part: any) => {
+                        const qty = Number(part.quantity || 1);
+                        // cost_at_time in DB is a total. We extract unit cost or fallback to retail price
+                        const unitCost = part.cost_at_time 
+                            ? (Number(part.cost_at_time) / qty) 
+                            : Number(part.unit_price_at_time || 0);
+                        calculatedCost += unitCost * qty;
+                    });
+                }
+                const pCosto = calculatedCost > 0 ? calculatedCost : Number(r.spare_part_cost || 0);
+                
+                monthlyMap.get(costPeriod)!.costo += pCosto;
+                
+                if (isPeriodMatch(costDate)) {
+                    spare_part_costs += pCosto;
+                }
+            }
+
+            // Solo contabilizamos ingreso cuando la reparación está facturada (Lista o Entregada)
             if (statusId === 5 || statusId === 6) {
                 const pIngreso = Number(r.final_cost || 0);
-                const pCosto = Number(r.spare_part_cost || 0);
-
                 monthlyMap.get(revenuePeriod)!.ingreso += pIngreso;
-                monthlyMap.get(revenuePeriod)!.costo += pCosto;
 
                 if (isPeriodMatch(revenueDate)) {
                     total_facturado += pIngreso;
-                    spare_part_costs += pCosto;
                     if (statusId === 6) equipos_entregados++;
                 }
             }

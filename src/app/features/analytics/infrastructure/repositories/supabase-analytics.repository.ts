@@ -141,7 +141,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
 
         let partsQuery = this.supabase
             .from('repairs')
-            .select(`created_at, current_status_id, final_cost, completed_at, repair_parts_used(quantity, cost_at_time)`)
+            .select(`created_at, current_status_id, final_cost, completed_at, repair_parts_used(quantity, cost_at_time, unit_price_at_time)`)
             .eq('tenant_id', tenantId);
         if (branchId) partsQuery = partsQuery.eq('branch_id', branchId);
 
@@ -170,12 +170,17 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
                     result.repairsRevenueByMonth.set(period, (result.repairsRevenueByMonth.get(period) || 0) + rev);
                 }
 
+                if (sId === 7) return; // Do not count costs for cancelled repairs
                 if (!repair.repair_parts_used || repair.repair_parts_used.length === 0) return;
                 const date = new Date(repair.created_at);
                 const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                 let cost = 0;
                 repair.repair_parts_used.forEach((part: any) => {
-                    cost += Number(part.quantity || 1) * Number(part.cost_at_time || part.cost_price || 0);
+                    const qty = Number(part.quantity || 1);
+                    const unitCost = part.cost_at_time
+                        ? (Number(part.cost_at_time) / qty)
+                        : Number(part.unit_price_at_time || part.cost_price || 0);
+                    cost += unitCost * qty;
                 });
                 result.partsTotal += cost;
                 result.partsByMonth.set(period, (result.partsByMonth.get(period) || 0) + cost);
