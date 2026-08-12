@@ -59,7 +59,10 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
 
         if (this.branchContextService) {
             const branchId = this.branchContextService.getBranchId();
-            if (branchId && enhancedQuery) {
+            // La sucursal central ve absolutamente todo (bypassea el aislamiento por sucursal)
+            const isCentralBranch = branchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !branchId;
+            
+            if (branchId && enhancedQuery && !isCentralBranch) {
                 if (this.useStrictBranchIsolation && typeof enhancedQuery.eq === 'function') {
                     enhancedQuery = enhancedQuery.eq('branch_id', branchId);
                 } else if (this.useBranchIsolation && typeof enhancedQuery.or === 'function') {

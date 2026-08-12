@@ -30,7 +30,8 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
     const contextBranchId = this.branchContextService.getBranchId();
     const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
 
-    if (!(isGlobalAdmin && isCentralBranch)) {
+    // Si estamos en la central, vemos todo sin importar si somos admin o no
+    if (!isCentralBranch) {
       const branchId = contextBranchId || profile?.branch_id;
       if (branchId) {
         // Group of branches that share clients
@@ -71,8 +72,8 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
 
   findByEmailOrPhone(email?: string, phone?: string): Observable<UserProfile | null> {
     if (!email && !phone) return from(Promise.resolve(null));
-    
-    let query = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'));
+    const tenantId = this.tenantService.getTenantId();
+    let query = this.supabase.from(this.tableName).select('*').eq('tenant_id', tenantId);
     // Do not apply branch filter or role filter here because we need to find 
     // if the email/phone exists anywhere in the tenant to prevent unique constraint errors.
     
