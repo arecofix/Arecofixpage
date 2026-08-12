@@ -1,0 +1,18 @@
+# Build artifacts
+dist/
+out/
+.angular/
+
+# Dependencies
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+
+# Testing
+coverage/
+cypress/videos/
+cypress/screenshots/
+
+# System
+.DS_Store
+*.log

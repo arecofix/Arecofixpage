@@ -3,6 +3,7 @@ import { LoggerService } from './logger.service';
 import { firstValueFrom } from 'rxjs';
 import { RepairRepository } from '../../features/repairs/domain/repositories/repair.repository';
 import { NotificationService } from './notification.service';
+import Dexie, { Table } from 'dexie';
 
 export interface CachedRequest {
   url: string;
@@ -14,7 +15,7 @@ export interface CachedRequest {
 }
 
 export interface QueuedMutation {
-  id?: number; // Auto-incremented by IndexedDB
+  id?: number;
   url: string;
   method: string;
   headers: [string, string][];
@@ -23,303 +24,202 @@ export interface QueuedMutation {
   retryCount: number;
 }
 
+export interface MasterData {
+  key: string;
+  data: any;
+  timestamp: number;
+}
+
+export interface OfflineRepair {
+  id: string;
+  payload: any;
+  timestamp: number;
+}
+
+export class ArecofixDatabase extends Dexie {
+  requestsCache!: Table<CachedRequest, string>;
+  syncQueue!: Table<QueuedMutation, number>;
+  masterData!: Table<MasterData, string>;
+  offlineRepairs!: Table<OfflineRepair, string>;
+
+  constructor() {
+    super('ArecofixOfflineDB');
+    // Using version 3 to cleanly upgrade from the native DB version 2
+    this.version(3).stores({
+      requestsCache: 'url',
+      syncQueue: '++id, timestamp',
+      masterData: 'key',
+      offlineRepairs: 'id, timestamp'
+    });
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class OfflineSyncService {
   private logger = inject(LoggerService);
   private injector = inject(Injector);
-  private ngZone = inject(NgZone);
   
   private get repairRepo(): RepairRepository { return this.injector.get(RepairRepository); }
   private get notification(): NotificationService { return this.injector.get(NotificationService); }
   
   public pendingCount = signal<number>(0);
-  private dbName = 'ArecofixOfflineDB';
-  private dbVersion = 2; // Incremented for masterData store
-  private db: IDBDatabase | null = null;
+  private db: ArecofixDatabase;
   
-  private cacheStoreName = 'requestsCache';
-  private queueStoreName = 'syncQueue';
-  private masterDataStoreName = 'masterData';
-
   public isReady = false;
-  private initPromise: Promise<void> | null = null;
 
   constructor() {
-    if (typeof window !== 'undefined' && 'indexedDB' in window) {
+    this.db = new ArecofixDatabase();
+    
+    if (typeof window !== 'undefined') {
       this.initDB();
       this.setupNetworkListeners();
-    }
-    
-    // Auto-sync when coming back online
-    if (typeof window !== 'undefined') {
-      this.pendingCount.set(this.getOfflineRepairs().length);
-      window.addEventListener('online', () => {
-        if (this.pendingCount() > 0) {
-          this.notification.showInfo('Conexión restaurada. Procesando órdenes offline...');
-          this.syncAll();
-        }
-      });
     }
   }
 
   private async initDB(): Promise<void> {
-    if (this.initPromise) return this.initPromise;
+    try {
+      await this.db.open();
+      this.isReady = true;
+      
+      const count = await this.db.offlineRepairs.count();
+      this.pendingCount.set(count);
 
-    this.initPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.dbVersion);
-
-      const timeout = setTimeout(() => {
-          this.ngZone.run(() => reject('IndexedDB init timeout'));
-      }, 2000);
-
-      request.onerror = (event) => {
-        clearTimeout(timeout);
-        this.logger.error('Error opening IndexedDB', event);
-        this.ngZone.run(() => reject('Error opening IndexedDB'));
-      };
-
-      request.onsuccess = (event: Event) => {
-        clearTimeout(timeout);
-        const target = event.target as IDBOpenDBRequest;
-        this.db = target.result;
-        this.isReady = true;
-        this.ngZone.run(() => resolve());
-        
-        // Process queue immediately if we are online on startup
-        if (typeof navigator !== 'undefined' && navigator.onLine) {
-          setTimeout(() => this.processSyncQueue(), 2000);
-        }
-      };
-
-      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-        const target = event.target as IDBOpenDBRequest;
-        const db = target.result;
-        
-        if (!db.objectStoreNames.contains(this.cacheStoreName)) {
-          db.createObjectStore(this.cacheStoreName, { keyPath: 'url' });
-        }
-        
-        if (!db.objectStoreNames.contains(this.queueStoreName)) {
-          const queueStore = db.createObjectStore(this.queueStoreName, { keyPath: 'id', autoIncrement: true });
-          queueStore.createIndex('timestamp', 'timestamp', { unique: false });
-        }
-        
-        if (!db.objectStoreNames.contains(this.masterDataStoreName)) {
-          db.createObjectStore(this.masterDataStoreName, { keyPath: 'key' });
-        }
-      };
-    });
-
-    return this.initPromise;
+      // Process queue immediately if we are online on startup
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        setTimeout(() => this.processSyncQueue(), 2000);
+      }
+    } catch (err) {
+      this.logger.error('Error opening Dexie IndexedDB', err);
+    }
   }
 
   private setupNetworkListeners() {
-    window.addEventListener('online', () => {
+    window.addEventListener('online', async () => {
+      if (this.pendingCount() > 0) {
+        this.notification.showInfo('Conexión restaurada. Procesando órdenes offline...');
+        await this.syncAll();
+      }
       this.logger.info('[OfflineSync] Back online. Processing sync queue...');
       this.processSyncQueue();
     });
   }
 
   async cacheGetRequest(url: string, data: string, status: number, statusText: string, headers: [string, string][]): Promise<void> {
-    if (!this.db) await this.initDB();
-    if (!this.db) return;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.cacheStoreName], 'readwrite');
-      const store = transaction.objectStore(this.cacheStoreName);
-      
-      const cachedRequest: CachedRequest = {
+    if (!this.isReady) return;
+    try {
+      await this.db.requestsCache.put({
         url,
         data,
         status,
         statusText,
         headers,
         timestamp: Date.now()
-      };
-
-      const request = store.put(cachedRequest);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+      });
+    } catch (err) {
+      this.logger.error('[OfflineSync] cacheGetRequest error', err);
+    }
   }
 
   async getCachedRequest(url: string): Promise<CachedRequest | null> {
-    if (!this.db) await this.initDB();
-    if (!this.db) return null;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.cacheStoreName], 'readonly');
-      const store = transaction.objectStore(this.cacheStoreName);
-      const request = store.get(url);
-      
-      const timeout = setTimeout(() => {
-          this.ngZone.run(() => reject(new Error('IndexedDB get timeout')));
-      }, 2000);
-
-      request.onsuccess = () => {
-        clearTimeout(timeout);
-        this.ngZone.run(() => resolve(request.result as CachedRequest || null));
-      };
-      request.onerror = () => {
-        clearTimeout(timeout);
-        this.ngZone.run(() => reject(request.error));
-      };
-    });
+    if (!this.isReady) return null;
+    try {
+      const cached = await this.db.requestsCache.get(url);
+      return cached || null;
+    } catch (err) {
+      this.logger.error('[OfflineSync] getCachedRequest error', err);
+      return null;
+    }
   }
 
   async enqueueMutation(url: string, method: string, headers: [string, string][], body: string | null): Promise<void> {
-    if (!this.db) await this.initDB();
-    if (!this.db) return;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.queueStoreName], 'readwrite');
-      const store = transaction.objectStore(this.queueStoreName);
-      
-      const mutation: QueuedMutation = {
+    if (!this.isReady) return;
+    try {
+      await this.db.syncQueue.add({
         url,
         method,
         headers,
         body,
         timestamp: Date.now(),
         retryCount: 0
-      };
-
-      const request = store.add(mutation);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+      });
+    } catch (err) {
+      this.logger.error('[OfflineSync] enqueueMutation error', err);
+    }
   }
 
   async processSyncQueue(): Promise<void> {
-    if (!this.db || !navigator.onLine) return;
+    if (!this.isReady || !navigator.onLine) return;
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.queueStoreName], 'readwrite');
-      const store = transaction.objectStore(this.queueStoreName);
-      const request = store.getAll();
-
-      request.onsuccess = async () => {
-        const mutations: QueuedMutation[] = request.result;
-        
-        for (const mutation of mutations) {
-          try {
-            // Strip headers that might conflict or be stale
-            const fetchHeaders = new Headers();
-            mutation.headers.forEach(([key, value]) => {
-              // Authorization header might need to be refreshed, but assuming it's valid for now
-              fetchHeaders.append(key, value);
-            });
-
-            const response = await fetch(mutation.url, {
-              method: mutation.method,
-              headers: fetchHeaders,
-              body: mutation.body
-            });
-
-            if (response.ok || (response.status >= 400 && response.status < 500)) {
-              // Delete from queue if successful OR if it's a client error (e.g. 400 bad request)
-              await this.deleteFromQueue(mutation.id!);
-            } else {
-              // Server error, keep in queue and increment retry count
-              mutation.retryCount++;
-              await this.updateInQueue(mutation);
-            }
-          } catch (e) {
-            this.logger.error('[OfflineSync] Error syncing mutation', e);
-          }
-        }
-        resolve();
-      };
+    try {
+      const mutations = await this.db.syncQueue.toArray();
       
-      request.onerror = () => reject(request.error);
-    });
-  }
+      for (const mutation of mutations) {
+        try {
+          const fetchHeaders = new Headers();
+          mutation.headers.forEach(([key, value]) => fetchHeaders.append(key, value));
 
-  private async deleteFromQueue(id: number): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.queueStoreName], 'readwrite');
-      const store = transaction.objectStore(this.queueStoreName);
-      const request = store.delete(id);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
+          const response = await fetch(mutation.url, {
+            method: mutation.method,
+            headers: fetchHeaders,
+            body: mutation.body
+          });
 
-  private async updateInQueue(mutation: QueuedMutation): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.queueStoreName], 'readwrite');
-      const store = transaction.objectStore(this.queueStoreName);
-      const request = store.put(mutation);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+          if (response.ok || (response.status >= 400 && response.status < 500)) {
+            // Delete from queue if successful OR if it's a client error (e.g. 400 bad request)
+            await this.db.syncQueue.delete(mutation.id!);
+          } else {
+            // Server error, keep in queue and increment retry count
+            await this.db.syncQueue.update(mutation.id!, { retryCount: mutation.retryCount + 1 });
+          }
+        } catch (e) {
+          this.logger.error('[OfflineSync] Error syncing mutation', e);
+        }
+      }
+    } catch (err) {
+      this.logger.error('[OfflineSync] processSyncQueue error', err);
+    }
   }
 
   async clearCache(): Promise<void> {
-    if (!this.db) await this.initDB();
-    if (!this.db) return;
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.cacheStoreName], 'readwrite');
-      const store = transaction.objectStore(this.cacheStoreName);
-      const request = store.clear();
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    if (!this.isReady) return;
+    await this.db.requestsCache.clear();
   }
 
   async saveMasterData(key: string, data: any): Promise<void> {
-    if (!this.db) await this.initDB();
-    if (!this.db) return;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.masterDataStoreName], 'readwrite');
-      const store = transaction.objectStore(this.masterDataStoreName);
-      const request = store.put({ key, data, timestamp: Date.now() });
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    if (!this.isReady) return;
+    await this.db.masterData.put({ key, data, timestamp: Date.now() });
   }
 
   async getMasterData<T>(key: string): Promise<T | null> {
-    if (!this.db) await this.initDB();
-    if (!this.db) return null;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.masterDataStoreName], 'readonly');
-      const store = transaction.objectStore(this.masterDataStoreName);
-      const request = store.get(key);
-      request.onsuccess = () => resolve(request.result ? request.result.data : null);
-      request.onerror = () => reject(request.error);
-    });
+    if (!this.isReady) return null;
+    const result = await this.db.masterData.get(key);
+    return result ? result.data : null;
   }
 
   // --- REPAIR EXPLICIT OFFLINE QUEUE --- //
-  private readonly REPAIR_STORAGE_KEY = 'arecofix_offline_repairs';
-
-  saveOfflineRepair(payload: any): void {
-    const repairs = this.getOfflineRepairs();
-    repairs.push({
+  
+  async saveOfflineRepair(payload: any): Promise<void> {
+    if (!this.isReady) return;
+    await this.db.offlineRepairs.add({
       id: crypto.randomUUID(),
       payload,
       timestamp: Date.now()
     });
-    localStorage.setItem(this.REPAIR_STORAGE_KEY, JSON.stringify(repairs));
-    this.pendingCount.set(repairs.length);
+    const count = await this.db.offlineRepairs.count();
+    this.pendingCount.set(count);
   }
 
-  getOfflineRepairs(): any[] {
-    if (typeof localStorage === 'undefined') return [];
-    const data = localStorage.getItem(this.REPAIR_STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+  async getOfflineRepairs(): Promise<OfflineRepair[]> {
+    if (!this.isReady) return [];
+    return this.db.offlineRepairs.toArray();
   }
 
-  clearOfflineRepairs(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(this.REPAIR_STORAGE_KEY);
-      this.pendingCount.set(0);
-    }
+  async clearOfflineRepairs(): Promise<void> {
+    if (!this.isReady) return;
+    await this.db.offlineRepairs.clear();
+    this.pendingCount.set(0);
   }
 
   async syncAll(): Promise<void> {
@@ -328,31 +228,32 @@ export class OfflineSyncService {
       return;
     }
 
-    const repairs = this.getOfflineRepairs();
+    const repairs = await this.getOfflineRepairs();
     if (repairs.length === 0) return;
 
     this.notification.showInfo(`Sincronizando ${repairs.length} órdenes pendientes...`);
     let successCount = 0;
-    let newRepairs: any[] = [];
+    let failedCount = 0;
 
     for (const item of repairs) {
       try {
         await firstValueFrom(this.repairRepo.create(item.payload));
+        await this.db.offlineRepairs.delete(item.id);
         successCount++;
       } catch (err) {
         this.logger.error('Error syncing offline repair:', err);
-        newRepairs.push(item); // Keep it if it failed
+        failedCount++;
       }
     }
 
-    localStorage.setItem(this.REPAIR_STORAGE_KEY, JSON.stringify(newRepairs));
-    this.pendingCount.set(newRepairs.length);
+    const newCount = await this.db.offlineRepairs.count();
+    this.pendingCount.set(newCount);
 
     if (successCount > 0) {
       this.notification.showSuccess(`¡${successCount} órdenes sincronizadas con éxito!`);
     }
-    if (newRepairs.length > 0) {
-      this.notification.showError(`Fallo al sincronizar ${newRepairs.length} órdenes. Revise la conexión.`);
+    if (failedCount > 0) {
+      this.notification.showError(`Fallo al sincronizar ${failedCount} órdenes. Revise la conexión.`);
     }
   }
 }
