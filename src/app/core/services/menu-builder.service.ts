@@ -44,7 +44,7 @@ export class MenuBuilderService {
       { title: lang === 'es' ? 'Movimientos de Caja' : 'Cash Movements', path: `${basePrefix}/finance/cash-movements`, icon: 'fa-money-bill-wave' },
       { title: lang === 'es' ? 'Servicios Web' : 'Web Services', path: `${basePrefix}/services`, icon: 'fa-tools' },
       { title: lang === 'es' ? 'Blog & Noticias' : 'Blog & News', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
-      { title: lang === 'es' ? 'Mensajes Recibidos' : 'Received Messages', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
+      { title: lang === 'es' ? 'Buzón & Turnos' : 'Inbox & Appointments', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
     ];
 
     if (isGlobalAdmin && isCentral) {
@@ -84,8 +84,7 @@ export class MenuBuilderService {
         module: 'repairs',
         expanded: false,
         children: [
-          { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' },
-          { title: lang === 'es' ? 'Reservas de Turno' : 'Reservations', path: `${basePrefix}/reservations`, icon: 'fa-calendar-check' }
+          { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' }
         ]
       },
       {

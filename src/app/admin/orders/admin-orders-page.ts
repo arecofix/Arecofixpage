@@ -128,4 +128,8 @@ export class AdminOrdersPage implements OnInit {
         const value = (event.target as HTMLSelectElement).value;
         this.sortOrder.set(value as 'date_desc' | 'date_asc' | 'total_desc');
     }
+    
+    trackById(index: number, item: any): string {
+        return item.id;
+    }
 }

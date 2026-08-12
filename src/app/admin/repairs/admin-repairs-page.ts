@@ -205,4 +205,8 @@ export class AdminRepairsPage implements OnInit {
     this.loadRepairs();
     this.loadSummary();
   }
+
+  trackById(index: number, item: any): string {
+    return item.id;
+  }
 }
