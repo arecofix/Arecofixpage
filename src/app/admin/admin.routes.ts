@@ -99,10 +99,7 @@ export const adminRoutes: Routes = [
         path: 'messages',
         loadChildren: () => import('@app/admin/messages/admin-messages.routes').then(m => m.ADMIN_MESSAGES_ROUTES)
       },
-      {
-        path: 'reservations',
-        loadChildren: () => import('@app/admin/reservations/admin-reservations.routes').then(m => m.ADMIN_RESERVATIONS_ROUTES)
-      },
+
       {
         path: 'posts',
         loadChildren: () => import('@app/admin/posts/admin-posts.routes').then(m => m.ADMIN_POSTS_ROUTES)

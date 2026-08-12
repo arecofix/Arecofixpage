@@ -1,5 +1,5 @@
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-green-600">Mensajes de Contacto</h1>
+    <h1 class="text-2xl font-bold text-green-600">Buzón de Mensajes & Turnos</h1>
 </div>
 
 <div class="grid gap-4">
@@ -15,7 +15,7 @@
     } @else {
     @for (msg of messages(); track msg.id) {
     <div class="card bg-base-100 shadow hover:shadow-md transition-shadow text-base-content" [class.border-l-4]="!msg.is_read"
-        [class.border-primary]="!msg.is_read">
+        [class.border-primary]="!msg.is_read" [class.border-l-indigo-500]="msg.subject === 'Solicitud de Turno: Reparación'">
         <div class="card-body p-6">
             <div class="flex justify-between items-start gap-4">
                 <div class="flex-1">
@@ -24,37 +24,48 @@
                         @if (!msg.is_read) {
                         <span class="badge badge-primary badge-sm">Nuevo</span>
                         }
-                        <span class="text-sm text-gray-500">{{ msg.created_at | date:'medium' }}</span>
+                        @if (msg.subject === 'Solicitud de Turno: Reparación') {
+                        <span class="badge badge-info badge-sm bg-indigo-100 text-indigo-700 border-indigo-200"><i class="fas fa-calendar-check mr-1"></i> Turno Solicitado</span>
+                        }
+                        <span class="text-sm text-gray-500 ml-auto">{{ msg.created_at | date:'medium' }}</span>
                     </div>
 
                     <div class="text-sm text-gray-600 mb-2">
                         <div class="flex items-center gap-4">
+                            @if (msg.email && msg.email !== 'no-reply@arecofix.com.ar') {
                             <span><i class="fas fa-envelope mr-1"></i> {{ msg.email }}</span>
+                            }
                             @if (msg.phone) {
                             <span><i class="fas fa-phone mr-1"></i> {{ msg.phone }}</span>
                             }
                         </div>
                     </div>
 
-                    @if (msg.subject) {
+                    @if (msg.subject && msg.subject !== 'Solicitud de Turno: Reparación') {
                     <div class="font-medium mb-2">Asunto: {{ msg.subject }}</div>
                     }
 
-                    <p class="text-gray-700 whitespace-pre-wrap">{{ msg.message }}</p>
+                    <p class="text-gray-700 whitespace-pre-wrap bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl font-medium mt-2">{{ msg.message }}</p>
                 </div>
 
                 <div class="flex flex-col gap-2">
                     @if (!msg.is_read) {
-                    <button class="btn btn-sm btn-ghost" (click)="markAsRead(msg.id)" title="Marcar como leído">
+                    <button class="btn btn-sm btn-ghost tooltip" data-tip="Marcar como leído" (click)="markAsRead(msg.id)">
                         <i class="fas fa-check text-success"></i>
                     </button>
                     }
-                    <button class="btn btn-sm btn-ghost text-error" (click)="deleteMessage(msg.id)" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <a [href]="'mailto:' + msg.email" class="btn btn-sm btn-ghost text-info" title="Responder">
+                    @if (msg.phone && msg.subject === 'Solicitud de Turno: Reparación') {
+                    <a [href]="'https://wa.me/' + msg.phone.replace('+', '')" target="_blank" class="btn btn-sm btn-ghost text-green-600 tooltip" data-tip="WhatsApp">
+                        <i class="fab fa-whatsapp text-lg"></i>
+                    </a>
+                    } @else if (msg.email && msg.email !== 'no-reply@arecofix.com.ar') {
+                    <a [href]="'mailto:' + msg.email" class="btn btn-sm btn-ghost text-info tooltip" data-tip="Responder por Email">
                         <i class="fas fa-reply"></i>
                     </a>
+                    }
+                    <button class="btn btn-sm btn-ghost text-error tooltip" data-tip="Eliminar" (click)="deleteMessage(msg.id)">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         </div>

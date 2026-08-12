@@ -194,6 +194,8 @@ export class AdminLayout implements OnInit, OnDestroy {
     await this.notificationService.markAsRead(notif.id);
     if (notif.payload?.route) {
       this.router.navigate([notif.payload.route]);
+    } else if (notif.type === 'message' || notif.type === 'chat' || notif.title?.toLowerCase().includes('mensaje') || notif.title?.toLowerCase().includes('message')) {
+      this.router.navigate(['/admin/messages']);
     }
   }
 

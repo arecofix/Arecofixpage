@@ -283,6 +283,15 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     this.repairForm.patchValue({ final_cost: newFinalCost }, { emitEvent: false });
                 }
             });
+
+        // If the status is changed to CANCELLED (7), automatically remove warranty
+        this.repairForm.get('current_status_id')?.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(statusId => {
+                if (statusId === RepairStatus.CANCELLED || statusId === 7) {
+                    this.repairForm.patchValue({ warranty: '' }, { emitEvent: false });
+                }
+            });
     }
 
     onSelectClient(clientName: string) {
@@ -653,9 +662,14 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     });
                     if (client && client.id) {
                         finalClientId = client.id;
+                    } else {
+                        throw new Error('No se obtuvo el ID del cliente.');
                     }
-                } catch (err) {
+                } catch (err: any) {
                     console.error('[AdminRepairForm] Error creating guest profile:', err);
+                    this.notificationService.showError('Error al crear o buscar el cliente: ' + (err.message || 'Verifique los datos.'));
+                    this.saving.set(false);
+                    return;
                 }
             } else if (finalClientId && customer_dni) {
                 // Actualizar DNI si se editó un cliente existente
