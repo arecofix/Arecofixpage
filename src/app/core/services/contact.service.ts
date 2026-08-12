@@ -85,7 +85,6 @@ export class ContactService {
             .from('contact_messages')
             .select('*')
             .eq('tenant_id', this.tenantService.getTenantId())
-            .neq('subject', 'Solicitud de Turno: Reparación') // filter out reservations
             .order('created_at', { ascending: false });
         
         if (error) {

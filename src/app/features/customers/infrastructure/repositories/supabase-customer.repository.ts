@@ -33,7 +33,19 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
     if (!(isGlobalAdmin && isCentralBranch)) {
       const branchId = contextBranchId || profile?.branch_id;
       if (branchId) {
-        return query.eq('branch_id', branchId);
+        // Group of branches that share clients
+        const sharedBranches = [
+          'de967f68-7b15-44c0-bc98-952ccf06e1e5', // Arecofix
+          // TODO: Add the second branch ID here when the user provides it
+        ];
+
+        if (sharedBranches.includes(branchId)) {
+          // If current branch is in the shared group, allow seeing clients from any branch in the group
+          return query.in('branch_id', sharedBranches);
+        } else {
+          // Otherwise, strictly filter to the current branch
+          return query.eq('branch_id', branchId);
+        }
       }
     }
     return query;
@@ -61,8 +73,8 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
     if (!email && !phone) return from(Promise.resolve(null));
     
     let query = this.applyTenantFilter(this.supabase.from(this.tableName).select('*'));
-    query = this.applyBranchFilter(query);
-    query = query.or('role.eq.user,is_guest.eq.true');
+    // Do not apply branch filter or role filter here because we need to find 
+    // if the email/phone exists anywhere in the tenant to prevent unique constraint errors.
     
     if (email && phone) {
       query = query.or(`email.eq.${email},phone.eq.${phone}`);
@@ -72,7 +84,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       query = query.eq('phone', phone);
     }
 
-    return from(query.maybeSingle() as unknown as PromiseLike<{ data: UserProfile | null, error: unknown }>).pipe(
+    return from(query.limit(1).maybeSingle() as unknown as PromiseLike<{ data: UserProfile | null, error: unknown }>).pipe(
       map(({ data }) => data)
     );
   }
@@ -106,7 +118,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .or('role.eq.user,is_guest.eq.true');
 
     dbQuery = this.applyTenantFilter(dbQuery);
-    dbQuery = this.applyBranchFilter(dbQuery);
+    // Removed applyBranchFilter so clients are visible tenant-wide
     dbQuery = dbQuery
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -126,7 +138,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .or('role.eq.user,is_guest.eq.true');
 
     dbQuery = this.applyTenantFilter(dbQuery);
-    dbQuery = this.applyBranchFilter(dbQuery);
+    // Removed applyBranchFilter so clients are visible tenant-wide
 
     return from(dbQuery as any).pipe(
       map(({ data, error }: any) => {
@@ -157,7 +169,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .select('*', { count: 'exact' });
 
     dbQuery = this.applyTenantFilter(dbQuery);
-    dbQuery = this.applyBranchFilter(dbQuery);
+    // Removed applyBranchFilter so clients are visible tenant-wide
 
     if (searchTerm && searchTerm.trim()) {
       const q = searchTerm.trim();
@@ -184,7 +196,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
       .or('role.eq.user,is_guest.eq.true');
 
     dbQuery = this.applyTenantFilter(dbQuery);
-    dbQuery = this.applyBranchFilter(dbQuery);
+    // Removed applyBranchFilter so clients are visible tenant-wide
 
     return from(dbQuery as any).pipe(
       map(({ data, error }: any) => {

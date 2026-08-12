@@ -194,53 +194,71 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
 
   private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[]}> {
     try {
-      // First, get all orders that are completed or paid
+      const productStats = new Map<string, number>();
+      const categoryStats = new Map<string, number>();
+
+      // 1. Fetch Order Items (POS / Store) - Only paid/completed orders
       let ordersQuery = this.supabase
         .from('orders')
         .select('id')
         .eq('tenant_id', tenantId)
-        .in('status', ['pending', 'pending_payment', 'awaiting_verification', 'paid', 'preparing', 'shipped', 'completed', 'delivered']);
+        .in('status', ['paid', 'completed', 'delivered']);
         
-      if (branchId) {
-        ordersQuery = ordersQuery.eq('branch_id', branchId);
-      }
+      if (branchId) ordersQuery = ordersQuery.eq('branch_id', branchId);
       
-      const { data: orders, error: ordersError } = await ordersQuery;
+      const { data: orders } = await ordersQuery;
       
-      if (ordersError || !orders || orders.length === 0) {
-        return { products_chart: [], category_chart: [] };
-      }
-      
-      const orderIds = orders.map(o => o.id);
-      
-      // Get all order items for these orders with product and category details
-      const { data: orderItems, error: itemsError } = await this.supabase
-        .from('order_items')
-        .select('quantity, product_id, product_name, products(category_id, categories(name))')
-        .eq('tenant_id', tenantId)
-        .in('order_id', orderIds);
-        
-      if (itemsError || !orderItems || orderItems.length === 0) {
-        return { products_chart: [], category_chart: [] };
-      }
-      
-      const productStats = new Map<string, number>();
-      const categoryStats = new Map<string, number>();
-      
-      orderItems.forEach((item: any) => {
-        const qty = item.quantity || 1;
-        const pName = item.product_name || 'Desconocido';
-        
-        productStats.set(pName, (productStats.get(pName) || 0) + qty);
-        
-        // Handle category
-        let cName = 'Otros';
-        if (item.products && item.products.categories && item.products.categories.name) {
-            cName = item.products.categories.name;
+      if (orders && orders.length > 0) {
+        const orderIds = orders.map(o => o.id);
+        const { data: orderItems } = await this.supabase
+          .from('order_items')
+          .select('quantity, product_name, products(category_id, categories(name))')
+          .eq('tenant_id', tenantId)
+          .in('order_id', orderIds);
+          
+        if (orderItems) {
+          orderItems.forEach((item: any) => {
+            const qty = item.quantity || 1;
+            const pName = item.product_name || 'Desconocido';
+            productStats.set(pName, (productStats.get(pName) || 0) + qty);
+            
+            let cName = 'Otros';
+            if (item.products?.categories?.name) cName = item.products.categories.name;
+            categoryStats.set(cName, (categoryStats.get(cName) || 0) + qty);
+          });
         }
+      }
+
+      // 2. Fetch Repair Parts Used (Workshop) - Only completed/delivered repairs (5 = Listo, 6 = Entregado)
+      let repairsQuery = this.supabase
+        .from('repairs')
+        .select('id')
+        .eq('tenant_id', tenantId)
+        .in('current_status_id', [5, 6]);
         
-        categoryStats.set(cName, (categoryStats.get(cName) || 0) + qty);
-      });
+      if (branchId) repairsQuery = repairsQuery.eq('branch_id', branchId);
+      
+      const { data: repairs } = await repairsQuery;
+      
+      if (repairs && repairs.length > 0) {
+        const repairIds = repairs.map(r => r.id);
+        const { data: repairParts } = await this.supabase
+          .from('repair_parts_used')
+          .select('quantity, product_id, products(name, category_id, categories(name))')
+          .in('repair_id', repairIds);
+          
+        if (repairParts) {
+          repairParts.forEach((part: any) => {
+            const qty = part.quantity || 1;
+            const pName = part.products?.name || 'Repuesto Genérico';
+            productStats.set(pName, (productStats.get(pName) || 0) + qty);
+            
+            let cName = 'Repuestos'; // Default category for workshop parts if none
+            if (part.products?.categories?.name) cName = part.products.categories.name;
+            categoryStats.set(cName, (categoryStats.get(cName) || 0) + qty);
+          });
+        }
+      }
       
       // Sort and take top 5 products
       const products_chart = Array.from(productStats.entries())
