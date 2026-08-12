@@ -32,11 +32,30 @@ describe('Admin Statistics computational and rendering audit', () => {
         current_month_gross: 250000,
         current_month_cost: 60000,
         monthly_breakdown: [
-          { period: '2025-01', gross_revenue: 200000, cost: 50000, repairs_revenue: 150000, sales_revenue: 50000, repairs_cost: 20000, sales_cost: 30000 },
-          { period: '2025-02', gross_revenue: 250000, cost: 60000, repairs_revenue: 180000, sales_revenue: 70000, repairs_cost: 25000, sales_cost: 35000 }
+          { period: '2025-01', gross_revenue: 0, cost: 0, repairs_revenue: 0, sales_revenue: 570000, repairs_cost: 0, sales_cost: 0 },
+          { period: '2025-02', gross_revenue: 0, cost: 0, repairs_revenue: 0, sales_revenue: 600000, repairs_cost: 0, sales_cost: 0 }
         ]
       }
     }).as('getFinanceStats');
+
+    // Add mocks for the new local calculations
+    cy.intercept('GET', '**/rest/v1/repairs*', {
+      statusCode: 200,
+      body: [
+        {
+          id: 'r1', current_status_id: 6, final_cost: 150000, created_at: '2025-01-10T00:00:00Z', completed_at: '2025-01-10T00:00:00Z', 
+          repair_parts_used: [{ quantity: 1, cost_at_time: 20000 }]
+        },
+        {
+          id: 'r2', current_status_id: 6, final_cost: 180000, created_at: '2025-02-10T00:00:00Z', completed_at: '2025-02-10T00:00:00Z', 
+          repair_parts_used: [{ quantity: 1, cost_at_time: 25000 }]
+        }
+      ]
+    }).as('getRepairs');
+
+    cy.intercept('GET', '**/rest/v1/cash_movements*', { statusCode: 200, body: [] }).as('getExpenses');
+    cy.intercept('GET', '**/rest/v1/orders*', { statusCode: 200, body: [] }).as('getOrders');
+    cy.intercept('GET', '**/rest/v1/order_items*', { statusCode: 200, body: [] }).as('getOrderItems');
 
     // 2. Visit Dashboard
     cy.visit('/admin/dashboard');
@@ -44,6 +63,7 @@ describe('Admin Statistics computational and rendering audit', () => {
     // 3. Wait for data to load
     cy.wait('@getLegacyStats');
     cy.wait('@getFinanceStats');
+    cy.wait('@getRepairs');
 
     // 4. Assert KPI Cards render exact numbers from mock (Formatted)
     // - Ingresos Tienda (revenue = 1.500.000)
