@@ -35,15 +35,21 @@ export class CustomerService {
     const tenantId = this.tenantService.getCurrentTenant()?.id ?? data.tenant_id;
     const supabase = this.authService.getSupabaseClient();
 
+    // Generar un email falso único si no se provee uno, para evitar el error de constraint único
+    // si el RPC internamente convierte null a ''.
+    const finalEmail = (data.email && data.email.trim() !== '') 
+        ? data.email.trim() 
+        : `guest_${crypto.randomUUID().substring(0, 8)}@noemail.com`;
+
     const { data: rpcResult, error } = await supabase.rpc('create_guest_profile', {
-      p_first_name: data.first_name   ?? '',
-      p_last_name:  data.last_name    ?? '',
-      p_email:      data.email        ?? '',
-      p_phone:      data.phone        ?? '',
-      p_address:    data.address      ?? '',
-      p_dni:        data.dni          ?? '',
-      p_tenant_id:  tenantId          ?? null,
-      p_branch_id:  data.branch_id    ?? null,
+      p_first_name: data.first_name   || '',
+      p_last_name:  data.last_name    || '',
+      p_email:      finalEmail,
+      p_phone:      data.phone        || null,
+      p_address:    data.address      || '',
+      p_dni:        data.dni          || null,
+      p_tenant_id:  tenantId          || null,
+      p_branch_id:  data.branch_id    || null,
     });
 
     if (error) {

@@ -331,9 +331,13 @@
                     <p class="text-center text-gray-600 mb-12">Desde microsoldadura hasta cambios de módulo. Así trabajamos.</p>
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <!-- Video -->
+                        <!-- Video (Moved out of public folder due to Cloudflare 25MB limit) -->
                         <div class="col-span-2 row-span-2 rounded-xl overflow-hidden shadow-md group relative bg-black">
-                            <video src="assets/img/repair/4.mp4" controls playsinline preload="metadata" class="w-full h-full object-cover" poster="assets/img/repair/1.jpg"></video>
+                            <!-- <video src="assets/img/repair/4.mp4" controls playsinline preload="metadata" class="w-full h-full object-cover" poster="assets/img/repair/1.jpg"></video> -->
+                            <img src="assets/img/repair/1.jpg" class="w-full h-full object-cover opacity-80" alt="Video placeholder">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-6xl opacity-50"></i>
+                            </div>
                         </div>
                         
                         <div class="aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:scale-105 cursor-pointer group relative">

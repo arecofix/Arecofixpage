@@ -84,7 +84,8 @@ export class MenuBuilderService {
         module: 'repairs',
         expanded: false,
         children: [
-          { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' }
+          { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' },
+          { title: lang === 'es' ? 'Reservas de Turno' : 'Reservations', path: `${basePrefix}/reservations`, icon: 'fa-calendar-check' }
         ]
       },
       {
