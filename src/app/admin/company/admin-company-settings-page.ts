@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, ChangeDetectorRef, computed } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CompanyService } from '@app/core/services/company.service';
 import { BranchService } from '@app/core/services/branch.service';
 import { TenantService } from '@app/core/services/tenant.service';
@@ -12,7 +12,7 @@ import { TranslationService } from '@app/core/services/translation.service';
 @Component({
     selector: 'app-admin-company-settings-page',
     standalone: true,
-    imports: [FormsModule, RouterLink],
+    imports: [FormsModule],
     templateUrl: './admin-company-settings-page.html',
 })
 export class AdminCompanySettingsPage implements OnInit {
