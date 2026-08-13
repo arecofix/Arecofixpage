@@ -672,15 +672,27 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                     this.saving.set(false);
                     return;
                 }
-            } else if (finalClientId && customer_dni) {
-                // Actualizar DNI si se editó un cliente existente
+            } else if (finalClientId) {
+                // Actualizar datos si se editó un cliente existente
+                const updateData: any = {};
+                if (customer_dni) updateData.dni = customer_dni;
+                if (customer_phone) updateData.phone = customer_phone;
+                if (customer_email) updateData.email = customer_email;
+                if (customer_name) {
+                    const nameParts = customer_name.trim().split(' ');
+                    updateData.first_name = nameParts[0] || '';
+                    updateData.last_name = nameParts.slice(1).join(' ') || '';
+                }
+
                 try {
-                    await this.supabaseService.getClient()
-                        .from('profiles')
-                        .update({ dni: customer_dni })
-                        .eq('id', finalClientId);
+                    if (Object.keys(updateData).length > 0) {
+                        await this.supabaseService.getClient()
+                            .from('profiles')
+                            .update(updateData)
+                            .eq('id', finalClientId);
+                    }
                 } catch (err) {
-                    console.error('[AdminRepairForm] Error updating customer DNI:', err);
+                    console.error('[AdminRepairForm] Error updating customer data:', err);
                 }
             }
 
@@ -752,7 +764,18 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 device_id: finalDeviceId,
                 images: this.images(),
                 parts: this.parts(),
-                branch_id: branchIdActual
+                branch_id: branchIdActual,
+                customer_phone,
+                customer_name,
+                customer_email,
+                customer_dni,
+                device_model,
+                device_type,
+                brand_id,
+                imei,
+                device_passcode,
+                payment_method,
+                surcharge_percentage
             };
             
             console.log('📤 [AdminRepairForm] Enviando a servicio...', this.id ? 'UPDATE' : 'CREATE');
@@ -843,7 +866,12 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         }
 
         const customerName = data.customer_name || 'Cliente';
-        const device = data.device_model || 'Equipo';
+        let brandName = '';
+        if (data.brand_id) {
+            const brand = this.brands().find(b => b.id === data.brand_id);
+            if (brand) brandName = brand.name + ' ';
+        }
+        const device = (brandName + (data.device_model || 'Equipo')).trim();
         const url = this.getTrackingUrl();
         const cost = data.final_cost || data.estimated_cost || 0;
         const statusId = Number(data.current_status_id);
@@ -853,25 +881,25 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
         switch (statusId) {
             case RepairStatus.PENDING_DIAGNOSIS:
-                message = `📦 *Arecofix - Equipo Recibido*\n\nHola ${customerName}, recibimos tu ${device}. Podés seguir el estado de tu reparación en tiempo real aquí:\n\n🔗 ${url}\n\n¡Gracias por elegirnos!`;
+                message = `\uD83D\uDCE6 *Arecofix - Equipo Recibido*\n\nHola ${customerName}, recibimos tu ${device}. Podés seguir el estado de tu reparación en tiempo real aquí:\n\n\uD83D\uDD17 ${url}\n\n¡Gracias por elegirnos!`;
                 break;
             case RepairStatus.SUPPLY_MANAGEMENT:
-                message = `⏳ *Arecofix - Presupuesto / Repuestos*\n\nHola ${customerName}, tenemos novedades sobre el presupuesto o repuestos para tu ${device}. Podés ver los detalles aquí:\n\n🔗 ${url}\n\nPor favor comunícate con nosotros para coordinar. ¡Gracias!`;
+                message = `\u23F3 *Arecofix - Presupuesto / Repuestos*\n\nHola ${customerName}, tenemos novedades sobre el presupuesto o repuestos para tu ${device}. Podés ver los detalles aquí:\n\n\uD83D\uDD17 ${url}\n\nPor favor comunícate con nosotros para coordinar. ¡Gracias!`;
                 break;
             case RepairStatus.IN_PROGRESS:
-                message = `⚙️ *Arecofix - En Reparación*\n\nHola ${customerName}, te informamos que tu ${device} ya se encuentra en servicio técnico. Podés seguir el progreso en tiempo real aquí:\n\n🔗 ${url}`;
+                message = `\u2699\uFE0F *Arecofix - En Reparación*\n\nHola ${customerName}, te informamos que tu ${device} ya se encuentra en servicio técnico. Podés seguir el progreso en tiempo real aquí:\n\n\uD83D\uDD17 ${url}`;
                 break;
             case RepairStatus.QUALITY_CONTROL:
-                message = `🔍 *Arecofix - Control de Calidad*\n\nHola ${customerName}, tu ${device} está siendo evaluado en el control de calidad final. Seguí el estado aquí:\n\n🔗 ${url}`;
+                message = `\uD83D\uDD0D *Arecofix - Control de Calidad*\n\nHola ${customerName}, tu ${device} está siendo evaluado en el control de calidad final. Seguí el estado aquí:\n\n\uD83D\uDD17 ${url}`;
                 break;
             case RepairStatus.READY_FOR_PICKUP:
-                message = `✅ *Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\n📍 Te esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n🔗 ${url}\n\n¿Qué te pareció nuestro servicio? Déjanos tu reseña: ${reviewUrl}`;
+                message = `\u2705 *Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\n\uD83D\uDCCD Te esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n\uD83D\uDD17 ${url}\n\n¿Qué te pareció nuestro servicio? Déjanos tu reseña: ${reviewUrl}`;
                 break;
             case RepairStatus.DELIVERED:
-                message = `🌟 *Arecofix - ¡Equipo Entregado!*\n\nHola ${customerName}, fue un gusto ayudarte con la reparación de tu ${device}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n⭐⭐⭐⭐⭐\n🔗 ${reviewUrl}\n\n¡Muchas gracias!`;
+                message = `\uD83C\uDF1F *Arecofix - ¡Equipo Entregado!*\n\nHola ${customerName}, fue un gusto ayudarte con la reparación de tu ${device}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n\u2B50\u2B50\u2B50\u2B50\u2B50\n\uD83D\uDD17 ${reviewUrl}\n\n¡Muchas gracias!`;
                 break;
             case RepairStatus.CANCELLED:
-                message = `❌ *Arecofix - Reparación Cancelada*\n\nHola ${customerName}, te informamos que la orden para tu ${device} fue cancelada. Podés ver los detalles aquí:\n\n🔗 ${url}`;
+                message = `\u274C *Arecofix - Reparación Cancelada*\n\nHola ${customerName}, te informamos que la orden para tu ${device} fue cancelada. Podés ver los detalles aquí:\n\n\uD83D\uDD17 ${url}`;
                 break;
             default:
                 message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
