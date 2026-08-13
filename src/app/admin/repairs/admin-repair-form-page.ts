@@ -140,6 +140,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     // This will be triggered whenever searchQuery changes from UI
     onSearchChange(query: string) {
+        this.searchQuery.set(query);
         this.productSearch$.next(query);
     }
 

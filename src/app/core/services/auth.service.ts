@@ -10,6 +10,8 @@ import {
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
 import { TenantService } from './tenant.service';
@@ -52,9 +54,11 @@ export class AuthService {
 
   public authState$ = this.authState.asObservable();
 
+  private currentProfileSignal = toSignal(this.authState$.pipe(map(state => state.profile)), { initialValue: null });
+
   // Método para obtener el perfil actual
   getCurrentProfile(): UserProfile | null {
-    return this.authState.value.profile;
+    return this.currentProfileSignal();
   }
 
   constructor() {
