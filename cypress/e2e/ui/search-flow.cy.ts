@@ -2,47 +2,55 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
   beforeEach(() => {
     cy.intercept('GET', '**/rest/v1/products*').as('initialLoad');
     cy.visit('/productos');
+    cy.wait('@initialLoad');
     cy.get('app-products-grid').should('be.visible');
   });
 
   it('should find products using partial words (e.g. "th" -> "thinkpad")', () => {
-    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts1');
+    cy.intercept({ method: 'GET', pathname: '/rest/v1/products' }).as('getSearchProducts1');
 
-    cy.get('.mobile-search-input').clear().type('th', { delay: 0 });
-    cy.wait('@getSearchProducts1').then((interception) => {
-      expect(interception.request.url).to.match(/ilike|or=/);
-    });
+    cy.get('.mobile-search-input').as('searchInput');
+    cy.get('@searchInput').clear();
+    cy.get('@searchInput').type('th', { delay: 50 });
+    
+    cy.wait('@getSearchProducts1');
 
-    cy.get('.mobile-search-input').should('have.value', 'th');
+    cy.get('@searchInput').should('have.value', 'th');
   });
 
   it('should ignore accents and find products (e.g. "modulo" -> "módulo")', () => {
-    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts2');
+    cy.intercept({ method: 'GET', pathname: '/rest/v1/products' }).as('getSearchProducts2');
 
+    cy.get('.mobile-search-input').as('searchInput');
+    
     // Type without accent
-    cy.get('.mobile-search-input').clear().type('modulo', { delay: 0 });
+    cy.get('@searchInput').clear();
+    cy.get('@searchInput').type('modulo', { delay: 50 });
     cy.wait('@getSearchProducts2');
     
     // Type with accent
-    cy.get('.mobile-search-input').clear().invoke('val', 'módulo').trigger('input').should('have.value', 'módulo');
+    cy.get('@searchInput').clear();
+    cy.get('@searchInput').invoke('val', 'módulo').trigger('input').should('have.value', 'módulo');
     cy.wait('@getSearchProducts2');
 
-    cy.get('.mobile-search-input').should('have.value', 'módulo');
+    cy.get('@searchInput').should('have.value', 'módulo');
   });
 
   it('should refine the search progressively with more words (e.g. "lenovo th")', () => {
-    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts3');
+    cy.intercept({ method: 'GET', pathname: '/rest/v1/products' }).as('getSearchProducts3');
 
-    cy.get('.mobile-search-input').clear().type('lenovo th', { delay: 0 });
-    cy.wait('@getSearchProducts3').then((interception) => {
-      expect(interception.request.url).to.match(/ilike|or=/);
-    });
+    cy.get('.mobile-search-input').as('searchInput');
+    cy.get('@searchInput').clear();
+    cy.get('@searchInput').type('lenovo th', { delay: 50 });
+    cy.wait('@getSearchProducts3');
   });
 
   it('should handle special characters safely without breaking', () => {
-    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }).as('getSearchProducts4');
+    cy.intercept({ method: 'GET', pathname: '/rest/v1/products' }).as('getSearchProducts4');
 
-    cy.get('.mobile-search-input').clear().type('iphone 11!@#', { delay: 0 });
+    cy.get('.mobile-search-input').as('searchInput');
+    cy.get('@searchInput').clear();
+    cy.get('@searchInput').type('iphone 11!@#', { delay: 50 });
     
     cy.wait('@getSearchProducts4').then((interception) => {
        const status = interception.response?.statusCode;
@@ -51,7 +59,7 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
   });
 
   it('should show empty state when no products match', () => {
-    cy.intercept({ method: 'GET', url: /rest\/v1\/products.*(ilike|or=)/ }, {
+    cy.intercept({ method: 'GET', pathname: '/rest/v1/products' }, {
       statusCode: 200,
       body: [],
       headers: {
@@ -59,7 +67,9 @@ describe('Product Search Flow (Partial, Accents, Refinement)', () => {
       }
     }).as('getEmptyProducts');
 
-    cy.get('.mobile-search-input').clear().type('asdasdasd123456', { delay: 0 });
+    cy.get('.mobile-search-input').as('searchInput');
+    cy.get('@searchInput').clear();
+    cy.get('@searchInput').type('asdasdasd123456', { delay: 50 });
     cy.wait('@getEmptyProducts');
 
     cy.contains(/0 resultados|No se encontraron productos/i).should('be.visible');

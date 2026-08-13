@@ -71,7 +71,7 @@ describe('Full Reservation to Admin Flow', () => {
       body: [mockReservation]
     }).as('getContactMessages');
 
-    cy.visit('/admin/reservations');
+    cy.visit('/admin/messages');
     
     cy.wait('@getContactMessages');
     

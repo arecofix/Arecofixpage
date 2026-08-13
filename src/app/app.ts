@@ -12,6 +12,7 @@ import { ScannerService } from './core/services/scanner.service';
 import { ShortcutService } from './core/services/shortcut.service';
 import { SupabaseService } from './core/services/supabase.service';
 import { SwUpdate } from '@angular/service-worker';
+import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
 
 @Component({
 
@@ -20,7 +21,8 @@ import { SwUpdate } from '@angular/service-worker';
   imports: [
     RouterOutlet,
     ToastComponent,
-    RibbonMenuComponent
+    RibbonMenuComponent,
+    ChatbotComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './app.html'
@@ -43,6 +45,10 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.seoService.initialize();
+    if (typeof document !== 'undefined') {
+      const loader = document.querySelector('.initial-loader');
+      if (loader) loader.remove();
+    }
 
     if (isPlatformBrowser(this.platformId)) {
       // Auto-recarga cuando hay una nueva versión (evita errores MIME y ChunkLoad)

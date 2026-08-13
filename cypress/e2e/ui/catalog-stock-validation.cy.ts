@@ -41,12 +41,38 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
       body: [productLimited]
     }).as('getProductsLimited');
 
-    cy.intercept('GET', '**/rest/v1/orders*', { body: [] }).as('getActiveCart');
-    cy.intercept('POST', '**/rest/v1/orders*', { statusCode: 201, body: [{ id: '35b91b9f-0c8a-49f2-84b2-26fbaf3be20e' }] });
-    cy.intercept('PATCH', '**/rest/v1/orders*', (req) => req.reply({ statusCode: 200, body: req.body }));
-    cy.intercept('POST', '**/rest/v1/order_items*', { statusCode: 201, body: [{}] });
+    let mockOrder: any = null;
+    
+    cy.intercept('GET', '**/rest/v1/orders*', (req) => {
+      const isSingle = req.headers['accept']?.includes('application/vnd.pgrst.object+json');
+      if (mockOrder) {
+        req.reply({ body: isSingle ? mockOrder : [mockOrder] });
+      } else {
+        req.reply({ body: isSingle ? null : [] }); // O 406 si es single, pero null funciona a veces o [] 
+      }
+    }).as('getActiveCart');
+
+    cy.intercept('POST', '**/rest/v1/orders*', (req) => {
+      const isSingle = req.headers['accept']?.includes('application/vnd.pgrst.object+json');
+      mockOrder = { id: '35b91b9f-0c8a-49f2-84b2-26fbaf3be20e', ...req.body };
+      req.reply({ statusCode: 201, body: isSingle ? mockOrder : [mockOrder] });
+    });
+
+    cy.intercept('PATCH', '**/rest/v1/orders*', (req) => {
+      const isSingle = req.headers['accept']?.includes('application/vnd.pgrst.object+json');
+      mockOrder = { ...mockOrder, ...req.body };
+      req.reply({ statusCode: 200, body: isSingle ? mockOrder : [mockOrder] });
+    });
+    cy.intercept('POST', '**/rest/v1/order_items*', (req) => {
+      const newItems = Array.isArray(req.body) ? req.body : [req.body];
+      mockOrder.items = newItems; // upsert resets them
+      req.reply({ statusCode: 201, body: req.body });
+    });
     cy.intercept('PATCH', '**/rest/v1/order_items*', { statusCode: 200, body: [{}] });
-    cy.intercept('DELETE', '**/rest/v1/order_items*', { statusCode: 200, body: [{}] });
+    cy.intercept('DELETE', '**/rest/v1/order_items*', (req) => {
+      if (mockOrder) mockOrder.items = [];
+      req.reply({ statusCode: 200, body: [{}] });
+    });
 
     cy.visit('/productos');
     cy.wait('@getProductsLimited', { timeout: 10000 });
@@ -56,12 +82,16 @@ describe('Carga, Configuración y Verificación de Stock (E2E)', () => {
 
     // Click 3 times. Stock is 2. 3rd click should trigger stock guard.
     cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
-    cy.wait(500); // Wait for state to update
-    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
-    cy.wait(500); // Wait for state to update
-    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
+    cy.get('app-toast').contains(/Agregaste un producto/i).should('be.visible');
+    cy.wait(1000); // Ensure toast is fading / state is settled
 
-    cy.get('app-toast').contains(/stock|máximo/i, { timeout: 8000 }).should('be.visible');
+    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
+    cy.get('app-toast').contains(/Agregaste un producto/i).should('be.visible');
+    cy.wait(1000);
+
+    cy.get('product-card button').contains(/Añadir al Carrito/i).click({ force: true });
+    
+    cy.get('app-toast').contains(/límite máximo|stock/i, { timeout: 8000 }).should('be.visible');
   });
 
 

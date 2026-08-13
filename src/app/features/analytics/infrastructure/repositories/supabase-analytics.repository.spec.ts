@@ -71,17 +71,32 @@ describe('SupabaseAnalyticsRepository (Financial Engine)', () => {
       return Promise.resolve({ data: null, error: null });
     });
 
-    const mockQueryBuilder = {
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null })),
-          in: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null }))
-        }),
-        in: jest.fn().mockReturnValue(Promise.resolve({ data: [], error: null }))
-      })
-    };
-    
-    mockSupabase.from = jest.fn().mockReturnValue(mockQueryBuilder);
+    mockSupabase.from = jest.fn().mockImplementation((table: string) => {
+      const mockEq = jest.fn().mockImplementation(() => {
+        const chainable: any = {
+          eq: mockEq,
+          in: mockEq,
+          then: (resolve: any) => {
+            if (table === 'repairs') {
+              resolve({
+                data: [{
+                  created_at: '2026-04-10T12:00:00Z',
+                  current_status_id: 6,
+                  final_cost: 34900, // Revenue
+                  completed_at: '2026-04-10T12:00:00Z',
+                  repair_parts_used: [{ quantity: 1, cost_at_time: 15000, unit_price_at_time: 15000 }] // Cost
+                }],
+                error: null
+              });
+            } else {
+              resolve({ data: [], error: null });
+            }
+          }
+        };
+        return chainable;
+      });
+      return { select: jest.fn().mockReturnValue({ eq: mockEq, in: mockEq }) };
+    });
 
     // Act
     const stats = await firstValueFrom(repository.getDashboardStats());

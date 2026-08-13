@@ -1,3 +1,8 @@
 <app-ribbon-menu></app-ribbon-menu>
 <router-outlet />
 <app-toast></app-toast>
+@defer (on idle) {
+  <app-chatbot></app-chatbot>
+} @placeholder {
+  <div></div>
+}
