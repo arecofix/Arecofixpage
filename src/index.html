@@ -178,15 +178,20 @@
         fbq('track', 'PageView');
       }; 
       
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(initAnalytics, { timeout: 3500 });
+      if (document.readyState === 'complete') {
+        initAnalytics();
       } else {
-        setTimeout(initAnalytics, 3500);
+        window.addEventListener('load', () => {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(initAnalytics, { timeout: 2000 });
+          } else {
+            setTimeout(initAnalytics, 2000);
+          }
+        });
       }
     </script>
     <!-- End Deferred Meta Pixel & GTAG Code -->
-    <!-- Chatbot React Custom Element Bundle (data-cfasync=false prevents Rocket Loader interference with ES modules) -->
-    <script type="module" src="/assets/js/react-mfe.js" defer data-cfasync="false" fetchpriority="low"></script>
+
   </head>
 
   <body>

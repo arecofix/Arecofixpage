@@ -664,4 +664,10 @@ body.hide-floating-widgets app-ai-chatbot { display: none !important; }
 i[class*='fa-'] { position: relative; z-index: 2; --fa-display: swap; }
 .btn, .w-12.h-12.flex { position: relative; z-index: 1; }
 
+/* Stencil Logo Text Styles */
+.stencil-logo {
+  font-family: 'Syncopate', 'Orbitron', 'Chakra Petch', system-ui, sans-serif;
+}
+
+
 

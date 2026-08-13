@@ -52,6 +52,14 @@ describe('Admin Core Operations Flow (Products & Orders)', () => {
         ]
       }).as('getBrands');
 
+      // Interceptamos sucursales
+      cy.intercept('GET', '**/rest/v1/branches*', {
+        statusCode: 200,
+        body: [
+          { id: 'branch-1', name: 'Central' }
+        ]
+      }).as('getBranches');
+
       cy.visit('/admin/products');
     });
 
@@ -74,12 +82,23 @@ describe('Admin Core Operations Flow (Products & Orders)', () => {
       }).as('createProduct');
 
       cy.visit('/admin/products/new');
-      cy.wait('@getCategories');
+      cy.wait(['@getCategories', '@getBrands', '@getBranches']);
 
       // Completamos el formulario básico con validación de valor para evitar race conditions de hidratación
-      cy.get('input[name="name"]').should('be.visible').clear().type('Nuevo Producto Test', { delay: 0 }).should('have.value', 'Nuevo Producto Test');
-      cy.get('input[name="price"]').should('be.visible').clear().type('5000', { delay: 0 }).should('have.value', '5000');
-      cy.get('input[name="stock"]').should('be.visible').clear().type('5', { delay: 0 }).should('have.value', '5');
+      cy.get('input[name="name"]').as('nameInput');
+      cy.get('@nameInput').should('be.visible').clear();
+      cy.get('@nameInput').invoke('val', 'Nuevo Producto Test').trigger('input').trigger('change').trigger('blur');
+      cy.get('@nameInput').should('have.value', 'Nuevo Producto Test');
+
+      cy.get('input[name="price"]').as('priceInput');
+      cy.get('@priceInput').should('be.visible').clear();
+      cy.get('@priceInput').invoke('val', '5000').trigger('input').trigger('change').trigger('blur');
+      cy.get('@priceInput').should('have.value', '5000');
+
+      cy.get('input[name="stock"]').as('stockInput');
+      cy.get('@stockInput').should('be.visible').clear();
+      cy.get('@stockInput').invoke('val', '5').trigger('input').trigger('change').trigger('blur');
+      cy.get('@stockInput').should('have.value', '5');
       
       // Suponemos que hay un botón Guardar
       cy.contains('Guardar').click();
