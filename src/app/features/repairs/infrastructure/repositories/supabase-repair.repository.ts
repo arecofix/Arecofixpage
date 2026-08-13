@@ -27,7 +27,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
 
     override getById(id: string): Observable<Repair | null> {
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
+            .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, type, imei, passcode, model:models(name, brand_id))')
             .eq('id', id);
 
         return from((this.applyTenantFilter(query) as any)).pipe(
@@ -46,7 +46,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         const offset = params?.offset || 0;
 
         let query = this.supabase.from(this.tableName)
-            .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))')
+            .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, type, imei, passcode, model:models(name, brand_id))')
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });
 
@@ -248,7 +248,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone),
                 assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name),
                 status:repair_status_types(id, name, color, icon),
-                device:customer_devices!device_id(id, imei, passcode, model:models(name, brand_id))
+                device:customer_devices!device_id(id, type, imei, passcode, model:models(name, brand_id))
             `)
             .range(offset, offset + limit - 1)
             .order('created_at', { ascending: false });

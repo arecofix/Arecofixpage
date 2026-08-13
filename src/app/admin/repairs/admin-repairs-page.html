@@ -164,7 +164,7 @@
                         <!-- Equipo -->
                         <div class="min-w-0 pr-4">
                             <div class="font-bold text-gray-900 dark:text-white flex items-center gap-2 truncate">
-                                <i class="fas fa-mobile-alt text-gray-400 dark:text-gray-500"></i> {{ repair.device_model }}
+                                <i [class]="getDeviceIcon(repair.device_type)"></i> {{ repair.device_model }}
                             </div>
                             @if(repair.glass_upsell) {
                                 <span class="inline-flex mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800 items-center gap-1 shadow-sm">
@@ -233,7 +233,7 @@
     
                             <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 mb-3 border border-gray-100 dark:border-gray-800">
                                 <div class="flex items-center gap-2 mb-2 font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-1">
-                                    <i class="fas fa-mobile-alt text-gray-400"></i> {{ repair.device_model }}
+                                    <i [class]="getDeviceIcon(repair.device_type)"></i> {{ repair.device_model }}
                                 </div>
                                 @if(repair.glass_upsell) {
                                     <div class="mb-2">

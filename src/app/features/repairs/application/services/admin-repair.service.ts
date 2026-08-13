@@ -281,14 +281,14 @@ export class AdminRepairService {
 
         switch (event) {
             case 'RECIBIDO':
-                message = `\uD83D\uDCE6 *Arecofix - Equipo Recibido*\n\nHola ${repair.customer_name}, recibimos su ${deviceName}. Podes seguir el estado de tu reparación en tiempo real aquí:\n\n\uD83D\uDD17 ${trackingUrl}\n\n¡Gracias por elegirnos!`;
+                message = `*Arecofix - Equipo Recibido*\n\nHola ${repair.customer_name}, recibimos su ${deviceName}. Podes seguir el estado de tu reparación en tiempo real aquí:\n\n${trackingUrl}\n\n¡Gracias por elegirnos!`;
                 break;
             case 'READY':
-                message = `\u2705 *Arecofix - Su equipo está LISTO*\n\nHola ${repair.customer_name}, le informamos que su ${deviceName} ya se encuentra reparado y listo para retirar.\n\n\uD83D\uDCCD Podes pasar por nuestra sucursal. No olvides presentar tu código de seguimiento: *${repair.tracking_code}*`;
+                message = `*Arecofix - Su equipo está LISTO*\n\nHola ${repair.customer_name}, le informamos que su ${deviceName} ya se encuentra reparado y listo para retirar.\n\nPodes pasar por nuestra sucursal. No olvides presentar tu código de seguimiento: *${repair.tracking_code}*`;
                 break;
             case 'DELIVERED':
                 const reviewUrl = environment.contact.socialMedia.googleMaps;
-                message = `\uD83C\uDF1F *Arecofix - ¡Reparación Finalizada!*\n\nHola ${repair.customer_name}, fue un gusto ayudarte con tu ${deviceName}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n\u2B50\u2B50\u2B50\u2B50\u2B50\n\uD83D\uDD17 ${reviewUrl}\n\n¡Muchas gracias!`;
+                message = `*Arecofix - ¡Reparación Finalizada!*\n\nHola ${repair.customer_name}, fue un gusto ayudarte con tu ${deviceName}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n${reviewUrl}\n\n¡Muchas gracias!`;
                 break;
         }
 

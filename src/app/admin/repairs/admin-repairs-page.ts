@@ -22,6 +22,18 @@ export class AdminRepairsPage implements OnInit {
   offlineSyncService = inject(OfflineSyncService); // Injected to manage offline form submissions
   public t = inject(TranslationService).t;
 
+  getDeviceIcon(type?: string): string {
+    if (!type) return 'fas fa-mobile-alt text-gray-400 dark:text-gray-500';
+    const lowerType = type.toLowerCase();
+    if (lowerType === 'printer' || lowerType === 'impresora') return 'fas fa-print text-gray-400 dark:text-gray-500';
+    if (lowerType === 'notebook' || lowerType === 'laptop') return 'fas fa-laptop text-gray-400 dark:text-gray-500';
+    if (lowerType === 'tablet') return 'fas fa-tablet-alt text-gray-400 dark:text-gray-500';
+    if (lowerType === 'desktop' || lowerType === 'pc') return 'fas fa-desktop text-gray-400 dark:text-gray-500';
+    if (lowerType === 'console') return 'fas fa-gamepad text-gray-400 dark:text-gray-500';
+    if (lowerType === 'tv') return 'fas fa-tv text-gray-400 dark:text-gray-500';
+    return 'fas fa-mobile-alt text-gray-400 dark:text-gray-500';
+  }
+
   constructor() {
     // React to branch changes globally
     effect(() => {
