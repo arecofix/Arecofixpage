@@ -18,12 +18,12 @@ export interface RepairListDto {
   customer_name: string;
   device_brand: string;
   device_model: string;
+  device_type?: string;
   current_status_id: number;
   created_at: string;
   final_cost: number;
   branch_id?: string;
   tenant_id?: string;
-  device_type?: string;
 }
 
 /**
