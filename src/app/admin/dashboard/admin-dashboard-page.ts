@@ -121,6 +121,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   selectedMonthGross = computed(() => this.selectedMonthData().gross_revenue);
   selectedMonthCost = computed(() => this.selectedMonthData().cost);
   selectedMonthProfit = computed(() => this.selectedMonthData().net_profit);
+  selectedMonthRepairsProfit = computed(() => this.selectedMonthData().repairs_revenue - this.selectedMonthData().repairs_cost);
 
   currentMonthMargin = computed(() => {
     return NumberUtils.calculateMargin(this.selectedMonthGross(), this.selectedMonthProfit());

@@ -209,11 +209,11 @@
                         <div class="flex flex-col gap-1 mt-2 pt-2 border-t border-emerald-200 dark:border-emerald-500/20">
                             <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                                 <span><i class="fas fa-store mr-1 text-purple-500"></i> {{ t().repairs.dashboard.workshop50 || '50% Taller:' }}</span>
-                                <span class="font-bold">${{ (selectedMonthProfit() * 0.5) | number:'1.0-0' }}</span>
+                                <span class="font-bold">${{ (selectedMonthRepairsProfit() * 0.5) | number:'1.0-0' }}</span>
                             </div>
                             <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                                 <span><i class="fas fa-user-cog mr-1 text-blue-500"></i> 50% Técnico:</span>
-                                <span class="font-bold">${{ (selectedMonthProfit() * 0.5) | number:'1.0-0' }}</span>
+                                <span class="font-bold">${{ (selectedMonthRepairsProfit() * 0.5) | number:'1.0-0' }}</span>
                             </div>
                         </div>
                     </div>
@@ -236,9 +236,9 @@
                         </div>
                         <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 mb-2">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
                         <div class="flex justify-center gap-3 text-[10px] sm:text-xs">
-                            <span class="text-gray-500 dark:text-gray-400">Taller: <b class="text-gray-700 dark:text-gray-300">${{ (stats().total_net_profit * 0.5) | number:'1.0-0' }}</b></span>
+                            <span class="text-gray-500 dark:text-gray-400">Taller: <b class="text-gray-700 dark:text-gray-300">${{ (stats().repairs_profit * 0.5) | number:'1.0-0' }}</b></span>
                             <span class="text-gray-300 dark:text-gray-600">|</span>
-                            <span class="text-gray-500 dark:text-gray-400">Técnico: <b class="text-gray-700 dark:text-gray-300">${{ (stats().total_net_profit * 0.5) | number:'1.0-0' }}</b></span>
+                            <span class="text-gray-500 dark:text-gray-400">Técnico: <b class="text-gray-700 dark:text-gray-300">${{ (stats().repairs_profit * 0.5) | number:'1.0-0' }}</b></span>
                         </div>
                     </div>
                 </div>

@@ -38,13 +38,18 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         p_start_date: startDate,
         p_branch_id: branchId || null
       }),
+      this.supabase.rpc('get_financial_analytics_v3', {
+        p_tenant_id: tenantId,
+        p_start_date: '2010-01-01T00:00:00.000Z',
+        p_branch_id: branchId || null
+      }),
       this.supabase.rpc('get_dashboard_stats_v2', {
         p_branch_id: branchId || null
       }),
       this.fetchAdditionalCosts(tenantId, branchId || null),
       this.fetchProductsAndCategoryStats(tenantId, branchId || null)
     ])).pipe(
-      map(([financeRes, legacyDashRes, additionalCosts, statsData]: [any, any, any, any]) => {
+      map(([financeRes, allTimeFinanceRes, legacyDashRes, additionalCosts, statsData]: [any, any, any, any, any]) => {
         if (financeRes.error) throw financeRes.error;
         if (legacyDashRes.error) console.error('[RPC ERROR] legacy_stats:', legacyDashRes.error);
 
@@ -83,30 +88,39 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         const safe_cm_cost = cm ? cm.cost : 0;
         const safe_cm_net = safe_cm_gross - safe_cm_cost;
 
-        // Recalculate global totals based on the corrected monthly breakdown
-        const total_gross = monthlyBreakdown.reduce((sum, m) => sum + m.gross_revenue, 0);
-        let total_cost_safe = Number(rawFinance.total_cost || 0);
-        
+        // Recalculate global totals based on ALL TIME data
+        const rawAllTimeFinance = allTimeFinanceRes.data as any || {};
+        const allTimeBreakdown: MonthlyRevenue[] = this.mapMonthlyBreakdown(rawAllTimeFinance.monthly_breakdown);
+        const total_gross_all_time = allTimeBreakdown.reduce((sum, m) => sum + m.sales_revenue + m.repairs_revenue, 0); // initial calc
+
         // Ensure total_cost_safe includes our explicit totals at minimum
         const explicit_total_cost = additionalCosts.partsTotal + additionalCosts.expensesTotal;
+        let total_cost_safe = Number(rawAllTimeFinance.total_cost || 0);
+        
         if (total_cost_safe < explicit_total_cost) {
-            // If the RPC completely missed parts/expenses, we fallback to the sum of all explicit costs + whatever sales costs we have in the breakdown
-            const total_sales_cost = monthlyBreakdown.reduce((s, m) => s + m.sales_cost, 0);
-            total_cost_safe = explicit_total_cost + total_sales_cost;
+            // Include all-time explicit costs + all-time sales costs
+            const total_sales_cost_all_time = allTimeBreakdown.reduce((s, m) => s + m.sales_cost, 0);
+            total_cost_safe = explicit_total_cost + total_sales_cost_all_time;
         }
 
-        const safe_total_net = total_gross - total_cost_safe;
+        // True all-time gross includes explicit repairs revenue from all time (since RPC has bugs with repairs)
+        const total_sales_revenue_all_time = allTimeBreakdown.reduce((s, m) => s + m.sales_revenue, 0);
+        const true_total_gross_all_time = total_sales_revenue_all_time + additionalCosts.repairsRevenueTotal;
+        const safe_total_net = true_total_gross_all_time - total_cost_safe;
+
+        // Calculate all-time true repairs profit
+        const true_repairs_profit_all_time = additionalCosts.repairsRevenueTotal - additionalCosts.partsTotal;
 
         return {
           users: legacyData.users || 0,
           products: legacyData.products || 0,
           sales: legacyData.sales || 0,
-          revenue: total_gross,
+          revenue: true_total_gross_all_time,
           repairs_month: cm ? cm.repairs_revenue : 0,
-          repairs_revenue: monthlyBreakdown.reduce((s, m) => s + m.repairs_revenue, 0),
-          repairs_profit: monthlyBreakdown.reduce((s, m) => s + (m.repairs_revenue - m.repairs_cost), 0),
+          repairs_revenue: additionalCosts.repairsRevenueTotal,
+          repairs_profit: true_repairs_profit_all_time,
           devices_fixed: legacyData.devices_fixed || 0,
-          total_gross_revenue: total_gross,
+          total_gross_revenue: true_total_gross_all_time,
           total_cost: total_cost_safe,
           total_net_profit: safe_total_net,
           current_month_gross: safe_cm_gross,
