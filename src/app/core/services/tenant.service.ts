@@ -179,6 +179,7 @@ export class TenantService {
 
       if (data) {
         const tenant = data as Tenant;
+        tenant.branding_settings = tenant.branding_settings || {};
         this.setTenant(tenant);
         return tenant;
       }

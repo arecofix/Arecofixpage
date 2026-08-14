@@ -22,11 +22,28 @@ export class CustomerService {
   }
 
   async create(data: any): Promise<UserProfile> {
-    // 1. Re-use existing client to avoid duplicates
+    // 1. Re-use existing client to avoid duplicates ONLY if it is actually the same person
     const existing = await firstValueFrom(
       this.repository.findByEmailOrPhone(data.email, data.phone)
     );
-    if (existing) return existing;
+    
+    let shouldReuse = false;
+    if (existing) {
+        if (data.email && existing.email === data.email) {
+            shouldReuse = true;
+        } else if (data.phone && existing.phone === data.phone) {
+            const newName = `${data.first_name || ''} ${data.last_name || ''}`.toLowerCase().trim();
+            const existingName = `${existing.first_name || ''} ${existing.last_name || ''}`.toLowerCase().trim();
+            
+            const newParts = newName.split(' ').filter(p => p.length > 2);
+            // If they didn't provide a meaningful name, or at least one significant part of the name matches
+            if (newParts.length === 0 || newParts.some(p => existingName.includes(p))) {
+                shouldReuse = true;
+            }
+        }
+    }
+    
+    if (shouldReuse && existing) return existing;
 
     // 2. Create guest profile via Postgres RPC (SECURITY DEFINER).
     //    This bypasses the profiles.id → auth.users FK constraint, which blocked

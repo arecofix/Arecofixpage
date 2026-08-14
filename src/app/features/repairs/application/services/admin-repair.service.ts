@@ -110,7 +110,22 @@ export class AdminRepairService {
                 dto.customer_phone || undefined
             );
 
+            let shouldReuse = false;
             if (existing) {
+                if (dto.customer_email && existing.email === dto.customer_email) {
+                    shouldReuse = true;
+                } else if (dto.customer_phone && existing.phone === dto.customer_phone) {
+                    const newName = (dto.customer_name || '').toLowerCase().trim();
+                    const existingName = `${existing.first_name || ''} ${existing.last_name || ''}`.toLowerCase().trim();
+                    
+                    const newParts = newName.split(' ').filter((p: string) => p.length > 2);
+                    if (newParts.length === 0 || newParts.some((p: string) => existingName.includes(p))) {
+                        shouldReuse = true;
+                    }
+                }
+            }
+
+            if (shouldReuse && existing) {
                 // console.log('✅ [AdminRepairService] Cliente existente encontrado:', existing.id);
                 customerId = existing.id;
             } else {
