@@ -167,7 +167,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
             }),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe(response => {
-            this.filteredProducts.set((response.data || []) as unknown as Product[]);
+            const data = (response.data || []) as unknown as Product[];
+            // Filter out products with 0 stock to prevent database constraint violations on repair save
+            this.filteredProducts.set(data.filter(p => (p.stock || 0) > 0));
             this.searchingProducts.set(false);
         });
 
@@ -308,7 +310,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
                 customer_dni: client.dni
             });
         } else {
-            this.repairForm.get('customer_name')?.setValue(clientName);
+            this.repairForm.patchValue({
+                customer_id: '',
+                customer_name: clientName
+            }, { emitEvent: false });
         }
     }
 

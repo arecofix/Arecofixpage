@@ -136,6 +136,9 @@ serve(async (req: Request) => {
 
     const userId = authUser.user.id;
 
+    // Link the owner to the tenant
+    await supabaseAdmin.from('tenants').update({ owner_id: userId }).eq('id', tenant.id);
+
     // 4. Create Profile (upsert – may be auto-created by trigger)
     const { error: updateProfileErr } = await supabaseAdmin
       .from('profiles')
