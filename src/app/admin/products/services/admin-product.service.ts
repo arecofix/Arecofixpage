@@ -161,7 +161,7 @@ export class AdminProductService {
         
         // Extract stock and branch_id
         const initialStock = payload.stock;
-        let branchId = payload.branch_id || this.branchContextService.getBranchId();
+        let branchId = payload.branch_id || this.branchContextService.getBranchId() || 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
         
         // 🐛 BUGFIX: Anteriormente se eliminaba el branch_id aquí. Ahora lo asignamos
         // explícitamente para asegurar que el producto pertenezca a la sucursal actual.
@@ -208,7 +208,7 @@ export class AdminProductService {
     async updateProduct(id: string, payload: Partial<Product>): Promise<void> {
         // Extract stock and branch_id
         const initialStock = payload.stock;
-        const branchId = payload.branch_id || this.branchContextService.getBranchId();
+        const branchId = payload.branch_id || this.branchContextService.getBranchId() || 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
         
         // 🐛 BUGFIX: Mantener el branch_id para no perder la asignación del producto.
         payload.branch_id = branchId || undefined;

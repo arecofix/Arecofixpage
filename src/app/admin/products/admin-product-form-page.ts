@@ -42,7 +42,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     brand_id: '',
     category_id: '',
     is_active: true,
-    is_global: false,
+    is_global: true,
     branch_id: '',
     model_id: '',
     specifications: {} as Record<string, any>,
