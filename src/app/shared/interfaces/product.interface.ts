@@ -9,10 +9,13 @@ export interface ProductSpecification {
     height?: number;
   };
   color?: string;
+  colors?: string | string[];
+  quality?: string;
   material?: string;
   warranty?: string;
   features?: string[];
   technical_details?: Record<string, string | number | boolean>;
+  [key: string]: any;
 }
 
 export interface ProductsResponse {

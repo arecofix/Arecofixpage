@@ -80,10 +80,31 @@ export interface CourseModuleContent {
     id: string;
     lesson_id: string; // References CourseModule.id
     tenant_id?: string;
-    type: 'video' | 'image' | 'document' | 'link' | 'text';
+    type: 'video' | 'image' | 'document' | 'link' | 'text' | 'exam';
     url: string;
     metadata?: any;
     title?: string;
     order_index: number;
+    created_at?: string;
+}
+
+export interface CourseExamQuestion {
+    id?: string;
+    content_id: string;
+    question_text: string;
+    options: string[];
+    correct_option_index: number;
+    order_index: number;
+    tenant_id?: string;
+}
+
+export interface CourseExamSubmission {
+    id?: string;
+    content_id: string;
+    email: string;
+    answers: { question_id: string; selected_index: number }[];
+    score: number;
+    passed: boolean;
+    tenant_id?: string;
     created_at?: string;
 }

@@ -6,7 +6,7 @@ import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 import { BranchResolver } from '@app/core/resolvers/branch.resolver';
 import { tauriRootRedirectGuard } from '@app/guards/tauri-root-redirect.guard';
 import { trackingSeoResolver } from '@app/core/resolvers/tracking-seo.resolver';
-import { noAuthGuard } from '@app/guards/auth.guard';
+import { noAuthGuard, authGuard } from '@app/guards/auth.guard';
 
 export const publicRoutes: Routes = [
   {
@@ -284,11 +284,28 @@ export const publicRoutes: Routes = [
         }
       },
       {
+        title: 'Mis Cursos',
+        path: 'academy/mis-cursos',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('@app/public/cursos/my-courses/student-my-courses-page').then(
+            (m) => m.StudentMyCoursesPage
+          ),
+      },
+      {
         title: 'Proponer Curso',
         path: 'academy/create',
         loadComponent: () =>
           import('@app/public/cursos/create-course/create-course.component').then(
             (m) => m.CreateCourseComponent
+          ),
+      },
+      {
+        title: 'Campus Virtual',
+        path: 'academy/:slug/aula',
+        loadComponent: () =>
+          import('@app/public/cursos/campus/student-campus-page').then(
+            (m) => m.StudentCampusPage
           ),
       },
       {

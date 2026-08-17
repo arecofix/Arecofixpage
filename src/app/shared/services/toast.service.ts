@@ -12,9 +12,11 @@ export interface Toast {
 })
 export class ToastService {
   toasts = signal<Toast[]>([]);
+  private counterId = 0;
 
   show(message: string, type: 'success' | 'error' | 'info' = 'success', action?: () => void) {
-    const id = Date.now();
+    this.counterId++;
+    const id = Date.now() + this.counterId;
     this.toasts.update(current => [...current, { id, message, type, action }]);
 
     setTimeout(() => {

@@ -179,6 +179,11 @@ import { CoursesService, Course } from '@app/core/services/courses.service';
                    class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-gray-900 dark:hover:text-white tooltip" data-tip="Ver en página">
                   <i class="fas fa-external-link-alt"></i>
                 </a>
+                <!-- Materials / Aula -->
+                <a [routerLink]="['/admin/courses', course.id, 'materials']" 
+                   class="btn btn-sm btn-circle bg-orange-50 dark:bg-slate-700 text-orange-500 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 border-none transition-colors tooltip" data-tip="Materiales">
+                  <i class="fas fa-folder-open text-xs"></i>
+                </a>
                 <!-- Edit -->
                 <a [routerLink]="['/admin/courses', course.id]" 
                    class="btn btn-sm btn-circle bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 border-none transition-colors">
