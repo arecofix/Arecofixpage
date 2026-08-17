@@ -1,3 +1,5 @@
+import { buildMockProduct } from '../../support/mock-factories';
+
 describe('Product Stock Sync (Global vs Branch)', () => {
   const uniqueId = Date.now();
   const globalProductId = 'global-test-prod-' + uniqueId;
@@ -6,31 +8,34 @@ describe('Product Stock Sync (Global vs Branch)', () => {
   beforeEach(() => {
     // Intercept API calls to mock data instead of using actual backend since this is UI logic validation
     cy.intercept('GET', '**/rest/v1/products*', (req) => {
-      if (req.url.includes(globalProductId) || req.url.includes(globalSlug)) {
-        req.reply({
-          statusCode: 200,
-          body: [
-            {
-              id: globalProductId,
-              name: 'Test Global Product without Branch',
-              slug: globalSlug,
-              price: 1500,
-              stock: 25, // Fallback legacy stock
-              is_global: false, // The buggy condition (not global)
-              branch_id: null,  // The buggy condition (no specific branch)
-              is_active: true,
-              branch_stock: []  // Empty branch stock table
-            }
-          ]
-        });
-      }
+      req.reply({
+        statusCode: 200,
+        headers: { 'Content-Range': '0-0/1', 'Content-Type': 'application/json' },
+        body: [
+          buildMockProduct({
+            id: globalProductId,
+            name: 'Test Global Product without Branch',
+            slug: globalSlug,
+            price: 1500,
+            stock: 25,
+            is_global: false,
+            branch_id: null,
+            is_active: true,
+            branch_stock: []
+          })
+        ]
+      });
     }).as('getProducts');
 
-    cy.visit(`/productos/${globalSlug}`);
+    cy.visit(`/productos`);
   });
 
   it('should display the legacy stock when branch_id is null and branch_stock is empty', () => {
-    cy.wait('@getProducts');
+    cy.wait('@getProducts', { timeout: 10000 });
+    
+    // Navigate client-side to avoid SSR bypassing the intercept
+    cy.contains('Test Global Product without Branch', { timeout: 10000 }).click({ force: true });
+    
     // Ensure product loads and check stock UI
     cy.get('h1').contains('Test Global Product without Branch', { timeout: 10000 }).should('be.visible');
     
