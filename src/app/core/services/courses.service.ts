@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { Course, CourseModule, StudentEnrollment, CourseModuleContent, CourseExamQuestion, CourseExamSubmission } from '@app/features/courses/domain/entities/course.entity';
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
 import { LoggerService } from './logger.service';
@@ -281,7 +281,8 @@ export class CoursesService {
                 .from('course_exam_questions')
                 .delete()
                 .eq('content_id', contentId)
-                .then(() => {
+                .then(async () => {
+                    if (payload.length === 0) return { data: [], error: null };
                     return this.supabase
                         .from('course_exam_questions')
                         .insert(payload)
@@ -301,6 +302,75 @@ export class CoursesService {
             map(res => ({ data: res.data, error: res.error })),
             catchError(error => {
                 this.logger.error(`Failed to submit exam for content: ${contentId}`, error);
+                return of({ data: null, error });
+            })
+        );
+    }
+
+    getCourseProgress(courseId: string): Observable<{ data: { progress: number, completed_contents: string[], certificate_id?: string } | null, error: any }> {
+        return from(
+            this.supabase
+                .from('course_progress')
+                .select('content_id')
+                .eq('course_id', courseId)
+        ).pipe(
+            map(res => {
+                if (res.error) return { data: null, error: res.error };
+                return {
+                    data: {
+                        progress: 0, // Calculated on the frontend or backend
+                        completed_contents: res.data.map((row: any) => row.content_id),
+                        certificate_id: undefined // Checked separately if needed, or we fetch from course_certificates
+                    },
+                    error: null
+                };
+            }),
+            switchMap(result => {
+                if (result.error || !result.data) return of(result);
+                // Also check if certificate exists
+                return from(
+                    this.supabase
+                        .from('course_certificates')
+                        .select('id')
+                        .eq('course_id', courseId)
+                        .maybeSingle()
+                ).pipe(
+                    map(certRes => {
+                        if (certRes.data) {
+                            result.data!.certificate_id = certRes.data.id;
+                        }
+                        return result;
+                    })
+                );
+            }),
+            catchError(error => {
+                this.logger.error(`Failed to get course progress for course: ${courseId}`, error);
+                return of({ data: null, error });
+            })
+        );
+    }
+
+    markContentCompleted(contentId: string): Observable<{ data: any, error: any }> {
+        return from(this.supabase.rpc('mark_content_completed', { p_content_id: contentId })).pipe(
+            map(res => ({ data: res.data, error: res.error })),
+            catchError(error => {
+                this.logger.error(`Failed to mark content completed: ${contentId}`, error);
+                return of({ data: null, error });
+            })
+        );
+    }
+
+    getCertificate(certId: string): Observable<{ data: any, error: any }> {
+        return from(
+            this.supabase
+                .from('course_certificates')
+                .select('*, courses(title)')
+                .eq('id', certId)
+                .single()
+        ).pipe(
+            map(res => ({ data: res.data, error: res.error })),
+            catchError(error => {
+                this.logger.error(`Failed to get certificate: ${certId}`, error);
                 return of({ data: null, error });
             })
         );

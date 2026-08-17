@@ -1,17 +1,19 @@
 describe('Product Stock Sync (Global vs Branch)', () => {
-  const globalProductId = 'global-test-prod-' + Date.now();
+  const uniqueId = Date.now();
+  const globalProductId = 'global-test-prod-' + uniqueId;
+  const globalSlug = 'test-global-product-' + uniqueId;
   
   beforeEach(() => {
     // Intercept API calls to mock data instead of using actual backend since this is UI logic validation
     cy.intercept('GET', '**/rest/v1/products*', (req) => {
-      if (req.url.includes(globalProductId) || req.url.includes('stock-test')) {
+      if (req.url.includes(globalProductId) || req.url.includes(globalSlug)) {
         req.reply({
           statusCode: 200,
           body: [
             {
               id: globalProductId,
               name: 'Test Global Product without Branch',
-              slug: 'test-global-product',
+              slug: globalSlug,
               price: 1500,
               stock: 25, // Fallback legacy stock
               is_global: false, // The buggy condition (not global)
@@ -24,7 +26,7 @@ describe('Product Stock Sync (Global vs Branch)', () => {
       }
     }).as('getProducts');
 
-    cy.visit('/productos/test-global-product');
+    cy.visit(`/productos/${globalSlug}`);
   });
 
   it('should display the legacy stock when branch_id is null and branch_stock is empty', () => {

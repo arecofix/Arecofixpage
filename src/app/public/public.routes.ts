@@ -317,6 +317,14 @@ export const publicRoutes: Routes = [
           ),
       },
       {
+        title: 'Certificado de Finalización',
+        path: 'academy/cert/:id',
+        loadComponent: () =>
+          import('@app/public/cursos/certificate/certificate-page.component').then(
+            (m) => m.CertificatePageComponent
+          ),
+      },
+      {
         title: 'Checkout',
         path: 'checkout',
         loadComponent: () =>

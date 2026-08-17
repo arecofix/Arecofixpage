@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, signal, effect } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -393,7 +394,7 @@ export class AdminCourseMaterialsPage implements OnInit {
       this.saving.set(true);
       
       try {
-          const res = await this.coursesService.saveModuleContents(modId, currentContents).toPromise();
+          const res = await firstValueFrom(this.coursesService.saveModuleContents(modId, currentContents));
           
           if (res?.error) {
               throw res.error;
@@ -408,11 +409,11 @@ export class AdminCourseMaterialsPage implements OnInit {
                   const questionsPayload = savedItem.metadata.questions.map((q: any, idx: number) => ({
                       question_text: q.question_text,
                       options: q.options,
-                      correct_option_index: q.correct_option_index,
+                      correct_option_index: q.correct_option_index ?? 0,
                       order_index: idx
                   }));
                   
-                  const qRes = await this.coursesService.saveExamQuestions(savedItem.id, questionsPayload).toPromise();
+                  const qRes = await firstValueFrom(this.coursesService.saveExamQuestions(savedItem.id, questionsPayload));
                   if (qRes?.error) {
                       this.logger.error('Failed to save exam questions', qRes.error);
                       this.notification.showError('Materiales guardados, pero falló al guardar las preguntas del examen.');
@@ -434,9 +435,30 @@ export class AdminCourseMaterialsPage implements OnInit {
 
   // --- Exam Editor Logic ---
 
-  openExamEditor(content: ModuleContent) {
+  async openExamEditor(content: ModuleContent) {
       if (!content.metadata) content.metadata = { passing_score: 60, questions: [] };
-      if (!content.metadata.questions) content.metadata.questions = [];
+      
+      if (content.id) {
+          try {
+              const res = await firstValueFrom(this.coursesService.getExamQuestions(content.id));
+              if (res.data && res.data.length > 0) {
+                  // Ensure correct format and types
+                  content.metadata.questions = res.data.sort((a: any, b: any) => a.order_index - b.order_index).map((q: any) => ({
+                      question_text: q.question_text,
+                      options: q.options,
+                      correct_option_index: Number(q.correct_option_index) || 0
+                  }));
+              } else {
+                  content.metadata.questions = content.metadata.questions || [];
+              }
+          } catch (err) {
+              this.logger.error('Error fetching exam questions', err);
+              if (!content.metadata.questions) content.metadata.questions = [];
+          }
+      } else {
+          if (!content.metadata.questions) content.metadata.questions = [];
+      }
+      
       this.editingExamContent = content;
   }
 
