@@ -8,6 +8,9 @@ import { ProductMediaService } from '@app/admin/products/services/product-media.
 import { LoggerService } from '@app/core/services/logger.service';
 import { CourseLevel } from '@app/features/courses/domain/entities/course.entity';
 import { NotificationService } from '@app/core/services/notification.service';
+import { AdminUsersService } from '@app/admin/users/services/admin-users.service';
+import { UserProfile } from '@app/shared/interfaces/user.interface';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-admin-course-form-page',
@@ -195,6 +198,22 @@ import { NotificationService } from '@app/core/services/notification.service';
                     <i class="fas fa-user-tag text-slate-400 dark:text-slate-500"></i>
                     <input type="text" formControlName="instructor_role" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Experto en Microelectrónica" />
                   </label>
+                </div>
+                <!-- Instructor Assigment (author_id) -->
+                <div class="form-control md:col-span-2">
+                  <label class="label">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Asignar a Cuenta de Instructor</span>
+                  </label>
+                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                    <i class="fas fa-link text-slate-400 dark:text-slate-500"></i>
+                    <select formControlName="author_id" class="grow bg-transparent outline-none">
+                      <option value="">-- Sin Instructor Asignado --</option>
+                      @for (instructor of instructors(); track instructor.id) {
+                        <option [value]="instructor.id">{{ instructor.first_name }} {{ instructor.last_name }} ({{ instructor.email }})</option>
+                      }
+                    </select>
+                  </label>
+                  <span class="text-[10px] text-slate-500 mt-1">Al vincular una cuenta, ese instructor podrá ver y editar su curso desde su panel.</span>
                 </div>
                 <!-- Instructor Avatar -->
                 <div class="form-control">
@@ -419,11 +438,14 @@ export class AdminCourseFormPage implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private logger = inject(LoggerService);
   private notificationService = inject(NotificationService);
+  private adminUsersService = inject(AdminUsersService);
 
   form: FormGroup;
   isEditing = false;
   courseId: string | null = null;
   saving = false;
+  
+  instructors = signal<UserProfile[]>([]);
 
   constructor() {
     this.form = this.fb.group({
@@ -451,6 +473,7 @@ export class AdminCourseFormPage implements OnInit {
       instructor_role: [''],
       instructor_bio: [''],
       instructor_avatar: [''],
+      author_id: [''],
       audience_list: [''],
       reviews_count: [0],
       modules: this.fb.array([])
@@ -489,6 +512,7 @@ export class AdminCourseFormPage implements OnInit {
   }
 
   ngOnInit() {
+    this.loadInstructors();
     this.courseId = this.route.snapshot.paramMap.get('id');
     if (this.courseId) {
       this.isEditing = true;
@@ -590,26 +614,42 @@ export class AdminCourseFormPage implements OnInit {
     }
 
     this.saving = true;
-    const { modules, rating, students, audience_list, ...courseData } = this.form.value;
+    const formValue = this.form.value;
     
-    // Convert string separated by newlines back to jsonb array
-    if (audience_list && typeof audience_list === 'string') {
-        courseData.audience_list = audience_list.split('\n').map((i: string) => i.trim()).filter((i: string) => i.length > 0);
-    } else {
-        courseData.audience_list = [];
-    }
-    
-    // Retain these in courseData as well so they are saved
-    courseData.rating = rating;
-    courseData.students = students;
-    
-    // Convert empty strings to null to prevent Postgres type casting errors (UUID, Date, etc.)
-    Object.keys(courseData).forEach(key => {
-      if (courseData[key] === '') {
-        courseData[key] = null;
-      }
-    });
-    
+    const courseData = {
+      title: formValue.title,
+      slug: formValue.slug,
+      description: formValue.description,
+      price: formValue.price,
+      sale_price: formValue.sale_price || null,
+      level: formValue.level,
+      duration: formValue.duration,
+      schedule: formValue.schedule,
+      image_url: formValue.image_url,
+      is_active: formValue.is_active,
+      instructor_name: formValue.instructor_name || null,
+      instructor_id: formValue.instructor_id || null,
+      start_date: formValue.start_date || null,
+      is_featured: formValue.is_featured || false,
+      short_description: formValue.short_description || null,
+      students: formValue.students || 0,
+      rating: formValue.rating || 5.0,
+      classes_count: formValue.classes_count || 0,
+      hours_content: formValue.hours_content || 0,
+      hours_practice: formValue.hours_practice || 0,
+      hours_per_week: formValue.hours_per_week || null,
+      instructor_role: formValue.instructor_role || null,
+      instructor_bio: formValue.instructor_bio || null,
+      instructor_avatar: formValue.instructor_avatar || null,
+      author_id: formValue.author_id || null,
+      audience_list: formValue.audience_list 
+        ? formValue.audience_list.split('\n').map((i: string) => i.trim()).filter((i: string) => i) 
+        : null,
+      reviews_count: formValue.reviews_count || 0
+    };
+
+    const modules = this.modulesFormArray.value;
+
     this.logger.debug('Starting course save workflow', { isEditing: this.isEditing });
 
     try {
@@ -646,5 +686,17 @@ export class AdminCourseFormPage implements OnInit {
       this.saving = false;
       this.cdr.markForCheck();
     }
+  }
+
+  loadInstructors() {
+    this.adminUsersService.getInstructors().subscribe({
+      next: (instructors) => {
+        this.instructors.set(instructors);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.logger.error('Error loading instructors', err);
+      }
+    });
   }
 }
