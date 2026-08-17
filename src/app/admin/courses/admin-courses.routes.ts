@@ -25,5 +25,10 @@ export const ADMIN_COURSES_ROUTES: Routes = [
     path: ':id',
     title: 'Editar Curso',
     loadComponent: () => import('./admin-course-form-page').then(m => m.AdminCourseFormPage)
+  },
+  {
+    path: ':id/materials',
+    title: 'Materiales del Curso',
+    loadComponent: () => import('./materials/admin-course-materials-page').then(m => m.AdminCourseMaterialsPage)
   }
 ];

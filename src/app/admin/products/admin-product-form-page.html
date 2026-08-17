@@ -116,6 +116,28 @@
              </div>
            </div>
            
+           <!-- NEW QUALITY AND COLORS FIELDS -->
+           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+             <div class="form-control">
+                <label class="label font-semibold">Calidad (Opcional)</label>
+                <select [(ngModel)]="formVal.specifications['quality']" name="quality" tabindex="8" class="select select-bordered w-full">
+                  <option value="">Seleccionar calidad...</option>
+                  <option value="Original">Original</option>
+                  <option value="Original Desmontaje">Original Desmontaje</option>
+                  <option value="Premium">Premium</option>
+                  <option value="AAA">AAA</option>
+                  <option value="Genérico">Genérico</option>
+                </select>
+             </div>
+
+             <div class="form-control">
+                <label class="label font-semibold">Colores (Opcional)</label>
+                <input type="text" [(ngModel)]="formVal.specifications['colors']" name="colors" tabindex="8"
+                  class="input input-bordered w-full" placeholder="Negro, Blanco, Azul..." />
+                <p class="text-[10px] text-gray-500 mt-1">Separar por comas (,)</p>
+             </div>
+           </div>
+           
            <div class="form-control">
              <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                <input type="checkbox" [(ngModel)]="formVal.is_active" name="is_active" tabindex="9" class="toggle toggle-success" />

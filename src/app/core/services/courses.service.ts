@@ -1,13 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { Course, CourseModule, StudentEnrollment } from '@app/features/courses/domain/entities/course.entity';
+import { Course, CourseModule, StudentEnrollment, CourseModuleContent, CourseExamQuestion, CourseExamSubmission } from '@app/features/courses/domain/entities/course.entity';
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
 import { LoggerService } from './logger.service';
 import { TenantService } from './tenant.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
-export type { Course, CourseModule as Module, StudentEnrollment };
+export type { Course, CourseModule as Module, StudentEnrollment, CourseModuleContent, CourseExamQuestion, CourseExamSubmission };
 
 @Injectable({
     providedIn: 'root'
@@ -156,6 +156,64 @@ export class CoursesService {
         );
     }
 
+    getUserEnrolledCourses(email: string): Observable<{ data: StudentEnrollment[], error: any }> {
+        const tenantId = this.tenantService.getTenantId();
+        return from(this.supabase.from('course_enrollments').select(`
+            *,
+            course:courses(id, title, slug, image_url, short_description)
+        `)
+        .eq('tenant_id', tenantId)
+        .eq('email', email)
+        .eq('status', 'confirmed')
+        .order('created_at', { ascending: false })
+        ).pipe(
+            map(({ data, error }) => {
+                if (error) throw error;
+                return { data: data as any[], error: null };
+            }),
+            catchError(error => {
+                this.logger.error('Failed to fetch user enrolled courses', error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+    searchUsersByEmail(query: string): Observable<{ data: any[], error: any }> {
+        const tenantId = this.tenantService.getTenantId();
+        return from(this.supabase.from('profiles').select('id, email, first_name, last_name, phone')
+            .eq('tenant_id', tenantId)
+            .ilike('email', `%${query}%`)
+            .limit(10)
+        ).pipe(
+            map(({ data, error }) => {
+                if (error) throw error;
+                return { data: data || [], error: null };
+            }),
+            catchError(error => {
+                this.logger.error('Failed to search users', error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+    async enrollStudentManually(courseId: string, email: string, fullName: string, phone?: string): Promise<{ data: any, error: any }> {
+        const enrollment: StudentEnrollment = {
+            course_id: courseId,
+            full_name: fullName,
+            email: email,
+            phone: phone || '',
+            status: 'confirmed',
+            tenant_id: this.tenantService.getTenantId()
+        };
+        try {
+            const result = await this.repository.enrollStudent(enrollment);
+            return { data: result, error: null };
+        } catch (error) {
+            this.logger.error('Failed to manually enroll student', error);
+            return { data: null, error };
+        }
+    }
+
     assignInstructors(courseId: string, instructorIds: string[]): Observable<{ error: any }> {
         const tenantId = this.tenantService.getTenantId();
         return from(this.repository.assignInstructors(courseId, instructorIds, tenantId)).pipe(
@@ -194,6 +252,56 @@ export class CoursesService {
             catchError(error => {
                 this.logger.error(`Failed to save contents for module: ${moduleId}`, error);
                 return of({ data: [], error });
+            })
+        );
+    }
+
+    // --- Exams ---
+    
+    getExamQuestions(contentId: string): Observable<{ data: any[], error: any }> {
+        return from(this.supabase.rpc('get_exam_questions', { p_content_id: contentId })).pipe(
+            map(res => ({ data: res.data || [], error: res.error })),
+            catchError(error => {
+                this.logger.error(`Failed to get exam questions for content: ${contentId}`, error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+    saveExamQuestions(contentId: string, questions: Partial<CourseExamQuestion>[]): Observable<{ data: any[], error: any }> {
+        const tenantId = this.tenantService.getTenantId();
+        const payload = questions.map(q => ({
+            ...q,
+            content_id: contentId,
+            tenant_id: tenantId
+        }));
+        
+        return from(
+            this.supabase
+                .from('course_exam_questions')
+                .delete()
+                .eq('content_id', contentId)
+                .then(() => {
+                    return this.supabase
+                        .from('course_exam_questions')
+                        .insert(payload)
+                        .select();
+                })
+        ).pipe(
+            map(res => ({ data: res.data || [], error: res.error })),
+            catchError(error => {
+                this.logger.error(`Failed to save exam questions for content: ${contentId}`, error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+    submitExam(contentId: string, answers: { question_id: string, selected_index: number }[]): Observable<{ data: any, error: any }> {
+        return from(this.supabase.rpc('submit_exam', { p_content_id: contentId, p_answers: answers })).pipe(
+            map(res => ({ data: res.data, error: res.error })),
+            catchError(error => {
+                this.logger.error(`Failed to submit exam for content: ${contentId}`, error);
+                return of({ data: null, error });
             })
         );
     }

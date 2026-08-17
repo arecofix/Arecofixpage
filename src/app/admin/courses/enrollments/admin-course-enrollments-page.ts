@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CoursesService, StudentEnrollment } from '@app/core/services/courses.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { ToastService } from '@app/shared/services/toast.service';
@@ -7,7 +8,7 @@ import { ToastService } from '@app/shared/services/toast.service';
 @Component({
   selector: 'app-admin-course-enrollments-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-course-enrollments-page.html',
 })
 export class AdminCourseEnrollmentsPage implements OnInit {
@@ -16,10 +17,24 @@ export class AdminCourseEnrollmentsPage implements OnInit {
   private toastService = inject(ToastService);
 
   enrollments = signal<StudentEnrollment[]>([]);
+  courses = signal<any[]>([]);
+
+  searchQuery = signal('');
+  searchResults = signal<any[]>([]);
+  selectedUser = signal<any>(null);
+  selectedCourseId = signal('');
+  isEnrolling = signal(false);
   loading = signal(true);
 
   ngOnInit() {
     this.loadEnrollments();
+    this.loadCourses();
+  }
+
+  loadCourses() {
+      this.coursesService.getCourses().subscribe(res => {
+          this.courses.set(res.data || []);
+      });
   }
 
   loadEnrollments() {
@@ -65,5 +80,47 @@ export class AdminCourseEnrollmentsPage implements OnInit {
       this.toastService.show('Estado actualizado', 'success');
       this.enrollments.update(e => e.map(en => en.id === id ? { ...en, status: 'confirmed' as const } : en));
     }
+  }
+
+  searchUsers() {
+      const query = this.searchQuery().trim();
+      if (query.length < 3) {
+          this.searchResults.set([]);
+          return;
+      }
+      this.coursesService.searchUsersByEmail(query).subscribe(res => {
+          this.searchResults.set(res.data || []);
+      });
+  }
+
+  selectUser(user: any) {
+      this.selectedUser.set(user);
+      this.searchResults.set([]);
+      this.searchQuery.set('');
+  }
+
+  clearSelectedUser() {
+      this.selectedUser.set(null);
+  }
+
+  async enrollUser() {
+      if (!this.selectedUser() || !this.selectedCourseId()) return;
+      
+      this.isEnrolling.set(true);
+      const user = this.selectedUser();
+      const courseId = this.selectedCourseId();
+      const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+
+      const { data, error } = await this.coursesService.enrollStudentManually(courseId, user.email, fullName, user.phone);
+      
+      this.isEnrolling.set(false);
+      if (error) {
+          this.toastService.show('Error al matricular', 'error');
+      } else {
+          this.toastService.show('Usuario matriculado correctamente', 'success');
+          this.selectedUser.set(null);
+          this.selectedCourseId.set('');
+          this.loadEnrollments(); // reload to show the new one
+      }
   }
 }
