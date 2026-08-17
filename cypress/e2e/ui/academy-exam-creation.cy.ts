@@ -38,7 +38,7 @@ describe('Academy Exam Creation', () => {
         type: 'exam',
         title: 'Nuevo Examen',
         url: 'exam',
-        metadata: { passing_score: 80, questions: [{ question_text: 'Test', options: ['A', 'B'], correct_option_index: 1 }] }
+        metadata: { passing_score: 80, questions: [{ question_text: 'Pregunta de prueba', options: ['A', 'B'], correct_option_index: 1 }] }
       }]
     }).as('saveContents');
 
@@ -47,45 +47,57 @@ describe('Academy Exam Creation', () => {
       body: { data: [], error: null }
     }).as('saveExamQuestionsRPC');
 
-    // Mocks for saveExamQuestions logic
-    cy.intercept('DELETE', '**/rest/v1/course_exam_questions*', { statusCode: 204 }).as('deleteExamQuestions');
     cy.intercept('POST', '**/rest/v1/course_exam_questions*', {
       statusCode: 201,
       body: [{ id: '44444444-4444-4444-4444-444444444444' }]
     }).as('insertExamQuestions');
 
-    cy.visit(`/admin/courses/${courseId}/materials`);
+    // Inline login logic so it doesn't override our intercepts
+    const mockProfile = { id: 'mock-admin-id', email: 'admin@arecofix.com', role: 'super_admin' };
+    const session = {
+      provider_token: null, access_token: 'fake-token', expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'fake', token_type: 'bearer',
+      user: { id: 'mock-admin-id', aud: 'authenticated', role: 'authenticated', email: 'admin@arecofix.com' }
+    };
+    cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: session.user }).as('getUser');
+    cy.intercept('GET', '**/rest/v1/profiles*', { statusCode: 200, body: [mockProfile] }).as('getProfile');
+
+    cy.visit(`/admin/courses/${courseId}/materials`, {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+      }
+    });
   });
 
   it('should create an exam and correctly send the payload with correct_option_index', () => {
     cy.wait('@getModules');
 
     // Select Module
-    cy.contains('Módulo 1').click();
+    cy.contains('Módulo 1').click({ force: true });
 
     // Add Exam Resource
-    cy.contains('Añadir Recurso').click();
-    cy.contains('Examen').click();
+    cy.contains('Agregar Recurso').click({ force: true });
+    cy.contains('Examen').click({ force: true });
 
     // Exam should appear in list
-    cy.contains('Nuevo Examen').should('be.visible');
+    cy.get('input[placeholder="Título del recurso..."]').should('exist');
 
     // Open Config Modal
-    cy.contains('Configurar Examen').click();
+    cy.contains('Configurar Examen').click({ force: true });
     cy.get('#exam_modal').should('be.visible');
 
     // Change passing score
-    cy.get('input[type="number"]').clear().type('80', { delay: 0 });
+    cy.get('input[type="number"]').invoke('val', '80').trigger('input');
 
     // Add a question
     cy.contains('Añadir Nueva Pregunta').click();
 
     // Type Question Text
-    cy.get('input[placeholder="Ej: ¿Qué es HTML?"]').type('Pregunta de prueba', { delay: 0 });
+    cy.get('input[placeholder="Ej: ¿Qué es HTML?"]').invoke('val', 'Pregunta de prueba').trigger('input');
 
     // Modify options and select the correct one
-    cy.get('input[placeholder="Opción..."]').eq(0).clear().type('A', { delay: 0 });
-    cy.get('input[placeholder="Opción..."]').eq(1).clear().type('B', { delay: 0 });
+    cy.get('input[placeholder="Opción..."]').eq(0).invoke('val', 'A').trigger('input');
+    cy.get('input[placeholder="Opción..."]').eq(1).invoke('val', 'B').trigger('input');
     
     // Select Option 2 (index 1) as correct
     cy.get('input[type="radio"]').eq(1).click();

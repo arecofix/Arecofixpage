@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, effect } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, ChangeDetectorRef } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
@@ -251,6 +251,7 @@ export class AdminCourseMaterialsPage implements OnInit {
   private mediaService = inject(ProductMediaService);
   private notification = inject(NotificationService);
   private logger = inject(LoggerService);
+  private cdr = inject(ChangeDetectorRef);
 
   courseId = signal<string>('');
   course = signal<Course | null>(null);
@@ -460,10 +461,12 @@ export class AdminCourseMaterialsPage implements OnInit {
       }
       
       this.editingExamContent = content;
+      this.cdr.detectChanges();
   }
 
   closeExamEditor() {
       this.editingExamContent = null;
+      this.cdr.detectChanges();
   }
 
   addQuestion() {

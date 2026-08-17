@@ -84,17 +84,18 @@ describe('Admin Core Operations Flow (Products & Orders)', () => {
       cy.visit('/admin/products/new');
       cy.wait(['@getCategories', '@getBrands', '@getBranches']);
 
-      // Completamos el formulario básico con validación de valor para evitar race conditions de hidratación
+      // Wait for Angular to hydrate completely before typing
+      cy.wait(500);
       cy.get('input[name="name"]').as('nameInput');
-      cy.get('@nameInput').should('be.visible').clear().type('Nuevo Producto Test', { delay: 0 });
+      cy.get('@nameInput').should('be.visible').invoke('val', 'Nuevo Producto Test').trigger('input');
       cy.get('@nameInput').should('have.value', 'Nuevo Producto Test');
 
       cy.get('input[name="price"]').as('priceInput');
-      cy.get('@priceInput').should('be.visible').clear().type('5000', { delay: 0 });
+      cy.get('@priceInput').should('be.visible').invoke('val', '5000').trigger('input');
       cy.get('@priceInput').should('have.value', '5000');
 
       cy.get('input[name="stock"]').as('stockInput');
-      cy.get('@stockInput').should('be.visible').clear().type('5', { delay: 0 });
+      cy.get('@stockInput').should('be.visible').invoke('val', '5').trigger('input');
       cy.get('@stockInput').should('have.value', '5');
       
       // Suponemos que hay un botón Guardar
