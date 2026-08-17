@@ -96,4 +96,19 @@ export class AdminUsersService {
       if (error) throw error;
     })());
   }
+
+  getInstructors(): Observable<UserProfile[]> {
+    return from((async () => {
+      const tenantId = this.tenantService.getTenantId();
+      const { data, error } = await this.supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name, avatar_url')
+        .eq('tenant_id', tenantId)
+        .eq('role', 'instructor')
+        .order('first_name', { ascending: true });
+
+      if (error) throw error;
+      return (data || []) as UserProfile[];
+    })());
+  }
 }

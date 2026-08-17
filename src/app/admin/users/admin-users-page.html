@@ -344,6 +344,7 @@
                                     [ngModel]="user.role"
                                     (ngModelChange)="updateUserRole(user, $event)">
                                 <option value="user">{{ t().crm.clients.table.client || 'Cliente' }}</option>
+                                <option value="instructor">Instructor</option>
                                 <option value="staff">{{ t().crm.users.roles.staff || 'Staff' }}</option>
                                 <option value="admin">Admin de Sucursal</option>
                             </select>
