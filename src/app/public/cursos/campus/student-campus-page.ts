@@ -110,11 +110,21 @@ import { FormsModule } from '@angular/forms';
                                                         <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">{{ getTypeLabel(resource.type) }}</p>
                                                     </div>
                                                     
-                                                    <div class="shrink-0 text-slate-300 group-hover:text-blue-500 transition-colors">
-                                                        @if (resource.type === 'exam') {
-                                                            <button class="btn btn-sm btn-outline rounded-xl" (click)="openExam(resource); $event.preventDefault()">Comenzar</button>
+                                                    <div class="shrink-0 flex items-center gap-2">
+                                                        @if (completedContents().has(resource.id!)) {
+                                                            <div class="text-emerald-500 tooltip tooltip-left" data-tip="Completado"><i class="fas fa-check-circle text-xl"></i></div>
                                                         } @else {
-                                                            <i class="fas fa-chevron-right text-xs"></i>
+                                                            @if (resource.type === 'exam') {
+                                                                <button class="btn btn-sm btn-outline rounded-xl" (click)="openExam(resource); $event.preventDefault()">Comenzar</button>
+                                                            } @else {
+                                                                <button class="btn btn-sm btn-ghost hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400 rounded-xl tooltip tooltip-left" data-tip="Marcar completado" (click)="markContentAsCompleted(resource.id!, $event)" [disabled]="markingCompleted()[resource.id!]">
+                                                                    @if (markingCompleted()[resource.id!]) {
+                                                                        <span class="loading loading-spinner loading-xs"></span>
+                                                                    } @else {
+                                                                        <i class="far fa-circle text-slate-300 dark:text-slate-600 text-xl"></i>
+                                                                    }
+                                                                </button>
+                                                            }
                                                         }
                                                     </div>
                                                 </a>
@@ -141,13 +151,22 @@ import { FormsModule } from '@angular/forms';
                 
                 <!-- Right Sidebar: Shortcuts & Instructor Info -->
                 <div class="lg:col-span-1 space-y-6">
-                    <!-- Progress Card (Visual only) -->
+                    <!-- Progress Card -->
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                         <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><i class="fas fa-tasks text-emerald-500"></i> Tu Progreso</h3>
-                        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mb-2">
-                          <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 10%"></div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mb-2 overflow-hidden">
+                          <div class="bg-emerald-500 h-2.5 rounded-full transition-all duration-1000" [style.width]="progress() + '%'"></div>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium text-right">Iniciado</p>
+                        <p class="text-xs text-slate-500 font-medium text-right">{{ progress() | number:'1.0-0' }}% Completado</p>
+                        
+                        @if (certificateId()) {
+                            <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-700 text-center">
+                                <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-3 uppercase tracking-wider">¡Curso Finalizado!</div>
+                                <a [routerLink]="['/academy/cert', certificateId()]" target="_blank" class="btn btn-sm btn-primary w-full shadow-lg shadow-blue-500/30 rounded-xl">
+                                    <i class="fas fa-certificate"></i> Ver Certificado
+                                </a>
+                            </div>
+                        }
                     </div>
 
                     <!-- Instructor -->
@@ -248,6 +267,12 @@ export class StudentCampusPage implements OnInit {
   
   hasAccess = signal(false);
 
+  // Progress state
+  progress = signal<number>(0);
+  completedContents = signal<Set<string>>(new Set());
+  certificateId = signal<string | null>(null);
+  markingCompleted = signal<Record<string, boolean>>({});
+
   // Exam state
   activeExam: ModuleContent | null = null;
   activeExamQuestions = signal<any[]>([]);
@@ -309,8 +334,19 @@ export class StudentCampusPage implements OnInit {
                 }
 
                 this.hasAccess.set(accessConfirmed);
+
+                // Fetch progress
+                this.coursesService.getCourseProgress(courseId).subscribe(progressRes => {
+                    if (progressRes.data) {
+                        this.progress.set(progressRes.data.progress);
+                        this.completedContents.set(new Set(progressRes.data.completed_contents));
+                        this.certificateId.set(progressRes.data.certificate_id || null);
+                    }
+                    this.loading.set(false);
+                });
+            } else {
+                this.loading.set(false);
             }
-            this.loading.set(false);
         });
     });
   }
@@ -332,6 +368,26 @@ export class StudentCampusPage implements OnInit {
           case 'exam': return 'Examen';
           default: return 'Recurso';
       }
+  }
+
+  markContentAsCompleted(contentId: string, event: Event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (this.completedContents().has(contentId)) return;
+      
+      this.markingCompleted.update(v => ({ ...v, [contentId]: true }));
+      this.coursesService.markContentCompleted(contentId).subscribe(res => {
+          this.markingCompleted.update(v => ({ ...v, [contentId]: false }));
+          if (!res.error && res.data) {
+              this.progress.set(res.data.progress);
+              const newSet = new Set(this.completedContents());
+              newSet.add(contentId);
+              this.completedContents.set(newSet);
+              if (res.data.certificate_id) {
+                  this.certificateId.set(res.data.certificate_id);
+              }
+          }
+      });
   }
 
   // --- Exam Logic ---
@@ -378,6 +434,16 @@ export class StudentCampusPage implements OnInit {
               alert('Error al enviar el examen: ' + res.error.message);
           } else {
               this.examResult.set(res.data);
+              // Update progress if passed
+              if (res.data?.progress) {
+                  this.progress.set(res.data.progress.progress);
+                  const newSet = new Set(this.completedContents());
+                  newSet.add(this.activeExam!.id!);
+                  this.completedContents.set(newSet);
+                  if (res.data.progress.certificate_id) {
+                      this.certificateId.set(res.data.progress.certificate_id);
+                  }
+              }
           }
       });
   }
