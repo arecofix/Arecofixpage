@@ -17,7 +17,7 @@
             <i class="fas fa-tools text-indigo-200"></i>
             <span class="font-medium text-sm sm:text-base">Eres el instructor de este curso.</span>
           </div>
-          <a [routerLink]="['/instructor/builder', course.id]" class="btn btn-sm bg-white text-indigo-700 hover:bg-indigo-50 border-none whitespace-nowrap">
+          <a [routerLink]="['/instructor/builder', course.slug]" class="btn btn-sm bg-white text-indigo-700 hover:bg-indigo-50 border-none whitespace-nowrap">
             <i class="fas fa-edit"></i> Editar Curso
           </a>
         </div>
@@ -142,39 +142,66 @@
             </div>
           </section>
 
-          <!-- Syllabus / Temario -->
+          <!-- Syllabus / Temario (contenido real de la DB) -->
           <section>
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Contenido del curso</h2>
-            <div class="text-sm text-gray-500 mb-4">{{courseModules.length}} módulos • {{classesCount}} clases • {{hoursContent}} horas de contenido</div>
-            
-            <div class="space-y-4">
-              @for (module of courseModules; track module.title; let i = $index) {
-                <div class="border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
-                  <div class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                     <div class="flex flex-col">
-                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Módulo {{i + 1}}</span>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{module.title}}</h3>
-                     </div>
-                     <div class="text-sm text-gray-500">
-                        {{module.lessons.length}} clases
-                     </div>
+            @if (loadingModules) {
+              <div class="flex items-center gap-3 text-slate-500 py-4">
+                <span class="loading loading-spinner loading-sm"></span>
+                <span class="text-sm">Cargando temario...</span>
+              </div>
+            } @else if (modules.length === 0) {
+              <div class="text-slate-400 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 text-center">
+                <i class="fas fa-layer-group text-2xl mb-2 block"></i>
+                El temario de este curso estara disponible pronto.
+              </div>
+            } @else {
+              <div class="text-sm text-gray-500 mb-4">{{ modules.length }} modulos • {{ classesCount || modules.reduce((a, m) => a + m.contents.length, 0) }} clases</div>
+              <div class="space-y-4">
+                @for (mod of modules; track mod.id; let i = $index) {
+                  <div class="border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
+                    <div class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                         (click)="toggleModule(mod)">
+                      <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Modulo {{ i + 1 }}</span>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ mod.title }}</h3>
+                        @if (mod.description) {
+                          <p class="text-sm text-gray-500 mt-1">{{ mod.description }}</p>
+                        }
+                      </div>
+                      <div class="flex items-center gap-3 shrink-0">
+                        <span class="text-sm text-gray-500">{{ mod.contents.length }} clases</span>
+                        <i class="fas text-gray-400 transition-transform" [class.fa-chevron-down]="!mod.expanded" [class.fa-chevron-up]="mod.expanded"></i>
+                      </div>
+                    </div>
+                    @if (mod.expanded && mod.contents.length > 0) {
+                      <div class="border-t border-gray-100 dark:border-gray-700">
+                        @for (content of mod.contents; track content.id; let j = $index) {
+                          <div class="px-5 py-4 flex items-center gap-3 border-b border-gray-50 dark:border-gray-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs"
+                              [class.bg-blue-100]="content.type==='video'" [class.text-blue-600]="content.type==='video'"
+                              [class.bg-red-100]="content.type==='document'" [class.text-red-600]="content.type==='document'"
+                              [class.bg-green-100]="content.type==='image'" [class.text-green-600]="content.type==='image'"
+                              [class.bg-purple-100]="content.type==='link'" [class.text-purple-600]="content.type==='link'"
+                              [class.bg-orange-100]="content.type==='exam'" [class.text-orange-600]="content.type==='exam'"
+                              [class.bg-gray-100]="content.type==='text'" [class.text-gray-500]="content.type==='text'">
+                              <i class="fas" [class]="getContentIcon(content.type)"></i>
+                            </div>
+                            <span class="text-gray-700 dark:text-gray-300 font-medium text-sm flex-1">{{ content.title || ('Contenido ' + (j + 1)) }}</span>
+                            <span class="text-xs text-gray-400 font-mono shrink-0">{{ getContentLabel(content.type) }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
+                    @if (mod.expanded && mod.contents.length === 0) {
+                      <div class="border-t border-gray-100 dark:border-gray-700 px-5 py-4 text-sm text-gray-400 italic">
+                        <i class="fas fa-clock mr-2"></i>Contenido en preparacion
+                      </div>
+                    }
                   </div>
-                  <div class="border-t border-gray-100 dark:border-gray-700 p-0">
-                     @for (lesson of module.lessons; track lesson.name; let j = $index) {
-                        <div class="px-5 py-4 flex items-center justify-between border-b border-gray-50 dark:border-gray-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                           <div class="flex items-center gap-3">
-                              <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold">
-                                 {{j + 1}}
-                              </div>
-                              <span class="text-gray-700 dark:text-gray-300 font-medium text-sm">{{lesson.name}}</span>
-                           </div>
-                           <span class="text-xs text-gray-500 font-medium"><i class="fas fa-play-circle mr-1 text-gray-400"></i> {{lesson.duration}}</span>
-                        </div>
-                     }
-                  </div>
-                </div>
-              }
-            </div>
+                }
+              </div>
+            }
           </section>
 
           <!-- Instructor -->
