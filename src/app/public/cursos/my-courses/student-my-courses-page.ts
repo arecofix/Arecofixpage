@@ -179,6 +179,7 @@ export class StudentMyCoursesPage implements OnInit {
 
     async ngOnInit() {
         const session = await this.authService.getSession();
+        const user = session?.user || await this.authService.getUser();
         const profile = this.authService.getCurrentProfile();
         
         if (profile) {
@@ -186,7 +187,7 @@ export class StudentMyCoursesPage implements OnInit {
             this.isAdmin.set(profile.role === 'admin' || profile.role === 'super_admin');
         }
 
-        const userEmail = session?.user?.email;
+        const userEmail = user?.email || profile?.email;
 
         if (userEmail) {
             this.loadMyCourses(userEmail);
@@ -208,7 +209,8 @@ export class StudentMyCoursesPage implements OnInit {
 
     loadMyCourses(email: string) {
         this.coursesService.getUserEnrolledCourses(email).subscribe(res => {
-            this.enrolledCourses.set(res.data || []);
+            const validEnrollments = (res.data || []).filter(e => !!e.course);
+            this.enrolledCourses.set(validEnrollments);
             this.loading.set(false);
         });
     }

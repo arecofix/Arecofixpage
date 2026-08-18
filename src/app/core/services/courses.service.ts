@@ -158,18 +158,23 @@ export class CoursesService {
 
     getUserEnrolledCourses(email: string): Observable<{ data: StudentEnrollment[], error: any }> {
         const tenantId = this.tenantService.getTenantId();
-        return from(this.supabase.from('course_enrollments').select(`
+        const trimmedEmail = (email || '').trim();
+        let query = this.supabase.from('course_enrollments').select(`
             *,
             course:courses(id, title, slug, image_url, short_description)
         `)
-        .eq('tenant_id', tenantId)
-        .eq('email', email)
+        .ilike('email', trimmedEmail)
         .eq('status', 'confirmed')
-        .order('created_at', { ascending: false })
-        ).pipe(
+        .order('created_at', { ascending: false });
+
+        if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
+            query = query.or(`tenant_id.eq.${tenantId},tenant_id.is.null`);
+        }
+
+        return from(query).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return { data: data as any[], error: null };
+                return { data: (data || []) as any[], error: null };
             }),
             catchError(error => {
                 this.logger.error('Failed to fetch user enrolled courses', error);
@@ -200,6 +205,28 @@ export class CoursesService {
                 return of({ data: [], error });
             })
         );
+    }
+
+    /**
+     * Checks directly in course_enrollments if a confirmed enrollment exists
+     * for the given email + courseId. This is the canonical way to gate campus access.
+     */
+    async checkEnrollment(courseId: string, email: string): Promise<{ enrolled: boolean, error: unknown }> {
+        const trimmedEmail = (email || '').trim();
+        console.log('[checkEnrollment] checking:', { courseId, email: trimmedEmail });
+        const { data, error } = await this.supabase
+            .from('course_enrollments')
+            .select('id, status')
+            .eq('course_id', courseId)
+            .ilike('email', trimmedEmail)
+            .eq('status', 'confirmed')
+            .maybeSingle();
+        console.log('[checkEnrollment] result:', { data, error });
+        if (error) {
+            this.logger.error('checkEnrollment failed', error);
+            return { enrolled: false, error };
+        }
+        return { enrolled: !!data, error: null };
     }
 
     async enrollStudentManually(courseId: string, email: string, fullName: string, phone?: string): Promise<{ data: any, error: any }> {
