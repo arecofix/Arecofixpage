@@ -24,6 +24,8 @@ export class CourseBuilderComponent implements OnInit {
   courseId = signal<string | null>(null);
   loading = signal(true);
   saving = signal(false);
+  uploadingImage = signal(false);
+  uploadingAvatar = signal(false);
   errorMsg = signal<string | null>(null);
   successMsg = signal<string | null>(null);
 
@@ -159,6 +161,40 @@ export class CourseBuilderComponent implements OnInit {
     this.moduleContentsMap[modId] = this.moduleContentsMap[modId].filter(c => c.id !== contentId);
   }
 
+  async uploadCourseImage(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.uploadingImage.set(true);
+      this.cd.detectChanges();
+      const file = event.target.files[0];
+      try {
+        const url = await this.storageService.uploadFile(file, 'courses');
+        this.courseData.image_url = url;
+      } catch (e) {
+        this.errorMsg.set('Error al subir la imagen de portada');
+      } finally {
+        this.uploadingImage.set(false);
+        this.cd.detectChanges();
+      }
+    }
+  }
+
+  async uploadInstructorAvatar(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.uploadingAvatar.set(true);
+      this.cd.detectChanges();
+      const file = event.target.files[0];
+      try {
+        const url = await this.storageService.uploadFile(file, 'courses');
+        this.courseData.instructor_avatar = url;
+      } catch (e) {
+        this.errorMsg.set('Error al subir el avatar del instructor');
+      } finally {
+        this.uploadingAvatar.set(false);
+        this.cd.detectChanges();
+      }
+    }
+  }
+
   async save() {
     this.errorMsg.set(null);
     this.successMsg.set(null);
@@ -168,7 +204,11 @@ export class CourseBuilderComponent implements OnInit {
       if (this.courseId()) {
           await firstValueFrom(this.coursesService.updateCourse(this.courseId()!, this.courseData));
           
-          const savedModulesRes = await firstValueFrom(this.coursesService.saveModules(this.courseId()!, this.modules));
+          const cleanModules = this.modules.map(m => {
+              const { uploading, uploadProgress, created_at, updated_at, ...rest } = m;
+              return rest;
+          });
+          const savedModulesRes = await firstValueFrom(this.coursesService.saveModules(this.courseId()!, cleanModules));
           if (savedModulesRes.data) {
              const savedModules = savedModulesRes.data;
              for (let i = 0; i < savedModules.length; i++) {
