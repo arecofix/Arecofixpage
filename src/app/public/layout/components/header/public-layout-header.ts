@@ -11,7 +11,7 @@ import {
   HostListener,
   effect,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '@env/environment';
@@ -204,6 +204,18 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
         }, 2000);
       }
     }
+
+    // Reset navbar visibility on navigation
+    this.subscriptions.add(
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        this.showNavbar();
+        this.lastScrollTop = isPlatformBrowser(this.platformId)
+          ? window.scrollY || document.documentElement.scrollTop
+          : 0;
+      })
+    );
 
     // Listen for external search-focus requests (e.g. from other components)
     this.subscriptions.add(

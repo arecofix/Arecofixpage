@@ -96,7 +96,40 @@
                                 <input type="text" [(ngModel)]="courseData.short_description" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14">
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="mt-8 mb-4">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-2">Perfil Público del Instructor</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Nombre a mostrar</label>
+                                            <input type="text" [(ngModel)]="courseData.instructor_name" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                        </div>
+                                        <div>
+                                            <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Foto del Instructor</label>
+                                            <div class="flex flex-col gap-3">
+                                                <div class="flex gap-2">
+                                                    <input type="text" [(ngModel)]="courseData.instructor_avatar" placeholder="https://..." class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                                    <label class="btn btn-outline border-slate-300 min-w-[120px]" [class.loading]="uploadingAvatar()">
+                                                        @if (!uploadingAvatar()) { <i class="fas fa-upload mr-2"></i> Subir }
+                                                        <input type="file" class="hidden" accept="image/*" (change)="uploadInstructorAvatar($event)">
+                                                    </label>
+                                                </div>
+                                                @if (courseData.instructor_avatar) {
+                                                    <div class="w-16 h-16 rounded-full overflow-hidden border border-slate-200 shadow-sm relative group">
+                                                        <img [src]="courseData.instructor_avatar" class="w-full h-full object-cover">
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Biografía del Instructor</label>
+                                        <textarea [(ngModel)]="courseData.instructor_bio" rows="6" class="textarea textarea-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-slate-700">
                                 <div>
                                     <label class="label font-bold text-slate-700 dark:text-slate-300">Nivel</label>
                                     <select [(ngModel)]="courseData.level" class="select select-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl h-14">
@@ -108,7 +141,20 @@
                                 </div>
                                 <div>
                                     <label class="label font-bold text-slate-700 dark:text-slate-300">URL Imagen de Portada</label>
-                                    <input type="text" [(ngModel)]="courseData.image_url" placeholder="https://..." class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14">
+                                    <div class="flex flex-col gap-3">
+                                        <div class="flex gap-2">
+                                            <input type="text" [(ngModel)]="courseData.image_url" placeholder="https://..." class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14">
+                                            <label class="btn btn-outline border-slate-300 h-14 min-w-[120px]" [class.loading]="uploadingImage()">
+                                                @if (!uploadingImage()) { <i class="fas fa-upload mr-2"></i> Subir }
+                                                <input type="file" class="hidden" accept="image/*" (change)="uploadCourseImage($event)">
+                                            </label>
+                                        </div>
+                                        @if (courseData.image_url) {
+                                            <div class="w-32 h-20 rounded-lg overflow-hidden border border-slate-200 shadow-sm relative group">
+                                                <img [src]="courseData.image_url" class="w-full h-full object-cover">
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -243,24 +289,6 @@
                                 <div>
                                     <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Horas Práctica</label>
                                     <input type="number" [(ngModel)]="courseData.hours_practice" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">Perfil Público del Instructor</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Nombre a mostrar</label>
-                                    <input type="text" [(ngModel)]="courseData.instructor_name" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
-                                </div>
-                                <div>
-                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Foto del Instructor (URL)</label>
-                                    <input type="text" [(ngModel)]="courseData.instructor_avatar" placeholder="https://..." class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
-                                </div>
-                                <div>
-                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Biografía del Instructor</label>
-                                    <textarea [(ngModel)]="courseData.instructor_bio" rows="3" class="textarea textarea-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl"></textarea>
                                 </div>
                             </div>
                         </div>

@@ -70,7 +70,7 @@ describe('Academy Progress and Certificates', () => {
     
     // Fill Document Title and URL
     cy.get('input[placeholder="Título del recurso..."]').eq(0).clear().type('Guía PDF E2E');
-    cy.get('input[placeholder="URL del archivo (o súbelo usando el botón)"]').eq(0).clear().type('https://example.com/file.pdf');
+    cy.get('input[placeholder*="URL del archivo"]').eq(0).clear().type('https://example.com/file.pdf');
     
     // Exam Editor
     cy.get('input[placeholder="Título del recurso..."]').eq(1).clear().type('Examen E2E');

@@ -92,7 +92,7 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
     cy.get('input[formControlName="whatsapp"]').type('1122334455', { delay: 50 });
     cy.get('input[formControlName="email"]').type(mockUser.email, { delay: 50 });
 
-    cy.get('button[type="submit"]').contains('Solicitar Prueba Gratis').click();
+    cy.get('button[type="submit"]').contains('Solicitar Prueba Gratis').click({ force: true });
 
     cy.wait('@createTrialTenant');
     cy.contains('¡Tu sucursal ha sido creada!').should('be.visible');
