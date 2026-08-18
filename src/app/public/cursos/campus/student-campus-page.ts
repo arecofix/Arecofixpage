@@ -324,44 +324,50 @@ export class StudentCampusPage implements OnInit {
             this.isAuthor.set(true);
         }
 
-        // 2. Validate Access (Using auth service + explicit enrollment check, or relying on RLS)
-        // We will fetch modules. If RLS allows, we get them.
+        // 2. Validate Access — check role and enrollment directly
+        let accessConfirmed = false;
+        
+        // 2a. Admins and staff always have access
+        const userSession = await this.authService.getSession();
+        const userRole = userSession?.user?.user_metadata?.['role'];
+        if (['admin', 'staff', 'super_admin', 'tenant_owner'].includes(userRole)) {
+            accessConfirmed = true;
+        }
+
+        // 2b. Course author always has access
+        if (this.isAuthor()) {
+            accessConfirmed = true;
+        }
+
+        // 2c. For regular students: check directly in course_enrollments
+        if (!accessConfirmed) {
+            const userEmail = userSession?.user?.email || profile?.email || '';
+            if (userEmail) {
+                const { enrolled } = await this.coursesService.checkEnrollment(courseId, userEmail);
+                accessConfirmed = enrolled;
+            }
+        }
+
+        this.hasAccess.set(accessConfirmed);
+
+        // 3. Load modules and their contents (for enrolled/authorized users)
         this.coursesService.getModulesByCourseId(courseId).subscribe(async modulesRes => {
             if (modulesRes.data) {
                 this.modules.set(modulesRes.data);
                 
-                // Let's try to fetch contents for the first module to verify deep access (RLS)
-                // or just fetch all contents for all modules
-                let accessConfirmed = false;
-                
-                for (const mod of modulesRes.data) {
-                    try {
-                        const contentsRes = await this.coursesService.getModuleContents(mod.id!).toPromise();
-                        if (contentsRes?.data) {
-                            this.moduleContentsMap[mod.id!] = contentsRes.data;
-                            // If we successfully retrieved contents array (even empty but no error 403), we assume access
-                            accessConfirmed = true; 
+                if (accessConfirmed) {
+                    for (const mod of modulesRes.data) {
+                        try {
+                            const contentsRes = await this.coursesService.getModuleContents(mod.id!).toPromise();
+                            if (contentsRes?.data) {
+                                this.moduleContentsMap[mod.id!] = contentsRes.data;
+                            }
+                        } catch (e) {
+                            console.error('Error loading contents for module', mod.id, e);
                         }
-                    } catch (e) {
-                        // RLS rejected
-                        console.error('Access to contents denied by RLS');
                     }
                 }
                 
-                // Fallback check: if user is admin, allow
-                const userSession = await this.authService.getSession();
-                const userRole = userSession?.user?.user_metadata?.['role'];
-                if (['admin', 'staff', 'super_admin', 'tenant_owner'].includes(userRole)) {
-                    accessConfirmed = true;
-                }
-                
-                // If user is the author of the course, they always have access to their classroom
-                if (this.isAuthor()) {
-                    accessConfirmed = true;
-                }
-
-                this.hasAccess.set(accessConfirmed);
-
                 // Fetch progress
                 this.coursesService.getCourseProgress(courseId).subscribe(progressRes => {
                     if (progressRes.data) {
