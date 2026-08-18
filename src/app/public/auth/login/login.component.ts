@@ -44,8 +44,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.document.body.classList.add('hide-floating-widgets');
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
-    if (typeof window !== 'undefined' && this.route.snapshot.queryParams['returnUrl']) {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
+    if (typeof window !== 'undefined') {
         localStorage.setItem('arecofix_return_url', this.returnUrl);
     }
     
@@ -100,7 +100,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   async handleLogin() {
     this.error = '';
     this.success = '';
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.error = 'Por favor completa correctamente todos los campos.';
+      return;
+    }
     
     this.loading = true;
     const { email, password, rememberMe } = this.form.value;
