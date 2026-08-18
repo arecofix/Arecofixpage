@@ -21,8 +21,8 @@ describe('Instructor Assignment Flow', () => {
   it('allows an admin to assign an instructor to a course', () => {
     cy.loginAsAdmin('/admin/courses/new');
 
-    // Add intercept specifically for instructors
-    cy.intercept('GET', '**/rest/v1/profiles?*role=eq.instructor*', {
+    // Add intercept specifically for instructors (which now fetches all users)
+    cy.intercept('GET', '**/rest/v1/profiles?select=id%2Cemail%2Cfirst_name%2Clast_name%2Cavatar_url%2Crole*', {
       statusCode: 200,
       body: [
         {
@@ -45,7 +45,7 @@ describe('Instructor Assignment Flow', () => {
     cy.get('select[formControlName="author_id"]').should('have.value', 'instructor-123');
   });
 
-  it('shows Mis Cursos in the dropdown when student is logged in', () => {
+  it('shows Mi Academia in the dropdown when student is logged in', () => {
     const session = {
       provider_token: null,
       access_token: 'fake-token',
@@ -92,6 +92,6 @@ describe('Instructor Assignment Flow', () => {
     });
     
     cy.get('[aria-label="Menú de usuario"]').click();
-    cy.get('a[routerLink="/academy/mis-cursos"]').should('be.visible').and('contain', 'Mis Cursos');
+    cy.get('a[routerLink="/academy/mis-cursos"]').should('be.visible').and('contain', 'Mi Academia');
   });
 });

@@ -102,9 +102,8 @@ export class AdminUsersService {
       const tenantId = this.tenantService.getTenantId();
       const { data, error } = await this.supabase
         .from('profiles')
-        .select('id, email, first_name, last_name, avatar_url')
+        .select('id, email, first_name, last_name, avatar_url, role')
         .eq('tenant_id', tenantId)
-        .eq('role', 'instructor')
         .order('first_name', { ascending: true });
 
       if (error) throw error;

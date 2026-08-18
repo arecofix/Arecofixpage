@@ -1,0 +1,320 @@
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
+  
+  @if (loading()) {
+    <div class="flex justify-center items-center h-screen">
+      <span class="loading loading-spinner loading-lg text-blue-500"></span>
+    </div>
+  } @else if (errorMsg() && !courseData.title) {
+    <div class="flex justify-center items-center h-[60vh] flex-col text-slate-500">
+      <i class="fas fa-exclamation-circle text-4xl mb-4 text-red-400"></i>
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white">{{ errorMsg() }}</h2>
+      <button routerLink="/instructor" class="btn btn-primary mt-4">Volver al Panel</button>
+    </div>
+  } @else {
+    <!-- Premium Header -->
+    <div class="bg-blue-900 dark:bg-slate-950 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay" [style.backgroundImage]="'url(' + (courseData.image_url || 'assets/img/branding/og-academy.jpg') + ')'"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 to-transparent dark:from-slate-950"></div>
+        
+        <div class="max-w-6xl mx-auto px-4 py-8 relative z-10">
+            <div class="flex items-center gap-2 mb-4 text-blue-300 text-sm font-medium">
+                <a routerLink="/instructor" class="hover:text-white transition-colors"><i class="fas fa-arrow-left mr-1"></i> Volver</a>
+                <span>/</span>
+                <span>Editor de Cursos</span>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-6 items-end justify-between">
+                <div class="flex-1">
+                    <div class="badge badge-primary badge-sm font-bold mb-3 uppercase tracking-widest border-none bg-blue-500 text-white">{{ courseId() ? 'Edición en Vivo' : 'Nuevo Curso' }}</div>
+                    <h1 class="text-3xl md:text-5xl font-black mb-2 leading-tight">
+                        {{ courseData.title || 'Título de tu Curso' }}
+                    </h1>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <button class="btn bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-md" (click)="save()">
+                        @if (saving()) { <span class="loading loading-spinner loading-sm"></span> }
+                        @else { <i class="fas fa-save"></i> }
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Editor Body -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        @if (successMsg()) {
+            <div class="alert alert-success shadow-lg mb-6 border-none text-white bg-emerald-500 rounded-2xl">
+                <i class="fas fa-check-circle text-xl"></i>
+                <span>{{ successMsg() }}</span>
+            </div>
+        }
+        
+        @if (errorMsg()) {
+            <div class="alert alert-error shadow-lg mb-6 border-none text-white bg-red-500 rounded-2xl">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+                <span>{{ errorMsg() }}</span>
+            </div>
+        }
+
+        <!-- Tabs Navigation -->
+        <div class="tabs tabs-boxed bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-8 inline-flex gap-2">
+            <button class="tab h-12 px-6 rounded-xl font-bold transition-all" [class.tab-active]="activeTab() === 'general'" [class.bg-blue-500]="activeTab() === 'general'" [class.text-white]="activeTab() === 'general'" (click)="activeTab.set('general')">
+                <i class="fas fa-info-circle mr-2"></i> General
+            </button>
+            <button class="tab h-12 px-6 rounded-xl font-bold transition-all" [class.tab-active]="activeTab() === 'modules'" [class.bg-blue-500]="activeTab() === 'modules'" [class.text-white]="activeTab() === 'modules'" (click)="activeTab.set('modules')">
+                <i class="fas fa-layer-group mr-2"></i> Módulos y Clases
+            </button>
+            <button class="tab h-12 px-6 rounded-xl font-bold transition-all" [class.tab-active]="activeTab() === 'settings'" [class.bg-blue-500]="activeTab() === 'settings'" [class.text-white]="activeTab() === 'settings'" (click)="activeTab.set('settings')">
+                <i class="fas fa-cog mr-2"></i> Configuración
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Form Area -->
+            <div class="lg:col-span-2">
+                
+                <!-- General Tab -->
+                @if (activeTab() === 'general') {
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">Información Principal</h2>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Título del Curso</label>
+                                <input type="text" [(ngModel)]="courseData.title" placeholder="Ej: Reparación de Celulares desde Cero" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14">
+                            </div>
+                            
+                            <div>
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Descripción Detallada</label>
+                                <textarea [(ngModel)]="courseData.description" rows="5" placeholder="Explica detalladamente qué aprenderán los alumnos..." class="textarea textarea-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="label font-bold text-slate-700 dark:text-slate-300">Breve Resumen (Seo/Cards)</label>
+                                <input type="text" [(ngModel)]="courseData.short_description" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="label font-bold text-slate-700 dark:text-slate-300">Nivel</label>
+                                    <select [(ngModel)]="courseData.level" class="select select-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl h-14">
+                                        <option value="basic">Básico</option>
+                                        <option value="intermediate">Intermedio</option>
+                                        <option value="advanced">Avanzado</option>
+                                        <option value="all">Todos los niveles</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="label font-bold text-slate-700 dark:text-slate-300">URL Imagen de Portada</label>
+                                    <input type="text" [(ngModel)]="courseData.image_url" placeholder="https://..." class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-14">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Modules Tab -->
+                @if (activeTab() === 'modules') {
+                    <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-black text-gray-900 dark:text-white">Plan de Estudios</h2>
+                            <button (click)="addModule()" class="btn btn-primary rounded-xl shadow-lg shadow-blue-500/30">
+                                <i class="fas fa-plus mr-2"></i> Nuevo Módulo
+                            </button>
+                        </div>
+
+                        @if (modules.length === 0) {
+                            <div class="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center shadow-sm border border-slate-200 dark:border-slate-700 border-dashed">
+                                <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Comienza a estructurar tu curso</h3>
+                                <p class="text-slate-500 mb-6">Agrega módulos para organizar tus videos, archivos y exámenes.</p>
+                                <button (click)="addModule()" class="btn btn-primary rounded-xl">Crear primer módulo</button>
+                            </div>
+                        }
+
+                        <div class="space-y-6">
+                            @for (mod of modules; track mod.id; let i = $index) {
+                                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 group transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                                    <div class="flex items-start gap-4 mb-6">
+                                        <div class="flex flex-col gap-1 mt-2 shrink-0">
+                                            <button (click)="moveModule(i, -1)" [disabled]="i === 0" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-blue-600 disabled:opacity-30 transition-colors"><i class="fas fa-chevron-up"></i></button>
+                                            <button (click)="moveModule(i, 1)" [disabled]="i === modules.length - 1" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-blue-600 disabled:opacity-30 transition-colors"><i class="fas fa-chevron-down"></i></button>
+                                        </div>
+                                        <div class="grow space-y-4">
+                                            <input type="text" [(ngModel)]="mod.title" placeholder="Ej: Módulo 1: Introducción" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl text-lg font-bold h-14">
+                                            <textarea [(ngModel)]="mod.description" rows="2" placeholder="Breve descripción del módulo..." class="textarea textarea-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl text-sm"></textarea>
+                                        </div>
+                                        <button (click)="removeModule(i)" class="btn btn-circle btn-ghost text-red-500 hover:bg-red-50 shrink-0 mt-2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Mod Materials -->
+                                    <div class="ml-12 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 border border-slate-100 dark:border-slate-700/50">
+                                        <h4 class="font-bold text-slate-700 dark:text-slate-300 mb-4 text-sm uppercase tracking-wider flex items-center gap-2">
+                                            <i class="fas fa-paperclip text-blue-500"></i> Archivos y Lecciones
+                                        </h4>
+                                        
+                                        <div class="space-y-2 mb-4">
+                                            @for (content of moduleContentsMap[mod.id]; track content.id) {
+                                                <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-3 rounded-xl shadow-xs border border-slate-100 dark:border-slate-700">
+                                                    <div class="flex items-center gap-3 min-w-0">
+                                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                                                             [class.bg-red-50]="content.type === 'video'" [class.text-red-500]="content.type === 'video'"
+                                                             [class.bg-orange-50]="content.type === 'document'" [class.text-orange-500]="content.type === 'document'"
+                                                             [class.bg-blue-50]="content.type === 'image'" [class.text-blue-500]="content.type === 'image'">
+                                                             @if(content.type==='video'){ <i class="fas fa-play"></i> }
+                                                             @else if(content.type==='document'){ <i class="fas fa-file-pdf"></i> }
+                                                             @else { <i class="fas fa-image"></i> }
+                                                        </div>
+                                                        <span class="font-medium text-sm text-gray-900 dark:text-white truncate">{{ content.title }}</span>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-ghost text-red-400 hover:bg-red-50" (click)="removeContent(mod.id, content.id)"><i class="fas fa-times"></i></button>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <!-- Dropzone -->
+                                        <div class="relative border-2 border-dashed border-blue-200 dark:border-slate-600 rounded-xl p-8 text-center bg-white dark:bg-slate-800 hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer"
+                                             (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event, mod)">
+                                            
+                                            <input type="file" multiple (change)="onFileSelected($event, mod)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" [disabled]="mod.uploading">
+                                            
+                                            @if (mod.uploading) {
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <span class="loading loading-spinner text-blue-500 mb-2"></span>
+                                                    <span class="text-sm font-bold text-blue-500">Subiendo archivos... por favor espera</span>
+                                                </div>
+                                            } @else {
+                                                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-full flex items-center justify-center text-xl mx-auto mb-3">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                </div>
+                                                <p class="text-sm font-bold text-slate-700 dark:text-slate-300">Arrastra videos o PDFs aquí</p>
+                                                <p class="text-xs text-slate-400 mt-1">Soporta mp4, pdf, jpg. Tamaño max 2GB.</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Settings Tab -->
+                @if (activeTab() === 'settings') {
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+                        
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">Precios y Ventas</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="label font-bold text-slate-700 dark:text-slate-300">Precio Regular (ARS)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-4 text-slate-400 font-bold">$</span>
+                                        <input type="number" [(ngModel)]="courseData.price" class="input input-bordered w-full pl-8 bg-slate-50 dark:bg-slate-900/50 rounded-xl h-14 font-bold text-lg text-gray-900 dark:text-white">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="label font-bold text-slate-700 dark:text-slate-300">Precio en Oferta (ARS)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-4 text-slate-400 font-bold">$</span>
+                                        <input type="number" [(ngModel)]="courseData.sale_price" class="input input-bordered w-full pl-8 bg-slate-50 dark:bg-slate-900/50 rounded-xl h-14 font-bold text-lg text-emerald-600">
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Déjalo en 0 si no hay oferta activa.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">Detalles Técnicos</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Total Clases</label>
+                                    <input type="number" [(ngModel)]="courseData.classes_count" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Horas Contenido</label>
+                                    <input type="number" [(ngModel)]="courseData.hours_content" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Horas Práctica</label>
+                                    <input type="number" [(ngModel)]="courseData.hours_practice" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">Perfil Público del Instructor</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Nombre a mostrar</label>
+                                    <input type="text" [(ngModel)]="courseData.instructor_name" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Foto del Instructor (URL)</label>
+                                    <input type="text" [(ngModel)]="courseData.instructor_avatar" placeholder="https://..." class="input input-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="label text-sm font-bold text-slate-700 dark:text-slate-300">Biografía del Instructor</label>
+                                    <textarea [(ngModel)]="courseData.instructor_bio" rows="3" class="textarea textarea-bordered w-full bg-slate-50 dark:bg-slate-900/50 rounded-xl"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Visibility Card -->
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-eye text-blue-500"></i> Visibilidad</h3>
+                    
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-4">
+                            <input type="checkbox" [(ngModel)]="courseData.is_active" class="toggle toggle-primary toggle-lg" />
+                            <span class="label-text font-bold dark:text-white">Curso Publicado</span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 ml-14">Si está apagado, el curso no será visible para nuevos alumnos en la página principal.</p>
+                </div>
+
+                <!-- Summary Card -->
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-4">Resumen</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                            <span class="text-slate-500">Módulos</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ modules.length }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                            <span class="text-slate-500">Archivos totales</span>
+                            <span class="font-bold text-gray-900 dark:text-white">
+                                {{ modules.reduce((acc, m) => acc + (moduleContentsMap[m.id]?.length || 0), 0) }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                            <span class="text-slate-500">Estado</span>
+                            @if (courseData.is_active) {
+                                <span class="badge badge-success badge-sm text-white border-none font-bold">Activo</span>
+                            } @else {
+                                <span class="badge badge-warning badge-sm text-white border-none font-bold">Oculto</span>
+                            }
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary w-full mt-6 rounded-xl shadow-lg shadow-blue-500/30" (click)="save()" [disabled]="saving()">
+                        @if (saving()) { <span class="loading loading-spinner"></span> Guardando... }
+                        @else { <i class="fas fa-save mr-2"></i> Guardar Todo }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+  }
+</div>
