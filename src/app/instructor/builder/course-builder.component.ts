@@ -4,14 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CoursesService, Course, Module } from '@app/core/services/courses.service';
 import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
-import { IsLoadingComponent, IsErrorComponent } from '@app/shared/components/resource-status';
-import { ModuleContent } from '@app/admin/courses/materials/admin-course-materials-page';
+
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-course-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, IsLoadingComponent, IsErrorComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './course-builder.component.html'
 })
 export class CourseBuilderComponent implements OnInit {

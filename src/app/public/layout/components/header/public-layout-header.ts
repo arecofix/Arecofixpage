@@ -30,7 +30,7 @@ import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/mod
 import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
 import { ThemeToggleComponent } from '@app/shared/components/theme-toggle/theme-toggle.component';
 import { SearchUtils } from '@app/shared/utils/search.utils';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { map, switchMap, catchError, filter } from 'rxjs/operators';
 import { Subscription, firstValueFrom, of } from 'rxjs';
 
 import { NavigationStateService } from '@app/core/services/navigation-state.service';
