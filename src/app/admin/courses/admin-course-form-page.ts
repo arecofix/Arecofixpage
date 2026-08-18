@@ -632,8 +632,6 @@ export class AdminCourseFormPage implements OnInit {
       start_date: formValue.start_date || null,
       is_featured: formValue.is_featured || false,
       short_description: formValue.short_description || null,
-      students: formValue.students || 0,
-      rating: formValue.rating || 5.0,
       classes_count: formValue.classes_count || 0,
       hours_content: formValue.hours_content || 0,
       hours_practice: formValue.hours_practice || 0,
@@ -689,7 +687,7 @@ export class AdminCourseFormPage implements OnInit {
   }
 
   loadInstructors() {
-    this.adminUsersService.getInstructors().subscribe({
+    this.adminUsersService.getUsers().subscribe({
       next: (instructors) => {
         this.instructors.set(instructors);
         this.cdr.markForCheck();

@@ -284,7 +284,7 @@ export const publicRoutes: Routes = [
         }
       },
       {
-        title: 'Mis Cursos',
+        title: 'Mi Academia',
         path: 'academy/mis-cursos',
         canActivate: [authGuard],
         loadComponent: () =>

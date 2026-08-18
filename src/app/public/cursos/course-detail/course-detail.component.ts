@@ -98,6 +98,7 @@ export class CourseDetailComponent implements OnInit {
       avatar: 'assets/img/cursos/academy/profe_de_reparacion-de-celulares.jpeg'
   };
   
+  isAuthor = false;
   get isCelularCourse(): boolean {
       if (!this.course) return false;
       const title = (this.course.title || '').toLowerCase();
@@ -181,6 +182,9 @@ export class CourseDetailComponent implements OnInit {
           for (let i = 0; i < seed.length; i++) x += seed.charCodeAt(i);
           return Math.abs((Math.sin(x) * 10000) - Math.floor(Math.sin(x) * 10000));
       };
+      
+      const profile = this.authService.getCurrentProfile();
+      this.isAuthor = !!profile && profile.id === this.course.author_id;
 
       this.rating = this.course.rating || 5.0;
       this.reviewsCount = this.course.reviews_count || 120;

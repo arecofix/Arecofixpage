@@ -396,24 +396,24 @@
               </span>
             </a>
           </li>
-          <!-- Enlace agregado para "Mis Cursos" -->
+          <!-- Enlace Unificado para la Academia -->
           <li>
             <a routerLink="/academy/mis-cursos" class="rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-500/10 cursor-pointer text-emerald-600 dark:text-emerald-400 font-medium">
-              <i class="fas fa-book-reader"></i> Mis Cursos
+              <i class="fas fa-graduation-cap"></i> Mi Academia
             </a>
           </li>
+          @if (activeUser?.role === 'super_admin' || activeUser?.role === 'admin') {
+            <li>
+              <a routerLink="/admin/dashboard" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
+                <i class="fas fa-shield-alt"></i> Panel Admin
+              </a>
+            </li>
+          }
           <li>
             <button (click)="logout()" class="rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500">
               <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </button>
           </li>
-          @if (activeUser?.role === 'instructor' || activeUser?.role === 'super_admin' || activeUser?.role === 'admin') {
-            <li>
-              <a [routerLink]="(activeUser?.role === 'instructor' || isAcademyMode) ? '/instructor' : '/admin/dashboard'" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
-                <i [class]="(activeUser?.role === 'instructor' || isAcademyMode) ? 'fas fa-chalkboard-teacher' : 'fas fa-shield-alt'"></i> {{ (activeUser?.role === 'instructor' || isAcademyMode) ? 'Panel Instructor' : 'Admin' }}
-              </a>
-            </li>
-          }
         } @else {
           <li>
             <a routerLink="/login" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
@@ -599,7 +599,7 @@
       <a routerLink="/academy/mis-cursos" (click)="closeMobileMenu()"
          class="btn btn-xs btn-ghost w-full justify-start gap-2 rounded-lg
                 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium mb-1">
-        <i class="fas fa-book-reader text-[10px]"></i> Mis Cursos
+        <i class="fas fa-graduation-cap text-[10px]"></i> Mi Academia
       </a>
       <button (click)="logout()"
               class="btn btn-xs btn-ghost w-full justify-start gap-2 rounded-lg

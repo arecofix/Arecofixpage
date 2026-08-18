@@ -33,6 +33,21 @@ import { FormsModule } from '@angular/forms';
         </div>
       } @else {
         
+        <!-- Instructor Edit Banner -->
+        @if (isAuthor()) {
+          <div class="bg-indigo-600 text-white shadow-md relative z-50">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-tools text-indigo-200"></i>
+                <span class="font-medium text-sm sm:text-base">Estás viendo este curso en modo estudiante.</span>
+              </div>
+              <a [routerLink]="['/instructor/builder', course()?.id]" class="btn btn-sm bg-white text-indigo-700 hover:bg-indigo-50 border-none whitespace-nowrap">
+                <i class="fas fa-edit"></i> Editar este Curso
+              </a>
+            </div>
+          </div>
+        }
+
         <!-- Header Banner -->
         <div class="bg-blue-900 dark:bg-slate-950 text-white relative overflow-hidden">
             <div class="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay" [style.backgroundImage]="'url(' + getImageSrc(course()?.image_url) + ')'"></div>
@@ -273,6 +288,8 @@ export class StudentCampusPage implements OnInit {
   certificateId = signal<string | null>(null);
   markingCompleted = signal<Record<string, boolean>>({});
 
+  isAuthor = signal(false);
+
   // Exam state
   activeExam: ModuleContent | null = null;
   activeExamQuestions = signal<any[]>([]);
@@ -301,6 +318,11 @@ export class StudentCampusPage implements OnInit {
         }
         this.course.set(res.data);
         const courseId = res.data.id;
+        
+        const profile = this.authService.getCurrentProfile();
+        if (profile && res.data.author_id === profile.id) {
+            this.isAuthor.set(true);
+        }
 
         // 2. Validate Access (Using auth service + explicit enrollment check, or relying on RLS)
         // We will fetch modules. If RLS allows, we get them.
@@ -330,6 +352,11 @@ export class StudentCampusPage implements OnInit {
                 const userSession = await this.authService.getSession();
                 const userRole = userSession?.user?.user_metadata?.['role'];
                 if (['admin', 'staff', 'super_admin', 'tenant_owner'].includes(userRole)) {
+                    accessConfirmed = true;
+                }
+                
+                // If user is the author of the course, they always have access to their classroom
+                if (this.isAuthor()) {
                     accessConfirmed = true;
                 }
 
