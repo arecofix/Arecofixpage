@@ -107,13 +107,25 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          tenant_id: string | null;
           email: string | null;
-          role: 'user' | 'admin' | 'staff';
           first_name: string | null;
           last_name: string | null;
-          full_name: string | null;
+          avatar_url: string | null;
+          bio: string | null;
+          phone: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          role: 'user' | 'admin' | 'staff' | 'super_admin' | 'tenant_owner' | 'technician';
+          address: string | null;
+          dni: string | null;
+          cuit_cuil: string | null;
           branch_id: string | null;
+          tenant_id: string | null;
+          deleted_at: string | null;
+          is_guest: boolean;
+          referral_code: string | null;
+          points: number;
         };
         Insert: Partial<Database['public']['Tables']['profiles']['Row']>;
         Update: Partial<Database['public']['Tables']['profiles']['Row']>;

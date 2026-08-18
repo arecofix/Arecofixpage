@@ -180,11 +180,17 @@ export class CoursesService {
 
     searchUsersByEmail(query: string): Observable<{ data: any[], error: any }> {
         const tenantId = this.tenantService.getTenantId();
-        return from(this.supabase.from('profiles').select('id, email, first_name, last_name, phone')
-            .eq('tenant_id', tenantId)
-            .ilike('email', `%${query}%`)
-            .limit(10)
-        ).pipe(
+        const trimmed = (query || '').trim();
+        let dbQuery = this.supabase.from('profiles')
+            .select('id, email, first_name, last_name, phone, avatar_url, role')
+            .ilike('email', `%${trimmed}%`)
+            .limit(10);
+
+        if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
+            dbQuery = dbQuery.or(`tenant_id.eq.${tenantId},tenant_id.is.null`);
+        }
+
+        return from(dbQuery).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
                 return { data: data || [], error: null };

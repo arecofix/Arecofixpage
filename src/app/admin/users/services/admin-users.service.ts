@@ -21,8 +21,11 @@ export class AdminUsersService {
       let query = this.supabase
         .from('profiles')
         .select('id, email, first_name, last_name, phone, role, avatar_url, created_at, updated_at, is_active, branch_id')
-        .eq('tenant_id', tenantId)
         .order('created_at', { ascending: false });
+
+      if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
+        query = query.eq('tenant_id', tenantId);
+      }
 
       const profile = this.authService.getCurrentProfile();
       const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
@@ -49,8 +52,11 @@ export class AdminUsersService {
       let query = this.supabase
         .from('profiles')
         .select('id, email, first_name, last_name, phone, role, avatar_url, created_at, updated_at, is_active, branch_id', { count: 'exact' })
-        .eq('tenant_id', tenantId)
         .order('created_at', { ascending: false });
+
+      if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
+        query = query.eq('tenant_id', tenantId);
+      }
 
       const profile = this.authService.getCurrentProfile();
       const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
@@ -100,11 +106,16 @@ export class AdminUsersService {
   getInstructors(): Observable<UserProfile[]> {
     return from((async () => {
       const tenantId = this.tenantService.getTenantId();
-      const { data, error } = await this.supabase
+      let query = this.supabase
         .from('profiles')
         .select('id, email, first_name, last_name, avatar_url, role')
-        .eq('tenant_id', tenantId)
         .order('first_name', { ascending: true });
+
+      if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
+        query = query.eq('tenant_id', tenantId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return (data || []) as UserProfile[];

@@ -333,17 +333,25 @@ export class AuthService {
          localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
          return existingProfile;
       }
-      const tenantId = this.tenantService.getTenantId();
-      const isFallback = tenantId === TENANT_CONSTANTS.FALLBACK_ID;
+
+      const currentTenantId = this.tenantService.getTenantId();
+      const isFallback = currentTenantId === TENANT_CONSTANTS.FALLBACK_ID;
+      const targetTenantId = (!isFallback && currentTenantId) ? currentTenantId : 'bba26ccd-59ce-471c-aac0-4c1f5513de3b';
+
+      const metaFullName = meta['full_name'] || meta['name'] || null;
+      const metaFirstName = meta['first_name'] || meta['given_name'] || (metaFullName ? metaFullName.split(' ')[0] : null) || (session.user.email ? session.user.email.split('@')[0] : null);
+      const metaLastName = meta['last_name'] || meta['family_name'] || (metaFullName && metaFullName.includes(' ') ? metaFullName.split(' ').slice(1).join(' ') : null);
+      const computedFullName = metaFullName || (metaFirstName && metaLastName ? `${metaFirstName} ${metaLastName}` : (metaFirstName || ''));
 
       const payload: Partial<UserProfile> = {
         id: session.user.id,
         email: session.user.email || meta['email'] || '',
-        first_name: meta['first_name'] || meta['given_name'] || null,
-        last_name: meta['last_name'] || meta['family_name'] || null,
-        full_name: meta['full_name'] || meta['name'] || null,
-        avatar_url: meta['avatar_url'] || meta['picture'] || null,
+        first_name: metaFirstName,
+        last_name: metaLastName,
+        avatar_url: metaAvatar,
         role: meta['role'] || session.user.app_metadata?.['role'] || 'user',
+        tenant_id: targetTenantId,
+        branch_id: meta['branch_id'] || 'de967f68-7b15-44c0-bc98-952ccf06e1e5',
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -352,10 +360,6 @@ export class AuthService {
       if (payload.email && TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(payload.email)) {
         payload.role = 'super_admin';
         this.isSuperAdmin.set(true);
-      }
-
-      if (!isFallback) {
-        payload.tenant_id = tenantId;
       }
 
       const { data, error } = await this.supabase

@@ -330,11 +330,11 @@
                             <div class="flex items-center gap-3">
                                 <div class="avatar">
                                     <div class="mask mask-squircle w-10 h-10">
-                                        <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.first_name + '+' + user.last_name" alt="Avatar" />
+                                        <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + (user.full_name || (user.first_name ? user.first_name + '+' + user.last_name : user.email))" alt="Avatar" />
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-bold text-sm">{{ user.first_name }} {{ user.last_name }}</div>
+                                    <div class="font-bold text-sm">{{ user.full_name || (user.first_name ? user.first_name + ' ' + (user.last_name || '') : user.email) }}</div>
                                     <div class="text-xs opacity-50">{{ user.email }}</div>
                                 </div>
                             </div>
