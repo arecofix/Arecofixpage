@@ -15,7 +15,7 @@
             @if (selectedUser()) {
                 <div class="flex items-center gap-2 p-2 border border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800 rounded-lg">
                     <div class="flex-1 min-w-0">
-                        <div class="font-medium text-sm text-green-800 dark:text-green-400 truncate">{{ selectedUser().first_name }} {{ selectedUser().last_name }}</div>
+                        <div class="font-medium text-sm text-green-800 dark:text-green-400 truncate">{{ selectedUser().full_name || (selectedUser().first_name ? selectedUser().first_name + ' ' + (selectedUser().last_name || '') : selectedUser().email) }}</div>
                         <div class="text-xs text-green-600 dark:text-green-500 truncate">{{ selectedUser().email }}</div>
                     </div>
                     <button class="btn btn-xs btn-ghost btn-circle text-error" (click)="clearSelectedUser()"><i class="fas fa-times"></i></button>
@@ -32,7 +32,7 @@
                             <li>
                                 <a (click)="selectUser(user)" class="py-3">
                                     <div class="flex flex-col">
-                                        <span class="font-bold text-sm">{{ user.first_name }} {{ user.last_name }}</span>
+                                        <span class="font-bold text-sm">{{ user.full_name || (user.first_name ? user.first_name + ' ' + (user.last_name || '') : user.email) }}</span>
                                         <span class="text-xs text-slate-500">{{ user.email }}</span>
                                     </div>
                                 </a>

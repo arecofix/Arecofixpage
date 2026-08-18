@@ -109,7 +109,7 @@ export class AdminCourseEnrollmentsPage implements OnInit {
       this.isEnrolling.set(true);
       const user = this.selectedUser();
       const courseId = this.selectedCourseId();
-      const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+      const fullName = user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
 
       const { data, error } = await this.coursesService.enrollStudentManually(courseId, user.email, fullName, user.phone);
       
