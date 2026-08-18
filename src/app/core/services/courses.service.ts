@@ -256,6 +256,43 @@ export class CoursesService {
         );
     }
 
+    /**
+     * Loads all modules for a course AND their contents in parallel.
+     * Returns modules with a `contents` array attached to each one.
+     * Used by the public course detail page to render the real syllabus.
+     */
+    getModulesWithContents(courseId: string): Observable<{ data: (CourseModule & { contents: CourseModuleContent[] })[], error: unknown }> {
+        return this.getModulesByCourseId(courseId).pipe(
+            switchMap(modulesRes => {
+                if (modulesRes.error || !modulesRes.data?.length) {
+                    return of({ data: [], error: modulesRes.error });
+                }
+                const modules = modulesRes.data;
+                const contentRequests = modules.map(mod =>
+                    this.getModuleContents(mod.id)
+                );
+                return from(Promise.all(contentRequests.map(obs => obs.toPromise()))).pipe(
+                    map(allContents => ({
+                        data: modules.map((mod, i) => ({
+                            ...mod,
+                            contents: (allContents[i]?.data || []) as CourseModuleContent[]
+                        })),
+                        error: null
+                    })),
+                    catchError(err => {
+                        this.logger.error(`Failed to load module contents for course: ${courseId}`, err);
+                        return of({ data: modules.map(m => ({ ...m, contents: [] as CourseModuleContent[] })), error: err });
+                    })
+                );
+            }),
+            catchError(error => {
+                this.logger.error(`Failed to load modules with contents for course: ${courseId}`, error);
+                return of({ data: [], error });
+            })
+        );
+    }
+
+
     // --- Exams ---
     
     getExamQuestions(contentId: string): Observable<{ data: any[], error: any }> {

@@ -12,8 +12,10 @@ export default [
     title: 'Constructor de Curso'
   },
   {
-    path: 'builder/:id',
+    // Accepts both UUID (legacy) and slug (new friendly URL)
+    path: 'builder/:idOrSlug',
     loadComponent: () => import('./builder/course-builder.component').then(m => m.CourseBuilderComponent),
     title: 'Editar Curso'
   }
 ] as Routes;
+
