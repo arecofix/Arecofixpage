@@ -55,7 +55,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
-    if (typeof window !== 'undefined' && this.route.snapshot.queryParams['returnUrl']) {
+    if (typeof window !== 'undefined') {
         localStorage.setItem('arecofix_return_url', this.returnUrl);
     }
     
@@ -136,6 +136,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.success = '';
     
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
       this.error = 'Por favor completa correctamente todos los campos.';
       return;
     }

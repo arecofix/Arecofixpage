@@ -21,6 +21,7 @@ import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { TENANT_CONSTANTS } from '../constants/tenant.constants';
+import { ToastService } from '@app/shared/services/toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -214,15 +215,36 @@ export class AuthService {
           }
 
           if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
-            const returnUrl = localStorage.getItem('arecofix_return_url');
-            if (returnUrl) {
-              localStorage.removeItem('arecofix_return_url');
-              setTimeout(async () => {
-                const { Router } = await import('@angular/router');
-                const router = this.injector.get(Router);
-                router.navigateByUrl(returnUrl);
-              }, 100);
+            let returnUrl = localStorage.getItem('arecofix_return_url');
+            if (returnUrl !== null) {
+               localStorage.removeItem('arecofix_return_url');
             }
+            
+            const isOAuthRedirect = window.location.hash.includes('access_token');
+            if (isOAuthRedirect) {
+               const toastService = this.injector.get(ToastService);
+               toastService.show(`Bienvenido${profile?.first_name ? ' ' + profile.first_name : ''}! Has iniciado sesión correctamente.`, 'success');
+            }
+
+            if (!returnUrl || returnUrl === '') {
+              const userRole = profile?.role || 'user';
+              const isAdmin = ['admin', 'super_admin', 'tenant_owner', 'technician'].includes(userRole);
+              returnUrl = isAdmin ? '/admin' : '/';
+            }
+
+            setTimeout(async () => {
+              const { Router } = await import('@angular/router');
+              const router = this.injector.get(Router);
+              
+              const currentPath = window.location.pathname;
+              // Redirect unless we are already exactly on the intended route (ignoring hash)
+              if (currentPath !== returnUrl || returnUrl !== '/') {
+                 router.navigateByUrl(returnUrl);
+              } else if (isOAuthRedirect) {
+                 // Remove hash from URL to clean it up without reloading
+                 history.replaceState(null, '', window.location.pathname + window.location.search);
+              }
+            }, 100);
           }
 
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
