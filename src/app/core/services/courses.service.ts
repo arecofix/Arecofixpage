@@ -213,7 +213,7 @@ export class CoursesService {
         const trimmed = (query || '').trim();
         // Search by email OR by first/last name — no tenant filter so admin can find any registered user
         const dbQuery = this.supabase.from('profiles')
-            .select('id, email, first_name, last_name, full_name, phone, avatar_url, role')
+            .select('id, email, first_name, last_name, phone, avatar_url, role')
             .or(`email.ilike.%${trimmed}%,first_name.ilike.%${trimmed}%,last_name.ilike.%${trimmed}%`)
             .limit(15);
 

@@ -10,7 +10,7 @@ import { LoggerService } from '@app/core/services/logger.service';
 
 export interface ModuleContent {
   id?: string;
-  lesson_id: string;
+  module_id: string;
   type: 'video' | 'image' | 'document' | 'link' | 'text' | 'exam';
   title: string;
   url: string;
@@ -470,7 +470,7 @@ export class AdminCourseMaterialsPage implements OnInit {
   addResource(type: 'video' | 'image' | 'document' | 'link' | 'text' | 'exam') {
       const current = this.contents();
       const newResource: ModuleContent = {
-          lesson_id: this.selectedModule()!.id!,
+          module_id: this.selectedModule()!.id!,
           type,
           title: '',
           url: '',

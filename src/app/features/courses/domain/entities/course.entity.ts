@@ -79,7 +79,7 @@ export interface CourseInstructor {
 
 export interface CourseModuleContent {
     id: string;
-    lesson_id: string; // References CourseModule.id
+    module_id: string; // References CourseModule.id
     tenant_id?: string;
     type: 'video' | 'image' | 'document' | 'link' | 'text' | 'exam';
     url: string;

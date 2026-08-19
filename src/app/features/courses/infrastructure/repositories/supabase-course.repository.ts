@@ -173,8 +173,8 @@ export class SupabaseCourseRepository extends CourseRepository {
 
   async getModuleContents(moduleId: string): Promise<CourseModuleContent[]> {
     const { data, error } = await this.scoped.withTenantScope(
-      this.scoped.from('course_module_contents').select('*')
-    ).eq('lesson_id', moduleId)
+      this.scoped.from('course_lessons').select('*')
+    ).eq('module_id', moduleId)
      .order('order_index', { ascending: true });
 
     if (error) throw error;
@@ -187,24 +187,24 @@ export class SupabaseCourseRepository extends CourseRepository {
 
     if (existingIds.length > 0) {
       await this.scoped
-        .withTenantScope(this.scoped.from('course_module_contents').delete())
-        .eq('lesson_id', moduleId)
+        .withTenantScope(this.scoped.from('course_lessons').delete())
+        .eq('module_id', moduleId)
         .not('id', 'in', `(${existingIds.join(',')})`);
     } else {
       await this.scoped
-        .withTenantScope(this.scoped.from('course_module_contents').delete())
-        .eq('lesson_id', moduleId);
+        .withTenantScope(this.scoped.from('course_lessons').delete())
+        .eq('module_id', moduleId);
     }
 
     const toUpsert = contents.map((c, idx) => ({
       ...c,
-      lesson_id: moduleId,
+      module_id: moduleId,
       order_index: idx + 1,
       tenant_id: tid,
       id: isUUID(c.id) ? c.id : crypto.randomUUID(),
     }));
 
-    const { data, error } = await this.scoped.from('course_module_contents').upsert(toUpsert).select();
+    const { data, error } = await this.scoped.from('course_lessons').upsert(toUpsert).select();
     if (error) throw error;
     return data || [];
   }
