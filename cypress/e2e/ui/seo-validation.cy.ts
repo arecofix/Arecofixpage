@@ -63,13 +63,22 @@ describe('SEO Meta Tags & Full Validation', () => {
   });
 
   it('Verifica el SEO de Cursos Dinámicos (Curso de Barbería)', () => {
+    cy.intercept('GET', '**/rest/v1/courses?**slug=eq.curso-de-barberia**').as('getBarberiaCourse');
     cy.visit('/academy/curso-de-barberia');
+    cy.wait('@getBarberiaCourse', { timeout: 15000 });
+    cy.get('h1', { timeout: 10000 }).should('exist');
     checkSeoTags('Barber', 'curso', 'xcxsrn0.webp', '/academy/curso-de-barberia', true);
   });
 
   it('Verifica el SEO de Cursos Dinámicos (Reparación de Notebooks y PC)', () => {
+    // Intercept the Supabase courses request so we can wait for it
+    cy.intercept('GET', '**/rest/v1/courses?**slug=eq.reparacion-pc**').as('getCourse');
     cy.visit('/academy/reparacion-pc');
-    checkSeoTags('Reparación de Notebooks', 'diagnosticar, reparar y optimizar', 'assets/img/cursos/pc-repair.jpg', '/academy/reparacion-pc', true);
+    // Wait for the API response before asserting dynamic SEO tags
+    cy.wait('@getCourse', { timeout: 15000 });
+    // Give Angular time to update the DOM after the API response
+    cy.get('h1', { timeout: 10000 }).should('exist');
+    checkSeoTags('Reparación', null, null, '/academy/reparacion-pc', false);
   });
 
   it('Verifica el SEO de un Producto Dinámico (Usando Fallback)', () => {

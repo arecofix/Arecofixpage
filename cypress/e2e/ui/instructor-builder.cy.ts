@@ -79,16 +79,16 @@ describe('Instructor Builder Component', () => {
     cy.get('h1').should('contain.text', 'Curso Original');
     
     // Cambiar Título en la pestaña General
-    cy.get('input[placeholder="Ej: Reparación de Celulares desde Cero"]').clear().type('Curso Editado', { delay: 50 }).blur();
+    cy.get('input[placeholder="Ej: Reparacion de Celulares desde Cero"]').clear().type('Curso Editado', { delay: 50 }).blur();
     
     // Cambiar a pestaña de módulos
-    cy.contains('Módulos y Clases').click();
+    cy.contains('Modulos y Clases').click();
     
     // Verificar que el módulo cargó
-    cy.get('input[placeholder="Ej: Módulo 1: Introducción"]').should('have.value', 'Módulo 1');
+    cy.get('input[placeholder="Ej: Modulo 1: Introduccion al Hardware"]').should('have.value', 'Módulo 1');
     
     // Editar módulo
-    cy.get('input[placeholder="Ej: Módulo 1: Introducción"]').clear().type('Módulo Editado', { delay: 50 }).blur();
+    cy.get('input[placeholder="Ej: Modulo 1: Introduccion al Hardware"]').clear().type('Módulo Editado', { delay: 50 }).blur();
     
     // Clic en Guardar
     cy.contains('Guardar Cambios').click();
@@ -103,6 +103,6 @@ describe('Instructor Builder Component', () => {
     });
     
     // Mensaje de éxito
-    cy.contains('¡Curso guardado exitosamente!').should('be.visible');
+    cy.contains('Curso guardado exitosamente!').should('be.visible');
   });
 });
