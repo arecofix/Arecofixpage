@@ -99,6 +99,32 @@ export class CoursesService {
         );
     }
 
+    /**
+     * Actualiza la fecha de desbloqueo de un módulo (drip content).
+     * @param moduleId UUID del módulo
+     * @param unlockDate ISO string para programar, null para bloquear, 'now' para habilitar ya
+     */
+    updateModuleUnlockDate(moduleId: string, unlockDate: string | null): Observable<{ data: CourseModule | null, error: any }> {
+        const value = unlockDate === 'now' ? new Date().toISOString() : unlockDate;
+        return from(
+            this.supabase
+                .from('course_modules')
+                .update({ unlock_date: value })
+                .eq('id', moduleId)
+                .select()
+                .single()
+        ).pipe(
+            map(({ data, error }) => {
+                if (error) throw error;
+                return { data: data as CourseModule, error: null };
+            }),
+            catchError(error => {
+                this.logger.error(`Failed to update unlock_date for module ${moduleId}`, error);
+                return of({ data: null, error });
+            })
+        );
+    }
+
     async registerStudent(data: any): Promise<{ data: StudentEnrollment | null, error: any }> {
         try {
             const enrollment: StudentEnrollment = {

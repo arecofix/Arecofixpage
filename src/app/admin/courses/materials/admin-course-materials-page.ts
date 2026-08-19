@@ -63,7 +63,14 @@ export interface ModuleContent {
                       <a [class.active]="selectedModule()?.id === mod.id" 
                          (click)="selectModule(mod)"
                          class="rounded-xl py-3 text-gray-700 dark:text-gray-300">
-                         <i class="fas fa-folder text-blue-500"></i>
+                         <!-- Drip status dot -->
+                         @if (isModuleUnlocked(mod)) {
+                             <i class="fas fa-circle text-emerald-400 text-[8px]" title="Disponible"></i>
+                         } @else if (mod.unlock_date) {
+                             <i class="fas fa-clock text-amber-400 text-xs" title="Programado"></i>
+                         } @else {
+                             <i class="fas fa-lock text-slate-300 dark:text-slate-600 text-xs" title="Bloqueado"></i>
+                         }
                          <span class="truncate font-medium">{{ mod.title }}</span>
                       </a>
                     </li>
@@ -75,23 +82,104 @@ export interface ModuleContent {
             <div class="lg:col-span-3">
                 @if (selectedModule()) {
                     <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                        <div class="bg-slate-50 dark:bg-slate-900/50 p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedModule()?.title }}</h3>
-                                <p class="text-sm text-slate-500 mt-1">Organiza los recursos educativos para esta unidad.</p>
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-6 border-b border-slate-200 dark:border-slate-700">
+                            <!-- Module header row -->
+                            <div class="flex justify-between items-center mb-5">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedModule()?.title }}</h3>
+                                    <p class="text-sm text-slate-500 mt-1">Organiza los recursos educativos para esta unidad.</p>
+                                </div>
+                                <div class="dropdown dropdown-end">
+                                  <div tabindex="0" role="button" class="btn btn-primary btn-sm rounded-xl">
+                                    <i class="fas fa-plus"></i> Agregar Recurso
+                                  </div>
+                                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-52 border border-slate-200 dark:border-slate-700 mt-2">
+                                    <li><a (click)="addResource('video')"><i class="fas fa-video text-red-500"></i> Enlace de Video (YouTube/Vimeo)</a></li>
+                                    <li><a (click)="addResource('document')"><i class="fas fa-file-pdf text-orange-500"></i> Documento / PDF</a></li>
+                                    <li><a (click)="addResource('link')"><i class="fas fa-link text-blue-500"></i> Enlace Externo (Meet, Web)</a></li>
+                                    <li><a (click)="addResource('text')"><i class="fas fa-align-left text-green-500"></i> Texto (Aviso / Info)</a></li>
+                                    <li><a (click)="addResource('exam')"><i class="fas fa-clipboard-list text-purple-500"></i> Examen (Cuestionario)</a></li>
+                                  </ul>
+                                </div>
                             </div>
-                            <div class="dropdown dropdown-end">
-                              <div tabindex="0" role="button" class="btn btn-primary btn-sm rounded-xl">
-                                <i class="fas fa-plus"></i> Agregar Recurso
-                              </div>
-                              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-52 border border-slate-200 dark:border-slate-700 mt-2">
-                                <li><a (click)="addResource('video')"><i class="fas fa-video text-red-500"></i> Enlace de Video (YouTube/Vimeo)</a></li>
-                                <li><a (click)="addResource('document')"><i class="fas fa-file-pdf text-orange-500"></i> Documento / PDF</a></li>
-                                <li><a (click)="addResource('link')"><i class="fas fa-link text-blue-500"></i> Enlace Externo (Meet, Web)</a></li>
-                                <li><a (click)="addResource('text')"><i class="fas fa-align-left text-green-500"></i> Texto (Aviso / Info)</a></li>
-                                <li><a (click)="addResource('exam')"><i class="fas fa-clipboard-list text-purple-500"></i> Examen (Cuestionario)</a></li>
-                              </ul>
+
+                            <!-- ── DRIP CONTENT PANEL ────────────────────────────── -->
+                            <div class="rounded-xl border p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                                 [class.border-emerald-200]="isModuleUnlocked(selectedModule())"
+                                 [class.bg-emerald-50]="isModuleUnlocked(selectedModule())"
+                                 [class.dark:bg-emerald-900/10]="isModuleUnlocked(selectedModule())"
+                                 [class.dark:border-emerald-800]="isModuleUnlocked(selectedModule())"
+                                 [class.border-amber-200]="!isModuleUnlocked(selectedModule()) && selectedModule()?.unlock_date"
+                                 [class.bg-amber-50]="!isModuleUnlocked(selectedModule()) && selectedModule()?.unlock_date"
+                                 [class.dark:bg-amber-900/10]="!isModuleUnlocked(selectedModule()) && selectedModule()?.unlock_date"
+                                 [class.dark:border-amber-800]="!isModuleUnlocked(selectedModule()) && selectedModule()?.unlock_date"
+                                 [class.border-slate-200]="!isModuleUnlocked(selectedModule()) && !selectedModule()?.unlock_date"
+                                 [class.bg-white]="!isModuleUnlocked(selectedModule()) && !selectedModule()?.unlock_date"
+                                 [class.dark:bg-slate-800]="!isModuleUnlocked(selectedModule()) && !selectedModule()?.unlock_date"
+                                 [class.dark:border-slate-700]="!isModuleUnlocked(selectedModule()) && !selectedModule()?.unlock_date">
+
+                                <!-- Status icon + label -->
+                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                    @if (isModuleUnlocked(selectedModule())) {
+                                        <div class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                                            <i class="fas fa-lock-open text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-emerald-800 dark:text-emerald-300 text-sm">Disponible para alumnos</p>
+                                            <p class="text-xs text-emerald-600 dark:text-emerald-500">Habilitado desde {{ formatUnlockDate(selectedModule()?.unlock_date) }}</p>
+                                        </div>
+                                    } @else if (selectedModule()?.unlock_date) {
+                                        <div class="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                                            <i class="fas fa-clock text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-amber-800 dark:text-amber-300 text-sm">Programado</p>
+                                            <p class="text-xs text-amber-600 dark:text-amber-500">Se habilitará el {{ formatUnlockDate(selectedModule()?.unlock_date) }}</p>
+                                        </div>
+                                    } @else {
+                                        <div class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+                                            <i class="fas fa-lock text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-slate-700 dark:text-slate-300 text-sm">Bloqueado</p>
+                                            <p class="text-xs text-slate-400">Sin fecha programada — los alumnos no pueden acceder al contenido</p>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Controls -->
+                                <div class="flex items-center gap-2 flex-wrap shrink-0">
+                                    <!-- Date picker to schedule -->
+                                    <input type="datetime-local"
+                                           id="unlock-date-input"
+                                           [value]="selectedModule()?.unlock_date ? (selectedModule()!.unlock_date!.slice(0,16)) : ''"
+                                           (change)="scheduleUnlock($event)"
+                                           class="input input-sm input-bordered text-xs w-48 rounded-xl"
+                                           title="Programar fecha de disponibilidad" />
+
+                                    <!-- Enable now -->
+                                    <button class="btn btn-sm btn-success rounded-xl gap-1"
+                                            [disabled]="updatingDrip() || isModuleUnlocked(selectedModule())"
+                                            (click)="enableNow()"
+                                            title="Habilitar ahora mismo">
+                                        @if (updatingDrip()) {
+                                            <span class="loading loading-spinner loading-xs"></span>
+                                        } @else {
+                                            <i class="fas fa-bolt"></i>
+                                        }
+                                        Habilitar Ahora
+                                    </button>
+
+                                    <!-- Lock -->
+                                    <button class="btn btn-sm btn-ghost text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl gap-1"
+                                            [disabled]="updatingDrip() || (!selectedModule()?.unlock_date)"
+                                            (click)="lockModule()"
+                                            title="Volver a bloquear">
+                                        <i class="fas fa-lock"></i> Bloquear
+                                    </button>
+                                </div>
                             </div>
+                            <!-- ──────────────────────────────────────────────────── -->
                         </div>
                         
                         <div class="p-6 space-y-4 bg-slate-50 dark:bg-slate-800/50">
@@ -263,6 +351,7 @@ export class AdminCourseMaterialsPage implements OnInit {
   loading = signal(true);
   loadingContents = signal(false);
   saving = signal(false);
+  updatingDrip = signal(false);
 
   editingExamContent: ModuleContent | null = null;
 
@@ -303,6 +392,80 @@ export class AdminCourseMaterialsPage implements OnInit {
           this.contents.set(res.data || []);
       });
   }
+
+  // ── Drip Content helpers ──────────────────────────────────────────────────
+
+  /** Returns true if the module is currently accessible to students */
+  isModuleUnlocked(mod: Module | null): boolean {
+      if (!mod?.unlock_date) return false;
+      return new Date(mod.unlock_date) <= new Date();
+  }
+
+  /** Formats an ISO date string to a human-readable local date */
+  formatUnlockDate(iso: string | null | undefined): string {
+      if (!iso) return '';
+      return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  /** Enable the current module right now */
+  enableNow() {
+      const mod = this.selectedModule();
+      if (!mod?.id) return;
+      this.updatingDrip.set(true);
+      this.coursesService.updateModuleUnlockDate(mod.id, 'now').subscribe(res => {
+          this.updatingDrip.set(false);
+          if (res.error) {
+              this.notification.showError('Error al habilitar el módulo.');
+          } else {
+              const updated = { ...mod, unlock_date: res.data!.unlock_date };
+              this.selectedModule.set(updated);
+              this.modules.update(list => list.map(m => m.id === updated.id ? updated : m));
+              this.notification.showSuccess('✅ Módulo habilitado para los alumnos.');
+          }
+      });
+  }
+
+  /** Lock the module (remove its unlock_date) */
+  lockModule() {
+      const mod = this.selectedModule();
+      if (!mod?.id) return;
+      if (!confirm('¿Querés bloquear este módulo? Los alumnos dejarán de ver su contenido.')) return;
+      this.updatingDrip.set(true);
+      this.coursesService.updateModuleUnlockDate(mod.id, null).subscribe(res => {
+          this.updatingDrip.set(false);
+          if (res.error) {
+              this.notification.showError('Error al bloquear el módulo.');
+          } else {
+              const updated = { ...mod, unlock_date: null };
+              this.selectedModule.set(updated);
+              this.modules.update(list => list.map(m => m.id === updated.id ? updated : m));
+              this.notification.showSuccess('🔒 Módulo bloqueado correctamente.');
+          }
+      });
+  }
+
+  /** Schedule a specific unlock date from datetime-local input */
+  scheduleUnlock(event: Event) {
+      const mod = this.selectedModule();
+      if (!mod?.id) return;
+      const input = event.target as HTMLInputElement;
+      if (!input.value) return;
+      // Convert local datetime-local value to UTC ISO string
+      const isoDate = new Date(input.value).toISOString();
+      this.updatingDrip.set(true);
+      this.coursesService.updateModuleUnlockDate(mod.id, isoDate).subscribe(res => {
+          this.updatingDrip.set(false);
+          if (res.error) {
+              this.notification.showError('Error al programar la fecha.');
+          } else {
+              const updated = { ...mod, unlock_date: res.data!.unlock_date };
+              this.selectedModule.set(updated);
+              this.modules.update(list => list.map(m => m.id === updated.id ? updated : m));
+              this.notification.showSuccess(`📅 Módulo programado: ${this.formatUnlockDate(updated.unlock_date)}`);
+          }
+      });
+  }
+  // ──────────────────────────────────────────────────────────────────────────
 
   addResource(type: 'video' | 'image' | 'document' | 'link' | 'text' | 'exam') {
       const current = this.contents();

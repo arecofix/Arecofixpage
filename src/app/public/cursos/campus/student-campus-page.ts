@@ -89,77 +89,113 @@ import { FormsModule } from '@angular/forms';
                     
                     <div class="space-y-4">
                         @for (mod of modules(); track mod.id; let i = $index) {
-                            <div class="collapse collapse-arrow bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 rounded-2xl" [class.collapse-open]="i === 0">
-                                <input type="radio" name="modules-accordion" [checked]="i === 0" /> 
-                                <div class="collapse-title text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">{{ i + 1 }}</div>
-                                    {{ mod.title }}
-                                </div>
-                                <div class="collapse-content border-t border-slate-100 dark:border-slate-700 pt-4">
-                                    @if (mod.description) {
-                                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">{{ mod.description }}</p>
-                                    }
-                                    
-                                    @if ((moduleContentsMap[mod.id!] || []).length > 0) {
-                                        <div class="space-y-2">
-                                            @for (resource of moduleContentsMap[mod.id!]; track resource.id) {
-                                                <a [href]="resource.url" target="_blank" class="group flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
-                                                    
-                                            <!-- Icon -->
-                                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-                                                         [class.bg-red-50]="resource.type === 'video'" [class.text-red-500]="resource.type === 'video'"
-                                                         [class.bg-orange-50]="resource.type === 'document'" [class.text-orange-500]="resource.type === 'document'"
-                                                         [class.bg-blue-50]="resource.type === 'link'" [class.text-blue-500]="resource.type === 'link'"
-                                                         [class.bg-purple-50]="resource.type === 'exam'" [class.text-purple-500]="resource.type === 'exam'"
-                                                         [class.bg-green-50]="resource.type === 'text'" [class.text-green-500]="resource.type === 'text'">
-                                                         
-                                                        @if (resource.type === 'video') { <i class="fas fa-play ml-1"></i> }
-                                                        @else if (resource.type === 'document') { <i class="fas fa-file-pdf"></i> }
-                                                        @else if (resource.type === 'link') { <i class="fas fa-link"></i> }
-                                                        @else if (resource.type === 'exam') { <i class="fas fa-clipboard-list"></i> }
-                                                        @else { <i class="fas fa-align-left"></i> }
-                                                    </div>
-                                                    
-                                                    <div class="grow min-w-0">
-                                                        <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ resource.title }}</h4>
-                                                        <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">{{ getTypeLabel(resource.type) }}</p>
-                                                    </div>
-                                                    
-                                                    <div class="shrink-0 flex items-center gap-2">
-                                                        @if (completedContents().has(resource.id!)) {
-                                                            <div class="text-emerald-500 tooltip tooltip-left" data-tip="Completado"><i class="fas fa-check-circle text-xl"></i></div>
-                                                        } @else {
-                                                            @if (resource.type === 'exam') {
-                                                                <button class="btn btn-sm btn-outline rounded-xl" (click)="openExam(resource); $event.preventDefault()">Comenzar</button>
+                            @if (isModuleUnlocked(mod) || isAuthor()) {
+                                <!-- UNLOCKED MODULE — normal accordion -->
+                                <div class="collapse collapse-arrow bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 rounded-2xl" [class.collapse-open]="i === 0">
+                                    <input type="radio" name="modules-accordion" [checked]="i === 0" /> 
+                                    <div class="collapse-title text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">{{ i + 1 }}</div>
+                                        {{ mod.title }}
+                                        @if (isAuthor() && !isModuleUnlocked(mod)) {
+                                            <span class="badge badge-warning badge-sm ml-2 font-normal">Bloqueado (solo tú lo ves)</span>
+                                        }
+                                    </div>
+                                    <div class="collapse-content border-t border-slate-100 dark:border-slate-700 pt-4">
+                                        @if (mod.description) {
+                                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">{{ mod.description }}</p>
+                                        }
+                                        
+                                        @if ((moduleContentsMap[mod.id!] || []).length > 0) {
+                                            <div class="space-y-2">
+                                                @for (resource of moduleContentsMap[mod.id!]; track resource.id) {
+                                                    <a [href]="resource.url" target="_blank" class="group flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                                                        
+                                                    <!-- Icon -->
+                                                        <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                                                             [class.bg-red-50]="resource.type === 'video'" [class.text-red-500]="resource.type === 'video'"
+                                                             [class.bg-orange-50]="resource.type === 'document'" [class.text-orange-500]="resource.type === 'document'"
+                                                             [class.bg-blue-50]="resource.type === 'link'" [class.text-blue-500]="resource.type === 'link'"
+                                                             [class.bg-purple-50]="resource.type === 'exam'" [class.text-purple-500]="resource.type === 'exam'"
+                                                             [class.bg-green-50]="resource.type === 'text'" [class.text-green-500]="resource.type === 'text'">
+                                                             
+                                                            @if (resource.type === 'video') { <i class="fas fa-play ml-1"></i> }
+                                                            @else if (resource.type === 'document') { <i class="fas fa-file-pdf"></i> }
+                                                            @else if (resource.type === 'link') { <i class="fas fa-link"></i> }
+                                                            @else if (resource.type === 'exam') { <i class="fas fa-clipboard-list"></i> }
+                                                            @else { <i class="fas fa-align-left"></i> }
+                                                        </div>
+                                                        
+                                                        <div class="grow min-w-0">
+                                                            <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ resource.title }}</h4>
+                                                            <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">{{ getTypeLabel(resource.type) }}</p>
+                                                        </div>
+                                                        
+                                                        <div class="shrink-0 flex items-center gap-2">
+                                                            @if (completedContents().has(resource.id!)) {
+                                                                <div class="text-emerald-500 tooltip tooltip-left" data-tip="Completado"><i class="fas fa-check-circle text-xl"></i></div>
                                                             } @else {
-                                                                <button class="btn btn-sm btn-ghost hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400 rounded-xl tooltip tooltip-left" data-tip="Marcar completado" (click)="markContentAsCompleted(resource.id!, $event)" [disabled]="markingCompleted()[resource.id!]">
-                                                                    @if (markingCompleted()[resource.id!]) {
-                                                                        <span class="loading loading-spinner loading-xs"></span>
-                                                                    } @else {
-                                                                        <i class="far fa-circle text-slate-300 dark:text-slate-600 text-xl"></i>
-                                                                    }
-                                                                </button>
+                                                                @if (resource.type === 'exam') {
+                                                                    <button class="btn btn-sm btn-outline rounded-xl" (click)="openExam(resource); $event.preventDefault()">Comenzar</button>
+                                                                } @else {
+                                                                    <button class="btn btn-sm btn-ghost hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400 rounded-xl tooltip tooltip-left" data-tip="Marcar completado" (click)="markContentAsCompleted(resource.id!, $event)" [disabled]="markingCompleted()[resource.id!]">
+                                                                        @if (markingCompleted()[resource.id!]) {
+                                                                            <span class="loading loading-spinner loading-xs"></span>
+                                                                        } @else {
+                                                                            <i class="far fa-circle text-slate-300 dark:text-slate-600 text-xl"></i>
+                                                                        }
+                                                                    </button>
+                                                                }
                                                             }
-                                                        }
-                                                    </div>
-                                                </a>
-                                                
-                                                <!-- If it is text type, display the content inline instead of link -->
-                                                @if (resource.type === 'text') {
-                                                    <div class="ml-14 pl-4 border-l-2 border-green-200 dark:border-green-900/50 py-2 pr-4 text-sm text-slate-600 dark:text-slate-300 mb-4 bg-green-50/30 dark:bg-green-900/10 rounded-r-xl">
-                                                        {{ resource.url }}
-                                                    </div>
+                                                        </div>
+                                                    </a>
+                                                    
+                                                    <!-- If it is text type, display the content inline instead of link -->
+                                                    @if (resource.type === 'text') {
+                                                        <div class="ml-14 pl-4 border-l-2 border-green-200 dark:border-green-900/50 py-2 pr-4 text-sm text-slate-600 dark:text-slate-300 mb-4 bg-green-50/30 dark:bg-green-900/10 rounded-r-xl">
+                                                            {{ resource.url }}
+                                                        </div>
+                                                    }
                                                 }
+                                            </div>
+                                        } @else {
+                                            <div class="text-center py-6 bg-slate-50 dark:bg-slate-900/30 rounded-xl text-slate-400 text-sm">
+                                                <i class="fas fa-clock text-2xl mb-2 opacity-50"></i>
+                                                <p>Aún no hay materiales publicados en esta unidad.</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            } @else {
+                                <!-- LOCKED MODULE — visible structure but content blocked -->
+                                <div class="bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden opacity-75">
+                                    <!-- Module title row (always visible) -->
+                                    <div class="px-6 py-4 flex items-center gap-3 cursor-not-allowed">
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center text-sm font-bold">{{ i + 1 }}</div>
+                                        <span class="text-lg font-bold text-slate-400 dark:text-slate-500 flex-1">{{ mod.title }}</span>
+                                        <i class="fas fa-lock text-slate-300 dark:text-slate-600 text-lg"></i>
+                                    </div>
+                                    <!-- Lock banner -->
+                                    <div class="border-t border-slate-100 dark:border-slate-700 px-6 py-5 bg-slate-50/60 dark:bg-slate-900/30 flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                                            <i class="fas fa-lock text-slate-400 dark:text-slate-500 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            @if (mod.unlock_date) {
+                                                <p class="font-semibold text-slate-500 dark:text-slate-400 text-sm">Disponible el {{ formatUnlockDate(mod.unlock_date) }}</p>
+                                                <p class="text-xs text-slate-400 mt-0.5">Este módulo se habilitará automáticamente en la fecha indicada.</p>
+                                            } @else {
+                                                <p class="font-semibold text-slate-500 dark:text-slate-400 text-sm">Disponible próximamente</p>
+                                                <p class="text-xs text-slate-400 mt-0.5">Este módulo se habilitará más adelante durante la cursada.</p>
                                             }
                                         </div>
-                                    } @else {
-                                        <div class="text-center py-6 bg-slate-50 dark:bg-slate-900/30 rounded-xl text-slate-400 text-sm">
-                                            <i class="fas fa-clock text-2xl mb-2 opacity-50"></i>
-                                            <p>Aún no hay materiales publicados en esta unidad.</p>
+                                        <div class="ml-auto">
+                                            <span class="btn btn-sm btn-disabled rounded-xl cursor-not-allowed opacity-60 pointer-events-none">
+                                                <i class="fas fa-lock mr-1"></i> Bloqueado
+                                            </span>
                                         </div>
-                                    }
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
                     </div>
                 </div>
@@ -357,6 +393,9 @@ export class StudentCampusPage implements OnInit {
                 
                 if (accessConfirmed) {
                     for (const mod of modulesRes.data) {
+                        // Only fetch contents for unlocked modules (or for admins/authors)
+                        const shouldLoad = this.isModuleUnlocked(mod) || this.isAuthor();
+                        if (!shouldLoad) continue;
                         try {
                             const contentsRes = await this.coursesService.getModuleContents(mod.id!).toPromise();
                             if (contentsRes?.data) {
@@ -390,6 +429,18 @@ export class StudentCampusPage implements OnInit {
       return url;
     }
     return '/' + url;
+  }
+
+  /** Returns true if the module is currently accessible to students */
+  isModuleUnlocked(mod: Module | null | undefined): boolean {
+      if (!mod?.unlock_date) return false;
+      return new Date(mod.unlock_date) <= new Date();
+  }
+
+  /** Formats an ISO date string to a human-readable date (es-AR locale) */
+  formatUnlockDate(iso: string | null | undefined): string {
+      if (!iso) return '';
+      return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
   getTypeLabel(type: string): string {

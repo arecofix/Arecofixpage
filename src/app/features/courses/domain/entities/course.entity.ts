@@ -53,6 +53,7 @@ export interface CourseModule {
     title: string;
     description: string;
     order_index: number;
+    unlock_date?: string | null;  // null = bloqueado; ISO string = programado/activo
     tenant_id?: string;
     created_at?: string;
 }
