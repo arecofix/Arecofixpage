@@ -184,16 +184,12 @@ export class CoursesService {
     }
 
     searchUsersByEmail(query: string): Observable<{ data: any[], error: any }> {
-        const tenantId = this.tenantService.getTenantId();
         const trimmed = (query || '').trim();
-        let dbQuery = this.supabase.from('profiles')
-            .select('id, email, first_name, last_name, phone, avatar_url, role')
-            .ilike('email', `%${trimmed}%`)
-            .limit(10);
-
-        if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
-            dbQuery = dbQuery.or(`tenant_id.eq.${tenantId},tenant_id.is.null`);
-        }
+        // Search by email OR by first/last name — no tenant filter so admin can find any registered user
+        const dbQuery = this.supabase.from('profiles')
+            .select('id, email, first_name, last_name, full_name, phone, avatar_url, role')
+            .or(`email.ilike.%${trimmed}%,first_name.ilike.%${trimmed}%,last_name.ilike.%${trimmed}%`)
+            .limit(15);
 
         return from(dbQuery).pipe(
             map(({ data, error }) => {

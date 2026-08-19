@@ -22,7 +22,7 @@
                 </div>
             } @else {
                 <div class="join w-full">
-                    <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchUsers()" placeholder="ejemplo@email.com" class="input input-bordered join-item w-full">
+                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" (keyup.enter)="searchUsers()" placeholder="ejemplo@email.com" class="input input-bordered join-item w-full">
                     <button class="btn btn-primary join-item" (click)="searchUsers()"><i class="fas fa-search"></i></button>
                 </div>
                 
@@ -46,7 +46,7 @@
         <!-- Select Course -->
         <div class="md:col-span-5">
             <label class="label"><span class="label-text font-medium">Curso a Asignar</span></label>
-            <select [(ngModel)]="selectedCourseId" class="select select-bordered w-full">
+            <select [ngModel]="selectedCourseId()" (ngModelChange)="selectedCourseId.set($event)" class="select select-bordered w-full">
                 <option value="" disabled selected>Selecciona un curso...</option>
                 @for (course of courses(); track course.id) {
                     <option [value]="course.id">{{ course.title }}</option>
