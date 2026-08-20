@@ -216,6 +216,8 @@ export class AuthService {
 
           if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
             let returnUrl = localStorage.getItem('arecofix_return_url');
+            const hasExplicitReturnUrl = returnUrl !== null;
+            
             if (returnUrl !== null) {
                localStorage.removeItem('arecofix_return_url');
             }
@@ -237,11 +239,19 @@ export class AuthService {
               const router = this.injector.get(Router);
               
               const currentPath = window.location.pathname;
-              // Redirect unless we are already exactly on the intended route (ignoring hash)
-              if (currentPath !== returnUrl || returnUrl !== '/') {
-                 router.navigateByUrl(returnUrl);
-              } else if (isOAuthRedirect) {
-                 // Remove hash from URL to clean it up without reloading
+              const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/' || currentPath.includes('/auth/');
+              
+              if (hasExplicitReturnUrl) {
+                 if (currentPath !== returnUrl) {
+                     router.navigateByUrl(returnUrl);
+                 }
+              } else if (isAuthPage) {
+                 if (currentPath !== returnUrl) {
+                     router.navigateByUrl(returnUrl);
+                 }
+              }
+              
+              if (isOAuthRedirect) {
                  history.replaceState(null, '', window.location.pathname + window.location.search);
               }
             }, 100);

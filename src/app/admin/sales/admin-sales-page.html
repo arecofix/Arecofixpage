@@ -23,11 +23,13 @@
                 </a>
 
                 <div class="flex-1 sm:max-w-xs md:max-w-sm relative group">
-                    <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors text-sm"></i>
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <i class="fas fa-barcode text-gray-400 group-focus-within:text-blue-500 transition-colors text-sm"></i>
+                    </div>
                     <input type="text" #searchInput [ngModel]="searchInputText()" (ngModelChange)="searchInputText.set($event); onSearchChange($event)"
                        placeholder="Escanear o buscar producto... (F3)" 
                        autofocus
-                       class="w-full pl-9 pr-3 py-2 bg-gray-50/50 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner" />
+                       class="w-full pl-10 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm" />
                 </div>
             </div>
         </div>
