@@ -297,36 +297,36 @@
 <!-- TAB: USUARIOS REGISTRADOS                                              -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 @if (activeTab() === 'users') {
-<div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">
+<div class="bg-white dark:bg-gray-800/50 rounded-2xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[400px]">
     <div class="overflow-x-auto">
-        <table class="table w-full">
-            <thead class="bg-base-200/50">
-                <tr class="text-base-content/70 text-xs uppercase tracking-wider">
-                    <th>{{ t().crm.users.table.user || 'Usuario' }}</th>
-                    <th>{{ t().crm.users.table.role || 'Rol' }}</th>
-                    <th>{{ t().crm.users.table.branch || 'Sucursal Asignada' }}</th>
-                    <th>{{ t().crm.users.table.registration || 'Registro' }}</th>
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-800/80">
+                <tr>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.users.table.user || 'Usuario' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.users.table.role || 'Rol' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.users.table.branch || 'Sucursal Asignada' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.users.table.registration || 'Registro' }}</th>
                 </tr>
             </thead>
             <tbody>
                 @if (usersLoading()) {
                     <tr>
                         <td colspan="4" class="text-center py-12">
-                            <span class="loading loading-spinner loading-md text-primary"></span>
-                            <p class="text-sm text-base-content/50 mt-2">{{ t().crm.users.loading || 'Cargando usuarios...' }}</p>
+                            <span class="loading loading-spinner loading-md text-blue-500"></span>
+                            <p class="text-sm text-gray-500 mt-2">{{ t().crm.users.loading || 'Cargando usuarios...' }}</p>
                         </td>
                     </tr>
                 } @else if (users().length === 0) {
                     <tr>
-                        <td colspan="4" class="text-center py-12 text-base-content/40">
-                            <i class="fas fa-users text-4xl mb-3 block"></i>
+                        <td colspan="4" class="text-center py-12 text-gray-400">
+                            <i class="fas fa-users text-4xl mb-3 block opacity-30"></i>
                             {{ t().crm.users.emptyState || 'No hay usuarios registrados.' }}
                         </td>
                     </tr>
                 } @else {
                     @for (user of users(); track user.id) {
-                    <tr class="hover:bg-base-50">
-                        <td>
+                    <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                        <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
                                 <div class="avatar">
                                     <div class="mask mask-squircle w-10 h-10">
@@ -334,13 +334,13 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-bold text-sm">{{ user.full_name || (user.first_name ? user.first_name + ' ' + (user.last_name || '') : user.email) }}</div>
-                                    <div class="text-xs opacity-50">{{ user.email }}</div>
+                                    <div class="font-bold text-gray-800 dark:text-white">{{ user.full_name || (user.first_name ? user.first_name + ' ' + (user.last_name || '') : user.email) }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ user.email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>
-                            <select class="select select-sm select-bordered w-full max-w-xs"
+                        <td class="px-4 py-3">
+                            <select class="select select-sm select-bordered bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     [ngModel]="user.role"
                                     (ngModelChange)="updateUserRole(user, $event)">
                                 <option value="user">{{ t().crm.clients.table.client || 'Cliente' }}</option>
@@ -349,21 +349,26 @@
                                 <option value="admin">Admin de Sucursal</option>
                             </select>
                         </td>
-                        <td>
+                        <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 @if (hasGlobalAccess(user)) {
-                                    <!-- Only true super_admin gets global access badge -->
-                                    <span class="badge badge-ghost badge-sm opacity-60 font-bold uppercase tracking-tighter px-3 py-2">
-                                        <i class="fas fa-globe text-[9px] mr-1"></i> Super Admin
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+                                        <i class="fas fa-globe text-[9px]"></i> Super Admin
                                     </span>
                                 } @else {
                                     <div class="flex flex-col gap-1">
-                                        <span class="badge badge-sm font-bold p-2"
-                                              [class.badge-primary]="user.branch_id"
-                                              [class.badge-ghost]="!user.branch_id">
+                                        <span class="inline-flex items-center text-[10px] font-bold px-2 py-1 rounded-lg"
+                                              [class.bg-blue-50]="user.branch_id"
+                                              [class.dark:bg-blue-500/10]="user.branch_id"
+                                              [class.text-blue-600]="user.branch_id"
+                                              [class.dark:text-blue-400]="user.branch_id"
+                                              [class.bg-gray-100]="!user.branch_id"
+                                              [class.dark:bg-gray-700]="!user.branch_id"
+                                              [class.text-gray-500]="!user.branch_id"
+                                              [class.dark:text-gray-400]="!user.branch_id">
                                             {{ getBranchName(user.branch_id) }}
                                         </span>
-                                        <button class="btn btn-xs btn-outline btn-primary border-primary/30"
+                                        <button class="btn btn-xs btn-outline border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                                                 (click)="openBranchModal(user)">
                                             <i class="fas fa-edit text-[10px]"></i>
                                             {{ user.branch_id ? 'Cambiar' : 'Asignar' }}
@@ -372,7 +377,7 @@
                                 }
                             </div>
                         </td>
-                        <td class="text-sm opacity-70">{{ user.created_at | date:'shortDate' }}</td>
+                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ user.created_at | date:'shortDate' }}</td>
                     </tr>
                     }
                 }
@@ -383,9 +388,9 @@
     <!-- Pagination Users -->
     @if (totalUsersPages() > 1) {
         <div class="mt-4 mb-4 flex justify-center gap-1">
-            <button [disabled]="usersCurrentPage() === 1" (click)="onUsersPageChange(usersCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
-            <span class="btn btn-sm btn-ghost cursor-default">{{ usersCurrentPage() }} / {{ totalUsersPages() }}</span>
-            <button [disabled]="usersCurrentPage() === totalUsersPages()" (click)="onUsersPageChange(usersCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+            <button [disabled]="usersCurrentPage() === 1" (click)="onUsersPageChange(usersCurrentPage() - 1)" class="btn btn-sm btn-outline border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default text-gray-600 dark:text-gray-400">{{ usersCurrentPage() }} / {{ totalUsersPages() }}</span>
+            <button [disabled]="usersCurrentPage() === totalUsersPages()" (click)="onUsersPageChange(usersCurrentPage() + 1)" class="btn btn-sm btn-outline border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Siguiente</button>
         </div>
     }
 </div>
@@ -395,30 +400,30 @@
 <!-- TAB 2: STAFF / EMPLEADOS                                               -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 @if (activeTab() === 'staff') {
-<div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">
+<div class="bg-white dark:bg-gray-800/50 rounded-2xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[400px]">
     <div class="overflow-x-auto">
-        <table class="table w-full">
-            <thead class="bg-base-200/50">
-                <tr class="text-base-content/70 text-xs uppercase tracking-wider">
-                    <th>{{ t().crm.staff.table.employee || 'Empleado' }}</th>
-                    <th>{{ t().crm.staff.table.role || 'Cargo / Rol' }}</th>
-                    <th>{{ t().crm.clients.table.contact || 'Contacto' }}</th>
-                    <th>{{ t().crm.staff.table.status || 'Estado' }}</th>
-                    <th>{{ t().crm.clients.table.actions || 'Acciones' }}</th>
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-800/80">
+                <tr>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.staff.table.employee || 'Empleado' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.staff.table.role || 'Cargo / Rol' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.contact || 'Contacto' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.staff.table.status || 'Estado' }}</th>
+                    <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.actions || 'Acciones' }}</th>
                 </tr>
             </thead>
             <tbody>
                 @if (staffLoading()) {
                     <tr>
                         <td colspan="5" class="text-center py-12">
-                            <span class="loading loading-spinner loading-md text-primary"></span>
-                            <p class="text-sm text-base-content/50 mt-2">{{ t().crm.staff.loading || 'Cargando staff...' }}</p>
+                            <span class="loading loading-spinner loading-md text-blue-500"></span>
+                            <p class="text-sm text-gray-500 mt-2">{{ t().crm.staff.loading || 'Cargando staff...' }}</p>
                         </td>
                     </tr>
                 } @else if (employees().length === 0) {
                     <tr>
-                        <td colspan="5" class="text-center py-12 text-base-content/40">
-                            <i class="fas fa-id-badge text-4xl mb-3 block"></i>
+                        <td colspan="5" class="text-center py-12 text-gray-400">
+                            <i class="fas fa-id-badge text-4xl mb-3 block opacity-30"></i>
                             {{ t().crm.staff.emptyState || 'No hay empleados registrados.' }}
                             <div class="mt-4">
                                 <a routerLink="/admin/employees/new" class="btn btn-sm btn-primary">
@@ -429,8 +434,8 @@
                     </tr>
                 } @else {
                     @for (employee of employees(); track employee.id) {
-                    <tr class="hover:bg-base-50">
-                        <td>
+                    <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                        <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
                                 <div class="avatar">
                                     <div class="mask mask-squircle w-10 h-10">
@@ -438,24 +443,27 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-bold text-sm">{{ employee.first_name }} {{ employee.last_name }}</div>
-                                    <div class="text-xs opacity-50">{{ employee.email }}</div>
+                                    <div class="font-bold text-gray-800 dark:text-white">{{ employee.first_name }} {{ employee.last_name }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ employee.email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>
-                            <div class="badge badge-primary badge-outline text-xs">{{ employee.role | uppercase }}</div>
-                            <div class="text-xs mt-1 opacity-60">{{ employee.job_title || 'Sin cargo definido' }}</div>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center text-[10px] font-bold px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 uppercase tracking-wider">{{ employee.role }}</span>
+                            <div class="text-xs mt-1 text-gray-500 dark:text-gray-400">{{ employee.job_title || 'Sin cargo definido' }}</div>
                         </td>
-                        <td>
-                            <div class="text-sm">{{ employee.phone || 'N/A' }}</div>
+                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                            {{ employee.phone || 'N/A' }}
                         </td>
-                        <td>
-                            <span class="badge badge-success badge-sm">Activo</span>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                Activo
+                            </span>
                         </td>
-                        <td>
-                            <a [routerLink]="['/admin/employees', employee.id]" class="btn btn-sm btn-ghost">
-                                <i class="fas fa-edit"></i>
+                        <td class="px-4 py-3 text-center">
+                            <a [routerLink]="['/admin/employees', employee.id]"
+                                class="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 text-gray-400 hover:text-blue-500 transition-all inline-block">
+                                <i class="fas fa-edit text-sm"></i>
                             </a>
                         </td>
                     </tr>
@@ -468,9 +476,9 @@
     <!-- Pagination Staff -->
     @if (totalStaffPages() > 1) {
         <div class="mt-4 mb-4 flex justify-center gap-1">
-            <button [disabled]="staffCurrentPage() === 1" (click)="onStaffPageChange(staffCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
-            <span class="btn btn-sm btn-ghost cursor-default">{{ staffCurrentPage() }} / {{ totalStaffPages() }}</span>
-            <button [disabled]="staffCurrentPage() === totalStaffPages()" (click)="onStaffPageChange(staffCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+            <button [disabled]="staffCurrentPage() === 1" (click)="onStaffPageChange(staffCurrentPage() - 1)" class="btn btn-sm btn-outline border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default text-gray-600 dark:text-gray-400">{{ staffCurrentPage() }} / {{ totalStaffPages() }}</span>
+            <button [disabled]="staffCurrentPage() === totalStaffPages()" (click)="onStaffPageChange(staffCurrentPage() + 1)" class="btn btn-sm btn-outline border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Siguiente</button>
         </div>
     }
 </div>
@@ -480,35 +488,35 @@
 <!-- TAB 3: PROVEEDORES                                                     -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 @if (activeTab() === 'suppliers') {
-<div class="bg-base-100 rounded-xl shadow border border-base-200 overflow-hidden">
+<div class="bg-white dark:bg-gray-800/50 rounded-2xl shadow border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[400px]">
     <div class="overflow-x-auto">
-        <table class="table w-full">
-            <thead class="bg-base-200/50">
-                <tr class="text-base-content/70 text-xs uppercase tracking-wider">
-                    <th class="w-10">
-                        <input type="checkbox" class="checkbox checkbox-sm"
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-800/80">
+                <tr>
+                    <th class="w-10 px-4 py-3">
+                        <input type="checkbox" class="checkbox checkbox-sm border-gray-300 dark:border-gray-600 rounded"
                             [checked]="selectedSupplierIds().size > 0 && selectedSupplierIds().size === suppliers().length"
                             (change)="toggleAll($event)">
                     </th>
-                    <th>{{ t().crm.suppliers.table.name || 'Nombre' }}</th>
-                    <th>{{ t().crm.suppliers.table.type || 'Rubro / Tipo' }}</th>
-                    <th>{{ t().crm.clients.table.contact || 'Contacto' }}</th>
-                    <th>{{ t().crm.staff.table.status || 'Estado' }}</th>
-                    <th>{{ t().crm.clients.table.actions || 'Acciones' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.suppliers.table.name || 'Nombre' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.suppliers.table.type || 'Rubro / Tipo' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.contact || 'Contacto' }}</th>
+                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.staff.table.status || 'Estado' }}</th>
+                    <th class="text-center px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().crm.clients.table.actions || 'Acciones' }}</th>
                 </tr>
             </thead>
             <tbody>
                 @if (suppliersLoading()) {
                     <tr>
                         <td colspan="6" class="text-center py-12">
-                            <span class="loading loading-spinner loading-md text-primary"></span>
-                            <p class="text-sm text-base-content/50 mt-2">{{ t().crm.suppliers.loading || 'Cargando proveedores...' }}</p>
+                            <span class="loading loading-spinner loading-md text-blue-500"></span>
+                            <p class="text-sm text-gray-500 mt-2">{{ t().crm.suppliers.loading || 'Cargando proveedores...' }}</p>
                         </td>
                     </tr>
                 } @else if (suppliers().length === 0) {
                     <tr>
-                        <td colspan="6" class="text-center py-12 text-base-content/40">
-                            <i class="fas fa-truck text-4xl mb-3 block"></i>
+                        <td colspan="6" class="text-center py-12 text-gray-400">
+                            <i class="fas fa-truck text-4xl mb-3 block opacity-30"></i>
                             {{ t().crm.suppliers.emptyState || 'No hay proveedores registrados.' }}
                             <div class="mt-4">
                                 <a routerLink="/admin/suppliers/new" class="btn btn-sm btn-primary">
@@ -519,10 +527,10 @@
                     </tr>
                 } @else {
                     @for (supplier of suppliers(); track supplier.id) {
-                    <tr class="hover:bg-base-50" [class.bg-base-200]="selectedSupplierIds().has(supplier.id)">
-                        <td>
+                    <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors" [class.bg-blue-50]="selectedSupplierIds().has(supplier.id)" [class.dark:bg-blue-900/10]="selectedSupplierIds().has(supplier.id)">
+                        <td class="px-4 py-3">
                             @if (supplier.phone) {
-                                <input type="checkbox" class="checkbox checkbox-sm"
+                                <input type="checkbox" class="checkbox checkbox-sm border-gray-300 dark:border-gray-600 rounded"
                                     [checked]="selectedSupplierIds().has(supplier.id)"
                                     (change)="toggleSupplier(supplier.id)">
                             } @else {
@@ -531,28 +539,29 @@
                                 </div>
                             }
                         </td>
-                        <td>
-                            <div class="font-bold text-sm">{{ supplier.name }}</div>
-                            <div class="text-xs opacity-50">{{ supplier.cuil }}</div>
+                        <td class="px-4 py-3">
+                            <div class="font-bold text-gray-800 dark:text-white">{{ supplier.name }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ supplier.cuil }}</div>
                         </td>
-                        <td>
-                            <div class="badge badge-outline badge-sm">{{ supplier.rubro }}</div>
-                            <div class="text-xs mt-1 opacity-60">{{ supplier.type }}</div>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center text-[10px] font-bold px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 uppercase tracking-wider">{{ supplier.rubro }}</span>
+                            <div class="text-xs mt-1 text-gray-500 dark:text-gray-400">{{ supplier.type }}</div>
                         </td>
-                        <td>
-                            <div class="text-sm">{{ supplier.email }}</div>
-                            <div class="text-xs opacity-60">{{ supplier.phone }}</div>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-700 dark:text-gray-300">{{ supplier.email }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ supplier.phone }}</div>
                         </td>
-                        <td>
-                            <span class="badge badge-sm"
-                                  [class.badge-success]="supplier.is_active"
-                                  [class.badge-ghost]="!supplier.is_active">
-                                {{ supplier.is_active ? 'Activo' : 'Inactivo' }}
-                            </span>
+                        <td class="px-4 py-3">
+                            @if (supplier.is_active) {
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Activo</span>
+                            } @else {
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">Inactivo</span>
+                            }
                         </td>
-                        <td>
-                            <a [routerLink]="['/admin/suppliers', supplier.id]" class="btn btn-sm btn-ghost">
-                                <i class="fas fa-edit"></i>
+                        <td class="px-4 py-3 text-center">
+                            <a [routerLink]="['/admin/suppliers', supplier.id]"
+                                class="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 text-gray-400 hover:text-blue-500 transition-all inline-block">
+                                <i class="fas fa-edit text-sm"></i>
                             </a>
                         </td>
                     </tr>
@@ -565,9 +574,9 @@
     <!-- Pagination Suppliers -->
     @if (totalSuppliersPages() > 1) {
         <div class="mt-4 mb-4 flex justify-center gap-1">
-            <button [disabled]="suppliersCurrentPage() === 1" (click)="onSuppliersPageChange(suppliersCurrentPage() - 1)" class="btn btn-sm btn-outline">Anterior</button>
-            <span class="btn btn-sm btn-ghost cursor-default">{{ suppliersCurrentPage() }} / {{ totalSuppliersPages() }}</span>
-            <button [disabled]="suppliersCurrentPage() === totalSuppliersPages()" (click)="onSuppliersPageChange(suppliersCurrentPage() + 1)" class="btn btn-sm btn-outline">Siguiente</button>
+            <button [disabled]="suppliersCurrentPage() === 1" (click)="onSuppliersPageChange(suppliersCurrentPage() - 1)" class="btn btn-sm btn-outline border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Anterior</button>
+            <span class="btn btn-sm btn-ghost cursor-default text-gray-600 dark:text-gray-400">{{ suppliersCurrentPage() }} / {{ totalSuppliersPages() }}</span>
+            <button [disabled]="suppliersCurrentPage() === totalSuppliersPages()" (click)="onSuppliersPageChange(suppliersCurrentPage() + 1)" class="btn btn-sm btn-outline border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Siguiente</button>
         </div>
     }
 </div>

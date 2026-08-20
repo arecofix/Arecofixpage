@@ -84,10 +84,6 @@ export class AdminCourseEnrollmentsPage implements OnInit {
 
   searchUsers() {
       const query = this.searchQuery().trim();
-      if (query.length < 3) {
-          this.searchResults.set([]);
-          return;
-      }
       this.coursesService.searchUsersByEmail(query).subscribe(res => {
           this.searchResults.set(res.data || []);
       });
