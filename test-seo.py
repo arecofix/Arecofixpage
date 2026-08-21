@@ -12,7 +12,7 @@ class Parser(html.parser.HTMLParser):
             elif tag == 'link' and attrs_dict.get('rel') == 'canonical':
                 print(f"canonical: {attrs_dict.get('href')}")
 
-url = 'https://arecofix.com.ar/productos/categoria/repuestos/tools'
+url = 'https://arecofix.com.ar/academy'
 req = urllib.request.Request(url, headers={'User-Agent': 'facebookexternalhit/1.1'})
 response = urllib.request.urlopen(req)
 html_content = response.read().decode('utf-8')
