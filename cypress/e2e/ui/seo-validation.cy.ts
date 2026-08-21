@@ -89,6 +89,23 @@ describe('SEO Meta Tags & Full Validation', () => {
     checkSeoTags('Joystick Play Station 4', 'Comprá Joystick Play Station 4 al mejor precio', '1000028937.jpg', '/productos/detalle/joystick-play-station-4', true);
   });
 
+  it('Verifica el SEO de la ruta Tracking Dinámica (AF-155)', () => {
+    cy.intercept('GET', '**/rest/v1/repairs?**').as('getRepair');
+    cy.visit('/tracking/AF-155');
+    // We wait for the mock repair or backend to answer
+    cy.wait('@getRepair', { timeout: 15000 });
+    cy.get('h3').contains('Maximiza').should('exist'); // Just wait for something on page load
+
+    // Based on the resolver logic, if AF-155 exists, we check SEO tags.
+    // Assuming the test hits a mocked or seeded database, we verify it doesn't use the generic tracking tags.
+    // Title should contain 'Seguimiento' and 'AF-155'
+    cy.title().should('include', 'AF-155');
+    cy.get('meta[property="og:title"]').should('have.attr', 'content').and('include', 'AF-155');
+    
+    // Fallback image test (og-tracking.png) or custom image
+    cy.get('meta[property="og:image"]').should('have.attr', 'content').and('not.include', genericImage);
+  });
+
   it.skip('Debería retornar las etiquetas Open Graph dinámicas desde el servidor (SSR/Prerender)', () => {
     // Al usar cy.request evitamos que Angular inicie en el cliente.
     // Simula exactamente lo que ve Meta Debugger en Producción.
