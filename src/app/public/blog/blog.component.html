@@ -1,51 +1,111 @@
 <div class="bg-white py-24 sm:py-32">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl text-center relative">
-      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Nuestro Blog</h2>
-      <p class="mt-2 text-lg leading-8 text-gray-600">Noticias, consejos y novedades sobre tecnología.</p>
+    <div class="mx-auto max-w-2xl text-center relative mb-16">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Comunidad Tech</h2>
+      <p class="mt-2 text-lg leading-8 text-gray-600">Artículos, noticias y tutoriales libres para toda la comunidad.</p>
       
       @if (authService.getCurrentUser()) {
         <div class="mt-6">
           <a routerLink="/blog/create" class="btn btn-primary btn-sm rounded-full bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg">
             <i class="fas fa-plus mr-2"></i> Crear Publicación
           </a>
-          <p class="text-[10px] text-gray-400 mt-2">* Requiere aprobación del administrador</p>
-        </div>
-      }
-    </div>
-    <div class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-      @if (loading()) {
-        <div class="col-span-full text-center py-12">
-          <span class="loading loading-spinner loading-lg text-primary"></span>
-        </div>
-      } @else if (error()) {
-        <div class="col-span-full text-center py-12 text-red-500">
-          {{ error() }}
+          <p class="text-[10px] text-gray-400 mt-2">* Requiere aprobación del moderador</p>
         </div>
       } @else {
-        @for (post of posts(); track post.id) {
-          <article class="flex flex-col items-start justify-between">
-            <div class="relative w-full">
-              <img src="{{ post.image || 'assets/img/no-image.svg' }}" alt="{{ post.title }}" class="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2">
-              <div class="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
-            </div>
-            <div class="max-w-xl">
-              <div class="mt-8 flex items-center gap-x-4 text-xs">
-                <time [attr.datetime]="post.created_at" class="text-gray-500">{{ post.created_at | date:'mediumDate' }}</time>
-              </div>
-              <div class="group relative">
-                <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                  <a [routerLink]="['/posts', post.slug]">
-                    <span class="absolute inset-0"></span>
-                    {{ post.title }}
-                  </a>
-                </h3>
-                <p class="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">{{ post.content }}</p>
-              </div>
-            </div>
-          </article>
-        }
+          <div class="mt-6">
+            <a routerLink="/auth/login" class="text-blue-600 text-sm font-semibold hover:underline">Iniciá sesión para publicar en el blog</a>
+          </div>
       }
     </div>
+
+    @if (loading()) {
+      <div class="text-center py-12">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    } @else if (error()) {
+      <div class="text-center py-12 text-red-500">
+        {{ error() }}
+      </div>
+    } @else {
+      <!-- Official Posts Section -->
+      @if (officialPosts().length > 0) {
+          <div class="mb-16">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="h-px bg-gray-200 flex-1"></div>
+                <h3 class="text-2xl font-bold text-gray-900"><i class="fas fa-star text-yellow-400 mr-2"></i> Destacados Oficiales</h3>
+                <div class="h-px bg-gray-200 flex-1"></div>
+            </div>
+            
+            <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+              @for (post of officialPosts(); track post.id) {
+                <article class="flex flex-col items-start justify-between bg-gray-50 rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <div class="relative w-full">
+                    <img src="{{ post.image || 'assets/img/no-image.svg' }}" alt="{{ post.title }}" class="aspect-video w-full rounded-xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2">
+                    <div class="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Oficial</div>
+                  </div>
+                  <div class="max-w-xl w-full mt-4">
+                    <div class="flex items-center gap-x-4 text-xs">
+                      <time [attr.datetime]="post.created_at" class="text-gray-500 font-medium">{{ post.created_at | date:'mediumDate' }}</time>
+                    </div>
+                    <div class="group relative">
+                      <h3 class="mt-2 text-lg font-bold leading-6 text-gray-900 group-hover:text-blue-600 transition-colors">
+                        <a [routerLink]="['/posts', post.slug]">
+                          <span class="absolute inset-0"></span>
+                          {{ post.title }}
+                        </a>
+                      </h3>
+                      <p class="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">{{ post.content }}</p>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+      }
+
+      <!-- Community Posts Section -->
+      @if (communityPosts().length > 0) {
+          <div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="h-px bg-gray-200 flex-1"></div>
+                <h3 class="text-xl font-bold text-gray-700"><i class="fas fa-users text-gray-400 mr-2"></i> De la Comunidad</h3>
+                <div class="h-px bg-gray-200 flex-1"></div>
+            </div>
+            
+            <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-4">
+              @for (post of communityPosts(); track post.id) {
+                <article class="flex flex-col items-start justify-between">
+                  <div class="relative w-full">
+                    <img src="{{ post.image || 'assets/img/no-image.svg' }}" alt="{{ post.title }}" class="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2">
+                    <div class="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10"></div>
+                  </div>
+                  <div class="max-w-xl">
+                    <div class="mt-4 flex items-center gap-x-4 text-xs">
+                      <time [attr.datetime]="post.created_at" class="text-gray-500">{{ post.created_at | date:'mediumDate' }}</time>
+                    </div>
+                    <div class="group relative">
+                      <h3 class="mt-2 text-md font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                        <a [routerLink]="['/posts', post.slug]">
+                          <span class="absolute inset-0"></span>
+                          {{ post.title }}
+                        </a>
+                      </h3>
+                      <p class="mt-2 line-clamp-2 text-sm leading-6 text-gray-600">{{ post.content }}</p>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+      }
+      
+      @if (officialPosts().length === 0 && communityPosts().length === 0) {
+          <div class="text-center py-20 bg-gray-50 rounded-3xl">
+              <i class="fas fa-newspaper text-gray-300 text-5xl mb-4"></i>
+              <h3 class="text-xl font-bold text-gray-700 mb-2">Aún no hay publicaciones</h3>
+              <p class="text-gray-500 max-w-sm mx-auto">Sé el primero en compartir algo interesante con la comunidad.</p>
+          </div>
+      }
+    }
   </div>
 </div>
