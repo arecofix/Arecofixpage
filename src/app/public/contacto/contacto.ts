@@ -20,7 +20,7 @@ import { CONTACTO_CONTENT, ContactoContent } from './contacto.content';
     templateUrl: './contacto.html',
     styleUrls: ['./contacto.scss']
 })
-export class ContactoComponent implements OnInit {
+export class ContactoComponent {
     private fb = inject(FormBuilder);
     private contactService = inject(ContactService);
     public preferencesService = inject(PreferencesService);
@@ -49,13 +49,7 @@ export class ContactoComponent implements OnInit {
         );
     }
 
-    ngOnInit() {
-        this.seoService.setPageData({
-            title: 'Contacto',
-            description: 'Ponte en contacto con nosotros. Estamos listos para escuchar tu idea y convertirla en realidad. Whatsapp, Email y Redes Sociales.',
-            imageUrl: 'assets/img/branding/og-contact.jpg'
-        });
-    }
+
 
     onSubmit() {
         if (this.contactForm.invalid) {

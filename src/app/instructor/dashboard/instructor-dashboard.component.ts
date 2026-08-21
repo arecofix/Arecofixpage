@@ -56,7 +56,7 @@ import { AuthService } from '@app/core/services/auth.service';
                 <!-- Image Banner & Status -->
                 <div class="relative h-48 sm:h-56 overflow-hidden bg-slate-100 dark:bg-slate-900">
                   <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent z-10"></div>
-                  <img [src]="course.image_url || 'assets/img/branding/og-services.png'" 
+                  <img [src]="course.image_url || 'assets/img/branding/inicio.jpg'" 
                        alt="Course Image"
                        class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700">
                   

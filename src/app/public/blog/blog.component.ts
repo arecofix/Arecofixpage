@@ -22,11 +22,7 @@ export class BlogComponent {
   error = signal<string | null>(null);
 
   async ngOnInit() {
-    this.seoService.setPageData({
-      title: 'Blog de Tecnología y Reparación',
-      description: 'Novedades, guías de reparación y noticias del mundo tecnológico de Marcos Paz. Mantente actualizado con Arecofix.',
-      imageUrl: 'assets/img/branding/og-blog.png'
-    });
+    
     try {
       const allPosts = await this.postService.getRecentPosts(100);
       const publicPosts = allPosts.filter(p => p.published || p.status === 'published');

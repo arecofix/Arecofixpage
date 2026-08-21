@@ -207,11 +207,7 @@ export class RepuestosComponent implements OnInit, OnDestroy {
     });
 
     async ngOnInit() {
-        this.seoService.setPageData({
-            title: 'Mayorista de Repuestos para Celulares | Envíos a todo el país',
-            description: 'El mayor catálogo de repuestos para celulares. Módulos, baterías, pines de carga y más. Venta mayorista y minorista con envíos a toda Argentina.',
-            imageUrl: 'assets/img/branding/og-repuestos.png'
-        });
+        
         
         this.tenant$
             .pipe(takeUntil(this.destroy$))

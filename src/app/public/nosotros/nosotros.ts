@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PreferencesService } from '../../shared/services/preferences.service';
@@ -67,7 +67,7 @@ interface NosotrosContent {
   templateUrl: './nosotros.html',
   styleUrls: ['./nosotros.css']
 })
-export class NosotrosComponent implements OnInit {
+export class NosotrosComponent {
   private seoService = inject(SeoService);
   private sanitizer = inject(DomSanitizer);
 
@@ -76,13 +76,7 @@ export class NosotrosComponent implements OnInit {
     'https://www.youtube.com/embed/l93eYkGMxsI?start=58&rel=0'
   );
 
-  ngOnInit() {
-    this.seoService.setPageData({
-      title: 'Sobre Nosotros',
-      description: 'Más que una empresa de software. Somos un equipo apasionado por transformar negocios a través de la tecnología en Marcos Paz y el mundo.',
-      imageUrl: 'assets/img/branding/og-nosotros.png'
-    });
-  }
+
 
   expandedFAQ: number | null = null;
 

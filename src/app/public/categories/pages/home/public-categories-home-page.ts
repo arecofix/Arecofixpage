@@ -78,14 +78,9 @@ export class PublicCategoriesHomePage {
 
   private setSEO() {
     const description = 'Explorá nuestro catálogo de productos organizado por categorías: Repuestos, Herramientas, Celulares y más.';
-    const imageUrl = 'assets/img/branding/og-services.png';
+    const imageUrl = 'assets/img/branding/inicio.jpg';
 
-    this.seoService.setPageData({
-      title: 'Categorías de Productos | Arecofix',
-      description: description,
-      imageUrl: imageUrl,
-      type: 'website'
-    });
+    
   }
 }
 

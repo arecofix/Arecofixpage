@@ -215,13 +215,7 @@ export class TrackingPage implements OnInit, OnDestroy {
             imageUrl = 'assets/img/branding/og-tracking.png';
         }
 
-        this.seoService.setPageData({
-            title: title,
-            description: desc,
-            imageUrl: imageUrl,
-            type: 'website',
-            url: `/tracking/${this.code}`
-        });
+        
     }
 
 

@@ -32,11 +32,7 @@ export class PruebaGratisComponent {
   logoPreviewUrl = signal<string | null>(null);
 
   constructor() {
-    this.seoService.setPageData({
-      title: 'Prueba Gratis Arecofix SaaS | Gestión de Talleres',
-      description: 'Obtén tu licencia de prueba gratuita para Arecofix SaaS. Optimiza tu taller de reparación con el mejor software del mercado.',
-      imageUrl: 'assets/img/branding/og-default.png'
-    });
+    
 
     this.trialForm = this.fb.group({
       businessName: ['', [Validators.required, Validators.minLength(3)]],

@@ -23,6 +23,13 @@ export const productsRoutes: Routes = [
       import('@app/public/products/pages/all/products-all-page').then(
         (m) => m.ProductsAllPage
       ),
+    data: {
+      seo: {
+        title: 'Tienda de Repuestos y Herramientas | Arecofix',
+        description: 'Explorá nuestro catálogo completo de repuestos, herramientas y accesorios para servicio técnico. Calidad garantizada.',
+        imageUrl: 'assets/img/branding/og-tienda.png'
+      }
+    }
   },
   {
     path: 'inicio',
@@ -30,6 +37,13 @@ export const productsRoutes: Routes = [
       import('@app/public/products/pages/index/products-index-page').then(
         (m) => m.ProductsIndexPage
       ),
+    data: {
+      seo: {
+        title: 'Tienda de Repuestos y Herramientas | Arecofix',
+        description: 'Explorá nuestro catálogo completo de repuestos, herramientas y accesorios para servicio técnico. Calidad garantizada.',
+        imageUrl: 'assets/img/branding/og-tienda.png'
+      }
+    }
   },
 
   // ── 301 Redirects: flat slugs → hierarchical paths ──────────────────────
@@ -85,6 +99,13 @@ export const productsRoutes: Routes = [
       import('@app/public/repuestos/repuestos').then(
         (m) => m.RepuestosComponent
       ),
+    data: {
+      seo: {
+        title: 'Mayorista de Repuestos para Celulares | Envíos a todo el país',
+        description: 'El mayor catálogo de repuestos para celulares. Módulos, baterías, pines de carga y más. Venta mayorista y minorista con envíos a toda Argentina.',
+        imageUrl: 'assets/img/branding/og-repuestos.png'
+      }
+    }
   },
 
   // ── Generic multi-segment category matcher ───────────────────────────────

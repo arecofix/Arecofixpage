@@ -341,7 +341,7 @@ export class ProductsByCategoryPage {
 
   private setSEO(category: iCategory) {
     const description = category.description || `Explorá nuestra selección de ${category.name} en Arecofix. Calidad y mejores precios garantizados.`;
-    const imageUrl = category.image_url || 'assets/img/branding/og-services.png';
+    const imageUrl = category.image_url || 'assets/img/branding/inicio.jpg';
 
     this.seoService.setPageData({
       title: `${category.name} | Arecofix`,

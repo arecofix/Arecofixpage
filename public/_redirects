@@ -28,6 +28,10 @@
 /terms/ /terms/index.html 200
 /reserva /reserva/index.html 200
 /reserva/ /reserva/index.html 200
+/repuestos /repuestos/index.html 200
+/repuestos/ /repuestos/index.html 200
+/prueba-gratis /prueba-gratis/index.html 200
+/prueba-gratis/ /prueba-gratis/index.html 200
 /productos/detalle/* /productos/detalle/:splat/index.html 200
 /productos/categoria/* /productos/categoria/:splat/index.html 200
 /posts/* /posts/:splat/index.html 200

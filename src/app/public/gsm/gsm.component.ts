@@ -276,14 +276,7 @@ export class GsmComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // SEO ...
-    this.seoService.setPageData({
-      title: 'Bypass iPhone iCloud hasta 16 Pro Max | Oferta Limitada | ARECOFIX',
-      description: '¿iPhone bloqueado con iCloud? Solución de Bypass profesional hasta iPhone 16 Pro Max. 100% remoto, seguro y garantizado. ¡Oferta por tiempo limitado para revendedores!',
-      imageUrl: '/assets/img/gsm/gsm-og-banner.png',
-      url: '/gsm',
-      keywords: 'bypass iphone, bypass icloud, desbloqueo icloud, iphone 16 prm bypass, bypass remoto, frp, gsm tools, arecofix',
-      type: 'website'
-    });
+    
 
     this.loadData();
     this.startCountdown();
