@@ -335,7 +335,7 @@ export class ProductsDetailsPage {
     }
 
     if (!absoluteImageUrl || isRecursive) {
-      absoluteImageUrl = `assets/img/branding/og-services.png`;
+      absoluteImageUrl = `assets/img/branding/inicio.jpg`;
     }
 
     const defaultDescription = product.description

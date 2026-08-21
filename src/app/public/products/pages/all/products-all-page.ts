@@ -65,13 +65,7 @@ export class ProductsAllPage {
   private seoService = inject(SeoService);
 
   constructor() {
-    this.seoService.setPageData({
-      title: 'Tienda Virtual | Arecofix',
-      description: 'Explora nuestra tienda virtual. Encuentra los mejores repuestos, celulares y soluciones tecnológicas en Marcos Paz.',
-      imageUrl: 'assets/img/branding/og-tienda.png',
-      url: '/productos',
-      type: 'website'
-    });
+    
 
     this.searchSubject.pipe(
       debounceTime(400),

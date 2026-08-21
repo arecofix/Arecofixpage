@@ -1,6 +1,5 @@
 import {
   Component,
-  OnInit,
   inject,
   PLATFORM_ID,
   ChangeDetectorRef,
@@ -67,7 +66,7 @@ interface GalleryItem {
   ],
   templateUrl: './celular-landing.component.html',
 })
-export class CelularLandingComponent implements OnInit {
+export class CelularLandingComponent {
   public sanitizer = inject(DomSanitizer);
   safeMapUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
     LOCATION_DATA.mapEmbedUrl,
@@ -119,58 +118,9 @@ export class CelularLandingComponent implements OnInit {
   contactMessage = '';
   sendingContact = false;
 
-  ngOnInit() {
-    this.updateSeo();
-  }
+  
 
-  private updateSeo() {
-    const seoData = {
-      title: 'Reparación de Celulares en Marcos Paz y Merlo | Servicio Técnico iPhone Arecofix',
-      description: 'Especialistas en arreglo de celulares en Marcos Paz. Cambio de pantallas, baterías y pines de carga en el acto con garantía escrita. iPhone, Samsung, Motorola y Xiaomi.',
-      imageUrl: 'assets/img/repair/cel.png',
-      keywords: 'reparacion de celulares marcos paz, servicio tecnico celulares merlo, arreglo de celulares zona oeste, cambio de modulos iphone, servicio tecnico samsung marcos paz, arecofix',
-      type: 'website' as const,
-      schema: {
-        "@context": "https://schema.org",
-        "@type": ["LocalBusiness", "MobilePhoneRepair"],
-        "name": "Arecofix Servicio Técnico",
-        "alternateName": "Arecofix Marcos Paz",
-        "description": "Servicio técnico especializado en celulares en Marcos Paz. Líderes en reparación de iPhone y multimarca.",
-        "url": "https://www.arecofix.com.ar/celular",
-        "telephone": "+5491125960900",
-        "priceRange": "$$",
-        "image": "https://www.arecofix.com.ar/assets/img/repair/cel.png",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Jorge Newbery 69",
-          "addressLocality": "Marcos Paz",
-          "addressRegion": "Buenos Aires",
-          "postalCode": "1727",
-          "addressCountry": "AR"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": -34.767191,
-          "longitude": -58.817973
-        },
-        "openingHoursSpecification": [
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            "opens": "09:00",
-            "closes": "19:00"
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Saturday",
-            "opens": "09:00",
-            "closes": "13:00"
-          }
-        ]
-      }
-    };
-    this.seoService.setPageData(seoData);
-  }
+
 
   async sendContactForm() {
     if (!this.contactName || !this.contactPhone || !this.contactMessage) {

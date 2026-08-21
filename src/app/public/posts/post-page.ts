@@ -124,7 +124,7 @@ export class PostPage implements OnInit, OnDestroy {
             }
 
             // Open Graph (Social)
-            const postImage = post.image || 'assets/img/branding/og-services.png';
+            const postImage = post.image || 'assets/img/branding/inicio.jpg';
             let absoluteImageUrl = postImage;
             if (postImage && !postImage.startsWith('http') && postImage !== '_' && postImage !== 'null' && !postImage.startsWith('assets/')) {
                 const encodedPath = postImage.split('/').map((s: string) => encodeURIComponent(s)).join('/');

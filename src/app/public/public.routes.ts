@@ -40,7 +40,7 @@ export const publicRoutes: Routes = [
             seo: {
                 title: 'Consultoría IT & Software Factory | Arecofix',
                 description: 'Especialistas en desarrollo de software, sistemas de gestión SaaS y consultoría IT para transformar tu negocio.',
-                imageUrl: 'assets/img/branding/og-inicio.png',
+                imageUrl: 'assets/img/branding/inicio.jpg',
                 keywords: 'software marcos paz, sistemas de gestion, saas, desarrollo de aplicaciones, desarrollo web argentina, arecofix, tecnologia argentina'
             }
         }
@@ -127,11 +127,25 @@ export const publicRoutes: Routes = [
         title: 'Repuestos',
         path: 'repuestos',
         loadComponent: () => import('@app/public/repuestos/repuestos').then((m) => m.RepuestosComponent),
+        data: {
+          seo: {
+            title: 'Mayorista de Repuestos para Celulares | Envíos a todo el país',
+            description: 'El mayor catálogo de repuestos para celulares. Módulos, baterías, pines de carga y más. Venta mayorista y minorista con envíos a toda Argentina.',
+            imageUrl: 'assets/img/branding/og-repuestos.png'
+          }
+        }
       },
       {
         title: 'Prueba Gratis | Arecofix',
         path: 'prueba-gratis',
         loadComponent: () => import('@app/public/prueba-gratis/prueba-gratis.component').then((m) => m.PruebaGratisComponent),
+        data: {
+          seo: {
+            title: 'Prueba Gratis del Sistema | Arecofix',
+            description: 'Comenzá a usar Arecofix totalmente gratis. Gestioná tus reparaciones, clientes e inventario de forma fácil.',
+            imageUrl: 'assets/img/branding/inicio.jpg'
+          }
+        }
       },
       {
         title: 'Login',
@@ -218,7 +232,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Sobre Nosotros | Arecofix - Innovación y Compromiso',
             description: 'Conocé al equipo detrás de Arecofix. Somos expertos en tecnología comprometidos con brindar soluciones de calidad en Marcos Paz.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            imageUrl: 'assets/img/cursos/profesor.png',
             type: 'article'
           }
         }
@@ -234,7 +248,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Contacto | Arecofix - Estamos para Ayudarte',
             description: '¿Tenés alguna consulta o necesitás soporte técnico? Contáctanos por WhatsApp, Email o visitanos en nuestro local.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            imageUrl: 'assets/img/branding/inicio.jpg'
           }
         }
       },
@@ -249,7 +263,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Servicios de Tecnología y Reparación | Arecofix',
             description: 'Soluciones integrales: Reparación de Celulares, Desarrollo de Software, Cámaras de Seguridad y Soporte IT para empresas.',
-            imageUrl: 'assets/img/branding/og-services.png',
+            imageUrl: 'assets/img/branding/inicio.jpg',
             keywords: 'servicios informaticos, reparacion celulares, desarrollo software, soporte it, camaras seguridad'
           }
         }
@@ -276,9 +290,9 @@ export const publicRoutes: Routes = [
           ),
         data: {
           seo: {
-            title: 'Arecofix Academy | Cursos de Tecnología',
-            description: 'Aprendé reparación de celulares, programación y más con nuestros cursos presenciales y online.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            title: 'Cursos & Oficios | Arecofix Academy',
+            description: 'Convertite en técnico profesional. Cursos presenciales de reparación de celulares y tablets en Marcos Paz. Certificación y salida laboral.',
+            imageUrl: 'https://arecofix.com.ar/assets/img/branding/og-academy-pro.png',
             type: 'website'
           }
         }
@@ -373,7 +387,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Seguimiento de Reparación | Arecofix',
             description: 'Consultá el estado de tu reparación en tiempo real con tu código de seguimiento.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            imageUrl: 'assets/img/branding/og-tracking.png'
           }
         }
       },
@@ -388,7 +402,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Política de Privacidad | Arecofix',
             description: 'Conocé cómo protegemos tus datos y tu privacidad en Arecofix.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            imageUrl: 'assets/img/branding/inicio.jpg'
           }
         }
       },
@@ -403,7 +417,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Términos y Condiciones | Arecofix',
             description: 'Términos y condiciones de uso de nuestros servicios y sitio web.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            imageUrl: 'assets/img/branding/inicio.jpg'
           }
         }
       },
@@ -418,7 +432,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Blog de Tecnología | Arecofix',
             description: 'Noticias, guías y tutoriales sobre tecnología, reparaciones y desarrollo de software.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            imageUrl: 'assets/img/branding/inicio.jpg',
             type: 'website'
           }
         }
@@ -442,7 +456,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Protocolo de Diagnóstico de Celulares | Arecofix',
             description: 'Guía interactiva paso a paso para diagnosticar fallas en celulares. Detectá problemas de encendido, carga, audio, señal y software.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG',
+            imageUrl: 'assets/img/branding/inicio.jpg',
             keywords: 'diagnostico celulares, protocolo reparacion, fallas celular, no enciende, no carga, sin señal, reparacion moviles'
           }
         }
@@ -466,7 +480,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Comunidad FixTécnicos | Arecofix',
             description: 'Recursos y herramientas exclusivas para técnicos reparadores.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            imageUrl: 'assets/img/branding/inicio.jpg'
           }
         }
       },
@@ -481,7 +495,7 @@ export const publicRoutes: Routes = [
           seo: {
             title: 'Centro de Recursos | Arecofix',
             description: 'Descargas, drivers y manuales para reparaciones y software.',
-            imageUrl: 'assets/img/branding/logo/logo-normal1.PNG'
+            imageUrl: 'assets/img/branding/inicio.jpg'
           }
         }
       },

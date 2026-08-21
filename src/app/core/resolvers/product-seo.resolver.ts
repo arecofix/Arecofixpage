@@ -41,7 +41,7 @@ export const productSeoResolver: ResolveFn<Product | null> = (route, state) => {
         }
 
         if (!absoluteImageUrl || isRecursive) {
-          absoluteImageUrl = `assets/img/branding/og-services.png`;
+          absoluteImageUrl = `assets/img/branding/inicio.jpg`;
         }
 
         const nameKeywords = product.name

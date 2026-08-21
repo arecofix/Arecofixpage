@@ -19,23 +19,7 @@ export interface SeoData {
 
 const SEO_DATA_KEY = makeStateKey<SeoData>('SEO_DATA');
 
-export const STATIC_SEO_CONFIG: Record<string, SeoData> = {
-  '/': {
-    title: 'Arecofix - Servicio Técnico y Soluciones IT en Marcos Paz',
-    description: 'Especialistas en reparación de celulares, notebooks y consolas en el acto. Venta de repuestos y accesorios. ¡Presupuesto gratis!',
-    imageUrl: 'assets/img/branding/og-services.png'
-  },
-  '/celular': {
-    title: 'Reparación de Celulares en Marcos Paz | Arecofix',
-    description: 'Cambio de módulos y baterías en el acto con repuestos originales. Servicio técnico especializado para iPhone, Samsung y Motorola.',
-    imageUrl: 'assets/img/repair/cel.png'
-  },
-  '/servicios': {
-    title: 'Nuestros Servicios Técnicos | Arecofix',
-    description: 'Reparación de Hardware, Microsoldadura, Desarrollo Web y Cámaras de Seguridad para empresas y hogares.',
-    imageUrl: 'assets/img/branding/og-services.png'
-  }
-};
+
 
 @Injectable({
   providedIn: 'root'
@@ -52,12 +36,7 @@ export class SeoService {
   private lastDynamicPath: string | null = null;
 
   public initialize() {
-    if (isPlatformServer(this.platformId)) {
-      const initialUrl = this.router.url.split('?')[0];
-      if (STATIC_SEO_CONFIG[initialUrl]) {
-        this.setPageData(STATIC_SEO_CONFIG[initialUrl]);
-      }
-    } else {
+    if (!isPlatformServer(this.platformId)) {
       // Avoid flicker: retrieve SEO data from server state if available
       const transferredData = this.transferState.get(SEO_DATA_KEY, null);
       if (transferredData) {
@@ -85,13 +64,11 @@ export class SeoService {
       this.lastDynamicPath = null;
       const contentRoute = this.getContentRoute(this.activatedRoute);
       const routeTitle = contentRoute.snapshot.title;
-      let seoData = STATIC_SEO_CONFIG[currentPath];
+      let seoData: SeoData | undefined;
 
-      if (!seoData) {
-        const routeData = contentRoute.snapshot.data;
-        if (routeData && routeData['seo']) {
-          seoData = { ...routeData['seo'] } as SeoData;
-        }
+      const routeData = contentRoute.snapshot.data;
+      if (routeData && routeData['seo']) {
+        seoData = { ...routeData['seo'] } as SeoData;
       }
 
       // Final Fallback for standard pages
@@ -99,7 +76,7 @@ export class SeoService {
         seoData = {
           title: routeTitle || 'Servicio Técnico de Celulares en Marcos Paz - Arecofix',
           description: 'Líderes en reparación técnica y soluciones tecnológicas en Marcos Paz.',
-          imageUrl: 'assets/img/branding/og-services.png'
+          imageUrl: 'assets/img/branding/inicio.jpg'
         };
       } else if (!seoData.title && routeTitle) {
         seoData.title = routeTitle;
@@ -152,12 +129,17 @@ export class SeoService {
         ? currentPath 
         : `${SITE_URL}${currentPath.startsWith('/') ? '' : '/'}${currentPath}`;
     
+    // Ensure trailing slash for directory routes to prevent Cloudflare Pages 308 redirect loops with Facebook Scraper
+    if (!finalUrl.endsWith('/') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
+      finalUrl = `${finalUrl}/`;
+    }
+    
     try {
         finalUrl = encodeURI(decodeURI(finalUrl));
     } catch(e) {}
     
     // --- Image URL Resolution ---
-    let finalImageUrl = `${SITE_URL}/assets/img/branding/og-services.png`;
+    let finalImageUrl = `${SITE_URL}/assets/img/branding/inicio.jpg`;
     
     if (imageUrl && imageUrl.trim().length > 0) {
         if (imageUrl.startsWith('http')) {
@@ -186,7 +168,7 @@ export class SeoService {
         if (isPlatformServer(this.platformId)) {
           console.warn(`[SEO] Warning: Invalid Image URL detected: ${finalImageUrl}. Falling back to default branding.`);
         }
-        finalImageUrl = `${SITE_URL}/assets/img/branding/og-services.png`;
+        finalImageUrl = `${SITE_URL}/assets/img/branding/inicio.jpg`;
     }
 
     // Open Graph

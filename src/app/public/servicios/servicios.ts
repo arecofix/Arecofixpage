@@ -50,11 +50,7 @@ export class ServiciosComponent implements OnInit {
     ]);
 
     async ngOnInit() {
-        this.seoService.setPageData({
-            title: 'Soluciones Tecnológicas Integrales | Arecofix Servicios',
-            description: 'Experiencia y tecnología al servicio de tu empresa. Desarrollo de Software, Soporte IT, Ciberseguridad y Reparación de Hardware Especializada.',
-            imageUrl: 'assets/img/branding/og-services.png'
-        });
+        
 
         await this.loadDatabaseServices();
     }
