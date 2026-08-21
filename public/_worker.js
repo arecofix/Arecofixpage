@@ -20,6 +20,9 @@ export default {
       } else if (pathParts[0] === 'academy' && pathParts[1]) {
         table = 'courses';
         slug = pathParts[1];
+      } else if (pathParts[0] === 'tracking' && pathParts[1]) {
+        table = 'repairs';
+        slug = pathParts[1]; // We will handle tracking_code instead of slug below
       }
       
       if (table && slug) {
@@ -27,7 +30,8 @@ export default {
       const supabaseKey = env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
       
       try {
-        const res = await fetch(`${supabaseUrl}/rest/v1/${table}?slug=eq.${slug}&select=*`, {
+        const queryParam = table === 'repairs' ? 'tracking_code' : 'slug';
+        const res = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParam}=eq.${slug}&select=*`, {
           headers: {
             'apikey': supabaseKey,
             'Authorization': `Bearer ${supabaseKey}`
@@ -39,22 +43,42 @@ export default {
           if (data && data.length > 0) {
             const item = data[0];
             
-            // Format image url
-            let imageUrl = item.image_url || item.thumbnail_url || '';
-            if (imageUrl && !imageUrl.startsWith('http')) {
-                imageUrl = `${supabaseUrl}/storage/v1/object/public/public-assets/${imageUrl}`;
-            }
-            if (!imageUrl) {
-                imageUrl = 'https://arecofix.com.ar/assets/img/branding/og-services.png';
-            }
+            let imageUrl = '';
+            let description = '';
+            let title = '';
 
-            // Fallback description
-            let description = (item.description || item.excerpt || item.meta_description || `Mira esto en Arecofix.`);
-            // Extract text from description if it's html
-            description = description.replace(/<[^>]*>?/gm, '').slice(0, 155) + (description.length > 155 ? '...' : '');
-            description = description.replace(/"/g, '&quot;');
+            if (table === 'repairs') {
+              // SEO Logic for Tracking
+              title = `Seguimiento de Equipo: ${item.device_model || 'Reparación'} - Orden #${item.repair_number || slug}`;
+              const statusMap = { 1: 'Diagnóstico en Curso', 2: 'Esperando Repuestos', 3: 'En Reparación', 4: 'Control de Calidad', 5: 'Listo para Retirar', 6: 'Entregado', 7: 'Cancelado' };
+              const statusName = statusMap[item.current_status_id] || 'En Proceso';
+              description = `Estado: ${statusName} | Cliente: ${item.customer_name || 'Arecofix'}. Hacé clic para ver los detalles en tiempo real.`;
+              
+              if (item.images && item.images.length > 0) {
+                const firstImg = item.images[0];
+                imageUrl = (firstImg && !firstImg.startsWith('http') && !firstImg.startsWith('assets/')) 
+                  ? `${supabaseUrl}/storage/v1/object/public/repair-images/${firstImg}` 
+                  : (firstImg || '');
+              }
+              if (!imageUrl) imageUrl = 'https://arecofix.com.ar/assets/img/branding/og-tracking.png';
+            } else {
+              // SEO Logic for Products, Posts, Courses
+              imageUrl = item.image_url || item.thumbnail_url || '';
+              if (imageUrl && !imageUrl.startsWith('http')) {
+                  imageUrl = `${supabaseUrl}/storage/v1/object/public/public-assets/${imageUrl}`;
+              }
+              if (!imageUrl) {
+                  imageUrl = 'https://arecofix.com.ar/assets/img/branding/og-services.png';
+              }
 
-            let title = (item.name || item.title || item.meta_title || 'Arecofix').replace(/"/g, '&quot;');
+              // Fallback description
+              description = (item.description || item.excerpt || item.meta_description || `Mira esto en Arecofix.`);
+              // Extract text from description if it's html
+              description = description.replace(/<[^>]*>?/gm, '').slice(0, 155) + (description.length > 155 ? '...' : '');
+              description = description.replace(/"/g, '&quot;');
+
+              title = (item.name || item.title || item.meta_title || 'Arecofix').replace(/"/g, '&quot;');
+            }
 
             // Fetch the static HTML from Cloudflare Pages
             const response = await env.ASSETS.fetch(request);
