@@ -166,36 +166,16 @@
                         <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Modulo {{ i + 1 }}</span>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ mod.title }}</h3>
                         @if (mod.description) {
-                          <p class="text-sm text-gray-500 mt-1">{{ mod.description }}</p>
+                          <p class="text-sm text-gray-500 mt-1">{{ mod.description | slice:0:150 }}{{ mod.description.length > 150 ? '...' : '' }}</p>
                         }
                       </div>
                       <div class="flex items-center gap-3 shrink-0">
                         <span class="text-sm text-gray-500">{{ mod.contents.length }} clases</span>
-                        <i class="fas text-gray-400 transition-transform" [class.fa-chevron-down]="!mod.expanded" [class.fa-chevron-up]="mod.expanded"></i>
                       </div>
                     </div>
-                    @if (mod.expanded && mod.contents.length > 0) {
-                      <div class="border-t border-gray-100 dark:border-gray-700">
-                        @for (content of mod.contents; track content.id; let j = $index) {
-                          <div class="px-5 py-4 flex items-center gap-3 border-b border-gray-50 dark:border-gray-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs"
-                              [class.bg-blue-100]="content.type==='video'" [class.text-blue-600]="content.type==='video'"
-                              [class.bg-red-100]="content.type==='document'" [class.text-red-600]="content.type==='document'"
-                              [class.bg-green-100]="content.type==='image'" [class.text-green-600]="content.type==='image'"
-                              [class.bg-purple-100]="content.type==='link'" [class.text-purple-600]="content.type==='link'"
-                              [class.bg-orange-100]="content.type==='exam'" [class.text-orange-600]="content.type==='exam'"
-                              [class.bg-gray-100]="content.type==='text'" [class.text-gray-500]="content.type==='text'">
-                              <i class="fas" [class]="getContentIcon(content.type)"></i>
-                            </div>
-                            <span class="text-gray-700 dark:text-gray-300 font-medium text-sm flex-1">{{ content.title || ('Contenido ' + (j + 1)) }}</span>
-                            <span class="text-xs text-gray-400 font-mono shrink-0">{{ getContentLabel(content.type) }}</span>
-                          </div>
-                        }
-                      </div>
-                    }
-                    @if (mod.expanded && mod.contents.length === 0) {
-                      <div class="border-t border-gray-100 dark:border-gray-700 px-5 py-4 text-sm text-gray-400 italic">
-                        <i class="fas fa-clock mr-2"></i>Contenido en preparacion
+                    @if (mod.expanded) {
+                      <div class="border-t border-gray-100 dark:border-gray-700 px-5 py-4 text-sm text-gray-500">
+                        <i class="fas fa-lock mr-2 text-gray-400"></i>Contenido exclusivo para alumnos inscriptos.
                       </div>
                     }
                   </div>
