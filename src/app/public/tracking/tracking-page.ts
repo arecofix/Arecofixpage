@@ -200,54 +200,27 @@ export class TrackingPage implements OnInit, OnDestroy {
     }
 
     private async updateSeo(r: PublicRepairDto) {
-        const statusName = r.status_label;
-        const statusId = r.current_status_id;
+        const title = `Seguimiento de Equipo: ${r.device_model} - Orden #${r.repair_number || this.code}`;
+        const desc = `Estado: ${r.status_label} | Cliente: ${r.customer_name || 'Arecofix'}. Hacé clic para ver los detalles en tiempo real.`;
         
-        let customTitle = `${statusName} - Tu ${r.device_model} | Arecofix`;
-        let customDescription = `Tu equipo está en etapa de ${statusName}. Seguí el avance de tu reparación en tiempo real con Arecofix.`;
-        // Generamos una ruta para la imagen dependiendo del estado (ej: og-status-1.png, og-status-2.png, etc.)
-        // Para que esto funcione, en la carpeta public/assets/img/og/ deberás colocar las 7 imágenes.
-        let imageUrl = `${this.baseUrl}/assets/img/og/status-${statusId}.png`;
-
-        switch (statusId) {
-            case 1: // PENDING_DIAGNOSIS
-                customTitle = `Diagnóstico en Curso - ${r.device_model} | Arecofix`;
-                customDescription = `Estamos revisando tu ${r.device_model}. Ingresá para ver el estado del diagnóstico en Arecofix.`;
-                break;
-            case 2: // SUPPLY_MANAGEMENT
-                customTitle = `Esperando Repuestos - ${r.device_model} | Arecofix`;
-                customDescription = `Estamos gestionando los repuestos para tu ${r.device_model}. Seguí el progreso de tu reparación en Arecofix.`;
-                break;
-            case 3: // IN_PROGRESS
-                customTitle = `En Reparación - ${r.device_model} | Arecofix`;
-                customDescription = `Nuestros técnicos están trabajando en tu ${r.device_model}. Seguí el avance en tiempo real.`;
-                break;
-            case 4: // QUALITY_CONTROL
-                customTitle = `Control de Calidad - ${r.device_model} | Arecofix`;
-                customDescription = `Tu ${r.device_model} está siendo testeado para asegurar que todo funcione de manera perfecta.`;
-                break;
-            case 5: // READY_FOR_PICKUP
-                customTitle = `¡Listo para Retirar! - ${r.device_model} | Arecofix`;
-                customDescription = `Tu ${r.device_model} ya está reparado y listo para que lo pases a buscar. ¡Te esperamos en nuestra sucursal!`;
-                break;
-            case 6: // DELIVERED
-                customTitle = `Equipo Entregado - ${r.device_model} | Arecofix`;
-                customDescription = `Esta reparación ya fue entregada exitosamente. ¡Gracias por confiar en Arecofix!`;
-                break;
-            case 7: // CANCELLED
-                customTitle = `Reparación Cancelada - ${r.device_model} | Arecofix`;
-                customDescription = `El servicio para tu ${r.device_model} ha sido cancelado. Ingresá para ver los detalles.`;
-                break;
+        let imageUrl = '';
+        if (r.images && r.images.length > 0) {
+            imageUrl = r.images[0];
+            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('assets/')) {
+                imageUrl = `${environment.supabaseUrl}/storage/v1/object/public/repair-images/${imageUrl}`;
+            }
+        }
+        
+        if (!imageUrl) {
+            imageUrl = 'assets/img/branding/og-tracking.png';
         }
 
-        // Ya no sobrescribimos con el logo del settings si el usuario quiere que la imagen dependa del estado.
-        // Si el día de mañana se quiere fallback, se podría hacer, pero la directiva es personalizarlo por estado.
-
         this.seoService.setPageData({
-            title: customTitle,
-            description: customDescription,
-            imageUrl,
-            type: 'article'
+            title: title,
+            description: desc,
+            imageUrl: imageUrl,
+            type: 'website',
+            url: `/tracking/${this.code}`
         });
     }
 
