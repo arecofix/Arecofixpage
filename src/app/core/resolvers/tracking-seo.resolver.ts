@@ -16,8 +16,8 @@ export const trackingSeoResolver: ResolveFn<PublicRepairDto | null> = (route, st
   return trackingUseCase.execute(code).pipe(
     tap(repairData => {
       if (repairData) {
-        const title = `Estado de Reparación #${repairData.repair_number || code} | Arecofix`;
-        const desc = `Seguimiento de ${repairData.device_model}. Estado actual: ${repairData.status_label}. ${repairData.issue_description || ''}`;
+        const title = `Seguimiento de Equipo: ${repairData.device_model} - Orden #${repairData.repair_number || code}`;
+        const desc = `Estado: ${repairData.status_label} | Cliente: ${repairData.customer_name || 'Arecofix'}. Hacé clic para ver los detalles en tiempo real.`;
         
         let imageUrl = '';
         if (repairData.images && repairData.images.length > 0) {
@@ -28,7 +28,7 @@ export const trackingSeoResolver: ResolveFn<PublicRepairDto | null> = (route, st
         }
         
         if (!imageUrl) {
-            imageUrl = 'assets/img/branding/og-services.png';
+            imageUrl = 'assets/img/branding/og-tracking.png';
         }
 
         seoService.setPageData({
