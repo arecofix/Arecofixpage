@@ -30,16 +30,35 @@ export default {
       const supabaseKey = env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
       
       try {
-        const queryParam = table === 'repairs' ? 'tracking_code' : 'slug';
-        const res = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParam}=eq.${slug}&select=*`, {
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`
-          }
-        });
+        let res;
+        
+        if (table === 'repairs') {
+          // Use RPC for tracking to bypass RLS policies
+          res = await fetch(`${supabaseUrl}/rest/v1/rpc/get_repair_tracking`, {
+            method: 'POST',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ p_code: slug })
+          });
+        } else {
+          res = await fetch(`${supabaseUrl}/rest/v1/${table}?slug=eq.${slug}&select=*`, {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`
+            }
+          });
+        }
 
         if (res.ok) {
-          const data = await res.json();
+          let data = await res.json();
+          // RPC might return a single object or an array. Standardize to array.
+          if (data && !Array.isArray(data)) {
+            data = [data];
+          }
+
           if (data && data.length > 0) {
             const item = data[0];
             
@@ -49,13 +68,18 @@ export default {
 
             if (table === 'repairs') {
               // SEO Logic for Tracking
-              title = `Seguimiento de Equipo: ${item.device_model || 'Reparación'} - Orden #${item.repair_number || slug}`;
+              const deviceName = item.device_model || item.device?.model?.name || 'Reparación';
+              title = `Seguimiento de Equipo: ${deviceName} - Orden #${item.repair_number || item.tracking_code || slug}`;
+              
               const statusMap = { 1: 'Diagnóstico en Curso', 2: 'Esperando Repuestos', 3: 'En Reparación', 4: 'Control de Calidad', 5: 'Listo para Retirar', 6: 'Entregado', 7: 'Cancelado' };
               const statusName = statusMap[item.current_status_id] || 'En Proceso';
-              description = `Estado: ${statusName} | Cliente: ${item.customer_name || 'Arecofix'}. Hacé clic para ver los detalles en tiempo real.`;
+              
+              const clientName = item.client ? `${item.client.first_name || ''} ${item.client.last_name || ''}`.trim() : 'Arecofix';
+              
+              description = `Estado: ${statusName} | Cliente: ${clientName}. Hacé clic para ver los detalles en tiempo real.`;
               
               if (item.images && item.images.length > 0) {
-                const firstImg = item.images[0];
+                const firstImg = item.images[0]?.image_url || item.images[0];
                 imageUrl = (firstImg && !firstImg.startsWith('http') && !firstImg.startsWith('assets/')) 
                   ? `${supabaseUrl}/storage/v1/object/public/repair-images/${firstImg}` 
                   : (firstImg || '');
