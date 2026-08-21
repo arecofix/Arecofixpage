@@ -5,7 +5,7 @@ import { CoursesService } from '@app/core/services/courses.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
 import { Course } from '@app/features/courses/domain/entities/course.entity';
-
+import { SeoService } from '@app/core/services/seo.service';
 @Component({
   selector: 'app-student-my-courses-page',
   standalone: true,
@@ -167,6 +167,7 @@ export class StudentMyCoursesPage implements OnInit {
     private coursesService = inject(CoursesService);
     private authService = inject(AuthService);
     private courseRepo = inject(CourseRepository);
+    private seoService = inject(SeoService);
 
     enrolledCourses = signal<any[]>([]);
     authoredCourses = signal<Course[]>([]);
@@ -178,6 +179,12 @@ export class StudentMyCoursesPage implements OnInit {
     isAdmin = signal(false);
 
     async ngOnInit() {
+        this.seoService.setPageData({
+            title: 'Mis Cursos',
+            description: 'Accede a todos tus cursos inscritos y gestiona tu aprendizaje en Arecofix Academy.',
+            imageUrl: 'https://arecofix.com.ar/assets/img/branding/og-academy-pro.png'
+        });
+
         const session = await this.authService.getSession();
         const user = session?.user || await this.authService.getUser();
         const profile = this.authService.getCurrentProfile();
