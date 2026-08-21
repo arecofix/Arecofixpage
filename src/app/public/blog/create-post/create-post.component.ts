@@ -50,15 +50,16 @@ export class CreatePostComponent {
       const payload = {
         title: this.post.title,
         content: this.post.content,
-        image_url: this.post.image,
+        featured_image: this.post.image, // Note: the DB column is featured_image according to admin service
         seo_title: this.post.meta_title || this.post.title,
         seo_description: this.post.meta_description || this.post.content?.substring(0, 150),
         slug: this.post.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
-        author_id: user.id,
+        author: user.id, // DB column is author
         status: 'draft' // Draft equals pending for admin approval
       };
 
-      const { error } = await this.scoped.withTenantScope(this.scoped.from('blog_posts').insert(payload));
+      const finalPayload = this.scoped.withTenant(payload);
+      const { error } = await this.scoped.from('blog_posts').insert(finalPayload);
 
       if (error) throw error;
       

@@ -10,7 +10,8 @@ export interface Post {
     status?: string;
     meta_title?: string;
     meta_description?: string;
-    author_id?: string;
+    author?: string;
+    author_role?: string;
     template?: string;
 }
 

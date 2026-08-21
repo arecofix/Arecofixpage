@@ -34,7 +34,7 @@ export class PostService {
 
   async getRecentPosts(limit = 5): Promise<Post[]> {
     const { data, error } = await this.scoped
-      .withTenantScope(this.scoped.from('blog_posts').select('*'))
+      .withTenantScope(this.scoped.from('blog_posts').select('*, profiles(role)'))
       .eq('status', 'published')
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -87,6 +87,13 @@ export class PostService {
 
   private mapToEntity(data: Record<string, unknown>): Post {
     const rawImage = (data['featured_image'] ?? data['image'] ?? data['image_url']) as string | null;
+    let role = undefined;
+    if (data['profiles'] && typeof data['profiles'] === 'object' && !Array.isArray(data['profiles'])) {
+        role = (data['profiles'] as any).role;
+    } else if (Array.isArray(data['profiles']) && data['profiles'].length > 0) {
+        role = data['profiles'][0].role;
+    }
+
     return {
       id: data['id'] as string,
       created_at: data['created_at'] as string,
@@ -99,6 +106,8 @@ export class PostService {
       meta_title: (data['seo_title'] || data['meta_title']) as string | undefined,
       meta_description: (data['seo_description'] || data['meta_description']) as string | undefined,
       template: (data['template'] || 'modern') as string,
+      author: data['author'] as string | undefined,
+      author_role: role,
     };
   }
 
