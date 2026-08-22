@@ -17,7 +17,7 @@ const CHUNK_SIZE = 1000;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STATIC_ROUTES = [
-  '/', '/celular', '/servicios', '/academy', '/blog',
+  '/', '/celular', '/servicios', '/academy', '/academy/mis-cursos', '/academy/create', '/blog',
   '/contacto', '/nosotros', '/fixtecnicos', '/recursos',
   '/productos', '/productos/destacados', '/portfolio',
   '/gsm', '/privacy', '/terms', '/not-found', '/reserva',

@@ -2,6 +2,8 @@
 /celular
 /servicios
 /academy
+/academy/mis-cursos
+/academy/create
 /blog
 /contacto
 /nosotros
@@ -79,4 +81,4 @@
 /academy/test-course-1782533140322
 /academy/test-course-1782780458099
 /academy/curso-angular
-/academy/reparacion-celulares-basico/academy/mis-cursos
+/academy/reparacion-celulares-basico
