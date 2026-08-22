@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
@@ -9,7 +9,8 @@ import { PreferencesService } from '../services/preferences.service';
   standalone: true,
   imports: [RouterLink, FormsModule],
   templateUrl: './footer.html',
-  styleUrl: './footer.css'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './footer.css',
 })
 export class Footer {
   email: string = '';

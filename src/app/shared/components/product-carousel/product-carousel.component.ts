@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 
@@ -13,7 +13,8 @@ export interface ProductCarouselItem {
   selector: 'app-product-carousel',
   standalone: true,
   imports: [RouterModule],
-  templateUrl: './product-carousel.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './product-carousel.component.html',
 })
 export class ProductCarouselComponent {
   @Input() title: string = '';

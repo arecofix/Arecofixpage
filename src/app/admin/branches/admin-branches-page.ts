@@ -1,4 +1,12 @@
-import { Component, inject, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  computed,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,296 +17,327 @@ import { AuthService } from '@app/core/services/auth.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 
 @Component({
-    selector: 'app-admin-branches-page',
-    standalone: true,
-    imports: [CommonModule, FormsModule, Pagination],
-    templateUrl: './admin-branches-page.html',
+  selector: 'app-admin-branches-page',
+  standalone: true,
+  imports: [CommonModule, FormsModule, Pagination],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './admin-branches-page.html',
 })
 export class AdminBranchesPage implements OnInit {
-    public branchService = inject(BranchService);
-    private tenantService = inject(TenantService);
-    private supabase = inject(SupabaseService);
-    public auth = inject(AuthService);
-    private router = inject(Router);
-    private cdr = inject(ChangeDetectorRef);
+  public branchService = inject(BranchService);
+  private tenantService = inject(TenantService);
+  private supabase = inject(SupabaseService);
+  public auth = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
-    branches = signal<Branch[]>([]);
-    loading = signal(true);
-    saving = signal(false);
-    error = signal<string | null>(null);
-    success = signal<string | null>(null);
+  branches = signal<Branch[]>([]);
+  loading = signal(true);
+  saving = signal(false);
+  error = signal<string | null>(null);
+  success = signal<string | null>(null);
 
-    currentPage = signal(1);
-    itemsPerPage = signal(10);
-    totalItems = signal(0);
-    totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())));
-    paginatedBranches = computed(() => this.branches());
+  currentPage = signal(1);
+  itemsPerPage = signal(10);
+  totalItems = signal(0);
+  totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())),
+  );
+  paginatedBranches = computed(() => this.branches());
 
-    // Form states
-    showForm = signal(false);
-    isEditing = signal(false);
-    currentTab = signal<'general' | 'branding' | 'contact' | 'financial'>('general');
-    uploadingLogo = signal(false);
+  // Form states
+  showForm = signal(false);
+  isEditing = signal(false);
+  currentTab = signal<'general' | 'branding' | 'contact' | 'financial'>(
+    'general',
+  );
+  uploadingLogo = signal(false);
 
-    currentForm = signal<Partial<Branch>>({
-        name: '',
-        address: '',
-        slug: '',
-        official_name: '',
-        contact_email: '',
-        contact_phone: '',
-        whatsapp_number: '',
-        tax_id: '',
-        global_markup_percentage: 0,
-        is_active: true,
-        plan_id: 'basic',
+  currentForm = signal<Partial<Branch>>({
+    name: '',
+    address: '',
+    slug: '',
+    official_name: '',
+    contact_email: '',
+    contact_phone: '',
+    whatsapp_number: '',
+    tax_id: '',
+    global_markup_percentage: 0,
+    is_active: true,
+    plan_id: 'basic',
+    branding_settings: {
+      logo_url: null,
+      favicon_url: null,
+      primary_color: '#0d9488',
+      owner_name: '',
+    },
+    bank_info: {
+      alias: '',
+      cbu: '',
+      bank: '',
+    },
+    modules_config: {
+      dashboard: true,
+      repairs: false,
+      inventory: false,
+      customers: true,
+    },
+  });
+
+  async onLogoSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.uploadingLogo.set(true);
+    try {
+      const url = await this.branchService.uploadLogo(file);
+      const form = this.currentForm();
+      this.currentForm.set({
+        ...form,
         branding_settings: {
+          ...(form.branding_settings || {
             logo_url: null,
             favicon_url: null,
             primary_color: '#0d9488',
-            owner_name: ''
+          }),
+          logo_url: url,
         },
-        bank_info: {
-            alias: '',
-            cbu: '',
-            bank: ''
-        },
-        modules_config: {
-            dashboard: true,
-            repairs: false,
-            inventory: false,
-            customers: true
-        }
+      });
+    } catch (e: any) {
+      this.error.set('Error al subir logo: ' + e.message);
+    } finally {
+      this.uploadingLogo.set(false);
+    }
+  }
+
+  async ngOnInit() {
+    await this.loadBranches();
+  }
+
+  async loadBranches() {
+    this.loading.set(true);
+    try {
+      const result = await this.branchService.getPaginatedAdminBranches(
+        this.currentPage(),
+        this.itemsPerPage(),
+      );
+      this.branches.set(result.data || []);
+      this.totalItems.set(result.total || 0);
+
+      // Auto-open specific branch if we are in its context (and not a Super Admin)
+      const activeBranch = this.branchService.currentBranch();
+      if (activeBranch && !this.auth.isSuperAdmin()) {
+        this.openEditForm(activeBranch);
+      }
+    } catch (e: any) {
+      this.error.set(e.message);
+    } finally {
+      this.loading.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
+  async changePage(page: number) {
+    this.currentPage.set(page);
+    await this.loadBranches();
+  }
+
+  openCreateForm() {
+    this.isEditing.set(false);
+    this.currentTab.set('general');
+    this.currentForm.set({
+      name: '',
+      address: '',
+      slug: '',
+      official_name: '',
+      contact_email: '',
+      contact_phone: '',
+      whatsapp_number: '',
+      tax_id: '',
+      global_markup_percentage: 0,
+      is_active: true,
+      plan_id: 'basic',
+      branding_settings: {
+        logo_url: null,
+        favicon_url: null,
+        primary_color: '#0d9488',
+        owner_name: '',
+      },
+      bank_info: {
+        alias: '',
+        cbu: '',
+        bank: '',
+      },
+      modules_config: {
+        dashboard: true,
+        repairs: false,
+        inventory: false,
+        customers: true,
+      },
     });
+    this.showForm.set(true);
+  }
 
-    async onLogoSelected(event: any) {
-        const file = event.target.files[0];
-        if (!file) return;
+  openEditForm(branch: Branch) {
+    this.isEditing.set(true);
+    this.currentTab.set('general');
+    // Ensure nested objects exist
+    const modules = branch.modules_config || {
+      dashboard: true,
+      repairs: branch.plan_id === 'premium',
+      inventory: branch.plan_id === 'premium',
+      customers: true,
+    };
+    const branding = branch.branding_settings || {
+      logo_url: null,
+      favicon_url: null,
+      primary_color: '#0d9488',
+    };
+    const bank = branch.bank_info || {
+      alias: '',
+      cbu: '',
+      bank: '',
+    };
+    this.currentForm.set({
+      ...branch,
+      modules_config: { ...modules },
+      branding_settings: { ...branding },
+      bank_info: { ...bank },
+    });
+    this.showForm.set(true);
+  }
 
-        this.uploadingLogo.set(true);
-        try {
-            const url = await this.branchService.uploadLogo(file);
-            const form = this.currentForm();
-            this.currentForm.set({
-                ...form,
-                branding_settings: {
-                    ...(form.branding_settings || { logo_url: null, favicon_url: null, primary_color: '#0d9488' }),
-                    logo_url: url
-                }
+  onPlanChange(newPlan: string) {
+    const form = this.currentForm();
+    if (newPlan === 'premium') {
+      this.currentForm.set({
+        ...form,
+        plan_id: 'premium',
+        modules_config: {
+          dashboard: true,
+          repairs: true,
+          inventory: true,
+          customers: true,
+        },
+      });
+    } else if (newPlan === 'basic') {
+      this.currentForm.set({
+        ...form,
+        plan_id: 'basic',
+        modules_config: {
+          dashboard: true,
+          repairs: false,
+          inventory: false,
+          customers: true,
+        },
+      });
+    }
+  }
+
+  cancelForm() {
+    this.showForm.set(false);
+    this.error.set(null);
+  }
+
+  async saveBranch() {
+    const payload = this.currentForm();
+    if (!payload.name) {
+      this.error.set('El nombre de la sucursal es obligatorio.');
+      return;
+    }
+
+    this.saving.set(true);
+    this.error.set(null);
+
+    const slug =
+      payload.slug || payload.name.toLowerCase().trim().replace(/\s+/g, '-');
+
+    try {
+      if (this.isEditing() && (payload as Branch).id) {
+        await this.branchService.updateBranch(payload as Branch);
+        this.success.set('Sucursal actualizada con éxito');
+      } else {
+        if (this.auth.isSuperAdmin()) {
+          // Si es SuperAdmin, creamos un nuevo Tenant y Sucursal usando la Edge Function
+          const response = await this.supabase
+            .getClient()
+            .functions.invoke('create-trial-tenant', {
+              body: {
+                email: payload.contact_email || 'admin@arecofix.com',
+                businessName: payload.name,
+                subtitle: payload.official_name || '',
+                whatsapp: payload.whatsapp_number || '+5491100000000',
+                currency: 'ARS',
+                logo_url: payload.branding_settings?.logo_url || null,
+              },
             });
-        } catch (e: any) {
-            this.error.set('Error al subir logo: ' + e.message);
-        } finally {
-            this.uploadingLogo.set(false);
+          console.log(
+            'DEBUG [create-trial-tenant] response:',
+            JSON.stringify(response),
+          );
+          if (response.error || (response.data && !response.data.success)) {
+            throw new Error(
+              response.error?.message ||
+                response.data?.error ||
+                'Error creando tenant.',
+            );
+          }
+          this.success.set(
+            'Nuevo Tenant/Sucursal creado con éxito. El usuario recibirá un correo.',
+          );
+        } else {
+          await this.branchService.addBranch(payload, slug);
+          this.success.set('Sucursal creada con éxito');
         }
+      }
+      this.showForm.set(false);
+      await this.loadBranches();
+      setTimeout(() => this.success.set(null), 3000);
+    } catch (e: any) {
+      this.error.set(e.message);
+    } finally {
+      this.saving.set(false);
+      this.cdr.markForCheck();
     }
+  }
 
-    async ngOnInit() {
-        await this.loadBranches();
+  async deleteBranch(id: string) {
+    if (
+      !confirm(
+        '¿Seguro que deseas eliminar esta sucursal? Esta acción no se puede deshacer.',
+      )
+    )
+      return;
+
+    try {
+      await this.branchService.deleteBranch(id);
+      this.success.set('Sucursal eliminada');
+      await this.loadBranches();
+      setTimeout(() => this.success.set(null), 3000);
+    } catch (e: any) {
+      const errorMsg = e.message || '';
+      if (errorMsg.includes('23503') || errorMsg.includes('foreign key')) {
+        this.error.set(
+          'No se puede eliminar la sucursal porque tiene datos asociados (productos, reparaciones, etc.). Por favor, desactívela en su lugar.',
+        );
+      } else {
+        this.error.set('Error al eliminar: ' + errorMsg);
+      }
+    } finally {
+      this.cdr.markForCheck();
     }
+  }
 
-    async loadBranches() {
-        this.loading.set(true);
-        try {
-            const result = await this.branchService.getPaginatedAdminBranches(this.currentPage(), this.itemsPerPage());
-            this.branches.set(result.data || []);
-            this.totalItems.set(result.total || 0);
-
-            // Auto-open specific branch if we are in its context (and not a Super Admin)
-            const activeBranch = this.branchService.currentBranch();
-            if (activeBranch && !this.auth.isSuperAdmin()) {
-                this.openEditForm(activeBranch);
-            }
-        } catch (e: any) {
-            this.error.set(e.message);
-        } finally {
-            this.loading.set(false);
-            this.cdr.markForCheck();
-        }
+  async toggleStatus(branch: Branch) {
+    try {
+      await this.branchService.toggleBranchStatus(branch);
+      await this.loadBranches();
+    } catch (e: any) {
+      this.error.set(e.message);
     }
+  }
 
-    async changePage(page: number) {
-        this.currentPage.set(page);
-        await this.loadBranches();
-    }
-
-    openCreateForm() {
-        this.isEditing.set(false);
-        this.currentTab.set('general');
-        this.currentForm.set({
-            name: '',
-            address: '',
-            slug: '',
-            official_name: '',
-            contact_email: '',
-            contact_phone: '',
-            whatsapp_number: '',
-            tax_id: '',
-            global_markup_percentage: 0,
-            is_active: true,
-            plan_id: 'basic',
-            branding_settings: {
-                logo_url: null,
-                favicon_url: null,
-                primary_color: '#0d9488',
-                owner_name: ''
-            },
-            bank_info: {
-                alias: '',
-                cbu: '',
-                bank: ''
-            },
-            modules_config: {
-                dashboard: true,
-                repairs: false,
-                inventory: false,
-                customers: true
-            }
-        });
-        this.showForm.set(true);
-    }
-
-    openEditForm(branch: Branch) {
-        this.isEditing.set(true);
-        this.currentTab.set('general');
-        // Ensure nested objects exist
-        const modules = branch.modules_config || {
-            dashboard: true,
-            repairs: branch.plan_id === 'premium',
-            inventory: branch.plan_id === 'premium',
-            customers: true
-        };
-        const branding = branch.branding_settings || {
-            logo_url: null,
-            favicon_url: null,
-            primary_color: '#0d9488'
-        };
-        const bank = branch.bank_info || {
-            alias: '',
-            cbu: '',
-            bank: ''
-        };
-        this.currentForm.set({ 
-            ...branch, 
-            modules_config: { ...modules },
-            branding_settings: { ...branding },
-            bank_info: { ...bank }
-        });
-        this.showForm.set(true);
-    }
-
-    onPlanChange(newPlan: string) {
-        const form = this.currentForm();
-        if (newPlan === 'premium') {
-            this.currentForm.set({
-                ...form,
-                plan_id: 'premium',
-                modules_config: {
-                    dashboard: true,
-                    repairs: true,
-                    inventory: true,
-                    customers: true
-                }
-            });
-        } else if (newPlan === 'basic') {
-            this.currentForm.set({
-                ...form,
-                plan_id: 'basic',
-                modules_config: {
-                    dashboard: true,
-                    repairs: false,
-                    inventory: false,
-                    customers: true
-                }
-            });
-        }
-    }
-
-    cancelForm() {
-        this.showForm.set(false);
-        this.error.set(null);
-    }
-
-    async saveBranch() {
-        const payload = this.currentForm();
-        if (!payload.name) {
-            this.error.set('El nombre de la sucursal es obligatorio.');
-            return;
-        }
-
-        this.saving.set(true);
-        this.error.set(null);
-
-        const slug = payload.slug || payload.name.toLowerCase().trim().replace(/\s+/g, '-');
-
-        try {
-            if (this.isEditing() && (payload as Branch).id) {
-                await this.branchService.updateBranch(payload as Branch);
-                this.success.set('Sucursal actualizada con éxito');
-            } else {
-                if (this.auth.isSuperAdmin()) {
-                    // Si es SuperAdmin, creamos un nuevo Tenant y Sucursal usando la Edge Function
-                    const response = await this.supabase.getClient().functions.invoke('create-trial-tenant', {
-                        body: {
-                            email: payload.contact_email || 'admin@arecofix.com',
-                            businessName: payload.name,
-                            subtitle: payload.official_name || '',
-                            whatsapp: payload.whatsapp_number || '+5491100000000',
-                            currency: 'ARS',
-                            logo_url: payload.branding_settings?.logo_url || null
-                        }
-                    });
-                    console.log('DEBUG [create-trial-tenant] response:', JSON.stringify(response));
-                    if (response.error || (response.data && !response.data.success)) {
-                        throw new Error(response.error?.message || response.data?.error || 'Error creando tenant.');
-                    }
-                    this.success.set('Nuevo Tenant/Sucursal creado con éxito. El usuario recibirá un correo.');
-                } else {
-                    await this.branchService.addBranch(payload, slug);
-                    this.success.set('Sucursal creada con éxito');
-                }
-            }
-            this.showForm.set(false);
-            await this.loadBranches();
-            setTimeout(() => this.success.set(null), 3000);
-        } catch (e: any) {
-            this.error.set(e.message);
-        } finally {
-            this.saving.set(false);
-            this.cdr.markForCheck();
-        }
-    }
-
-    async deleteBranch(id: string) {
-        if (!confirm('¿Seguro que deseas eliminar esta sucursal? Esta acción no se puede deshacer.')) return;
-        
-        try {
-            await this.branchService.deleteBranch(id);
-            this.success.set('Sucursal eliminada');
-            await this.loadBranches();
-            setTimeout(() => this.success.set(null), 3000);
-        } catch (e: any) {
-            const errorMsg = e.message || '';
-            if (errorMsg.includes('23503') || errorMsg.includes('foreign key')) {
-                this.error.set('No se puede eliminar la sucursal porque tiene datos asociados (productos, reparaciones, etc.). Por favor, desactívela en su lugar.');
-            } else {
-                this.error.set('Error al eliminar: ' + errorMsg);
-            }
-        } finally {
-            this.cdr.markForCheck();
-        }
-    }
-
-    async toggleStatus(branch: Branch) {
-        try {
-            await this.branchService.toggleBranchStatus(branch);
-            await this.loadBranches();
-        } catch (e: any) {
-            this.error.set(e.message);
-        }
-    }
-
-    manageBranch(slug: string) {
-        this.router.navigate([`/${slug}/admin/dashboard`]);
-    }
+  manageBranch(slug: string) {
+    this.router.navigate([`/${slug}/admin/dashboard`]);
+  }
 }

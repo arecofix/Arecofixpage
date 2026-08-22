@@ -1,9 +1,20 @@
-import { Component, inject, OnInit, signal, computed, DestroyRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  computed,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, switchMap, catchError } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { TenantIsolatedDashboardService, TenantDashboardStats } from './services/tenant-isolated-dashboard.service';
+import {
+  TenantIsolatedDashboardService,
+  TenantDashboardStats,
+} from './services/tenant-isolated-dashboard.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { FinanceDashboardService } from '@app/features/finance/application/services/finance-dashboard.service';
@@ -13,7 +24,8 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-branch-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './branch-dashboard.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './branch-dashboard.component.html',
 })
 export class BranchDashboardComponent implements OnInit {
   private dashboardService = inject(TenantIsolatedDashboardService);
@@ -47,7 +59,7 @@ export class BranchDashboardComponent implements OnInit {
     profit_chart: [],
     tenantId: '',
     isBranchAdmin: false,
-    branchName: ''
+    branchName: '',
   });
 
   loading = signal(true);
@@ -58,9 +70,15 @@ export class BranchDashboardComponent implements OnInit {
   // Computed properties para permisos
   isSuperAdmin = computed(() => this.authService.isSuperAdmin());
   isBranchAdmin = computed(() => this.stats().isBranchAdmin);
-  canViewGlobalStats = computed(() => this.dashboardService.canViewGlobalStats());
-  canViewOtherBranches = computed(() => this.dashboardService.canViewOtherBranches());
-  currentBranchId = computed(() => this.dashboardService.getCurrentUserBranchId());
+  canViewGlobalStats = computed(() =>
+    this.dashboardService.canViewGlobalStats(),
+  );
+  canViewOtherBranches = computed(() =>
+    this.dashboardService.canViewOtherBranches(),
+  );
+  currentBranchId = computed(() =>
+    this.dashboardService.getCurrentUserBranchId(),
+  );
 
   // Información de la sucursal actual
   branchInfo = computed(() => {
@@ -68,7 +86,7 @@ export class BranchDashboardComponent implements OnInit {
     return {
       name: stats.branchName || 'Sucursal',
       id: stats.branchId || '',
-      tenantId: stats.tenantId
+      tenantId: stats.tenantId,
     };
   });
 
@@ -86,12 +104,12 @@ export class BranchDashboardComponent implements OnInit {
   // salesChartData = signal<ChartData<'line'>>({
   //   labels: [],
   //   datasets: [
-  //     { 
-  //       data: [], 
-  //       label: 'Ventas ($)', 
-  //       borderColor: CHART_COLORS.primary, 
-  //       backgroundColor: CHART_COLORS.primaryTransparent, 
-  //       fill: true 
+  //     {
+  //       data: [],
+  //       label: 'Ventas ($)',
+  //       borderColor: CHART_COLORS.primary,
+  //       backgroundColor: CHART_COLORS.primaryTransparent,
+  //       fill: true
   //     },
   //   ]
   // });
@@ -109,9 +127,9 @@ export class BranchDashboardComponent implements OnInit {
   // productsChartData = signal<ChartData<'bar'>>({
   //   labels: [],
   //   datasets: [
-  //     { 
-  //       data: [], 
-  //       label: 'Unidades', 
+  //     {
+  //       data: [],
+  //       label: 'Unidades',
   //       backgroundColor: CHART_COLORS.palette
   //     }
   //   ]
@@ -135,26 +153,30 @@ export class BranchDashboardComponent implements OnInit {
   // });
 
   constructor() {
-    this.loadStats$.pipe(
-      switchMap(branchSlug => {
-        this.loading.set(true);
-        this.error.set(null);
-        return this.dashboardService.getDashboardStats(branchSlug).pipe(
-          catchError(err => {
-            console.error('Error loading dashboard stats:', err);
-            this.error.set('No se pudieron cargar las estadísticas. Por favor, intente nuevamente.');
-            this.loading.set(false);
-            return [];
-          })
-        );
-      }),
-      takeUntilDestroyed()
-    ).subscribe((stats: any) => {
-      if (stats && !Array.isArray(stats)) {
-        this.stats.set(stats);
-      }
-      this.loading.set(false);
-    });
+    this.loadStats$
+      .pipe(
+        switchMap((branchSlug) => {
+          this.loading.set(true);
+          this.error.set(null);
+          return this.dashboardService.getDashboardStats(branchSlug).pipe(
+            catchError((err) => {
+              console.error('Error loading dashboard stats:', err);
+              this.error.set(
+                'No se pudieron cargar las estadísticas. Por favor, intente nuevamente.',
+              );
+              this.loading.set(false);
+              return [];
+            }),
+          );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((stats: any) => {
+        if (stats && !Array.isArray(stats)) {
+          this.stats.set(stats);
+        }
+        this.loading.set(false);
+      });
   }
 
   async ngOnInit() {
@@ -175,7 +197,7 @@ export class BranchDashboardComponent implements OnInit {
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     this.financeService.initializeBranches().then(() => {
-        this.financeService.loadMovements(startOfMonth, today);
+      this.financeService.loadMovements(startOfMonth, today);
     });
   }
 
@@ -187,16 +209,16 @@ export class BranchDashboardComponent implements OnInit {
   //   if (stats.sales_chart && stats.sales_chart.length > 0) {
   //     const months = stats.sales_chart.map(d => this.formatMonth(d.period));
   //     const totals = stats.sales_chart.map(d => d.total);
-      
+
   //     this.salesChartData.set({
   //       labels: months,
   //       datasets: [
-  //         { 
-  //           data: totals, 
-  //           label: 'Ventas ($)', 
-  //           borderColor: CHART_COLORS.primary, 
-  //           backgroundColor: CHART_COLORS.primaryTransparent, 
-  //           fill: true 
+  //         {
+  //           data: totals,
+  //           label: 'Ventas ($)',
+  //           borderColor: CHART_COLORS.primary,
+  //           backgroundColor: CHART_COLORS.primaryTransparent,
+  //           fill: true
   //         }
   //       ]
   //     });
@@ -210,10 +232,10 @@ export class BranchDashboardComponent implements OnInit {
   //     this.productsChartData.set({
   //       labels: productNames,
   //       datasets: [
-  //         { 
-  //           data: quantities, 
-  //           label: 'Unidades', 
-  //           backgroundColor: CHART_COLORS.palette 
+  //         {
+  //           data: quantities,
+  //           label: 'Unidades',
+  //           backgroundColor: CHART_COLORS.palette
   //         }
   //       ]
   //     });
@@ -227,8 +249,8 @@ export class BranchDashboardComponent implements OnInit {
   //     this.categoryChartData.set({
   //       labels: catNames,
   //       datasets: [
-  //         { 
-  //           data: catCounts, 
+  //         {
+  //           data: catCounts,
   //           backgroundColor: CHART_COLORS.paletteAlt
   //         }
   //       ]
@@ -289,7 +311,7 @@ export class BranchDashboardComponent implements OnInit {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   }
 
@@ -315,18 +337,20 @@ export class BranchDashboardComponent implements OnInit {
    */
   getDashboardMessage(): string {
     const s = this.stats();
-    
+
     if (this.isBranchAdmin()) {
       if (!this.hasData()) {
         return `Bienvenido a ${s.branchName}. Aún no tienes ventas o productos registrados.`;
       }
       return `Estadísticas de ${s.branchName}`;
     }
-    
+
     if (this.isSuperAdmin()) {
-      return s.branchId ? `Viendo estadísticas de: ${s.branchName}` : 'Estadísticas Globales';
+      return s.branchId
+        ? `Viendo estadísticas de: ${s.branchName}`
+        : 'Estadísticas Globales';
     }
-    
+
     return 'Panel de Administración';
   }
 }

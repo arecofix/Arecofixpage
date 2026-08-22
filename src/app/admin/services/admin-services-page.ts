@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AppCatalogService } from '@app/features/products/application/services/app-catalog.service';
@@ -10,6 +17,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-admin-services-page',
   standalone: true,
   imports: [CommonModule, RouterLink, Pagination],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-services-page.html',
 })
 export class AdminServicesPage implements OnInit {
@@ -17,16 +25,18 @@ export class AdminServicesPage implements OnInit {
   private route = inject(ActivatedRoute);
   services = signal<AppServiceEntity[]>([]);
   loading = signal(true);
-  
+
   currentPage = signal(1);
   itemsPerPage = signal(24);
   totalItems = signal(0);
-  totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())));
+  totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage())),
+  );
 
   private querySub?: Subscription;
 
   async ngOnInit() {
-    this.querySub = this.route.queryParams.subscribe(params => {
+    this.querySub = this.route.queryParams.subscribe((params) => {
       const page = parseInt(params['_page']) || 1;
       if (this.currentPage() !== page || this.services().length === 0) {
         this.currentPage.set(page);
@@ -42,11 +52,15 @@ export class AdminServicesPage implements OnInit {
   async loadServices() {
     this.loading.set(true);
     try {
-      const res = await this.catalogService.getPaginated(this.currentPage(), this.itemsPerPage());
+      const res = await this.catalogService.getPaginated(
+        this.currentPage(),
+        this.itemsPerPage(),
+      );
       this.services.set(res.data);
       this.totalItems.set(res.total);
     } catch (e: unknown) {
-      if (e instanceof Error) console.error('Error loading services', e.message);
+      if (e instanceof Error)
+        console.error('Error loading services', e.message);
     } finally {
       this.loading.set(false);
     }
@@ -68,4 +82,3 @@ export class AdminServicesPage implements OnInit {
     }
   }
 }
-

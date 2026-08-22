@@ -1,7 +1,18 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
-
-import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CoursesService, Module } from '@app/core/services/courses.service';
 import { ProductMediaService } from '@app/admin/products/services/product-media.service';
@@ -16,418 +27,873 @@ import { signal } from '@angular/core';
   selector: 'app-admin-course-form-page',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="max-w-5xl mx-auto pb-12">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
+      >
         <div>
-          <h2 class="text-3xl font-black text-gray-900 dark:text-white mb-1 flex items-center gap-3">
-             <a routerLink="/admin/courses" class="btn btn-sm btn-circle btn-ghost text-slate-400 hover:text-white transition-colors">
+          <h2
+            class="text-3xl font-black text-gray-900 dark:text-white mb-1 flex items-center gap-3"
+          >
+            <a
+              routerLink="/admin/courses"
+              class="btn btn-sm btn-circle btn-ghost text-slate-400 hover:text-white transition-colors"
+            >
               <i class="fas fa-arrow-left"></i>
-             </a>
-            {{ isEditing ? 'Editar Programa Educativo' : 'Nuevo Programa Educativo' }}
+            </a>
+            {{
+              isEditing
+                ? 'Editar Programa Educativo'
+                : 'Nuevo Programa Educativo'
+            }}
           </h2>
-          <p class="text-sm text-gray-500 dark:text-slate-400 ml-11">Configura la oferta educativa, precio y presentación para los alumnos.</p>
+          <p class="text-sm text-gray-500 dark:text-slate-400 ml-11">
+            Configura la oferta educativa, precio y presentación para los
+            alumnos.
+          </p>
         </div>
       </div>
-    
+
       <form [formGroup]="form" (ngSubmit)="save()">
-        
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           <!-- Left Column (Main Info & Pricing) -->
           <div class="lg:col-span-2 space-y-8">
-            
             <!-- Bloque 1: Identidad del Curso -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-              <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-tag text-blue-500"></i> Identidad y Detalles</h3>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-tag text-blue-500"></i> Identidad y Detalles
+                </h3>
               </div>
               <div class="p-6 space-y-6">
                 <!-- Título -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Título Comercial</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Título Comercial</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors flex items-center gap-3 rounded-xl focus-within:ring-2 focus-within:ring-blue-500/20 px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-heading text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="title" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Especialización en Hardware Apple" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors flex items-center gap-3 rounded-xl focus-within:ring-2 focus-within:ring-blue-500/20 px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-heading text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="title"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: Especialización en Hardware Apple"
+                    />
                   </label>
-                  @if (form.get('title')?.invalid && form.get('title')?.touched) {
-                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> El título es obligatorio</span>
+                  @if (
+                    form.get('title')?.invalid && form.get('title')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                      ><i class="fas fa-exclamation-circle"></i> El título es
+                      obligatorio</span
+                    >
                   }
                 </div>
-          
+
                 <!-- Slug & Nivel -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div class="form-control">
                     <label class="label">
-                      <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">URL (Slug)</span>
+                      <span
+                        class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                        >URL (Slug)</span
+                      >
                     </label>
-                    <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                      <i class="fas fa-link text-slate-400 dark:text-slate-500"></i>
-                      <input type="text" formControlName="slug" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="ej: hardware-apple" />
+                    <label
+                      class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                    >
+                      <i
+                        class="fas fa-link text-slate-400 dark:text-slate-500"
+                      ></i>
+                      <input
+                        type="text"
+                        formControlName="slug"
+                        class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                        placeholder="ej: hardware-apple"
+                      />
                     </label>
-                    @if (form.get('slug')?.invalid && form.get('slug')?.touched) {
-                      <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> El slug es obligatorio</span>
+                    @if (
+                      form.get('slug')?.invalid && form.get('slug')?.touched
+                    ) {
+                      <span
+                        class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                        ><i class="fas fa-exclamation-circle"></i> El slug es
+                        obligatorio</span
+                      >
                     }
                   </div>
                   <div class="form-control">
                     <label class="label">
-                      <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Dificultad / Nivel</span>
+                      <span
+                        class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                        >Dificultad / Nivel</span
+                      >
                     </label>
-                    <select formControlName="level" class="select select-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-12">
+                    <select
+                      formControlName="level"
+                      class="select select-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-12"
+                    >
                       <option value="basic">Básico (Inicial)</option>
-                      <option value="intermediate">Intermedio (Requiere experiencia)</option>
+                      <option value="intermediate">
+                        Intermedio (Requiere experiencia)
+                      </option>
                       <option value="advanced">Avanzado (Profesionales)</option>
                       <option value="all">Apto para todo público</option>
                     </select>
                   </div>
                 </div>
-          
+
                 <!-- Descripción -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Descripción / Propuesta de Valor</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Descripción / Propuesta de Valor</span
+                    >
                   </label>
-                  <textarea formControlName="description" class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-28 resize-none focus:ring-2 focus:ring-blue-500/20" placeholder="¿Qué va a lograr el alumno con este curso? Redactá un texto vendedor..."></textarea>
-                  @if (form.get('description')?.invalid && form.get('description')?.touched) {
-                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> La descripción es obligatoria</span>
+                  <textarea
+                    formControlName="description"
+                    class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-28 resize-none focus:ring-2 focus:ring-blue-500/20"
+                    placeholder="¿Qué va a lograr el alumno con este curso? Redactá un texto vendedor..."
+                  ></textarea>
+                  @if (
+                    form.get('description')?.invalid &&
+                    form.get('description')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                      ><i class="fas fa-exclamation-circle"></i> La descripción
+                      es obligatoria</span
+                    >
                   }
                 </div>
               </div>
             </div>
 
             <!-- Bloque 2: Logística y Tiempos -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-              <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-500"></i> Cursada y Logística</h3>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-calendar-alt text-purple-500"></i> Cursada y
+                  Logística
+                </h3>
               </div>
               <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Duración -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Duración Total</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Duración Total</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-hourglass-half text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="duration" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 3 meses" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-hourglass-half text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="duration"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 3 meses"
+                    />
                   </label>
-                  @if (form.get('duration')?.invalid && form.get('duration')?.touched) {
-                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> La duración es obligatoria</span>
+                  @if (
+                    form.get('duration')?.invalid &&
+                    form.get('duration')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                      ><i class="fas fa-exclamation-circle"></i> La duración es
+                      obligatoria</span
+                    >
                   }
                 </div>
                 <!-- Horarios -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Días y Horarios</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Días y Horarios</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-clock text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="schedule" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Lunes y Miércoles 18hs a 21hs" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-clock text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="schedule"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: Lunes y Miércoles 18hs a 21hs"
+                    />
                   </label>
-                  @if (form.get('schedule')?.invalid && form.get('schedule')?.touched) {
-                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> Los horarios son obligatorios</span>
+                  @if (
+                    form.get('schedule')?.invalid &&
+                    form.get('schedule')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                      ><i class="fas fa-exclamation-circle"></i> Los horarios
+                      son obligatorios</span
+                    >
                   }
                 </div>
                 <!-- Horas por Semana -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas por Semana</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Horas por Semana</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-business-time text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="hours_per_week" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 6 horas semanales" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-business-time text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="hours_per_week"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 6 horas semanales"
+                    />
                   </label>
                 </div>
                 <!-- Cantidad de Clases -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Cantidad de Clases</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Cantidad de Clases</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-chalkboard text-slate-400 dark:text-slate-500"></i>
-                    <input type="number" formControlName="classes_count" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 24" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-chalkboard text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="number"
+                      formControlName="classes_count"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 24"
+                    />
                   </label>
                 </div>
                 <!-- Horas Contenido -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas de Contenido</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Horas de Contenido</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-video text-slate-400 dark:text-slate-500"></i>
-                    <input type="number" formControlName="hours_content" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 12" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-video text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="number"
+                      formControlName="hours_content"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 12"
+                    />
                   </label>
                 </div>
                 <!-- Horas Práctica -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas de Práctica</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Horas de Práctica</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-tools text-slate-400 dark:text-slate-500"></i>
-                    <input type="number" formControlName="hours_practice" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 36" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-tools text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="number"
+                      formControlName="hours_practice"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 36"
+                    />
                   </label>
                 </div>
               </div>
             </div>
 
             <!-- Bloque 3: Staff & Social Proof (Métricas Semilla) -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-              <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-star text-yellow-500"></i> Marketing, Prestigio e Instructor</h3>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-star text-yellow-500"></i> Marketing,
+                  Prestigio e Instructor
+                </h3>
               </div>
               <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Instructor Name -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Nombre del Instructor</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Nombre del Instructor</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-chalkboard-teacher text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="instructor_name" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Ezequiel" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-chalkboard-teacher text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="instructor_name"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: Ezequiel"
+                    />
                   </label>
                 </div>
                 <!-- Instructor Role -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Rol del Instructor</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Rol del Instructor</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-user-tag text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="instructor_role" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: Experto en Microelectrónica" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-user-tag text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="instructor_role"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: Experto en Microelectrónica"
+                    />
                   </label>
                 </div>
                 <!-- Instructor Assigment (author_id) -->
                 <div class="form-control md:col-span-2">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Asignar a Cuenta de Instructor</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Asignar a Cuenta de Instructor</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-link text-slate-400 dark:text-slate-500"></i>
-                    <select formControlName="author_id" class="grow bg-transparent outline-none">
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-link text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <select
+                      formControlName="author_id"
+                      class="grow bg-transparent outline-none"
+                    >
                       <option value="">-- Sin Instructor Asignado --</option>
                       @for (instructor of instructors(); track instructor.id) {
-                        <option [value]="instructor.id">{{ instructor.first_name }} {{ instructor.last_name }} ({{ instructor.email }})</option>
+                        <option [value]="instructor.id">
+                          {{ instructor.first_name }}
+                          {{ instructor.last_name }} ({{ instructor.email }})
+                        </option>
                       }
                     </select>
                   </label>
-                  <span class="text-[10px] text-slate-500 mt-1">Al vincular una cuenta, ese instructor podrá ver y editar su curso desde su panel.</span>
+                  <span class="text-[10px] text-slate-500 mt-1"
+                    >Al vincular una cuenta, ese instructor podrá ver y editar
+                    su curso desde su panel.</span
+                  >
                 </div>
                 <!-- Instructor Avatar -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Foto del Instructor (URL)</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Foto del Instructor (URL)</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-image text-slate-400 dark:text-slate-500"></i>
-                    <input type="text" formControlName="instructor_avatar" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: assets/img/profe.jpg" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-image text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="text"
+                      formControlName="instructor_avatar"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: assets/img/profe.jpg"
+                    />
                   </label>
                 </div>
                 <!-- Reviews Count -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Cantidad de Opiniones</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Cantidad de Opiniones</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-comments text-slate-400 dark:text-slate-500"></i>
-                    <input type="number" formControlName="reviews_count" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 371" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-comments text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="number"
+                      formControlName="reviews_count"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 371"
+                    />
                   </label>
                 </div>
                 <!-- Instructor Bio -->
                 <div class="form-control md:col-span-2">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Biografía del Instructor</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Biografía del Instructor</span
+                    >
                   </label>
-                  <textarea formControlName="instructor_bio" class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-24 resize-none" placeholder="Profesional destacado con más de 10 años de experiencia..."></textarea>
+                  <textarea
+                    formControlName="instructor_bio"
+                    class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-24 resize-none"
+                    placeholder="Profesional destacado con más de 10 años de experiencia..."
+                  ></textarea>
                 </div>
                 <!-- Audiencia / Beneficios -->
                 <div class="form-control md:col-span-2">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Este curso es para ti si: (Uno por línea)</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Este curso es para ti si: (Uno por línea)</span
+                    >
                   </label>
-                  <textarea formControlName="audience_list" class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-28 resize-none" placeholder="Querés aprender desde cero...&#10;Buscás alta rentabilidad..."></textarea>
-                  <span class="text-[10px] text-slate-500 mt-1">Escribe cada punto en una nueva línea.</span>
+                  <textarea
+                    formControlName="audience_list"
+                    class="textarea textarea-bordered bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl h-28 resize-none"
+                    placeholder="Querés aprender desde cero...&#10;Buscás alta rentabilidad..."
+                  ></textarea>
+                  <span class="text-[10px] text-slate-500 mt-1"
+                    >Escribe cada punto en una nueva línea.</span
+                  >
                 </div>
-                
-                <div class="col-span-1 md:col-span-2 border-t border-slate-100 dark:border-slate-700 my-2"></div>
-                
+
+                <div
+                  class="col-span-1 md:col-span-2 border-t border-slate-100 dark:border-slate-700 my-2"
+                ></div>
+
                 <!-- Alumnos Ficticios -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Alumnos (Semilla)</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Alumnos (Semilla)</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
-                    <i class="fas fa-users text-slate-400 dark:text-slate-500"></i>
-                    <input type="number" formControlName="students" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 120" />
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <i
+                      class="fas fa-users text-slate-400 dark:text-slate-500"
+                    ></i>
+                    <input
+                      type="number"
+                      formControlName="students"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 120"
+                    />
                   </label>
                 </div>
                 <!-- Calificación -->
                 <div class="form-control">
                   <label class="label">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Rating (0 - 5.0)</span>
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Rating (0 - 5.0)</span
+                    >
                   </label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
                     <i class="fas fa-star text-yellow-500"></i>
-                    <input type="number" step="0.1" max="5.0" formControlName="rating" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Ej: 4.9" />
+                    <input
+                      type="number"
+                      step="0.1"
+                      max="5.0"
+                      formControlName="rating"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Ej: 4.9"
+                    />
                   </label>
                 </div>
               </div>
             </div>
 
             <!-- Bloque 4: Gestor de Módulos (Temario) -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-              <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center h-[72px]">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-list-ol text-orange-500"></i> Gestor de Módulos (Temario)</h3>
-                <button type="button" class="btn btn-sm btn-ghost hover:bg-orange-50 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-500 rounded-xl" (click)="addModule()">
-                  <i class="fas fa-plus"></i> <span class="hidden sm:inline">Agregar Módulo</span>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center h-[72px]"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-list-ol text-orange-500"></i> Gestor de
+                  Módulos (Temario)
+                </h3>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-ghost hover:bg-orange-50 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-500 rounded-xl"
+                  (click)="addModule()"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span class="hidden sm:inline">Agregar Módulo</span>
                 </button>
               </div>
               <div class="p-6 space-y-4" formArrayName="modules">
                 @if (modulesFormArray.length === 0) {
-                   <div class="text-center py-10 text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700">
-                     <i class="fas fa-sitemap text-4xl mb-3 opacity-30"></i>
-                     <p class="text-sm">Aún no agregaste ningún módulo al temario del curso.</p>
-                     <button type="button" class="btn btn-sm btn-outline mt-4 rounded-xl" (click)="addModule()">Crear el Primer Módulo</button>
-                   </div>
+                  <div
+                    class="text-center py-10 text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700"
+                  >
+                    <i class="fas fa-sitemap text-4xl mb-3 opacity-30"></i>
+                    <p class="text-sm">
+                      Aún no agregaste ningún módulo al temario del curso.
+                    </p>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline mt-4 rounded-xl"
+                      (click)="addModule()"
+                    >
+                      Crear el Primer Módulo
+                    </button>
+                  </div>
                 }
                 @for (mod of modulesFormArray.controls; track $index) {
-                  <div [formGroupName]="$index" class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex gap-4 items-start relative group transition-all hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
-                    
-                    <div class="flex-none pt-3 text-slate-400 font-bold text-lg w-8 text-center" title="Orden">
+                  <div
+                    [formGroupName]="$index"
+                    class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex gap-4 items-start relative group transition-all hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500"
+                  >
+                    <div
+                      class="flex-none pt-3 text-slate-400 font-bold text-lg w-8 text-center"
+                      title="Orden"
+                    >
                       {{ $index + 1 }}
                     </div>
-                    
+
                     <div class="grow space-y-4">
                       <div class="form-control">
-                        <input type="text" formControlName="title" class="input bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-blue-500 w-full font-bold text-gray-900 dark:text-white h-11 rounded-lg" placeholder="Título (ej: Módulo 1: Fundamentos de Microelectrónica...)" />
+                        <input
+                          type="text"
+                          formControlName="title"
+                          class="input bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-blue-500 w-full font-bold text-gray-900 dark:text-white h-11 rounded-lg"
+                          placeholder="Título (ej: Módulo 1: Fundamentos de Microelectrónica...)"
+                        />
                       </div>
                       <div class="form-control">
-                        <textarea formControlName="description" class="textarea bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-blue-500 w-full text-gray-900 dark:text-white resize-none h-20 rounded-lg text-sm" placeholder="Breve descripción de los temas a cubrir (Opcional)..."></textarea>
+                        <textarea
+                          formControlName="description"
+                          class="textarea bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-blue-500 w-full text-gray-900 dark:text-white resize-none h-20 rounded-lg text-sm"
+                          placeholder="Breve descripción de los temas a cubrir (Opcional)..."
+                        ></textarea>
                       </div>
                     </div>
-                    
+
                     <div class="flex-none pt-1">
-                      <button type="button" class="btn btn-square btn-sm btn-ghost text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" (click)="removeModule($index)" title="Eliminar Módulo">
+                      <button
+                        type="button"
+                        class="btn btn-square btn-sm btn-ghost text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        (click)="removeModule($index)"
+                        title="Eliminar Módulo"
+                      >
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
-                    
                   </div>
                 }
               </div>
             </div>
-
           </div>
 
           <!-- Right Column (Pricing & Media) -->
           <div class="lg:col-span-1 space-y-8">
-            
             <!-- Estado / Publicación -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
-               <div class="form-control">
-                  <label class="cursor-pointer flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl transition-colors"
-                         [class.border-emerald-500]="form.get('is_active')?.value"
-                         [class.bg-emerald-50]="form.get('is_active')?.value"
-                         [class.dark:bg-emerald-900/10]="form.get('is_active')?.value"
-                         [class.border-slate-300]="!form.get('is_active')?.value"
-                         [class.dark:border-slate-700]="!form.get('is_active')?.value">
-                    <div class="flex items-center gap-3 w-full">
-                      <div class="flex-1">
-                        <span class="block text-sm font-bold text-gray-900 dark:text-white">{{ form.get('is_active')?.value ? 'Curso Público' : 'Modo Borrador' }}</span>
-                        <span class="block text-xs text-slate-500 dark:text-slate-400 mt-1">{{ form.get('is_active')?.value ? 'Visible en la academia para todos' : 'Oculto, solo lo ven admins' }}</span>
-                      </div>
-                      <input type="checkbox" formControlName="is_active" class="toggle toggle-success" />
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6"
+            >
+              <div class="form-control">
+                <label
+                  class="cursor-pointer flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl transition-colors"
+                  [class.border-emerald-500]="form.get('is_active')?.value"
+                  [class.bg-emerald-50]="form.get('is_active')?.value"
+                  [class.dark:bg-emerald-900/10]="form.get('is_active')?.value"
+                  [class.border-slate-300]="!form.get('is_active')?.value"
+                  [class.dark:border-slate-700]="!form.get('is_active')?.value"
+                >
+                  <div class="flex items-center gap-3 w-full">
+                    <div class="flex-1">
+                      <span
+                        class="block text-sm font-bold text-gray-900 dark:text-white"
+                        >{{
+                          form.get('is_active')?.value
+                            ? 'Curso Público'
+                            : 'Modo Borrador'
+                        }}</span
+                      >
+                      <span
+                        class="block text-xs text-slate-500 dark:text-slate-400 mt-1"
+                        >{{
+                          form.get('is_active')?.value
+                            ? 'Visible en la academia para todos'
+                            : 'Oculto, solo lo ven admins'
+                        }}</span
+                      >
                     </div>
-                  </label>
-                </div>
+                    <input
+                      type="checkbox"
+                      formControlName="is_active"
+                      class="toggle toggle-success"
+                    />
+                  </div>
+                </label>
+              </div>
             </div>
 
             <!-- Precios -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-              <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-money-bill-wave text-emerald-500"></i> Estrategia de Precio</h3>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-money-bill-wave text-emerald-500"></i>
+                  Estrategia de Precio
+                </h3>
               </div>
               <div class="p-6 space-y-4">
                 <div class="form-control">
-                  <label class="label"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Precio Original / Normal</span></label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white">
+                  <label class="label"
+                    ><span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Precio Original / Normal</span
+                    ></label
+                  >
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
                     <span class="text-slate-400">$</span>
-                    <input type="number" formControlName="price" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none text-lg font-bold" />
+                    <input
+                      type="number"
+                      formControlName="price"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none text-lg font-bold"
+                    />
                   </label>
-                  @if (form.get('price')?.invalid && form.get('price')?.touched) {
-                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> El precio es obligatorio</span>
+                  @if (
+                    form.get('price')?.invalid && form.get('price')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                      ><i class="fas fa-exclamation-circle"></i> El precio es
+                      obligatorio</span
+                    >
                   }
                 </div>
-                
+
                 <div class="form-control">
-                  <label class="label"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Precio de Oferta (Opcional)</span></label>
-                  <label class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white opacity-80">
-                    <span class="font-bold text-emerald-600 dark:text-emerald-500">$</span>
-                    <input type="number" formControlName="sale_price" class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none" placeholder="Opcional..." />
+                  <label class="label"
+                    ><span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Precio de Oferta (Opcional)</span
+                    ></label
+                  >
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white opacity-80"
+                  >
+                    <span
+                      class="font-bold text-emerald-600 dark:text-emerald-500"
+                      >$</span
+                    >
+                    <input
+                      type="number"
+                      formControlName="sale_price"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Opcional..."
+                    />
                   </label>
-                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 ml-1">Debe ser menor al Precio Original.</span>
+                  <span
+                    class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 ml-1"
+                    >Debe ser menor al Precio Original.</span
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Multimedia -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-              <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fas fa-image text-pink-500"></i> Portada del Curso</h3>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-image text-pink-500"></i> Portada del Curso
+                </h3>
               </div>
               <div class="p-6">
                 <!-- Image Preview Area -->
-                <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4 group flex items-center justify-center">
+                <div
+                  class="relative w-full aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4 group flex items-center justify-center"
+                >
                   @if (form.get('image_url')?.value) {
-                    <img [src]="getImageSrc(form.get('image_url')?.value)" class="w-full h-full object-cover" alt="Portada" onerror="this.src='/assets/img/cursos/1.jpg'" />
-                    <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                       <span class="text-white font-bold text-sm bg-black/50 px-4 py-2 rounded-lg backdrop-blur-md border border-white/20"><i class="fas fa-exchange-alt mr-2"></i> Cambiar Portada</span>
+                    <img
+                      [src]="
+                        getImageSrc(
+                          $safeNavigationMigration(form.get('image_url')?.value)
+                        )
+                      "
+                      class="w-full h-full object-cover"
+                      alt="Portada"
+                      onerror="this.src='/assets/img/cursos/1.jpg'"
+                    />
+                    <div
+                      class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm"
+                    >
+                      <span
+                        class="text-white font-bold text-sm bg-black/50 px-4 py-2 rounded-lg backdrop-blur-md border border-white/20"
+                        ><i class="fas fa-exchange-alt mr-2"></i> Cambiar
+                        Portada</span
+                      >
                     </div>
                   } @else {
-                    <div class="text-slate-400 dark:text-slate-600 flex flex-col items-center">
+                    <div
+                      class="text-slate-400 dark:text-slate-600 flex flex-col items-center"
+                    >
                       <i class="fas fa-cloud-upload-alt text-4xl mb-2"></i>
                       <span class="text-sm font-medium">Sin imagen</span>
                     </div>
                   }
-                  
+
                   <!-- Invisible File Input overlapping the entire box for easy click -->
-                  <input type="file" (change)="onFileChange($event)" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <input
+                    type="file"
+                    (change)="onFileChange($event)"
+                    accept="image/*"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
                 </div>
-                
+
                 <div class="form-control">
-                  <span class="text-[10px] text-center text-slate-500 dark:text-slate-400 mb-2">O pega una URL directamente:</span>
-                  <input type="text" formControlName="image_url" class="input input-sm bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-xs text-gray-900 dark:text-white w-full rounded-lg text-center" placeholder="https://..." />
-                  @if (form.get('image_url')?.invalid && form.get('image_url')?.touched) {
-                    <span class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1 justify-center"><i class="fas fa-exclamation-circle"></i> La portada es obligatoria</span>
+                  <span
+                    class="text-[10px] text-center text-slate-500 dark:text-slate-400 mb-2"
+                    >O pega una URL directamente:</span
+                  >
+                  <input
+                    type="text"
+                    formControlName="image_url"
+                    class="input input-sm bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-xs text-gray-900 dark:text-white w-full rounded-lg text-center"
+                    placeholder="https://..."
+                  />
+                  @if (
+                    form.get('image_url')?.invalid &&
+                    form.get('image_url')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1 justify-center"
+                      ><i class="fas fa-exclamation-circle"></i> La portada es
+                      obligatoria</span
+                    >
                   }
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-        
+
         <!-- Sticky Bottom Actions Bar -->
-        <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)]">
-          <div class="container mx-auto max-w-5xl flex justify-between items-center px-4">
-            <button type="button" class="btn btn-ghost text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl" routerLink="/admin/courses">
+        <div
+          class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)]"
+        >
+          <div
+            class="container mx-auto max-w-5xl flex justify-between items-center px-4"
+          >
+            <button
+              type="button"
+              class="btn btn-ghost text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl"
+              routerLink="/admin/courses"
+            >
               Cancelar
             </button>
-            <button type="submit" class="btn border-none bg-blue-600 hover:bg-blue-700 text-white px-10 rounded-xl shadow-lg shadow-blue-500/30 text-base flex items-center gap-2 transition-all" [disabled]="saving">
+            <button
+              type="submit"
+              class="btn border-none bg-blue-600 hover:bg-blue-700 text-white px-10 rounded-xl shadow-lg shadow-blue-500/30 text-base flex items-center gap-2 transition-all"
+              [disabled]="saving"
+            >
               @if (saving) {
-                <span class="loading loading-spinner text-white w-5"></span> Guardando datos...
+                <span class="loading loading-spinner text-white w-5"></span>
+                Guardando datos...
               } @else {
-                <i class="fas fa-save"></i> {{ isEditing ? 'Guardar Cambios' : 'Lanzar Programa Educativo' }}
+                <i class="fas fa-save"></i>
+                {{
+                  isEditing ? 'Guardar Cambios' : 'Lanzar Programa Educativo'
+                }}
               }
             </button>
           </div>
         </div>
-
       </form>
     </div>
-  `
+  `,
 })
 export class AdminCourseFormPage implements OnInit {
   private fb = inject(FormBuilder);
@@ -444,51 +910,54 @@ export class AdminCourseFormPage implements OnInit {
   isEditing = false;
   courseId: string | null = null;
   saving = false;
-  
+
   instructors = signal<UserProfile[]>([]);
 
   constructor() {
-    this.form = this.fb.group({
-      title: ['', Validators.required],
-      slug: ['', Validators.required],
-      description: ['', Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]],
-      sale_price: [null],
-      level: [CourseLevel.BASIC, Validators.required],
-      duration: ['', Validators.required],
-      schedule: ['', Validators.required],
-      image_url: ['', Validators.required],
-      is_active: [true],
-      instructor_name: [''],
-      instructor_id: [''],
-      start_date: [''],
-      is_featured: [false],
-      short_description: [''],
-      students: [0],
-      rating: [5.0],
-      classes_count: [0],
-      hours_content: [0],
-      hours_practice: [0],
-      hours_per_week: [''],
-      instructor_role: [''],
-      instructor_bio: [''],
-      instructor_avatar: [''],
-      author_id: [''],
-      audience_list: [''],
-      reviews_count: [0],
-      modules: this.fb.array([])
-    }, { validators: this.priceValidator });
+    this.form = this.fb.group(
+      {
+        title: ['', Validators.required],
+        slug: ['', Validators.required],
+        description: ['', Validators.required],
+        price: [0, [Validators.required, Validators.min(0)]],
+        sale_price: [null],
+        level: [CourseLevel.BASIC, Validators.required],
+        duration: ['', Validators.required],
+        schedule: ['', Validators.required],
+        image_url: ['', Validators.required],
+        is_active: [true],
+        instructor_name: [''],
+        instructor_id: [''],
+        start_date: [''],
+        is_featured: [false],
+        short_description: [''],
+        students: [0],
+        rating: [5.0],
+        classes_count: [0],
+        hours_content: [0],
+        hours_practice: [0],
+        hours_per_week: [''],
+        instructor_role: [''],
+        instructor_bio: [''],
+        instructor_avatar: [''],
+        author_id: [''],
+        audience_list: [''],
+        reviews_count: [0],
+        modules: this.fb.array([]),
+      },
+      { validators: this.priceValidator },
+    );
   }
 
   // Custom validator to ensure sale_price < price
   priceValidator(group: FormGroup) {
     const price = group.get('price')?.value;
     const salePrice = group.get('sale_price')?.value;
-    
+
     if (price !== null && salePrice !== null && salePrice !== '') {
-       if (Number(salePrice) >= Number(price)) {
-          return { salePriceTooHigh: true };
-       }
+      if (Number(salePrice) >= Number(price)) {
+        return { salePriceTooHigh: true };
+      }
     }
     return null;
   }
@@ -502,7 +971,7 @@ export class AdminCourseFormPage implements OnInit {
       id: [modData?.id || null],
       title: [modData?.title || '', Validators.required],
       description: [modData?.description || ''],
-      order_index: [modData?.order_index || this.modulesFormArray.length + 1]
+      order_index: [modData?.order_index || this.modulesFormArray.length + 1],
     });
     this.modulesFormArray.push(moduleGroup);
   }
@@ -519,9 +988,14 @@ export class AdminCourseFormPage implements OnInit {
       this.loadCourse(this.courseId);
     } else {
       // Auto-generate slug for new courses
-      this.form.get('title')?.valueChanges.subscribe(val => {
+      this.form.get('title')?.valueChanges.subscribe((val) => {
         if (val) {
-          const slug = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+          const slug = val
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
           this.form.get('slug')?.setValue(slug, { emitEvent: false });
         }
       });
@@ -550,7 +1024,9 @@ export class AdminCourseFormPage implements OnInit {
       this.cdr.markForCheck(); // Update preview
     } catch (error: any) {
       this.logger.error('Error uploading image', error);
-      this.notificationService.showError('Error al subir la imagen: ' + (error.message || error));
+      this.notificationService.showError(
+        'Error al subir la imagen: ' + (error.message || error),
+      );
     } finally {
       this.saving = false;
       this.cdr.markForCheck(); // Ensure spinner stops
@@ -561,61 +1037,78 @@ export class AdminCourseFormPage implements OnInit {
 
   loadCourse(id: string) {
     this.coursesService.getCourseById(id).subscribe({
-      next: (response: { data: any, error: any }) => {
+      next: (response: { data: any; error: any }) => {
         if (response.data) {
           // Join audience_list array to string for the textarea
-          if (response.data.audience_list && Array.isArray(response.data.audience_list)) {
-              response.data.audience_list = response.data.audience_list.join('\n');
+          if (
+            response.data.audience_list &&
+            Array.isArray(response.data.audience_list)
+          ) {
+            response.data.audience_list =
+              response.data.audience_list.join('\n');
           }
           this.form.patchValue(response.data);
         }
       },
-      error: (err: any) => this.logger.error('Error loading course', err)
+      error: (err: any) => this.logger.error('Error loading course', err),
     });
 
     this.coursesService.getModulesByCourseId(id).subscribe({
-      next: (res: { data: any[], error: any }) => {
+      next: (res: { data: any[]; error: any }) => {
         if (res.data && res.data.length > 0) {
-            this.modulesFormArray.clear();
-            res.data.forEach((m: any) => this.addModule(m));
+          this.modulesFormArray.clear();
+          res.data.forEach((m: any) => this.addModule(m));
         }
       },
-      error: (err: any) => this.logger.error('Error loading modules', err)
+      error: (err: any) => this.logger.error('Error loading modules', err),
     });
   }
 
   async save() {
     if (this.saving) return; // Prevent double execution
-    
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      
+
       // Extract which fields are invalid
-      const invalidFields = Object.keys(this.form.controls).filter(key => this.form.get(key)?.invalid);
-      
+      const invalidFields = Object.keys(this.form.controls).filter(
+        (key) => this.form.get(key)?.invalid,
+      );
+
       const fieldNames: Record<string, string> = {
-         title: 'Título', slug: 'URL (Slug)', description: 'Descripción',
-         price: 'Inversión Real', duration: 'Duración Total',
-         schedule: 'Días y Horarios', image_url: 'Portada del Curso', level: 'Dificultad'
+        title: 'Título',
+        slug: 'URL (Slug)',
+        description: 'Descripción',
+        price: 'Inversión Real',
+        duration: 'Duración Total',
+        schedule: 'Días y Horarios',
+        image_url: 'Portada del Curso',
+        level: 'Dificultad',
       };
-      
-      const translatedFields = invalidFields.map(f => fieldNames[f] || f);
-      
+
+      const translatedFields = invalidFields.map((f) => fieldNames[f] || f);
+
       this.logger.warn('Form is invalid. Missing fields:', invalidFields);
-      
+
       if (this.modulesFormArray.invalid) {
-         this.notificationService.showError('Por favor asegúrate de que todos los módulos tengan un título.');
+        this.notificationService.showError(
+          'Por favor asegúrate de que todos los módulos tengan un título.',
+        );
       } else if (this.form.hasError('salePriceTooHigh')) {
-         this.notificationService.showError('El Precio Ficticio (Tachado) no puede ser mayor o igual a la Inversión Real.');
+        this.notificationService.showError(
+          'El Precio Ficticio (Tachado) no puede ser mayor o igual a la Inversión Real.',
+        );
       } else {
-         this.notificationService.showError(`Faltan completar campos obligatorios: ${translatedFields.join(', ')}`);
+        this.notificationService.showError(
+          `Faltan completar campos obligatorios: ${translatedFields.join(', ')}`,
+        );
       }
       return;
     }
 
     this.saving = true;
     const formValue = this.form.value;
-    
+
     const courseData = {
       title: formValue.title,
       slug: formValue.slug,
@@ -640,42 +1133,58 @@ export class AdminCourseFormPage implements OnInit {
       instructor_bio: formValue.instructor_bio || null,
       instructor_avatar: formValue.instructor_avatar || null,
       author_id: formValue.author_id || null,
-      audience_list: formValue.audience_list 
-        ? formValue.audience_list.split('\n').map((i: string) => i.trim()).filter((i: string) => i) 
+      audience_list: formValue.audience_list
+        ? formValue.audience_list
+            .split('\n')
+            .map((i: string) => i.trim())
+            .filter((i: string) => i)
         : null,
-      reviews_count: formValue.reviews_count || 0
+      reviews_count: formValue.reviews_count || 0,
     };
 
     const modules = this.modulesFormArray.value;
 
-    this.logger.debug('Starting course save workflow', { isEditing: this.isEditing });
+    this.logger.debug('Starting course save workflow', {
+      isEditing: this.isEditing,
+    });
 
     try {
       let courseResult;
       if (this.isEditing && this.courseId) {
-        courseResult = await this.coursesService.updateCourse(this.courseId, courseData).toPromise();
+        courseResult = await this.coursesService
+          .updateCourse(this.courseId, courseData)
+          .toPromise();
       } else {
-        courseResult = await this.coursesService.createCourse(courseData).toPromise();
+        courseResult = await this.coursesService
+          .createCourse(courseData)
+          .toPromise();
       }
 
       if (courseResult?.error) {
-        throw new Error(courseResult.error.message || 'Error al guardar el curso');
+        throw new Error(
+          courseResult.error.message || 'Error al guardar el curso',
+        );
       }
 
       const savedCourseId = courseResult?.data?.id || this.courseId;
-      
+
       if (savedCourseId && modules && modules.length >= 0) {
         try {
-          await this.coursesService.saveModules(savedCourseId, modules).toPromise();
+          await this.coursesService
+            .saveModules(savedCourseId, modules)
+            .toPromise();
         } catch (modErr: any) {
           this.logger.warn('Failed to sync modules', modErr);
-          this.notificationService.showError('El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario.');
+          this.notificationService.showError(
+            'El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario.',
+          );
         }
       }
-      
-      this.notificationService.showSuccess('Programa educativo guardado correctamente.');
+
+      this.notificationService.showSuccess(
+        'Programa educativo guardado correctamente.',
+      );
       this.router.navigate(['/admin/courses']);
-      
     } catch (err: any) {
       this.logger.error('Save workflow failed', err);
       this.notificationService.showError('Error al guardar: ' + err.message);
@@ -694,7 +1203,7 @@ export class AdminCourseFormPage implements OnInit {
       },
       error: (err) => {
         this.logger.error('Error loading instructors', err);
-      }
+      },
     });
   }
 }

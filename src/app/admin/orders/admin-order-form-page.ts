@@ -1,11 +1,29 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  DestroyRef,
+} from '@angular/core';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 
 import { OrderService } from '@app/features/orders/application/services/order.service';
-import { Order, OrderItem } from '@app/features/orders/domain/entities/order.entity';
+import {
+  Order,
+  OrderItem,
+} from '@app/features/orders/domain/entities/order.entity';
 import { AuthService } from '@app/core/services/auth.service';
 
 import { OrderNotificationService } from '@app/features/orders/services/order-notification.service'; // Import Ecommerce Notification service
@@ -17,439 +35,494 @@ import { BranchService } from '@app/core/services/branch.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ProductOption {
-    id: string;
-    name: string;
-    sku: string;
-    price: number;
-    cost_price: number;
-    stock: number;
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  cost_price: number;
+  stock: number;
 }
 
 @Component({
-    selector: 'app-admin-order-form-page',
-    standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, CurrencyPipe, DecimalPipe],
-    templateUrl: './admin-order-form-page.html',
-    changeDetection: ChangeDetectionStrategy.Default,
+  selector: 'app-admin-order-form-page',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CurrencyPipe,
+    DecimalPipe,
+  ],
+  templateUrl: './admin-order-form-page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AdminOrderFormPage implements OnInit {
-    private route = inject(ActivatedRoute);
-    private router = inject(Router);
-    private orderService = inject(OrderService);
-    private authService = inject(AuthService);
-    private customerService = inject(CustomerService);
-    private productRepository = inject(ProductRepository);
-    private notificationService = inject(OrderNotificationService);
-    private pricingService = inject(PricingService);
-    private fb = inject(FormBuilder);
-    private cdr = inject(ChangeDetectorRef);
-    private workflowService = inject(OrderWorkflowService);
-    private branchService = inject(BranchService);
-    private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private orderService = inject(OrderService);
+  private authService = inject(AuthService);
+  private customerService = inject(CustomerService);
+  private productRepository = inject(ProductRepository);
+  private notificationService = inject(OrderNotificationService);
+  private pricingService = inject(PricingService);
+  private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private workflowService = inject(OrderWorkflowService);
+  private branchService = inject(BranchService);
+  private destroyRef = inject(DestroyRef);
 
-    orderForm!: FormGroup;
+  orderForm!: FormGroup;
 
+  id: string | null = null;
+  loading = true;
+  saving = false;
+  error: string | null = null;
+  private originalStatus: string | null = null; // Store original status
 
-    id: string | null = null;
-    loading = true;
-    saving = false;
-    error: string | null = null;
-    private originalStatus: string | null = null; // Store original status
+  products = signal<ProductOption[]>([]);
+  clients = signal<any[]>([]);
 
+  // Product autocomplete state
+  // Product autocomplete state
+  productSearchQueries = signal<string[]>([]);
+  showProductDropdowns = signal<boolean[]>([]);
 
-    products = signal<ProductOption[]>([]);
-    clients = signal<any[]>([]);
+  private setupForm() {
+    this.orderForm = this.fb.group({
+      customer_name: ['', [Validators.required]],
+      customer_email: [''],
+      customer_phone: ['', [Validators.required]],
+      shipping_address: this.fb.group({
+        street: [''],
+        number: [''],
+        city: ['Marcos Paz'],
+        neighborhood: [''],
+      }),
+      status: ['pending'],
+      subtotal: [0],
+      tax: [0],
+      discount: [0],
+      total: [0],
+      payment_method: ['efectivo'],
+      notes: [''],
+      items: this.fb.array([]),
+    });
 
-    // Product autocomplete state
-    // Product autocomplete state
-    productSearchQueries = signal<string[]>([]);
-    showProductDropdowns = signal<boolean[]>([]);
+    // Listen for value changes to recalculate totals
+    this.orderForm
+      .get('items')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.calculateTotals());
+    this.orderForm
+      .get('discount')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.calculateTotals());
+  }
 
-    private setupForm() {
-        this.orderForm = this.fb.group({
-            customer_name: ['', [Validators.required]],
-            customer_email: [''],
-            customer_phone: ['', [Validators.required]],
-            shipping_address: this.fb.group({
-                street: [''],
-                number: [''],
-                city: ['Marcos Paz'],
-                neighborhood: ['']
-            }),
-            status: ['pending'],
-            subtotal: [0],
-            tax: [0],
-            discount: [0],
-            total: [0],
-            payment_method: ['efectivo'],
-            notes: [''],
-            items: this.fb.array([])
-        });
+  get items() {
+    return this.orderForm.get('items') as FormArray;
+  }
 
-        // Listen for value changes to recalculate totals
-        this.orderForm.get('items')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.calculateTotals());
-        this.orderForm.get('discount')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.calculateTotals());
+  async ngOnInit() {
+    this.id = this.route.snapshot.paramMap.get('id');
+    this.setupForm();
+
+    // Parallel initial loading
+    await Promise.all([
+      this.loadProducts(),
+      this.loadClients(),
+      this.id ? this.loadOrder() : Promise.resolve(),
+    ]);
+
+    this.loading = false;
+    this.cdr.markForCheck();
+  }
+
+  async loadClients() {
+    try {
+      const data = await this.customerService.getRecentClients(50);
+
+      if (data) {
+        this.clients.set(
+          data.map((c: any) => ({
+            ...c,
+            displayName:
+              c.full_name ||
+              `${c.first_name || ''} ${c.last_name || ''}`.trim() ||
+              c.email,
+          })),
+        );
+      }
+    } catch (e) {
+      console.error('Error loading clients', e);
     }
+  }
 
-    get items() {
-        return this.orderForm.get('items') as FormArray;
+  onSelectClient(clientName: string) {
+    const client = this.clients().find((c) => c.displayName === clientName);
+    if (client) {
+      this.orderForm.patchValue({
+        customer_name: client.displayName,
+        customer_email: client.email,
+        customer_phone: client.phone,
+        shipping_address:
+          typeof client.address === 'string'
+            ? { street: client.address }
+            : client.address || {},
+      });
     }
+  }
 
-    async ngOnInit() {
-        this.id = this.route.snapshot.paramMap.get('id');
-        this.setupForm();
+  async loadProducts() {
+    return new Promise<void>((resolve) => {
+      this.productRepository.findAvailable().subscribe({
+        next: (products: any[]) => {
+          this.products.set(
+            products.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              sku: p.sku || '',
+              price: p.price,
+              cost_price: p.cost_price || 0,
+              stock: p.stock || 0,
+            })),
+          );
+          resolve();
+        },
+        error: (err: any) => {
+          console.error('Error loading products', err);
+          resolve();
+        },
+      });
+    });
+  }
 
-        // Parallel initial loading
-        await Promise.all([
-            this.loadProducts(),
-            this.loadClients(),
-            this.id ? this.loadOrder() : Promise.resolve()
-        ]);
+  async loadOrder() {
+    if (!this.id) return;
 
-        this.loading = false;
-        this.cdr.markForCheck();
-    }
-
-    async loadClients() {
-        try {
-            const data = await this.customerService.getRecentClients(50);
-            
-            if (data) {
-                this.clients.set(data.map((c: any) => ({
-                    ...c,
-                    displayName: c.full_name || `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email
-                })));
-            }
-        } catch (e) {
-            console.error('Error loading clients', e);
+    this.orderService.getOrderById(this.id).subscribe({
+      next: (order: Order | null) => {
+        if (!order) return;
+        let address = order.shipping_address;
+        if (typeof address === 'string') {
+          address = {
+            street: address,
+            number: '',
+            city: 'Marcos Paz',
+            neighborhood: '',
+          };
         }
-    }
-
-    onSelectClient(clientName: string) {
-        const client = this.clients().find(c => c.displayName === clientName);
-        if (client) {
-            this.orderForm.patchValue({
-                customer_name: client.displayName,
-                customer_email: client.email,
-                customer_phone: client.phone,
-                shipping_address: typeof client.address === 'string' ? { street: client.address } : (client.address || {})
-            });
-        }
-    }
-
-    async loadProducts() {
-        return new Promise<void>((resolve) => {
-            this.productRepository.findAvailable().subscribe({
-                next: (products: any[]) => {
-                    this.products.set(products.map((p: any) => ({
-                        id: p.id,
-                        name: p.name,
-                        sku: p.sku || '',
-                        price: p.price,
-                        cost_price: p.cost_price || 0,
-                        stock: p.stock || 0
-                    })));
-                    resolve();
-                },
-                error: (err: any) => {
-                    console.error('Error loading products', err);
-                    resolve();
-                }
-            });
-        });
-    }
-
-    async loadOrder() {
-        if (!this.id) return;
-
-        this.orderService.getOrderById(this.id).subscribe({
-            next: (order: Order | null) => {
-                if (!order) return;
-                let address = order.shipping_address;
-                if (typeof address === 'string') {
-                    address = {
-                        street: address,
-                        number: '',
-                        city: 'Marcos Paz',
-                        neighborhood: ''
-                    };
-                }
-
-                this.orderForm.patchValue({
-                    customer_name: order.customer_name,
-                    customer_email: order.customer_email,
-                    customer_phone: order.customer_phone,
-                    shipping_address: address || { street: '', number: '', city: '', neighborhood: '' },
-                    status: order.status,
-                    subtotal: order.subtotal,
-                    tax: order.tax,
-                    discount: order.discount,
-                    total: order.total,
-                    payment_method: order.payment_method || 'efectivo',
-                    notes: order.notes
-                });
-
-                // Clear and repopulate items
-                this.items.clear();
-                (order.items || []).forEach(item => {
-                    this.items.push(this.createItemFormGroup(item));
-                });
-
-                this.originalStatus = order.status; // Capture original status
-                this.cdr.markForCheck();
-
-            },
-            error: (err: any) => {
-                this.error = err.message || 'Error desconocido'; // Default message
-                this.cdr.markForCheck();
-            }
-        });
-    }
-
-    createItemFormGroup(item?: OrderItem) {
-        return this.fb.group({
-            product_id: [item?.product_id || null],
-            product_name: [item?.product_name || '', [Validators.required]],
-            product_sku: [item?.product_sku || ''],
-            quantity: [item?.quantity || 1, [Validators.required, Validators.min(1)]],
-            unit_price: [item?.unit_price || 0, [Validators.required, Validators.min(0)]],
-            cost_price: [item?.cost_price || 0],
-            subtotal: [item?.subtotal || 0]
-        });
-    }
-
-    addItem() {
-        this.items.push(this.createItemFormGroup());
-        this.cdr.markForCheck();
-    }
-
-    removeItem(index: number) {
-        this.items.removeAt(index);
-        this.calculateTotals();
-    }
-
-    onSearchProduct(index: number, nameQuery: string) {
-        const product = this.products().find(p => p.name === nameQuery);
-        const itemGroup = this.items.at(index) as FormGroup;
-
-        if (product) {
-            itemGroup.patchValue({
-                product_id: product.id,
-                product_name: product.name,
-                product_sku: product.sku,
-                unit_price: product.price,
-                cost_price: product.cost_price,
-                subtotal: product.price * itemGroup.get('quantity')?.value
-            });
-        } else {
-            itemGroup.patchValue({
-                product_id: undefined,
-                product_name: nameQuery,
-                product_sku: undefined
-            });
-        }
-        this.calculateTotals();
-    }
-
-    onUnitPriceChange(index: number) {
-        const item = this.items.at(index);
-        item.get('subtotal')?.setValue(item.get('unit_price')?.value * item.get('quantity')?.value);
-        this.calculateTotals();
-    }
-
-    onQuantityChange(index: number) {
-        const item = this.items.at(index);
-        item.get('subtotal')?.setValue(item.get('unit_price')?.value * item.get('quantity')?.value);
-        this.calculateTotals();
-    }
-
-    calculateTotals() {
-        const items = this.items.value as OrderItem[];
-        const subtotal = items.reduce((sum, item) => sum + (Number(item.subtotal) || 0), 0);
-        const discount = Number(this.orderForm.get('discount')?.value) || 0;
-        
-        const taxableAmount = Math.max(0, subtotal - discount);
-        const tax = this.pricingService.calculateTaxAmount(taxableAmount);
-        const total = this.pricingService.calculateFinalPrice(taxableAmount);
 
         this.orderForm.patchValue({
-            subtotal,
-            tax,
-            total
-        }, { emitEvent: false }); // Avoid infinite loop
-
-        this.cdr.markForCheck();
-    }
-
-    updateStatus(newStatus: Order['status']) {
-        this.orderForm.get('status')?.setValue(newStatus);
-        this.cdr.markForCheck();
-    }
-
-    async save() {
-        // console.log('[AdminOrderForm] SAVE BUTTON CLICKED');
-        
-        // console.log('[AdminOrderForm] Starting save process...');
-        // console.log('[AdminOrderForm] Form status:', this.orderForm.status);
-        
-        if (this.orderForm.invalid) {
-            console.warn('[AdminOrderForm] Form is invalid:', this.getFormValidationErrors());
-            this.orderForm.markAllAsTouched();
-            this.error = 'El formulario contiene errores. Por favor, revisa los campos marcados en rojo.';
-            this.cdr.markForCheck();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return;
-        }
-
-        if (this.items.length === 0) {
-            this.error = 'Debes agregar al menos un producto al pedido.';
-            this.cdr.markForCheck();
-            return;
-        }
-
-        this.saving = true;
-        this.error = null;
-        this.cdr.markForCheck();
-
-        try {
-            const orderToSave = this.orderForm.getRawValue();
-            
-            // Critical: Ensure branch context for data isolation
-            if (!orderToSave.branch_id) {
-                const effectiveId = await this.branchService.resolveEffectiveBranchId();
-                if (effectiveId) {
-                    orderToSave.branch_id = effectiveId;
-                }
-            }
-
-            let result;
-            
-            if (this.id) {
-                result = await firstValueFrom(this.orderService.updateOrder(this.id, orderToSave));
-            } else {
-                result = await this.workflowService.processCheckout(orderToSave);
-            }
-
-            // Check for status change and notify
-            if (this.id && this.originalStatus && orderToSave.status !== this.originalStatus) {
-                const productDetails = (orderToSave.items as OrderItem[]).map(item => `${item.quantity}x ${item.product_name}`).join(', ');
-
-                const link = this.notificationService.generateWhatsAppLink(
-                    orderToSave.customer_phone || '',
-                    orderToSave.customer_name,
-                    orderToSave.status,
-                    result?.order_number || this.id.substring(0, 8).toUpperCase(), 
-                    productDetails
-                );
-
-                if (link) {
-                    window.open(link, '_blank');
-                }
-            }
-
-            this.router.navigate(['/admin/orders']);
-            
-        } catch (e: unknown) {
-            console.error('💥 Save method error:', e);
-            this.error = (e instanceof Error ? e.message : String(e)) || 'Error al guardar pedido';
-            this.saving = false;
-            this.cdr.markForCheck();
-        }
-    }
-
-    // Product autocomplete methods
-    onProductInput(index: number, query: string) {
-        const queries = [...this.productSearchQueries()];
-        queries[index] = query.toLowerCase();
-        this.productSearchQueries.set(queries);
-    }
-
-    onProductFocus(index: number) {
-        const dropdowns = [...this.showProductDropdowns()];
-        dropdowns[index] = true;
-        this.showProductDropdowns.set(dropdowns);
-    }
-
-    onProductBlur(index: number) {
-        // Delay hiding to allow click on dropdown items
-        setTimeout(() => {
-            const dropdowns = [...this.showProductDropdowns()];
-            dropdowns[index] = false;
-            this.showProductDropdowns.set(dropdowns);
-        }, 200);
-    }
-
-    getFilteredProducts(index: number): ProductOption[] {
-        const query = this.productSearchQueries()[index] || '';
-        if (!query) return this.products();
-        
-        const searchTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
-        
-        return this.products().filter(product => {
-            const searchString = `${product.name} ${product.sku} ${product.price}`.toLowerCase();
-            return searchTerms.every(term => searchString.includes(term));
-        });
-    }
-
-    showProductDropdown(index: number): boolean {
-        return this.showProductDropdowns()[index] || false;
-    }
-
-    selectProduct(index: number, product: ProductOption) {
-        const itemGroup = this.items.at(index) as FormGroup;
-        itemGroup.patchValue({
-            product_id: product.id,
-            product_name: product.name,
-            product_sku: product.sku,
-            unit_price: product.price,
-            cost_price: product.cost_price,
-            subtotal: product.price * itemGroup.get('quantity')?.value
+          customer_name: order.customer_name,
+          customer_email: order.customer_email,
+          customer_phone: order.customer_phone,
+          shipping_address: address || {
+            street: '',
+            number: '',
+            city: '',
+            neighborhood: '',
+          },
+          status: order.status,
+          subtotal: order.subtotal,
+          tax: order.tax,
+          discount: order.discount,
+          total: order.total,
+          payment_method: order.payment_method || 'efectivo',
+          notes: order.notes,
         });
 
-        // Hide dropdown and clear search
-        const dropdowns = [...this.showProductDropdowns()];
-        dropdowns[index] = false;
-        this.showProductDropdowns.set(dropdowns);
-        
-        const queries = [...this.productSearchQueries()];
-        queries[index] = '';
-        this.productSearchQueries.set(queries);
-        
-        this.calculateTotals();
+        // Clear and repopulate items
+        this.items.clear();
+        (order.items || []).forEach((item) => {
+          this.items.push(this.createItemFormGroup(item));
+        });
+
+        this.originalStatus = order.status; // Capture original status
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        this.error = err.message || 'Error desconocido'; // Default message
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  createItemFormGroup(item?: OrderItem) {
+    return this.fb.group({
+      product_id: [item?.product_id || null],
+      product_name: [item?.product_name || '', [Validators.required]],
+      product_sku: [item?.product_sku || ''],
+      quantity: [item?.quantity || 1, [Validators.required, Validators.min(1)]],
+      unit_price: [
+        item?.unit_price || 0,
+        [Validators.required, Validators.min(0)],
+      ],
+      cost_price: [item?.cost_price || 0],
+      subtotal: [item?.subtotal || 0],
+    });
+  }
+
+  addItem() {
+    this.items.push(this.createItemFormGroup());
+    this.cdr.markForCheck();
+  }
+
+  removeItem(index: number) {
+    this.items.removeAt(index);
+    this.calculateTotals();
+  }
+
+  onSearchProduct(index: number, nameQuery: string) {
+    const product = this.products().find((p) => p.name === nameQuery);
+    const itemGroup = this.items.at(index) as FormGroup;
+
+    if (product) {
+      itemGroup.patchValue({
+        product_id: product.id,
+        product_name: product.name,
+        product_sku: product.sku,
+        unit_price: product.price,
+        cost_price: product.cost_price,
+        subtotal: product.price * itemGroup.get('quantity')?.value,
+      });
+    } else {
+      itemGroup.patchValue({
+        product_id: undefined,
+        product_name: nameQuery,
+        product_sku: undefined,
+      });
+    }
+    this.calculateTotals();
+  }
+
+  onUnitPriceChange(index: number) {
+    const item = this.items.at(index);
+    item
+      .get('subtotal')
+      ?.setValue(item.get('unit_price')?.value * item.get('quantity')?.value);
+    this.calculateTotals();
+  }
+
+  onQuantityChange(index: number) {
+    const item = this.items.at(index);
+    item
+      .get('subtotal')
+      ?.setValue(item.get('unit_price')?.value * item.get('quantity')?.value);
+    this.calculateTotals();
+  }
+
+  calculateTotals() {
+    const items = this.items.value as OrderItem[];
+    const subtotal = items.reduce(
+      (sum, item) => sum + (Number(item.subtotal) || 0),
+      0,
+    );
+    const discount = Number(this.orderForm.get('discount')?.value) || 0;
+
+    const taxableAmount = Math.max(0, subtotal - discount);
+    const tax = this.pricingService.calculateTaxAmount(taxableAmount);
+    const total = this.pricingService.calculateFinalPrice(taxableAmount);
+
+    this.orderForm.patchValue(
+      {
+        subtotal,
+        tax,
+        total,
+      },
+      { emitEvent: false },
+    ); // Avoid infinite loop
+
+    this.cdr.markForCheck();
+  }
+
+  updateStatus(newStatus: Order['status']) {
+    this.orderForm.get('status')?.setValue(newStatus);
+    this.cdr.markForCheck();
+  }
+
+  async save() {
+    // console.log('[AdminOrderForm] SAVE BUTTON CLICKED');
+
+    // console.log('[AdminOrderForm] Starting save process...');
+    // console.log('[AdminOrderForm] Form status:', this.orderForm.status);
+
+    if (this.orderForm.invalid) {
+      console.warn(
+        '[AdminOrderForm] Form is invalid:',
+        this.getFormValidationErrors(),
+      );
+      this.orderForm.markAllAsTouched();
+      this.error =
+        'El formulario contiene errores. Por favor, revisa los campos marcados en rojo.';
+      this.cdr.markForCheck();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
 
-    // Helper to debug form errors
-    private getFormValidationErrors() {
-        const errors: any = {};
-        Object.keys(this.orderForm.controls).forEach(key => {
-            const control = this.orderForm.get(key);
-            const controlErrors = control?.errors;
-            if (controlErrors != null) {
-                errors[key] = controlErrors;
-            }
-            if (control instanceof FormGroup) {
-                const groupErrors: any = {};
-                Object.keys(control.controls).forEach(k => {
-                    const err = control.get(k)?.errors;
-                    if (err) groupErrors[k] = err;
-                });
-                if (Object.keys(groupErrors).length > 0) {
-                    errors[key] = groupErrors;
-                }
-            }
-            if (control instanceof FormArray) {
-                control.controls.forEach((group, i) => {
-                    const groupErrors: any = {};
-                    Object.keys((group as FormGroup).controls).forEach(k => {
-                        const err = group.get(k)?.errors;
-                        if (err) groupErrors[k] = err;
-                    });
-                    if (Object.keys(groupErrors).length > 0) {
-                        errors[`item_${i}`] = groupErrors;
-                    }
-                });
-            }
-        });
-        return errors;
+    if (this.items.length === 0) {
+      this.error = 'Debes agregar al menos un producto al pedido.';
+      this.cdr.markForCheck();
+      return;
     }
+
+    this.saving = true;
+    this.error = null;
+    this.cdr.markForCheck();
+
+    try {
+      const orderToSave = this.orderForm.getRawValue();
+
+      // Critical: Ensure branch context for data isolation
+      if (!orderToSave.branch_id) {
+        const effectiveId = await this.branchService.resolveEffectiveBranchId();
+        if (effectiveId) {
+          orderToSave.branch_id = effectiveId;
+        }
+      }
+
+      let result;
+
+      if (this.id) {
+        result = await firstValueFrom(
+          this.orderService.updateOrder(this.id, orderToSave),
+        );
+      } else {
+        result = await this.workflowService.processCheckout(orderToSave);
+      }
+
+      // Check for status change and notify
+      if (
+        this.id &&
+        this.originalStatus &&
+        orderToSave.status !== this.originalStatus
+      ) {
+        const productDetails = (orderToSave.items as OrderItem[])
+          .map((item) => `${item.quantity}x ${item.product_name}`)
+          .join(', ');
+
+        const link = this.notificationService.generateWhatsAppLink(
+          orderToSave.customer_phone || '',
+          orderToSave.customer_name,
+          orderToSave.status,
+          result?.order_number || this.id.substring(0, 8).toUpperCase(),
+          productDetails,
+        );
+
+        if (link) {
+          window.open(link, '_blank');
+        }
+      }
+
+      this.router.navigate(['/admin/orders']);
+    } catch (e: unknown) {
+      console.error('💥 Save method error:', e);
+      this.error =
+        (e instanceof Error ? e.message : String(e)) ||
+        'Error al guardar pedido';
+      this.saving = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  // Product autocomplete methods
+  onProductInput(index: number, query: string) {
+    const queries = [...this.productSearchQueries()];
+    queries[index] = query.toLowerCase();
+    this.productSearchQueries.set(queries);
+  }
+
+  onProductFocus(index: number) {
+    const dropdowns = [...this.showProductDropdowns()];
+    dropdowns[index] = true;
+    this.showProductDropdowns.set(dropdowns);
+  }
+
+  onProductBlur(index: number) {
+    // Delay hiding to allow click on dropdown items
+    setTimeout(() => {
+      const dropdowns = [...this.showProductDropdowns()];
+      dropdowns[index] = false;
+      this.showProductDropdowns.set(dropdowns);
+    }, 200);
+  }
+
+  getFilteredProducts(index: number): ProductOption[] {
+    const query = this.productSearchQueries()[index] || '';
+    if (!query) return this.products();
+
+    const searchTerms = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
+
+    return this.products().filter((product) => {
+      const searchString =
+        `${product.name} ${product.sku} ${product.price}`.toLowerCase();
+      return searchTerms.every((term) => searchString.includes(term));
+    });
+  }
+
+  showProductDropdown(index: number): boolean {
+    return this.showProductDropdowns()[index] || false;
+  }
+
+  selectProduct(index: number, product: ProductOption) {
+    const itemGroup = this.items.at(index) as FormGroup;
+    itemGroup.patchValue({
+      product_id: product.id,
+      product_name: product.name,
+      product_sku: product.sku,
+      unit_price: product.price,
+      cost_price: product.cost_price,
+      subtotal: product.price * itemGroup.get('quantity')?.value,
+    });
+
+    // Hide dropdown and clear search
+    const dropdowns = [...this.showProductDropdowns()];
+    dropdowns[index] = false;
+    this.showProductDropdowns.set(dropdowns);
+
+    const queries = [...this.productSearchQueries()];
+    queries[index] = '';
+    this.productSearchQueries.set(queries);
+
+    this.calculateTotals();
+  }
+
+  // Helper to debug form errors
+  private getFormValidationErrors() {
+    const errors: any = {};
+    Object.keys(this.orderForm.controls).forEach((key) => {
+      const control = this.orderForm.get(key);
+      const controlErrors = control?.errors;
+      if (controlErrors != null) {
+        errors[key] = controlErrors;
+      }
+      if (control instanceof FormGroup) {
+        const groupErrors: any = {};
+        Object.keys(control.controls).forEach((k) => {
+          const err = control.get(k)?.errors;
+          if (err) groupErrors[k] = err;
+        });
+        if (Object.keys(groupErrors).length > 0) {
+          errors[key] = groupErrors;
+        }
+      }
+      if (control instanceof FormArray) {
+        control.controls.forEach((group, i) => {
+          const groupErrors: any = {};
+          Object.keys((group as FormGroup).controls).forEach((k) => {
+            const err = group.get(k)?.errors;
+            if (err) groupErrors[k] = err;
+          });
+          if (Object.keys(groupErrors).length > 0) {
+            errors[`item_${i}`] = groupErrors;
+          }
+        });
+      }
+    });
+    return errors;
+  }
 }

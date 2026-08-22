@@ -1,9 +1,21 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Router, RouterLink } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { Subject } from 'rxjs';
 import { FavoritesService } from '@app/shared/services/favorites.service';
 import { CartService } from '@app/shared/services/cart.service';
@@ -12,6 +24,7 @@ import { CartService } from '@app/shared/services/cart.service';
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
@@ -36,7 +49,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
       last_name: ['', [Validators.required, Validators.minLength(2)]],
-      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+      email: [
+        { value: '', disabled: true },
+        [Validators.required, Validators.email],
+      ],
       phone: ['', [Validators.pattern(/^[0-9\-\+\s\(\)]*$/)]],
       bio: ['', [Validators.maxLength(500)]],
       avatar_url: [''],
@@ -67,7 +83,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.loading = false;
       this.cdr.markForCheck();
     }
-    
+
     // Safety timeout
     setTimeout(() => {
       if (this.loading) {
@@ -122,7 +138,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         avatar_url: this.form.get('avatar_url')?.value,
       };
 
-      const updated = await this.authService.updateUserProfile(currentUser.id, profileData);
+      const updated = await this.authService.updateUserProfile(
+        currentUser.id,
+        profileData,
+      );
       this.saving = false;
 
       if (updated) {
@@ -167,7 +186,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   async generateReferralCode() {
     if (!this.user) return;
-    
+
     // Si ya tiene código, no generamos uno nuevo
     if (this.user.referral_code) {
       this.success = 'Tu código de referido es: ' + this.user.referral_code;
@@ -177,18 +196,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.cdr.markForCheck();
-    
+
     try {
-      const prefix = (this.user.first_name || 'AFX').substring(0, 3).toUpperCase();
+      const prefix = (this.user.first_name || 'AFX')
+        .substring(0, 3)
+        .toUpperCase();
       const randomNum = Math.floor(1000 + Math.random() * 9000);
       const newCode = `${prefix}${randomNum}`;
 
-      const updated = await this.authService.updateUserProfile(this.user.id, { referral_code: newCode });
-      
+      const updated = await this.authService.updateUserProfile(this.user.id, {
+        referral_code: newCode,
+      });
+
       this.loading = false;
       if (updated) {
         this.user = updated;
-        this.success = '¡Código generado exitosamente! Tu código es: ' + newCode;
+        this.success =
+          '¡Código generado exitosamente! Tu código es: ' + newCode;
       } else {
         this.error = 'Error al generar el código de referido.';
       }

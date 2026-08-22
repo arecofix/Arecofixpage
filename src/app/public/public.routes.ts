@@ -339,6 +339,14 @@ export const publicRoutes: Routes = [
           ),
       },
       {
+        title: 'Validación de Certificado',
+        path: 'academy/certificado/:id',
+        loadComponent: () =>
+          import('@app/public/cursos/certificate-validation/certificate-validation.page').then(
+            (m) => m.CertificateValidationPage
+          ),
+      },
+      {
         title: 'Checkout',
         path: 'checkout',
         loadComponent: () =>

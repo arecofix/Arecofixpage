@@ -1,7 +1,20 @@
-﻿import { Component, OnInit, OnDestroy, signal, inject, DestroyRef } from '@angular/core';
+﻿import {
+  Component,
+  OnInit,
+  OnDestroy,
+  signal,
+  inject,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { PreferencesService } from '../../shared/services/preferences.service';
-import { GsmService, GsmTool, BrandService, DownloadItem } from './services/gsm.service';
+import {
+  GsmService,
+  GsmTool,
+  BrandService,
+  DownloadItem,
+} from './services/gsm.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SeoService } from '@app/core/services/seo.service';
@@ -16,16 +29,18 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './gsm.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gsm.component.css',
 })
 export class GsmComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
-  
+
   gsmTools = signal<GsmTool[]>([]);
   brandServices = signal<BrandService[]>([]);
   downloads = signal<DownloadItem[]>([]);
 
-  whatsappUrl = 'https://wa.me/541125960900?text=Hola,%20necesito%20ayuda%20con%20herramientas%20GSM';
+  whatsappUrl =
+    'https://wa.me/541125960900?text=Hola,%20necesito%20ayuda%20con%20herramientas%20GSM';
   telegramUrl = 'https://t.me/+541125960900';
 
   // Translations
@@ -33,15 +48,18 @@ export class GsmComponent implements OnInit, OnDestroy {
     es: {
       badge: 'Bypass iPhone Profesional',
       title_sub: 'Bypass iCloud hasta iPhone 16 Pro Max',
-      description: 'La plataforma más potente para revendedores. Desbloqueos instantáneos, seguridad bancaria y soporte real. Bypass, FRP, F4, eliminación y cuentas bloqueadas para iPhone, iPad y más.',
+      description:
+        'La plataforma más potente para revendedores. Desbloqueos instantáneos, seguridad bancaria y soporte real. Bypass, FRP, F4, eliminación y cuentas bloqueadas para iPhone, iPad y más.',
       btn_whatsapp: 'Consultar Oferta',
       btn_tools: 'Herramientas GSM',
       btn_telegram: 'CANAL TELEGRAM',
       official_channel: 'NOVEDADES EN CANAL OFICIAL',
       offer_badge: 'OFERTA POR TIEMPO LIMITADO',
-      offer_desc: 'Bypass Full para todos los modelos. iPhone 5s al 16 Pro Max.',
+      offer_desc:
+        'Bypass Full para todos los modelos. iPhone 5s al 16 Pro Max.',
       trust_badge: '100% GARANTIZADO',
-      trust_text: 'Recuperamos tu iPhone bloqueado de forma segura y permanente.',
+      trust_text:
+        'Recuperamos tu iPhone bloqueado de forma segura y permanente.',
       trust_secure: 'Servicio Seguro & Privado',
       region: 'Disponibilidad',
       region_all: 'TODOS LOS MODELOS',
@@ -59,7 +77,8 @@ export class GsmComponent implements OnInit, OnDestroy {
       total_est: 'Total Estimado (ARS)',
       cot_ref: 'Cotización ref',
       tools_title: 'Herramientas GSM & Licencias',
-      tools_desc: 'Software profesional para desbloqueo, flasheo y reparación de dispositivos móviles.',
+      tools_desc:
+        'Software profesional para desbloqueo, flasheo y reparación de dispositivos móviles.',
       btn_login: 'Inicia sesión',
       brands_title: 'Catálogo de Servicios',
       brands_desc: 'Selecciona una marca para ver los servicios disponibles',
@@ -110,16 +129,18 @@ export class GsmComponent implements OnInit, OnDestroy {
       remote_bypass: 'Bypass Remoto 100% Garantizado',
       remote_bypass_desc: 'Desbloqueos y bypass 100% remotos',
       footer_title: '¿Listo para empezar?',
-      footer_desc: 'Unite hoy a la red de revendedores más grande de la región.',
+      footer_desc:
+        'Unite hoy a la red de revendedores más grande de la región.',
       footer_btn: 'Registrarme',
       tool_names: {},
       tool_desc: {},
-      dl_desc: {}
+      dl_desc: {},
     },
     en: {
       badge: 'Professional iPhone Bypass',
       title_sub: 'iCloud Bypass up to iPhone 16 Pro Max',
-      description: 'The most powerful platform for resellers. Instant unlocks, bank-grade security, and real support. Bypass, FRP, F4, removal and locked accounts for iPhone, iPad and more.',
+      description:
+        'The most powerful platform for resellers. Instant unlocks, bank-grade security, and real support. Bypass, FRP, F4, removal and locked accounts for iPhone, iPad and more.',
       btn_whatsapp: 'Check Offer',
       btn_tools: 'GSM Tools',
       btn_telegram: 'TELEGRAM CHANNEL',
@@ -145,7 +166,8 @@ export class GsmComponent implements OnInit, OnDestroy {
       total_est: 'Estimated Total (ARS)',
       cot_ref: 'Ref quote',
       tools_title: 'GSM Tools & Licenses',
-      tools_desc: 'Professional software for unlocking, flashing, and repairing mobile devices.',
+      tools_desc:
+        'Professional software for unlocking, flashing, and repairing mobile devices.',
       btn_login: 'Login',
       brands_title: 'Service Catalog',
       brands_desc: 'Select a brand to view available services',
@@ -199,52 +221,56 @@ export class GsmComponent implements OnInit, OnDestroy {
       footer_desc: 'Join the largest network of resellers in the region today.',
       footer_btn: 'Register Now',
       tool_names: {
-        'UnlockTool': 'UnlockTool',
+        UnlockTool: 'UnlockTool',
         'Chimera Tool': 'Chimera Tool',
         'Z3X Box': 'Z3X Box',
-        'SigmaKey': 'SigmaKey',
+        SigmaKey: 'SigmaKey',
         'Octoplus Box': 'Octoplus Box',
         'Hydra Tool': 'Hydra Tool',
         'EFT Pro': 'EFT Pro',
-        'DFT Pro': 'DFT Pro'
+        'DFT Pro': 'DFT Pro',
       },
       tool_desc: {
-        'UnlockTool': 'Professional tool for FRP unlock, Mi Account and Flashing.',
-        'Chimera Tool': 'Multi-brand support for IMEI repair, unlocking and more.',
+        UnlockTool:
+          'Professional tool for FRP unlock, Mi Account and Flashing.',
+        'Chimera Tool':
+          'Multi-brand support for IMEI repair, unlocking and more.',
         'Z3X Box': 'Specialized in Samsung and LG. IMEI repair and Flashing.',
-        'SigmaKey': 'Solution for Huawei, Motorola and other MTK/Qualcomm brands.',
+        SigmaKey:
+          'Solution for Huawei, Motorola and other MTK/Qualcomm brands.',
         'Octoplus Box': 'Leader in LG, Samsung and JTAG/Specialized services.',
-        'Hydra Tool': 'Powerful dongle for MTK, Qualcomm and Spreadtrum repairs.',
+        'Hydra Tool':
+          'Powerful dongle for MTK, Qualcomm and Spreadtrum repairs.',
         'EFT Pro': 'Specialist in Samsung (Flash/FRP) and Huawei devices.',
-        'DFT Pro': 'Modern tool for Xiaomi, Samsung and MediaTek processors.'
+        'DFT Pro': 'Modern tool for Xiaomi, Samsung and MediaTek processors.',
       },
       dl_desc: {
         'Samsung USB Drivers': 'Official drivers for Samsung devices.',
         'Odin Flash Tool': 'Flashing tool for Samsung.',
         'Xiaomi ADB/Fastboot Tools': 'Tool to manage Xiaomi devices.',
         'Platform Tools (ADB/Fastboot)': 'Command line tools from Android SDK.',
-        'FlexiHub': 'Remote access to USB devices and COM ports.',
+        FlexiHub: 'Remote access to USB devices and COM ports.',
         'Radmin VPN': 'Secure and easy-to-use virtual private network.',
         'USB Redirector 2.5': 'USB device redirection over network.',
         'USB Redirector 1.9.7': 'Legacy version for specific compatibility.',
-        'RustDesk': 'Open source remote desktop software.',
-        'TeamViewer': 'Leading solution for remote support.',
-        'UltraViewer': 'Alternative remote desktop control.',
-        'Psiphon': 'Internet censorship circumvention tool.',
-        'AnyDesk': 'Fast remote desktop application.',
+        RustDesk: 'Open source remote desktop software.',
+        TeamViewer: 'Leading solution for remote support.',
+        UltraViewer: 'Alternative remote desktop control.',
+        Psiphon: 'Internet censorship circumvention tool.',
+        AnyDesk: 'Fast remote desktop application.',
         'VirtualHere Client': 'Client for sharing USB over IP.',
         'SamFw Tool': 'Free tool for Samsung FRP and more.',
-        'SamFirm': 'Download official Samsung firmwares.',
-        '3uTools': 'All-in-one tool for iOS devices.'
-      }
-    }
+        SamFirm: 'Download official Samsung firmwares.',
+        '3uTools': 'All-in-one tool for iOS devices.',
+      },
+    },
   };
 
   constructor(
     public preferencesService: PreferencesService,
     private gsmService: GsmService,
-    private seoService: SeoService
-  ) { }
+    private seoService: SeoService,
+  ) {}
 
   // Calculator
   usdtAmount = signal<number | null>(null);
@@ -256,51 +282,82 @@ export class GsmComponent implements OnInit, OnDestroy {
     days: 5,
     hours: 9,
     minutes: 8,
-    seconds: 19
+    seconds: 19,
   });
   private countdownInterval: ReturnType<typeof setInterval> | undefined;
 
   // New Offers Data
   offers = signal([
-    { name: 'ChatGPT Plus - 1 Month - All Countrys', price: 0.6, type: 'Private Account' },
-    { name: 'ChatGPT Plus - 3 Months - All Countrys', price: 0.6, type: 'Private Account' },
+    {
+      name: 'ChatGPT Plus - 1 Month - All Countrys',
+      price: 0.6,
+      type: 'Private Account',
+    },
+    {
+      name: 'ChatGPT Plus - 3 Months - All Countrys',
+      price: 0.6,
+      type: 'Private Account',
+    },
     { name: 'Cheetah Tool Pro - 3 Meses', price: 27.12, type: 'License' },
     { name: 'Cheetah Tool Pro - 6 Meses', price: 39.12, type: 'License' },
     { name: 'Cheetah Tool Pro - 12 Meses', price: 53.52, type: 'License' },
-    { name: 'Cheetah Tool - Recarga de Creditos', price: 0.85, type: 'Credits' },
-    { name: '⚡PROMO HFZ (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 5.04, type: 'Bypass' },
-    { name: '⚡PROMO iRemove (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 9, type: 'Bypass' },
-    { name: '⚡PROMO iRemoval Pro (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 7.8, type: 'Bypass' },
-    { name: '⚡PROMO Mina (A12+) ✔ [XR a 16 Pro Max + iPads]', price: 7.2, type: 'Bypass' }
+    {
+      name: 'Cheetah Tool - Recarga de Creditos',
+      price: 0.85,
+      type: 'Credits',
+    },
+    {
+      name: '⚡PROMO HFZ (A12+) ✔ [XR a 16 Pro Max + iPads]',
+      price: 5.04,
+      type: 'Bypass',
+    },
+    {
+      name: '⚡PROMO iRemove (A12+) ✔ [XR a 16 Pro Max + iPads]',
+      price: 9,
+      type: 'Bypass',
+    },
+    {
+      name: '⚡PROMO iRemoval Pro (A12+) ✔ [XR a 16 Pro Max + iPads]',
+      price: 7.8,
+      type: 'Bypass',
+    },
+    {
+      name: '⚡PROMO Mina (A12+) ✔ [XR a 16 Pro Max + iPads]',
+      price: 7.2,
+      type: 'Bypass',
+    },
   ]);
 
   ngOnInit(): void {
     // SEO ...
-    
 
     this.loadData();
     this.startCountdown();
   }
 
   loadData() {
-    this.gsmService.getUsdtRate()
+    this.gsmService
+      .getUsdtRate()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(rate => {
+      .subscribe((rate) => {
         this.usdtRate.set(rate);
         this.calculateUsdt(); // Re-calculate if amount was already entered
       });
 
-    this.gsmService.getGsmTools()
+    this.gsmService
+      .getGsmTools()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(data => this.gsmTools.set(data));
+      .subscribe((data) => this.gsmTools.set(data));
 
-    this.gsmService.getBrandServices()
+    this.gsmService
+      .getBrandServices()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(data => this.brandServices.set(data));
+      .subscribe((data) => this.brandServices.set(data));
 
-    this.gsmService.getDownloads()
+    this.gsmService
+      .getDownloads()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(data => this.downloads.set(data));
+      .subscribe((data) => this.downloads.set(data));
   }
 
   ngOnDestroy() {
@@ -323,34 +380,42 @@ export class GsmComponent implements OnInit, OnDestroy {
   startCountdown() {
     if (isPlatformBrowser(this.platformId)) {
       this.countdownInterval = setInterval(() => {
-        this.countdown.update((c: { days: number, hours: number, minutes: number, seconds: number }) => {
-          let { days, hours, minutes, seconds } = c;
-          if (seconds > 0) {
-            seconds--;
-          } else {
-            seconds = 59;
-            if (minutes > 0) {
-              minutes--;
+        this.countdown.update(
+          (c: {
+            days: number;
+            hours: number;
+            minutes: number;
+            seconds: number;
+          }) => {
+            let { days, hours, minutes, seconds } = c;
+            if (seconds > 0) {
+              seconds--;
             } else {
-              minutes = 59;
-              if (hours > 0) {
-                hours--;
+              seconds = 59;
+              if (minutes > 0) {
+                minutes--;
               } else {
-                hours = 23;
-                if (days > 0) {
-                  days--;
+                minutes = 59;
+                if (hours > 0) {
+                  hours--;
                 } else {
-                  // Time up, reset for demo or stop
-                  days = 5; hours = 9; minutes = 8; seconds = 19;
+                  hours = 23;
+                  if (days > 0) {
+                    days--;
+                  } else {
+                    // Time up, reset for demo or stop
+                    days = 5;
+                    hours = 9;
+                    minutes = 8;
+                    seconds = 19;
+                  }
                 }
               }
             }
-          }
-          return { days, hours, minutes, seconds };
-        });
+            return { days, hours, minutes, seconds };
+          },
+        );
       }, 1000);
     }
   }
 }
-
-

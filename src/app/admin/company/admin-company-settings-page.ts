@@ -1,4 +1,12 @@
-import { Component, inject, OnInit, signal, ChangeDetectorRef, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectorRef,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -10,268 +18,300 @@ import { AuthService } from '@app/core/services/auth.service';
 import { TranslationService } from '@app/core/services/translation.service';
 
 @Component({
-    selector: 'app-admin-company-settings-page',
-    standalone: true,
-    imports: [FormsModule],
-    templateUrl: './admin-company-settings-page.html',
+  selector: 'app-admin-company-settings-page',
+  standalone: true,
+  imports: [FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './admin-company-settings-page.html',
 })
 export class AdminCompanySettingsPage implements OnInit {
-    private tenantService = inject(TenantService);
-    private companyService = inject(CompanyService);
-    private branchService = inject(BranchService);
-    private route = inject(ActivatedRoute);
-    private cdr = inject(ChangeDetectorRef);
-    private authService = inject(AuthService);
-    private translationService = inject(TranslationService);
+  private tenantService = inject(TenantService);
+  private companyService = inject(CompanyService);
+  private branchService = inject(BranchService);
+  private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private translationService = inject(TranslationService);
 
-    t = this.translationService.t;
+  t = this.translationService.t;
 
-    canManageBranches = computed(() => {
-        const profile = this.authService.getCurrentProfile();
-        return this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
-    });
+  canManageBranches = computed(() => {
+    const profile = this.authService.getCurrentProfile();
+    return this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
+  });
 
-    form = signal({
-        id: '',
-        name: '',
-        owner_name: '',
-        tax_id: '',
-        ruc: 'CUIT/CUIL', 
-        address: '',
-        tax_percentage: 21,
-        tax_abbreviation: 'IVA',
-        email: '',
-        phone: '',
-        location: '',
-        currency: 'ARS',
-        usd_rate: 1,
-        logo_url: '',
-    });
+  form = signal({
+    id: '',
+    name: '',
+    owner_name: '',
+    tax_id: '',
+    ruc: 'CUIT/CUIL',
+    address: '',
+    tax_percentage: 21,
+    tax_abbreviation: 'IVA',
+    email: '',
+    phone: '',
+    location: '',
+    currency: 'ARS',
+    usd_rate: 1,
+    logo_url: '',
+  });
 
-    loading = signal(true);
-    saving = signal(false);
-    error = signal<string | null>(null);
-    success = signal<string | null>(null);
+  loading = signal(true);
+  saving = signal(false);
+  error = signal<string | null>(null);
+  success = signal<string | null>(null);
 
-    // Branches Setup
-    branches = signal<Branch[]>([]);
-    newBranch = signal({ name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true });
-    editingBranch = signal<Branch | null>(null);
-    tempBranch: Partial<Branch> = { name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true, id: '' };
-    savingBranch = signal(false);
+  // Branches Setup
+  branches = signal<Branch[]>([]);
+  newBranch = signal({
+    name: '',
+    address: '',
+    slug: '',
+    global_markup_percentage: 0,
+    is_active: true,
+  });
+  editingBranch = signal<Branch | null>(null);
+  tempBranch: Partial<Branch> = {
+    name: '',
+    address: '',
+    slug: '',
+    global_markup_percentage: 0,
+    is_active: true,
+    id: '',
+  };
+  savingBranch = signal(false);
 
-    // Password Update Setup
-    passwordForm = signal({ newPassword: '', confirmPassword: '' });
-    updatingPassword = signal(false);
-    passwordError = signal<string | null>(null);
-    passwordSuccess = signal<string | null>(null);
+  // Password Update Setup
+  passwordForm = signal({ newPassword: '', confirmPassword: '' });
+  updatingPassword = signal(false);
+  passwordError = signal<string | null>(null);
+  passwordSuccess = signal<string | null>(null);
 
-    async ngOnInit() {
+  async ngOnInit() {
+    await this.loadSettings();
+  }
+
+  async loadSettings() {
+    this.loading.set(true);
+    const branchId = this.branchService.getCurrentBranchId();
+
+    try {
+      const data = await this.companyService.getSettings(branchId || undefined);
+      if (data) {
+        this.form.set({
+          id: data.id,
+          name: data.name,
+          owner_name: data.owner_name || '',
+          tax_id: data.tax_id || '',
+          ruc: data.tax_id_name || 'CUIT/CUIL',
+          address: data.location || '',
+          tax_percentage: data.tax_percentage || 21,
+          tax_abbreviation: data.tax_abbreviation || 'IVA',
+          email: data.contact_email || '',
+          phone: data.contact_phone || '',
+          location: data.location || '',
+          currency: data.currency || 'ARS',
+          usd_rate: Number(data.usd_rate || 1),
+          logo_url: data.branding_settings?.logo_url || '',
+        });
+      }
+
+      const branchData = await this.branchService.getAllAdminBranches();
+      this.branches.set((branchData as Branch[]) || []);
+    } catch (e: unknown) {
+      if (e instanceof Error) this.error.set(e.message);
+    } finally {
+      this.loading.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
+  async onFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file: File | undefined = input.files?.[0];
+    if (!file) return;
+
+    // Let's keep this out for now or define a FileUploadService.
+    // Actually, since I must remove supabase:
+    alert(
+      'Por favor contacte al administrador para subir logos. Componente de Subida en Mantenimiento.',
+    );
+  }
+
+  async save() {
+    this.saving.set(true);
+    this.error.set(null);
+    this.success.set(null);
+    this.cdr.markForCheck();
+
+    const payload = { ...this.form() };
+    const tenantId = this.tenantService.getTenantId();
+
+    const updateData: any = {
+      name: payload.name,
+      owner_name: payload.owner_name,
+      tax_id: payload.tax_id,
+      tax_id_name: payload.ruc,
+      location: payload.address || payload.location,
+      tax_percentage: payload.tax_percentage,
+      tax_abbreviation: payload.tax_abbreviation,
+      contact_email: payload.email,
+      contact_phone: payload.phone,
+      currency: payload.currency,
+      usd_rate: payload.usd_rate,
+      branding_settings: {
+        logo_url: payload.logo_url,
+        primary_color: '#3b82f6',
+      },
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      const branchId = this.branchService.getCurrentBranchId();
+      const updatedRows = await this.companyService.updateSettings(
+        tenantId,
+        updateData,
+        branchId || undefined,
+      );
+      if (
+        !updatedRows ||
+        (Array.isArray(updatedRows) && updatedRows.length === 0)
+      ) {
+        this.error.set('No se guardaron los cambios. Permisos denegados.');
+      } else {
+        this.success.set('Configuración guardada correctamente');
         await this.loadSettings();
+      }
+    } catch (e: unknown) {
+      if (e instanceof Error) this.error.set(e.message);
+    } finally {
+      this.saving.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
+  // --- ACCOUNT SECURITY ---
+  async updatePassword() {
+    const payload = this.passwordForm();
+
+    this.passwordError.set(null);
+    this.passwordSuccess.set(null);
+
+    if (!payload.newPassword || payload.newPassword.length < 6) {
+      this.passwordError.set('La contraseña debe tener al menos 6 caracteres.');
+      return;
     }
 
-    async loadSettings() {
-        this.loading.set(true);
-        const branchId = this.branchService.getCurrentBranchId();
-        
-        try {
-            const data = await this.companyService.getSettings(branchId || undefined);
-            if (data) {
-                this.form.set({
-                    id: data.id,
-                    name: data.name,
-                    owner_name: data.owner_name || '',
-                    tax_id: data.tax_id || '',
-                    ruc: data.tax_id_name || 'CUIT/CUIL',
-                    address: data.location || '',
-                    tax_percentage: data.tax_percentage || 21,
-                    tax_abbreviation: data.tax_abbreviation || 'IVA',
-                    email: data.contact_email || '',
-                    phone: data.contact_phone || '',
-                    location: data.location || '',
-                    currency: data.currency || 'ARS',
-                    usd_rate: Number(data.usd_rate || 1),
-                    logo_url: data.branding_settings?.logo_url || '',
-                });
-            }
-            
-            const branchData = await this.branchService.getAllAdminBranches();
-            this.branches.set(branchData as Branch[] || []);
-        } catch (e: unknown) {
-            if (e instanceof Error) this.error.set(e.message);
-        } finally {
-            this.loading.set(false);
-            this.cdr.markForCheck();
-        }
+    if (payload.newPassword !== payload.confirmPassword) {
+      this.passwordError.set('Las contraseñas no coinciden.');
+      return;
     }
 
-    async onFileChange(event: Event) {
-        const input = event.target as HTMLInputElement;
-        const file: File | undefined = input.files?.[0];
-        if (!file) return;
-        
-        // Let's keep this out for now or define a FileUploadService.
-        // Actually, since I must remove supabase:
-        alert('Por favor contacte al administrador para subir logos. Componente de Subida en Mantenimiento.');
+    this.updatingPassword.set(true);
+    this.cdr.markForCheck();
+
+    try {
+      const error = await this.authService.updatePassword(payload.newPassword);
+
+      if (error) {
+        this.passwordError.set(error);
+      } else {
+        this.passwordSuccess.set(
+          'Tu contraseña se ha actualizado correctamente.',
+        );
+        this.passwordForm.set({ newPassword: '', confirmPassword: '' });
+      }
+    } catch (e: unknown) {
+      if (e instanceof Error) this.passwordError.set(e.message);
+    } finally {
+      this.updatingPassword.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
+  // --- BRANCHES MANAGEMENT ---
+  async addBranch() {
+    const payload = this.newBranch();
+    if (!payload.name) {
+      this.error.set('El nombre de la sucursal es obligatorio.');
+      this.cdr.markForCheck();
+      return;
     }
 
-    async save() {
-        this.saving.set(true);
-        this.error.set(null);
-        this.success.set(null);
-        this.cdr.markForCheck();
-        
-        const payload = { ...this.form() };
-        const tenantId = this.tenantService.getTenantId();
+    this.savingBranch.set(true);
+    this.cdr.markForCheck();
 
-        const updateData: any = {
-            name: payload.name,
-            owner_name: payload.owner_name,
-            tax_id: payload.tax_id,
-            tax_id_name: payload.ruc,
-            location: payload.address || payload.location,
-            tax_percentage: payload.tax_percentage,
-            tax_abbreviation: payload.tax_abbreviation,
-            contact_email: payload.email,
-            contact_phone: payload.phone,
-            currency: payload.currency,
-            usd_rate: payload.usd_rate,
-            branding_settings: {
-                logo_url: payload.logo_url,
-                primary_color: '#3b82f6'
-            },
-            updated_at: new Date().toISOString()
-        };
+    const slug =
+      payload.slug || payload.name.toLowerCase().trim().replace(/\s+/g, '-');
 
-        try {
-            const branchId = this.branchService.getCurrentBranchId();
-            const updatedRows = await this.companyService.updateSettings(tenantId, updateData, branchId || undefined);
-            if (!updatedRows || (Array.isArray(updatedRows) && updatedRows.length === 0)) {
-                this.error.set("No se guardaron los cambios. Permisos denegados.");
-            } else {
-                this.success.set('Configuración guardada correctamente');
-                await this.loadSettings(); 
-            }
-        } catch (e: unknown) {
-            if (e instanceof Error) this.error.set(e.message);
-        } finally {
-            this.saving.set(false);
-            this.cdr.markForCheck();
-        }
+    try {
+      await this.branchService.addBranch(payload, slug);
+      this.success.set('Sucursal agregada con éxito');
+      this.newBranch.set({
+        name: '',
+        address: '',
+        slug: '',
+        global_markup_percentage: 0,
+        is_active: true,
+      });
+      await this.loadSettings();
+    } catch (e: unknown) {
+      if (e instanceof Error) this.error.set(e.message);
+    } finally {
+      this.savingBranch.set(false);
+      this.cdr.markForCheck();
     }
+  }
 
-    // --- ACCOUNT SECURITY ---
-    async updatePassword() {
-        const payload = this.passwordForm();
-        
-        this.passwordError.set(null);
-        this.passwordSuccess.set(null);
+  openEditBranchModal(branch: Branch) {
+    this.tempBranch = { ...branch };
+    this.editingBranch.set(branch);
+    this.cdr.markForCheck();
+  }
 
-        if (!payload.newPassword || payload.newPassword.length < 6) {
-            this.passwordError.set('La contraseña debe tener al menos 6 caracteres.');
-            return;
-        }
+  async updateBranch() {
+    const branch = this.tempBranch;
+    if (!branch.id) return;
 
-        if (payload.newPassword !== payload.confirmPassword) {
-            this.passwordError.set('Las contraseñas no coinciden.');
-            return;
-        }
+    this.savingBranch.set(true);
+    this.cdr.markForCheck();
 
-        this.updatingPassword.set(true);
-        this.cdr.markForCheck();
-
-        try {
-            const error = await this.authService.updatePassword(payload.newPassword);
-            
-            if (error) {
-                this.passwordError.set(error);
-            } else {
-                this.passwordSuccess.set('Tu contraseña se ha actualizado correctamente.');
-                this.passwordForm.set({ newPassword: '', confirmPassword: '' });
-            }
-        } catch (e: unknown) {
-            if (e instanceof Error) this.passwordError.set(e.message);
-        } finally {
-            this.updatingPassword.set(false);
-            this.cdr.markForCheck();
-        }
+    try {
+      await this.branchService.updateBranch(branch as Branch);
+      this.success.set('Sucursal actualizada');
+      this.editingBranch.set(null);
+      await this.loadSettings();
+    } catch (e: unknown) {
+      if (e instanceof Error) this.error.set(e.message);
+    } finally {
+      this.savingBranch.set(false);
+      this.cdr.markForCheck();
     }
+  }
 
-    // --- BRANCHES MANAGEMENT ---
-    async addBranch() {
-        const payload = this.newBranch();
-        if (!payload.name) {
-            this.error.set('El nombre de la sucursal es obligatorio.');
-            this.cdr.markForCheck();
-            return;
-        }
+  async deleteBranch(id: string) {
+    if (!confirm('¿Seguro que deseas eliminar esta sucursal?')) return;
 
-        this.savingBranch.set(true);
-        this.cdr.markForCheck();
-
-        const slug = payload.slug || payload.name.toLowerCase().trim().replace(/\s+/g, '-');
-
-        try {
-            await this.branchService.addBranch(payload, slug);
-            this.success.set('Sucursal agregada con éxito');
-            this.newBranch.set({ name: '', address: '', slug: '', global_markup_percentage: 0, is_active: true });
-            await this.loadSettings();
-        } catch (e: unknown) {
-            if (e instanceof Error) this.error.set(e.message);
-        } finally {
-            this.savingBranch.set(false);
-            this.cdr.markForCheck();
-        }
+    try {
+      await this.branchService.deleteBranch(id);
+      this.success.set('Sucursal eliminada');
+      await this.loadSettings();
+    } catch (e: unknown) {
+      if (e instanceof Error) this.error.set(e.message);
+    } finally {
+      this.cdr.markForCheck();
     }
+  }
 
-    openEditBranchModal(branch: Branch) {
-        this.tempBranch = { ...branch };
-        this.editingBranch.set(branch);
-        this.cdr.markForCheck();
+  async toggleBranchStatus(branch: Branch) {
+    try {
+      await this.branchService.toggleBranchStatus(branch);
+      await this.loadSettings();
+    } catch (e: unknown) {
+      if (e instanceof Error) this.error.set(e.message);
+    } finally {
+      this.cdr.markForCheck();
     }
-
-    async updateBranch() {
-        const branch = this.tempBranch;
-        if (!branch.id) return;
-
-        this.savingBranch.set(true);
-        this.cdr.markForCheck();
-
-        try {
-            await this.branchService.updateBranch(branch as Branch);
-            this.success.set('Sucursal actualizada');
-            this.editingBranch.set(null);
-            await this.loadSettings();
-        } catch (e: unknown) {
-            if (e instanceof Error) this.error.set(e.message);
-        } finally {
-            this.savingBranch.set(false);
-            this.cdr.markForCheck();
-        }
-    }
-
-    async deleteBranch(id: string) {
-        if (!confirm('¿Seguro que deseas eliminar esta sucursal?')) return;
-        
-        try {
-            await this.branchService.deleteBranch(id);
-            this.success.set('Sucursal eliminada');
-            await this.loadSettings();
-        } catch (e: unknown) {
-            if (e instanceof Error) this.error.set(e.message);
-        } finally {
-            this.cdr.markForCheck();
-        }
-    }
-
-    async toggleBranchStatus(branch: Branch) {
-        try {
-            await this.branchService.toggleBranchStatus(branch);
-            await this.loadSettings();
-        } catch (e: unknown) {
-            if (e instanceof Error) this.error.set(e.message);
-        } finally {
-            this.cdr.markForCheck();
-        }
-    }
+  }
 }

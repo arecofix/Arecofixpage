@@ -1,4 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PaginationConfig } from '../../services/pagination.service';
 
@@ -7,15 +15,15 @@ import { PaginationConfig } from '../../services/pagination.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./pagination.component.scss'],
 })
 export class PaginationComponent implements OnChanges {
-  
   @Input() pagination!: PaginationConfig;
   @Input() showItemRange = true;
   @Input() showPageSizeSelector = false;
   @Input() pageSizeOptions = [12, 24, 48, 96];
-  
+
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
 
@@ -31,10 +39,13 @@ export class PaginationComponent implements OnChanges {
 
   private updatePageNumbers(): void {
     // Importamos el servicio dinámicamente para evitar dependencias circulares
-    import('../../services/pagination.service').then(module => {
+    import('../../services/pagination.service').then((module) => {
       const paginationService = module.PaginationService;
       const service = new paginationService();
-      this.pageNumbers = service.getPageNumbers(this.pagination.page, this.pagination.totalPages);
+      this.pageNumbers = service.getPageNumbers(
+        this.pagination.page,
+        this.pagination.totalPages,
+      );
     });
   }
 
@@ -46,7 +57,10 @@ export class PaginationComponent implements OnChanges {
 
   private getItemRange(): string {
     const start = (this.pagination.page - 1) * this.pagination.limit + 1;
-    const end = Math.min(this.pagination.page * this.pagination.limit, this.pagination.total);
+    const end = Math.min(
+      this.pagination.page * this.pagination.limit,
+      this.pagination.total,
+    );
     return `${start}-${end} de ${this.pagination.total}`;
   }
 
@@ -80,7 +94,8 @@ export class PaginationComponent implements OnChanges {
 
   isPageDisabled(type: 'prev' | 'next'): boolean {
     if (type === 'prev') return this.pagination.page === 1;
-    if (type === 'next') return this.pagination.page === this.pagination.totalPages;
+    if (type === 'next')
+      return this.pagination.page === this.pagination.totalPages;
     return false;
   }
 

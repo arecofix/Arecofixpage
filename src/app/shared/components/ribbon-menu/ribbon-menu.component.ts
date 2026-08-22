@@ -1,4 +1,11 @@
-import { Component, PLATFORM_ID, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  PLATFORM_ID,
+  inject,
+  OnInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { BugReportModalComponent } from '../bug-report-modal/bug-report-modal.component';
@@ -25,104 +32,109 @@ import { BranchService } from '@app/core/services/branch.service';
           <span class="text">Ayuda</span>
         </button>
       </div>
-      
+
       <div class="window-controls">
         <button class="control-btn" (click)="minimize()">_</button>
         <button class="control-btn" (click)="toggleMaximize()">□</button>
         <button class="control-btn close-btn" (click)="close()">×</button>
       </div>
     </div>
-    
+
     @if (showHelpModal) {
-      <app-bug-report-modal (close)="showHelpModal = false"></app-bug-report-modal>
+      <app-bug-report-modal
+        (close)="showHelpModal = false"
+      ></app-bug-report-modal>
     }
   `,
-  styles: [`
-    .custom-titlebar {
-      height: 65px;
-      background-color: #1e1e1e;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      user-select: none;
-      z-index: 9999;
-      border-bottom: 1px solid #333;
-    }
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styles: [
+    `
+      .custom-titlebar {
+        height: 65px;
+        background-color: #1e1e1e;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        user-select: none;
+        z-index: 9999;
+        border-bottom: 1px solid #333;
+      }
 
-    .ribbon-menu {
-      display: flex;
-      gap: 5px;
-      padding-left: 15px;
-      height: 100%;
-      align-items: center;
-    }
+      .ribbon-menu {
+        display: flex;
+        gap: 5px;
+        padding-left: 15px;
+        height: 100%;
+        align-items: center;
+      }
 
-    .ribbon-btn {
-      background: transparent;
-      border: none;
-      color: #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 45px;
-      height: 45px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
+      .ribbon-btn {
+        background: transparent;
+        border: none;
+        color: #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
 
-    .ribbon-btn:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
+      .ribbon-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
 
-    .ribbon-btn .icon {
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
+      .ribbon-btn .icon {
+        font-size: 13px;
+        margin-bottom: 2px;
+      }
 
-    .ribbon-btn .text {
-      font-size: 9px;
-      font-family: sans-serif;
-    }
+      .ribbon-btn .text {
+        font-size: 9px;
+        font-family: sans-serif;
+      }
 
-    .window-controls {
-      display: flex;
-      height: 100%;
-      align-items: flex-start;
-    }
+      .window-controls {
+        display: flex;
+        height: 100%;
+        align-items: flex-start;
+      }
 
-    .control-btn {
-      background: transparent;
-      border: none;
-      color: #e0e0e0;
-      width: 45px;
-      height: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-size: 16px;
-    }
+      .control-btn {
+        background: transparent;
+        border: none;
+        color: #e0e0e0;
+        width: 45px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 16px;
+      }
 
-    .control-btn:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
+      .control-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
 
-    .close-btn:hover {
-      background-color: #e81123;
-      color: white;
-    }
-    
-    /* Make body padding top if tauri */
-    :host-context(body.is-tauri) {
-      /* Padding applied globally */
-    }
-  `]
+      .close-btn:hover {
+        background-color: #e81123;
+        color: white;
+      }
+
+      /* Make body padding top if tauri */
+      :host-context(body.is-tauri) {
+        /* Padding applied globally */
+      }
+    `,
+  ],
 })
 export class RibbonMenuComponent implements OnInit {
   isTauri = false;
@@ -135,20 +147,21 @@ export class RibbonMenuComponent implements OnInit {
 
   async ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      import('@tauri-apps/api/core').then(({ isTauri }) => {
-        this.isTauri = isTauri();
-        if (this.isTauri) {
-          document.body.classList.add('is-tauri');
-          document.body.style.paddingTop = '65px';
-        }
-        this.cdr.detectChanges();
-      }).catch(() => {
-        this.isTauri = false;
-        this.cdr.detectChanges();
-      });
+      import('@tauri-apps/api/core')
+        .then(({ isTauri }) => {
+          this.isTauri = isTauri();
+          if (this.isTauri) {
+            document.body.classList.add('is-tauri');
+            document.body.style.paddingTop = '65px';
+          }
+          this.cdr.detectChanges();
+        })
+        .catch(() => {
+          this.isTauri = false;
+          this.cdr.detectChanges();
+        });
     }
   }
-
 
   navigate(path: string) {
     this.router.navigate([path]);

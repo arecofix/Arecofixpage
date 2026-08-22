@@ -16,6 +16,11 @@ export default [
     path: 'builder/:idOrSlug',
     loadComponent: () => import('./builder/course-builder.component').then(m => m.CourseBuilderComponent),
     title: 'Editar Curso'
+  },
+  {
+    path: 'students/:id',
+    loadComponent: () => import('./pages/course-students/course-students.page').then(m => m.CourseStudentsPage),
+    title: 'Alumnos Inscritos'
   }
 ] as Routes;
 

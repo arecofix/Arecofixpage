@@ -1,559 +1,1060 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 py-8 px-4 sm:px-6 lg:px-8 font-sans text-gray-900 dark:text-gray-100">
-  
+<div
+  class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 py-8 px-4 sm:px-6 lg:px-8 font-sans text-gray-900 dark:text-gray-100"
+>
   <!-- Trust Header -->
-  <header class="max-w-6xl mx-auto mb-8 flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800">
+  <header
+    class="max-w-6xl mx-auto mb-8 flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800"
+  >
     <div class="flex items-center gap-2">
       <i class="fas fa-lock text-emerald-600 dark:text-emerald-400 text-xl"></i>
       <h1 class="text-xl font-black tracking-tight">Pago Seguro</h1>
     </div>
-    <div class="flex items-center gap-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-      <span class="hidden sm:inline-flex items-center gap-1"><i class="fas fa-shield-alt"></i> SSL 256-bit</span>
+    <div
+      class="flex items-center gap-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest"
+    >
+      <span class="hidden sm:inline-flex items-center gap-1"
+        ><i class="fas fa-shield-alt"></i> SSL 256-bit</span
+      >
     </div>
   </header>
 
   <!-- ═══════════════════════════════════════════════════════
        STEP: FORM + CART SUMMARY
   ═══════════════════════════════════════════════════════ -->
-  @if (step() === 'form') {
-  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-
-    <!-- LEFT: Customer Form -->
-    <section class="lg:col-span-7 xl:col-span-8 order-2 lg:order-1">
-      <div class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">1</div>
-          <h2 class="text-lg font-bold">Tus datos de entrega</h2>
-        </div>
-
-        <form [formGroup]="checkoutForm" (ngSubmit)="goToPaymentMethod()" class="p-6 md:p-8 space-y-6" novalidate>
-          <!-- Name -->
-          <div>
-            <label for="checkout-name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre completo *</label>
-            <input id="checkout-name" type="text" formControlName="name" placeholder="Ej. Juan Pérez"
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow dark:text-white"
-              [class.border-red-500]="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" />
-            @if (checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched) {
-              <p class="mt-1 text-sm text-red-500 font-medium">El nombre es requerido</p>
-            }
+  @if (step() === "form") {
+    <div
+      class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
+    >
+      <!-- LEFT: Customer Form -->
+      <section class="lg:col-span-7 xl:col-span-8 order-2 lg:order-1">
+        <div
+          class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
+        >
+          <div
+            class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex items-center gap-3"
+          >
+            <div
+              class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold"
+            >
+              1
+            </div>
+            <h2 class="text-lg font-bold">Tus datos de entrega</h2>
           </div>
 
-          <!-- Email & Phone -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form
+            [formGroup]="checkoutForm"
+            (ngSubmit)="goToPaymentMethod()"
+            class="p-6 md:p-8 space-y-6"
+            novalidate
+          >
+            <!-- Name -->
             <div>
-              <label for="checkout-email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Email *</label>
-              <input id="checkout-email" type="email" formControlName="email" placeholder="email@ejemplo.com"
+              <label
+                for="checkout-name"
+                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                >Nombre completo *</label
+              >
+              <input
+                id="checkout-name"
+                type="text"
+                formControlName="name"
+                placeholder="Ej. Juan Pérez"
                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow dark:text-white"
-                [class.border-red-500]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" />
-              @if (checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched) {
-                <p class="mt-1 text-sm text-red-500 font-medium">Email inválido</p>
+                [class.border-red-500]="
+                  checkoutForm.get('name')?.invalid &&
+                  checkoutForm.get('name')?.touched
+                "
+              />
+              @if (
+                checkoutForm.get("name")?.invalid &&
+                checkoutForm.get("name")?.touched
+              ) {
+                <p class="mt-1 text-sm text-red-500 font-medium">
+                  El nombre es requerido
+                </p>
               }
             </div>
-            <div>
-              <label for="checkout-phone" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Teléfono *</label>
-              <input id="checkout-phone" type="tel" formControlName="phone" placeholder="+54 9 11..."
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow dark:text-white"
-                [class.border-red-500]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched" />
-              @if (checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched) {
-                <p class="mt-1 text-sm text-red-500 font-medium">Teléfono requerido</p>
-              }
-            </div>
-          </div>
 
-          <!-- Address Box -->
-          <div formGroupName="address" class="bg-gray-50 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-5">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Dirección de Envío</h3>
-            
-            <div class="grid grid-cols-3 gap-5">
-              <div class="col-span-2">
-                <label for="checkout-street" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Calle *</label>
-                <input id="checkout-street" type="text" formControlName="street" placeholder="Av. San Martín"
-                  class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white" />
-              </div>
-              <div class="col-span-1">
-                <label for="checkout-number" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Número *</label>
-                <input id="checkout-number" type="text" formControlName="number" placeholder="1234"
-                  class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Email & Phone -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label for="checkout-neighborhood" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Barrio / Dpto</label>
-                <input id="checkout-neighborhood" type="text" formControlName="neighborhood" placeholder="Opcional"
-                  class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white" />
+                <label
+                  for="checkout-email"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                  >Email *</label
+                >
+                <input
+                  id="checkout-email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="email@ejemplo.com"
+                  class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow dark:text-white"
+                  [class.border-red-500]="
+                    checkoutForm.get('email')?.invalid &&
+                    checkoutForm.get('email')?.touched
+                  "
+                />
+                @if (
+                  checkoutForm.get("email")?.invalid &&
+                  checkoutForm.get("email")?.touched
+                ) {
+                  <p class="mt-1 text-sm text-red-500 font-medium">
+                    Email inválido
+                  </p>
+                }
               </div>
               <div>
-                <label for="checkout-city" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Ciudad *</label>
-                <input id="checkout-city" type="text" formControlName="city"
-                  class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white" />
-              </div>
-              <div>
-                <label for="checkout-cp" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">C.P. *</label>
-                <input id="checkout-cp" type="text" formControlName="postal_code" placeholder="1727" maxlength="4"
-                  class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-center dark:text-white" />
-                @if (checkoutForm.get('address.postal_code')?.invalid && checkoutForm.get('address.postal_code')?.touched) {
-                  <p class="mt-1 text-xs text-red-500 font-medium">4 dígitos</p>
+                <label
+                  for="checkout-phone"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                  >Teléfono *</label
+                >
+                <input
+                  id="checkout-phone"
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="+54 9 11..."
+                  class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow dark:text-white"
+                  [class.border-red-500]="
+                    checkoutForm.get('phone')?.invalid &&
+                    checkoutForm.get('phone')?.touched
+                  "
+                />
+                @if (
+                  checkoutForm.get("phone")?.invalid &&
+                  checkoutForm.get("phone")?.touched
+                ) {
+                  <p class="mt-1 text-sm text-red-500 font-medium">
+                    Teléfono requerido
+                  </p>
                 }
               </div>
             </div>
-          </div>
 
-          <!-- Notes -->
-          <div>
-            <label for="checkout-notes" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Notas adicionales</label>
-            <textarea id="checkout-notes" formControlName="notes" rows="3" placeholder="Instrucciones de entrega, referencias, etc."
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"></textarea>
-          </div>
-
-          <!-- Actions -->
-          <div class="pt-4 flex items-center justify-between">
-            <a routerLink="/products/featured" class="text-sm font-semibold text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors">
-              ← Seguir comprando
-            </a>
-            <button
-              id="btn-go-payment"
-              type="submit"
-              [disabled]="cartService.cartItems().length === 0 || isCalculatingShipping()"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            <!-- Address Box -->
+            <div
+              formGroupName="address"
+              class="bg-gray-50 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-5"
             >
-              Ir a Pagar <i class="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
+              <h3
+                class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Dirección de Envío
+              </h3>
 
-    <!-- RIGHT: Cart Summary (Sticky) -->
-    <aside class="lg:col-span-5 xl:col-span-4 order-1 lg:order-2">
-      <div class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-2xl border border-gray-100 dark:border-gray-700 lg:sticky lg:top-24 overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
-          <h2 class="text-lg font-bold flex items-center gap-2">
-            <i class="fas fa-shopping-bag text-emerald-500"></i> Resumen de compra
-          </h2>
-        </div>
+              <div class="grid grid-cols-3 gap-5">
+                <div class="col-span-2">
+                  <label
+                    for="checkout-street"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                    >Calle *</label
+                  >
+                  <input
+                    id="checkout-street"
+                    type="text"
+                    formControlName="street"
+                    placeholder="Av. San Martín"
+                    class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+                  />
+                </div>
+                <div class="col-span-1">
+                  <label
+                    for="checkout-number"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                    >Número *</label
+                  >
+                  <input
+                    id="checkout-number"
+                    type="text"
+                    formControlName="number"
+                    placeholder="1234"
+                    class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+                  />
+                </div>
+              </div>
 
-        <div class="p-6">
-          @if (cartService.cartItems().length === 0) {
-            <div class="text-center py-8">
-              <i class="fas fa-box-open text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
-              <p class="text-gray-500 dark:text-gray-400 font-medium">Tu carrito está vacío</p>
-            </div>
-          } @else {
-            <!-- Items List -->
-            <ul class="space-y-4 mb-6">
-              @for (item of cartService.cartItems(); track item.product.id) {
-                <li class="flex items-center gap-4">
-                  <div class="w-16 h-16 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-hidden shrink-0">
-                    <img [src]="item.product.image_url || item.product.gallery_urls?.[0] || 'assets/img/no-image.svg'" [alt]="item.product.name" class="w-full h-full object-cover" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ item.product.name }}</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Cant: {{ item.quantity }}</p>
-                  </div>
-                  <div class="text-right shrink-0">
-                    <p class="text-sm font-black text-gray-900 dark:text-white">
-                      {{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ (item.product.price * item.quantity) | number:'1.2-2' }}
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div>
+                  <label
+                    for="checkout-neighborhood"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                    >Barrio / Dpto</label
+                  >
+                  <input
+                    id="checkout-neighborhood"
+                    type="text"
+                    formControlName="neighborhood"
+                    placeholder="Opcional"
+                    class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="checkout-city"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                    >Ciudad *</label
+                  >
+                  <input
+                    id="checkout-city"
+                    type="text"
+                    formControlName="city"
+                    class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="checkout-cp"
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                    >C.P. *</label
+                  >
+                  <input
+                    id="checkout-cp"
+                    type="text"
+                    formControlName="postal_code"
+                    placeholder="1727"
+                    maxlength="4"
+                    class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-center dark:text-white"
+                  />
+                  @if (
+                    checkoutForm.get("address.postal_code")?.invalid &&
+                    checkoutForm.get("address.postal_code")?.touched
+                  ) {
+                    <p class="mt-1 text-xs text-red-500 font-medium">
+                      4 dígitos
                     </p>
-                    <button (click)="cartService.removeFromCart(item.product.id)" class="text-xs text-red-500 hover:text-red-700 font-semibold mt-1">Quitar</button>
-                  </div>
-                </li>
-              }
-            </ul>
-
-            <!-- Coupon Input -->
-            <div class="mb-6">
-              <label for="coupon-code" class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1 uppercase tracking-wider">¿Tienes un cupón?</label>
-              <div class="flex gap-2">
-                <input id="coupon-code" type="text" placeholder="Ej. DESCUENTO10"
-                       #couponInput
-                       class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm uppercase dark:text-white" />
-                <button type="button" (click)="applyCoupon(couponInput.value)"
-                        class="px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white font-bold text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
-                  Aplicar
-                </button>
+                  }
+                </div>
               </div>
             </div>
 
-            <!-- Totals -->
-            <div class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm">
-              <div class="flex justify-between text-gray-600 dark:text-gray-400">
-                <span>Subtotal</span>
-                <span class="font-bold text-gray-900 dark:text-white">${{ cartService.totalPrice() | number:'1.2-2' }}</span>
-              </div>
-
-              @if (isCalculatingShipping()) {
-                <div class="flex justify-between items-center text-gray-500 italic">
-                  <span class="flex items-center gap-2"><div class="spinner"></div> Calculando envío...</span>
-                </div>
-              } @else if (shippingQuote()) {
-                <div class="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Envío ({{ shippingQuote()!.provider }})</span>
-                  <span class="font-bold text-gray-900 dark:text-white">${{ shippingQuote()!.cost | number:'1.2-2' }}</span>
-                </div>
-              }
-
-              <!-- Points System -->
-              @if (availablePoints() > 0) {
-                <div class="flex justify-between items-center bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3 border border-emerald-100 dark:border-emerald-800 mt-2">
-                  <div>
-                    <span class="block text-emerald-800 dark:text-emerald-400 font-bold">Mis Puntos</span>
-                    <span class="block text-xs text-emerald-600 dark:text-emerald-500">Tienes {{ availablePoints() | number }} pts = ${{ availablePoints() | number }} dto.</span>
-                  </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" [checked]="usePoints()" (change)="toggleUsePoints()">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
-                  </label>
-                </div>
-              }
-              
-              @if (usePoints() && pointsDiscountValue() > 0) {
-                <div class="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
-                  <span>Descuento por Puntos</span>
-                  <span>-${{ pointsDiscountValue() | number:'1.2-2' }}</span>
-                </div>
-              }
-
-              <div class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
-                <span class="text-base font-bold text-gray-900 dark:text-white">Total</span>
-                <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                  ${{ (cartService.totalPrice() + (shippingQuote()?.cost || 0) - pointsDiscountValue()) | number:'1.2-2' }}
-                </span>
-              </div>
+            <!-- Notes -->
+            <div>
+              <label
+                for="checkout-notes"
+                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1"
+                >Notas adicionales</label
+              >
+              <textarea
+                id="checkout-notes"
+                formControlName="notes"
+                rows="3"
+                placeholder="Instrucciones de entrega, referencias, etc."
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
+              ></textarea>
             </div>
 
-            <!-- Guarantee Badge -->
-            <div class="mt-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-xl p-4 flex items-start gap-3">
-              <i class="fas fa-shield-check text-emerald-600 dark:text-emerald-400 text-xl mt-0.5"></i>
-              <div>
-                <h4 class="text-sm font-bold text-emerald-800 dark:text-emerald-300">Compra 100% Segura</h4>
-                <p class="text-xs text-emerald-600 dark:text-emerald-400/80 mt-1">Tus datos están encriptados y protegidos. Stock garantizado al confirmar.</p>
-              </div>
+            <!-- Actions -->
+            <div class="pt-4 flex items-center justify-between">
+              <a
+                routerLink="/products/featured"
+                class="text-sm font-semibold text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors"
+              >
+                ← Seguir comprando
+              </a>
+              <button
+                id="btn-go-payment"
+                type="submit"
+                [disabled]="
+                  cartService.cartItems().length === 0 ||
+                  isCalculatingShipping()
+                "
+                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                Ir a Pagar <i class="fas fa-arrow-right"></i>
+              </button>
             </div>
-          }
+          </form>
         </div>
-      </div>
-    </aside>
+      </section>
 
-  </div>
+      <!-- RIGHT: Cart Summary (Sticky) -->
+      <aside class="lg:col-span-5 xl:col-span-4 order-1 lg:order-2">
+        <div
+          class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-2xl border border-gray-100 dark:border-gray-700 lg:sticky lg:top-24 overflow-hidden"
+        >
+          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+            <h2 class="text-lg font-bold flex items-center gap-2">
+              <i class="fas fa-shopping-bag text-emerald-500"></i> Resumen de
+              compra
+            </h2>
+          </div>
+
+          <div class="p-6">
+            @if (cartService.cartItems().length === 0) {
+              <div class="text-center py-8">
+                <i
+                  class="fas fa-box-open text-4xl text-gray-300 dark:text-gray-600 mb-3"
+                ></i>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">
+                  Tu carrito está vacío
+                </p>
+              </div>
+            } @else {
+              <!-- Items List -->
+              <ul class="space-y-4 mb-6">
+                @for (item of cartService.cartItems(); track item.product.id) {
+                  <li class="flex items-center gap-4">
+                    <div
+                      class="w-16 h-16 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-hidden shrink-0"
+                    >
+                      <img
+                        [src]="
+                          item.product.image_url ||
+                          item.product.gallery_urls?.[0] ||
+                          'assets/img/no-image.svg'
+                        "
+                        [alt]="item.product.name"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4
+                        class="text-sm font-bold text-gray-900 dark:text-white truncate"
+                      >
+                        {{ item.product.name }}
+                      </h4>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Cant: {{ item.quantity }}
+                      </p>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <p
+                        class="text-sm font-black text-gray-900 dark:text-white"
+                      >
+                        {{ item.product.currency === "USD" ? "USD " : "$"
+                        }}{{
+                          item.product.price * item.quantity | number: "1.2-2"
+                        }}
+                      </p>
+                      <button
+                        (click)="cartService.removeFromCart(item.product.id)"
+                        class="text-xs text-red-500 hover:text-red-700 font-semibold mt-1"
+                      >
+                        Quitar
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+
+              <!-- Coupon Input -->
+              <div class="mb-6">
+                <label
+                  for="coupon-code"
+                  class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1 uppercase tracking-wider"
+                  >¿Tienes un cupón?</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    id="coupon-code"
+                    type="text"
+                    placeholder="Ej. DESCUENTO10"
+                    #couponInput
+                    class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm uppercase dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    (click)="applyCoupon(couponInput.value)"
+                    class="px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white font-bold text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Totals -->
+              <div
+                class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm"
+              >
+                <div
+                  class="flex justify-between text-gray-600 dark:text-gray-400"
+                >
+                  <span>Subtotal</span>
+                  <span class="font-bold text-gray-900 dark:text-white"
+                    >${{ cartService.totalPrice() | number: "1.2-2" }}</span
+                  >
+                </div>
+
+                @if (isCalculatingShipping()) {
+                  <div
+                    class="flex justify-between items-center text-gray-500 italic"
+                  >
+                    <span class="flex items-center gap-2"
+                      ><div class="spinner"></div>
+                      Calculando envío...</span
+                    >
+                  </div>
+                } @else if (shippingQuote()) {
+                  <div
+                    class="flex justify-between text-gray-600 dark:text-gray-400"
+                  >
+                    <span>Envío ({{ shippingQuote()!.provider }})</span>
+                    <span class="font-bold text-gray-900 dark:text-white"
+                      >${{ shippingQuote()!.cost | number: "1.2-2" }}</span
+                    >
+                  </div>
+                }
+
+                <!-- Points System -->
+                @if (availablePoints() > 0) {
+                  <div
+                    class="flex justify-between items-center bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3 border border-emerald-100 dark:border-emerald-800 mt-2"
+                  >
+                    <div>
+                      <span
+                        class="block text-emerald-800 dark:text-emerald-400 font-bold"
+                        >Mis Puntos</span
+                      >
+                      <span
+                        class="block text-xs text-emerald-600 dark:text-emerald-500"
+                        >Tienes {{ availablePoints() | number }} pts = ${{
+                          availablePoints() | number
+                        }}
+                        dto.</span
+                      >
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        class="sr-only peer"
+                        [checked]="usePoints()"
+                        (change)="toggleUsePoints()"
+                      />
+                      <div
+                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"
+                      ></div>
+                    </label>
+                  </div>
+                }
+
+                @if (usePoints() && pointsDiscountValue() > 0) {
+                  <div
+                    class="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold"
+                  >
+                    <span>Descuento por Puntos</span>
+                    <span>-${{ pointsDiscountValue() | number: "1.2-2" }}</span>
+                  </div>
+                }
+
+                <div
+                  class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700"
+                >
+                  <span
+                    class="text-base font-bold text-gray-900 dark:text-white"
+                    >Total</span
+                  >
+                  <span
+                    class="text-2xl font-black text-emerald-600 dark:text-emerald-400"
+                  >
+                    ${{
+                      cartService.totalPrice() +
+                        (shippingQuote()?.cost || 0) -
+                        pointsDiscountValue() | number: "1.2-2"
+                    }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Guarantee Badge -->
+              <div
+                class="mt-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-xl p-4 flex items-start gap-3"
+              >
+                <i
+                  class="fas fa-shield-check text-emerald-600 dark:text-emerald-400 text-xl mt-0.5"
+                ></i>
+                <div>
+                  <h4
+                    class="text-sm font-bold text-emerald-800 dark:text-emerald-300"
+                  >
+                    Compra 100% Segura
+                  </h4>
+                  <p
+                    class="text-xs text-emerald-600 dark:text-emerald-400/80 mt-1"
+                  >
+                    Tus datos están encriptados y protegidos. Stock garantizado
+                    al confirmar.
+                  </p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </aside>
+    </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════
        STEP: PAYMENT METHOD SELECTION
   ═══════════════════════════════════════════════════════ -->
-  @if (step() === 'payment_method') {
-  <div class="max-w-3xl mx-auto animate-slideIn">
-    
-    <!-- Reservation Banner -->
-    <div class="bg-blue-600 text-white rounded-2xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-lg shadow-blue-600/20">
-      <div class="flex items-center gap-4 text-center sm:text-left">
-        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl shrink-0">
-          ⏳
-        </div>
-        <div>
-          <h3 class="text-lg font-bold">Reserva confirmada temporalmente</h3>
-          <p class="text-blue-100 text-sm">Tu unidad está separada en depósito. Finalizá el pago para asegurarla.</p>
-        </div>
-      </div>
-      <div class="bg-blue-800/50 px-6 py-3 rounded-xl border border-blue-400/30 text-center shrink-0 min-w-[120px]">
-        <span class="block text-2xl font-black font-mono tracking-wider">{{ countdownDisplay() }}</span>
-        <span class="block text-xs text-blue-200 uppercase tracking-widest mt-1">Minutos</span>
-      </div>
-    </div>
-
-    <!-- Payment Options -->
-    <div class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-3xl border border-gray-100 dark:border-gray-700 p-6 sm:p-10">
-      <div class="text-center mb-10">
-        <h2 class="text-2xl font-black text-gray-900 dark:text-white">¿Cómo querés pagar?</h2>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">Monto total: <strong class="text-emerald-600 dark:text-emerald-400 text-xl">${{ (cartService.totalPrice() + (shippingQuote()?.cost || 0) - pointsDiscountValue()) | number:'1.2-2' }}</strong></p>
-      </div>
-
-      <div class="space-y-4 mb-10">
-        <!-- Mercado Pago -->
-        <label class="relative block bg-white dark:bg-gray-900 border-2 rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-cyan-400 dark:hover:border-cyan-500"
-               [class.border-cyan-500]="selectedMethod() === 'credit_card'"
-               [class.border-gray-200]="selectedMethod() !== 'credit_card'"
-               [class.dark:border-gray-700]="selectedMethod() !== 'credit_card'">
-          <input type="radio" name="payment" class="peer sr-only" (change)="selectMethod('credit_card')" [checked]="selectedMethod() === 'credit_card'">
-          <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-cyan-500 peer-checked:bg-cyan-500 flex items-center justify-center transition-colors">
-            <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+  @if (step() === "payment_method") {
+    <div class="max-w-3xl mx-auto animate-slideIn">
+      <!-- Reservation Banner -->
+      <div
+        class="bg-blue-600 text-white rounded-2xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-lg shadow-blue-600/20"
+      >
+        <div class="flex items-center gap-4 text-center sm:text-left">
+          <div
+            class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl shrink-0"
+          >
+            ⏳
           </div>
-          <span class="absolute -top-3 left-6 bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200 text-xs font-bold px-3 py-1 rounded-full border border-cyan-200 dark:border-cyan-800">Recomendado</span>
-          
-          <div class="flex items-start gap-4 mt-2">
-            <div class="text-3xl text-cyan-600 dark:text-cyan-500 mt-1"><i class="fas fa-handshake"></i></div>
-            <div>
-              <h4 class="text-lg font-bold text-gray-900 dark:text-white">Mercado Pago</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tarjetas de crédito, débito o dinero en cuenta.</p>
-              <div class="flex items-center gap-4 mt-3 text-xs font-semibold text-gray-700 dark:text-gray-300">
-                <span class="flex items-center gap-1"><i class="fas fa-check-circle text-emerald-500"></i> Seguro</span>
-                <span class="flex items-center gap-1"><i class="fas fa-check-circle text-emerald-500"></i> Rápido</span>
+          <div>
+            <h3 class="text-lg font-bold">Reserva confirmada temporalmente</h3>
+            <p class="text-blue-100 text-sm">
+              Tu unidad está separada en depósito. Finalizá el pago para
+              asegurarla.
+            </p>
+          </div>
+        </div>
+        <div
+          class="bg-blue-800/50 px-6 py-3 rounded-xl border border-blue-400/30 text-center shrink-0 min-w-[120px]"
+        >
+          <span class="block text-2xl font-black font-mono tracking-wider">{{
+            countdownDisplay()
+          }}</span>
+          <span
+            class="block text-xs text-blue-200 uppercase tracking-widest mt-1"
+            >Minutos</span
+          >
+        </div>
+      </div>
+
+      <!-- Payment Options -->
+      <div
+        class="bg-white dark:bg-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none rounded-3xl border border-gray-100 dark:border-gray-700 p-6 sm:p-10"
+      >
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-black text-gray-900 dark:text-white">
+            ¿Cómo querés pagar?
+          </h2>
+          <p class="text-gray-500 dark:text-gray-400 mt-2">
+            Monto total:
+            <strong class="text-emerald-600 dark:text-emerald-400 text-xl"
+              >${{
+                cartService.totalPrice() +
+                  (shippingQuote()?.cost || 0) -
+                  pointsDiscountValue() | number: "1.2-2"
+              }}</strong
+            >
+          </p>
+        </div>
+
+        <div class="space-y-4 mb-10">
+          <!-- Mercado Pago -->
+          <label
+            class="relative block bg-white dark:bg-gray-900 border-2 rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-cyan-400 dark:hover:border-cyan-500"
+            [class.border-cyan-500]="selectedMethod() === 'credit_card'"
+            [class.border-gray-200]="selectedMethod() !== 'credit_card'"
+            [class.dark:border-gray-700]="selectedMethod() !== 'credit_card'"
+          >
+            <input
+              type="radio"
+              name="payment"
+              class="peer sr-only"
+              (change)="selectMethod('credit_card')"
+              [checked]="selectedMethod() === 'credit_card'"
+            />
+            <div
+              class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-cyan-500 peer-checked:bg-cyan-500 flex items-center justify-center transition-colors"
+            >
+              <i
+                class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"
+              ></i>
+            </div>
+            <span
+              class="absolute -top-3 left-6 bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200 text-xs font-bold px-3 py-1 rounded-full border border-cyan-200 dark:border-cyan-800"
+              >Recomendado</span
+            >
+
+            <div class="flex items-start gap-4 mt-2">
+              <div class="text-3xl text-cyan-600 dark:text-cyan-500 mt-1">
+                <i class="fas fa-handshake"></i>
+              </div>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                  Mercado Pago
+                </h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Tarjetas de crédito, débito o dinero en cuenta.
+                </p>
+                <div
+                  class="flex items-center gap-4 mt-3 text-xs font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  <span class="flex items-center gap-1"
+                    ><i class="fas fa-check-circle text-emerald-500"></i>
+                    Seguro</span
+                  >
+                  <span class="flex items-center gap-1"
+                    ><i class="fas fa-check-circle text-emerald-500"></i>
+                    Rápido</span
+                  >
+                </div>
               </div>
             </div>
-          </div>
-        </label>
+          </label>
 
-        <!-- Transfer -->
-        <label class="relative block bg-white dark:bg-gray-900 border-2 rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500"
-               [class.border-blue-500]="selectedMethod() === 'digital'"
-               [class.border-gray-200]="selectedMethod() !== 'digital'"
-               [class.dark:border-gray-700]="selectedMethod() !== 'digital'">
-          <input type="radio" name="payment" class="peer sr-only" (change)="selectMethod('digital')" [checked]="selectedMethod() === 'digital'">
-          <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-500 flex items-center justify-center transition-colors">
-            <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-          </div>
-          
-          <div class="flex items-start gap-4">
-            <div class="text-3xl text-blue-600 dark:text-blue-500 mt-1"><i class="fas fa-university"></i></div>
-            <div>
-              <h4 class="text-lg font-bold text-gray-900 dark:text-white">Transferencia Bancaria</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Transferí mediante CBU o Alias. Validación manual en minutos.</p>
+          <!-- Transfer -->
+          <label
+            class="relative block bg-white dark:bg-gray-900 border-2 rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500"
+            [class.border-blue-500]="selectedMethod() === 'digital'"
+            [class.border-gray-200]="selectedMethod() !== 'digital'"
+            [class.dark:border-gray-700]="selectedMethod() !== 'digital'"
+          >
+            <input
+              type="radio"
+              name="payment"
+              class="peer sr-only"
+              (change)="selectMethod('digital')"
+              [checked]="selectedMethod() === 'digital'"
+            />
+            <div
+              class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-500 flex items-center justify-center transition-colors"
+            >
+              <i
+                class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"
+              ></i>
             </div>
-          </div>
-        </label>
 
-        <!-- Cash -->
-        <label class="relative block bg-white dark:bg-gray-900 border-2 rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-amber-400 dark:hover:border-amber-500"
-               [class.border-amber-500]="selectedMethod() === 'cash'"
-               [class.border-gray-200]="selectedMethod() !== 'cash'"
-               [class.dark:border-gray-700]="selectedMethod() !== 'cash'">
-          <input type="radio" name="payment" class="peer sr-only" (change)="selectMethod('cash')" [checked]="selectedMethod() === 'cash'">
-          <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-amber-500 peer-checked:bg-amber-500 flex items-center justify-center transition-colors">
-            <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-          </div>
-          
-          <div class="flex items-start gap-4">
-            <div class="text-3xl text-amber-500 mt-1"><i class="fas fa-store"></i></div>
-            <div>
-              <h4 class="text-lg font-bold text-gray-900 dark:text-white">Efectivo (Puntos de Cobro)</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Generá un ticket para pagar en Rapipago o Pago Fácil.</p>
+            <div class="flex items-start gap-4">
+              <div class="text-3xl text-blue-600 dark:text-blue-500 mt-1">
+                <i class="fas fa-university"></i>
+              </div>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                  Transferencia Bancaria
+                </h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Transferí mediante CBU o Alias. Validación manual en minutos.
+                </p>
+              </div>
             </div>
-          </div>
-        </label>
-      </div>
+          </label>
 
-      <!-- Actions -->
-      <div class="flex flex-col sm:flex-row items-center gap-4">
-        <button class="w-full sm:w-auto px-6 py-4 rounded-xl font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" (click)="step.set('form')">
-          ← Atrás
-        </button>
-        <button
-          class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-emerald-600/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          (click)="placeOrder()"
-          [disabled]="!selectedMethod() || isProcessing()"
-        >
-          @if (isProcessing()) {
-            <div class="spinner border-white/50 border-t-white"></div> Procesando...
-          } @else {
-            Confirmar Pedido Seguro <i class="fas fa-lock"></i>
-          }
-        </button>
+          <!-- Cash -->
+          <label
+            class="relative block bg-white dark:bg-gray-900 border-2 rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-amber-400 dark:hover:border-amber-500"
+            [class.border-amber-500]="selectedMethod() === 'cash'"
+            [class.border-gray-200]="selectedMethod() !== 'cash'"
+            [class.dark:border-gray-700]="selectedMethod() !== 'cash'"
+          >
+            <input
+              type="radio"
+              name="payment"
+              class="peer sr-only"
+              (change)="selectMethod('cash')"
+              [checked]="selectedMethod() === 'cash'"
+            />
+            <div
+              class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-amber-500 peer-checked:bg-amber-500 flex items-center justify-center transition-colors"
+            >
+              <i
+                class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"
+              ></i>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="text-3xl text-amber-500 mt-1">
+                <i class="fas fa-store"></i>
+              </div>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                  Efectivo (Puntos de Cobro)
+                </h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Generá un ticket para pagar en Rapipago o Pago Fácil.
+                </p>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <button
+            class="w-full sm:w-auto px-6 py-4 rounded-xl font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            (click)="step.set('form')"
+          >
+            ← Atrás
+          </button>
+          <button
+            class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-emerald-600/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            (click)="placeOrder()"
+            [disabled]="!selectedMethod() || isProcessing()"
+          >
+            @if (isProcessing()) {
+              <div class="spinner border-white/50 border-t-white"></div>
+              Procesando...
+            } @else {
+              Confirmar Pedido Seguro <i class="fas fa-lock"></i>
+            }
+          </button>
+        </div>
       </div>
     </div>
-  </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════
        STEP: PENDING PAYMENT (Digital / Cash)
   ═══════════════════════════════════════════════════════ -->
-  @if (step() === 'pending_payment') {
-  <div class="max-w-2xl mx-auto animate-slideIn">
-    
-    <div class="text-center mb-10">
-      <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 animate-pulse-dot shadow-xl shadow-emerald-500/20">
-        <i class="fas fa-box-check"></i>
+  @if (step() === "pending_payment") {
+    <div class="max-w-2xl mx-auto animate-slideIn">
+      <div class="text-center mb-10">
+        <div
+          class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 animate-pulse-dot shadow-xl shadow-emerald-500/20"
+        >
+          <i class="fas fa-box-check"></i>
+        </div>
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2">
+          ¡Pedido Registrado!
+        </h1>
+        <p class="text-xl font-mono text-gray-500 dark:text-gray-400 mb-4">
+          #{{ currentOrder()?.order_number }}
+        </p>
+        <p class="text-lg text-gray-600 dark:text-gray-300">
+          Completá el pago siguiendo las instrucciones debajo para que
+          despachemos tu unidad.
+        </p>
       </div>
-      <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2">¡Pedido Registrado!</h1>
-      <p class="text-xl font-mono text-gray-500 dark:text-gray-400 mb-4">#{{ currentOrder()?.order_number }}</p>
-      <p class="text-lg text-gray-600 dark:text-gray-300">
-        Completá el pago siguiendo las instrucciones debajo para que despachemos tu unidad.
-      </p>
-    </div>
 
-    <!-- DIGITAL Instructions -->
-    @if (selectedMethod() === 'digital') {
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-8 mb-8">
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">Datos para Transferencia</h3>
-      
-      <div class="space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div>
-            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Alias</span>
-            <span class="text-lg font-bold text-gray-900 dark:text-white font-mono">{{ branchService.currentBranch()?.bank_info?.alias || 'areco.fix' }}</span>
-          </div>
-          <button class="mt-2 sm:mt-0 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-bold rounded-lg hover:bg-blue-200 transition-colors"
-                  onclick="navigator.clipboard.writeText(this.previousElementSibling.lastElementChild.textContent); this.innerHTML='<i class=\'fas fa-check\'></i> Copiado';">
-            Copiar
-          </button>
-        </div>
+      <!-- DIGITAL Instructions -->
+      @if (selectedMethod() === "digital") {
+        <div
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-8 mb-8"
+        >
+          <h3
+            class="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-4"
+          >
+            Datos para Transferencia
+          </h3>
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div>
-            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">CBU / CVU</span>
-            <span class="text-lg font-bold text-gray-900 dark:text-white font-mono">{{ branchService.currentBranch()?.bank_info?.cbu || '0000003100084531456958' }}</span>
-          </div>
-          <button class="mt-2 sm:mt-0 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-bold rounded-lg hover:bg-blue-200 transition-colors"
-                  onclick="navigator.clipboard.writeText(this.previousElementSibling.lastElementChild.textContent); this.innerHTML='<i class=\'fas fa-check\'></i> Copiado';">
-            Copiar
-          </button>
-        </div>
+          <div class="space-y-4">
+            <div
+              class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700"
+            >
+              <div>
+                <span
+                  class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"
+                  >Alias</span
+                >
+                <span
+                  class="text-lg font-bold text-gray-900 dark:text-white font-mono"
+                  >{{
+                    branchService.currentBranch()?.bank_info?.alias ||
+                      "areco.fix"
+                  }}</span
+                >
+              </div>
+              <button
+                class="mt-2 sm:mt-0 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-bold rounded-lg hover:bg-blue-200 transition-colors"
+                onclick="
+                  navigator.clipboard.writeText(
+                    this.previousElementSibling.lastElementChild.textContent,
+                  );
+                  this.innerHTML = '<i class=\'fas fa-check\'></i> Copiado';
+                "
+              >
+                Copiar
+              </button>
+            </div>
 
-        <div class="flex justify-between items-center p-4 mt-6 border-t border-gray-100 dark:border-gray-700">
-          <span class="text-gray-600 dark:text-gray-400 font-semibold">Total a transferir:</span>
-          <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400">${{ currentOrder()?.total | number:'1.2-2' }}</span>
-        </div>
-      </div>
-    </div>
-    }
+            <div
+              class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700"
+            >
+              <div>
+                <span
+                  class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"
+                  >CBU / CVU</span
+                >
+                <span
+                  class="text-lg font-bold text-gray-900 dark:text-white font-mono"
+                  >{{
+                    branchService.currentBranch()?.bank_info?.cbu ||
+                      "0000003100084531456958"
+                  }}</span
+                >
+              </div>
+              <button
+                class="mt-2 sm:mt-0 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-bold rounded-lg hover:bg-blue-200 transition-colors"
+                onclick="
+                  navigator.clipboard.writeText(
+                    this.previousElementSibling.lastElementChild.textContent,
+                  );
+                  this.innerHTML = '<i class=\'fas fa-check\'></i> Copiado';
+                "
+              >
+                Copiar
+              </button>
+            </div>
 
-    <!-- CASH Ticket -->
-    @if (selectedMethod() === 'cash' && paymentTicket()) {
-    <div class="ticket-wrapper">
-      <div class="ticket">
-        <div class="ticket-header">
-          <div class="flex items-center gap-3">
-            <span class="logo-af">AF</span>
-            <div>
-              <strong class="block text-sm tracking-widest uppercase">Arecofix</strong>
-              <small class="text-xs opacity-80">Ticket de Pago</small>
+            <div
+              class="flex justify-between items-center p-4 mt-6 border-t border-gray-100 dark:border-gray-700"
+            >
+              <span class="text-gray-600 dark:text-gray-400 font-semibold"
+                >Total a transferir:</span
+              >
+              <span
+                class="text-2xl font-black text-emerald-600 dark:text-emerald-400"
+                >${{
+                  $safeNavigationMigration(currentOrder()?.total)
+                    | number: "1.2-2"
+                }}</span
+              >
             </div>
           </div>
         </div>
-        <div class="ticket-divider"><span>✦ ✦ ✦</span></div>
-        <div class="barcode-container">
-          <div class="barcode">
-            @for (b of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]; track b) {
-              <div class="bar" [class.wide]="b % 5 === 0"></div>
-            }
-          </div>
-          <p class="font-mono text-sm font-bold tracking-widest mt-2">{{ formatTicketCode(paymentTicket()!.ticketCode) }}</p>
-        </div>
-        <div class="ticket-divider"><span>✦ ✦ ✦</span></div>
-        <div class="text-center py-6 px-4">
-          <span class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Total a abonar</span>
-          <strong class="text-4xl font-black text-gray-900 dark:text-white">${{ paymentTicket()!.total | number:'1.2-2' }}</strong>
-        </div>
-        <div class="bg-gray-50 dark:bg-gray-800 p-6 text-center text-sm text-gray-600 dark:text-gray-300">
-          <p class="mb-4">Dictá este código en cualquier sucursal de Rapipago o Pago Fácil. La acreditación es automática.</p>
-          <div class="flex justify-center gap-4 font-black">
-            <span class="text-emerald-800 dark:text-emerald-400">RAPIPAGO</span>
-            <span class="text-amber-500">PAGO FÁCIL</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    }
-
-    <!-- Upload Proof Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-8 text-center">
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¿Ya pagaste?</h3>
-      <p class="text-gray-500 dark:text-gray-400 mb-6">Subí tu comprobante aquí para que validemos tu pago de inmediato.</p>
-
-      <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors overflow-hidden group mb-6"
-           [class.border-blue-500]="proofFile()" [class.bg-blue-50]="proofFile()" [class.dark:bg-blue-900/20]="proofFile()">
-        <input type="file" id="proof-upload" (change)="onProofFileSelected($event)" accept="image/*,application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-        
-        <div class="p-8 flex flex-col items-center justify-center gap-3">
-          @if (proofPreviewUrl()) {
-            <img [src]="proofPreviewUrl()" class="max-h-48 rounded-lg object-contain shadow-md" alt="Comprobante" />
-          } @else if (proofFile()) {
-            <i class="fas fa-file-invoice text-4xl text-blue-500"></i>
-            <span class="font-bold text-blue-700 dark:text-blue-400">{{ proofFile()!.name }}</span>
-          } @else {
-            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 group-hover:text-blue-500 transition-colors"></i>
-            <span class="font-bold text-gray-700 dark:text-gray-300">Tocá para subir comprobante</span>
-            <span class="text-xs text-gray-500">JPG, PNG o PDF · Máx. 10 MB</span>
-          }
-        </div>
-      </div>
-
-      @if (proofFile()) {
-        <button
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex justify-center items-center gap-2"
-          (click)="submitProof()"
-          [disabled]="isUploadingProof()"
-        >
-          @if (isUploadingProof()) {
-            <div class="spinner border-white/50 border-t-white"></div> Enviando...
-          } @else {
-            <i class="fas fa-paper-plane"></i> Enviar comprobante
-          }
-        </button>
       }
 
-      <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
-        <a [href]="whatsappUrl" target="_blank" class="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
-          <i class="fab fa-whatsapp text-xl"></i> Enviar por WhatsApp
-        </a>
+      <!-- CASH Ticket -->
+      @if (selectedMethod() === "cash" && paymentTicket()) {
+        <div class="ticket-wrapper">
+          <div class="ticket">
+            <div class="ticket-header">
+              <div class="flex items-center gap-3">
+                <span class="logo-af">AF</span>
+                <div>
+                  <strong class="block text-sm tracking-widest uppercase"
+                    >Arecofix</strong
+                  >
+                  <small class="text-xs opacity-80">Ticket de Pago</small>
+                </div>
+              </div>
+            </div>
+            <div class="ticket-divider"><span>✦ ✦ ✦</span></div>
+            <div class="barcode-container">
+              <div class="barcode">
+                @for (
+                  b of [
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                  ];
+                  track b
+                ) {
+                  <div class="bar" [class.wide]="b % 5 === 0"></div>
+                }
+              </div>
+              <p class="font-mono text-sm font-bold tracking-widest mt-2">
+                {{ formatTicketCode(paymentTicket()!.ticketCode) }}
+              </p>
+            </div>
+            <div class="ticket-divider"><span>✦ ✦ ✦</span></div>
+            <div class="text-center py-6 px-4">
+              <span
+                class="block text-xs uppercase tracking-widest text-gray-500 mb-1"
+                >Total a abonar</span
+              >
+              <strong class="text-4xl font-black text-gray-900 dark:text-white"
+                >${{ paymentTicket()!.total | number: "1.2-2" }}</strong
+              >
+            </div>
+            <div
+              class="bg-gray-50 dark:bg-gray-800 p-6 text-center text-sm text-gray-600 dark:text-gray-300"
+            >
+              <p class="mb-4">
+                Dictá este código en cualquier sucursal de Rapipago o Pago
+                Fácil. La acreditación es automática.
+              </p>
+              <div class="flex justify-center gap-4 font-black">
+                <span class="text-emerald-800 dark:text-emerald-400"
+                  >RAPIPAGO</span
+                >
+                <span class="text-amber-500">PAGO FÁCIL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Upload Proof Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-8 text-center"
+      >
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          ¿Ya pagaste?
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">
+          Subí tu comprobante aquí para que validemos tu pago de inmediato.
+        </p>
+
+        <div
+          class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors overflow-hidden group mb-6"
+          [class.border-blue-500]="proofFile()"
+          [class.bg-blue-50]="proofFile()"
+          [class.dark:bg-blue-900/20]="proofFile()"
+        >
+          <input
+            type="file"
+            id="proof-upload"
+            (change)="onProofFileSelected($event)"
+            accept="image/*,application/pdf"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          />
+
+          <div class="p-8 flex flex-col items-center justify-center gap-3">
+            @if (proofPreviewUrl()) {
+              <img
+                [src]="proofPreviewUrl()"
+                class="max-h-48 rounded-lg object-contain shadow-md"
+                alt="Comprobante"
+              />
+            } @else if (proofFile()) {
+              <i class="fas fa-file-invoice text-4xl text-blue-500"></i>
+              <span class="font-bold text-blue-700 dark:text-blue-400">{{
+                proofFile()!.name
+              }}</span>
+            } @else {
+              <i
+                class="fas fa-cloud-upload-alt text-4xl text-gray-400 group-hover:text-blue-500 transition-colors"
+              ></i>
+              <span class="font-bold text-gray-700 dark:text-gray-300"
+                >Tocá para subir comprobante</span
+              >
+              <span class="text-xs text-gray-500"
+                >JPG, PNG o PDF · Máx. 10 MB</span
+              >
+            }
+          </div>
+        </div>
+
+        @if (proofFile()) {
+          <button
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex justify-center items-center gap-2"
+            (click)="submitProof()"
+            [disabled]="isUploadingProof()"
+          >
+            @if (isUploadingProof()) {
+              <div class="spinner border-white/50 border-t-white"></div>
+              Enviando...
+            } @else {
+              <i class="fas fa-paper-plane"></i> Enviar comprobante
+            }
+          </button>
+        }
+
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+          <a
+            [href]="whatsappUrl"
+            target="_blank"
+            class="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
+          >
+            <i class="fab fa-whatsapp text-xl"></i> Enviar por WhatsApp
+          </a>
+        </div>
       </div>
     </div>
-  </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════
        STEP: AWAITING VERIFICATION
   ═══════════════════════════════════════════════════════ -->
-  @if (step() === 'awaiting_verification') {
-  <div class="max-w-2xl mx-auto animate-slideIn mt-12">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center">
-      <div class="w-24 h-24 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-8 animate-pulse shadow-xl shadow-blue-500/20">
-        <i class="fas fa-clock"></i>
-      </div>
-      
-      <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-4">Comprobante Recibido</h1>
-      <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto">
-        Estamos validando tu pago. Este proceso suele demorar entre <strong class="text-gray-900 dark:text-white">5 y 30 minutos</strong>. Te notificaremos por email.
-      </p>
+  @if (step() === "awaiting_verification") {
+    <div class="max-w-2xl mx-auto animate-slideIn mt-12">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center"
+      >
+        <div
+          class="w-24 h-24 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-8 animate-pulse shadow-xl shadow-blue-500/20"
+        >
+          <i class="fas fa-clock"></i>
+        </div>
 
-      <div class="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 text-left max-w-sm mx-auto mb-10">
-        <div class="flex items-center gap-4 text-emerald-600 dark:text-emerald-400 font-bold mb-4">
-          <i class="fas fa-check-circle text-xl"></i> Pedido registrado
-        </div>
-        <div class="flex items-center gap-4 text-emerald-600 dark:text-emerald-400 font-bold mb-4">
-          <i class="fas fa-check-circle text-xl"></i> Comprobante recibido
-        </div>
-        <div class="flex items-center gap-4 text-blue-600 dark:text-blue-400 font-bold mb-4 border-l-4 border-blue-500 pl-3 ml-[-19px]">
-          <div class="spinner w-5 h-5 border-blue-200 border-t-blue-600"></div> Verificando pago...
-        </div>
-        <div class="flex items-center gap-4 text-gray-400 dark:text-gray-600 font-bold">
-          <i class="fas fa-box text-xl ml-1"></i> Preparación
-        </div>
-      </div>
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-4">
+          Comprobante Recibido
+        </h1>
+        <p
+          class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto"
+        >
+          Estamos validando tu pago. Este proceso suele demorar entre
+          <strong class="text-gray-900 dark:text-white">5 y 30 minutos</strong>.
+          Te notificaremos por email.
+        </p>
 
-      <a routerLink="/" class="inline-block px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-        Volver a la tienda
-      </a>
+        <div
+          class="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 text-left max-w-sm mx-auto mb-10"
+        >
+          <div
+            class="flex items-center gap-4 text-emerald-600 dark:text-emerald-400 font-bold mb-4"
+          >
+            <i class="fas fa-check-circle text-xl"></i> Pedido registrado
+          </div>
+          <div
+            class="flex items-center gap-4 text-emerald-600 dark:text-emerald-400 font-bold mb-4"
+          >
+            <i class="fas fa-check-circle text-xl"></i> Comprobante recibido
+          </div>
+          <div
+            class="flex items-center gap-4 text-blue-600 dark:text-blue-400 font-bold mb-4 border-l-4 border-blue-500 pl-3 ml-[-19px]"
+          >
+            <div
+              class="spinner w-5 h-5 border-blue-200 border-t-blue-600"
+            ></div>
+            Verificando pago...
+          </div>
+          <div
+            class="flex items-center gap-4 text-gray-400 dark:text-gray-600 font-bold"
+          >
+            <i class="fas fa-box text-xl ml-1"></i> Preparación
+          </div>
+        </div>
+
+        <a
+          routerLink="/"
+          class="inline-block px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          Volver a la tienda
+        </a>
+      </div>
     </div>
-  </div>
   }
 
   <!-- ═══════════════════════════════════════════════════════
        STEP: MERCADO PAGO REDIRECT
   ═══════════════════════════════════════════════════════ -->
-  @if (step() === 'mp_redirect') {
-  <div class="max-w-xl mx-auto animate-slideIn mt-12">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center">
-      <div class="text-6xl text-cyan-600 mb-6"><i class="fas fa-lock"></i></div>
-      <h1 class="text-2xl font-black text-gray-900 dark:text-white mb-4">Redirigiendo a Pago Seguro...</h1>
-      <p class="text-gray-600 dark:text-gray-400 mb-8">
-        Te estamos transfiriendo a la pasarela encriptada de <strong>Mercado Pago</strong> para procesar tu pago.
-      </p>
-      
-      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-8 overflow-hidden">
-        <div class="bg-cyan-500 h-2 rounded-full w-full animate-pulse"></div>
-      </div>
-      
-      @if (mpPaymentUrl()) {
-        <a [href]="mpPaymentUrl()" class="inline-flex items-center justify-center w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 rounded-xl shadow-lg transition-colors">
-          Continuar a Mercado Pago <i class="fas fa-external-link-alt ml-2"></i>
-        </a>
-      }
-      
-      <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-center gap-2 grayscale opacity-50">
-        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Powered by</span>
-        <span class="text-2xl font-black text-cyan-600 tracking-tighter">mercado pago</span>
+  @if (step() === "mp_redirect") {
+    <div class="max-w-xl mx-auto animate-slideIn mt-12">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center"
+      >
+        <div class="text-6xl text-cyan-600 mb-6">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+          Redirigiendo a Pago Seguro...
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-8">
+          Te estamos transfiriendo a la pasarela encriptada de
+          <strong>Mercado Pago</strong> para procesar tu pago.
+        </p>
+
+        <div
+          class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-8 overflow-hidden"
+        >
+          <div class="bg-cyan-500 h-2 rounded-full w-full animate-pulse"></div>
+        </div>
+
+        @if (mpPaymentUrl()) {
+          <a
+            [href]="mpPaymentUrl()"
+            class="inline-flex items-center justify-center w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 rounded-xl shadow-lg transition-colors"
+          >
+            Continuar a Mercado Pago
+            <i class="fas fa-external-link-alt ml-2"></i>
+          </a>
+        }
+
+        <div
+          class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-center gap-2 grayscale opacity-50"
+        >
+          <span
+            class="text-xs font-bold uppercase tracking-widest text-gray-500"
+            >Powered by</span
+          >
+          <span class="text-2xl font-black text-cyan-600 tracking-tighter"
+            >mercado pago</span
+          >
+        </div>
       </div>
     </div>
-  </div>
   }
-
 </div>

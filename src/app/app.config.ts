@@ -5,12 +5,25 @@ import {
   provideZonelessChangeDetection,
   APP_INITIALIZER,
   LOCALE_ID,
-  isDevMode
+  isDevMode,
 } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideRouter, withInMemoryScrolling, TitleStrategy, withHashLocation } from '@angular/router';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import {
+  provideClientHydration,
+  withEventReplay,
+  withNoIncrementalHydration,
+} from '@angular/platform-browser';
+import {
+  provideRouter,
+  withInMemoryScrolling,
+  TitleStrategy,
+  withHashLocation,
+} from '@angular/router';
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+} from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { AppTitleStrategy } from './core/strategies/app-title.strategy';
@@ -54,7 +67,9 @@ import { NotificationBaseRepository } from './features/messages/domain/repositor
 import { SupabaseNotificationRepository } from './features/messages/infrastructure/repositories/supabase-notification.repository';
 import { TenantService } from './core/services/tenant.service';
 
-const isTauri = typeof window !== 'undefined' && (!!(window as any)['__TAURI_INTERNALS__'] || !!(window as any)['__TAURI__']);
+const isTauri =
+  typeof window !== 'undefined' &&
+  (!!(window as any)['__TAURI_INTERNALS__'] || !!(window as any)['__TAURI__']);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -66,60 +81,70 @@ export const appConfig: ApplicationConfig = {
 
     // Global error handler
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    
+
     // Custom Route Reuse Strategy for Tabs
     { provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy },
-    
+
     // Initializer to resolve Tenant Context before anything else
     {
       provide: APP_INITIALIZER,
       useFactory: (tenantService: TenantService) => () => tenantService.init(),
       deps: [TenantService],
-      multi: true
+      multi: true,
     },
-    
+
     // Supabase Client Provider via SupabaseService
-    { 
-      provide: SUPABASE_CLIENT, 
-      useFactory: (supabaseService: SupabaseService) => supabaseService.getClient(),
-      deps: [SupabaseService]
+    {
+      provide: SUPABASE_CLIENT,
+      useFactory: (supabaseService: SupabaseService) =>
+        supabaseService.getClient(),
+      deps: [SupabaseService],
     },
 
     // Core Angular providers
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(withEventReplay(), withNoIncrementalHydration()),
     provideRouter(
       routes,
       withInMemoryScrolling({
         anchorScrolling: 'enabled',
-        scrollPositionRestoration: 'enabled'
+        scrollPositionRestoration: 'enabled',
       }),
-      ...(isTauri ? [withHashLocation()] : [])
+      ...(isTauri ? [withHashLocation()] : []),
     ),
     provideHttpClient(
       withFetch(),
-      withInterceptors([timeoutInterceptor, globalErrorInterceptor])
+      withInterceptors([timeoutInterceptor, globalErrorInterceptor]),
     ),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode() && !isTauri,
-      registrationStrategy: 'registerWhenStable:30000'
+      registrationStrategy: 'registerWhenStable:30000',
     }),
 
     // Repositories
     { provide: ProductRepository, useClass: SupabaseProductRepository },
     { provide: CategoryRepository, useClass: SupabaseCategoryRepository },
     { provide: BrandRepository, useClass: SupabaseBrandRepository },
-    { provide: ProductStockRepository, useClass: SupabaseProductStockRepository },
+    {
+      provide: ProductStockRepository,
+      useClass: SupabaseProductStockRepository,
+    },
     { provide: AppServiceRepository, useClass: SupabaseAppServiceRepository },
     { provide: RepairRepository, useClass: SupabaseRepairRepository },
     { provide: AnalyticsRepository, useClass: SupabaseAnalyticsRepository },
     { provide: UserProfileRepository, useClass: SupabaseUserProfileRepository },
     { provide: OrderRepository, useClass: SupabaseOrderRepository },
     { provide: FinanceRepository, useClass: SupabaseFinanceRepository },
-    { provide: ProductReviewBaseRepository, useClass: SupabaseProductReviewRepository },
+    {
+      provide: ProductReviewBaseRepository,
+      useClass: SupabaseProductReviewRepository,
+    },
     { provide: InvoiceRepository, useClass: SupabaseInvoiceRepository },
     { provide: CourseRepository, useClass: SupabaseCourseRepository },
-    { provide: NotificationBaseRepository, useClass: SupabaseNotificationRepository },
-  ]
+    {
+      provide: NotificationBaseRepository,
+      useClass: SupabaseNotificationRepository,
+    },
+  ],
 };

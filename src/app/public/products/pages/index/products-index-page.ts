@@ -1,4 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -10,79 +16,79 @@ import { Product } from '@app/shared/interfaces/product.interface';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 @Component({
-    selector: 'app-products-index-page',
-    standalone: true,
-    imports: [CommonModule, RouterLink, ProductCard, FormsModule],
-    templateUrl: './products-index-page.html',
+  selector: 'app-products-index-page',
+  standalone: true,
+  imports: [CommonModule, RouterLink, ProductCard, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './products-index-page.html',
 })
 export class ProductsIndexPage implements OnInit {
-    private getProductsUseCase = inject(GetProductsByCategorySlugUseCase);
-    private seoService = inject(SeoService);
-    private router = inject(Router);
-    private gsmService = inject(GsmService);
+  private getProductsUseCase = inject(GetProductsByCategorySlugUseCase);
+  private seoService = inject(SeoService);
+  private router = inject(Router);
+  private gsmService = inject(GsmService);
 
-    celulares = signal<Product[]>([]);
-    repuestos = signal<Product[]>([]);
-    loading = signal(true);
-    searchQuery = '';
-    
-    // Quick View State
-    quickViewProduct = signal<Product | null>(null);
-    isQuickViewOpen = signal(false);
+  celulares = signal<Product[]>([]);
+  repuestos = signal<Product[]>([]);
+  loading = signal(true);
+  searchQuery = '';
 
-    ngOnInit() {
-        this.setSeoData();
-        this.loadData();
-    }
+  // Quick View State
+  quickViewProduct = signal<Product | null>(null);
+  isQuickViewOpen = signal(false);
 
-    private setSeoData() {
-        
-    }
+  ngOnInit() {
+    this.setSeoData();
+    this.loadData();
+  }
 
-    private async loadData() {
-        try {
-            // Parallel execution using forkJoin
-            const [celularesData, repuestosData, rate] = await firstValueFrom(
-                forkJoin([
-                    this.getProductsUseCase.execute('celulares'),
-                    this.getProductsUseCase.execute('repuestos'),
-                    this.gsmService.getUsdtRate()
-                ])
-            );
-            
-            const mapProduct = (p: Product) => {
-                if (p.currency === 'USD') {
-                    return {
-                        ...p,
-                        convertedPrice: p.price * rate
-                    };
-                }
-                return p;
-            };
+  private setSeoData() {}
 
-            this.celulares.set((celularesData as Product[]).map(mapProduct));
-            this.repuestos.set((repuestosData as Product[]).map(mapProduct));
+  private async loadData() {
+    try {
+      // Parallel execution using forkJoin
+      const [celularesData, repuestosData, rate] = await firstValueFrom(
+        forkJoin([
+          this.getProductsUseCase.execute('celulares'),
+          this.getProductsUseCase.execute('repuestos'),
+          this.gsmService.getUsdtRate(),
+        ]),
+      );
 
-        } catch (error) {
-            console.error('Error loading products', error);
-        } finally {
-            this.loading.set(false);
+      const mapProduct = (p: Product) => {
+        if (p.currency === 'USD') {
+          return {
+            ...p,
+            convertedPrice: p.price * rate,
+          };
         }
-    }
+        return p;
+      };
 
-    onSearch() {
-        if (this.searchQuery.trim()) {
-            this.router.navigate(['/products/all'], { queryParams: { q: this.searchQuery } });
-        }
+      this.celulares.set((celularesData as Product[]).map(mapProduct));
+      this.repuestos.set((repuestosData as Product[]).map(mapProduct));
+    } catch (error) {
+      console.error('Error loading products', error);
+    } finally {
+      this.loading.set(false);
     }
+  }
 
-    openQuickView(product: Product) {
-        this.quickViewProduct.set(product);
-        this.isQuickViewOpen.set(true);
+  onSearch() {
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/products/all'], {
+        queryParams: { q: this.searchQuery },
+      });
     }
+  }
 
-    closeQuickView() {
-        this.isQuickViewOpen.set(false);
-        this.quickViewProduct.set(null);
-    }
+  openQuickView(product: Product) {
+    this.quickViewProduct.set(product);
+    this.isQuickViewOpen.set(true);
+  }
+
+  closeQuickView() {
+    this.isQuickViewOpen.set(false);
+    this.quickViewProduct.set(null);
+  }
 }

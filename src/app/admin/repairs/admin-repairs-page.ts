@@ -1,4 +1,12 @@
-import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  computed,
+  effect,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +22,7 @@ import { OfflineSyncService } from '@app/core/services/offline-sync.service';
   selector: 'app-admin-repairs-page',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule, ScrollingModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-repairs-page.html',
 })
 export class AdminRepairsPage implements OnInit {
@@ -25,11 +34,16 @@ export class AdminRepairsPage implements OnInit {
   getDeviceIcon(type?: string): string {
     if (!type) return 'fas fa-mobile-alt text-gray-400 dark:text-gray-500';
     const lowerType = type.toLowerCase();
-    if (lowerType === 'printer' || lowerType === 'impresora') return 'fas fa-print text-gray-400 dark:text-gray-500';
-    if (lowerType === 'notebook' || lowerType === 'laptop') return 'fas fa-laptop text-gray-400 dark:text-gray-500';
-    if (lowerType === 'tablet') return 'fas fa-tablet-alt text-gray-400 dark:text-gray-500';
-    if (lowerType === 'desktop' || lowerType === 'pc') return 'fas fa-desktop text-gray-400 dark:text-gray-500';
-    if (lowerType === 'console') return 'fas fa-gamepad text-gray-400 dark:text-gray-500';
+    if (lowerType === 'printer' || lowerType === 'impresora')
+      return 'fas fa-print text-gray-400 dark:text-gray-500';
+    if (lowerType === 'notebook' || lowerType === 'laptop')
+      return 'fas fa-laptop text-gray-400 dark:text-gray-500';
+    if (lowerType === 'tablet')
+      return 'fas fa-tablet-alt text-gray-400 dark:text-gray-500';
+    if (lowerType === 'desktop' || lowerType === 'pc')
+      return 'fas fa-desktop text-gray-400 dark:text-gray-500';
+    if (lowerType === 'console')
+      return 'fas fa-gamepad text-gray-400 dark:text-gray-500';
     if (lowerType === 'tv') return 'fas fa-tv text-gray-400 dark:text-gray-500';
     return 'fas fa-mobile-alt text-gray-400 dark:text-gray-500';
   }
@@ -45,48 +59,57 @@ export class AdminRepairsPage implements OnInit {
   repairs = signal<Repair[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
-  
+
   // Statistics and Summary
-  summary = signal<any>({ inWorkshop: 0, readyToPickup: 0, pendingParts: 0, thisMonthProfit: 0 });
-  
+  summary = signal<any>({
+    inWorkshop: 0,
+    readyToPickup: 0,
+    pendingParts: 0,
+    thisMonthProfit: 0,
+  });
+
   // Search and Filter signals
   searchTerm = signal('');
   filterType = signal('all');
-  
+
   // Pagination
   pageOffset = signal(0);
   pageSize = signal(25);
   hasMore = signal(true);
   loadingMore = signal(false);
-  
+
   private searchTimeout?: any;
 
   // Mapped repairs with precalculated UI properties to avoid template function calls
   mappedRepairs = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const type = this.filterType();
-    
+
     return this.repairs()
-      .filter(repair => {
-        // Basic type filtering still in-memory for immediate UX if needed, 
+      .filter((repair) => {
+        // Basic type filtering still in-memory for immediate UX if needed,
         // but search is now server-side
         const type = this.filterType();
-        const matchesType = type === 'all' || 
-          (repair.device_type?.toLowerCase()?.includes(type.toLowerCase())) ||
-          (type === 'smartphone' && (!repair.device_type || 
-                                     repair.device_type.toLowerCase().includes('celular') || 
-                                     repair.device_type.toLowerCase().includes('phone') ||
-                                     repair.device_type.toLowerCase().includes('móvil')));
-          
+        const matchesType =
+          type === 'all' ||
+          repair.device_type?.toLowerCase()?.includes(type.toLowerCase()) ||
+          (type === 'smartphone' &&
+            (!repair.device_type ||
+              repair.device_type.toLowerCase().includes('celular') ||
+              repair.device_type.toLowerCase().includes('phone') ||
+              repair.device_type.toLowerCase().includes('móvil')));
+
         return matchesType;
       })
-      .map(repair => {
+      .map((repair) => {
         // Pre-calculate warranty status
         let warrantyLabel = 'N/A';
         let warrantyClass = 'badge-ghost opacity-50';
         if (repair.received_at) {
           const receivedDate = new Date(repair.received_at);
-          const diffTime = Math.abs(this.date.getTime() - receivedDate.getTime());
+          const diffTime = Math.abs(
+            this.date.getTime() - receivedDate.getTime(),
+          );
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           if (diffDays <= 30) {
             warrantyLabel = 'EN GARANTÍA';
@@ -100,11 +123,14 @@ export class AdminRepairsPage implements OnInit {
         return {
           ...repair,
           ui: {
-            statusClass: RepairStatusUtils.getAdminBadgeClass(repair.current_status_id),
-            statusLabel: RepairStatusUtils.getStatusUI(repair.current_status_id).label,
+            statusClass: RepairStatusUtils.getAdminBadgeClass(
+              repair.current_status_id,
+            ),
+            statusLabel: RepairStatusUtils.getStatusUI(repair.current_status_id)
+              .label,
             warrantyLabel,
-            warrantyClass
-          }
+            warrantyClass,
+          },
         };
       });
   });
@@ -120,10 +146,7 @@ export class AdminRepairsPage implements OnInit {
   date = new Date();
 
   async ngOnInit() {
-    await Promise.all([
-      this.loadRepairs(),
-      this.loadSummary()
-    ]);
+    await Promise.all([this.loadRepairs(), this.loadSummary()]);
   }
 
   async loadSummary() {
@@ -143,21 +166,21 @@ export class AdminRepairsPage implements OnInit {
       this.pageOffset.set(0);
       this.hasMore.set(true);
     }
-    
+
     this.error.set(null);
     try {
       const data = await this.repairService.getAdminList(
-        this.pageSize(), 
-        this.pageOffset(), 
-        this.searchTerm()
+        this.pageSize(),
+        this.pageOffset(),
+        this.searchTerm(),
       );
-      
+
       if (append) {
         this.repairs.set([...this.repairs(), ...data]);
       } else {
         this.repairs.set(data);
       }
-      
+
       this.hasMore.set(data.length === this.pageSize());
     } catch (e: any) {
       this.error.set('Error al cargar las reparaciones: ' + e.message);
@@ -169,7 +192,7 @@ export class AdminRepairsPage implements OnInit {
 
   loadMore() {
     if (this.loading() || this.loadingMore() || !this.hasMore()) return;
-    this.pageOffset.update(v => v + this.pageSize());
+    this.pageOffset.update((v) => v + this.pageSize());
     this.loadRepairs(true);
   }
 
@@ -182,12 +205,13 @@ export class AdminRepairsPage implements OnInit {
   }
 
   async deleteRepair(id: string) {
-    if (!confirm('¿Estás seguro de eliminar este registro de reparación?')) return;
+    if (!confirm('¿Estás seguro de eliminar este registro de reparación?'))
+      return;
 
     const previousRepairs = this.repairs();
-    
+
     // 1. Optimistic Update
-    this.repairs.update(current => current.filter(r => r.id !== id));
+    this.repairs.update((current) => current.filter((r) => r.id !== id));
 
     try {
       // 2. Server call
@@ -206,7 +230,12 @@ export class AdminRepairsPage implements OnInit {
     // index is the first visible item. Viewport shows ~6 items (600px / 100px).
     // We trigger when the last visible item is within 5 items of the total.
     const lastVisibleItem = index + 6;
-    if (lastVisibleItem >= total - 5 && this.hasMore() && !this.loadingMore() && !this.loading()) {
+    if (
+      lastVisibleItem >= total - 5 &&
+      this.hasMore() &&
+      !this.loadingMore() &&
+      !this.loading()
+    ) {
       this.loadMore();
     }
   }

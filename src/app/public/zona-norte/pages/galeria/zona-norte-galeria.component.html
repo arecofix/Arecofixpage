@@ -4,7 +4,10 @@
     <div class="hero-content">
       <div class="container">
         <h1 class="hero-title">Galería de Trabajos</h1>
-        <p class="hero-subtitle">Conocé la calidad de nuestros trabajos realizados en hoteles, consorcios, residencias y más</p>
+        <p class="hero-subtitle">
+          Conocé la calidad de nuestros trabajos realizados en hoteles,
+          consorcios, residencias y más
+        </p>
       </div>
     </div>
   </section>
@@ -13,10 +16,12 @@
   <section class="filters-section">
     <div class="container">
       <div class="filters">
-        <button class="filter-btn" 
-                *ngFor="let categoria of categorias"
-                [class.active]="categoriaActual === categoria.id"
-                (click)="filtrarPorCategoria(categoria.id)">
+        <button
+          class="filter-btn"
+          *ngFor="let categoria of categorias"
+          [class.active]="categoriaActual === categoria.id"
+          (click)="filtrarPorCategoria(categoria.id)"
+        >
           {{ categoria.nombre }}
         </button>
       </div>
@@ -27,13 +32,20 @@
   <section class="gallery-section">
     <div class="container">
       <div class="projects-grid">
-        <div class="project-card" 
-             *ngFor="let proyecto of proyectosFiltrados"
-             (click)="verProyecto(proyecto)">
+        <div
+          class="project-card"
+          *ngFor="let proyecto of proyectosFiltrados"
+          (click)="verProyecto(proyecto)"
+        >
           <div class="project-image">
-            <img [src]="proyecto.imagen" 
-                 [alt]="proyecto.titulo"
-                 onerror="this.src='assets/img/branches/zona-norte/project-placeholder.jpg'">
+            <img
+              [src]="proyecto.imagen"
+              [alt]="proyecto.titulo"
+              onerror="
+                this.src =
+                  'assets/img/branches/zona-norte/project-placeholder.jpg'
+              "
+            />
             <div class="project-overlay">
               <div class="project-category">
                 <i class="fas fa-tag"></i>
@@ -65,14 +77,16 @@
   </section>
 
   <!-- Modal de Proyecto -->
-  <div class="project-modal" 
-       [class.active]="proyectoSeleccionado"
-       (click)="cerrarProyecto()">
+  <div
+    class="project-modal"
+    [class.active]="proyectoSeleccionado"
+    (click)="cerrarProyecto()"
+  >
     <div class="modal-content" (click)="$event.stopPropagation()">
       <button class="modal-close" (click)="cerrarProyecto()">
         <i class="fas fa-times"></i>
       </button>
-      
+
       <div class="modal-header">
         <h2>{{ proyectoSeleccionado?.titulo }}</h2>
         <p>{{ proyectoSeleccionado?.descripcion }}</p>
@@ -83,18 +97,28 @@
         <div class="before-after">
           <div class="comparison">
             <div class="comparison-item">
-              <img [src]="proyectoSeleccionado?.antes" 
-                   alt="Antes"
-                   onerror="this.src='assets/img/branches/zona-norte/before-placeholder.jpg'">
+              <img
+                [src]="$safeNavigationMigration(proyectoSeleccionado?.antes)"
+                alt="Antes"
+                onerror="
+                  this.src =
+                    'assets/img/branches/zona-norte/before-placeholder.jpg'
+                "
+              />
               <div class="comparison-label">ANTES</div>
             </div>
             <div class="comparison-arrow">
               <i class="fas fa-arrow-right"></i>
             </div>
             <div class="comparison-item">
-              <img [src]="proyectoSeleccionado?.despues" 
-                   alt="Después"
-                   onerror="this.src='assets/img/branches/zona-norte/after-placeholder.jpg'">
+              <img
+                [src]="$safeNavigationMigration(proyectoSeleccionado?.despues)"
+                alt="Después"
+                onerror="
+                  this.src =
+                    'assets/img/branches/zona-norte/after-placeholder.jpg'
+                "
+              />
               <div class="comparison-label">DESPUÉS</div>
             </div>
           </div>
@@ -125,7 +149,10 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary" (click)="contactarWhatsApp(proyectoSeleccionado)">
+        <button
+          class="btn btn-primary"
+          (click)="contactarWhatsApp(proyectoSeleccionado)"
+        >
           <i class="fab fa-whatsapp"></i>
           Consultar por este proyecto
         </button>
@@ -142,7 +169,10 @@
     <div class="container">
       <div class="cta-content">
         <h2 class="cta-title">¿Queremos que tu próximo proyecto esté aquí?</h2>
-        <p class="cta-subtitle">Contactanos hoy mismo y transformá tus espacios con calidad profesional</p>
+        <p class="cta-subtitle">
+          Contactanos hoy mismo y transformá tus espacios con calidad
+          profesional
+        </p>
         <div class="cta-actions">
           <button class="btn btn-primary btn-lg" (click)="contactarWhatsApp()">
             <i class="fab fa-whatsapp"></i>

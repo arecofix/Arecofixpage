@@ -1,5 +1,4 @@
-import { Component, Input } from '@angular/core';
-
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 export interface ReviewItem {
   image: string;
@@ -13,7 +12,8 @@ export interface ReviewItem {
   selector: 'app-review-grid',
   standalone: true,
   imports: [],
-  templateUrl: './review-grid.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './review-grid.component.html',
 })
 export class ReviewGridComponent {
   @Input() title: string = '';

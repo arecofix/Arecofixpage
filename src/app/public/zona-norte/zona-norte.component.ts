@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -7,40 +7,40 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './zona-norte.component.html',
-  styleUrls: ['./zona-norte.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./zona-norte.component.scss'],
 })
 export class ZonaNorteComponent {
-  
   // Datos del formulario de contacto
   contactoForm = {
     nombre: '',
     telefono: '',
     email: '',
-    consulta: ''
+    consulta: '',
   };
 
   // Imágenes para el carousel
   carouselImages = [
     {
       url: 'assets/img/services/banera-1.jpg',
-      alt: 'Bañera restaurada profesionalmente'
+      alt: 'Bañera restaurada profesionalmente',
     },
     {
-      url: 'assets/img/services/banera-2.jpg', 
-      alt: 'Jacuzzi moderno renovado'
+      url: 'assets/img/services/banera-2.jpg',
+      alt: 'Jacuzzi moderno renovado',
     },
     {
       url: 'assets/img/services/banera-3.jpg',
-      alt: 'Hidromasaje de lujo'
+      alt: 'Hidromasaje de lujo',
     },
     {
       url: 'assets/img/services/banera-4.jpg',
-      alt: 'Bañera antes y después'
+      alt: 'Bañera antes y después',
     },
     {
       url: 'assets/img/services/banera-5.jpg',
-      alt: 'Trabajo profesional en baños'
-    }
+      alt: 'Trabajo profesional en baños',
+    },
   ];
 
   // Servicios ofrecidos
@@ -48,40 +48,47 @@ export class ZonaNorteComponent {
     {
       titulo: 'ENLOZADO',
       descripcion: 'BAÑERAS - JACUZZI - HIDROMASAJES',
-      detalle: 'La superﬁcie se somete a un riguroso tratamiento para obtener una impregnación adecuada de la resina de origen alemán. El trabajo se realiza en 3 horas.',
-      icono: 'fa-bath'
+      detalle:
+        'La superﬁcie se somete a un riguroso tratamiento para obtener una impregnación adecuada de la resina de origen alemán. El trabajo se realiza en 3 horas.',
+      icono: 'fa-bath',
     },
     {
       titulo: 'SANITARIOS',
       descripcion: 'Restauración completa de sanitarios',
-      detalle: 'Se puede realizar cualquier modiﬁcación de color en el día, siguiendo los mismos procedimientos que en las bañeras - hidromasajes - jacuzzy. También en: inodoro, videt, piletas, bachas, jaboneras, etc.',
-      icono: 'fa-toilet'
+      detalle:
+        'Se puede realizar cualquier modiﬁcación de color en el día, siguiendo los mismos procedimientos que en las bañeras - hidromasajes - jacuzzy. También en: inodoro, videt, piletas, bachas, jaboneras, etc.',
+      icono: 'fa-toilet',
     },
     {
       titulo: 'AZULEJOS',
       descripcion: 'Instalación y restauración profesional',
-      detalle: 'Los azulejos se someten a una rigurosa limpieza, luego se aplica pastina en toda la superficie. Se pueden realizar cambios de azulejos rotos o deteriorados. Luego se realiza el mismo procedimiento que en bañeras - hidromasajes - jacuzzy. El trabajo se cotiza por metro cuadrado (m2).',
-      icono: 'fa-th-large'
+      detalle:
+        'Los azulejos se someten a una rigurosa limpieza, luego se aplica pastina en toda la superficie. Se pueden realizar cambios de azulejos rotos o deteriorados. Luego se realiza el mismo procedimiento que en bañeras - hidromasajes - jacuzzy. El trabajo se cotiza por metro cuadrado (m2).',
+      icono: 'fa-th-large',
     },
     {
       titulo: 'PULIDO Y PLASTIFICADO DE PARQUET',
       descripcion: 'Renovación de pisos de madera',
-      detalle: 'Los trabajos los realizamos basándonos en las especificaciones técnicas de los productos utilizados. Para el plastificado se procede a la preparación de la superficie en 3 procesos de lijado y se aplican 3 manos de laca de Alto Tránsito de terminación Brillante o Satinado.',
-      icono: 'fa-tree'
-    }
+      detalle:
+        'Los trabajos los realizamos basándonos en las especificaciones técnicas de los productos utilizados. Para el plastificado se procede a la preparación de la superficie en 3 procesos de lijado y se aplican 3 manos de laca de Alto Tránsito de terminación Brillante o Satinado.',
+      icono: 'fa-tree',
+    },
   ];
 
   currentImageIndex = 0;
 
-  constructor() { }
+  constructor() {}
 
   // Métodos para el carousel
   nextImage() {
-    this.currentImageIndex = (this.currentImageIndex + 1) % this.carouselImages.length;
+    this.currentImageIndex =
+      (this.currentImageIndex + 1) % this.carouselImages.length;
   }
 
   prevImage() {
-    this.currentImageIndex = (this.currentImageIndex - 1 + this.carouselImages.length) % this.carouselImages.length;
+    this.currentImageIndex =
+      (this.currentImageIndex - 1 + this.carouselImages.length) %
+      this.carouselImages.length;
   }
 
   goToImage(index: number) {
@@ -92,22 +99,24 @@ export class ZonaNorteComponent {
   enviarConsulta() {
     // Aquí iría la lógica para enviar el formulario
     // console.log('Enviando consulta:', this.contactoForm);
-    
+
     // Simulación de envío
     alert('¡Consulta enviada con éxito! Nos contactaremos a la brevedad.');
-    
+
     // Limpiar formulario
     this.contactoForm = {
       nombre: '',
       telefono: '',
       email: '',
-      consulta: ''
+      consulta: '',
     };
   }
 
   // Método para WhatsApp
   contactarWhatsApp() {
-    const mensaje = encodeURIComponent('Hola, quiero consultar sobre los servicios de plomería de Zona Norte');
+    const mensaje = encodeURIComponent(
+      'Hola, quiero consultar sobre los servicios de plomería de Zona Norte',
+    );
     window.open(`https://wa.me/5491563049494?text=${mensaje}`, '_blank');
   }
 }

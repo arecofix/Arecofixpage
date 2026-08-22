@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 
@@ -12,17 +12,45 @@ export interface BreadcrumbItem {
   standalone: true,
   imports: [RouterModule],
   template: `
-    <nav aria-label="Breadcrumb" [class]="'container mx-auto px-4 py-4 ' + wrapperClasses">
-      <ol [class]="'flex items-center space-x-2 text-sm flex-nowrap overflow-hidden ' + (classes || 'text-gray-500 dark:text-gray-400')">
-        @for (item of items; track trackByBreadcrumb($index, item); let last = $last) {
-          <li class="flex items-center min-w-0 shrink" [class.shrink-0]="last" [class.shrink]="!last">
+    <nav
+      aria-label="Breadcrumb"
+      [class]="'container mx-auto px-4 py-4 ' + wrapperClasses"
+    >
+      <ol
+        [class]="
+          'flex items-center space-x-2 text-sm flex-nowrap overflow-hidden ' +
+          (classes || 'text-gray-500 dark:text-gray-400')
+        "
+      >
+        @for (
+          item of items;
+          track trackByBreadcrumb($index, item);
+          let last = $last
+        ) {
+          <li
+            class="flex items-center min-w-0 shrink"
+            [class.shrink-0]="last"
+            [class.shrink]="!last"
+          >
             @if (!last) {
-              <a [routerLink]="item.url" class="hover:text-primary transition-colors hover:underline p-1 -m-1 truncate block" style="max-width: 150px;">
+              <a
+                [routerLink]="item.url"
+                class="hover:text-primary transition-colors hover:underline p-1 -m-1 truncate block"
+                style="max-width: 150px;"
+              >
                 {{ item.label }}
               </a>
-              <i class="fas fa-chevron-right text-xs mx-2 opacity-50 shrink-0"></i>
+              <i
+                class="fas fa-chevron-right text-xs mx-2 opacity-50 shrink-0"
+              ></i>
             } @else {
-              <span [class]="'font-semibold truncate block ' + (activeClasses || 'text-gray-900 dark:text-gray-200')" aria-current="page">
+              <span
+                [class]="
+                  'font-semibold truncate block ' +
+                  (activeClasses || 'text-gray-900 dark:text-gray-200')
+                "
+                aria-current="page"
+              >
                 {{ item.label }}
               </span>
             }
@@ -30,8 +58,9 @@ export interface BreadcrumbItem {
         }
       </ol>
     </nav>
-    `,
-  styles: []
+  `,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styles: [],
 })
 export class BreadcrumbsComponent {
   @Input() items: BreadcrumbItem[] = [];

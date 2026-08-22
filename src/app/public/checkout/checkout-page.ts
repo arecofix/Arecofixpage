@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   PLATFORM_ID,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -18,20 +19,35 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { CartService } from '@app/shared/services/cart.service';
 import { OrderService } from '@app/features/orders/application/services/order.service';
-import { PaymentService, PaymentTicket } from '@app/features/orders/application/services/payment.service';
+import {
+  PaymentService,
+  PaymentTicket,
+} from '@app/features/orders/application/services/payment.service';
 import { AuthService } from '@app/core/services/auth.service';
-import { Order, OrderItem } from '@app/features/orders/domain/entities/order.entity';
+import {
+  Order,
+  OrderItem,
+} from '@app/features/orders/domain/entities/order.entity';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ContactService } from '@app/core/services/contact.service';
 import { ProductService } from '@app/public/products/services/product.service';
 import { ProfileService } from '@app/core/services/profile.service';
 import { BranchService } from '@app/core/services/branch.service';
-import { ShippingService, ShippingQuote } from '@app/features/orders/application/services/shipping.service';
+import {
+  ShippingService,
+  ShippingQuote,
+} from '@app/features/orders/application/services/shipping.service';
 import { MercadoPagoService } from '@app/features/orders/application/services/mercadopago.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { firstValueFrom, debounceTime, distinctUntilChanged } from 'rxjs';
 
-type CheckoutStep = 'form' | 'payment_method' | 'pending_payment' | 'awaiting_verification' | 'paid' | 'mp_redirect';
+type CheckoutStep =
+  | 'form'
+  | 'payment_method'
+  | 'pending_payment'
+  | 'awaiting_verification'
+  | 'paid'
+  | 'mp_redirect';
 type PaymentMethodChoice = 'digital' | 'cash' | 'credit_card';
 
 @Component({
@@ -39,50 +55,54 @@ type PaymentMethodChoice = 'digital' | 'cash' | 'credit_card';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, CommonModule],
   templateUrl: './checkout-page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checkout-page.css',
 })
 export class CheckoutPage implements OnInit, OnDestroy {
-  cartService     = inject(CartService);
-  orderService    = inject(OrderService);
-  paymentService  = inject(PaymentService);
-  authService     = inject(AuthService);
-  contactService  = inject(ContactService);
-  productService  = inject(ProductService);
-  profileService  = inject(ProfileService);
-  fb              = inject(FormBuilder);
-  router          = inject(Router);
+  cartService = inject(CartService);
+  orderService = inject(OrderService);
+  paymentService = inject(PaymentService);
+  authService = inject(AuthService);
+  contactService = inject(ContactService);
+  productService = inject(ProductService);
+  profileService = inject(ProfileService);
+  fb = inject(FormBuilder);
+  router = inject(Router);
   notificationService = inject(NotificationService);
-  branchService   = inject(BranchService);
+  branchService = inject(BranchService);
   shippingService = inject(ShippingService);
   mercadopagoService = inject(MercadoPagoService);
 
   // ── Form ───────────────────────────────────────────────
   checkoutForm: FormGroup = this.fb.group({
-    name:  ['', [Validators.required]],
+    name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required]],
     address: this.fb.group({
-      street:       ['', [Validators.required]],
-      number:       ['', [Validators.required]],
-      city:         ['Marcos Paz', [Validators.required]],
+      street: ['', [Validators.required]],
+      number: ['', [Validators.required]],
+      city: ['Marcos Paz', [Validators.required]],
       neighborhood: [''],
-      postal_code:  ['', [Validators.required, Validators.pattern('^[0-9]{4}$')]],
+      postal_code: [
+        '',
+        [Validators.required, Validators.pattern('^[0-9]{4}$')],
+      ],
     }),
     notes: [''],
   });
 
   // ── UI State ────────────────────────────────────────────
-  step               = signal<CheckoutStep>('form');
-  isProcessing       = signal(false);
-  selectedMethod     = signal<PaymentMethodChoice | null>(null);
-  currentOrder       = signal<Order | null>(null);
-  paymentTicket      = signal<PaymentTicket | null>(null);
-  proofFile          = signal<File | null>(null);
-  proofPreviewUrl    = signal<string | null>(null);
-  shippingQuote      = signal<ShippingQuote | null>(null);
+  step = signal<CheckoutStep>('form');
+  isProcessing = signal(false);
+  selectedMethod = signal<PaymentMethodChoice | null>(null);
+  currentOrder = signal<Order | null>(null);
+  paymentTicket = signal<PaymentTicket | null>(null);
+  proofFile = signal<File | null>(null);
+  proofPreviewUrl = signal<string | null>(null);
+  shippingQuote = signal<ShippingQuote | null>(null);
   isCalculatingShipping = signal<boolean>(false);
-  mpPaymentUrl       = signal<string | null>(null);
-  
+  mpPaymentUrl = signal<string | null>(null);
+
   // Cross-selling
   recommendedProducts = signal<Product[]>([]);
 
@@ -93,7 +113,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
     // Definir el valor de los puntos. Ej: 100 puntos = $100 de descuento. (1 punto = $1)
     if (this.usePoints()) {
       const maxDiscount = this.cartService.totalPrice(); // No descontar más del total
-      const potentialDiscount = this.availablePoints(); 
+      const potentialDiscount = this.availablePoints();
       return Math.min(potentialDiscount, maxDiscount);
     }
     return 0;
@@ -113,8 +133,8 @@ export class CheckoutPage implements OnInit, OnDestroy {
   countdownPct = computed(() => (this.reservationSeconds() / 900) * 100);
 
   // expose payment service signals directly to template
-  orderStatus       = computed(() => this.paymentService.orderStatus());
-  isUploadingProof  = computed(() => this.paymentService.isUploadingProof());
+  orderStatus = computed(() => this.paymentService.orderStatus());
+  isUploadingProof = computed(() => this.paymentService.isUploadingProof());
 
   ngOnInit(): void {
     // Pre-fill form if user is logged in
@@ -122,7 +142,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
     if (user?.email) {
       this.checkoutForm.patchValue({ email: user.email });
       // Fetch fresh profile to get exact points
-      this.profileService.getProfile(user.id).then(profile => {
+      this.profileService.getProfile(user.id).then((profile) => {
         if (profile?.points) {
           this.availablePoints.set(profile.points);
         }
@@ -130,16 +150,16 @@ export class CheckoutPage implements OnInit, OnDestroy {
     }
 
     // Subscribe to postal code changes to calculate shipping
-    this.checkoutForm.get('address.postal_code')?.valueChanges.pipe(
-      debounceTime(800),
-      distinctUntilChanged()
-    ).subscribe(cp => {
-      if (cp && cp.length === 4) {
-        this.calculateShipping(cp);
-      } else {
-        this.shippingQuote.set(null);
-      }
-    });
+    this.checkoutForm
+      .get('address.postal_code')
+      ?.valueChanges.pipe(debounceTime(800), distinctUntilChanged())
+      .subscribe((cp) => {
+        if (cp && cp.length === 4) {
+          this.calculateShipping(cp);
+        } else {
+          this.shippingQuote.set(null);
+        }
+      });
 
     // Check initial value if exists
     const initialCp = this.checkoutForm.get('address.postal_code')?.value;
@@ -148,10 +168,12 @@ export class CheckoutPage implements OnInit, OnDestroy {
     }
 
     // Load cross-selling items
-    this.productService.getData({ _page: 1 }).subscribe(res => {
+    this.productService.getData({ _page: 1 }).subscribe((res) => {
       // Filter out items already in the cart
-      const inCartIds = this.cartService.cartItems().map(i => i.product.id);
-      const suggestions = (res.data || []).filter(p => !inCartIds.includes(p.id)).slice(0, 3);
+      const inCartIds = this.cartService.cartItems().map((i) => i.product.id);
+      const suggestions = (res.data || [])
+        .filter((p) => !inCartIds.includes(p.id))
+        .slice(0, 3);
       this.recommendedProducts.set(suggestions as unknown as Product[]);
     });
   }
@@ -160,7 +182,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this.cartService.addToCart(product);
     this.notificationService.showSuccess(`${product.name} agregado al pedido.`);
     // Remove from suggestions
-    this.recommendedProducts.update(list => list.filter(p => p.id !== product.id));
+    this.recommendedProducts.update((list) =>
+      list.filter((p) => p.id !== product.id),
+    );
   }
 
   private calculateShipping(cp: string) {
@@ -174,7 +198,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
       error: () => {
         this.shippingQuote.set(null);
         this.isCalculatingShipping.set(false);
-      }
+      },
     });
   }
 
@@ -186,7 +210,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
   async goToPaymentMethod(): Promise<void> {
     if (this.checkoutForm.invalid) {
       this.checkoutForm.markAllAsTouched();
-      this.notificationService.showError('Por favor, completá todos los campos requeridos.');
+      this.notificationService.showError(
+        'Por favor, completá todos los campos requeridos.',
+      );
       return;
     }
     if (this.cartService.cartItems().length === 0) {
@@ -216,49 +242,53 @@ export class CheckoutPage implements OnInit, OnDestroy {
   async placeOrder(): Promise<void> {
     const method = this.selectedMethod();
     if (!method) {
-      this.notificationService.showError('Elegí un método de pago para continuar.');
+      this.notificationService.showError(
+        'Elegí un método de pago para continuar.',
+      );
       return;
     }
 
     this.isProcessing.set(true);
 
-    const formVal    = this.checkoutForm.getRawValue();
-    const cartItems  = this.cartService.cartItems();
-    const subtotal   = this.cartService.totalPrice();
+    const formVal = this.checkoutForm.getRawValue();
+    const cartItems = this.cartService.cartItems();
+    const subtotal = this.cartService.totalPrice();
     const shippingCost = this.shippingQuote()?.cost || 0;
-    const discount   = this.pointsDiscountValue();
-    const total      = Math.max(0, subtotal + shippingCost - discount);
+    const discount = this.pointsDiscountValue();
+    const total = Math.max(0, subtotal + shippingCost - discount);
 
     const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city} (CP: ${formVal.address.postal_code})`;
 
     const order: Order = {
-      customer_name:    formVal.name,
-      customer_email:   formVal.email,
-      customer_phone:   formVal.phone,
+      customer_name: formVal.name,
+      customer_email: formVal.email,
+      customer_phone: formVal.phone,
       shipping_address: formVal.address,
-      status:           'pending_payment',
-      subtotal:         subtotal,
-      tax:              0,
-      discount:         discount,
+      status: 'pending_payment',
+      subtotal: subtotal,
+      tax: 0,
+      discount: discount,
       total,
-      total_amount:     total,
-      payment_method:   method,
-      notes:            formVal.notes,
-      user_id:          this.authService.getCurrentUser()?.id,
-      branch_id:        this.branchService.getCurrentBranchId() || undefined,
+      total_amount: total,
+      payment_method: method,
+      notes: formVal.notes,
+      user_id: this.authService.getCurrentUser()?.id,
+      branch_id: this.branchService.getCurrentBranchId() || undefined,
     };
 
     const orderItems: OrderItem[] = cartItems.map((item) => ({
       product_name: item.product.name,
-      product_id:   item.product.id,
-      quantity:     item.quantity,
-      unit_price:   item.product.price,
-      subtotal:     item.product.price * item.quantity,
+      product_id: item.product.id,
+      quantity: item.quantity,
+      unit_price: item.product.price,
+      subtotal: item.product.price * item.quantity,
     }));
 
     try {
       order.items = orderItems;
-      const created = await firstValueFrom(this.orderService.createOrder(order));
+      const created = await firstValueFrom(
+        this.orderService.createOrder(order),
+      );
 
       if (!created) throw new Error('No se pudo crear la orden.');
 
@@ -267,28 +297,42 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
       // Save contact message (non-fatal)
       const itemsList = cartItems
-        .map((i) => `- ${i.product.name} (x${i.quantity}) - $${(i.product.price * i.quantity).toFixed(2)}`)
+        .map(
+          (i) =>
+            `- ${i.product.name} (x${i.quantity}) - $${(i.product.price * i.quantity).toFixed(2)}`,
+        )
         .join('\n');
 
-      this.contactService.createMessage({
-        name:    formVal.name,
-        email:   formVal.email,
-        phone:   formVal.phone,
-        subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
-        message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : (method === 'credit_card' ? 'Mercado Pago' : 'Efectivo (Rapipago/PagoFácil)')}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
-      }).catch ((e: any) => console.warn('Contact message error (non-fatal):', e));
+      this.contactService
+        .createMessage({
+          name: formVal.name,
+          email: formVal.email,
+          phone: formVal.phone,
+          subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
+          message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : method === 'credit_card' ? 'Mercado Pago' : 'Efectivo (Rapipago/PagoFácil)'}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
+        })
+        .catch((e: any) =>
+          console.warn('Contact message error (non-fatal):', e),
+        );
 
       if (method === 'cash') {
         const ticket = this.paymentService.buildPaymentTicket(
           created.id!,
           created.order_number!,
-          total
+          total,
         );
         this.paymentTicket.set(ticket);
         this.step.set('pending_payment');
       } else if (method === 'credit_card') {
         // MERCADO PAGO INTEGRATION
-        const intent = await firstValueFrom(this.mercadopagoService.createPreference(created.id!, orderItems, shippingCost, formVal.name));
+        const intent = await firstValueFrom(
+          this.mercadopagoService.createPreference(
+            created.id!,
+            orderItems,
+            shippingCost,
+            formVal.name,
+          ),
+        );
         this.mpPaymentUrl.set(intent.init_point);
         this.step.set('mp_redirect');
       } else {
@@ -305,26 +349,30 @@ export class CheckoutPage implements OnInit, OnDestroy {
       if (discount > 0 && order.user_id) {
         const remainingPoints = this.availablePoints() - discount;
         try {
-          await this.authService.updateUserProfile(order.user_id, { points: remainingPoints });
+          await this.authService.updateUserProfile(order.user_id, {
+            points: remainingPoints,
+          });
           this.availablePoints.set(remainingPoints);
           this.usePoints.set(false);
         } catch (e) {
           console.warn('Could not deduct points from profile', e);
         }
       }
-
     } catch (error: any) {
       console.error('Checkout error:', error);
       this.isProcessing.set(false);
-      
+
       let errorMsg = error?.message || 'Error desconocido';
-      
+
       // Specifically handle permission errors to be clear for the user
       if (errorMsg.includes('permisos') || error?.code === '42501') {
-        errorMsg = 'No tienes permisos para crear la orden. Asegúrate de que tu sesión sea válida o contacta a soporte si el problema persiste.';
+        errorMsg =
+          'No tienes permisos para crear la orden. Asegúrate de que tu sesión sea válida o contacta a soporte si el problema persiste.';
       }
-      
-      this.notificationService.showError(`Error al procesar tu reserva: ${errorMsg}`);
+
+      this.notificationService.showError(
+        `Error al procesar tu reserva: ${errorMsg}`,
+      );
     } finally {
       this.isProcessing.set(false);
     }
@@ -333,19 +381,22 @@ export class CheckoutPage implements OnInit, OnDestroy {
   // ── Proof upload ────────────────────────────────────────
   onProofFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file  = input.files?.[0];
+    const file = input.files?.[0];
     if (!file) return;
 
     // Only images/pdf
     if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
-      this.notificationService.showError('Solo se aceptan imágenes o PDF como comprobante.');
+      this.notificationService.showError(
+        'Solo se aceptan imágenes o PDF como comprobante.',
+      );
       return;
     }
 
     this.proofFile.set(file);
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onload = (e) => this.proofPreviewUrl.set(e.target?.result as string);
+      reader.onload = (e) =>
+        this.proofPreviewUrl.set(e.target?.result as string);
       reader.readAsDataURL(file);
     } else {
       this.proofPreviewUrl.set(null);
@@ -353,20 +404,26 @@ export class CheckoutPage implements OnInit, OnDestroy {
   }
 
   async submitProof(): Promise<void> {
-    const file  = this.proofFile();
+    const file = this.proofFile();
     const order = this.currentOrder();
     if (!file || !order?.id) {
-      this.notificationService.showError('Seleccioná el archivo del comprobante.');
+      this.notificationService.showError(
+        'Seleccioná el archivo del comprobante.',
+      );
       return;
     }
 
     try {
       await this.paymentService.uploadPaymentProof(order.id, file);
-      this.notificationService.showSuccess('Comprobante enviado. ¡Te avisamos cuando lo validemos!');
+      this.notificationService.showSuccess(
+        'Comprobante enviado. ¡Te avisamos cuando lo validemos!',
+      );
       this.step.set('awaiting_verification');
     } catch (err: any) {
       const errorObj = err as { message?: string };
-      this.notificationService.showError(`No se pudo enviar el comprobante: ${errorObj?.message || 'Error desconocido'}`);
+      this.notificationService.showError(
+        `No se pudo enviar el comprobante: ${errorObj?.message || 'Error desconocido'}`,
+      );
     }
   }
 
@@ -377,18 +434,20 @@ export class CheckoutPage implements OnInit, OnDestroy {
   }
 
   get whatsappNumber(): string {
-    return (this.branchService.currentBranch()?.whatsapp_number || '+5491125960900')
+    return (
+      this.branchService.currentBranch()?.whatsapp_number || '+5491125960900'
+    )
       .replace(/\s/g, '')
       .replace('+', '');
   }
 
   get whatsappUrl(): string {
-    const order  = this.currentOrder();
-    const name   = this.checkoutForm.get('name')?.value || '';
+    const order = this.currentOrder();
+    const name = this.checkoutForm.get('name')?.value || '';
     const branch = this.branchService.currentBranch()?.name || 'Arecofix';
-    const num    = order?.order_number || '';
+    const num = order?.order_number || '';
     return `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(
-      `Hola, completé el pago de mi pedido #${num} en ${branch}. Mi nombre es ${name}. Adjunto comprobante.`
+      `Hola, completé el pago de mi pedido #${num} en ${branch}. Mi nombre es ${name}. Adjunto comprobante.`,
     )}`;
   }
 

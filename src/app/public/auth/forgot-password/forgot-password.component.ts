@@ -1,6 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 
@@ -8,6 +13,7 @@ import { AuthService } from '@app/core/services/auth.service';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
 })
 export class ForgotPasswordComponent {
@@ -26,7 +32,7 @@ export class ForgotPasswordComponent {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       code: [''],
-      newPassword: ['']
+      newPassword: [''],
     });
   }
 
@@ -45,7 +51,7 @@ export class ForgotPasswordComponent {
   async resetPassword() {
     this.error = '';
     this.success = '';
-    
+
     if (this.step === 'EMAIL') {
       if (this.email?.invalid) {
         this.error = 'Por favor ingresa un email válido.';
@@ -62,7 +68,9 @@ export class ForgotPasswordComponent {
           this.savedEmail = emailValue;
           this.success = 'Código enviado. Revisa tu bandeja de entrada.';
           this.step = 'CODE';
-          this.form.get('code')?.setValidators([Validators.required, Validators.minLength(6)]);
+          this.form
+            .get('code')
+            ?.setValidators([Validators.required, Validators.minLength(6)]);
           this.form.get('code')?.updateValueAndValidity();
         }
       } catch (err) {
@@ -77,14 +85,19 @@ export class ForgotPasswordComponent {
       this.loading = true;
       const codeValue = this.code?.value as string;
       try {
-        const err = await this.authService.verifyOtpRecovery(this.savedEmail, codeValue);
+        const err = await this.authService.verifyOtpRecovery(
+          this.savedEmail,
+          codeValue,
+        );
         this.loading = false;
         if (err) {
           this.error = this.parseAuthError(err);
         } else {
           this.success = 'Código verificado. Ingresa tu nueva contraseña.';
           this.step = 'PASSWORD';
-          this.form.get('newPassword')?.setValidators([Validators.required, Validators.minLength(8)]);
+          this.form
+            .get('newPassword')
+            ?.setValidators([Validators.required, Validators.minLength(8)]);
           this.form.get('newPassword')?.updateValueAndValidity();
         }
       } catch (err) {
@@ -104,7 +117,8 @@ export class ForgotPasswordComponent {
         if (err) {
           this.error = this.parseAuthError(err);
         } else {
-          this.success = 'Contraseña actualizada exitosamente. Ya puedes iniciar sesión.';
+          this.success =
+            'Contraseña actualizada exitosamente. Ya puedes iniciar sesión.';
           this.form.reset();
         }
       } catch (err) {
@@ -116,12 +130,20 @@ export class ForgotPasswordComponent {
 
   private parseAuthError(error: any): string {
     const errorMsg = error?.message || error || '';
-    if (typeof errorMsg === 'string' && errorMsg.toLowerCase().includes('user not found')) {
+    if (
+      typeof errorMsg === 'string' &&
+      errorMsg.toLowerCase().includes('user not found')
+    ) {
       return 'No existe una cuenta con este email.';
     }
-    if (typeof errorMsg === 'string' && errorMsg.toLowerCase().includes('token has expired or is invalid')) {
+    if (
+      typeof errorMsg === 'string' &&
+      errorMsg.toLowerCase().includes('token has expired or is invalid')
+    ) {
       return 'El código es inválido o ha expirado.';
     }
-    return typeof errorMsg === 'string' ? errorMsg : 'Error al procesar la solicitud.';
+    return typeof errorMsg === 'string'
+      ? errorMsg
+      : 'Error al procesar la solicitud.';
   }
 }

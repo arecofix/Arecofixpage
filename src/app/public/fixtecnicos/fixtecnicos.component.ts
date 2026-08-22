@@ -1,4 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +14,7 @@ import { Post } from '@app/features/posts/domain/entities/post.entity';
   selector: 'app-fixtecnicos',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './fixtecnicos.component.html',
 })
 export class FixtecnicosComponent {
@@ -17,10 +23,13 @@ export class FixtecnicosComponent {
   // Community Feed
   posts = signal<Post[]>([]);
   loadingPosts = signal(true);
-  
+
   // IMEI Checker
   imeiInput = '';
-  imeiResult: { status: 'clean' | 'stolen' | 'unknown', message: string } | null = null;
+  imeiResult: {
+    status: 'clean' | 'stolen' | 'unknown';
+    message: string;
+  } | null = null;
   checkingImei = false;
 
   async ngOnInit() {
@@ -30,7 +39,7 @@ export class FixtecnicosComponent {
   async loadCommunityPosts() {
     try {
       // Reusing existing posts for now, ideally filter by category 'Community'
-      const posts = await this.postService.getRecentPosts(5); 
+      const posts = await this.postService.getRecentPosts(5);
       this.posts.set(posts);
     } catch (err) {
       console.error('Error loading posts', err);
@@ -52,9 +61,15 @@ export class FixtecnicosComponent {
     setTimeout(() => {
       const random = Math.random();
       if (random > 0.8) {
-        this.imeiResult = { status: 'stolen', message: 'REPORTADO: Este dispositivo tiene reporte de robo/hurto.' };
+        this.imeiResult = {
+          status: 'stolen',
+          message: 'REPORTADO: Este dispositivo tiene reporte de robo/hurto.',
+        };
       } else {
-        this.imeiResult = { status: 'clean', message: 'LIMPIO: El IMEI no presenta reportes negativos.' };
+        this.imeiResult = {
+          status: 'clean',
+          message: 'LIMPIO: El IMEI no presenta reportes negativos.',
+        };
       }
       this.checkingImei = false;
     }, 1500);

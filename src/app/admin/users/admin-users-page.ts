@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -34,374 +41,446 @@ export interface ClientRow {
 }
 
 @Component({
-    selector: 'app-admin-users-page',
-    standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: './admin-users-page.html',
+  selector: 'app-admin-users-page',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './admin-users-page.html',
 })
 export class AdminUsersPage implements OnInit {
-    private adminUsersService = inject(AdminUsersService);
-    private adminProductService = inject(AdminProductService);
-    private authService = inject(AuthService);
-    private notificationService = inject(NotificationService);
-    private employeeService = inject(EmployeeService);
-    private supplierService = inject(SupplierService);
-    private customerService = inject(CustomerService);
-    private translationService = inject(TranslationService);
-    t = this.translationService.t;
+  private adminUsersService = inject(AdminUsersService);
+  private adminProductService = inject(AdminProductService);
+  private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
+  private employeeService = inject(EmployeeService);
+  private supplierService = inject(SupplierService);
+  private customerService = inject(CustomerService);
+  private translationService = inject(TranslationService);
+  t = this.translationService.t;
 
-    // --- Tab State ---
-    activeTab = signal<PeopleTab>('clients');
+  // --- Tab State ---
+  activeTab = signal<PeopleTab>('clients');
 
-    // --- Clients Tab ---
-    clients = signal<ClientRow[]>([]);
-    clientsLoading = signal<boolean>(false);
-    clientsSearchTerm = signal<string>('');
-    clientsPageSize = signal(15);
-    clientsCurrentPage = signal(1);
-    clientsTotal = signal(0);
+  // --- Clients Tab ---
+  clients = signal<ClientRow[]>([]);
+  clientsLoading = signal<boolean>(false);
+  clientsSearchTerm = signal<string>('');
+  clientsPageSize = signal(15);
+  clientsCurrentPage = signal(1);
+  clientsTotal = signal(0);
 
-    totalClientsPages = computed(() => Math.max(1, Math.ceil(this.clientsTotal() / this.clientsPageSize())));
+  totalClientsPages = computed(() =>
+    Math.max(1, Math.ceil(this.clientsTotal() / this.clientsPageSize())),
+  );
 
-    // --- Users Tab ---
-    users = signal<UserProfile[]>([]);
-    branches = signal<Branch[]>([]);
-    usersLoading = signal<boolean>(true);
-    selectedUserForBranch = signal<UserProfile | null>(null);
-    isUpdating = signal<boolean>(false);
-    usersPageSize = signal(15);
-    usersCurrentPage = signal(1);
-    usersTotal = signal(0);
-    totalUsersPages = computed(() => Math.max(1, Math.ceil(this.usersTotal() / this.usersPageSize())));
+  // --- Users Tab ---
+  users = signal<UserProfile[]>([]);
+  branches = signal<Branch[]>([]);
+  usersLoading = signal<boolean>(true);
+  selectedUserForBranch = signal<UserProfile | null>(null);
+  isUpdating = signal<boolean>(false);
+  usersPageSize = signal(15);
+  usersCurrentPage = signal(1);
+  usersTotal = signal(0);
+  totalUsersPages = computed(() =>
+    Math.max(1, Math.ceil(this.usersTotal() / this.usersPageSize())),
+  );
 
-    // --- Staff Tab ---
-    employees = signal<EmployeeProfile[]>([]);
-    staffLoading = signal<boolean>(false);
-    staffPageSize = signal(15);
-    staffCurrentPage = signal(1);
-    staffTotal = signal(0);
-    totalStaffPages = computed(() => Math.max(1, Math.ceil(this.staffTotal() / this.staffPageSize())));
+  // --- Staff Tab ---
+  employees = signal<EmployeeProfile[]>([]);
+  staffLoading = signal<boolean>(false);
+  staffPageSize = signal(15);
+  staffCurrentPage = signal(1);
+  staffTotal = signal(0);
+  totalStaffPages = computed(() =>
+    Math.max(1, Math.ceil(this.staffTotal() / this.staffPageSize())),
+  );
 
-    // --- Suppliers Tab ---
-    suppliers = signal<Supplier[]>([]);
-    suppliersLoading = signal<boolean>(false);
-    suppliersPageSize = signal(15);
-    suppliersCurrentPage = signal(1);
-    suppliersTotal = signal(0);
-    totalSuppliersPages = computed(() => Math.max(1, Math.ceil(this.suppliersTotal() / this.suppliersPageSize())));
-    isTrackingModalOpen = signal(false);
-    andreaniTrackingCode = signal<string>('');
-    trackingUrl = signal<string | null>(null);
-    selectedSupplierIds = signal<Set<string>>(new Set());
-    isMessageModalOpen = signal(false);
-    bulkMessage = signal<string>('Hola {nombre}, te contacto desde Arecofix. ');
+  // --- Suppliers Tab ---
+  suppliers = signal<Supplier[]>([]);
+  suppliersLoading = signal<boolean>(false);
+  suppliersPageSize = signal(15);
+  suppliersCurrentPage = signal(1);
+  suppliersTotal = signal(0);
+  totalSuppliersPages = computed(() =>
+    Math.max(1, Math.ceil(this.suppliersTotal() / this.suppliersPageSize())),
+  );
+  isTrackingModalOpen = signal(false);
+  andreaniTrackingCode = signal<string>('');
+  trackingUrl = signal<string | null>(null);
+  selectedSupplierIds = signal<Set<string>>(new Set());
+  isMessageModalOpen = signal(false);
+  bulkMessage = signal<string>('Hola {nombre}, te contacto desde Arecofix. ');
 
-    userProfile = signal<UserProfile | null>(null);
+  userProfile = signal<UserProfile | null>(null);
 
-    async ngOnInit() {
-        this.authService.authState$.subscribe(state => {
-            this.userProfile.set(state.profile);
-        });
-        await this.loadClients();
+  async ngOnInit() {
+    this.authService.authState$.subscribe((state) => {
+      this.userProfile.set(state.profile);
+    });
+    await this.loadClients();
+  }
+
+  isGlobalAdmin(): boolean {
+    return (
+      this.authService.isSuperAdmin() ||
+      this.userProfile()?.role === 'tenant_owner'
+    );
+  }
+
+  // ─── Tab Switch ────────────────────────────────────────────────────────
+  async setTab(tab: PeopleTab) {
+    if (!this.isGlobalAdmin() && tab !== 'clients') {
+      this.notificationService.showError(
+        'No tienes permisos para acceder a esta pestaña.',
+      );
+      return;
     }
-
-    isGlobalAdmin(): boolean {
-        return this.authService.isSuperAdmin() || this.userProfile()?.role === 'tenant_owner';
+    this.activeTab.set(tab);
+    if (tab === 'clients' && this.clients().length === 0) {
+      await this.loadClients();
     }
-
-    // ─── Tab Switch ────────────────────────────────────────────────────────
-    async setTab(tab: PeopleTab) {
-        if (!this.isGlobalAdmin() && tab !== 'clients') {
-            this.notificationService.showError('No tienes permisos para acceder a esta pestaña.');
-            return;
-        }
-        this.activeTab.set(tab);
-        if (tab === 'clients' && this.clients().length === 0) {
-            await this.loadClients();
-        }
-        if (tab === 'users' && this.users().length === 0) {
-            await Promise.all([
-                this.loadBranches(),
-                this.loadUsers()
-            ]);
-        }
-        if (tab === 'staff' && this.employees().length === 0) {
-            await this.loadEmployees();
-        }
-        if (tab === 'suppliers' && this.suppliers().length === 0) {
-            await this.loadSuppliers();
-        }
+    if (tab === 'users' && this.users().length === 0) {
+      await Promise.all([this.loadBranches(), this.loadUsers()]);
     }
-
-    // ─── Users Tab Logic ───────────────────────────────────────────────────
-    async loadBranches() {
-        try {
-            const data = await this.adminProductService.getBranches();
-            this.branches.set(data);
-        } catch (error) {
-            console.error('Error loading branches', error);
-        }
+    if (tab === 'staff' && this.employees().length === 0) {
+      await this.loadEmployees();
     }
-
-    async loadUsers() {
-        this.usersLoading.set(true);
-        try {
-            const res = await firstValueFrom(this.adminUsersService.getPaginatedUsers(this.usersCurrentPage(), this.usersPageSize()));
-            this.users.set(res.data);
-            this.usersTotal.set(res.total);
-        } catch (error: unknown) {
-            console.error(error instanceof Error ? error.message : 'Error desconocido');
-        } finally {
-            this.usersLoading.set(false);
-        }
+    if (tab === 'suppliers' && this.suppliers().length === 0) {
+      await this.loadSuppliers();
     }
+  }
 
-    onUsersPageChange(page: number) {
-        if (page < 1 || page > this.totalUsersPages()) return;
-        this.usersCurrentPage.set(page);
-        this.loadUsers();
+  // ─── Users Tab Logic ───────────────────────────────────────────────────
+  async loadBranches() {
+    try {
+      const data = await this.adminProductService.getBranches();
+      this.branches.set(data);
+    } catch (error) {
+      console.error('Error loading branches', error);
     }
+  }
 
-    async updateUserRole(user: UserProfile, newRole: string) {
-        try {
-            await firstValueFrom(this.adminUsersService.updateRole(user.id!, newRole));
-            user.role = newRole as UserRole;
-            this.notificationService.showSuccess(`Rol de ${user.full_name || 'usuario'} actualizado a ${newRole}`);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-            this.notificationService.showError('Error actualizando el rol: ' + errorMessage);
-        }
+  async loadUsers() {
+    this.usersLoading.set(true);
+    try {
+      const res = await firstValueFrom(
+        this.adminUsersService.getPaginatedUsers(
+          this.usersCurrentPage(),
+          this.usersPageSize(),
+        ),
+      );
+      this.users.set(res.data);
+      this.usersTotal.set(res.total);
+    } catch (error: unknown) {
+      console.error(
+        error instanceof Error ? error.message : 'Error desconocido',
+      );
+    } finally {
+      this.usersLoading.set(false);
     }
+  }
 
-    openBranchModal(user: UserProfile) {
-        this.selectedUserForBranch.set(user);
+  onUsersPageChange(page: number) {
+    if (page < 1 || page > this.totalUsersPages()) return;
+    this.usersCurrentPage.set(page);
+    this.loadUsers();
+  }
+
+  async updateUserRole(user: UserProfile, newRole: string) {
+    try {
+      await firstValueFrom(
+        this.adminUsersService.updateRole(user.id!, newRole),
+      );
+      user.role = newRole as UserRole;
+      this.notificationService.showSuccess(
+        `Rol de ${user.full_name || 'usuario'} actualizado a ${newRole}`,
+      );
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      this.notificationService.showError(
+        'Error actualizando el rol: ' + errorMessage,
+      );
     }
+  }
 
-    async saveUserBranch(branchId: string | null) {
-        const user = this.selectedUserForBranch();
-        if (!user) return;
-        this.isUpdating.set(true);
-        try {
-            await firstValueFrom(this.adminUsersService.updateBranch(user.id!, branchId || ''));
-            user.branch_id = branchId || undefined;
-            if (user.id === this.authService.getCurrentUser()?.id) {
-                await this.authService.refreshProfile();
-            }
-            this.notificationService.showSuccess('Sucursal asignada con éxito');
-            this.selectedUserForBranch.set(null);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-            this.notificationService.showError('Error actualizando la sucursal: ' + errorMessage);
-        } finally {
-            this.isUpdating.set(false);
-        }
+  openBranchModal(user: UserProfile) {
+    this.selectedUserForBranch.set(user);
+  }
+
+  async saveUserBranch(branchId: string | null) {
+    const user = this.selectedUserForBranch();
+    if (!user) return;
+    this.isUpdating.set(true);
+    try {
+      await firstValueFrom(
+        this.adminUsersService.updateBranch(user.id!, branchId || ''),
+      );
+      user.branch_id = branchId || undefined;
+      if (user.id === this.authService.getCurrentUser()?.id) {
+        await this.authService.refreshProfile();
+      }
+      this.notificationService.showSuccess('Sucursal asignada con éxito');
+      this.selectedUserForBranch.set(null);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      this.notificationService.showError(
+        'Error actualizando la sucursal: ' + errorMessage,
+      );
+    } finally {
+      this.isUpdating.set(false);
     }
+  }
 
-    getBranchName(branchId?: string): string {
-        if (!branchId) return 'Sin Asignar';
-        const branch = this.branches().find(b => b.id === branchId);
-        return branch ? branch.name : 'Desconocida';
+  getBranchName(branchId?: string): string {
+    if (!branchId) return 'Sin Asignar';
+    const branch = this.branches().find((b) => b.id === branchId);
+    return branch ? branch.name : 'Desconocida';
+  }
+
+  /** Only super_admin has truly unrestricted global access */
+  hasGlobalAccess(user: UserProfile): boolean {
+    return user.role === 'super_admin';
+  }
+
+  // ─── Staff Tab Logic ───────────────────────────────────────────────────
+  async loadEmployees() {
+    this.staffLoading.set(true);
+    try {
+      const res = await this.employeeService.getPaginated(
+        this.staffCurrentPage(),
+        this.staffPageSize(),
+      );
+      this.employees.set(res.data);
+      this.staffTotal.set(res.total);
+    } catch (error) {
+      console.error('Error loading employees:', error);
+    } finally {
+      this.staffLoading.set(false);
     }
+  }
 
-    /** Only super_admin has truly unrestricted global access */
-    hasGlobalAccess(user: UserProfile): boolean {
-        return user.role === 'super_admin';
+  onStaffPageChange(page: number) {
+    if (page < 1 || page > this.totalStaffPages()) return;
+    this.staffCurrentPage.set(page);
+    this.loadEmployees();
+  }
+
+  // ─── Suppliers Tab Logic ───────────────────────────────────────────────
+  async loadSuppliers() {
+    this.suppliersLoading.set(true);
+    try {
+      const res = await this.supplierService.getPaginated(
+        this.suppliersCurrentPage(),
+        this.suppliersPageSize(),
+      );
+      this.suppliers.set(res.data); // Removed sorting locally since server should handle it, or we accept default order
+      this.suppliersTotal.set(res.total);
+    } catch (error) {
+      console.error('Error loading suppliers:', error);
+    } finally {
+      this.suppliersLoading.set(false);
     }
+  }
 
-    // ─── Staff Tab Logic ───────────────────────────────────────────────────
-    async loadEmployees() {
-        this.staffLoading.set(true);
-        try {
-            const res = await this.employeeService.getPaginated(this.staffCurrentPage(), this.staffPageSize());
-            this.employees.set(res.data);
-            this.staffTotal.set(res.total);
-        } catch (error) {
-            console.error('Error loading employees:', error);
-        } finally {
-            this.staffLoading.set(false);
-        }
+  onSuppliersPageChange(page: number) {
+    if (page < 1 || page > this.totalSuppliersPages()) return;
+    this.suppliersCurrentPage.set(page);
+    this.loadSuppliers();
+  }
+
+  openTracker() {
+    this.andreaniTrackingCode.set('');
+    this.trackingUrl.set(null);
+    this.isTrackingModalOpen.set(true);
+  }
+
+  trackAndreani(code: string) {
+    if (!code) return;
+    this.andreaniTrackingCode.set(code);
+    this.trackingUrl.set(`https://seguimiento.andreani.com/envio/${code}`);
+  }
+
+  toggleSupplier(id: string) {
+    const s = new Set(this.selectedSupplierIds());
+    if (s.has(id)) s.delete(id);
+    else s.add(id);
+    this.selectedSupplierIds.set(s);
+  }
+
+  toggleAll(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.selectedSupplierIds.set(
+        new Set(
+          this.suppliers()
+            .filter((s) => s.phone)
+            .map((s) => s.id),
+        ),
+      );
+    } else {
+      this.selectedSupplierIds.set(new Set());
     }
+  }
 
-    onStaffPageChange(page: number) {
-        if (page < 1 || page > this.totalStaffPages()) return;
-        this.staffCurrentPage.set(page);
-        this.loadEmployees();
+  sendBulkMessages() {
+    const suppliers = this.suppliers().filter(
+      (s) => this.selectedSupplierIds().has(s.id) && s.phone,
+    );
+    const baseMsg = this.bulkMessage();
+    let delay = 0;
+    for (const supp of suppliers) {
+      setTimeout(() => {
+        const finalMsg = baseMsg.replace('{nombre}', supp.name || 'Proveedor');
+        const cleanPhone = supp.phone!.replace(/\D/g, '');
+        const phoneWithCode = cleanPhone.startsWith('54')
+          ? cleanPhone
+          : `549${cleanPhone}`;
+        window.open(
+          `https://wa.me/${phoneWithCode}?text=${encodeURIComponent(finalMsg)}`,
+          '_blank',
+        );
+      }, delay);
+      delay += 1000;
     }
+    this.isMessageModalOpen.set(false);
+    this.selectedSupplierIds.set(new Set());
+  }
 
-    // ─── Suppliers Tab Logic ───────────────────────────────────────────────
-    async loadSuppliers() {
-        this.suppliersLoading.set(true);
-        try {
-            const res = await this.supplierService.getPaginated(this.suppliersCurrentPage(), this.suppliersPageSize());
-            this.suppliers.set(res.data); // Removed sorting locally since server should handle it, or we accept default order
-            this.suppliersTotal.set(res.total);
-        } catch (error) {
-            console.error('Error loading suppliers:', error);
-        } finally {
-            this.suppliersLoading.set(false);
-        }
+  // ─── Clients Tab Logic ─────────────────────────────────────────────────
+  async loadClients() {
+    this.clientsLoading.set(true);
+    try {
+      const { data, total } =
+        await this.customerService.getPaginatedUnifiedClients(
+          this.clientsCurrentPage(),
+          this.clientsPageSize(),
+          this.clientsSearchTerm(),
+        );
+      this.clients.set(
+        data.map((c: any) => ({
+          id: c.id,
+          first_name: c.first_name || '',
+          last_name: c.last_name || '',
+          full_name: c.full_name || '',
+          email: c.email || '',
+          phone: c.phone || '',
+          address: c.address,
+          dni: c.dni,
+          source: c.source as any,
+          repair_count: c.repair_count || 0,
+          order_count: c.order_count || 0,
+          created_at: c.created_at,
+        })),
+      );
+      this.clientsTotal.set(total);
+    } catch (error) {
+      console.error('Error loading unified clients:', error);
+    } finally {
+      this.clientsLoading.set(false);
     }
+  }
 
-    onSuppliersPageChange(page: number) {
-        if (page < 1 || page > this.totalSuppliersPages()) return;
-        this.suppliersCurrentPage.set(page);
-        this.loadSuppliers();
+  onClientSearchChange(term: string) {
+    this.clientsSearchTerm.set(term);
+    this.clientsCurrentPage.set(1);
+    this.loadClients();
+  }
+
+  onClientsPageChange(page: number) {
+    if (page < 1 || page > this.totalClientsPages()) return;
+    this.clientsCurrentPage.set(page);
+    this.loadClients();
+  }
+
+  async downloadCSV() {
+    let rows = this.clients();
+
+    // Export current page only, or all up to 1000
+    try {
+      const { data } = await this.customerService.getPaginatedUnifiedClients(
+        1,
+        1000,
+        this.clientsSearchTerm(),
+      );
+      rows = data.map((c: any) => ({
+        id: c.id,
+        first_name: c.first_name || '',
+        last_name: c.last_name || '',
+        full_name: c.full_name || '',
+        email: c.email || '',
+        phone: c.phone || '',
+        address: c.address,
+        dni: c.dni,
+        source: c.source as any,
+        repair_count: c.repair_count || 0,
+        order_count: c.order_count || 0,
+        created_at: c.created_at,
+      }));
+    } catch (error) {}
+
+    const header = [
+      'Nombre',
+      'Apellido',
+      'Email',
+      'Teléfono',
+      'Dirección',
+      'DNI',
+      'Fuente',
+      'Reparaciones',
+      'Pedidos',
+    ];
+    const csvRows = rows.map((c) => [
+      this.csvEscape(c.first_name),
+      this.csvEscape(c.last_name),
+      this.csvEscape(c.email),
+      this.csvEscape(c.phone),
+      this.csvEscape(c.address ?? ''),
+      this.csvEscape(c.dni ?? ''),
+      this.translateSource(c.source),
+      c.repair_count ?? 0,
+      c.order_count ?? 0,
+    ]);
+
+    const content = [
+      'Arecofix - Listado de Clientes Centralizado',
+      `Exportado: ${new Date().toLocaleDateString('es-AR')}`,
+      '',
+      header.join(';'),
+      ...csvRows.map((r) => r.join(';')),
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + content], {
+      type: 'text/csv;charset=utf-8;',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `arecofix-clientes-completo-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private translateSource(source: string): string {
+    switch (source) {
+      case 'profile':
+        return 'Sistema';
+      case 'repair':
+        return 'Taller';
+      case 'order':
+        return 'Tienda';
+      default:
+        return source;
     }
+  }
 
-    openTracker() {
-        this.andreaniTrackingCode.set('');
-        this.trackingUrl.set(null);
-        this.isTrackingModalOpen.set(true);
-    }
-
-    trackAndreani(code: string) {
-        if (!code) return;
-        this.andreaniTrackingCode.set(code);
-        this.trackingUrl.set(`https://seguimiento.andreani.com/envio/${code}`);
-    }
-
-    toggleSupplier(id: string) {
-        const s = new Set(this.selectedSupplierIds());
-        if (s.has(id)) s.delete(id);
-        else s.add(id);
-        this.selectedSupplierIds.set(s);
-    }
-
-    toggleAll(event: Event) {
-        const checked = (event.target as HTMLInputElement).checked;
-        if (checked) {
-            this.selectedSupplierIds.set(new Set(this.suppliers().filter(s => s.phone).map(s => s.id)));
-        } else {
-            this.selectedSupplierIds.set(new Set());
-        }
-    }
-
-    sendBulkMessages() {
-        const suppliers = this.suppliers().filter(s => this.selectedSupplierIds().has(s.id) && s.phone);
-        const baseMsg = this.bulkMessage();
-        let delay = 0;
-        for (const supp of suppliers) {
-            setTimeout(() => {
-                const finalMsg = baseMsg.replace('{nombre}', supp.name || 'Proveedor');
-                const cleanPhone = supp.phone!.replace(/\D/g, '');
-                const phoneWithCode = cleanPhone.startsWith('54') ? cleanPhone : `549${cleanPhone}`;
-                window.open(`https://wa.me/${phoneWithCode}?text=${encodeURIComponent(finalMsg)}`, '_blank');
-            }, delay);
-            delay += 1000;
-        }
-        this.isMessageModalOpen.set(false);
-        this.selectedSupplierIds.set(new Set());
-    }
-
-    // ─── Clients Tab Logic ─────────────────────────────────────────────────
-    async loadClients() {
-        this.clientsLoading.set(true);
-        try {
-            const { data, total } = await this.customerService.getPaginatedUnifiedClients(
-                this.clientsCurrentPage(),
-                this.clientsPageSize(),
-                this.clientsSearchTerm()
-            );
-            this.clients.set(
-                data.map((c: any) => ({
-                    id: c.id,
-                    first_name: c.first_name || '',
-                    last_name: c.last_name || '',
-                    full_name: c.full_name || '',
-                    email: c.email || '',
-                    phone: c.phone || '',
-                    address: c.address,
-                    dni: c.dni,
-                    source: c.source as any,
-                    repair_count: c.repair_count || 0,
-                    order_count: c.order_count || 0,
-                    created_at: c.created_at
-                }))
-            );
-            this.clientsTotal.set(total);
-        } catch (error) {
-            console.error('Error loading unified clients:', error);
-        } finally {
-            this.clientsLoading.set(false);
-        }
-    }
-
-    onClientSearchChange(term: string) {
-        this.clientsSearchTerm.set(term);
-        this.clientsCurrentPage.set(1);
-        this.loadClients();
-    }
-
-    onClientsPageChange(page: number) {
-        if (page < 1 || page > this.totalClientsPages()) return;
-        this.clientsCurrentPage.set(page);
-        this.loadClients();
-    }
-
-    async downloadCSV() {
-        let rows = this.clients();
-        
-        // Export current page only, or all up to 1000
-        try {
-            const { data } = await this.customerService.getPaginatedUnifiedClients(1, 1000, this.clientsSearchTerm());
-            rows = data.map((c: any) => ({
-                    id: c.id,
-                    first_name: c.first_name || '',
-                    last_name: c.last_name || '',
-                    full_name: c.full_name || '',
-                    email: c.email || '',
-                    phone: c.phone || '',
-                    address: c.address,
-                    dni: c.dni,
-                    source: c.source as any,
-                    repair_count: c.repair_count || 0,
-                    order_count: c.order_count || 0,
-                    created_at: c.created_at
-            }));
-        } catch (error) {}
-
-        const header = ['Nombre', 'Apellido', 'Email', 'Teléfono', 'Dirección', 'DNI', 'Fuente', 'Reparaciones', 'Pedidos'];
-        const csvRows = rows.map(c => [
-            this.csvEscape(c.first_name),
-            this.csvEscape(c.last_name),
-            this.csvEscape(c.email),
-            this.csvEscape(c.phone),
-            this.csvEscape(c.address ?? ''),
-            this.csvEscape(c.dni ?? ''),
-            this.translateSource(c.source),
-            c.repair_count ?? 0,
-            c.order_count ?? 0
-        ]);
-
-        const content = [
-            'Arecofix - Listado de Clientes Centralizado',
-            `Exportado: ${new Date().toLocaleDateString('es-AR')}`,
-            '',
-            header.join(';'),
-            ...csvRows.map(r => r.join(';'))
-        ].join('\n');
-
-        const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `arecofix-clientes-completo-${new Date().toISOString().slice(0, 10)}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    private translateSource(source: string): string {
-        switch(source) {
-            case 'profile': return 'Sistema';
-            case 'repair': return 'Taller';
-            case 'order': return 'Tienda';
-            default: return source;
-        }
-    }
-
-    private csvEscape(value: string): string {
-        if (!value) return '';
-        const str = String(value).replace(/"/g, '""');
-        return str.includes(';') || str.includes('"') || str.includes('\n') ? `"${str}"` : str;
-    }
+  private csvEscape(value: string): string {
+    if (!value) return '';
+    const str = String(value).replace(/"/g, '""');
+    return str.includes(';') || str.includes('"') || str.includes('\n')
+      ? `"${str}"`
+      : str;
+  }
 }

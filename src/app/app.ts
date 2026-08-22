@@ -1,4 +1,12 @@
-import { Component, inject, OnInit, PLATFORM_ID, DOCUMENT, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  PLATFORM_ID,
+  DOCUMENT,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { ToastComponent } from './shared/components/toast/toast.component';
@@ -15,27 +23,27 @@ import { SwUpdate } from '@angular/service-worker';
 import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
 
 @Component({
-
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
     ToastComponent,
     RibbonMenuComponent,
-    ChatbotComponent
+    ChatbotComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  templateUrl: './app.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './app.html',
 })
 export class App implements OnInit {
   private analytics = inject(AnalyticsService);
   private logger = inject(LoggerService);
   private seoService = inject(SeoService);
-  private themeService = inject(ThemeService); 
-  private tenantService = inject(TenantService); 
+  private themeService = inject(ThemeService);
+  private tenantService = inject(TenantService);
   private platformId = inject(PLATFORM_ID);
   private document = inject(DOCUMENT);
-  
+
   // Initialize global services for Tauri/ERP features
   private scannerService = inject(ScannerService);
   private shortcutService = inject(ShortcutService);
@@ -53,15 +61,20 @@ export class App implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       // Auto-recarga cuando hay una nueva versión (evita errores MIME y ChunkLoad)
       if (this.swUpdate?.isEnabled) {
-        this.swUpdate.versionUpdates.subscribe(evt => {
+        this.swUpdate.versionUpdates.subscribe((evt) => {
           if (evt.type === 'VERSION_READY') {
-            this.logger.info('Nueva versión detectada. Recargando la aplicación...');
+            this.logger.info(
+              'Nueva versión detectada. Recargando la aplicación...',
+            );
             window.location.reload();
           }
         });
-        
-        this.swUpdate.unrecoverable.subscribe(evt => {
-          this.logger.error('Estado irrecuperable de caché, recargando...', evt.reason);
+
+        this.swUpdate.unrecoverable.subscribe((evt) => {
+          this.logger.error(
+            'Estado irrecuperable de caché, recargando...',
+            evt.reason,
+          );
           window.location.reload();
         });
       }
@@ -84,7 +97,9 @@ export class App implements OnInit {
   private async setupDeepLinks() {
     try {
       // @ts-ignore
-      const { onOpenUrl } = await import(/* @vite-ignore */ '@tauri-apps/plugin-deep-link');
+      const { onOpenUrl } = await import(
+        /* @vite-ignore */ '@tauri-apps/plugin-deep-link'
+      );
 
       await onOpenUrl((urls: string[]) => {
         if (!urls || urls.length === 0) return;
@@ -95,12 +110,15 @@ export class App implements OnInit {
             const token = urlObj.searchParams.get('token');
             if (token) {
               // Set the session
-              this.supabase.getClient().auth.setSession({ access_token: token, refresh_token: token }).then(({ error }) => {
-                if (!error) {
-                  // Redirect to admin or show a toast
-                  window.location.href = '/admin/dashboard';
-                }
-              });
+              this.supabase
+                .getClient()
+                .auth.setSession({ access_token: token, refresh_token: token })
+                .then(({ error }) => {
+                  if (!error) {
+                    // Redirect to admin or show a toast
+                    window.location.href = '/admin/dashboard';
+                  }
+                });
             }
           }
         } catch (e) {
@@ -108,10 +126,12 @@ export class App implements OnInit {
         }
       });
     } catch (e) {
-      this.logger.warn('Deep link plugin not available or failed to initialize:', e);
+      this.logger.warn(
+        'Deep link plugin not available or failed to initialize:',
+        e,
+      );
     }
   }
-
 
   private async checkBackendStatus(): Promise<boolean> {
     try {
@@ -119,7 +139,7 @@ export class App implements OnInit {
       const timeoutId = setTimeout(() => controller.abort(), 2000);
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'OPTIONS', // Fast preflight
-        signal: controller.signal
+        signal: controller.signal,
       });
       clearTimeout(timeoutId);
       // If we get a response (even a 405 Method Not Allowed), it means the server is UP.
@@ -132,16 +152,20 @@ export class App implements OnInit {
   private async startSidecar() {
     this.logger.info('Checking if backend is already running...');
     const isRunning = await this.checkBackendStatus();
-    
+
     if (isRunning) {
-      this.logger.info('Backend is already responding on port 5000. Skipping sidecar spawn.');
+      this.logger.info(
+        'Backend is already responding on port 5000. Skipping sidecar spawn.',
+      );
       return;
     }
 
     try {
-      this.logger.info('Backend not responding. Attempting to start sidecar...');
+      this.logger.info(
+        'Backend not responding. Attempting to start sidecar...',
+      );
       const { Command } = await import('@tauri-apps/plugin-shell');
-      
+
       // Try sidecar approach first
       try {
         const sidecar = Command.sidecar('arecofix-backend');
@@ -149,11 +173,17 @@ export class App implements OnInit {
         this.logger.info('Sidecar started successfully with PID:', child.pid);
         return;
       } catch (sidecarErr) {
-        this.logger.warn('Sidecar spawn failed, attempting standard execution fallback...', sidecarErr);
+        this.logger.warn(
+          'Sidecar spawn failed, attempting standard execution fallback...',
+          sidecarErr,
+        );
         // Fallback: standard execution if capabilities restricted the sidecar flag
         const command = Command.create('arecofix-backend');
         const child = await command.spawn();
-        this.logger.info('Backend started via fallback execution with PID:', child.pid);
+        this.logger.info(
+          'Backend started via fallback execution with PID:',
+          child.pid,
+        );
       }
     } catch (e) {
       this.logger.error('Failed to start backend completely:', e);

@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, PLATFORM_ID, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  PLATFORM_ID,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
@@ -8,6 +15,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-not-found',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './not-found.component.html',
 })
 export class NotFoundComponent implements OnInit {
@@ -31,7 +39,8 @@ export class NotFoundComponent implements OnInit {
     this.title.setTitle('Página no encontrada | Arecofix');
     this.meta.updateTag({
       name: 'description',
-      content: 'La página que buscás no existe o fue movida. Explorá nuestros servicios, productos o volvé al inicio de Arecofix.',
+      content:
+        'La página que buscás no existe o fue movida. Explorá nuestros servicios, productos o volvé al inicio de Arecofix.',
     });
     this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
   }
