@@ -1,15 +1,44 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed, DestroyRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  signal,
+  computed,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, from, catchError, of, finalize, firstValueFrom } from 'rxjs';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  from,
+  catchError,
+  of,
+  finalize,
+  firstValueFrom,
+} from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '@app/core/services/auth.service';
 import { CompanyService } from '@app/core/services/company.service';
 import { BranchService } from '@app/core/services/branch.service';
 import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
-import { CreateRepairDto, RepairStatus, UpdateRepairDto } from '@app/features/repairs/domain/entities/repair.entity';
+import {
+  CreateRepairDto,
+  RepairStatus,
+  UpdateRepairDto,
+} from '@app/features/repairs/domain/entities/repair.entity';
 import { PricingService } from '@app/core/services/pricing.service';
 import { environment } from '@env/environment';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
@@ -28,908 +57,1070 @@ import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
 
 interface ClientView extends Partial<UserProfile> {
-    displayName: string;
-    dni?: string;
+  displayName: string;
+  dni?: string;
 }
 
 @Component({
-    selector: 'app-admin-repair-form-page',
-    standalone: true,
-    imports: [
-        CommonModule, 
-        FormsModule, 
-        ReactiveFormsModule,
-        RouterLink
-    ],
-    templateUrl: './admin-repair-form-page.html',
+  selector: 'app-admin-repair-form-page',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './admin-repair-form-page.html',
 })
 export class AdminRepairFormPage implements OnInit, OnDestroy {
-    // Helper interface for UI
-    private clientView = (client: UserProfile | Partial<UserProfile>): ClientView => ({
-        ...client,
-        displayName: client.full_name || `${client.first_name || ''} ${client.last_name || ''}`.trim() || client.email || 'Sin nombre'
+  // Helper interface for UI
+  private clientView = (
+    client: UserProfile | Partial<UserProfile>,
+  ): ClientView => ({
+    ...client,
+    displayName:
+      client.full_name ||
+      `${client.first_name || ''} ${client.last_name || ''}`.trim() ||
+      client.email ||
+      'Sin nombre',
+  });
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private companyService = inject(CompanyService);
+  public branchService = inject(BranchService);
+  private repairService = inject(AdminRepairService);
+  private productService = inject(AdminProductService);
+  private auth = inject(AuthService);
+  private pricingService = inject(PricingService);
+  public tenantService = inject(TenantService);
+  private customerService = inject(CustomerService);
+  private supplierService = inject(SupplierService);
+  private notificationService = inject(NotificationService);
+  private repairPdfService = inject(RepairPdfService);
+  private fb = inject(FormBuilder);
+  private repairWorkflowService = inject(RepairWorkflowService);
+  private repairCalculator = inject(RepairCalculatorService);
+  private supabaseService = inject(SupabaseService);
+  public offlineSyncService = inject(OfflineSyncService);
+  private adminLayout = inject(AdminLayout, { optional: true });
+  private destroyRef = inject(DestroyRef);
+
+  repairForm!: FormGroup;
+
+  id: string | null = null;
+  date = new Date();
+
+  // Initial form state matching entity structure
+  initialFormState = {
+    customer_id: '', // New field for DB binding
+    customer_name: '',
+    customer_phone: '',
+    customer_email: '',
+    customer_dni: '',
+    device_model: '',
+    device_type: 'smartphone',
+    brand_id: null,
+    imei: '',
+    issue_description: '',
+    current_status_id: RepairStatus.PENDING_DIAGNOSIS,
+    estimated_cost: 0,
+    final_cost: 0,
+    technician_notes: '',
+    checklist: {
+      charger: false,
+      battery: false,
+      chip: false,
+      sd: false,
+      case: false,
+    },
+    security_pin: '',
+    security_pattern: '',
+    device_passcode: '',
+    deposit_amount: 0,
+    tracking_code: '',
+    repair_number: 0,
+    images: [] as string[],
+    technical_labor_cost: 0,
+    technical_report: '',
+    parts:
+      [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
+    glass_upsell: false,
+    whatsapp_notifications: true,
+    spare_part_cost: 0,
+  };
+
+  // Keep some UI-only signals
+  showProductModal = signal(false);
+  activeSecurityTab = signal<'pin' | 'pattern' | 'passcode'>('pin');
+
+  statusOptions = [
+    {
+      id: 1,
+      label: 'Recibido / Pendiente',
+      icon: 'fas fa-clipboard-list',
+      color: 'text-amber-500',
+    },
+    {
+      id: 2,
+      label: 'Gestión de Repuestos',
+      icon: 'fas fa-boxes',
+      color: 'text-cyan-500',
+    },
+    {
+      id: 3,
+      label: 'En Reparación',
+      icon: 'fas fa-tools',
+      color: 'text-blue-500',
+    },
+    {
+      id: 4,
+      label: 'Control de Calidad',
+      icon: 'fas fa-clipboard-check',
+      color: 'text-indigo-500',
+    },
+    {
+      id: 5,
+      label: 'Listo para Entregar',
+      icon: 'fas fa-check-circle',
+      color: 'text-green-500',
+    },
+    {
+      id: 6,
+      label: 'Entregado',
+      icon: 'fas fa-box-open',
+      color: 'text-slate-500',
+    },
+    {
+      id: 7,
+      label: 'Cancelado',
+      icon: 'fas fa-times-circle',
+      color: 'text-rose-500',
+    },
+  ];
+
+  readonly TAX_RATE = 0.21;
+  searchQuery = signal('');
+  parts = signal<
+    import('../../features/repairs/domain/entities/repair.entity').RepairPart[]
+  >([]);
+  images = signal<string[]>([]);
+  brands = signal<{ id: string; name: string }[]>([]);
+  suppliers = signal<Supplier[]>([]);
+
+  // Reactive search streams
+  private productSearch$ = new Subject<string>();
+  private clientSearch$ = new Subject<string>();
+
+  // This will be triggered whenever searchQuery changes from UI
+  onSearchChange(query: string) {
+    this.searchQuery.set(query);
+    this.productSearch$.next(query);
+  }
+
+  private setupSearchStreams() {
+    // Product Search Stream
+    this.productSearch$
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          const q = query.trim();
+          if (!q) {
+            return from(
+              this.productService.getProductsPaginated({ _per_page: 20 }),
+            );
+          }
+          if (q.length < 2) return of({ data: [] });
+
+          this.searchingProducts.set(true);
+          return from(
+            this.productService.getProductsPaginated({ q, _per_page: 20 }),
+          ).pipe(
+            catchError((err) => {
+              console.error('Error searching products', err);
+              return of({ data: [] });
+            }),
+            finalize(() => this.searchingProducts.set(false)),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((response) => {
+        const data = (response.data || []) as unknown as Product[];
+        // Filter out products with 0 stock to prevent database constraint violations on repair save
+        this.filteredProducts.set(data.filter((p) => (p.stock || 0) > 0));
+        this.searchingProducts.set(false);
+      });
+
+    // Client Search Stream
+    this.clientSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          const q = query.trim();
+          if (q.length < 2) return of([]);
+
+          return from(this.customerService.searchClients(q)).pipe(
+            catchError((err) => {
+              console.error('Error searching clients', err);
+              return of([]);
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((data) => {
+        if (data) {
+          this.clients.set(data.map((c) => this.clientView(c as any)));
+        }
+      });
+  }
+
+  searchingProducts = signal(false);
+  filteredProducts = signal<Product[]>([]);
+
+  async loadInitialProducts() {
+    this.productSearch$.next('');
+  }
+
+  saving = signal<boolean>(false);
+  error = signal<string | null>(null);
+  loading = signal<boolean>(true);
+  company = signal<unknown>(null);
+  // Removed duplicate properties
+  uploadingImages = signal(false);
+  clients = signal<ClientView[]>([]);
+
+  public missingBranch = computed(() => {
+    // SuperAdmins are never 'missing' a branch (fall back to Central)
+    if (this.auth.isSuperAdmin()) return false;
+    return !this.branchService.currentBranchId();
+  });
+
+  async loadInitialClients() {
+    try {
+      const data = await this.customerService.getRecentClients();
+      if (data) {
+        this.clients.set(data.map((c) => this.clientView(c as any)));
+      }
+    } catch (e) {
+      console.error('Error loading clients', e);
+    }
+  }
+
+  private setupForm() {
+    this.repairForm = this.fb.group({
+      customer_id: [''],
+      device_id: [''],
+      customer_name: ['', [Validators.required, Validators.minLength(3)]],
+      customer_phone: [''],
+      customer_email: ['', [Validators.email]],
+      customer_dni: [''],
+      device_model: ['', [Validators.required]],
+      device_type: ['smartphone'],
+      brand_id: [null],
+      imei: [''],
+      issue_description: ['', [Validators.required]],
+      current_status_id: [RepairStatus.PENDING_DIAGNOSIS],
+      estimated_cost: [0],
+      final_cost: [0],
+      technician_notes: [''],
+      checklist: this.fb.group({
+        charger: [false],
+        battery: [false],
+        chip: [false],
+        sd: [false],
+        case: [false],
+      }),
+      security_pin: [''],
+      security_pattern: [''],
+      device_passcode: [''],
+      deposit_amount: [0],
+      technical_labor_cost: [0],
+      technical_report: [''],
+      glass_upsell: [false],
+      whatsapp_notifications: [true],
+      spare_part_cost: [0],
+      tracking_code: [''],
+      repair_number: [0],
+      payment_method: ['efectivo'],
+      warranty: [''],
+      supplier_id: [null],
+      surcharge_percentage: [0],
     });
-    private route = inject(ActivatedRoute);
-    private router = inject(Router);
-    private companyService = inject(CompanyService);
-    public branchService = inject(BranchService);
-    private repairService = inject(AdminRepairService);
-    private productService = inject(AdminProductService);
-    private auth = inject(AuthService);
-    private pricingService = inject(PricingService);
-    public tenantService = inject(TenantService);
-    private customerService = inject(CustomerService);
-    private supplierService = inject(SupplierService);
-    private notificationService = inject(NotificationService);
-    private repairPdfService = inject(RepairPdfService);
-    private fb = inject(FormBuilder);
-    private repairWorkflowService = inject(RepairWorkflowService);
-    private repairCalculator = inject(RepairCalculatorService);
-    private supabaseService = inject(SupabaseService);
-    public offlineSyncService = inject(OfflineSyncService);
-    private adminLayout = inject(AdminLayout, { optional: true });
-    private destroyRef = inject(DestroyRef);
 
-    repairForm!: FormGroup;
+    // Automatically recalculate final_cost based on estimated_cost and surcharge_percentage
+    this.repairForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((val) => {
+        const estimated = Number(val.estimated_cost) || 0;
+        const surchargePct = Number(val.surcharge_percentage) || 0;
 
-    id: string | null = null;
-    date = new Date();
-    
-    // Initial form state matching entity structure
-    initialFormState = {
-        customer_id: '', // New field for DB binding
-        customer_name: '',
-        customer_phone: '',
-        customer_email: '',
-        customer_dni: '',
-        device_model: '',
-        device_type: 'smartphone',
-        brand_id: null,
-        imei: '',
-        issue_description: '',
-        current_status_id: RepairStatus.PENDING_DIAGNOSIS,
-        estimated_cost: 0,
-        final_cost: 0,
-        technician_notes: '',
-        checklist: {
-            charger: false,
-            battery: false,
-            chip: false,
-            sd: false,
-            case: false
+        // El Total del Servicio SIEMPRE debe ser igual al presupuestoEstimado + el valor del recargo calculado. NUNCA puede ser menor al presupuestoEstimado.
+        // El Recargo en Dinero se calcula así: (presupuestoEstimado * recargoPorcentaje) / 100
+        const surchargeAmount = (estimated * surchargePct) / 100;
+        const newFinalCost = estimated + surchargeAmount;
+
+        // Solo actualizar si el valor cambió para evitar loops infinitos
+        if (this.repairForm.get('final_cost')?.value !== newFinalCost) {
+          this.repairForm.patchValue(
+            { final_cost: newFinalCost },
+            { emitEvent: false },
+          );
+        }
+      });
+
+    // If the status is changed to CANCELLED (7), automatically remove warranty
+    this.repairForm
+      .get('current_status_id')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((statusId) => {
+        if (statusId === RepairStatus.CANCELLED || statusId === 7) {
+          this.repairForm.patchValue({ warranty: '' }, { emitEvent: false });
+        }
+      });
+  }
+
+  onSelectClient(clientName: string) {
+    this.clientSearch$.next(clientName);
+
+    const client = this.clients().find((c) => c.displayName === clientName);
+    if (client) {
+      this.repairForm.patchValue({
+        customer_id: client.id,
+        customer_name: client.displayName,
+        customer_phone: client.phone,
+        customer_email: client.email,
+        customer_dni: client.dni,
+      });
+    } else {
+      this.repairForm.patchValue(
+        {
+          customer_id: '',
+          customer_name: clientName,
         },
-        security_pin: '',
-        security_pattern: '',
-        device_passcode: '',
-        deposit_amount: 0,
-        tracking_code: '',
-        repair_number: 0,
-        images: [] as string[],
-        technical_labor_cost: 0,
-        technical_report: '',
-        parts: [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
-        glass_upsell: false,
-        whatsapp_notifications: true,
-        spare_part_cost: 0
-    };
+        { emitEvent: false },
+      );
+    }
+  }
 
-    // Keep some UI-only signals
-    showProductModal = signal(false);
-    activeSecurityTab = signal<'pin' | 'pattern' | 'passcode'>('pin');
-
-    statusOptions = [
-        { id: 1, label: 'Recibido / Pendiente', icon: 'fas fa-clipboard-list', color: 'text-amber-500' },
-        { id: 2, label: 'Gestión de Repuestos', icon: 'fas fa-boxes', color: 'text-cyan-500' },
-        { id: 3, label: 'En Reparación', icon: 'fas fa-tools', color: 'text-blue-500' },
-        { id: 4, label: 'Control de Calidad', icon: 'fas fa-clipboard-check', color: 'text-indigo-500' },
-        { id: 5, label: 'Listo para Entregar', icon: 'fas fa-check-circle', color: 'text-green-500' },
-        { id: 6, label: 'Entregado', icon: 'fas fa-box-open', color: 'text-slate-500' },
-        { id: 7, label: 'Cancelado', icon: 'fas fa-times-circle', color: 'text-rose-500' }
-    ];
-
-    readonly TAX_RATE = 0.21;
-    searchQuery = signal('');
-    parts = signal<import('../../features/repairs/domain/entities/repair.entity').RepairPart[]>([]);
-    images = signal<string[]>([]);
-    brands = signal<{id: string, name: string}[]>([]);
-    suppliers = signal<Supplier[]>([]);
-
-    // Reactive search streams
-    private productSearch$ = new Subject<string>();
-    private clientSearch$ = new Subject<string>();
-
-    // This will be triggered whenever searchQuery changes from UI
-    onSearchChange(query: string) {
-        this.searchQuery.set(query);
-        this.productSearch$.next(query);
+  async ngOnInit() {
+    if (this.adminLayout) {
+      this.adminLayout.isMainMenuOpen.set(false);
     }
 
-    private setupSearchStreams() {
-        // Product Search Stream
-        this.productSearch$.pipe(
-            debounceTime(400),
-            distinctUntilChanged(),
-            switchMap(query => {
-                const q = query.trim();
-                if (!q) {
-                    return from(this.productService.getProductsPaginated({ _per_page: 20 }));
-                }
-                if (q.length < 2) return of({ data: [] });
-                
-                this.searchingProducts.set(true);
-                return from(this.productService.getProductsPaginated({ q, _per_page: 20 })).pipe(
-                    catchError(err => {
-                        console.error('Error searching products', err);
-                        return of({ data: [] });
-                    }),
-                    finalize(() => this.searchingProducts.set(false))
-                );
-            }),
-            takeUntilDestroyed(this.destroyRef)
-        ).subscribe(response => {
-            const data = (response.data || []) as unknown as Product[];
-            // Filter out products with 0 stock to prevent database constraint violations on repair save
-            this.filteredProducts.set(data.filter(p => (p.stock || 0) > 0));
-            this.searchingProducts.set(false);
-        });
+    this.id = this.route.snapshot.paramMap.get('id');
+    this.setupForm();
+    this.setupSearchStreams();
 
-        // Client Search Stream
-        this.clientSearch$.pipe(
-            debounceTime(300),
-            distinctUntilChanged(),
-            switchMap(query => {
-                const q = query.trim();
-                if (q.length < 2) return of([]);
-                
-                return from(this.customerService.searchClients(q)).pipe(
-                    catchError(err => {
-                        console.error('Error searching clients', err);
-                        return of([]);
-                    })
-                );
-            }),
-            takeUntilDestroyed(this.destroyRef)
-        ).subscribe(data => {
-            if (data) {
-                this.clients.set(data.map(c => this.clientView(c as any)));
-            }
-        });
+    await Promise.all([
+      this.loadCompanySettings(),
+      this.loadInitialClients(),
+      this.loadBrands(),
+      this.id ? this.loadRepair() : Promise.resolve(),
+    ]);
+
+    this.loadInitialProducts();
+    this.loadSuppliers();
+    this.loading.set(false);
+  }
+
+  async openProductModal() {
+    this.showProductModal.set(true);
+    if (this.filteredProducts().length === 0) {
+      await this.loadInitialProducts();
     }
+  }
 
-    searchingProducts = signal(false);
-    filteredProducts = signal<Product[]>([]);
+  async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files || files.length === 0) return;
 
-    async loadInitialProducts() {
-        this.productSearch$.next('');
+    this.uploadingImages.set(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files.item(i);
+        if (file) {
+          const url = await this.repairService.uploadImage(file);
+          uploadedUrls.push(url);
+        }
+      }
+
+      const currentImages = this.images();
+      this.images.set([...currentImages, ...uploadedUrls]);
+      this.notificationService.showSuccess('Imágenes subidas correctamente.');
+    } catch (e: any) {
+      console.error('Error uploading images:', e);
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      this.notificationService.showError('Error al subir imágenes: ' + message);
+    } finally {
+      this.uploadingImages.set(false);
+      // Clear input
+      input.value = '';
     }
+  }
 
-    saving = signal<boolean>(false);
-    error = signal<string | null>(null);
-    loading = signal<boolean>(true);
-    company = signal<unknown>(null);
-    // Removed duplicate properties
-    uploadingImages = signal(false);
-    clients = signal<ClientView[]>([]);
+  removeImage(index: number) {
+    this.images.update((imgs) => imgs.filter((_, i) => i !== index));
+  }
 
-    public missingBranch = computed(() => {
-        // SuperAdmins are never 'missing' a branch (fall back to Central)
-        if (this.auth.isSuperAdmin()) return false; 
-        return !this.branchService.currentBranchId();
+  async loadCompanySettings() {
+    try {
+      const branchId = this.branchService.getCurrentBranchId();
+      const data = await this.companyService.getSettings(branchId || undefined);
+      if (data) {
+        this.company.set(data);
+      }
+    } catch (error) {
+      console.error('Error loading company settings', error);
+    }
+  }
+
+  async loadBrands() {
+    try {
+      const { data } = await this.supabaseService
+        .getClient()
+        .from('brands')
+        .select('id, name')
+        .order('name');
+      if (data) {
+        this.brands.set(data);
+      }
+    } catch (error) {
+      console.error('Error loading brands', error);
+    }
+  }
+
+  async loadSuppliers() {
+    try {
+      const data = await this.supplierService.getAll();
+      if (data) {
+        this.suppliers.set(data);
+      }
+    } catch (error) {
+      console.error('Error loading suppliers', error);
+    }
+  }
+
+  addPart(product: Product) {
+    const newPart = this.repairCalculator.buildNewPart(product, this.id || '');
+    this.parts.update((p) => [...p, newPart]);
+    this.calculateFinalCost();
+  }
+
+  async addManualProduct() {
+    const manualName = this.searchQuery().trim() || 'Repuesto Genérico';
+    this.saving.set(true);
+
+    try {
+      const branchIdActual =
+        await this.branchService.resolveEffectiveBranchId();
+      const newId = crypto.randomUUID();
+
+      const genericProduct: Product = {
+        id: newId,
+        name: manualName,
+        price: 0,
+        stock: 9999, // Ensures it's not disabled
+        cost_price: 0,
+        is_active: true,
+        is_global: false,
+        sku: '',
+        barcode: '',
+        branch_id: branchIdActual,
+        slug: 'manual-' + newId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as Product;
+
+      // Register it in the DB so repair_parts_used can link to it (uuid format & foreign key)
+      await this.productService.createProduct(genericProduct);
+
+      this.addPart(genericProduct);
+      this.showProductModal.set(false);
+      this.searchQuery.set('');
+    } catch (error) {
+      console.error('Error creating manual product:', error);
+      this.notificationService.showError(
+        'Error al crear el repuesto manual en la base de datos',
+      );
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  removePart(index: number) {
+    this.parts.update((p) => p.filter((_, i) => i !== index));
+    this.calculateFinalCost();
+  }
+
+  updateFormField(field: string, value: unknown) {
+    this.repairForm.get(field)?.setValue(value);
+    this.repairForm.get(field)?.markAsDirty();
+    if (field === 'technical_labor_cost') this.calculateFinalCost();
+  }
+
+  onPartsListChange(
+    parts: import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
+  ) {
+    this.parts.set(parts);
+    this.calculateFinalCost();
+  }
+
+  onLaborCostChange(value: number) {
+    this.updateFormField('technical_labor_cost', value);
+  }
+
+  calculateFinalCost() {
+    const laborCost =
+      Number(this.repairForm.get('technical_labor_cost')?.value) || 0;
+
+    // This calculates the parts cost and suggestions, but we do NOT override final_cost or deposit_amount
+    // based on parts, as per the user's explicit request.
+    const result = this.repairCalculator.calculateFinancials(
+      this.parts(),
+      laborCost,
+    );
+
+    this.parts.set(result.updatedParts);
+
+    // Recalculate final_cost based strictly on estimated_cost + surcharge
+    const estimated = Number(this.repairForm.get('estimated_cost')?.value) || 0;
+    const surchargePct =
+      Number(this.repairForm.get('surcharge_percentage')?.value) || 0;
+    const newFinalCost = estimated + (estimated * surchargePct) / 100;
+
+    this.repairForm.patchValue(
+      {
+        final_cost: newFinalCost,
+        spare_part_cost: result.partsCostTotal,
+      },
+      { emitEvent: false },
+    );
+  }
+
+  onEstimatedCostChange(value: number) {
+    this.repairForm.patchValue({
+      estimated_cost: value,
     });
-    
-    async loadInitialClients() {
-        try {
-            const data = await this.customerService.getRecentClients();
-            if (data) {
-                this.clients.set(data.map(c => this.clientView(c as any)));
-            }
-        } catch (e) {
-            console.error('Error loading clients', e);
-        }
-    }
+  }
 
-    private setupForm() {
-        this.repairForm = this.fb.group({
-            customer_id: [''],
-            device_id: [''],
-            customer_name: ['', [Validators.required, Validators.minLength(3)]],
-            customer_phone: [''],
-            customer_email: ['', [Validators.email]],
-            customer_dni: [''],
-            device_model: ['', [Validators.required]],
-            device_type: ['smartphone'],
-            brand_id: [null],
-            imei: [''],
-            issue_description: ['', [Validators.required]],
-            current_status_id: [RepairStatus.PENDING_DIAGNOSIS],
-            estimated_cost: [0],
-            final_cost: [0],
-            technician_notes: [''],
-            checklist: this.fb.group({
-                charger: [false],
-                battery: [false],
-                chip: [false],
-                sd: [false],
-                case: [false]
-            }),
-            security_pin: [''],
-            security_pattern: [''],
-            device_passcode: [''],
-            deposit_amount: [0],
-            technical_labor_cost: [0],
-            technical_report: [''],
-            glass_upsell: [false],
-            whatsapp_notifications: [true],
-            spare_part_cost: [0],
-            tracking_code: [''],
-            repair_number: [0],
-            payment_method: ['efectivo'],
-            warranty: [''],
-            supplier_id: [null],
-            surcharge_percentage: [0]
+  onFinalCostChange(value: number) {
+    this.repairForm.patchValue({
+      final_cost: value,
+    });
+  }
+
+  async loadRepair() {
+    if (!this.id) return;
+    try {
+      const data = await this.repairService.getById(this.id);
+      if (data) {
+        this.repairForm.patchValue({
+          customer_id: data.customer_id,
+          device_id: data.device_id || '',
+          customer_name: data.customer_name,
+          customer_phone: data.customer_phone,
+          customer_email: data.customer_email || '',
+          customer_dni: data.customer_dni || '',
+          device_model: data.device_model,
+          device_type: data.device_type,
+          brand_id: (data as any).brand_id || null,
+          imei: data.imei,
+          issue_description: data.issue_description,
+          current_status_id: data.current_status_id,
+          estimated_cost: data.estimated_cost,
+          final_cost: data.final_cost,
+          technician_notes: data.technician_notes,
+          security_pin: data.security_pin,
+          security_pattern: data.security_pattern,
+          device_passcode: data.device_passcode,
+          deposit_amount: data.deposit_amount,
+          tracking_code: data.tracking_code,
+          repair_number: data.repair_number,
+          technical_labor_cost: data.technical_labor_cost,
+          technical_report: data.technical_report,
+          glass_upsell: data.glass_upsell,
+          whatsapp_notifications: data.whatsapp_notifications,
+          spare_part_cost: data.spare_part_cost,
+          payment_method: (data as any).payment_method || 'efectivo',
+          warranty: (data as any).warranty || '',
+          supplier_id: (data as any).supplier_id || null,
         });
 
-        // Automatically recalculate final_cost based on estimated_cost and surcharge_percentage
-        this.repairForm.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(val => {
-                const estimated = Number(val.estimated_cost) || 0;
-                const surchargePct = Number(val.surcharge_percentage) || 0;
-                
-                // El Total del Servicio SIEMPRE debe ser igual al presupuestoEstimado + el valor del recargo calculado. NUNCA puede ser menor al presupuestoEstimado.
-                // El Recargo en Dinero se calcula así: (presupuestoEstimado * recargoPorcentaje) / 100
-                const surchargeAmount = (estimated * surchargePct) / 100;
-                const newFinalCost = estimated + surchargeAmount;
+        if (data.checklist) {
+          this.repairForm.get('checklist')?.patchValue(data.checklist);
+        }
 
-                // Solo actualizar si el valor cambió para evitar loops infinitos
-                if (this.repairForm.get('final_cost')?.value !== newFinalCost) {
-                    this.repairForm.patchValue({ final_cost: newFinalCost }, { emitEvent: false });
-                }
-            });
-
-        // If the status is changed to CANCELLED (7), automatically remove warranty
-        this.repairForm.get('current_status_id')?.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(statusId => {
-                if (statusId === RepairStatus.CANCELLED || statusId === 7) {
-                    this.repairForm.patchValue({ warranty: '' }, { emitEvent: false });
-                }
-            });
-    }
-
-    onSelectClient(clientName: string) {
-        this.clientSearch$.next(clientName);
-
-        const client = this.clients().find(c => c.displayName === clientName);
-        if (client) {
-            this.repairForm.patchValue({
-                customer_id: client.id, 
-                customer_name: client.displayName,
-                customer_phone: client.phone,
-                customer_email: client.email,
-                customer_dni: client.dni
-            });
+        if (data.security_pattern) {
+          this.activeSecurityTab.set('pattern');
+        } else if (data.device_passcode) {
+          this.activeSecurityTab.set('passcode');
         } else {
-            this.repairForm.patchValue({
-                customer_id: '',
-                customer_name: clientName
-            }, { emitEvent: false });
-        }
-    }
-
-    async ngOnInit() {
-        if (this.adminLayout) {
-            this.adminLayout.isMainMenuOpen.set(false);
+          this.activeSecurityTab.set('pin');
         }
 
-        this.id = this.route.snapshot.paramMap.get('id');
-        this.setupForm();
-        this.setupSearchStreams();
-        
-        await Promise.all([
-            this.loadCompanySettings(),
-            this.loadInitialClients(),
-            this.loadBrands(),
-            this.id ? this.loadRepair() : Promise.resolve()
-        ]);
-        
-        this.loadInitialProducts();
-        this.loadSuppliers();
-        this.loading.set(false);
+        this.parts.set(data.parts || []);
+        this.images.set(data.images || []);
+      }
+    } catch (e: any) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      this.error.set('Error cargando reparación: ' + message);
     }
+  }
 
-    async openProductModal() {
-        this.showProductModal.set(true);
-        if (this.filteredProducts().length === 0) {
-            await this.loadInitialProducts();
+  syncOfflineRepairs() {
+    this.offlineSyncService
+      .syncAll()
+      .then(() => {
+        this.notificationService.showSuccess(
+          `¡Órdenes sincronizadas con éxito!`,
+        );
+      })
+      .catch((err) => {
+        this.notificationService.showError(`Error al sincronizar.`);
+      });
+  }
+
+  openNotifyModal() {
+    this.shareWhatsApp();
+  }
+
+  async save() {
+    console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
+    window.saveCalled = true;
+    this.saving.set(true);
+    this.error.set(null);
+
+    try {
+      // 1. Resolve branch ID with centralized logic
+      console.log('📍 [AdminRepairForm] Resolviendo sucursal...');
+      const branchIdActual =
+        await this.branchService.resolveEffectiveBranchId();
+
+      if (!branchIdActual) {
+        console.error('❌ [AdminRepairForm] No se detectó sucursal activa');
+        const errorMsg =
+          'Sucursal no detectada. Selecciona una en el panel superior.';
+        this.notificationService.showError('❌ ' + errorMsg);
+        this.error.set(errorMsg);
+        this.saving.set(false);
+        return;
+      }
+      console.log('✅ [AdminRepairForm] Sucursal resuelta:', branchIdActual);
+
+      // 2. Validate form
+      if (this.repairForm.invalid) {
+        const invalidFields: string[] = [];
+        const controls = this.repairForm.controls;
+        for (const name in controls) {
+          if (controls[name].invalid) {
+            invalidFields.push(
+              `${name}: ${JSON.stringify(controls[name].errors)}`,
+            );
+          }
         }
-    }
+        console.warn(
+          '⚠️ [AdminRepairForm] Campos inválidos detected:',
+          invalidFields,
+        );
+        this.repairForm.markAllAsTouched();
 
-    async onFileSelected(event: Event) {
-        const input = event.target as HTMLInputElement;
-        const files = input.files;
-        if (!files || files.length === 0) return;
+        let firstError = 'Por favor, completa los campos obligatorios.';
+        const nameControl = this.repairForm.get('customer_name');
 
-        this.uploadingImages.set(true);
-        const uploadedUrls: string[] = [];
+        if (nameControl?.invalid) {
+          if (nameControl.errors?.['required'])
+            firstError = 'El nombre del cliente es obligatorio.';
+          else if (nameControl.errors?.['minlength'])
+            firstError = `El nombre es demasiado corto (mínimo ${nameControl.errors?.['minlength'].requiredLength} letras).`;
+          else firstError = 'Revisa el nombre del cliente.';
+        } else if (this.repairForm.get('device_model')?.invalid)
+          firstError = 'El modelo del equipo es obligatorio.';
+        else if (this.repairForm.get('issue_description')?.invalid)
+          firstError = 'La falla es obligatoria.';
+
+        // Scroll to the first invalid element
+        setTimeout(() => {
+          const firstInvalidElement = document.querySelector(
+            'input.ng-invalid, select.ng-invalid, textarea.ng-invalid',
+          );
+          if (firstInvalidElement) {
+            firstInvalidElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+            // Add a small shake animation or highlight if needed, or just let the red border do its job
+            (firstInvalidElement as HTMLElement).focus();
+          }
+        }, 100);
+
+        this.notificationService.showError('⚠️ ' + firstError);
+        this.saving.set(false);
+        return;
+      }
+
+      // 3. Prepare payload
+      console.log('📦 [AdminRepairForm] Preparando datos...');
+      const rawData = this.repairForm.getRawValue();
+
+      // Destructuramos para extraer campos del frontend que no existen en la tabla repairs
+      const {
+        device_type,
+        customer_name,
+        customer_email,
+        customer_phone,
+        customer_dni,
+        device_model,
+        brand_id,
+        imei,
+        device_passcode,
+        payment_method,
+        surcharge_percentage,
+        customer_id,
+        ...validFormData
+      } = rawData;
+
+      let finalClientId = customer_id || validFormData.client_id || null;
+      let finalDeviceId = validFormData.device_id || null;
+
+      // Si es un cliente nuevo ingresado manualmente, crear perfil invitado vía RPC
+      if (!finalClientId && customer_name) {
+        try {
+          const client = await this.customerService.create({
+            first_name: customer_name,
+            last_name: '',
+            email: customer_email || null,
+            phone: customer_phone || null,
+            dni: customer_dni || null,
+            tenant_id: this.tenantService.getTenantId(),
+            branch_id: branchIdActual,
+          });
+          if (client && client.id) {
+            finalClientId = client.id;
+          } else {
+            throw new Error('No se obtuvo el ID del cliente.');
+          }
+        } catch (err: any) {
+          console.error('[AdminRepairForm] Error creating guest profile:', err);
+          this.notificationService.showError(
+            'Error al crear o buscar el cliente: ' +
+              (err.message || 'Verifique los datos.'),
+          );
+          this.saving.set(false);
+          return;
+        }
+      } else if (finalClientId) {
+        // Actualizar datos si se editó un cliente existente
+        const updateData: any = {};
+        if (customer_dni) updateData.dni = customer_dni;
+        if (customer_phone) updateData.phone = customer_phone;
+        if (customer_email) updateData.email = customer_email;
+        if (customer_name) {
+          const nameParts = customer_name.trim().split(' ');
+          updateData.first_name = nameParts[0] || '';
+          updateData.last_name = nameParts.slice(1).join(' ') || '';
+        }
 
         try {
-            for (let i = 0; i < files.length; i++) {
-                const file = files.item(i);
-                if (file) {
-                    const url = await this.repairService.uploadImage(file);
-                    uploadedUrls.push(url);
-                }
-            }
-
-            const currentImages = this.images();
-            this.images.set([...currentImages, ...uploadedUrls]);
-            this.notificationService.showSuccess('Imágenes subidas correctamente.');
-        } catch (e: any) {
-            console.error('Error uploading images:', e);
-            const message = e instanceof Error ? e.message : 'Unknown error';
-            this.notificationService.showError('Error al subir imágenes: ' + message);
-        } finally {
-            this.uploadingImages.set(false);
-            // Clear input
-            input.value = '';
+          if (Object.keys(updateData).length > 0) {
+            await this.supabaseService
+              .getClient()
+              .from('profiles')
+              .update(updateData)
+              .eq('id', finalClientId);
+          }
+        } catch (err) {
+          console.error('[AdminRepairForm] Error updating customer data:', err);
         }
-    }
+      }
 
-    removeImage(index: number) {
-        this.images.update(imgs => imgs.filter((_, i) => i !== index));
-    }
-
-    async loadCompanySettings() {
+      // Si hay cliente pero no equipo asociado, crearlo
+      // Buscar o crear modelo (siempre que haya device_model)
+      let modelId: string | null = null;
+      if (device_model) {
         try {
-            const branchId = this.branchService.getCurrentBranchId(); 
-            const data = await this.companyService.getSettings(branchId || undefined);
-            if (data) {
-                this.company.set(data);
-            }
-        } catch (error) {
-            console.error('Error loading company settings', error);
-        }
-    }
+          const { data: existingModel } = await this.supabaseService
+            .getClient()
+            .from('models')
+            .select('id')
+            .ilike('name', device_model.trim())
+            .limit(1);
 
-    async loadBrands() {
+          if (existingModel && existingModel.length > 0) {
+            modelId = existingModel[0].id;
+          } else {
+            const modelName = device_model.trim();
+            const generatedSlug =
+              modelName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '') ||
+              'model-' + Math.random().toString(36).substring(2, 9);
+
+            const { data: newModel } = await this.supabaseService
+              .getClient()
+              .from('models')
+              .insert({
+                name: modelName,
+                slug: generatedSlug,
+                brand_id: brand_id || null,
+                tenant_id: this.tenantService.getTenantId(),
+              })
+              .select('id')
+              .single();
+            if (newModel) modelId = newModel.id;
+          }
+        } catch (modelErr) {
+          console.error('[AdminRepairForm] Error resolving model:', modelErr);
+        }
+      }
+
+      // Si hay cliente pero no equipo asociado, crearlo
+      if (finalClientId && !finalDeviceId && device_model) {
         try {
-            const { data } = await this.supabaseService.getClient().from('brands').select('id, name').order('name');
-            if (data) {
-                this.brands.set(data);
-            }
-        } catch (error) {
-            console.error('Error loading brands', error);
-        }
-    }
+          const { data: newDevice, error: devErr } = await this.supabaseService
+            .getClient()
+            .from('customer_devices')
+            .insert({
+              user_id: finalClientId,
+              model_id: modelId,
+              type: device_type || null,
+              imei: imei || null,
+              passcode: device_passcode || null,
+              tenant_id: this.tenantService.getTenantId(),
+            })
+            .select('id')
+            .single();
 
-    async loadSuppliers() {
+          if (newDevice) finalDeviceId = newDevice.id;
+          if (devErr)
+            console.error('[AdminRepairForm] Error inserting device:', devErr);
+        } catch (devErr) {
+          console.error(
+            '[AdminRepairForm] Exception inserting device:',
+            devErr,
+          );
+        }
+      } else if (finalDeviceId) {
+        // Si hay un dispositivo asociado, actualizar sus datos
         try {
-            const data = await this.supplierService.getAll();
-            if (data) {
-                this.suppliers.set(data);
-            }
-        } catch (error) {
-            console.error('Error loading suppliers', error);
+          const deviceUpdatePayload: any = {
+            imei: imei || null,
+            passcode: device_passcode || null,
+          };
+          if (modelId) deviceUpdatePayload.model_id = modelId;
+          if (device_type) deviceUpdatePayload.type = device_type;
+
+          await this.supabaseService
+            .getClient()
+            .from('customer_devices')
+            .update(deviceUpdatePayload)
+            .eq('id', finalDeviceId);
+        } catch (devUpdateErr) {
+          console.error(
+            '[AdminRepairForm] Error updating device:',
+            devUpdateErr,
+          );
         }
-    }
+      }
 
-    addPart(product: Product) {
-        const newPart = this.repairCalculator.buildNewPart(product, this.id || '');
-        this.parts.update(p => [...p, newPart]);
-        this.calculateFinalCost();
-    }
+      const payload = {
+        ...validFormData,
+        customer_id: finalClientId,
+        client_id: finalClientId,
+        device_id: finalDeviceId,
+        images: this.images(),
+        parts: this.parts(),
+        branch_id: branchIdActual,
+        customer_phone,
+        customer_name,
+        customer_email,
+        customer_dni,
+        device_model,
+        device_type,
+        brand_id,
+        imei,
+        device_passcode,
+        payment_method,
+        surcharge_percentage,
+      };
 
-    async addManualProduct() {
-        const manualName = this.searchQuery().trim() || 'Repuesto Genérico';
-        this.saving.set(true);
-        
-        try {
-            const branchIdActual = await this.branchService.resolveEffectiveBranchId();
-            const newId = crypto.randomUUID();
-            
-            const genericProduct: Product = {
-                id: newId,
-                name: manualName,
-                price: 0,
-                stock: 9999, // Ensures it's not disabled
-                cost_price: 0,
-                is_active: true,
-                is_global: false,
-                sku: '',
-                barcode: '',
-                branch_id: branchIdActual,
-                slug: 'manual-' + newId,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            } as Product;
-            
-            // Register it in the DB so repair_parts_used can link to it (uuid format & foreign key)
-            await this.productService.createProduct(genericProduct);
-            
-            this.addPart(genericProduct);
-            this.showProductModal.set(false);
-            this.searchQuery.set('');
-        } catch (error) {
-            console.error('Error creating manual product:', error);
-            this.notificationService.showError('Error al crear el repuesto manual en la base de datos');
-        } finally {
-            this.saving.set(false);
+      console.log(
+        '📤 [AdminRepairForm] Enviando a servicio...',
+        this.id ? 'UPDATE' : 'CREATE',
+      );
+
+      const isOffline = !navigator.onLine || window.forceOffline;
+      if (!this.id && typeof navigator !== 'undefined' && isOffline) {
+        console.log('📶 [AdminRepairForm] Sin conexión, guardando offline...');
+        this.offlineSyncService.saveOfflineRepair(payload);
+        this.notificationService.showWarning(
+          'Guardado localmente. Se sincronizará cuando haya conexión.',
+        );
+        this.router.navigate(['/admin/repairs']);
+        this.saving.set(false);
+        return;
+      }
+
+      if (this.id) {
+        await this.repairService.update(
+          this.id,
+          payload as unknown as Partial<
+            import('../../features/repairs/domain/entities/repair.entity').Repair
+          >,
+        );
+        this.notificationService.showSuccess(
+          '✅ Reparación actualizada correctamente.',
+        );
+      } else {
+        const createdRepair = await this.repairService.create(
+          payload as CreateRepairDto,
+        );
+        this.notificationService.showSuccess('✅ Orden Creada exitosamente.');
+
+        // Set the tracking code so shareWhatsApp and printOrder can use it
+        if (createdRepair && createdRepair.tracking_code) {
+          this.repairForm.patchValue({
+            tracking_code: createdRepair.tracking_code,
+          });
         }
-    }
-
-    removePart(index: number) {
-        this.parts.update(p => p.filter((_, i) => i !== index));
-        this.calculateFinalCost();
-    }
-
-    updateFormField(field: string, value: unknown) {
-        this.repairForm.get(field)?.setValue(value);
-        this.repairForm.get(field)?.markAsDirty();
-        if (field === 'technical_labor_cost') this.calculateFinalCost();
-    }
-
-    onPartsListChange(parts: import('../../features/repairs/domain/entities/repair.entity').RepairPart[]) {
-        this.parts.set(parts);
-        this.calculateFinalCost();
-    }
-
-    onLaborCostChange(value: number) {
-        this.updateFormField('technical_labor_cost', value);
-    }
-
-    calculateFinalCost() {
-        const laborCost = Number(this.repairForm.get('technical_labor_cost')?.value) || 0;
-        
-        // This calculates the parts cost and suggestions, but we do NOT override final_cost or deposit_amount
-        // based on parts, as per the user's explicit request.
-        const result = this.repairCalculator.calculateFinancials(this.parts(), laborCost);
-
-        this.parts.set(result.updatedParts);
-        
-        // Recalculate final_cost based strictly on estimated_cost + surcharge
-        const estimated = Number(this.repairForm.get('estimated_cost')?.value) || 0;
-        const surchargePct = Number(this.repairForm.get('surcharge_percentage')?.value) || 0;
-        const newFinalCost = estimated + (estimated * surchargePct / 100);
-        
-        this.repairForm.patchValue({
-            final_cost: newFinalCost,
-            spare_part_cost: result.partsCostTotal
-        }, { emitEvent: false });
-    }
-
-    onEstimatedCostChange(value: number) {
-        this.repairForm.patchValue({
-            estimated_cost: value
-        });
-    }
-
-    onFinalCostChange(value: number) {
-        this.repairForm.patchValue({
-            final_cost: value
-        });
-    }
-
-    async loadRepair() {
-        if (!this.id) return;
-        try {
-            const data = await this.repairService.getById(this.id);
-            if (data) {
-                this.repairForm.patchValue({
-                    customer_id: data.customer_id,
-                    device_id: data.device_id || '',
-                    customer_name: data.customer_name,
-                    customer_phone: data.customer_phone,
-                    customer_email: data.customer_email || '',
-                    customer_dni: data.customer_dni || '',
-                    device_model: data.device_model,
-                    device_type: data.device_type,
-                    brand_id: (data as any).brand_id || null,
-                    imei: data.imei,
-                    issue_description: data.issue_description,
-                    current_status_id: data.current_status_id,
-                    estimated_cost: data.estimated_cost,
-                    final_cost: data.final_cost,
-                    technician_notes: data.technician_notes,
-                    security_pin: data.security_pin,
-                    security_pattern: data.security_pattern,
-                    device_passcode: data.device_passcode,
-                    deposit_amount: data.deposit_amount,
-                    tracking_code: data.tracking_code,
-                    repair_number: data.repair_number,
-                    technical_labor_cost: data.technical_labor_cost,
-                    technical_report: data.technical_report,
-                    glass_upsell: data.glass_upsell,
-                    whatsapp_notifications: data.whatsapp_notifications,
-                    spare_part_cost: data.spare_part_cost,
-                    payment_method: (data as any).payment_method || 'efectivo',
-                    warranty: (data as any).warranty || '',
-                    supplier_id: (data as any).supplier_id || null
-                });
-
-                if (data.checklist) {
-                    this.repairForm.get('checklist')?.patchValue(data.checklist);
-                }
-
-                if (data.security_pattern) {
-                    this.activeSecurityTab.set('pattern');
-                } else if (data.device_passcode) {
-                    this.activeSecurityTab.set('passcode');
-                } else {
-                    this.activeSecurityTab.set('pin');
-                }
-
-                this.parts.set(data.parts || []);
-                this.images.set(data.images || []);
-            }
-        } catch (e: any) {
-            const message = e instanceof Error ? e.message : 'Unknown error';
-            this.error.set('Error cargando reparación: ' + message);
-        }
-    }
-
-    syncOfflineRepairs() {
-        this.offlineSyncService.syncAll().then(() => {
-            this.notificationService.showSuccess(`¡Órdenes sincronizadas con éxito!`);
-        }).catch(err => {
-            this.notificationService.showError(`Error al sincronizar.`);
-        });
-    }
-
-    openNotifyModal() {
-        this.shareWhatsApp();
-    }
-    
-    async save() {
-        console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
-        window.saveCalled = true;
-        this.saving.set(true);
-        this.error.set(null);
 
         try {
-            // 1. Resolve branch ID with centralized logic
-            console.log('📍 [AdminRepairForm] Resolviendo sucursal...');
-            const branchIdActual = await this.branchService.resolveEffectiveBranchId();
-            
-            if (!branchIdActual) {
-                console.error('❌ [AdminRepairForm] No se detectó sucursal activa');
-                const errorMsg = 'Sucursal no detectada. Selecciona una en el panel superior.';
-                this.notificationService.showError('❌ ' + errorMsg);
-                this.error.set(errorMsg);
-                this.saving.set(false);
-                return;
-            }
-            console.log('✅ [AdminRepairForm] Sucursal resuelta:', branchIdActual);
-
-            // 2. Validate form
-            if (this.repairForm.invalid) {
-                const invalidFields: string[] = [];
-                const controls = this.repairForm.controls;
-                for (const name in controls) {
-                    if (controls[name].invalid) {
-                        invalidFields.push(`${name}: ${JSON.stringify(controls[name].errors)}`);
-                    }
-                }
-                console.warn('⚠️ [AdminRepairForm] Campos inválidos detected:', invalidFields);
-                this.repairForm.markAllAsTouched();
-                
-                let firstError = 'Por favor, completa los campos obligatorios.';
-                const nameControl = this.repairForm.get('customer_name');
-                
-                if (nameControl?.invalid) {
-                    if (nameControl.errors?.['required']) firstError = 'El nombre del cliente es obligatorio.';
-                    else if (nameControl.errors?.['minlength']) firstError = `El nombre es demasiado corto (mínimo ${nameControl.errors?.['minlength'].requiredLength} letras).`;
-                    else firstError = 'Revisa el nombre del cliente.';
-                }
-                else if (this.repairForm.get('device_model')?.invalid) firstError = 'El modelo del equipo es obligatorio.';
-                else if (this.repairForm.get('issue_description')?.invalid) firstError = 'La falla es obligatoria.';
-                
-                // Scroll to the first invalid element
-                setTimeout(() => {
-                    const firstInvalidElement = document.querySelector('input.ng-invalid, select.ng-invalid, textarea.ng-invalid');
-                    if (firstInvalidElement) {
-                        firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        // Add a small shake animation or highlight if needed, or just let the red border do its job
-                        (firstInvalidElement as HTMLElement).focus();
-                    }
-                }, 100);
-
-                this.notificationService.showError('⚠️ ' + firstError);
-                this.saving.set(false);
-                return;
-            }
-
-            // 3. Prepare payload
-            console.log('📦 [AdminRepairForm] Preparando datos...');
-            const rawData = this.repairForm.getRawValue();
-            
-            // Destructuramos para extraer campos del frontend que no existen en la tabla repairs
-            const { 
-                device_type, customer_name, customer_email, customer_phone, customer_dni, 
-                device_model, brand_id, imei, device_passcode, payment_method, surcharge_percentage, 
-                customer_id, 
-                ...validFormData 
-            } = rawData;
-
-            let finalClientId = customer_id || validFormData.client_id || null;
-            let finalDeviceId = validFormData.device_id || null;
-
-            // Si es un cliente nuevo ingresado manualmente, crear perfil invitado vía RPC
-            if (!finalClientId && customer_name) {
-                try {
-                    const client = await this.customerService.create({
-                        first_name: customer_name,
-                        last_name: '',
-                        email: customer_email || null,
-                        phone: customer_phone || null,
-                        dni: customer_dni || null,
-                        tenant_id: this.tenantService.getTenantId(),
-                        branch_id: branchIdActual
-                    });
-                    if (client && client.id) {
-                        finalClientId = client.id;
-                    } else {
-                        throw new Error('No se obtuvo el ID del cliente.');
-                    }
-                } catch (err: any) {
-                    console.error('[AdminRepairForm] Error creating guest profile:', err);
-                    this.notificationService.showError('Error al crear o buscar el cliente: ' + (err.message || 'Verifique los datos.'));
-                    this.saving.set(false);
-                    return;
-                }
-            } else if (finalClientId) {
-                // Actualizar datos si se editó un cliente existente
-                const updateData: any = {};
-                if (customer_dni) updateData.dni = customer_dni;
-                if (customer_phone) updateData.phone = customer_phone;
-                if (customer_email) updateData.email = customer_email;
-                if (customer_name) {
-                    const nameParts = customer_name.trim().split(' ');
-                    updateData.first_name = nameParts[0] || '';
-                    updateData.last_name = nameParts.slice(1).join(' ') || '';
-                }
-
-                try {
-                    if (Object.keys(updateData).length > 0) {
-                        await this.supabaseService.getClient()
-                            .from('profiles')
-                            .update(updateData)
-                            .eq('id', finalClientId);
-                    }
-                } catch (err) {
-                    console.error('[AdminRepairForm] Error updating customer data:', err);
-                }
-            }
-
-            // Si hay cliente pero no equipo asociado, crearlo
-            // Buscar o crear modelo (siempre que haya device_model)
-            let modelId: string | null = null;
-            if (device_model) {
-                try {
-                    const { data: existingModel } = await this.supabaseService.getClient()
-                        .from('models')
-                        .select('id')
-                        .ilike('name', device_model.trim())
-                        .limit(1);
-
-                    if (existingModel && existingModel.length > 0) {
-                        modelId = existingModel[0].id;
-                    } else {
-                        const modelName = device_model.trim();
-                        const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('model-' + Math.random().toString(36).substring(2, 9));
-                        
-                        const { data: newModel } = await this.supabaseService.getClient()
-                            .from('models')
-                            .insert({
-                                name: modelName,
-                                slug: generatedSlug,
-                                brand_id: brand_id || null,
-                                tenant_id: this.tenantService.getTenantId()
-                            })
-                            .select('id')
-                            .single();
-                        if (newModel) modelId = newModel.id;
-                    }
-                } catch (modelErr) {
-                    console.error('[AdminRepairForm] Error resolving model:', modelErr);
-                }
-            }
-
-            // Si hay cliente pero no equipo asociado, crearlo
-            if (finalClientId && !finalDeviceId && device_model) {
-                try {
-                    const { data: newDevice, error: devErr } = await this.supabaseService.getClient().from('customer_devices').insert({
-                        user_id: finalClientId,
-                        model_id: modelId,
-                        type: device_type || null,
-                        imei: imei || null,
-                        passcode: device_passcode || null,
-                        tenant_id: this.tenantService.getTenantId()
-                    }).select('id').single();
-
-                    if (newDevice) finalDeviceId = newDevice.id;
-                    if (devErr) console.error('[AdminRepairForm] Error inserting device:', devErr);
-                } catch (devErr) {
-                    console.error('[AdminRepairForm] Exception inserting device:', devErr);
-                }
-            } else if (finalDeviceId) {
-                // Si hay un dispositivo asociado, actualizar sus datos
-                try {
-                    const deviceUpdatePayload: any = {
-                        imei: imei || null,
-                        passcode: device_passcode || null
-                    };
-                    if (modelId) deviceUpdatePayload.model_id = modelId;
-                    if (device_type) deviceUpdatePayload.type = device_type;
-
-                    await this.supabaseService.getClient().from('customer_devices').update(deviceUpdatePayload).eq('id', finalDeviceId);
-                } catch (devUpdateErr) {
-                    console.error('[AdminRepairForm] Error updating device:', devUpdateErr);
-                }
-            }
-
-            const payload = {
-                ...validFormData,
-                customer_id: finalClientId,
-                client_id: finalClientId,
-                device_id: finalDeviceId,
-                images: this.images(),
-                parts: this.parts(),
-                branch_id: branchIdActual,
-                customer_phone,
-                customer_name,
-                customer_email,
-                customer_dni,
-                device_model,
-                device_type,
-                brand_id,
-                imei,
-                device_passcode,
-                payment_method,
-                surcharge_percentage
-            };
-            
-            console.log('📤 [AdminRepairForm] Enviando a servicio...', this.id ? 'UPDATE' : 'CREATE');
-            
-            const isOffline = !navigator.onLine || window.forceOffline;
-            if (!this.id && typeof navigator !== 'undefined' && isOffline) {
-                console.log('📶 [AdminRepairForm] Sin conexión, guardando offline...');
-                this.offlineSyncService.saveOfflineRepair(payload);
-                this.notificationService.showWarning('Guardado localmente. Se sincronizará cuando haya conexión.');
-                this.router.navigate(['/admin/repairs']);
-                this.saving.set(false);
-                return;
-            }
-
-            if (this.id) {
-                await this.repairService.update(this.id, payload as unknown as Partial<import('../../features/repairs/domain/entities/repair.entity').Repair>);
-                this.notificationService.showSuccess('✅ Reparación actualizada correctamente.');
-            } else {
-                const createdRepair = await this.repairService.create(payload as CreateRepairDto);
-                this.notificationService.showSuccess('✅ Orden Creada exitosamente.');
-                
-                // Set the tracking code so shareWhatsApp and printOrder can use it
-                if (createdRepair && createdRepair.tracking_code) {
-                    this.repairForm.patchValue({ tracking_code: createdRepair.tracking_code });
-                }
-                
-                try {
-                    console.log('📄 [AdminRepairForm] Generando comprobante...');
-                    await this.printOrder();
-                } catch (pdfErr) {
-                    console.error('Error generando PDF automático:', pdfErr);
-                }
-
-                // WhatsApp Auto-Trigger
-                if (payload.customer_phone && payload.whatsapp_notifications !== false) {
-                    this.shareWhatsApp();
-                }
-            }
-
-            console.log('🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...');
-            this.router.navigate(['/admin/repairs']);
-        } catch (e: any) {
-            console.error('💥 [AdminRepairForm] Error crítico en save():', e);
-            const message = e?.message || e?.error?.message || (typeof e === 'string' ? e : 'Error desconocido al procesar la solicitud.');
-            this.notificationService.showError('Error al guardar: ' + message);
-            this.error.set(message);
-        } finally {
-            this.saving.set(false);
+          console.log('📄 [AdminRepairForm] Generando comprobante...');
+          await this.printOrder();
+        } catch (pdfErr) {
+          console.error('Error generando PDF automático:', pdfErr);
         }
+
+        // WhatsApp Auto-Trigger
+        if (
+          payload.customer_phone &&
+          payload.whatsapp_notifications !== false
+        ) {
+          this.shareWhatsApp();
+        }
+      }
+
+      console.log(
+        '🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...',
+      );
+      this.router.navigate(['/admin/repairs']);
+    } catch (e: any) {
+      console.error('💥 [AdminRepairForm] Error crítico en save():', e);
+      const message =
+        e?.message ||
+        e?.error?.message ||
+        (typeof e === 'string'
+          ? e
+          : 'Error desconocido al procesar la solicitud.');
+      this.notificationService.showError('Error al guardar: ' + message);
+      this.error.set(message);
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  async printOrder() {
+    try {
+      this.notificationService.showInfo('Generando documento PDF...');
+      const rawData = this.repairForm.getRawValue();
+
+      let brandName = 'No especificada';
+      if (rawData.brand_id) {
+        const brand = this.brands().find((b) => b.id === rawData.brand_id);
+        if (brand) brandName = brand.name;
+      }
+
+      // Need a Repair typed object for the service
+      const repairData: any = {
+        ...rawData,
+        brand_name: brandName,
+        parts: this.parts(),
+        images: this.images(),
+        id: this.id || 'new',
+      };
+      await this.repairPdfService.generateOrderPdf(
+        repairData as import('../../features/repairs/domain/entities/repair.entity').Repair,
+        this.company(),
+      );
+    } catch (e: any) {
+      console.error('PDF Error:', e);
+      const message =
+        e instanceof Error ? e.message : 'Error desconocido al generar PDF';
+      this.notificationService.showError('Error al generar PDF: ' + message);
+    }
+  }
+
+  shareWhatsApp() {
+    const data = this.repairForm.getRawValue();
+    if (!data.customer_phone) {
+      this.notificationService.showWarning(
+        'El cliente no tiene teléfono cargado.',
+      );
+      return;
+    }
+    if (!data.tracking_code) {
+      this.notificationService.showWarning(
+        'Falta el código de seguimiento. Guardá la orden primero.',
+      );
+      return;
     }
 
-    async printOrder() {
-        try {
-            this.notificationService.showInfo('Generando documento PDF...');
-            const rawData = this.repairForm.getRawValue();
-            
-            let brandName = 'No especificada';
-            if (rawData.brand_id) {
-                const brand = this.brands().find(b => b.id === rawData.brand_id);
-                if (brand) brandName = brand.name;
-            }
+    const customerName = data.customer_name || 'Cliente';
+    let brandName = '';
+    if (data.brand_id) {
+      const brand = this.brands().find((b) => b.id === data.brand_id);
+      if (brand) brandName = brand.name + ' ';
+    }
+    const device = (brandName + (data.device_model || 'Equipo')).trim();
+    const url = this.getTrackingUrl();
+    const cost = data.final_cost || data.estimated_cost || 0;
+    const statusId = Number(data.current_status_id);
 
-            // Need a Repair typed object for the service
-            const repairData: any = {
-                ...rawData,
-                brand_name: brandName,
-                parts: this.parts(),
-                images: this.images(),
-                id: this.id || 'new'
-            };
-            await this.repairPdfService.generateOrderPdf(repairData as import('../../features/repairs/domain/entities/repair.entity').Repair, this.company());
-        } catch (e: any) {
-            console.error('PDF Error:', e);
-            const message = e instanceof Error ? e.message : 'Error desconocido al generar PDF';
-            this.notificationService.showError('Error al generar PDF: ' + message);
-        }
+    let message = '';
+    const reviewUrl = environment.contact.socialMedia.googleMaps;
+
+    switch (statusId) {
+      case RepairStatus.PENDING_DIAGNOSIS:
+        message = `*Arecofix - Equipo Recibido*\n\nHola ${customerName}, recibimos tu ${device}. Podés seguir el estado de tu reparación en tiempo real aquí:\n\n${url}\n\n¡Gracias por elegirnos!`;
+        break;
+      case RepairStatus.SUPPLY_MANAGEMENT:
+        message = `*Arecofix - Presupuesto / Repuestos*\n\nHola ${customerName}, tenemos novedades sobre el presupuesto o repuestos para tu ${device}. Podés ver los detalles aquí:\n\n${url}\n\nPor favor comunícate con nosotros para coordinar. ¡Gracias!`;
+        break;
+      case RepairStatus.IN_PROGRESS:
+        message = `*Arecofix - En Reparación*\n\nHola ${customerName}, te informamos que tu ${device} ya se encuentra en servicio técnico. Podés seguir el progreso en tiempo real aquí:\n\n${url}`;
+        break;
+      case RepairStatus.QUALITY_CONTROL:
+        message = `*Arecofix - Control de Calidad*\n\nHola ${customerName}, tu ${device} está siendo evaluado en el control de calidad final. Seguí el estado aquí:\n\n${url}`;
+        break;
+      case RepairStatus.READY_FOR_PICKUP:
+        message = `*Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\nTe esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n${url}\n\n¿Qué te pareció nuestro servicio? Déjanos tu reseña: ${reviewUrl}`;
+        break;
+      case RepairStatus.DELIVERED:
+        message = `*Arecofix - ¡Equipo Entregado!*\n\nHola ${customerName}, fue un gusto ayudarte con la reparación de tu ${device}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n${reviewUrl}\n\n¡Muchas gracias!`;
+        break;
+      case RepairStatus.CANCELLED:
+        message = `*Arecofix - Reparación Cancelada*\n\nHola ${customerName}, te informamos que la orden para tu ${device} fue cancelada. Podés ver los detalles aquí:\n\n${url}`;
+        break;
+      default:
+        message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
+        break;
     }
 
-    shareWhatsApp() {
-        const data = this.repairForm.getRawValue();
-        if (!data.customer_phone) {
-            this.notificationService.showWarning('El cliente no tiene teléfono cargado.');
-            return;
-        }
-        if (!data.tracking_code) {
-            this.notificationService.showWarning('Falta el código de seguimiento. Guardá la orden primero.');
-            return;
-        }
+    const whatsappUrl = `https://wa.me/${data.customer_phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  }
 
-        const customerName = data.customer_name || 'Cliente';
-        let brandName = '';
-        if (data.brand_id) {
-            const brand = this.brands().find(b => b.id === data.brand_id);
-            if (brand) brandName = brand.name + ' ';
-        }
-        const device = (brandName + (data.device_model || 'Equipo')).trim();
-        const url = this.getTrackingUrl();
-        const cost = data.final_cost || data.estimated_cost || 0;
-        const statusId = Number(data.current_status_id);
+  getTrackingUrl(): string {
+    const trackingCode = this.repairForm.get('tracking_code')?.value;
+    if (!trackingCode) return '';
+    return `${window.location.origin}/tracking/${trackingCode}`;
+  }
 
-        let message = '';
-        const reviewUrl = environment.contact.socialMedia.googleMaps;
-
-        switch (statusId) {
-            case RepairStatus.PENDING_DIAGNOSIS:
-                message = `*Arecofix - Equipo Recibido*\n\nHola ${customerName}, recibimos tu ${device}. Podés seguir el estado de tu reparación en tiempo real aquí:\n\n${url}\n\n¡Gracias por elegirnos!`;
-                break;
-            case RepairStatus.SUPPLY_MANAGEMENT:
-                message = `*Arecofix - Presupuesto / Repuestos*\n\nHola ${customerName}, tenemos novedades sobre el presupuesto o repuestos para tu ${device}. Podés ver los detalles aquí:\n\n${url}\n\nPor favor comunícate con nosotros para coordinar. ¡Gracias!`;
-                break;
-            case RepairStatus.IN_PROGRESS:
-                message = `*Arecofix - En Reparación*\n\nHola ${customerName}, te informamos que tu ${device} ya se encuentra en servicio técnico. Podés seguir el progreso en tiempo real aquí:\n\n${url}`;
-                break;
-            case RepairStatus.QUALITY_CONTROL:
-                message = `*Arecofix - Control de Calidad*\n\nHola ${customerName}, tu ${device} está siendo evaluado en el control de calidad final. Seguí el estado aquí:\n\n${url}`;
-                break;
-            case RepairStatus.READY_FOR_PICKUP:
-                message = `*Arecofix - ¡Tu equipo está LISTO!*\n\nHola ${customerName}, te avisamos que tu ${device} ya está reparado y listo para retirar. El costo final es de $${cost.toLocaleString('es-AR')}.\n\nTe esperamos en nuestra sucursal. Código de seguimiento: *${data.tracking_code}*\n\nPodés ver la orden completa aquí:\n${url}\n\n¿Qué te pareció nuestro servicio? Déjanos tu reseña: ${reviewUrl}`;
-                break;
-            case RepairStatus.DELIVERED:
-                message = `*Arecofix - ¡Equipo Entregado!*\n\nHola ${customerName}, fue un gusto ayudarte con la reparación de tu ${device}. Si estás conforme con nuestro servicio, nos ayudaría mucho que nos dejes una reseña en Google:\n\n${reviewUrl}\n\n¡Muchas gracias!`;
-                break;
-            case RepairStatus.CANCELLED:
-                message = `*Arecofix - Reparación Cancelada*\n\nHola ${customerName}, te informamos que la orden para tu ${device} fue cancelada. Podés ver los detalles aquí:\n\n${url}`;
-                break;
-            default:
-                message = `Hola ${customerName}, tu ${device} está en reparación. Podés seguir el estado en tiempo real aquí: ${url}`;
-                break;
-        }
-
-        const whatsappUrl = `https://wa.me/${data.customer_phone}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
+  ngOnDestroy() {
+    if (this.adminLayout) {
+      this.adminLayout.isMainMenuOpen.set(true);
     }
-
-    getTrackingUrl(): string {
-        const trackingCode = this.repairForm.get('tracking_code')?.value;
-        if (!trackingCode) return '';
-        return `${window.location.origin}/tracking/${trackingCode}`;
-    }
-
-    ngOnDestroy() {
-        if (this.adminLayout) {
-            this.adminLayout.isMainMenuOpen.set(true);
-        }
-    }
+  }
 }

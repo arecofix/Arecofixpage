@@ -1,4 +1,14 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed, effect, DestroyRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  signal,
+  computed,
+  effect,
+  DestroyRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Subject } from 'rxjs';
 import { switchMap, catchError, takeUntil } from 'rxjs/operators';
 import { CommonModule, DecimalPipe, CurrencyPipe } from '@angular/common';
@@ -6,7 +16,11 @@ import { RouterLink, Router } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { SkeletonComponent } from '@app/shared/components/skeleton/skeleton.component';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import { AnalyticsRepository, DashboardStats, MonthlyRevenue } from '@app/features/analytics/domain/repositories/analytics.repository';
+import {
+  AnalyticsRepository,
+  DashboardStats,
+  MonthlyRevenue,
+} from '@app/features/analytics/domain/repositories/analytics.repository';
 import { CHART_COLORS } from './constants/chart-colors.constant';
 import { AuthService } from '@app/core/services/auth.service';
 import { TranslationService } from '@app/core/services/translation.service';
@@ -24,7 +38,14 @@ import { NotificationService } from '@app/core/services/notification.service';
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, BaseChartDirective, SkeletonComponent, FormsModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    BaseChartDirective,
+    SkeletonComponent,
+    FormsModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-dashboard-page.html',
 })
 export class AdminDashboardPage implements OnInit, OnDestroy {
@@ -46,7 +67,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     amount: 0,
     category: 'gasto_fijo' as any,
     payment_method: 'cash',
-    notes: ''
+    notes: '',
   });
   savingFinance = signal(false);
 
@@ -56,20 +77,26 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
       return [
         { value: 'sale', label: '🛒 Ventas de Tienda' },
         { value: 'repair', label: '🛠️ Reparación / Taller' },
-        { value: 'sueldo_externo', label: '💼 Inyección Capital / Sueldo Externo' },
+        {
+          value: 'sueldo_externo',
+          label: '💼 Inyección Capital / Sueldo Externo',
+        },
         { value: 'beca', label: '🎓 Becas / Subsidios' },
         { value: 'adjustment', label: '📊 Ajuste de Caja (Ingreso)' },
-        { value: 'otros', label: '➕ Otros Ingresos' }
+        { value: 'otros', label: '➕ Otros Ingresos' },
       ];
     } else {
       return [
         { value: 'purchase', label: '📦 Compra de Repuestos / Insumos' },
-        { value: 'gasto_fijo', label: '🏠 Gastos Fijos (Alquiler, Luz, Internet)' },
+        {
+          value: 'gasto_fijo',
+          label: '🏠 Gastos Fijos (Alquiler, Luz, Internet)',
+        },
         { value: 'gasto_hormiga', label: '☕ Gastos Hormiga (Café, Limpieza)' },
         { value: 'inversion', label: '📈 Inversión (Herramientas, Marketing)' },
         { value: 'draw', label: '💸 Retiro de Socios / Socias' },
         { value: 'adjustment', label: '📊 Ajuste de Caja (Egreso)' },
-        { value: 'otros', label: '➖ Otros Egresos' }
+        { value: 'otros', label: '➖ Otros Egresos' },
       ];
     }
   });
@@ -93,11 +120,14 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     sales_chart: [],
     products_chart: [],
     category_chart: [],
-    profit_chart: []
+    profit_chart: [],
   });
 
   totalProfitMargin = computed(() => {
-    return NumberUtils.calculateMargin(this.stats().total_gross_revenue, this.stats().total_net_profit);
+    return NumberUtils.calculateMargin(
+      this.stats().total_gross_revenue,
+      this.stats().total_net_profit,
+    );
   });
 
   selectedPeriod = signal<string>(this.getCurrentPeriod());
@@ -105,26 +135,36 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   selectedMonthData = computed(() => {
     const period = this.selectedPeriod();
     const breakdown = this.stats().monthly_breakdown || [];
-    return breakdown.find(m => m.period === period) || {
-      period: period,
-      label: 'Mes Seleccionado',
-      gross_revenue: 0,
-      cost: 0,
-      net_profit: 0,
-      repairs_revenue: 0,
-      sales_revenue: 0,
-      repairs_cost: 0,
-      sales_cost: 0
-    } as MonthlyRevenue;
+    return (
+      breakdown.find((m) => m.period === period) ||
+      ({
+        period: period,
+        label: 'Mes Seleccionado',
+        gross_revenue: 0,
+        cost: 0,
+        net_profit: 0,
+        repairs_revenue: 0,
+        sales_revenue: 0,
+        repairs_cost: 0,
+        sales_cost: 0,
+      } as MonthlyRevenue)
+    );
   });
 
   selectedMonthGross = computed(() => this.selectedMonthData().gross_revenue);
   selectedMonthCost = computed(() => this.selectedMonthData().cost);
   selectedMonthProfit = computed(() => this.selectedMonthData().net_profit);
-  selectedMonthRepairsProfit = computed(() => this.selectedMonthData().repairs_revenue - this.selectedMonthData().repairs_cost);
+  selectedMonthRepairsProfit = computed(
+    () =>
+      this.selectedMonthData().repairs_revenue -
+      this.selectedMonthData().repairs_cost,
+  );
 
   currentMonthMargin = computed(() => {
-    return NumberUtils.calculateMargin(this.selectedMonthGross(), this.selectedMonthProfit());
+    return NumberUtils.calculateMargin(
+      this.selectedMonthGross(),
+      this.selectedMonthProfit(),
+    );
   });
 
   private getCurrentPeriod(): string {
@@ -136,13 +176,13 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     enabled: false,
     sessionId: '',
     distinctId: '',
-    eventsCount: 0
+    eventsCount: 0,
   });
 
   loading = signal(true);
   isSuperAdmin = signal(false);
   pendingProductsCount = signal(0);
-  
+
   private branchService = inject(BranchService);
 
   // Branches for SuperAdmin
@@ -164,12 +204,15 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         bodyFont: { size: 12 },
         padding: 12,
         cornerRadius: 8,
-      }
+      },
     },
     scales: {
       y: { display: false },
-      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9ca3af' } }
-    }
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 10 }, color: '#9ca3af' },
+      },
+    },
   };
 
   public productsChartData?: ChartData<'bar'>;
@@ -180,8 +223,8 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     plugins: { legend: { display: false } },
     scales: {
       y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 } } },
-      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-    }
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+    },
   };
 
   public categoryChartData?: ChartData<'doughnut'>;
@@ -189,9 +232,14 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   public categoryChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20, font: { size: 11 } } } },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { boxWidth: 12, padding: 20, font: { size: 11 } },
+      },
+    },
     // @ts-ignore
-    cutout: '70%'
+    cutout: '70%',
   };
 
   private branchContextService = inject(BranchContextService);
@@ -199,25 +247,27 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
 
   constructor() {
     // Escudo RxJS contra Race Conditions y Fugas de Memoria
-    this.loadStats$.pipe(
-      switchMap(branchId => {
-        this.loading.set(true);
-        return this.analyticsRepo.getDashboardStats(branchId).pipe(
-          catchError(err => {
-            console.error('Error loading dashboard stats:', err);
-            this.loading.set(false);
-            return [];
-          })
-        );
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe((stats: any) => {
-      if (stats && !Array.isArray(stats)) {
-        this.stats.set(stats);
-        this.prepareCharts(stats);
-      }
-      this.loading.set(false);
-    });
+    this.loadStats$
+      .pipe(
+        switchMap((branchId) => {
+          this.loading.set(true);
+          return this.analyticsRepo.getDashboardStats(branchId).pipe(
+            catchError((err) => {
+              console.error('Error loading dashboard stats:', err);
+              this.loading.set(false);
+              return [];
+            }),
+          );
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((stats: any) => {
+        if (stats && !Array.isArray(stats)) {
+          this.stats.set(stats);
+          this.prepareCharts(stats);
+        }
+        this.loading.set(false);
+      });
 
     // React to branch changes globally
     effect(() => {
@@ -230,7 +280,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isSuperAdmin.set(this.authService.isSuperAdmin());
-    
+
     if (this.isSuperAdmin()) {
       await this.loadBranches();
     }
@@ -238,13 +288,13 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // Initial load happens via the effect above
 
     await this.loadPendingProductsCount();
-    
+
     // Analytics monitor
     this.analyticsStats.set({
       enabled: this.analyticsService.isEnabled(),
       sessionId: this.analyticsService.getSessionId() || 'N/A',
       distinctId: (this.analyticsService as any).getDistinctId?.() || 'N/A',
-      eventsCount: 0
+      eventsCount: 0,
     });
   }
 
@@ -296,16 +346,18 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // Sales Chart
     if (stats.sales_chart?.length > 0) {
       this.salesChartData = {
-        labels: stats.sales_chart.map(s => s.period),
-        datasets: [{
-          data: stats.sales_chart.map(s => s.total),
-          label: 'Ventas',
-          borderColor: CHART_COLORS.primary,
-          backgroundColor: CHART_COLORS.primaryLight,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0
-        }]
+        labels: stats.sales_chart.map((s) => s.period),
+        datasets: [
+          {
+            data: stats.sales_chart.map((s) => s.total),
+            label: 'Ventas',
+            borderColor: CHART_COLORS.primary,
+            backgroundColor: CHART_COLORS.primaryLight,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+        ],
       };
     } else {
       this.salesChartData = undefined;
@@ -323,15 +375,19 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         '#ec4899', // pink
         '#14b8a6', // teal
         '#f97316', // orange
-        '#64748b'  // slate
+        '#64748b', // slate
       ];
 
       this.categoryChartData = {
-        labels: stats.category_chart.map(c => c.name),
-        datasets: [{
-          data: stats.category_chart.map(c => c.count),
-          backgroundColor: stats.category_chart.map((_, i) => colors[i % colors.length])
-        }]
+        labels: stats.category_chart.map((c) => c.name),
+        datasets: [
+          {
+            data: stats.category_chart.map((c) => c.count),
+            backgroundColor: stats.category_chart.map(
+              (_, i) => colors[i % colors.length],
+            ),
+          },
+        ],
       };
     } else {
       this.categoryChartData = undefined;
@@ -340,13 +396,15 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // Products Chart
     if (stats.products_chart?.length > 0) {
       this.productsChartData = {
-        labels: stats.products_chart.map(p => p.name),
-        datasets: [{
-          data: stats.products_chart.map(p => p.quantity),
-          label: 'Unidades',
-          backgroundColor: CHART_COLORS.primary,
-          borderRadius: 8
-        }]
+        labels: stats.products_chart.map((p) => p.name),
+        datasets: [
+          {
+            data: stats.products_chart.map((p) => p.quantity),
+            label: 'Unidades',
+            backgroundColor: CHART_COLORS.primary,
+            borderRadius: 8,
+          },
+        ],
       };
     } else {
       this.productsChartData = undefined;
@@ -381,23 +439,23 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
       amount: 0,
       category: 'gasto_fijo',
       payment_method: 'cash',
-      notes: ''
+      notes: '',
     });
     this.showFinanceModal.set(true);
   }
 
   changeFinanceType(type: 'income' | 'expense') {
-    this.financeForm.update(form => ({
+    this.financeForm.update((form) => ({
       ...form,
       type,
-      category: type === 'income' ? 'sale' : 'gasto_fijo'
+      category: type === 'income' ? 'sale' : 'gasto_fijo',
     }));
   }
 
   updateFinanceField(field: string, value: any) {
-    this.financeForm.update(form => ({
+    this.financeForm.update((form) => ({
       ...form,
-      [field]: value
+      [field]: value,
     }));
   }
 
@@ -411,20 +469,22 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     this.savingFinance.set(true);
     try {
       const activeBranchId = this.branchContextService.currentBranchId();
-      
+
       const payload = {
         amount: form.amount,
         type: form.type,
         category: form.category,
         payment_method: form.payment_method,
         notes: form.notes || null,
-        branch_id: activeBranchId || null
+        branch_id: activeBranchId || null,
       };
 
       await this.financeService.recordMovement(payload as any);
-      this.notificationService.showSuccess('¡Movimiento financiero registrado!');
+      this.notificationService.showSuccess(
+        '¡Movimiento financiero registrado!',
+      );
       this.showFinanceModal.set(false);
-      
+
       // Forzar recarga del dashboard
       this.loadStats$.next(activeBranchId || undefined);
     } catch (e: any) {
@@ -440,6 +500,3 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
-
-
-

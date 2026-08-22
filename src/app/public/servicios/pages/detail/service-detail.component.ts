@@ -1,4 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SeoService } from '@app/core/services/seo.service';
@@ -10,6 +16,7 @@ import { AppCatalogService } from '@app/features/products/application/services/a
   selector: 'app-service-detail',
   standalone: true,
   imports: [RouterModule, NgOptimizedImage],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './service-detail.component.html',
 })
 export class ServiceDetailComponent implements OnInit {
@@ -22,7 +29,7 @@ export class ServiceDetailComponent implements OnInit {
   whatsappNumber = environment.contact.whatsappNumber;
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const slug = params.get('slug');
       if (slug) {
         this.loadService(slug);
@@ -32,25 +39,27 @@ export class ServiceDetailComponent implements OnInit {
 
   private slugify(text: string): string {
     return text
-        .toString()
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '')
-        .replace(/\-\-+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '');
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
   }
 
   private async loadService(slug: string) {
     // 1. Search in database first
     try {
       const dbServices = await this.catalogService.getAll();
-      const foundDb = dbServices.find(s => s.slug === slug || this.slugify(s.name) === slug);
+      const foundDb = dbServices.find(
+        (s) => s.slug === slug || this.slugify(s.name) === slug,
+      );
       if (foundDb && foundDb.is_active) {
         let desc = foundDb.description || '';
         let icon = 'fa-tools';
         let features: string[] = [];
-        
+
         if (desc.trim().startsWith('{') && desc.trim().endsWith('}')) {
           try {
             const parsed = JSON.parse(desc);
@@ -61,7 +70,7 @@ export class ServiceDetailComponent implements OnInit {
             // ignore
           }
         }
-        
+
         const mappedService: Service = {
           id: foundDb.id as any,
           title: foundDb.name,
@@ -69,9 +78,12 @@ export class ServiceDetailComponent implements OnInit {
           description: desc,
           icon: icon,
           features: features,
-          price: foundDb.price ? `Desde $${Number(foundDb.price).toLocaleString('es-AR')}` : 'Consultar',
-          image: foundDb.image_url || 'assets/img/services/repair-illustration.webp',
-          link: `/servicios/${foundDb.slug || this.slugify(foundDb.name)}`
+          price: foundDb.price
+            ? `Desde $${Number(foundDb.price).toLocaleString('es-AR')}`
+            : 'Consultar',
+          image:
+            foundDb.image_url || 'assets/img/services/repair-illustration.webp',
+          link: `/servicios/${foundDb.slug || this.slugify(foundDb.name)}`,
         };
         this.service.set(mappedService);
         this.setSeo(mappedService);
@@ -82,7 +94,9 @@ export class ServiceDetailComponent implements OnInit {
     }
 
     // 2. Fallback to static Spanish content
-    const foundService = SERVICIOS_CONTENT.es.services.find(s => s.slug === slug);
+    const foundService = SERVICIOS_CONTENT.es.services.find(
+      (s) => s.slug === slug,
+    );
 
     if (foundService) {
       this.service.set(foundService);
@@ -97,7 +111,7 @@ export class ServiceDetailComponent implements OnInit {
     this.seoService.setPageData({
       title: service.title,
       description: service.description,
-      imageUrl: service.image
+      imageUrl: service.image,
     });
   }
 
@@ -106,4 +120,3 @@ export class ServiceDetailComponent implements OnInit {
     return `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(message)}`;
   }
 }
-

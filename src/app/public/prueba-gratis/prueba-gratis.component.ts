@@ -1,6 +1,16 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { SeoService } from '@app/core/services/seo.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
@@ -8,7 +18,8 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
   selector: 'app-prueba-gratis',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './prueba-gratis.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './prueba-gratis.component.html',
 })
 export class PruebaGratisComponent {
   private seoService = inject(SeoService);
@@ -16,12 +27,12 @@ export class PruebaGratisComponent {
   private supabase = inject(SUPABASE_CLIENT);
 
   trialForm: FormGroup;
-  
+
   loading = signal(false);
   success = signal(false);
   errorMsg = signal<string | null>(null);
   uploadingLogo = signal(false);
-  
+
   // Credenciales generadas para mostrar al usuario
   generatedEmail = signal('');
   generatedPassword = signal('');
@@ -32,13 +43,14 @@ export class PruebaGratisComponent {
   logoPreviewUrl = signal<string | null>(null);
 
   constructor() {
-    
-
     this.trialForm = this.fb.group({
       businessName: ['', [Validators.required, Validators.minLength(3)]],
       userName: ['', [Validators.required, Validators.minLength(3)]],
-      whatsapp: ['', [Validators.required, Validators.pattern('^[0-9+ ]{8,15}$')]],
-      email: ['', [Validators.required, Validators.email]]
+      whatsapp: [
+        '',
+        [Validators.required, Validators.pattern('^[0-9+ ]{8,15}$')],
+      ],
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -49,7 +61,9 @@ export class PruebaGratisComponent {
 
     // Validate: only images, max 2MB
     if (!file.type.startsWith('image/')) {
-      this.errorMsg.set('Solo se permiten archivos de imagen (JPG, PNG, SVG, WebP).');
+      this.errorMsg.set(
+        'Solo se permiten archivos de imagen (JPG, PNG, SVG, WebP).',
+      );
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
@@ -84,11 +98,16 @@ export class PruebaGratisComponent {
         .upload(fileName, file, { contentType: file.type, upsert: false });
 
       if (error) {
-        console.warn('[PruebaGratis] Logo upload failed (non-critical):', error.message);
+        console.warn(
+          '[PruebaGratis] Logo upload failed (non-critical):',
+          error.message,
+        );
         return null;
       }
 
-      const { data } = this.supabase.storage.from('logos').getPublicUrl(fileName);
+      const { data } = this.supabase.storage
+        .from('logos')
+        .getPublicUrl(fileName);
       return data?.publicUrl ?? null;
     } catch (e) {
       console.warn('[PruebaGratis] Logo upload exception (non-critical):', e);
@@ -116,20 +135,25 @@ export class PruebaGratisComponent {
         logoUrl = await this.uploadLogo(this.selectedLogoFile);
       }
 
-      const { data, error } = await this.supabase.functions.invoke('create-trial-tenant', {
-        body: {
-          businessName: formData.businessName,
-          userName: formData.userName,
-          email: formData.email,
-          whatsapp: formData.whatsapp,
-          subtitle: 'Reparación Especializada por ' + formData.userName,
-          currency: 'ARS',
-          logo_url: logoUrl
-        }
-      });
+      const { data, error } = await this.supabase.functions.invoke(
+        'create-trial-tenant',
+        {
+          body: {
+            businessName: formData.businessName,
+            userName: formData.userName,
+            email: formData.email,
+            whatsapp: formData.whatsapp,
+            subtitle: 'Reparación Especializada por ' + formData.userName,
+            currency: 'ARS',
+            logo_url: logoUrl,
+          },
+        },
+      );
 
       if (error) {
-        throw new Error(error.message || 'Error al crear la cuenta. Intente nuevamente.');
+        throw new Error(
+          error.message || 'Error al crear la cuenta. Intente nuevamente.',
+        );
       }
 
       if (data?.error) {
@@ -141,10 +165,11 @@ export class PruebaGratisComponent {
       this.generatedPassword.set(data?.credentials?.password ?? '');
 
       this.success.set(true);
-      
     } catch (e: unknown) {
       const err = e as Error;
-      this.errorMsg.set(err.message || 'Ocurrió un error inesperado al solicitar la prueba.');
+      this.errorMsg.set(
+        err.message || 'Ocurrió un error inesperado al solicitar la prueba.',
+      );
     } finally {
       this.loading.set(false);
     }

@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -8,91 +14,95 @@ import { firstValueFrom } from 'rxjs';
 import { ProductMediaService } from '@app/admin/products/services/product-media.service';
 
 @Component({
-    selector: 'app-admin-brand-form-page',
-    standalone: true,
-    imports: [FormsModule, RouterLink],
-    templateUrl: './admin-brand-form-page.html',
+  selector: 'app-admin-brand-form-page',
+  standalone: true,
+  imports: [FormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './admin-brand-form-page.html',
 })
 export class AdminBrandFormPage implements OnInit {
-    private route = inject(ActivatedRoute);
-    private router = inject(Router);
-    private auth = inject(AuthService);
-    private brandRepo = inject(BrandRepository);
-    private mediaService = inject(ProductMediaService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
+  private brandRepo = inject(BrandRepository);
+  private mediaService = inject(ProductMediaService);
 
-    id: string | null = null;
-    form = signal({
-        name: '',
-        slug: '',
-        logo_url: '',
-        is_active: true,
-    });
+  id: string | null = null;
+  form = signal({
+    name: '',
+    slug: '',
+    logo_url: '',
+    is_active: true,
+  });
 
-    loading = signal(true);
-    saving = signal(false);
-    error = signal<string | null>(null);
+  loading = signal(true);
+  saving = signal(false);
+  error = signal<string | null>(null);
 
-    async ngOnInit() {
-        this.id = this.route.snapshot.paramMap.get('id');
-        if (this.id) {
-            try {
-                const data = await firstValueFrom(this.brandRepo.getById(this.id));
-                if (data) {
-                    this.form.set({
-                        name: data.name || '',
-                        slug: data.slug || '',
-                        logo_url: data.logo_url || '',
-                        is_active: data.is_active ?? true,
-                    });
-                }
-            } catch (err) {
-                console.error('Error loading brand:', err);
-                this.error.set('Error al cargar la marca.');
-            }
+  async ngOnInit() {
+    this.id = this.route.snapshot.paramMap.get('id');
+    if (this.id) {
+      try {
+        const data = await firstValueFrom(this.brandRepo.getById(this.id));
+        if (data) {
+          this.form.set({
+            name: data.name || '',
+            slug: data.slug || '',
+            logo_url: data.logo_url || '',
+            is_active: data.is_active ?? true,
+          });
         }
-        this.loading.set(false);
+      } catch (err) {
+        console.error('Error loading brand:', err);
+        this.error.set('Error al cargar la marca.');
+      }
+    }
+    this.loading.set(false);
+  }
+
+  async onFileChange(event: any) {
+    const file: File = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const publicUrl = await this.mediaService.uploadFile(file, 'brands');
+      this.form.update((f) => ({ ...f, logo_url: publicUrl }));
+    } catch (error: any) {
+      this.error.set(error.message);
+    }
+  }
+
+  async save() {
+    this.saving.set(true);
+    this.error.set(null);
+
+    const payload = { ...this.form() };
+
+    if (!payload.slug) {
+      payload.slug = this.slugify(payload.name);
     }
 
-    async onFileChange(event: any) {
-        const file: File = event.target.files?.[0];
-        if (!file) return;
-
-        try {
-            const publicUrl = await this.mediaService.uploadFile(file, 'brands');
-            this.form.update((f) => ({ ...f, logo_url: publicUrl }));
-        } catch (error: any) {
-            this.error.set(error.message);
-        }
+    try {
+      if (this.id) {
+        await firstValueFrom(this.brandRepo.update(this.id, payload as any));
+      } else {
+        await firstValueFrom(this.brandRepo.create(payload as any));
+      }
+      this.router.navigate(['/admin/brands']);
+    } catch (e: any) {
+      this.error.set(e.message || 'Error al guardar la marca');
+    } finally {
+      this.saving.set(false);
     }
+  }
 
-    async save() {
-        this.saving.set(true);
-        this.error.set(null);
-        
-        const payload = { ...this.form() };
-
-        if (!payload.slug) {
-            payload.slug = this.slugify(payload.name);
-        }
-
-        try {
-            if (this.id) {
-                await firstValueFrom(this.brandRepo.update(this.id, payload as any));
-            } else {
-                await firstValueFrom(this.brandRepo.create(payload as any));
-            }
-            this.router.navigate(['/admin/brands']);
-        } catch (e: any) {
-            this.error.set(e.message || 'Error al guardar la marca');
-        } finally {
-            this.saving.set(false);
-        }
-    }
-
-    private slugify(text: string): string {
-        return text.toString().toLowerCase().trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-');
-    }
+  private slugify(text: string): string {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
+  }
 }

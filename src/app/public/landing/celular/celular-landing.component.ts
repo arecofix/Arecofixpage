@@ -3,9 +3,14 @@ import {
   inject,
   PLATFORM_ID,
   ChangeDetectorRef,
-  DOCUMENT
+  DOCUMENT,
+  ChangeDetectionStrategy,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
+import {
+  CommonModule,
+  isPlatformBrowser,
+  NgOptimizedImage,
+} from '@angular/common';
 import {
   DomSanitizer,
   SafeResourceUrl,
@@ -64,6 +69,7 @@ interface GalleryItem {
     BreadcrumbsComponent,
     NgOptimizedImage,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './celular-landing.component.html',
 })
 export class CelularLandingComponent {
@@ -117,10 +123,6 @@ export class CelularLandingComponent {
   contactPhone = '';
   contactMessage = '';
   sendingContact = false;
-
-  
-
-
 
   async sendContactForm() {
     if (!this.contactName || !this.contactPhone || !this.contactMessage) {

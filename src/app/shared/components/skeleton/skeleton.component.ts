@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,14 +6,15 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div 
-      [style.width]="width" 
-      [style.height]="height" 
+    <div
+      [style.width]="width"
+      [style.height]="height"
       [class]="'animate-pulse bg-gray-200 dark:bg-gray-800 ' + borderRadius"
       aria-hidden="true"
     ></div>
   `,
-  styleUrl: './skeleton.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './skeleton.component.scss',
 })
 export class SkeletonComponent {
   @Input() width: string = '100%';

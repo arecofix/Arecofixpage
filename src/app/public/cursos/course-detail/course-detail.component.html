@@ -12,12 +12,19 @@
     <!-- Instructor Edit Banner -->
     @if (isAuthor) {
       <div class="bg-indigo-600 text-white shadow-md relative z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div
+          class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3"
+        >
           <div class="flex items-center gap-2">
             <i class="fas fa-tools text-indigo-200"></i>
-            <span class="font-medium text-sm sm:text-base">Eres el instructor de este curso.</span>
+            <span class="font-medium text-sm sm:text-base"
+              >Eres el instructor de este curso.</span
+            >
           </div>
-          <a [routerLink]="['/instructor/builder', course.slug]" class="btn btn-sm bg-white text-indigo-700 hover:bg-indigo-50 border-none whitespace-nowrap">
+          <a
+            [routerLink]="['/instructor/builder', course.slug]"
+            class="btn btn-sm bg-white text-indigo-700 hover:bg-indigo-50 border-none whitespace-nowrap"
+          >
             <i class="fas fa-edit"></i> Editar Curso
           </a>
         </div>
@@ -25,95 +32,172 @@
     }
 
     <!-- Hero Section Platzi Style -->
-    <div class="bg-slate-900 text-white pt-24 pb-12 overflow-hidden border-b border-slate-800 relative">
+    <div
+      class="bg-slate-900 text-white pt-24 pb-12 overflow-hidden border-b border-slate-800 relative"
+    >
       <!-- Background Image with Modern Dual Overlay -->
       <div class="absolute inset-0">
-        <img [src]="course.image_url" [alt]="course.title" fetchpriority="high" class="w-full h-full object-cover opacity-10 filter blur-sm scale-110">
-        <div class="absolute inset-0 bg-linear-to-r from-slate-900 via-slate-900/90 to-transparent"></div>
-        <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"></div>
+        <img
+          [src]="course.image_url"
+          [alt]="course.title"
+          fetchpriority="high"
+          class="w-full h-full object-cover opacity-10 filter blur-sm scale-110"
+        />
+        <div
+          class="absolute inset-0 bg-linear-to-r from-slate-900 via-slate-900/90 to-transparent"
+        ></div>
+        <div
+          class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"
+        ></div>
         <!-- Decorative Glow -->
-        <div class="absolute top-0 right-0 w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-blue-600/20 rounded-full blur-[60px] md:blur-[100px] pointer-events-none"></div>
+        <div
+          class="absolute top-0 right-0 w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-blue-600/20 rounded-full blur-[60px] md:blur-[100px] pointer-events-none"
+        ></div>
       </div>
 
-      <div class="container mx-auto px-4 relative z-10 max-w-6xl flex flex-col md:flex-row gap-8 items-start">
-        
+      <div
+        class="container mx-auto px-4 relative z-10 max-w-6xl flex flex-col md:flex-row gap-8 items-start"
+      >
         <!-- Course Meta & Title -->
         <div class="w-full md:w-2/3">
-          <div class="text-sm font-medium text-blue-400 mb-6 flex items-center gap-2">
-            <a routerLink="/" class="hover:text-blue-300 transition-colors">Inicio</a>
+          <div
+            class="text-sm font-medium text-blue-400 mb-6 flex items-center gap-2"
+          >
+            <a routerLink="/" class="hover:text-blue-300 transition-colors"
+              >Inicio</a
+            >
             <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
-            <a routerLink="/academy" class="hover:text-blue-300 transition-colors">Academia</a>
+            <a
+              routerLink="/academy"
+              class="hover:text-blue-300 transition-colors"
+              >Academia</a
+            >
             <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
-            <span class="text-white hidden sm:inline">{{course.title}}</span>
+            <span class="text-white hidden sm:inline">{{ course.title }}</span>
           </div>
 
-          <h1 class="text-4xl sm:text-5xl font-black mb-4 tracking-tight leading-[1.1] text-white">
-            {{course.title}}
+          <h1
+            class="text-4xl sm:text-5xl font-black mb-4 tracking-tight leading-[1.1] text-white"
+          >
+            {{ course.title }}
           </h1>
 
-          <p class="text-base sm:text-lg text-slate-300 mb-6 max-w-2xl leading-relaxed font-light">
-            {{course.description || course.short_description}}
+          <p
+            class="text-base sm:text-lg text-slate-300 mb-6 max-w-2xl leading-relaxed font-light"
+          >
+            {{ course.description || course.short_description }}
           </p>
 
-          <div class="flex items-center gap-4 text-sm text-slate-300 mb-6 flex-wrap">
+          <div
+            class="flex items-center gap-4 text-sm text-slate-300 mb-6 flex-wrap"
+          >
             <div class="flex items-center gap-1 text-yellow-400 font-bold">
-              <i class="fas fa-star"></i> {{rating}}
+              <i class="fas fa-star"></i> {{ rating }}
             </div>
             <span>·</span>
-            <div class="underline hover:text-white cursor-pointer">{{reviewsCount}} opiniones</div>
+            <div class="underline hover:text-white cursor-pointer">
+              {{ reviewsCount }} opiniones
+            </div>
             <span>·</span>
-            <div>Publicado el {{publishDate}}</div>
+            <div>Publicado el {{ publishDate }}</div>
           </div>
 
           <!-- Highlight Stats Grid -->
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5 w-fit backdrop-blur-sm">
+          <div
+            class="grid grid-cols-2 md:grid-cols-5 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5 w-fit backdrop-blur-sm"
+          >
             <div class="flex flex-col">
-              <span class="text-[10px] uppercase text-slate-400 font-bold">Nivel</span>
-              <span class="font-bold text-white capitalize">{{course.level === 'basic' ? 'Básico' : (course.level === 'intermediate' ? 'Intermedio' : 'Avanzado')}}</span>
+              <span class="text-[10px] uppercase text-slate-400 font-bold"
+                >Nivel</span
+              >
+              <span class="font-bold text-white capitalize">{{
+                course.level === "basic"
+                  ? "Básico"
+                  : course.level === "intermediate"
+                    ? "Intermedio"
+                    : "Avanzado"
+              }}</span>
             </div>
             <div class="flex flex-col">
-              <span class="text-[10px] uppercase text-slate-400 font-bold">Dedicación</span>
-              <span class="font-bold text-white">{{hoursPerWeek}}</span>
+              <span class="text-[10px] uppercase text-slate-400 font-bold"
+                >Dedicación</span
+              >
+              <span class="font-bold text-white">{{ hoursPerWeek }}</span>
             </div>
             <div class="flex flex-col">
-              <span class="text-[10px] uppercase text-slate-400 font-bold">Clases</span>
-              <span class="font-bold text-white">{{classesCount}} clases</span>
+              <span class="text-[10px] uppercase text-slate-400 font-bold"
+                >Clases</span
+              >
+              <span class="font-bold text-white"
+                >{{ classesCount }} clases</span
+              >
             </div>
             <div class="flex flex-col">
-              <span class="text-[10px] uppercase text-slate-400 font-bold">Contenido</span>
-              <span class="font-bold text-white">{{hoursContent}} horas</span>
+              <span class="text-[10px] uppercase text-slate-400 font-bold"
+                >Contenido</span
+              >
+              <span class="font-bold text-white">{{ hoursContent }} horas</span>
             </div>
             <div class="flex flex-col">
-              <span class="text-[10px] uppercase text-slate-400 font-bold">Práctica</span>
-              <span class="font-bold text-white">{{hoursPractice}} horas</span>
+              <span class="text-[10px] uppercase text-slate-400 font-bold"
+                >Práctica</span
+              >
+              <span class="font-bold text-white"
+                >{{ hoursPractice }} horas</span
+              >
             </div>
           </div>
         </div>
 
         <!-- Course Card Floating Action -->
         <div class="w-full md:w-1/3 hidden md:block">
-           <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700">
-              <img [src]="course.image_url" [alt]="course.title" fetchpriority="high" class="w-full h-48 object-cover">
-              <div class="p-6">
-                 <div class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                    @if (course.sale_price) {
-                       <span class="text-emerald-500">{{ course.sale_price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                       <span class="text-sm text-slate-400 line-through ml-2 font-normal">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                    } @else {
-                       {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
-                    }
-                 </div>
-                 <button (click)="openRegistration()" class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3 shadow-lg shadow-blue-500/30">
-                    Empieza ya
-                 </button>
-                 <a routerLink="/login" class="block text-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline">
-                    Accede a este curso adquiriendo un plan
-                 </a>
-                 <div class="text-xs text-gray-500 text-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <i class="fas fa-shield-alt mr-1"></i> Garantía de aprendizaje 100% práctico
-                 </div>
+          <div
+            class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
+          >
+            <img
+              [src]="course.image_url"
+              [alt]="course.title"
+              fetchpriority="high"
+              class="w-full h-48 object-cover"
+            />
+            <div class="p-6">
+              <div
+                class="text-2xl font-black text-gray-900 dark:text-white mb-4"
+              >
+                @if (course.sale_price) {
+                  <span class="text-emerald-500">{{
+                    course.sale_price | currency: "ARS" : "symbol" : "1.0-0"
+                  }}</span>
+                  <span
+                    class="text-sm text-slate-400 line-through ml-2 font-normal"
+                    >{{
+                      course.price | currency: "ARS" : "symbol" : "1.0-0"
+                    }}</span
+                  >
+                } @else {
+                  {{ course.price | currency: "ARS" : "symbol" : "1.0-0" }}
+                }
               </div>
-           </div>
+              <button
+                (click)="openRegistration()"
+                class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3 shadow-lg shadow-blue-500/30"
+              >
+                Empieza ya
+              </button>
+              <a
+                routerLink="/login"
+                class="block text-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Accede a este curso adquiriendo un plan
+              </a>
+              <div
+                class="text-xs text-gray-500 text-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700"
+              >
+                <i class="fas fa-shield-alt mr-1"></i> Garantía de aprendizaje
+                100% práctico
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -121,61 +205,99 @@
     <!-- Main Content Body -->
     <div class="container mx-auto px-4 py-12">
       <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-12">
-        
         <!-- Left Content -->
         <div class="w-full md:w-2/3 space-y-12">
-          
           <!-- Audience / What you will learn -->
           <section>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Acerca de este curso</h2>
-            <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
-               <p>{{course.description}}</p>
-               <h3 class="text-lg font-bold mt-6 mb-4 text-gray-900 dark:text-white">Este curso es para ti si:</h3>
-               <ul class="space-y-3 pl-0 list-none">
-                  @for (item of audienceList; track item) {
-                     <li class="flex items-start">
-                        <i class="fas fa-check text-blue-500 mt-1 mr-3 shrink-0"></i>
-                        <span>{{item}}</span>
-                     </li>
-                  }
-               </ul>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Acerca de este curso
+            </h2>
+            <div
+              class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300"
+            >
+              <p>{{ course.description }}</p>
+              <h3
+                class="text-lg font-bold mt-6 mb-4 text-gray-900 dark:text-white"
+              >
+                Este curso es para ti si:
+              </h3>
+              <ul class="space-y-3 pl-0 list-none">
+                @for (item of audienceList; track item) {
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-check text-blue-500 mt-1 mr-3 shrink-0"
+                    ></i>
+                    <span>{{ item }}</span>
+                  </li>
+                }
+              </ul>
             </div>
           </section>
 
           <!-- Syllabus / Temario (contenido real de la DB) -->
           <section>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Contenido del curso</h2>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Contenido del curso
+            </h2>
             @if (loadingModules) {
               <div class="flex items-center gap-3 text-slate-500 py-4">
                 <span class="loading loading-spinner loading-sm"></span>
                 <span class="text-sm">Cargando temario...</span>
               </div>
             } @else if (modules.length === 0) {
-              <div class="text-slate-400 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 text-center">
+              <div
+                class="text-slate-400 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 text-center"
+              >
                 <i class="fas fa-layer-group text-2xl mb-2 block"></i>
                 El temario de este curso estara disponible pronto.
               </div>
             } @else {
-              <div class="text-sm text-gray-500 mb-4">{{ modules.length }} modulos • {{ classesCount || modules.reduce((a, m) => a + m.contents.length, 0) }} clases</div>
+              <div class="text-sm text-gray-500 mb-4">
+                {{ modules.length }} modulos •
+                {{
+                  classesCount ||
+                    modules.reduce((a, m) => a + m.contents.length, 0)
+                }}
+                clases
+              </div>
               <div class="space-y-4">
                 @for (mod of modules; track mod.id; let i = $index) {
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
-                    <div class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                         (click)="toggleModule(mod)">
+                  <div
+                    class="border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm"
+                  >
+                    <div
+                      class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      (click)="toggleModule(mod)"
+                    >
                       <div class="flex flex-col">
-                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Modulo {{ i + 1 }}</span>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ mod.title }}</h3>
+                        <span
+                          class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1"
+                          >Modulo {{ i + 1 }}</span
+                        >
+                        <h3
+                          class="text-lg font-bold text-gray-900 dark:text-white"
+                        >
+                          {{ mod.title }}
+                        </h3>
                         @if (mod.description) {
-                          <p class="text-sm text-gray-500 mt-1">{{ mod.description | slice:0:150 }}{{ mod.description.length > 150 ? '...' : '' }}</p>
+                          <p class="text-sm text-gray-500 mt-1">
+                            {{ mod.description | slice: 0 : 150
+                            }}{{ mod.description.length > 150 ? "..." : "" }}
+                          </p>
                         }
                       </div>
                       <div class="flex items-center gap-3 shrink-0">
-                        <span class="text-sm text-gray-500">{{ mod.contents.length }} clases</span>
+                        <span class="text-sm text-gray-500"
+                          >{{ mod.contents.length }} clases</span
+                        >
                       </div>
                     </div>
                     @if (mod.expanded) {
-                      <div class="border-t border-gray-100 dark:border-gray-700 px-5 py-4 text-sm text-gray-500">
-                        <i class="fas fa-lock mr-2 text-gray-400"></i>Contenido exclusivo para alumnos inscriptos.
+                      <div
+                        class="border-t border-gray-100 dark:border-gray-700 px-5 py-4 text-sm text-gray-500"
+                      >
+                        <i class="fas fa-lock mr-2 text-gray-400"></i>Contenido
+                        exclusivo para alumnos inscriptos.
                       </div>
                     }
                   </div>
@@ -186,122 +308,249 @@
 
           <!-- Instructor -->
           <section>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Profesores del curso</h2>
-            <div class="text-sm text-gray-500 mb-4">Conoce quién enseña el curso</div>
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col sm:flex-row gap-6 items-start shadow-sm">
-               <img [src]="instructorProfile.avatar" [alt]="instructorProfile.name" loading="lazy" decoding="async" class="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white dark:border-gray-700">
-               <div>
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{instructorProfile.name}}</h3>
-                  <div class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-3">{{instructorProfile.role}}</div>
-                  <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">{{instructorProfile.bio}}</p>
-               </div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Profesores del curso
+            </h2>
+            <div class="text-sm text-gray-500 mb-4">
+              Conoce quién enseña el curso
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col sm:flex-row gap-6 items-start shadow-sm"
+            >
+              <img
+                [src]="instructorProfile.avatar"
+                [alt]="instructorProfile.name"
+                loading="lazy"
+                decoding="async"
+                class="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white dark:border-gray-700"
+              />
+              <div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  {{ instructorProfile.name }}
+                </h3>
+                <div
+                  class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-3"
+                >
+                  {{ instructorProfile.role }}
+                </div>
+                <p
+                  class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm"
+                >
+                  {{ instructorProfile.bio }}
+                </p>
+              </div>
             </div>
           </section>
 
           <!-- Reviews -->
           <section>
-            <div class="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
-               <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Opiniones del curso</h2>
-               <div class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-                  <i class="fas fa-star text-yellow-400"></i> {{rating}} <span class="text-sm font-normal text-gray-500 hidden sm:inline">· {{reviewsCount}} opiniones</span>
-               </div>
+            <div
+              class="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
+            >
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                Opiniones del curso
+              </h2>
+              <div
+                class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2"
+              >
+                <i class="fas fa-star text-yellow-400"></i> {{ rating }}
+                <span class="text-sm font-normal text-gray-500 hidden sm:inline"
+                  >· {{ reviewsCount }} opiniones</span
+                >
+              </div>
             </div>
-            
+
             <div class="grid grid-cols-1 gap-6">
-               @for (review of courseReviews; track review.name) {
-                  <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
-                     <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                           <img [src]="review.avatar" [alt]="review.name" loading="lazy" decoding="async" class="w-10 h-10 rounded-full bg-gray-100">
-                           <div>
-                              <div class="font-bold text-gray-900 dark:text-white text-sm">{{review.name}}</div>
-                              <div class="text-[10px] text-gray-500">{{review.date}}</div>
-                           </div>
+              @for (review of courseReviews; track review.name) {
+                <div
+                  class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-sm"
+                >
+                  <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-3">
+                      <img
+                        [src]="review.avatar"
+                        [alt]="review.name"
+                        loading="lazy"
+                        decoding="async"
+                        class="w-10 h-10 rounded-full bg-gray-100"
+                      />
+                      <div>
+                        <div
+                          class="font-bold text-gray-900 dark:text-white text-sm"
+                        >
+                          {{ review.name }}
                         </div>
-                        <div class="flex text-yellow-400 text-xs">
-                           @for (star of [1,2,3,4,5]; track star) {
-                              <i class="fas fa-star" [class.opacity-30]="star > review.rating"></i>
-                           }
+                        <div class="text-[10px] text-gray-500">
+                          {{ review.date }}
                         </div>
-                     </div>
-                     <p class="text-gray-600 dark:text-gray-300 italic text-sm">"{{review.comment}}"</p>
+                      </div>
+                    </div>
+                    <div class="flex text-yellow-400 text-xs">
+                      @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <i
+                          class="fas fa-star"
+                          [class.opacity-30]="star > review.rating"
+                        ></i>
+                      }
+                    </div>
                   </div>
-               }
+                  <p class="text-gray-600 dark:text-gray-300 italic text-sm">
+                    "{{ review.comment }}"
+                  </p>
+                </div>
+              }
             </div>
 
             <!-- Formulario para nuevo comentario -->
-            <div class="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
-               <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Escribe tu opinión</h3>
-               <div class="mb-4 flex items-center gap-2 text-yellow-400 text-lg">
-                  <span class="text-gray-700 dark:text-gray-300 mr-2 text-base">Calificación:</span>
-                  @for (star of [1,2,3,4,5]; track star) {
-                     <button (click)="newCommentRating = star" class="hover:scale-110 transition-transform cursor-pointer">
-                        <i class="fas fa-star" [class.opacity-30]="star > newCommentRating"></i>
-                     </button>
-                  }
-               </div>
-               <textarea [(ngModel)]="newCommentText" rows="3" placeholder="¿Qué te pareció este curso? Comparte tu experiencia..." class="w-full textarea textarea-bordered mb-4 bg-gray-50 dark:bg-gray-900 dark:text-white text-base"></textarea>
-               <div class="flex justify-end">
-                  <button (click)="submitComment()" [disabled]="!newCommentText.trim()" class="btn bg-blue-600 hover:bg-blue-700 text-white border-none rounded-xl px-6">
-                     Publicar Opinión
+            <div
+              class="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm"
+            >
+              <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">
+                Escribe tu opinión
+              </h3>
+              <div class="mb-4 flex items-center gap-2 text-yellow-400 text-lg">
+                <span class="text-gray-700 dark:text-gray-300 mr-2 text-base"
+                  >Calificación:</span
+                >
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <button
+                    (click)="newCommentRating = star"
+                    class="hover:scale-110 transition-transform cursor-pointer"
+                  >
+                    <i
+                      class="fas fa-star"
+                      [class.opacity-30]="star > newCommentRating"
+                    ></i>
                   </button>
-               </div>
+                }
+              </div>
+              <textarea
+                [(ngModel)]="newCommentText"
+                rows="3"
+                placeholder="¿Qué te pareció este curso? Comparte tu experiencia..."
+                class="w-full textarea textarea-bordered mb-4 bg-gray-50 dark:bg-gray-900 dark:text-white text-base"
+              ></textarea>
+              <div class="flex justify-end">
+                <button
+                  (click)="submitComment()"
+                  [disabled]="!newCommentText.trim()"
+                  class="btn bg-blue-600 hover:bg-blue-700 text-white border-none rounded-xl px-6"
+                >
+                  Publicar Opinión
+                </button>
+              </div>
             </div>
           </section>
-
         </div>
 
         <!-- Right Sidebar (Mobile Floating / Desktop Sticky) -->
         <div class="w-full md:w-1/3">
-           <div class="sticky top-24 space-y-6">
-              
-              <!-- Mobile Only CTA Card -->
-              <div class="md:hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 mb-6">
-                 <div class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                    @if (course.sale_price) {
-                       <span class="text-emerald-500">{{ course.sale_price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                       <span class="text-sm text-slate-400 line-through ml-2 font-normal">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                    } @else {
-                       {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
-                    }
-                 </div>
-                 <button (click)="openRegistration()" class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3">
-                    Empieza ya
-                 </button>
+          <div class="sticky top-24 space-y-6">
+            <!-- Mobile Only CTA Card -->
+            <div
+              class="md:hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 mb-6"
+            >
+              <div
+                class="text-2xl font-black text-gray-900 dark:text-white mb-4"
+              >
+                @if (course.sale_price) {
+                  <span class="text-emerald-500">{{
+                    course.sale_price | currency: "ARS" : "symbol" : "1.0-0"
+                  }}</span>
+                  <span
+                    class="text-sm text-slate-400 line-through ml-2 font-normal"
+                    >{{
+                      course.price | currency: "ARS" : "symbol" : "1.0-0"
+                    }}</span
+                  >
+                } @else {
+                  {{ course.price | currency: "ARS" : "symbol" : "1.0-0" }}
+                }
+              </div>
+              <button
+                (click)="openRegistration()"
+                class="btn w-full bg-blue-600 hover:bg-blue-700 border-none text-white font-bold h-12 rounded-xl mb-3"
+              >
+                Empieza ya
+              </button>
+            </div>
+
+            <!-- Related Plans Block -->
+            <div
+              class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm"
+            >
+              <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">
+                Elige el plan ideal para ti
+              </h3>
+
+              <!-- Plan Expert -->
+              <div
+                class="border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 mb-4 relative overflow-hidden bg-blue-50/50 dark:bg-blue-900/10"
+              >
+                <div
+                  class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg"
+                >
+                  RECOMENDADO
+                </div>
+                <div class="font-black text-gray-900 dark:text-white mb-1">
+                  Plan Profesional
+                </div>
+                <div class="text-xs text-gray-500 mb-3 leading-relaxed">
+                  Un año de acceso con cursos ilimitados y soporte prioritario.
+                  Ahorras 7 meses.
+                </div>
+                <div
+                  class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3"
+                >
+                  {{
+                    course.price * 2.5 | currency: "ARS" : "symbol" : "1.0-0"
+                  }}
+                  <span class="text-xs text-gray-500 font-normal">/año</span>
+                </div>
+                <button
+                  class="btn btn-sm btn-outline btn-primary w-full rounded-lg"
+                >
+                  Suscríbete a Plan Pro
+                </button>
               </div>
 
-              <!-- Related Plans Block -->
-              <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-                 <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-lg">Elige el plan ideal para ti</h3>
-                 
-                 <!-- Plan Expert -->
-                 <div class="border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 mb-4 relative overflow-hidden bg-blue-50/50 dark:bg-blue-900/10">
-                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">RECOMENDADO</div>
-                    <div class="font-black text-gray-900 dark:text-white mb-1">Plan Profesional</div>
-                    <div class="text-xs text-gray-500 mb-3 leading-relaxed">Un año de acceso con cursos ilimitados y soporte prioritario. Ahorras 7 meses.</div>
-                    <div class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">
-                       {{ course.price * 2.5 | currency:'ARS':'symbol':'1.0-0' }} <span class="text-xs text-gray-500 font-normal">/año</span>
-                    </div>
-                    <button class="btn btn-sm btn-outline btn-primary w-full rounded-lg">Suscríbete a Plan Pro</button>
-                 </div>
-
-                 <!-- Plan Basic -->
-                 <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-                    <div class="font-bold text-gray-900 dark:text-white mb-1">Curso Individual</div>
-                    <div class="text-xs text-gray-500 mb-3 leading-relaxed">Acceso de por vida únicamente a este curso y sus actualizaciones.</div>
-                    <div class="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                       @if (course.sale_price) {
-                          <span class="text-emerald-500">{{ course.sale_price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                          <span class="text-xs text-slate-400 line-through ml-2 font-normal">{{ course.price | currency:'ARS':'symbol':'1.0-0' }}</span>
-                       } @else {
-                          {{ course.price | currency:'ARS':'symbol':'1.0-0' }}
-                       }
-                    </div>
-                    <button (click)="openRegistration()" class="btn btn-sm bg-gray-900 hover:bg-gray-800 text-white w-full rounded-lg border-none">Comprar Curso</button>
-                 </div>
+              <!-- Plan Basic -->
+              <div
+                class="border border-gray-200 dark:border-gray-700 rounded-xl p-4"
+              >
+                <div class="font-bold text-gray-900 dark:text-white mb-1">
+                  Curso Individual
+                </div>
+                <div class="text-xs text-gray-500 mb-3 leading-relaxed">
+                  Acceso de por vida únicamente a este curso y sus
+                  actualizaciones.
+                </div>
+                <div
+                  class="text-lg font-bold text-gray-900 dark:text-white mb-3"
+                >
+                  @if (course.sale_price) {
+                    <span class="text-emerald-500">{{
+                      course.sale_price | currency: "ARS" : "symbol" : "1.0-0"
+                    }}</span>
+                    <span
+                      class="text-xs text-slate-400 line-through ml-2 font-normal"
+                      >{{
+                        course.price | currency: "ARS" : "symbol" : "1.0-0"
+                      }}</span
+                    >
+                  } @else {
+                    {{ course.price | currency: "ARS" : "symbol" : "1.0-0" }}
+                  }
+                </div>
+                <button
+                  (click)="openRegistration()"
+                  class="btn btn-sm bg-gray-900 hover:bg-gray-800 text-white w-full rounded-lg border-none"
+                >
+                  Comprar Curso
+                </button>
               </div>
-
-           </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -310,79 +559,167 @@
 
 <!-- Modal Registration (Unchanged Logic, Adapted Styling) -->
 @if (showRegistrationModal) {
-    <dialog class="modal modal-open modal-bottom sm:modal-middle" (click)="closeRegistration()">
-      <div class="modal-box bg-white dark:bg-gray-800 text-left relative shadow-2xl" (click)="$event.stopPropagation()">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-500" (click)="closeRegistration()">✕</button>
-        
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
-          Inscripción Directa
-        </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{course?.title}}</p>
+  <dialog
+    class="modal modal-open modal-bottom sm:modal-middle"
+    (click)="closeRegistration()"
+  >
+    <div
+      class="modal-box bg-white dark:bg-gray-800 text-left relative shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-500"
+        (click)="closeRegistration()"
+      >
+        ✕
+      </button>
 
-        <div class="mt-2">
-          @if (registrationSuccess) {
-            <div class="bg-green-50 border border-green-200 text-green-700 p-6 rounded-lg text-center" role="alert">
-              <i class="fas fa-check-circle text-5xl mb-4 text-green-500"></i>
-              <h3 class="text-xl font-bold mb-2">¡Pre-inscripción realizada!</h3>
-              <p class="mb-4">Para confirmar tu vacante, por favor realiza el pago:</p>
-              
-              <div class="bg-white p-4 rounded-lg shadow-xs border border-green-100 mb-6 text-left">
-                <p class="font-bold text-gray-800 mb-1">Datos Bancarios:</p>
-                <p class="text-gray-600 mb-1">Alias: <span class="font-mono font-bold text-gray-900 select-all">arecofix</span></p>
-                <p class="text-gray-600">CBU: <span class="font-mono font-bold text-gray-900 select-all">ecocell</span></p>
-              </div>
-              
-              <p class="text-sm mb-4">
-                Envía el comprobante por WhatsApp al:
-                <strong class="text-lg block mt-1">+54 9 11 2596-0900</strong>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
+        Inscripción Directa
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        {{ course?.title }}
+      </p>
+
+      <div class="mt-2">
+        @if (registrationSuccess) {
+          <div
+            class="bg-green-50 border border-green-200 text-green-700 p-6 rounded-lg text-center"
+            role="alert"
+          >
+            <i class="fas fa-check-circle text-5xl mb-4 text-green-500"></i>
+            <h3 class="text-xl font-bold mb-2">¡Pre-inscripción realizada!</h3>
+            <p class="mb-4">
+              Para confirmar tu vacante, por favor realiza el pago:
+            </p>
+
+            <div
+              class="bg-white p-4 rounded-lg shadow-xs border border-green-100 mb-6 text-left"
+            >
+              <p class="font-bold text-gray-800 mb-1">Datos Bancarios:</p>
+              <p class="text-gray-600 mb-1">
+                Alias:
+                <span class="font-mono font-bold text-gray-900 select-all"
+                  >arecofix</span
+                >
               </p>
+              <p class="text-gray-600">
+                CBU:
+                <span class="font-mono font-bold text-gray-900 select-all"
+                  >ecocell</span
+                >
+              </p>
+            </div>
 
-              <a [href]="'https://wa.me/' + whatsappNumber + '?text=Hola,%20acabo%20de%20inscribirme%20al%20curso:%20' + course?.title + '.%20Aquí%20envío%20mi%20comprobante.'" 
-                target="_blank"
-                class="btn bg-green-500 hover:bg-green-600 w-full text-white no-underline border-none">
-                <i class="fab fa-whatsapp mr-2 text-xl"></i> Enviar Comprobante
-              </a>
-              
-              <button (click)="closeRegistration()" class="btn btn-ghost w-full mt-4">Cerrar</button>
+            <p class="text-sm mb-4">
+              Envía el comprobante por WhatsApp al:
+              <strong class="text-lg block mt-1">+54 9 11 2596-0900</strong>
+            </p>
+
+            <a
+              [href]="
+                'https://wa.me/' +
+                whatsappNumber +
+                '?text=Hola,%20acabo%20de%20inscribirme%20al%20curso:%20' +
+                $safeNavigationMigration(course?.title) +
+                '.%20Aquí%20envío%20mi%20comprobante.'
+              "
+              target="_blank"
+              class="btn bg-green-500 hover:bg-green-600 w-full text-white no-underline border-none"
+            >
+              <i class="fab fa-whatsapp mr-2 text-xl"></i> Enviar Comprobante
+            </a>
+
+            <button
+              (click)="closeRegistration()"
+              class="btn btn-ghost w-full mt-4"
+            >
+              Cerrar
+            </button>
+          </div>
+        } @else {
+          <form class="space-y-4">
+            <div>
+              <label
+                for="full_name"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >Nombre Completo</label
+              >
+              <input
+                type="text"
+                id="full_name"
+                [(ngModel)]="registrationForm.full_name"
+                name="full_name"
+                placeholder="Ej: Juan Pérez"
+                class="input input-bordered w-full dark:bg-gray-700 dark:text-white"
+              />
             </div>
-          } @else {
-            <form class="space-y-4">
-              <div>
-                <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre Completo</label>
-                <input type="text" id="full_name" [(ngModel)]="registrationForm.full_name" name="full_name" placeholder="Ej: Juan Pérez" class="input input-bordered w-full dark:bg-gray-700 dark:text-white">
-              </div>
-              <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                <input type="email" id="email" [(ngModel)]="registrationForm.email" name="email" placeholder="tucorreo@ejemplo.com" class="input input-bordered w-full dark:bg-gray-700 dark:text-white">
-              </div>
-              <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono / WhatsApp</label>
-                <input type="tel" id="phone" [(ngModel)]="registrationForm.phone" name="phone" placeholder="Ej: +54 9 11 1234 5678" class="input input-bordered w-full dark:bg-gray-700 dark:text-white">
-              </div>
-              @if (registrationError) {
-                <p class="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-100">{{registrationError}}</p>
-              }
-            </form>
-          }
-        </div>
-        
-        @if (!registrationSuccess) {
-            <div class="modal-action flex flex-col sm:flex-row-reverse gap-2 mt-6">
-              <button type="button" (click)="submitRegistration()" [disabled]="registering"
-                class="btn bg-blue-600 hover:bg-blue-700 border-none text-white w-full sm:w-auto">
-                @if (registering) {
-                  <span class="loading loading-spinner loading-xs"></span>
-                }
-                Confirmar Inscripción
-              </button>
-              <button type="button" (click)="closeRegistration()" class="btn btn-ghost w-full sm:w-auto">
-                Cancelar
-              </button>
+            <div>
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >Email</label
+              >
+              <input
+                type="email"
+                id="email"
+                [(ngModel)]="registrationForm.email"
+                name="email"
+                placeholder="tucorreo@ejemplo.com"
+                class="input input-bordered w-full dark:bg-gray-700 dark:text-white"
+              />
             </div>
+            <div>
+              <label
+                for="phone"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >Teléfono / WhatsApp</label
+              >
+              <input
+                type="tel"
+                id="phone"
+                [(ngModel)]="registrationForm.phone"
+                name="phone"
+                placeholder="Ej: +54 9 11 1234 5678"
+                class="input input-bordered w-full dark:bg-gray-700 dark:text-white"
+              />
+            </div>
+            @if (registrationError) {
+              <p
+                class="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-100"
+              >
+                {{ registrationError }}
+              </p>
+            }
+          </form>
         }
       </div>
-      <form method="dialog" class="modal-backdrop">
-        <button (click)="closeRegistration()">close</button>
-      </form>
-    </dialog>
+
+      @if (!registrationSuccess) {
+        <div class="modal-action flex flex-col sm:flex-row-reverse gap-2 mt-6">
+          <button
+            type="button"
+            (click)="submitRegistration()"
+            [disabled]="registering"
+            class="btn bg-blue-600 hover:bg-blue-700 border-none text-white w-full sm:w-auto"
+          >
+            @if (registering) {
+              <span class="loading loading-spinner loading-xs"></span>
+            }
+            Confirmar Inscripción
+          </button>
+          <button
+            type="button"
+            (click)="closeRegistration()"
+            class="btn btn-ghost w-full sm:w-auto"
+          >
+            Cancelar
+          </button>
+        </div>
+      }
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeRegistration()">close</button>
+    </form>
+  </dialog>
 }

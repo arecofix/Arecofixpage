@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface ArticleItem {
@@ -15,7 +15,8 @@ export interface ArticleItem {
   selector: 'app-article-grid',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './article-grid.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './article-grid.component.html',
 })
 export class ArticleGridComponent {
   @Input() title: string = '';

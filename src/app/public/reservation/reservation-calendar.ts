@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContactService } from '@app/core/services/contact.service';
@@ -16,7 +23,8 @@ interface ReservationStep {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './reservation-calendar.html',
-  styleUrls: ['./reservation-calendar.css']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./reservation-calendar.css'],
 })
 export class ReservationCalendar implements OnInit {
   private contactService = inject(ContactService);
@@ -33,7 +41,7 @@ export class ReservationCalendar implements OnInit {
   selectedSlot = signal<string | null>(null);
   currentStep = signal<1 | 2 | 3>(1);
   isLoading = signal(false);
-  
+
   // Form Fields
   customerName = signal('');
   customerPhone = signal('');
@@ -44,13 +52,15 @@ export class ReservationCalendar implements OnInit {
   // ===== COMPUTED VALUES =====
   currentMonthYear = computed(() => {
     const date = this.currentDate();
-    return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' })
-      .format(date)
-      .charAt(0)
-      .toUpperCase() + 
+    return (
       new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' })
         .format(date)
-        .slice(1);
+        .charAt(0)
+        .toUpperCase() +
+      new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' })
+        .format(date)
+        .slice(1)
+    );
   });
 
   daysInMonth = computed(() => this.generateDaysInMonth(this.currentDate()));
@@ -58,28 +68,29 @@ export class ReservationCalendar implements OnInit {
   formattedSelectedDate = computed(() => {
     const date = this.selectedDate();
     if (!date) return '';
-    return new Intl.DateTimeFormat('es-ES', { 
-      weekday: 'long', 
-      day: 'numeric', 
-      month: 'long' 
+    return new Intl.DateTimeFormat('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
     }).format(date);
   });
 
-  isFormComplete = computed(() => 
-    !!this.selectedDate() && 
-    !!this.selectedSlot() && 
-    this.customerName().trim().length > 0 && 
-    this.customerPhone().trim().length > 0 &&
-    this.deviceModel().trim().length > 0 &&
-    this.issueDescription().trim().length > 0 &&
-    this.agreeTerms()
+  isFormComplete = computed(
+    () =>
+      !!this.selectedDate() &&
+      !!this.selectedSlot() &&
+      this.customerName().trim().length > 0 &&
+      this.customerPhone().trim().length > 0 &&
+      this.deviceModel().trim().length > 0 &&
+      this.issueDescription().trim().length > 0 &&
+      this.agreeTerms(),
   );
 
   // ===== PASOS =====
   steps = computed<ReservationStep[]>(() => [
     { number: 1, title: 'Elige tu día', completed: !!this.selectedDate() },
     { number: 2, title: 'Elige tu hora', completed: !!this.selectedSlot() },
-    { number: 3, title: 'Confirma datos', completed: this.isFormComplete() }
+    { number: 3, title: 'Confirma datos', completed: this.isFormComplete() },
   ]);
 
   ngOnInit(): void {
@@ -154,17 +165,21 @@ export class ReservationCalendar implements OnInit {
   isToday(date: Date | null): boolean {
     if (!date) return false;
     const today = new Date();
-    return date.getDate() === today.getDate() && 
-           date.getMonth() === today.getMonth() && 
-           date.getFullYear() === today.getFullYear();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
   }
 
   isSelectedDate(date: Date | null): boolean {
     if (!date || !this.selectedDate()) return false;
     const selected = this.selectedDate()!;
-    return date.getDate() === selected.getDate() && 
-           date.getMonth() === selected.getMonth() && 
-           date.getFullYear() === selected.getFullYear();
+    return (
+      date.getDate() === selected.getDate() &&
+      date.getMonth() === selected.getMonth() &&
+      date.getFullYear() === selected.getFullYear()
+    );
   }
 
   isPastDate(date: Date): boolean {
@@ -198,39 +213,46 @@ export class ReservationCalendar implements OnInit {
         phone: this.customerPhone(),
         deviceModel: this.deviceModel(),
         issueDescription: this.issueDescription(),
-        discount: this.config.DISCOUNT_PERCENTAGE
+        discount: this.config.DISCOUNT_PERCENTAGE,
       };
 
       // Guardar reserva y enviar notificacion en BD
-      const { error } = await this.contactService.createReservation(reservation);
-      
+      const { error } =
+        await this.contactService.createReservation(reservation);
+
       if (error) {
         console.error('Error returned from contactService:', error);
         throw new Error(error.message || 'Error al guardar reserva');
       }
 
       // Simular éxito (1.5s delay para UX)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Construir mensaje de WhatsApp
       const message = this._buildWhatsAppMessage(reservation);
-      
+
       // Abrir WhatsApp (SSR-safe check usando DOCUMENT)
       if (this.document.defaultView) {
-        this.document.defaultView.open(`https://wa.me/${this.config.WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        this.document.defaultView.open(
+          `https://wa.me/${this.config.WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
+          '_blank',
+        );
       }
 
       // Notificación de éxito
-      this.notificationService.showSuccess('✅ ¡Turno reservado! Se abrirá WhatsApp para confirmar.');
-      
+      this.notificationService.showSuccess(
+        '✅ ¡Turno reservado! Se abrirá WhatsApp para confirmar.',
+      );
+
       // Reset después de confirmación exitosa
       setTimeout(() => {
         this.resetSelection();
       }, 2000);
-
     } catch (error) {
       console.error('Error en reserva:', error);
-      this.notificationService.showError('❌ Hubo un error al reservar. Intenta de nuevo.');
+      this.notificationService.showError(
+        '❌ Hubo un error al reservar. Intenta de nuevo.',
+      );
     } finally {
       this.isLoading.set(false);
     }

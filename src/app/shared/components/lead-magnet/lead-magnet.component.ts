@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-lead-magnet',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './lead-magnet.component.html',
-  styleUrl: './lead-magnet.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './lead-magnet.component.scss',
 })
 export class LeadMagnetComponent {
   leadForm: FormGroup;
@@ -17,8 +23,11 @@ export class LeadMagnetComponent {
   constructor(private fb: FormBuilder) {
     this.leadForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      whatsapp: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
-      email: ['', [Validators.email]] // Opcional pero si se ingresa debe ser válido
+      whatsapp: [
+        '',
+        [Validators.required, Validators.pattern('^[0-9]{10,15}$')],
+      ],
+      email: ['', [Validators.email]], // Opcional pero si se ingresa debe ser válido
     });
   }
 

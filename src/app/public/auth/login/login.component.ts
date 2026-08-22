@@ -1,9 +1,20 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { AuthService } from '@app/core/services/auth.service';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -11,6 +22,7 @@ import { takeUntil } from 'rxjs/operators';
   selector: 'app-login',
   templateUrl: './login.component.html',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ReactiveFormsModule, RouterLink],
 })
 export class LoginComponent implements OnInit, OnDestroy {
@@ -46,26 +58,27 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.document.body.classList.add('hide-floating-widgets');
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
     if (typeof window !== 'undefined') {
-        localStorage.setItem('arecofix_return_url', this.returnUrl);
+      localStorage.setItem('arecofix_return_url', this.returnUrl);
     }
-    
+
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))
       .subscribe(async (state) => {
         if (state.user) {
           let target = this.sanitizeReturnUrl(this.returnUrl);
-          
+
           if (state.profile?.branch_id) {
             try {
               const { firstValueFrom, of } = await import('rxjs');
-              const { filter, take, timeout, catchError } = await import('rxjs/operators');
+              const { filter, take, timeout, catchError } =
+                await import('rxjs/operators');
               const branch = await firstValueFrom(
                 this.authService.currentBranch$.pipe(
-                  filter(b => b?.id === state.profile?.branch_id),
+                  filter((b) => b?.id === state.profile?.branch_id),
                   take(1),
                   timeout(2000),
-                  catchError(() => of(null))
-                )
+                  catchError(() => of(null)),
+                ),
               );
               if (branch?.slug) {
                 if (target === '/admin' || target.startsWith('/admin/')) {
@@ -74,7 +87,7 @@ export class LoginComponent implements OnInit, OnDestroy {
               }
             } catch (e) {}
           }
-          
+
           const currentUrl = this.router.url.split('?')[0];
           if (target !== currentUrl) {
             this.router.navigate([target]);
@@ -105,50 +118,54 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.error = 'Por favor completa correctamente todos los campos.';
       return;
     }
-    
+
     this.loading = true;
     const { email, password, rememberMe } = this.form.value;
-    
+
     if (typeof window !== 'undefined') {
-        localStorage.setItem('supabase-remember-me', rememberMe ? 'true' : 'false');
+      localStorage.setItem(
+        'supabase-remember-me',
+        rememberMe ? 'true' : 'false',
+      );
     }
-    
+
     try {
       const res = await this.authService.signIn(email, password);
       this.loading = false;
-      
+
       if (res.error) {
         this.error = this.parseAuthError(res.error);
         return;
       }
-      
+
       this.success = '¡Bienvenido! Redirigiendo...';
-      
+
       const { isTauri } = await import('@tauri-apps/api/core');
       const runningInTauri = isTauri();
       const isAdmin = this.authService.isSuperAdmin();
 
       let target = this.sanitizeReturnUrl(this.returnUrl);
-      
+
       const profile = this.authService.getCurrentProfile();
       if (profile?.branch_id) {
         try {
           const { firstValueFrom, of } = await import('rxjs');
-          const { filter, take, timeout, catchError } = await import('rxjs/operators');
+          const { filter, take, timeout, catchError } =
+            await import('rxjs/operators');
           const branch = await firstValueFrom(
             this.authService.currentBranch$.pipe(
-              filter(b => b?.id === profile.branch_id),
+              filter((b) => b?.id === profile.branch_id),
               take(1),
               timeout(2000),
-              catchError(() => of(null))
-            )
+              catchError(() => of(null)),
+            ),
           );
           if (branch?.slug) {
-             if (target === '/admin' || target.startsWith('/admin/')) {
-                target = `/${branch.slug}${target}`;
-             } else if (runningInTauri && target === '/') {
-                target = `/${branch.slug}/admin`;
-             }
+            if (target === '/admin' || target.startsWith('/admin/')) {
+              target = `/${branch.slug}${target}`;
+            } else if (runningInTauri && target === '/') {
+              target = `/${branch.slug}/admin`;
+            }
           }
         } catch (e) {}
       } else if (runningInTauri) {
@@ -172,20 +189,23 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.error = '';
     this.success = '';
     this.socialLoading['google'] = true;
-    
+
     if (typeof window !== 'undefined') {
-        localStorage.setItem('supabase-remember-me', this.form.value.rememberMe ? 'true' : 'false');
+      localStorage.setItem(
+        'supabase-remember-me',
+        this.form.value.rememberMe ? 'true' : 'false',
+      );
     }
-    
+
     try {
       const res = await this.authService.signInWithGoogle();
       this.socialLoading['google'] = false;
-      
+
       if (res.error) {
         this.error = this.parseAuthError(res.error);
         return;
       }
-      
+
       this.success = '¡Bienvenido! Redirigiendo...';
       const target = this.sanitizeReturnUrl(this.returnUrl);
       setTimeout(() => {
@@ -197,26 +217,27 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
   async loginWithFacebook() {
     this.error = '';
     this.success = '';
     this.socialLoading['facebook'] = true;
-    
+
     if (typeof window !== 'undefined') {
-        localStorage.setItem('supabase-remember-me', this.form.value.rememberMe ? 'true' : 'false');
+      localStorage.setItem(
+        'supabase-remember-me',
+        this.form.value.rememberMe ? 'true' : 'false',
+      );
     }
-    
+
     try {
       const res = await this.authService.signInWithFacebook();
       this.socialLoading['facebook'] = false;
-      
+
       if (res.error) {
         this.error = this.parseAuthError(res.error);
         return;
       }
-      
+
       this.success = '¡Bienvenido! Redirigiendo...';
       const target = this.sanitizeReturnUrl(this.returnUrl);
       setTimeout(() => {
@@ -232,20 +253,23 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.error = '';
     this.success = '';
     this.socialLoading['github'] = true;
-    
+
     if (typeof window !== 'undefined') {
-        localStorage.setItem('supabase-remember-me', this.form.value.rememberMe ? 'true' : 'false');
+      localStorage.setItem(
+        'supabase-remember-me',
+        this.form.value.rememberMe ? 'true' : 'false',
+      );
     }
-    
+
     try {
       const res = await this.authService.signInWithGithub();
       this.socialLoading['github'] = false;
-      
+
       if (res.error) {
         this.error = this.parseAuthError(res.error);
         return;
       }
-      
+
       this.success = '¡Bienvenido! Redirigiendo...';
       const target = this.sanitizeReturnUrl(this.returnUrl);
       setTimeout(() => {
@@ -271,7 +295,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     const errorMsg = error?.message || error || '';
     const errorMap: { [key: string]: string } = {
       'Invalid login credentials': 'Email o contraseña incorrectos.',
-      'Email not confirmed': 'Por favor confirma tu email antes de iniciar sesión.',
+      'Email not confirmed':
+        'Por favor confirma tu email antes de iniciar sesión.',
       'User not found': 'No existe una cuenta con este email.',
       'User already registered': 'Esta cuenta ya está registrada.',
       'Weak password': 'La contraseña debe tener al menos 6 caracteres.',
@@ -279,7 +304,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     };
 
     for (const [key, value] of Object.entries(errorMap)) {
-      if (typeof errorMsg === 'string' && errorMsg.toLowerCase().includes(key.toLowerCase())) {
+      if (
+        typeof errorMsg === 'string' &&
+        errorMsg.toLowerCase().includes(key.toLowerCase())
+      ) {
         return value;
       }
     }

@@ -1,6 +1,19 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { AuthService } from '@app/core/services/auth.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
@@ -15,7 +28,8 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
   selector: 'app-force-password-change',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './force-password-change.component.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './force-password-change.component.html',
 })
 export class ForcePasswordChangeComponent implements OnInit {
   private authService = inject(AuthService);
@@ -35,19 +49,32 @@ export class ForcePasswordChangeComponent implements OnInit {
   constructor() {
     this.form = this.fb.group(
       {
-        password: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]],
-        confirmPassword: ['', Validators.required]
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            this.passwordStrengthValidator,
+          ],
+        ],
+        confirmPassword: ['', Validators.required],
       },
-      { validators: this.passwordMatchValidator }
+      { validators: this.passwordMatchValidator },
     );
   }
 
   ngOnInit(): void {}
 
-  get password() { return this.form.get('password'); }
-  get confirmPassword() { return this.form.get('confirmPassword'); }
+  get password() {
+    return this.form.get('password');
+  }
+  get confirmPassword() {
+    return this.form.get('confirmPassword');
+  }
 
-  private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
+  private passwordStrengthValidator(
+    control: AbstractControl,
+  ): ValidationErrors | null {
     const value: string = control.value || '';
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
@@ -58,7 +85,9 @@ export class ForcePasswordChangeComponent implements OnInit {
     return null;
   }
 
-  private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+  private passwordMatchValidator(
+    group: AbstractControl,
+  ): ValidationErrors | null {
     const pass = group.get('password')?.value;
     const confirm = group.get('confirmPassword')?.value;
     return pass === confirm ? null : { mismatch: true };
@@ -84,10 +113,13 @@ export class ForcePasswordChangeComponent implements OnInit {
 
       // 2. Clear the must_change_password flag in user metadata
       const { error: metaErr } = await this.supabase.auth.updateUser({
-        data: { must_change_password: false }
+        data: { must_change_password: false },
       });
       if (metaErr) {
-        console.warn('[ForcePasswordChange] Could not clear flag:', metaErr.message);
+        console.warn(
+          '[ForcePasswordChange] Could not clear flag:',
+          metaErr.message,
+        );
       }
 
       // 3. Also update the profiles table flag
@@ -95,7 +127,10 @@ export class ForcePasswordChangeComponent implements OnInit {
       if (user?.id) {
         await this.supabase
           .from('profiles')
-          .update({ must_change_password: false, updated_at: new Date().toISOString() })
+          .update({
+            must_change_password: false,
+            updated_at: new Date().toISOString(),
+          })
           .eq('id', user.id);
       }
 
@@ -103,10 +138,12 @@ export class ForcePasswordChangeComponent implements OnInit {
       setTimeout(() => {
         if (this.onDone) this.onDone();
       }, 1800);
-
     } catch (e: unknown) {
       const err = e as Error;
-      this.errorMsg.set(err.message || 'No se pudo actualizar la contraseña. Intente nuevamente.');
+      this.errorMsg.set(
+        err.message ||
+          'No se pudo actualizar la contraseña. Intente nuevamente.',
+      );
     } finally {
       this.loading.set(false);
     }

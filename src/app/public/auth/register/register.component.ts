@@ -1,8 +1,21 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { AuthService } from '@app/core/services/auth.service';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -10,6 +23,7 @@ import { takeUntil } from 'rxjs/operators';
   selector: 'app-register',
   templateUrl: './register.component.html',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ReactiveFormsModule, RouterLink, CommonModule],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
@@ -41,24 +55,37 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor() {
-    this.form = this.fb.group({
-      first_name: ['', [Validators.required, Validators.minLength(2)]],
-      last_name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9\-\+\s\(\)]+$/)]],
-      password: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]],
-      confirmPassword: ['', [Validators.required]],
-      referral_code: [''],
-      terms: [false, [Validators.requiredTrue]],
-    }, { validators: this.passwordMatchValidator });
+    this.form = this.fb.group(
+      {
+        first_name: ['', [Validators.required, Validators.minLength(2)]],
+        last_name: ['', [Validators.required, Validators.minLength(2)]],
+        email: ['', [Validators.required, Validators.email]],
+        phone: [
+          '',
+          [Validators.required, Validators.pattern(/^[0-9\-\+\s\(\)]+$/)],
+        ],
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            this.passwordStrengthValidator,
+          ],
+        ],
+        confirmPassword: ['', [Validators.required]],
+        referral_code: [''],
+        terms: [false, [Validators.requiredTrue]],
+      },
+      { validators: this.passwordMatchValidator },
+    );
   }
 
   ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
     if (typeof window !== 'undefined') {
-        localStorage.setItem('arecofix_return_url', this.returnUrl);
+      localStorage.setItem('arecofix_return_url', this.returnUrl);
     }
-    
+
     // If user is already logged in, redirect
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))
@@ -79,13 +106,27 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  get first_name() { return this.form.get('first_name'); }
-  get last_name() { return this.form.get('last_name'); }
-  get email() { return this.form.get('email'); }
-  get phone() { return this.form.get('phone'); }
-  get password() { return this.form.get('password'); }
-  get confirmPassword() { return this.form.get('confirmPassword'); }
-  get terms() { return this.form.get('terms'); }
+  get first_name() {
+    return this.form.get('first_name');
+  }
+  get last_name() {
+    return this.form.get('last_name');
+  }
+  get email() {
+    return this.form.get('email');
+  }
+  get phone() {
+    return this.form.get('phone');
+  }
+  get password() {
+    return this.form.get('password');
+  }
+  get confirmPassword() {
+    return this.form.get('confirmPassword');
+  }
+  get terms() {
+    return this.form.get('terms');
+  }
 
   updatePasswordStrength() {
     const value = this.password?.value || '';
@@ -106,7 +147,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const hasNumeric = /[0-9]/.test(value);
     const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
 
-    const passwordValid = hasUpperCase && hasLowerCase && hasNumeric && hasSpecialChar;
+    const passwordValid =
+      hasUpperCase && hasLowerCase && hasNumeric && hasSpecialChar;
 
     if (!passwordValid) {
       return {
@@ -128,13 +170,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     if (!password || !confirmPassword) return null;
 
-    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
+    return password.value === confirmPassword.value
+      ? null
+      : { passwordMismatch: true };
   }
 
   async handleRegister() {
     this.error = '';
     this.success = '';
-    
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.error = 'Por favor completa correctamente todos los campos.';
@@ -142,14 +186,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    const { email, password, first_name, last_name, phone, referral_code } = this.form.value as {
-      email: string;
-      password: string;
-      first_name: string;
-      last_name: string;
-      phone: string;
-      referral_code?: string;
-    };
+    const { email, password, first_name, last_name, phone, referral_code } =
+      this.form.value as {
+        email: string;
+        password: string;
+        first_name: string;
+        last_name: string;
+        phone: string;
+        referral_code?: string;
+      };
 
     try {
       const res = await this.authService.signUp(email, password, {
@@ -168,28 +213,35 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
       // Mensaje según el flujo: si no hay usuario inmediato, se envió Magic Link
       if (!res.data?.user) {
-        this.success = 'Te enviamos un enlace de acceso por correo. Revisa tu bandeja de entrada para confirmar tu cuenta.';
+        this.success =
+          'Te enviamos un enlace de acceso por correo. Revisa tu bandeja de entrada para confirmar tu cuenta.';
       } else {
         this.success = '¡Cuenta creada exitosamente! Redirigiendo...';
-        
+      }
+
+      console.log('SUCCESS MESSAGE SET TO:', this.success);
+
+      // Redirigir según el tipo de registro
+      setTimeout(async () => {
         // Aplicar código de referido si se proporcionó
-        if (referral_code && referral_code.trim() !== '') {
+        if (referral_code && referral_code.trim() !== '' && res.data?.user) {
           try {
             const supabase = this.authService.getSupabaseClient();
             await supabase.rpc('apply_referral', {
               new_user_id: res.data.user.id,
-              ref_code: referral_code.trim()
+              ref_code: referral_code.trim(),
             });
           } catch (rpcErr) {
             console.error('Error aplicando código de referido:', rpcErr);
           }
         }
-      }
-      setTimeout(() => {
+
         if (this.returnUrl) {
-            this.router.navigate(['/login'], { queryParams: { returnUrl: this.returnUrl } });
+          this.router.navigate(['/login'], {
+            queryParams: { returnUrl: this.returnUrl },
+          });
         } else {
-            this.router.navigate(['/login']);
+          this.router.navigate(['/login']);
         }
       }, 2000);
     } catch (err) {
@@ -198,7 +250,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       console.error('Registration error:', err);
     }
   }
-  
+
   async handleGoogleLogin() {
     this.error = '';
     this.socialLoading['google'] = true;
@@ -260,8 +312,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   getPasswordStrengthText(): string {
-    const { hasUpperCase, hasLowerCase, hasNumeric, hasSpecialChar } = this.passwordStrengthRequirements;
-    const strength = [hasUpperCase, hasLowerCase, hasNumeric, hasSpecialChar].filter(Boolean).length;
+    const { hasUpperCase, hasLowerCase, hasNumeric, hasSpecialChar } =
+      this.passwordStrengthRequirements;
+    const strength = [
+      hasUpperCase,
+      hasLowerCase,
+      hasNumeric,
+      hasSpecialChar,
+    ].filter(Boolean).length;
 
     if (strength < 2) return 'Débil';
     if (strength < 3) return 'Media';
@@ -272,11 +330,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
   getPasswordStrengthColor(): string {
     const text = this.getPasswordStrengthText();
     switch (text) {
-      case 'Débil': return 'text-red-600';
-      case 'Media': return 'text-yellow-600';
-      case 'Fuerte': return 'text-blue-600';
-      case 'Muy Fuerte': return 'text-green-600';
-      default: return 'text-gray-400';
+      case 'Débil':
+        return 'text-red-600';
+      case 'Media':
+        return 'text-yellow-600';
+      case 'Fuerte':
+        return 'text-blue-600';
+      case 'Muy Fuerte':
+        return 'text-green-600';
+      default:
+        return 'text-gray-400';
     }
   }
 
@@ -284,18 +347,25 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const errorMsg = error?.message || error || '';
     const errorMap: { [key: string]: string } = {
       'User already registered': 'Este email ya está registrado.',
-      'Weak password': 'La contraseña debe tener al menos 8 caracteres con mayúsculas, minúsculas, números y caracteres especiales.',
+      'Weak password':
+        'La contraseña debe tener al menos 8 caracteres con mayúsculas, minúsculas, números y caracteres especiales.',
       'Invalid email': 'Por favor ingresa un email válido.',
       'Email already exists': 'Este email ya está registrado.',
-      'Password should be different': 'La contraseña debe ser diferente a la anterior.',
+      'Password should be different':
+        'La contraseña debe ser diferente a la anterior.',
     };
 
     for (const [key, value] of Object.entries(errorMap)) {
-      if (typeof errorMsg === 'string' && errorMsg.toLowerCase().includes(key.toLowerCase())) {
+      if (
+        typeof errorMsg === 'string' &&
+        errorMsg.toLowerCase().includes(key.toLowerCase())
+      ) {
         return value;
       }
     }
 
-    return typeof errorMsg === 'string' ? errorMsg : 'Error al crear la cuenta.';
+    return typeof errorMsg === 'string'
+      ? errorMsg
+      : 'Error al crear la cuenta.';
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PreferencesService } from '../../services/preferences.service';
 
@@ -6,7 +6,8 @@ import { PreferencesService } from '../../services/preferences.service';
   selector: 'app-accessibility-sidebar',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './accessibility-sidebar.html'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: './accessibility-sidebar.html',
 })
 export class AccessibilitySidebarComponent {
   constructor(public preferencesService: PreferencesService) {}

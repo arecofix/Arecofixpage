@@ -1,8 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ZonaNorteProductsService, Product, ProductFilter } from '../../services/zona-norte-products.service';
+import {
+  ZonaNorteProductsService,
+  Product,
+  ProductFilter,
+} from '../../services/zona-norte-products.service';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { PaginatedResult } from '../../../../shared/services/pagination.service';
 
@@ -11,29 +20,29 @@ import { PaginatedResult } from '../../../../shared/services/pagination.service'
   standalone: true,
   imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './zona-norte-productos.component.html',
-  styleUrls: ['./zona-norte-productos.component.scss']
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrls: ['./zona-norte-productos.component.scss'],
 })
 export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
-  
   products: Product[] = [];
   pagination: PaginatedResult<Product> | null = null;
-  
+
   // Filtros
   categories: string[] = [];
   brands: string[] = [];
   priceRange = { min: 0, max: 0 };
-  
+
   currentFilter: ProductFilter = {};
   selectedCategory = '';
   selectedBrand = '';
   selectedPriceRange = '';
   searchQuery = '';
-  
+
   // Estados
   loading = false;
   viewMode: 'grid' | 'list' = 'grid';
   sortBy: 'name' | 'price-asc' | 'price-desc' | 'featured' = 'name';
-  
+
   private subscriptions: Subscription[] = [];
 
   constructor(private productsService: ZonaNorteProductsService) {}
@@ -45,7 +54,7 @@ export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   private initializeFilters(): void {
@@ -56,11 +65,13 @@ export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
   }
 
   private setupSubscriptions(): void {
-    const productsSub = this.productsService.getProducts().subscribe(result => {
-      this.pagination = result;
-      this.products = result.data;
-      this.loading = false;
-    });
+    const productsSub = this.productsService
+      .getProducts()
+      .subscribe((result) => {
+        this.pagination = result;
+        this.products = result.data;
+        this.loading = false;
+      });
 
     this.subscriptions.push(productsSub);
   }
@@ -90,7 +101,7 @@ export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
       if (ranges.length === 2) {
         filter.priceRange = {
           min: parseInt(ranges[0]),
-          max: parseInt(ranges[1])
+          max: parseInt(ranges[1]),
         };
       }
     }
@@ -140,10 +151,14 @@ export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
         sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'price-asc':
-        sortedProducts.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
+        sortedProducts.sort(
+          (a, b) => (a.salePrice || a.price) - (b.salePrice || b.price),
+        );
         break;
       case 'price-desc':
-        sortedProducts.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+        sortedProducts.sort(
+          (a, b) => (b.salePrice || b.price) - (a.salePrice || a.price),
+        );
         break;
       case 'featured':
         sortedProducts.sort((a, b) => {
@@ -181,7 +196,9 @@ export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
 
   getDiscountPercentage(product: Product): number {
     if (!this.hasDiscount(product)) return 0;
-    return Math.round(((product.price - product.salePrice!) / product.price) * 100);
+    return Math.round(
+      ((product.price - product.salePrice!) / product.price) * 100,
+    );
   }
 
   isInStock(product: Product): boolean {
@@ -205,30 +222,46 @@ export class ZonaNorteProductosComponent implements OnInit, OnDestroy {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(price);
   }
 
   // Contacto
   contactarWhatsApp(product?: Product): void {
-    let message = 'Hola, quiero consultar sobre los productos de Sudamericana Enlozados';
+    let message =
+      'Hola, quiero consultar sobre los productos de Sudamericana Enlozados';
     if (product) {
       message = `Hola, quiero consultar sobre el producto: ${product.name} (SKU: ${product.sku})`;
     }
-    window.open(`https://wa.me/5491563049494?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(
+      `https://wa.me/5491563049494?text=${encodeURIComponent(message)}`,
+      '_blank',
+    );
   }
 
   // Métodos para filtros de precio
-  getPriceRanges(): Array<{label: string; value: string}> {
+  getPriceRanges(): Array<{ label: string; value: string }> {
     const { min, max } = this.priceRange;
     const step = (max - min) / 4;
-    
+
     return [
       { label: 'Todos', value: '' },
-      { label: `$${this.formatPrice(min)} - $${this.formatPrice(min + step)}`, value: `${min}-${min + step}` },
-      { label: `$${this.formatPrice(min + step)} - $${this.formatPrice(min + step * 2)}`, value: `${min + step}-${min + step * 2}` },
-      { label: `$${this.formatPrice(min + step * 2)} - $${this.formatPrice(min + step * 3)}`, value: `${min + step * 2}-${min + step * 3}` },
-      { label: `$${this.formatPrice(min + step * 3)} - $${this.formatPrice(max)}`, value: `${min + step * 3}-${max}` }
+      {
+        label: `$${this.formatPrice(min)} - $${this.formatPrice(min + step)}`,
+        value: `${min}-${min + step}`,
+      },
+      {
+        label: `$${this.formatPrice(min + step)} - $${this.formatPrice(min + step * 2)}`,
+        value: `${min + step}-${min + step * 2}`,
+      },
+      {
+        label: `$${this.formatPrice(min + step * 2)} - $${this.formatPrice(min + step * 3)}`,
+        value: `${min + step * 2}-${min + step * 3}`,
+      },
+      {
+        label: `$${this.formatPrice(min + step * 3)} - $${this.formatPrice(max)}`,
+        value: `${min + step * 3}-${max}`,
+      },
     ];
   }
 
