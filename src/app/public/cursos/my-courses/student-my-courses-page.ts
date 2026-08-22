@@ -182,7 +182,7 @@ export class StudentMyCoursesPage implements OnInit {
         this.seoService.setPageData({
             title: 'Mis Cursos',
             description: 'Accede a todos tus cursos inscritos y gestiona tu aprendizaje en Arecofix Academy.',
-            imageUrl: 'https://arecofix.com.ar/assets/img/branding/og-academy-pro.png'
+            imageUrl: 'https://arecofix.com.ar/assets/img/cursos/academy/academy.jpg'
         });
 
         const session = await this.authService.getSession();
