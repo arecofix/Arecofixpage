@@ -39,7 +39,23 @@
               transition-all duration-200 group py-1 px-1.5"
        [routerLink]="isAcademyMode ? ['/academy'] : ['/']" aria-label="Arecofix - Volver al inicio">
       @if (isAcademyMode) {
-        <img src="/assets/img/branding/academy-logo-removebg-preview.png" alt="Arecofix Academy Logo" class="h-10 w-auto object-contain drop-shadow-md" />
+        <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Logo de Arecofix - Modo Oscuro"
+             class="h-8 w-auto object-contain hidden dark:block drop-shadow-lg" height="32" width="30" priority />
+        <img ngSrc="/assets/img/brands/logo/logo-light.webp" alt="Logo de Arecofix - Modo Claro"
+             class="h-8 w-auto object-contain dark:hidden drop-shadow-md" height="32" width="31" priority />
+        <div class="stencil-logo hidden sm:flex items-center text-sm xl:text-base font-extrabold tracking-widest leading-none ml-1 group-hover:scale-105 transition-transform duration-300">
+          <span class="group-hover:text-[#3b82f6] dark:group-hover:text-[#60a5fa] transition-colors duration-300 text-gray-900 dark:text-white flex items-center">
+            <span class="relative inline-block">Λ</span>
+            <span class="relative inline-block">C</span>
+            <span class="relative inline-block">Λ</span>
+            <span class="relative inline-block">D</span>
+            <span class="relative inline-block">E</span>
+          </span>
+          <span class="text-[#22c55e] flex items-center ml-0.5">
+            <span class="relative inline-block">M</span>
+            <span class="relative inline-block">Y</span>
+          </span>
+        </div>
       } @else {
         <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Logo de Arecofix - Modo Oscuro"
              class="h-8 w-auto object-contain hidden dark:block drop-shadow-lg" height="32" width="30" priority />
@@ -454,7 +470,23 @@
   <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5 shrink-0">
     <a class="flex items-center gap-2" [routerLink]="isAcademyMode ? ['/academy'] : ['/']" (click)="closeMobileMenu()" aria-label="Arecofix - Inicio">
       @if (isAcademyMode) {
-        <img src="/assets/img/branding/academy-logo-removebg-preview.png" alt="Arecofix Academy Logo" class="h-8 w-auto object-contain" />
+        <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Logo Arecofix Oscuro"
+             class="h-6 w-auto hidden dark:block" height="24" width="22" />
+        <img ngSrc="/assets/img/brands/logo/logo-light.webp" alt="Logo Arecofix Claro"
+             class="h-6 w-auto dark:hidden" height="24" width="23" />
+        <div class="stencil-logo flex items-center text-xs font-extrabold tracking-widest leading-none ml-1">
+          <span class="text-gray-900 dark:text-white flex items-center">
+            <span class="relative inline-block">Λ</span>
+            <span class="relative inline-block">C</span>
+            <span class="relative inline-block">Λ</span>
+            <span class="relative inline-block">D</span>
+            <span class="relative inline-block">E</span>
+          </span>
+          <span class="text-[#22c55e] flex items-center ml-[1px]">
+            <span class="relative inline-block">M</span>
+            <span class="relative inline-block">Y</span>
+          </span>
+        </div>
       } @else {
         <img ngSrc="/assets/img/brands/logo/logo-dark.webp" alt="Logo Arecofix Oscuro"
              class="h-6 w-auto hidden dark:block" height="24" width="22" />
