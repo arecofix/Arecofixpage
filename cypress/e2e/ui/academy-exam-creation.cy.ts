@@ -24,13 +24,13 @@ describe('Academy Exam Creation', () => {
       }]
     }).as('getModules');
 
-    cy.intercept('GET', '**/rest/v1/course_module_contents*', {
+    cy.intercept('GET', '**/rest/v1/course_lessons*', {
       statusCode: 200,
       body: []
     }).as('getContents');
 
     // Intercept Save Calls
-    cy.intercept('POST', '**/rest/v1/course_module_contents*', {
+    cy.intercept('POST', '**/rest/v1/course_lessons*', {
       statusCode: 201,
       body: [{
         id: '33333333-3333-3333-3333-333333333333',
@@ -71,9 +71,10 @@ describe('Academy Exam Creation', () => {
 
   it('should create an exam and correctly send the payload with correct_option_index', () => {
     cy.wait('@getModules');
+    cy.wait('@getContents');
 
-    // Select Module
-    cy.contains('Módulo 1').click({ force: true });
+    // Wait for auto-selection and Angular render
+    cy.contains('Módulo 1').should('be.visible');
 
     // Add Exam Resource
     cy.contains('Agregar Recurso').click({ force: true });

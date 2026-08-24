@@ -21,18 +21,22 @@ describe('Instructor Assignment Flow', () => {
   it('allows an admin to assign an instructor to a course', () => {
     cy.loginAsAdmin('/admin/courses/new');
 
-    // Add intercept specifically for instructors (which now fetches all users)
-    cy.intercept('GET', '**/rest/v1/profiles?select=id%2Cemail%2Cfirst_name%2Clast_name%2Cavatar_url%2Crole*', {
-      statusCode: 200,
-      body: [
-        {
-          id: 'instructor-123',
-          first_name: 'Instructor',
-          last_name: 'Test',
-          email: 'instructor@test.com',
-          role: 'instructor'
-        }
-      ]
+    cy.intercept('GET', '**/rest/v1/profiles?*', (req) => {
+      // Only mock requests that ask for an array (list of users)
+      if (!String(req.headers['accept'])?.includes('application/vnd.pgrst.object')) {
+        req.reply({
+          statusCode: 200,
+          body: [
+            {
+              id: 'instructor-123',
+              first_name: 'Instructor',
+              last_name: 'Test',
+              email: 'instructor@test.com',
+              role: 'instructor'
+            }
+          ]
+        });
+      }
     }).as('getInstructors');
 
     // The courses page makes an API call

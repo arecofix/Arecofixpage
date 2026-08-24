@@ -37,7 +37,7 @@ describe('Instructor Builder Component', () => {
     }).as('getModules');
 
     // Intercept module contents
-    cy.intercept('GET', `**/rest/v1/course_module_contents*`, {
+    cy.intercept('GET', `**/rest/v1/course_lessons*`, {
       statusCode: 200,
       body: [{
         id: 'content-1',
@@ -66,7 +66,7 @@ describe('Instructor Builder Component', () => {
       }]
     }).as('saveModules');
     
-    cy.intercept('POST', `**/rest/v1/course_module_contents*`, {
+    cy.intercept('POST', `**/rest/v1/course_lessons*`, {
         statusCode: 200,
         body: []
     }).as('saveContents');

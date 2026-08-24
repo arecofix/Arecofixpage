@@ -57,24 +57,24 @@ describe('Flujo de Instructor en Academia', () => {
         cy.url().should('include', '/instructor/builder');
         
         // Ir a la pestaña de Módulos
-        cy.contains('Módulos y Clases').click();
+        cy.contains('Modulos y Clases').click();
 
         // Agregar un módulo
-        cy.contains(/Nuevo Módulo|Agregar Primer Módulo/i).click();
-        cy.get('input[placeholder*="Ej: Módulo"]').first().type('Módulo 1: Introducción');
+        cy.contains(/Crear primer modulo|Nuevo Modulo/i).click();
+        cy.get('input[placeholder*="Ej: Modulo"]').first().type('Modulo 1: Introducción');
         
         // Verificar existencia del Dropzone
-        cy.contains(/Arrastra archivos aquí|Arrastra videos o PDFs aquí/i).should('exist');
+        cy.contains(/Arrastra archivos abajo o usa|Arrastra videos, PDFs o imagenes aqui/i).should('exist');
     });
 
     it('2. El instructor simula la subida de un archivo al módulo', () => {
         cy.visit('/instructor/builder/curso-test-1');
         
         // Ir a la pestaña de Módulos
-        cy.contains('Módulos y Clases').click();
+        cy.contains('Modulos y Clases').click();
 
-        cy.contains(/Nuevo Módulo|Agregar Primer Módulo/i).click();
-        cy.get('input[placeholder*="Ej: Módulo"]').first().type('Módulo 1: Introducción');
+        cy.contains(/Crear primer modulo|Nuevo Modulo/i).click();
+        cy.get('input[placeholder*="Ej: Modulo"]').first().type('Modulo 1: Introducción');
         
         // Simulamos elegir un archivo. En cypress se puede usar selectFile si el input[type=file] existe
         cy.get('input[type="file"]').first().selectFile({

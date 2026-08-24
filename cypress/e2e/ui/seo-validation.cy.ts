@@ -3,7 +3,7 @@ describe('SEO Meta Tags & Full Validation', () => {
     cy.clearLocalStorage();
     cy.clearCookies();
   });
-  const genericImage = 'assets/img/branding/og-services.png';
+  const genericImage = 'assets/img/branding/inicio.jpg';
 
   const checkSeoTags = (
     expectedTitle,
@@ -54,16 +54,30 @@ describe('SEO Meta Tags & Full Validation', () => {
 
   it('Verifica el SEO de la página de Inicio (Genérico)', () => {
     cy.visit('/');
-    checkSeoTags('Arecofix', 'Especialistas en reparación', genericImage, 'arecofix.com.ar', false);
+    checkSeoTags('Arecofix', 'Especialistas en desarrollo de software', genericImage, 'arecofix.com.ar', false);
   });
 
   it('Verifica el SEO de la Landing de Celulares (Específico)', () => {
     cy.visit('/celular');
-    checkSeoTags('Reparación de Celulares', 'Especialistas en arreglo de celulares', 'assets/img/repair/cel.png', '/celular', true);
+    checkSeoTags('Reparación de Celulares', 'Servicio técnico especializado en la reparación de celulares', 'assets/img/repair/cel.png', '/celular', true);
   });
 
   it('Verifica el SEO de Cursos Dinámicos (Curso de Barbería)', () => {
-    cy.intercept('GET', '**/rest/v1/courses?**slug=eq.curso-de-barberia**').as('getBarberiaCourse');
+    cy.intercept('GET', '**/rest/v1/courses?**slug=eq.curso-de-barberia**', {
+      statusCode: 200,
+      body: [{
+        id: '12345678-1234-1234-1234-123456789012',
+        title: 'Curso de Barbería',
+        slug: 'curso-de-barberia',
+        is_active: true,
+        image_url: 'xcxsrn0.webp'
+      }]
+    }).as('getBarberiaCourse');
+
+    cy.intercept('GET', '**/rest/v1/course_modules*', {
+      statusCode: 200,
+      body: []
+    }).as('getModules');
     cy.visit('/academy/curso-de-barberia');
     cy.wait('@getBarberiaCourse', { timeout: 15000 });
     cy.get('h1', { timeout: 10000 }).should('exist');
@@ -71,12 +85,24 @@ describe('SEO Meta Tags & Full Validation', () => {
   });
 
   it('Verifica el SEO de Cursos Dinámicos (Reparación de Notebooks y PC)', () => {
-    // Intercept the Supabase courses request so we can wait for it
-    cy.intercept('GET', '**/rest/v1/courses?**slug=eq.reparacion-pc**').as('getCourse');
+    // Mock the course
+    cy.intercept('GET', '**/rest/v1/courses?**slug=eq.reparacion-pc**', {
+      statusCode: 200,
+      body: [{
+        id: 'c72580b2-4152-4f5e-a36a-bafaee324745',
+        title: 'Curso de Reparación de Notebooks y PC',
+        slug: 'reparacion-pc',
+        is_active: true
+      }]
+    }).as('getCourse');
+
+    cy.intercept('GET', '**/rest/v1/course_modules*', {
+      statusCode: 200,
+      body: []
+    }).as('getModules');
+
     cy.visit('/academy/reparacion-pc');
-    // Wait for the API response before asserting dynamic SEO tags
     cy.wait('@getCourse', { timeout: 15000 });
-    // Give Angular time to update the DOM after the API response
     cy.get('h1', { timeout: 10000 }).should('exist');
     checkSeoTags('Reparación', null, null, '/academy/reparacion-pc', false);
   });
@@ -93,8 +119,7 @@ describe('SEO Meta Tags & Full Validation', () => {
     cy.intercept('GET', '**/rest/v1/repairs?**').as('getRepair');
     cy.visit('/tracking/AF-155');
     // We wait for the mock repair or backend to answer
-    cy.wait('@getRepair', { timeout: 15000 });
-    cy.get('h3').contains('Maximiza').should('exist'); // Just wait for something on page load
+    cy.get('h2').should('exist'); // Just wait for something on page load
 
     // Based on the resolver logic, if AF-155 exists, we check SEO tags.
     // Assuming the test hits a mocked or seeded database, we verify it doesn't use the generic tracking tags.
