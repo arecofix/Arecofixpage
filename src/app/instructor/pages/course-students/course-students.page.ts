@@ -142,10 +142,11 @@ export class CourseStudentsPage implements OnInit {
       // 3. Get Certificates for this course
       const { data: certificates } = await this.supabase
         .from('course_certificates')
-        .select('email, pdf_url')
+        .select('*')
         .eq('course_id', this.courseId);
 
       const certsMap = new Map(certificates?.map(c => [c.email, c.pdf_url]));
+      const certsFullMap = new Map(certificates?.map(c => [c.email, c]));
 
       const capitalizeWords = (str: string) => {
         return str
@@ -154,6 +155,8 @@ export class CourseStudentsPage implements OnInit {
           .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
           .join(' ');
       };
+
+      const enrolledEmails = new Set<string>();
 
       const enrichedStudents = (enrollments || []).map((e: any) => {
         const profileName = e.profiles ? `${e.profiles.last_name || ''}, ${e.profiles.first_name || ''}`.trim().replace(/^,\s*|\s*,$/g, '') : '';
@@ -165,6 +168,8 @@ export class CourseStudentsPage implements OnInit {
         const finalEmail = e.profiles?.email || e.email || e.student_email || '';
         const finalPhone = e.profiles?.phone || e.phone || '-';
 
+        enrolledEmails.add(finalEmail);
+
         return {
           ...e,
           full_name: finalName,
@@ -175,7 +180,39 @@ export class CourseStudentsPage implements OnInit {
         };
       });
 
-      this.students.set(enrichedStudents);
+      // Add manual certificates that don't have an enrollment
+      if (certificates) {
+        for (const cert of certificates) {
+          if (!enrolledEmails.has(cert.email)) {
+            enrichedStudents.push({
+              id: 'manual-' + cert.id, // dummy ID
+              full_name: capitalizeWords(cert.student_name || 'Sin Nombre'),
+              email: cert.email,
+              phone: '-',
+              status: 'manual', // special status for UI
+              has_certificate: true,
+              certificate_url: cert.pdf_url
+            });
+          }
+        }
+      }
+
+      // To avoid duplicates in the UI if there are actual DB duplicates for some reason, 
+      // let's unique them by email for display (preferring confirmed over pending if duplicates exist)
+      const uniqueStudentsMap = new Map<string, any>();
+      for (const student of enrichedStudents) {
+        if (!uniqueStudentsMap.has(student.email)) {
+          uniqueStudentsMap.set(student.email, student);
+        } else {
+          const existing = uniqueStudentsMap.get(student.email);
+          // If we find a duplicate, prefer 'confirmed' or 'manual' over 'pending'
+          if (existing.status === 'pending' && (student.status === 'confirmed' || student.status === 'manual')) {
+            uniqueStudentsMap.set(student.email, student);
+          }
+        }
+      }
+
+      this.students.set(Array.from(uniqueStudentsMap.values()));
     } catch (e) {
       console.error('Error loading students', e);
     } finally {
