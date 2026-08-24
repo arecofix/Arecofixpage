@@ -16,9 +16,14 @@ serve(async (req) => {
   try {
     const { courseId, studentName, studentDni, studentEmail, courseName, tenantId } = await req.json();
 
-    if (!courseId || !studentName || !studentDni || !studentEmail || !courseName || !tenantId) {
-      throw new Error('Missing required fields');
+    if (!courseId || !studentName || !studentEmail || !courseName || !tenantId) {
+      return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
+
+    const dniToPrint = studentDni || '';
 
     // 1. Initialize Supabase Admin client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
@@ -103,7 +108,7 @@ serve(async (req) => {
     });
 
     // DNI (Sobre la línea de "con DNI _____")
-    page.drawText(studentDni, { 
+    page.drawText(dniToPrint, { 
       x: width * 0.365,
       y: height * 0.52,
       size: 16.5,
@@ -197,7 +202,7 @@ serve(async (req) => {
         course_id: courseId,
         tenant_id: tenantId,
         email: studentEmail,
-        student_dni: studentDni,
+        student_dni: dniToPrint,
         student_name: studentName,
         pdf_url: pdfUrl
       });
