@@ -30,22 +30,16 @@ import { CertificatesService } from '@app/features/courses/application/services/
 
           <div class="form-control w-full mb-4">
             <label class="label">
-              <span class="label-text">DNI del Alumno</span>
+              <span class="label-text">DNI del Alumno (Opcional)</span>
             </label>
             <input type="text" formControlName="studentDni" class="input input-bordered w-full" placeholder="Ej: 12345678" />
-            <label class="label" *ngIf="form.get('studentDni')?.invalid && form.get('studentDni')?.touched">
-              <span class="label-text-alt text-error">Requerido</span>
-            </label>
           </div>
 
           <div class="form-control w-full mb-6">
             <label class="label">
-              <span class="label-text">Email del Alumno</span>
+              <span class="label-text">Email del Alumno (Opcional)</span>
             </label>
             <input type="email" formControlName="studentEmail" class="input input-bordered w-full" placeholder="Ej: alumno@email.com" />
-            <label class="label" *ngIf="form.get('studentEmail')?.invalid && form.get('studentEmail')?.touched">
-              <span class="label-text-alt text-error">Email vlido es requerido</span>
-            </label>
           </div>
 
           <div class="modal-action">
@@ -81,8 +75,8 @@ export class ApproveStudentModalComponent {
 
   form = this.fb.nonNullable.group({
     studentName: ['', [Validators.required, Validators.minLength(3)]],
-    studentDni: ['', [Validators.required]],
-    studentEmail: ['', [Validators.required, Validators.email]]
+    studentDni: [''],
+    studentEmail: ['']
   });
 
   open(data: {
@@ -100,7 +94,7 @@ export class ApproveStudentModalComponent {
     this.form.patchValue({
       studentName: data.studentName,
       studentDni: data.studentDni || '',
-      studentEmail: data.studentEmail
+      studentEmail: data.studentEmail || ''
     });
 
     this.isOpen.set(true);
@@ -116,13 +110,16 @@ export class ApproveStudentModalComponent {
     if (this.form.invalid) return;
 
     const values = this.form.getRawValue();
+    // If no email is provided, generate a dummy one so the DB and logic doesn't fail
+    const finalEmail = values.studentEmail.trim() || `manual-${Date.now()}@local.cert`;
+    const finalDni = values.studentDni.trim() || '';
 
     const result = await this.certificatesService.approveStudentAndGenerateCertificate({
       courseId: this.currentCourseId,
       courseName: this.currentCourseName,
-      studentEmail: values.studentEmail,
+      studentEmail: finalEmail,
       studentName: values.studentName,
-      studentDni: values.studentDni,
+      studentDni: finalDni,
       enrollmentId: this.currentEnrollmentId || undefined
     });
 
