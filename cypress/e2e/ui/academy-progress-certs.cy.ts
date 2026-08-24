@@ -20,12 +20,12 @@ describe('Academy Progress and Certificates', () => {
       body: [{ id: moduleId, course_id: courseId, title: 'Modulo 1', order_index: 1 }]
     }).as('getModules');
 
-    cy.intercept('GET', '**/rest/v1/course_module_contents?*', {
+    cy.intercept('GET', '**/rest/v1/course_lessons*', {
       statusCode: 200,
       body: []
     }).as('getContents');
 
-    cy.intercept('POST', '**/rest/v1/course_module_contents*', {
+    cy.intercept('POST', '**/rest/v1/course_lessons*', {
       statusCode: 200,
       body: [
         { id: 'content-1', lesson_id: moduleId, type: 'document', title: 'Guía PDF E2E', url: 'https://example.com/file.pdf' },
@@ -56,9 +56,10 @@ describe('Academy Progress and Certificates', () => {
     });
 
     cy.wait('@getModules', { timeout: 10000 });
+    cy.wait('@getContents', { timeout: 10000 });
     
     // Select the module
-    cy.contains('Modulo 1').click();
+    cy.contains('Modulo 1').should('be.visible');
 
     // Add Document
     cy.contains('Agregar Recurso').click({ force: true });
@@ -69,11 +70,11 @@ describe('Academy Progress and Certificates', () => {
     cy.contains('Examen').click({ force: true });
     
     // Fill Document Title and URL
-    cy.get('input[placeholder="Título del recurso..."]').eq(0).clear().type('Guía PDF E2E');
-    cy.get('input[placeholder*="URL del archivo"]').eq(0).clear().type('https://example.com/file.pdf');
+    cy.get('input[placeholder="Título del recurso..."]').eq(0).clear().type('Guía PDF E2E', { force: true });
+    cy.get('input[placeholder*="URL del archivo"]').eq(0).clear().type('https://example.com/file.pdf', { force: true });
     
     // Exam Editor
-    cy.get('input[placeholder="Título del recurso..."]').eq(1).clear().type('Examen E2E');
+    cy.get('input[placeholder="Título del recurso..."]').eq(1).clear().type('Examen E2E', { force: true });
     cy.contains('Configurar Examen').click({ force: true });
     
     // Modal opens, add question
@@ -158,12 +159,17 @@ describe('Academy Progress and Certificates', () => {
       body: [{ id: courseId, title: 'Curso E2E Test', slug: 'curso-e2e-test' }]
     }).as('getCourse');
 
+    cy.intercept('GET', '**/rest/v1/course_enrollments?*', {
+      statusCode: 200,
+      body: [{ id: 'enrollment-1', course_id: courseId, user_id: 'student-1', email: studentEmail, status: 'confirmed' }]
+    }).as('getEnrollment');
+
     cy.intercept('GET', '**/rest/v1/course_modules?*', {
       statusCode: 200,
-      body: [{ id: moduleId, course_id: courseId, title: 'Modulo 1', order_index: 1 }]
+      body: [{ id: moduleId, course_id: courseId, title: 'Modulo 1', order_index: 1, unlock_date: '2020-01-01T00:00:00Z' }]
     }).as('getModules');
 
-    cy.intercept('GET', '**/rest/v1/course_module_contents?*', {
+    cy.intercept('GET', '**/rest/v1/course_lessons*', {
       statusCode: 200,
       body: [
         { id: 'content-1', lesson_id: moduleId, type: 'video', title: 'Video 1', url: 'https://youtube.com', order_index: 1 }

@@ -15,11 +15,17 @@ import { ViewChild } from '@angular/core';
     <div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="mb-8 flex items-center gap-4">
-          <a routerLink="/instructor" class="btn btn-circle btn-sm">
-            <i class="fas fa-arrow-left"></i>
-          </a>
-          <h1 class="text-3xl font-black text-slate-900 dark:text-white">Alumnos Inscritos</h1>
+        <div class="mb-8 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <a routerLink="/instructor" class="btn btn-circle btn-sm">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-3xl font-black text-slate-900 dark:text-white">Alumnos Inscritos</h1>
+          </div>
+          
+          <button class="btn btn-primary" (click)="openManualCertModal()">
+            <i class="fas fa-certificate mr-2"></i> Emitir Cert. Manual
+          </button>
         </div>
 
         @if (loading()) {
@@ -141,10 +147,20 @@ export class CourseStudentsPage implements OnInit {
 
       const certsMap = new Map(certificates?.map(c => [c.email, c.pdf_url]));
 
+      const capitalizeWords = (str: string) => {
+        return str
+          .split(' ')
+          .filter(word => word.length > 0)
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
+      };
+
       const enrichedStudents = (enrollments || []).map((e: any) => {
-        const profileName = e.profiles ? `${e.profiles.first_name || ''} ${e.profiles.last_name || ''}`.trim() : '';
+        const profileName = e.profiles ? `${e.profiles.last_name || ''}, ${e.profiles.first_name || ''}`.trim().replace(/^,\s*|\s*,$/g, '') : '';
         const fallbackName = e.student_name || e.full_name || e.name || 'Sin Nombre';
-        const finalName = profileName || fallbackName;
+        let finalName = profileName || fallbackName;
+        
+        finalName = capitalizeWords(finalName);
         
         const finalEmail = e.profiles?.email || e.email || e.student_email || '';
         const finalPhone = e.profiles?.phone || e.phone || '-';
@@ -174,6 +190,15 @@ export class CourseStudentsPage implements OnInit {
       courseName: this.courseName,
       studentName: student.full_name,
       studentEmail: student.email
+    });
+  }
+
+  openManualCertModal() {
+    this.approveModal.open({
+      courseId: this.courseId,
+      courseName: this.courseName,
+      studentName: '',
+      studentEmail: ''
     });
   }
 

@@ -34,15 +34,15 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
 
     cy.intercept('GET', '**/rest/v1/course_modules*', {
       statusCode: 200,
-      body: [{ id: 'module-1', course_id: courseId, title: 'Unidad 1', order_index: 1 }]
+      body: [{ id: 'module-1', course_id: courseId, title: 'Unidad 1', order_index: 1, unlock_date: '2020-01-01T00:00:00Z' }]
     }).as('getModules');
 
     let currentContents: any[] = [];
-    cy.intercept('GET', '**/rest/v1/course_module_contents*', (req) => {
+    cy.intercept('GET', '**/rest/v1/course_lessons*', (req) => {
       req.reply({ statusCode: 200, body: currentContents });
     }).as('getContents');
 
-    cy.intercept('POST', '**/rest/v1/course_module_contents*', (req) => {
+    cy.intercept('POST', '**/rest/v1/course_lessons*', (req) => {
       currentContents = req.body.map((item: any) => ({ ...item, id: 'content-1' }));
       req.reply({ statusCode: 200, body: currentContents });
     }).as('saveContents');
@@ -123,6 +123,11 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
         body: [{ id: 'student-123', first_name: 'Estudiante', last_name: 'Test', role: 'customer' }]
     }).as('getProfile');
 
+    cy.intercept('GET', '**/rest/v1/course_enrollments?*', {
+      statusCode: 200,
+      body: [{ id: 'enrollment-1', course_id: courseId, user_id: 'student-123', email: 'student@example.com', status: 'confirmed' }]
+    }).as('getEnrollment');
+
     cy.intercept('GET', '**/rest/v1/courses*', {
       statusCode: 200,
       body: [{ id: courseId, title: 'Curso de Reparación', slug: 'curso-reparacion-celulares', is_active: true }]
@@ -130,10 +135,10 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
 
     cy.intercept('GET', '**/rest/v1/course_modules*', {
       statusCode: 200,
-      body: [{ id: 'module-1', course_id: courseId, title: 'Unidad 1', order_index: 1 }]
+      body: [{ id: 'module-1', course_id: courseId, title: 'Unidad 1', order_index: 1, unlock_date: '2020-01-01T00:00:00Z' }]
     });
 
-    cy.intercept('GET', '**/rest/v1/course_module_contents*', {
+    cy.intercept('GET', '**/rest/v1/course_lessons*', {
       statusCode: 200, 
       body: [{
         id: 'content-1',
@@ -156,6 +161,11 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
     cy.intercept('POST', '**/rest/v1/rpc/submit_exam*', {
       statusCode: 200,
       body: { score: 100, passed: true, correct_answers: 1, total_questions: 1 }
+    });
+
+    cy.intercept('POST', '**/rest/v1/rpc/get_course_progress*', {
+      statusCode: 200,
+      body: { progress: 0, completed_contents: [], certificate_id: null }
     });
 
     cy.visit('/academy/curso-reparacion-celulares/aula', {
