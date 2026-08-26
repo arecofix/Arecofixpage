@@ -21,6 +21,11 @@ export default [
     path: 'students/:id',
     loadComponent: () => import('./pages/course-students/course-students.page').then(m => m.CourseStudentsPage),
     title: 'Alumnos Inscritos'
+  },
+  {
+    path: 'all-students',
+    loadComponent: () => import('./pages/students/instructor-students.page').then(m => m.InstructorStudentsPage),
+    title: 'Base de Datos de Alumnos'
   }
 ] as Routes;
 

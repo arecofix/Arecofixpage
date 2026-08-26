@@ -4,6 +4,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "strict": true,
     "noImplicitOverride": true,
@@ -18,7 +19,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
-    "ignoreDeprecations": "6.0",
+
     "paths": {
       "@app/*": ["src/app/*"],
       "@env/*": ["src/environments/*"]
