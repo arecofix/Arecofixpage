@@ -5,6 +5,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@app/*": ["src/app/*"],
       "@env/*": ["src/environments/*"]

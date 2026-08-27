@@ -1,0 +1,19 @@
+name = "arecofix-r2-worker"
+main = "src/index.js"
+compatibility_date = "2023-10-30"
+
+# Si quieres que el worker responda en un subdominio específico
+# (Por ejemplo, worker.arecofix.com.ar en lugar del genérico de workers.dev)
+routes = [
+  { pattern = "api.arecofix.com.ar", custom_domain = true }
+]
+
+[vars]
+R2_ACCOUNT_ID = "d43201aa7c78ff1a8e65376a7fb6fbf3"
+R2_ACCESS_KEY_ID = "e4e1d420c7fd3e5ebe27dafb76500c30"
+R2_SECRET_ACCESS_KEY = "58771aeeb2842f87bf73f9bbcc41660f5051d7ee7b55a17853e327ffda8d8745"
+R2_BUCKET_NAME = "arecofix-assets"
+
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "arecofix-assets"

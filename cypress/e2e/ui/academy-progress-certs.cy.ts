@@ -1,7 +1,7 @@
 describe('Academy Progress and Certificates', () => {
   const studentEmail = 'student@arecofix.com';
-  const courseId = 'course-1';
-  const moduleId = 'module-1';
+  const courseId = '22222222-2222-2222-2222-222222222222';
+  const moduleId = '33333333-3333-3333-3333-333333333333';
 
   beforeEach(() => {
     cy.clearLocalStorage();
@@ -28,8 +28,8 @@ describe('Academy Progress and Certificates', () => {
     cy.intercept('POST', '**/rest/v1/course_lessons*', {
       statusCode: 200,
       body: [
-        { id: 'content-1', lesson_id: moduleId, type: 'document', title: 'Guía PDF E2E', url: 'https://example.com/file.pdf' },
-        { id: 'content-2', lesson_id: moduleId, type: 'exam', title: 'Examen E2E', metadata: { questions: [{ question_text: '¿Qué es Cypress?', options: ['Un framework de testing', 'Un tipo de árbol'], correct_option_index: 0 }] } }
+        { id: '44444444-4444-4444-4444-444444444444', lesson_id: moduleId, type: 'document', title: 'Guía PDF E2E', url: 'https://example.com/file.pdf' },
+        { id: '55555555-5555-5555-5555-555555555555', lesson_id: moduleId, type: 'exam', title: 'Examen E2E', metadata: { questions: [{ question_text: '¿Qué es Cypress?', options: ['Un framework de testing', 'Un tipo de árbol'], correct_option_index: 0 }] } }
       ]
     }).as('saveContentsReq');
     
@@ -40,11 +40,11 @@ describe('Academy Progress and Certificates', () => {
     }).as('saveQuestionsReq');
 
     // Inline login logic so it doesn't override our intercepts
-    const mockProfile = { id: 'mock-admin-id', email: 'admin@arecofix.com', role: 'super_admin' };
+    const mockProfile = { id: '66666666-6666-6666-6666-666666666666', email: 'admin@arecofix.com', role: 'super_admin' };
     const session = {
       provider_token: null, access_token: 'fake-token', expires_in: 3600,
       expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'fake', token_type: 'bearer',
-      user: { id: 'mock-admin-id', aud: 'authenticated', role: 'authenticated', email: 'admin@arecofix.com' }
+      user: { id: '66666666-6666-6666-6666-666666666666', aud: 'authenticated', role: 'authenticated', email: 'admin@arecofix.com' }
     };
     cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: session.user }).as('getUser');
     cy.intercept('GET', '**/rest/v1/profiles*', { statusCode: 200, body: [mockProfile] }).as('getProfile');
@@ -102,7 +102,7 @@ describe('Academy Progress and Certificates', () => {
     cy.intercept('POST', '**/rpc/get_exam_questions', {
       statusCode: 200,
       body: [
-        { id: 'q-1', question_text: '¿Qué es Cypress?', options: ['Un framework de testing', 'Un tipo de árbol'], correct_option_index: 0, order_index: 0 }
+        { id: 'cccccccc-cccc-cccc-cccc-cccccccccccc', question_text: '¿Qué es Cypress?', options: ['Un framework de testing', 'Un tipo de árbol'], correct_option_index: 0, order_index: 0 }
       ]
     }).as('getQuestionsRpc');
 
@@ -125,7 +125,7 @@ describe('Academy Progress and Certificates', () => {
       refresh_token: 'fake-refresh-token',
       token_type: 'bearer',
       user: {
-        id: 'student-1',
+        id: '77777777-7777-7777-7777-777777777777',
         aud: 'authenticated',
         role: 'authenticated',
         email: studentEmail,
@@ -136,7 +136,7 @@ describe('Academy Progress and Certificates', () => {
     };
     
     const mockProfile = {
-      id: 'student-1',
+      id: '77777777-7777-7777-7777-777777777777',
       email: studentEmail,
       role: 'user',
       first_name: 'Student',
@@ -161,7 +161,7 @@ describe('Academy Progress and Certificates', () => {
 
     cy.intercept('GET', '**/rest/v1/course_enrollments?*', {
       statusCode: 200,
-      body: [{ id: 'enrollment-1', course_id: courseId, user_id: 'student-1', email: studentEmail, status: 'confirmed' }]
+      body: [{ id: '99999999-9999-9999-9999-999999999999', course_id: courseId, user_id: '77777777-7777-7777-7777-777777777777', email: studentEmail, status: 'confirmed' }]
     }).as('getEnrollment');
 
     cy.intercept('GET', '**/rest/v1/course_modules?*', {
@@ -172,7 +172,7 @@ describe('Academy Progress and Certificates', () => {
     cy.intercept('GET', '**/rest/v1/course_lessons*', {
       statusCode: 200,
       body: [
-        { id: 'content-1', lesson_id: moduleId, type: 'video', title: 'Video 1', url: 'https://youtube.com', order_index: 1 }
+        { id: '44444444-4444-4444-4444-444444444444', lesson_id: moduleId, type: 'video', title: 'Video 1', url: 'https://youtube.com', order_index: 1 }
       ]
     }).as('getContents');
 
@@ -197,7 +197,7 @@ describe('Academy Progress and Certificates', () => {
     // Mark as completed
     cy.intercept('POST', '**/rpc/mark_content_completed*', {
       statusCode: 200,
-      body: { progress: 100, certificate_id: 'cert-123' }
+      body: { progress: 100, certificate_id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' }
     }).as('markCompleted');
 
     cy.get('.fa-circle').click();
@@ -206,7 +206,7 @@ describe('Academy Progress and Certificates', () => {
     // Check updated progress
     cy.contains('100% Completado').should('be.visible');
     cy.contains('¡Curso Finalizado!').should('be.visible');
-    cy.contains('Ver Certificado').should('have.attr', 'href', '/academy/cert/cert-123');
+    cy.contains('Ver Certificado').should('have.attr', 'href', '/academy/cert/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
   });
 
   it('Renders the certificate page properly', () => {
@@ -214,8 +214,8 @@ describe('Academy Progress and Certificates', () => {
       statusCode: 200,
       headers: { 'Content-Range': '0-0/1', 'Content-Type': 'application/json' },
       body: {
-        id: 'cert-123',
-        student_id: 'mock-student',
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        student_id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
         student_name: 'Estudiante Cypress',
         course_id: courseId,
         issued_at: new Date().toISOString(),
@@ -223,7 +223,7 @@ describe('Academy Progress and Certificates', () => {
       }
     }).as('getCertificate');
 
-    cy.visit('/academy/cert/cert-123', {
+    cy.visit('/academy/cert/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', {
       onBeforeLoad: (win) => {
         // Mock a generic session for public cert viewing
         const mockCertProfile = { id: 'anon', role: 'user' };
