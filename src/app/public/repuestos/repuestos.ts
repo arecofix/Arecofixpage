@@ -257,29 +257,38 @@ export class RepuestosComponent implements OnInit, OnDestroy {
             const allCategories = res.data;
             this.categories.set(allCategories);
 
-            // Heuristic Strategy
-            const keywords = [
-                'repuesto', 'modulo', 'módulo', 'bateria', 'batería', 'display', 'screen', 'pantalla', 
-                'glass', 'tapa', 'flex', 'pin', 'carga', 'auricular', 'microfono', 'micrófono', 
-                'camara', 'cámara', 'lente', 'touch', 'vidrio', 'bandeja', 'sim', 'buzzer', 'speaker', 
-                'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power'
-            ];
-            
-            const relevantCategories = allCategories.filter((c: iCategory) => 
-                keywords.some(k => c.name.toLowerCase().includes(k) || c.slug.toLowerCase().includes(k))
-            );
-
             let repuestosCat = allCategories.find((c: iCategory) => c.slug.toLowerCase() === 'repuestos');
-            if (!repuestosCat && relevantCategories.length > 0) repuestosCat = relevantCategories[0];
+            let allIds = new Set<string>();
+
+            if (repuestosCat) {
+                // If "repuestos" exists, use ONLY this category and its descendants
+                allIds.add(repuestosCat.id);
+                const treeIds = this.getAllChildIds(repuestosCat.id, allCategories);
+                treeIds.forEach(id => allIds.add(id));
+            } else {
+                // Fallback Heuristic Strategy
+                const keywords = [
+                    'repuesto', 'modulo', 'módulo', 'bateria', 'batería', 'display', 'screen', 'pantalla', 
+                    'flex', 'pin', 'microfono', 'micrófono', 
+                    'camara', 'cámara', 'lente', 'touch', 'bandeja', 'sim', 'buzzer', 'speaker', 
+                    'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power'
+                ];
+                
+                const relevantCategories = allCategories.filter((c: iCategory) => 
+                    keywords.some(k => c.name.toLowerCase().includes(k) || c.slug.toLowerCase().includes(k))
+                );
 
                 if (relevantCategories.length > 0) {
-                let allIds = new Set<string>();
-                relevantCategories.forEach((cat: iCategory) => {
-                    allIds.add(cat.id);
-                    const treeIds = this.getAllChildIds(cat.id, allCategories);
-                    treeIds.forEach(id => allIds.add(id));
-                });
+                    repuestosCat = relevantCategories[0];
+                    relevantCategories.forEach((cat: iCategory) => {
+                        allIds.add(cat.id);
+                        const treeIds = this.getAllChildIds(cat.id, allCategories);
+                        treeIds.forEach(id => allIds.add(id));
+                    });
+                }
+            }
 
+            if (allIds.size > 0) {
                 this.repuestosRootId.set(repuestosCat?.id || null);
                 this.repuestosCategoryIds.set(Array.from(allIds));
                 this.isInitialized.set(true);

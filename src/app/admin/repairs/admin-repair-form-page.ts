@@ -813,22 +813,18 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       } else if (finalClientId) {
         // Actualizar datos si se editó un cliente existente
         const updateData: any = {};
-        if (customer_dni) updateData.dni = customer_dni;
-        if (customer_phone) updateData.phone = customer_phone;
-        if (customer_email) updateData.email = customer_email;
-        if (customer_name) {
-          const nameParts = customer_name.trim().split(' ');
+        if (customer_dni !== undefined) updateData.dni = customer_dni || null;
+        if (customer_phone !== undefined) updateData.phone = customer_phone || null;
+        if (customer_email !== undefined) updateData.email = customer_email || null;
+        if (customer_name !== undefined) {
+          const nameParts = (customer_name || '').trim().split(' ');
           updateData.first_name = nameParts[0] || '';
           updateData.last_name = nameParts.slice(1).join(' ') || '';
         }
 
         try {
           if (Object.keys(updateData).length > 0) {
-            await this.supabaseService
-              .getClient()
-              .from('profiles')
-              .update(updateData)
-              .eq('id', finalClientId);
+            await this.customerService.update(finalClientId, updateData);
           }
         } catch (err) {
           console.error('[AdminRepairForm] Error updating customer data:', err);

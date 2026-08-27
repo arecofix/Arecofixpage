@@ -6,7 +6,7 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
   };
 
   const mockTenant = {
-    id: 'mock-tenant-id',
+    id: '11111111-1111-1111-1111-111111111111',
     name: 'Taller Mock E2E',
     slug: 'taller-mock-e2e',
     is_active: true,

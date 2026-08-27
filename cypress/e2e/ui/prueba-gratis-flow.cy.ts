@@ -7,7 +7,7 @@ describe('Flujo de Prueba Gratis - Arecofix', () => {
       statusCode: 200,
       body: {
         success: true,
-        tenantId: 'mock-tenant-id'
+        tenantId: '11111111-1111-1111-1111-111111111111'
       },
     }).as('createTrialTenant');
 

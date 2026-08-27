@@ -1,0 +1,51 @@
+name: Tareas Programadas (Backup y Archivado)
+
+on:
+  schedule:
+    # Backup diario a las 03:00 UTC
+    - cron: '0 3 * * *'
+    # Archivado de logs el día 1 de cada mes a las 04:00 UTC
+    - cron: '0 4 1 * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  run-tasks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3 cryptography pandas supabase
+          
+      # El entorno runner de ubuntu-latest ya trae instalado PostgreSQL Client (pg_dump)
+      - name: Verificar pg_dump
+        run: pg_dump --version
+        
+      - name: Ejecutar Backup Automático (Solo diario)
+        if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+        run: python Back-End/scripts/automated_backup.py
+        
+      - name: Ejecutar Archivado de Logs (Solo mensual)
+        if: github.event.schedule == '0 4 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        run: python Back-End/scripts/archive_logs.py

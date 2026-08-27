@@ -18,11 +18,14 @@ export class SupabaseStorageService {
   private readonly DEFAULT_BUCKET = 'public-assets';
 
   /**
-   * Set this to true if you upgrade your Supabase plan to Pro or purchase the
-   * Storage Image Transformations add-on. Since transformations return 400 errors
-   * on the Free Plan, we default this to false.
+   * Cloudflare CDN Base URL
    */
-  private readonly enableServerTransformations = false;
+  private readonly CDN_URL = 'https://cdn.arecofix.com.ar';
+  
+  /**
+   * Cloudflare Worker API URL (For Presigned URLs)
+   */
+  private readonly WORKER_API_URL = 'https://api.arecofix.com.ar';
 
   /**
    * Uploads a file with automatic multi-tenant path isolation.
@@ -70,64 +73,55 @@ export class SupabaseStorageService {
       // Obligatory requirement: Set Cache-Control metadata to at least 1 year (31536000)
       const cacheHeader = options.cacheControl || '31536000';
 
-      // Convert File to ArrayBuffer to prevent fetch API hanging bugs with dynamically created Blobs in some browser engines
-      const arrayBuffer = await fileToUpload.arrayBuffer();
+      // 1. Get Presigned URL from Cloudflare Worker
+      const presignedRes = await fetch(`${this.WORKER_API_URL}/api/get-upload-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: filePath,
+          contentType: fileToUpload.type
+        })
+      });
 
-      // We use native fetch to bypass any hanging issues in the Supabase JS SDK (cross-fetch)
-      const { data: sessionData } = await this.supabase.auth.getSession();
-      const token = sessionData?.session?.access_token || '';
-      
-      // We must get the supabase url from the client config
-      // In Supabase v2, it's accessible via this.supabase.supabaseUrl
-      const supabaseUrl = (this.supabase as any).supabaseUrl;
-      const uploadUrl = `${supabaseUrl}/storage/v1/object/${bucket}/${filePath}`;
-      
+      if (!presignedRes.ok) {
+        throw new Error('Failed to get presigned URL from Cloudflare Worker');
+      }
+
+      const { uploadUrl } = await presignedRes.json();
+
+      // 2. Upload directly to Cloudflare R2 using the Presigned URL
       const fetchHeaders: Record<string, string> = {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': fileToUpload.type,
-        'cache-control': cacheHeader,
-        'x-upsert': options.upsert ? 'true' : 'false'
+        'cache-control': cacheHeader
       };
 
       const uploadPromise = fetch(uploadUrl, {
-        method: 'POST',
-        body: arrayBuffer,
+        method: 'PUT', // R2 Presigned URLs usually expect PUT
+        body: await fileToUpload.arrayBuffer(),
         headers: fetchHeaders
       }).then(async (res) => {
         if (!res.ok) {
           const errBody = await res.text();
-          let errMsg = `HTTP ${res.status}`;
-          try { errMsg = JSON.parse(errBody).message || errMsg; } catch(e) {}
-          throw new Error(errMsg);
+          throw new Error(`Upload to R2 failed: HTTP ${res.status} - ${errBody}`);
         }
-        return res.json();
+        return filePath;
       });
 
       // 60s timeout safety for slow network connections
       let timeoutId: any;
-      const timeoutPromise = new Promise<{ Key?: string; path?: string }>((_, reject) => {
+      const timeoutPromise = new Promise<string>((_, reject) => {
           timeoutId = setTimeout(() => reject(new Error('Upload timeout (60s)')), 60000);
       });
 
-      let data;
+      let finalPath: string;
       try {
-        data = await Promise.race([uploadPromise, timeoutPromise]);
+        finalPath = await Promise.race([uploadPromise, timeoutPromise]);
       } finally {
         clearTimeout(timeoutId);
       }
 
-      let finalPath = data.path;
-      if (!finalPath && data.Key) {
-         // REST API returns Key like "bucket/folder/file.ext"
-         if (data.Key.startsWith(bucket + '/')) {
-             finalPath = data.Key.substring(bucket.length + 1);
-         } else {
-             finalPath = data.Key;
-         }
-      }
-
-      // Return public URL optimized with Supabase Image Transformations
-      return this.getPublicUrl(finalPath || filePath, bucket);
+      // 3. Return the public CDN URL directly
+      return `${this.CDN_URL}/${finalPath}`;
     } catch (error) {
       this.logger.error(`Unhandled error in SupabaseStorageService.uploadFile`, error);
       throw error;
@@ -160,8 +154,7 @@ export class SupabaseStorageService {
   }
 
   /**
-   * Retrieves the public URL of a stored asset, applying Supabase Image Transformations 
-   * (width: 800, quality: 80, format: webp) to optimize delivery and minimize egress bandwidth.
+   * Retrieves the public URL of a stored asset from Cloudflare CDN.
    * Can accept either a relative path or a full storage URL.
    */
   getPublicUrl(
@@ -171,43 +164,29 @@ export class SupabaseStorageService {
   ): string {
     if (!pathOrUrl) return '';
 
-    let finalPath = pathOrUrl;
-    let finalBucket = bucket;
-
-    // Parse full URL to extract relative path and bucket if a full URL is provided
-    if (pathOrUrl.startsWith('http')) {
-      const publicObjectPrefix = '/storage/v1/object/public/';
-      const index = pathOrUrl.indexOf(publicObjectPrefix);
-      if (index !== -1) {
-        const pathAfterPublic = pathOrUrl.substring(index + publicObjectPrefix.length);
-        const parts = pathAfterPublic.split('/');
-        if (parts.length > 1) {
-          finalBucket = parts[0];
-          // Reconstruct path excluding the bucket name
-          finalPath = parts.slice(1).join('/');
-        }
-      } else {
-        // If it's an external HTTP URL and not from our Supabase storage, return it directly
-        return pathOrUrl;
-      }
+    // If it's already a full CDN URL, return it
+    if (pathOrUrl.startsWith(this.CDN_URL)) {
+      return pathOrUrl;
     }
 
-    // Determine if the resource is an image file to apply transformations
-    const isImage = /\.(jpg|jpeg|png|webp|gif|avif|heic|tiff|bmp)$/i.test(finalPath);
-
-    // Apply Supabase Image Transformations for images (only if enabled/supported by the plan)
-    const transformOptions = (isImage && this.enableServerTransformations) ? {
-      transform: {
-        width: options.width ?? 800,
-        quality: options.quality ?? 80,
-        format: (options.format ?? 'webp') as any
+    // If it's an old Supabase URL, extract the path and convert to CDN
+    const publicObjectPrefix = '/storage/v1/object/public/';
+    const index = pathOrUrl.indexOf(publicObjectPrefix);
+    if (index !== -1) {
+      const pathAfterPublic = pathOrUrl.substring(index + publicObjectPrefix.length);
+      const parts = pathAfterPublic.split('/');
+      if (parts.length > 1) {
+        // Reconstruct path excluding the bucket name (since R2 bucket is the root of CDN)
+        const finalPath = parts.slice(1).join('/');
+        return `${this.CDN_URL}/${finalPath}`;
       }
-    } : undefined;
+    } else if (pathOrUrl.startsWith('http')) {
+      // If it's an external HTTP URL and not from our storage, return it directly
+      return pathOrUrl;
+    }
 
-    const { data } = this.supabase.storage
-      .from(finalBucket)
-      .getPublicUrl(finalPath, transformOptions);
-
-    return data.publicUrl;
+    // If it's a relative path, append to CDN URL
+    // (Assuming relative paths are already stripped of bucket name)
+    return `${this.CDN_URL}/${pathOrUrl}`;
   }
 }
