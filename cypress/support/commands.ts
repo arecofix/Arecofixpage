@@ -47,7 +47,7 @@ declare global {
 Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean } = {}) => {
   const session = {
     provider_token: null,
-    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoibW9jay1hZG1pbi1pZCJ9.signature',
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk',
     expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     refresh_token: 'fake-refresh-token',
@@ -120,6 +120,7 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
     onBeforeLoad: (win) => {
       // Inject auth token BEFORE Angular initializes
       win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-127-auth-token', JSON.stringify(session));
       win.localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(fakeProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
@@ -137,7 +138,7 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
 Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
   const session = {
     provider_token: null,
-    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoibW9jay1hZG1pbi1pZCJ9.signature',
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk',
     expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     refresh_token: 'fake-refresh-token',
@@ -273,6 +274,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
       win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-127-auth-token', JSON.stringify(session));
       win.localStorage.setItem('arecofix_profile_mock-admin-id', JSON.stringify(mockProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
@@ -293,8 +295,10 @@ Cypress.Commands.add('setupCheckoutSession', () => {
   const branch = buildMockBranch();
 
   // Inject session into local storage BEFORE anything loads
-  cy.on('window:before:load', (win) => {
+  cy.window().then(w => w.indexedDB.deleteDatabase('ArecofixOfflineDB'));
+    cy.on('window:before:load', (win) => {
     win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+    win.localStorage.setItem('sb-127-auth-token', JSON.stringify(session));
     win.localStorage.setItem('arecofix_current_branch_id', branch.id);
   });
 
@@ -326,4 +330,4 @@ Cypress.Commands.add('setupCheckoutSession', () => {
     statusCode: 200,
     body: session.user
   }).as('getUser');
-});
+});
