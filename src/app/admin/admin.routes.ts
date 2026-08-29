@@ -107,6 +107,11 @@ export const adminRoutes: Routes = [
       {
         path: 'finance',
         loadChildren: () => import('@app/admin/finance/admin-finance.routes').then(m => m.ADMIN_FINANCE_ROUTES)
+      },
+      {
+        title: 'Base de Conocimiento IA',
+        path: 'knowledge-base',
+        loadComponent: () => import('@app/admin/knowledge-base/admin-knowledge-base.page').then(m => m.AdminKnowledgeBasePage)
       }
     ]
   }

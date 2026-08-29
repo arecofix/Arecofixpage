@@ -1,0 +1,33 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# wrangler.toml — Cloudflare Worker: rag-chatbot (Fase 3)
+#
+# Propósito: Motor RAG — embedding de pregunta + retrieval Supabase + LLM Llama-3
+# Deploy:  cd cloudflare/workers/rag-chatbot && npx wrangler deploy
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name               = "arecofix-rag-chatbot"
+main               = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# ── Workers AI binding ────────────────────────────────────────────────────────
+# Habilita tanto el modelo de embeddings como el LLM Llama-3.
+[ai]
+binding = "AI"
+
+# ── Variables de entorno (no sensibles) ───────────────────────────────────────
+[vars]
+SUPABASE_URL = "https://jftiyfnnaogmgvksgkbn.supabase.co"
+
+# ── Secrets requeridos (cargar con wrangler secret put) ───────────────────────
+# SUPABASE_SERVICE_ROLE_KEY  — misma key que en el Worker de embeddings
+# CHATBOT_SECRET             — secret diferente para Angular (generado en deploy)
+#
+# Comandos:
+#   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   npx wrangler secret put CHATBOT_SECRET
+
+# ── Nota sobre límites del plan Free ──────────────────────────────────────────
+# - Workers AI: 10k requests/día en el plan Free
+# - Llama-3-8b: ~50 tokens/s, máximo 512 tokens de output por request
+# - Para producción con alto tráfico: considerar plan Workers Paid ($5/mes)
+#   que aumenta a 1M requests/día y CPU ilimitado

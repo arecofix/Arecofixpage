@@ -1,0 +1,41 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# wrangler.toml — Cloudflare Worker: embedding-ingestion
+#
+# Propósito: Genera embeddings con Workers AI y los guarda en Supabase.
+# Deploy:  cd cloudflare/workers/embedding-ingestion && npx wrangler deploy
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name            = "arecofix-embedding-ingestion"
+main            = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# ── Workers AI binding ────────────────────────────────────────────────────────
+# Activa el acceso a la API de IA de Cloudflare desde el Worker.
+# Sin costo adicional en el plan Free (10,000 embeddings/día).
+[ai]
+binding = "AI"
+
+# ── Variables de entorno (no sensibles) ───────────────────────────────────────
+# Las variables sensibles (SUPABASE_SERVICE_ROLE_KEY, WORKER_SECRET)
+# deben agregarse como Secrets en el dashboard de Cloudflare o con:
+#   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   npx wrangler secret put WORKER_SECRET
+[vars]
+SUPABASE_URL = "https://jftiyfnnaogmgvksgkbn.supabase.co"
+
+# ── Entorno de desarrollo local ───────────────────────────────────────────────
+# Para desarrollo local, crea un archivo .dev.vars con:
+#   SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+#   WORKER_SECRET=un_secret_fuerte_para_desarrollo
+# Este archivo está en .gitignore por defecto.
+
+# ── Límites de CPU (opcional, ajustar según volumen) ─────────────────────────
+# El plan Workers Free tiene 10ms de CPU por request.
+# Para batches grandes, considera upgradar al plan Paid ($5/mes, 30s CPU).
+# [limits]
+# cpu_ms = 30000
+
+# ── CORS y rutas permitidas ───────────────────────────────────────────────────
+# Este Worker NO debe ser llamado directamente desde el navegador.
+# Solo lo llama: Flask Backend, scripts de re-indexación, y el Worker de Fase 3.
+# El header Access-Control-Allow-Origin está restringido a arecofix.com.ar.

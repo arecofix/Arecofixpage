@@ -15,18 +15,29 @@ import { FormsModule } from '@angular/forms';
 import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
+import { ChatbotService, ChatSource } from '../services/chatbot.service';
 
-type MessageType = 'text' | 'whatsapp-btn';
+// ── Tipos locales ─────────────────────────────────────────────────────────────
+
+type MessageType = 'text' | 'whatsapp-btn' | 'streaming' | 'error';
 
 interface ChatMessage {
   from: 'user' | 'bot';
   type: MessageType;
   text: string;
+  /** Fuentes RAG adjuntas a este mensaje (solo mensajes bot) */
+  sources?: ChatSource[];
+  /** Indica si el acordeón de fuentes está expandido */
+  isSourcesExpanded?: boolean;
+  /** Indica si este bubble aún está recibiendo tokens (streaming activo) */
+  isStreaming?: boolean;
 }
 
 interface QuickOption {
   label: string;
-  response: ChatMessage;
+  /** Si tiene question, delega al RAG; si tiene response, responde directo */
+  question?: string;
+  response?: ChatMessage;
 }
 
 const WA_NUMBER = '541125960900';
@@ -43,6 +54,7 @@ const WA_CELULAR_URL = `https://wa.me/${WA_NUMBER}?text=Hola,%20necesito%20consu
 })
 export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   private readonly router = inject(Router);
+  private readonly chatbot = inject(ChatbotService);
 
   @ViewChild('chatBody') chatBodyRef!: ElementRef<HTMLDivElement>;
 
@@ -52,10 +64,14 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   inputError = signal('');
   showQuickOptions = signal(true);
 
+  /** Expone el estado de carga/streaming del servicio a la template */
+  readonly isLoading = this.chatbot.loading;
+  readonly isStreaming = this.chatbot.streaming;
+  readonly serviceError = this.chatbot.error;
+
   readonly waUrl = WA_URL;
   readonly waCelularUrl = WA_CELULAR_URL;
 
-  /** true cuando la ruta actual es exactamente /celular */
   readonly isCelularRoute = computed(() => this.currentUrl() === '/celular');
 
   private readonly currentUrl = toSignal(
@@ -67,29 +83,26 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
     { initialValue: this.router.url },
   );
 
+  /** Opciones rápidas: las RAG-aware delegan al Worker, las directas responden local */
   readonly quickOptions: QuickOption[] = [
     {
-      label: '💬 Contactarse / WhatsApp',
+      label: '🔧 ¿Qué servicios ofrecen?',
+      question: '¿Qué servicios de reparación ofrecen en Arecofix?',
+    },
+    {
+      label: '📦 ¿Tienen productos en stock?',
+      question: '¿Qué productos tienen disponibles actualmente?',
+    },
+    {
+      label: '📚 ¿Tienen cursos disponibles?',
+      question: '¿Qué cursos o capacitaciones ofrece la academia Arecofix?',
+    },
+    {
+      label: '💬 Contactar por WhatsApp',
       response: {
         from: 'bot',
         type: 'whatsapp-btn',
         text: 'Para una atención rápida y personalizada, escribinos directamente por WhatsApp:',
-      },
-    },
-    {
-      label: '📍 ¿Dónde están ubicados?',
-      response: {
-        from: 'bot',
-        type: 'text',
-        text: 'Nuestro taller está ubicado en Jorge Newbery 69, Marcos Paz, Buenos Aires. ¡Te esperamos!',
-      },
-    },
-    {
-      label: '🔧 ¿Qué servicios ofrecen?',
-      response: {
-        from: 'bot',
-        type: 'text',
-        text: 'Nos especializamos en microelectrónica, reparación de celulares, tablets y notebooks. Cambios de módulo, pines de carga, y diagnóstico de placas.',
       },
     },
   ];
@@ -98,12 +111,11 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   private shouldScroll = false;
 
   ngOnInit(): void {
-    // Mensaje de bienvenida automático
     this.messages.set([
       {
         from: 'bot',
         type: 'text',
-        text: '¡Hola! Bienvenido a Arecofix. ¿En qué te puedo ayudar hoy?',
+        text: '¡Hola! Soy el asistente inteligente de Arecofix. Puedo ayudarte con consultas sobre productos, servicios, manuales técnicos y más. ¿En qué te puedo ayudar?',
       },
     ]);
   }
@@ -116,10 +128,32 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
+  toggleSources(index: number): void {
+    this.messages.update((msgs) => {
+      const updated = [...msgs];
+      if (updated[index] && updated[index].sources) {
+        updated[index] = {
+          ...updated[index],
+          isSourcesExpanded: !updated[index].isSourcesExpanded
+        };
+      }
+      return updated;
+    });
+    setTimeout(() => this.scrollToBottom(), 50);
+  }
+
+  private scrollToBottom(): void {
+    this.shouldScroll = true;
+  }
+
   toggleChat(): void {
     this.isOpen.update((v) => !v);
     if (this.isOpen()) {
       this.shouldScroll = true;
+    } else {
+      // Limpiar historial al cerrar para empezar fresco la próxima vez
+      // Comentar esta línea si preferís persistir la conversación
+      this.chatbot.clearHistory();
     }
   }
 
@@ -135,16 +169,23 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   selectOption(option: QuickOption): void {
-    // Mostrar la opción elegida como mensaje del usuario
-    this.messages.update((msgs) => [
-      ...msgs,
-      { from: 'user', type: 'text', text: option.label },
-    ]);
-    // Ocultar botones de opciones rápidas después de elegir
     this.showQuickOptions.set(false);
-    // Respuesta inmediata del bot
-    this.messages.update((msgs) => [...msgs, option.response]);
-    this.shouldScroll = true;
+
+    // Opción con respuesta directa (ej. WhatsApp)
+    if (option.response) {
+      this.messages.update((msgs) => [
+        ...msgs,
+        { from: 'user', type: 'text', text: option.label },
+        option.response!,
+      ]);
+      this.shouldScroll = true;
+      return;
+    }
+
+    // Opción que consulta al RAG
+    if (option.question) {
+      this.dispatchToRag(option.question, option.label);
+    }
   }
 
   sendMessage(): void {
@@ -158,26 +199,102 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.showError('El mensaje es demasiado corto.');
       return;
     }
+    if (this.isLoading() || this.isStreaming()) return;
 
-    // Agrega mensaje del usuario
-    this.messages.update((msgs) => [
-      ...msgs,
-      { from: 'user', type: 'text', text: raw },
-    ]);
     this.inputText.set('');
     this.showQuickOptions.set(false);
-    this.shouldScroll = true;
+    this.dispatchToRag(raw);
+  }
 
-    // Respuesta genérica con botón de WhatsApp
+  /**
+   * Envía una pregunta al Worker RAG y muestra la respuesta en streaming.
+   * @param question Texto de la pregunta para el Worker
+   * @param displayText Texto visible en el bubble de usuario (si difiere de question)
+   */
+  private dispatchToRag(question: string, displayText?: string): void {
+    // 1. Agregar mensaje del usuario
     this.messages.update((msgs) => [
       ...msgs,
-      {
-        from: 'bot',
-        type: 'whatsapp-btn',
-        text: '¡Hola! Para poder brindarte un presupuesto exacto y una mejor atención, contactanos directamente por WhatsApp:',
-      },
+      { from: 'user', type: 'text', text: displayText ?? question },
     ]);
     this.shouldScroll = true;
+
+    // 2. Agregar bubble del bot en estado streaming (vacío al inicio)
+    const streamingBubbleIndex = this.messages().length;
+    this.messages.update((msgs) => [
+      ...msgs,
+      { from: 'bot', type: 'streaming', text: '', isStreaming: true },
+    ]);
+
+    // 3. Llamar al Worker RAG con SSE
+    this.chatbot.askStream(question, {
+      onToken: (chunk) => {
+        // Acumular tokens en el bubble de streaming
+        this.messages.update((msgs) => {
+          const updated = [...msgs];
+          const bubble = updated[streamingBubbleIndex];
+          if (bubble) {
+            updated[streamingBubbleIndex] = { ...bubble, text: bubble.text + chunk };
+          }
+          return updated;
+        });
+        this.shouldScroll = true;
+      },
+
+      onSources: (sources) => {
+        // Desduplicar fuentes usando un Set para los títulos
+        const uniqueSources: ChatSource[] = [];
+        const seenTitles = new Set<string>();
+        for (const src of sources) {
+          if (!seenTitles.has(src.title)) {
+            seenTitles.add(src.title);
+            uniqueSources.push(src);
+          }
+        }
+
+        // Adjuntar fuentes al bubble cuando llegan
+        this.messages.update((msgs) => {
+          const updated = [...msgs];
+          const bubble = updated[streamingBubbleIndex];
+          if (bubble) {
+            updated[streamingBubbleIndex] = { ...bubble, sources: uniqueSources };
+          }
+          return updated;
+        });
+      },
+
+      onDone: () => {
+        // Marcar el bubble como completo (deja de mostrar cursor)
+        this.messages.update((msgs) => {
+          const updated = [...msgs];
+          const bubble = updated[streamingBubbleIndex];
+          if (bubble) {
+            updated[streamingBubbleIndex] = {
+              ...bubble,
+              type: 'text',
+              isStreaming: false,
+            };
+          }
+          return updated;
+        });
+        this.shouldScroll = true;
+      },
+
+      onError: (msg) => {
+        // Reemplazar el bubble de streaming por un mensaje de error
+        this.messages.update((msgs) => {
+          const updated = [...msgs];
+          updated[streamingBubbleIndex] = {
+            from: 'bot',
+            type: 'error',
+            text: msg,
+            isStreaming: false,
+          };
+          return updated;
+        });
+        this.shouldScroll = true;
+      },
+    });
   }
 
   private showError(msg: string): void {

@@ -45,6 +45,7 @@ export class MenuBuilderService {
       { title: lang === 'es' ? 'Servicios Web' : 'Web Services', path: `${basePrefix}/services`, icon: 'fa-tools' },
       { title: lang === 'es' ? 'Blog & Noticias' : 'Blog & News', path: `${basePrefix}/posts`, icon: 'fa-newspaper' },
       { title: lang === 'es' ? 'Buzón & Turnos' : 'Inbox & Appointments', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
+      { title: lang === 'es' ? 'Base de Conocimiento IA' : 'AI Knowledge Base', path: `${basePrefix}/knowledge-base`, icon: 'fa-brain' },
     ];
 
     if (isGlobalAdmin && isCentral) {

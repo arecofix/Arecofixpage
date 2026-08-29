@@ -1,0 +1,9 @@
+name = "arecofix-d1-sync"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Bind a D1 database
+[[d1_databases]]
+binding = "DB"
+database_name = "arecofix-sync-db"
+database_id = "YOUR_D1_DATABASE_ID_HERE"

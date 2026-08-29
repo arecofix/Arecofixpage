@@ -50,10 +50,7 @@
             "ssr": {
               "entry": "server.ts"
             },
-            "prerender": {
-              "discoverRoutes": false,
-              "routesFile": "routes.txt"
-            },
+            "prerender": false,
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/manifest.webmanifest",

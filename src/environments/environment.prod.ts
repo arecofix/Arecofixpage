@@ -24,6 +24,10 @@ export const environment: Environment = {
 
   authRedirectUrl: 'https://arecofix.com.ar',
   enableProfileUpsert: false,
+
+  // RAG Chatbot Worker (Fase 3)
+  chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
+  chatbotSecret: 'uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=',
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
   // WhatsApp Configuration
