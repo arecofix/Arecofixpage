@@ -98,10 +98,10 @@ export class SupabaseService {
           const response = await Promise.race([fetchPromise, timeoutPromise]);
           clearTimeout(timeoutId);
           
-          if (!response.ok && response.status >= 500) {
+          if (!response.ok && (response.status >= 500 || response.status === 402 || response.status === 429)) {
               const errorText = await response.text().catch(() => 'No error body');
-              console.error(`[Supabase] 500 on ${url} - Details:`, errorText);
-              throw new Error(`Server Error: ${response.status} - ${errorText}`);
+              console.error(`[Supabase] ${response.status} on ${url} - Details:`, errorText);
+              throw new Error(`Server Error or Quota Exceeded: ${response.status} - ${errorText}`);
           }
 
           if (isCacheable && response.ok) {
@@ -156,6 +156,35 @@ export class SupabaseService {
              });
            }
          } catch (e) {}
+         
+         // D1 Failover si no hay cache en IndexedDB
+         this.logger.warn(`[Failover] No IndexedDB cache found. Attempting D1 Failover for: ${urlStr}`);
+         try {
+             const d1WorkerUrl = 'https://arecofix-d1-failover.ezequielenrico15.workers.dev';
+             const urlObj = new URL(urlStr);
+             const pathAndQuery = urlObj.pathname.replace('/rest/v1/', '') + urlObj.search;
+             
+             const d1Response = await fetch(`${d1WorkerUrl}/${pathAndQuery}`, {
+                 method: 'GET',
+                 headers: {
+                     'Accept': 'application/json'
+                 }
+             });
+             
+             if (d1Response.ok) {
+                 const textData = await d1Response.text();
+                 this.logger.info(`[Failover] Successfully fetched from D1: ${urlStr}`);
+                 return new Response(textData, {
+                     status: 200,
+                     statusText: 'OK',
+                     headers: new Headers([['Content-Type', 'application/json']])
+                 });
+             } else {
+                 this.logger.error(`[Failover] D1 responded with ${d1Response.status}`);
+             }
+         } catch (d1Error) {
+             this.logger.error(`[Failover] D1 Worker fetch failed for ${urlStr}`, d1Error);
+         }
       } else if (isMutation) {
          // Si es mutación y falló por timeout o error de red, encolar en IndexedDB
          this.logger.warn(`[OfflineSync] Fallback to Queue after network failure: ${method} ${urlStr}`);
