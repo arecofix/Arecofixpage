@@ -4,6 +4,138 @@
    Reemplaza al botón de WhatsApp.
    ============================================================ */
 
+/* ── Streaming cursor ───────────────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.typing-cursor {
+  display: inline-block;
+  margin-left: 1px;
+  animation: blink 0.8s step-start infinite;
+  color: #6366f1;
+  font-weight: 700;
+}
+
+/* ── Spinner en botón de envío ──────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spinner-icon {
+  animation: spin 0.8s linear infinite;
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Estado dot "ocupado" (escritura) ───────────────────────── */
+.status-dot--busy {
+  background: #f59e0b !important;
+  animation: pulse-amber 1s ease-in-out infinite !important;
+}
+@keyframes pulse-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5); }
+  50%       { box-shadow: 0 0 0 4px rgba(245,158,11,0); }
+}
+
+/* ── Typing indicator (tres puntos) ─────────────────────────── */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+}
+.typing-indicator span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6366f1;
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: .4; }
+  40%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ── Error bubble ───────────────────────────────────────────── */
+.message-bubble--error {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+
+/* ── RAG Sources panel ──────────────────────────────────────── */
+.rag-sources {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 10px;
+  max-width: 92%;
+}
+.rag-sources-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6366f1;
+  margin: 0 0 5px 0;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.rag-sources-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rag-source-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+.rag-source-link {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+}
+.rag-source-link:hover { text-decoration: underline; }
+.rag-source-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: rgba(99,102,241,.12);
+  color: #6366f1;
+  text-transform: capitalize;
+  letter-spacing: 0.03em;
+}
+.rag-source-badge--manual  { background: rgba(245,158,11,.12); color: #d97706; }
+.rag-source-badge--product { background: rgba(16,185,129,.12); color: #059669; }
+.rag-source-badge--course  { background: rgba(139,92,246,.12); color: #7c3aed; }
+.rag-source-badge--service { background: rgba(59,130,246,.12); color: #2563eb; }
+
+/* ── Powered by footer ──────────────────────────────────────── */
+.chatbot-powered-by {
+  text-align: center;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin: 4px 0 0 0;
+  letter-spacing: 0.02em;
+}
+
+
 :host {
   display: block;
   position: fixed;
@@ -285,15 +417,18 @@
 /* Burbujas */
 .chatbot-message {
   display: flex;
+  flex-direction: column;
   max-width: 85%;
 }
 
 .chatbot-message.user {
   align-self: flex-end;
+  align-items: flex-end;
 }
 
 .chatbot-message.bot {
   align-self: flex-start;
+  align-items: flex-start;
 }
 
 .message-bubble {

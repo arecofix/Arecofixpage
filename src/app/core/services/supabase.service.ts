@@ -156,6 +156,29 @@ export class SupabaseService {
              });
            }
          } catch (e) {}
+      } else if (isMutation) {
+         // Si es mutación y falló por timeout o error de red, encolar en IndexedDB
+         this.logger.warn(`[OfflineSync] Fallback to Queue after network failure: ${method} ${urlStr}`);
+         const headersArray: [string, string][] = [];
+         if (options?.headers) {
+           new Headers(options.headers).forEach((val, key) => headersArray.push([key, val]));
+         }
+         
+         await this.syncService.enqueueMutation(urlStr, method, headersArray, typeof options?.body === 'string' ? options.body : null);
+         
+         let mockResponseData: any[] = [];
+         if (options?.body && typeof options.body === 'string') {
+            try {
+              const parsed = JSON.parse(options.body);
+              mockResponseData = Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {}
+         }
+         
+         return new Response(JSON.stringify(mockResponseData), {
+           status: method === 'POST' ? 201 : 200,
+           statusText: 'OK (Offline Mock Fallback)',
+           headers: new Headers([['Content-Type', 'application/json']])
+         });
       }
       
       this.logger.error('Supabase fetch critically failed after retries', lastError);
@@ -273,6 +296,12 @@ export class SupabaseService {
 
   getClient(): SupabaseClient {
     return this.client;
+  }
+
+  async clearCache(): Promise<void> {
+    this.logger.info('[SupabaseCache] Manually clearing cache.');
+    this.cacheMap.clear();
+    await this.syncService.clearCache();
   }
 
   async testConnection(): Promise<boolean> {

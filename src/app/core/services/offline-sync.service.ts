@@ -3,7 +3,8 @@ import { LoggerService } from './logger.service';
 import { firstValueFrom } from 'rxjs';
 import { RepairRepository } from '../../features/repairs/domain/repositories/repair.repository';
 import { NotificationService } from './notification.service';
-import Dexie, { Table } from 'dexie';
+import { PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface CachedRequest {
   url: string;
@@ -36,23 +37,8 @@ export interface OfflineRepair {
   timestamp: number;
 }
 
-export class ArecofixDatabase extends Dexie {
-  requestsCache!: Table<CachedRequest, string>;
-  syncQueue!: Table<QueuedMutation, number>;
-  masterData!: Table<MasterData, string>;
-  offlineRepairs!: Table<OfflineRepair, string>;
-
-  constructor() {
-    super('ArecofixOfflineDB');
-    // Using version 3 to cleanly upgrade from the native DB version 2
-    this.version(3).stores({
-      requestsCache: 'url',
-      syncQueue: '++id, timestamp',
-      masterData: 'key',
-      offlineRepairs: 'id, timestamp'
-    });
-  }
-}
+// Dynamic Dexie wrapper instead of top-level class extension
+export type ArecofixDatabase = any;
 
 @Injectable({
   providedIn: 'root'
@@ -65,14 +51,14 @@ export class OfflineSyncService {
   private get notification(): NotificationService { return this.injector.get(NotificationService); }
   
   public pendingCount = signal<number>(0);
-  private db: ArecofixDatabase;
+  private db!: ArecofixDatabase;
   
   public isReady = false;
 
+  private platformId = inject(PLATFORM_ID);
+
   constructor() {
-    this.db = new ArecofixDatabase();
-    
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       this.initDB();
       this.setupNetworkListeners();
     }
@@ -80,6 +66,14 @@ export class OfflineSyncService {
 
   private async initDB(): Promise<void> {
     try {
+      const { default: Dexie } = await import('dexie');
+      this.db = new Dexie('ArecofixOfflineDB');
+      this.db.version(3).stores({
+        requestsCache: 'url',
+        syncQueue: '++id, timestamp',
+        masterData: 'key',
+        offlineRepairs: 'id, timestamp'
+      });
       await this.db.open();
       this.isReady = true;
       
@@ -158,7 +152,7 @@ export class OfflineSyncService {
       for (const mutation of mutations) {
         try {
           const fetchHeaders = new Headers();
-          mutation.headers.forEach(([key, value]) => fetchHeaders.append(key, value));
+          mutation.headers.forEach(([key, value]: [string, string]) => fetchHeaders.append(key, value));
 
           const response = await fetch(mutation.url, {
             method: mutation.method,

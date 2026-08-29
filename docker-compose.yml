@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres-vector:
+    image: pgvector/pgvector:pg16
+    container_name: arecofix_local_db
+    environment:
+      POSTGRES_USER: arecofix
+      POSTGRES_PASSWORD: eze321
+      POSTGRES_DB: arecofix_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  pgdata:

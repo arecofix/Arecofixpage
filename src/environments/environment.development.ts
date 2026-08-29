@@ -17,11 +17,15 @@ export const environment: Environment = {
   baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
-  supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0',
+  supabaseUrl: 'http://127.0.0.1:54321',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
 
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
+
+  // RAG Chatbot Worker (Fase 3)
+  chatbotWorkerUrl: 'http://127.0.0.1:8788',
+  chatbotSecret: 'uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=',
 
   // Analytics Configuration Removed
 

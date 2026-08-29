@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { GSM_TOOLS, BRAND_SERVICES } from '@app/core/data/gsm.data';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 
 export interface GsmTool {
   name: string;

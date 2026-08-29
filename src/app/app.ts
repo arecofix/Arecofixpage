@@ -20,7 +20,7 @@ import { ScannerService } from './core/services/scanner.service';
 import { ShortcutService } from './core/services/shortcut.service';
 import { SupabaseService } from './core/services/supabase.service';
 import { SwUpdate } from '@angular/service-worker';
-import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
+import { AiChatbotComponent } from './shared/ai-chatbot/ai-chatbot.component';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +29,7 @@ import { ChatbotComponent } from './shared/components/chatbot/chatbot.component'
     RouterOutlet,
     ToastComponent,
     RibbonMenuComponent,
-    ChatbotComponent,
+    AiChatbotComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.Eager,

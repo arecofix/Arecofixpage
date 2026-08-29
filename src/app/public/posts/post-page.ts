@@ -8,7 +8,7 @@ import { PostService } from '@app/features/posts/application/post.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { ContactService } from '@app/core/services/contact.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 
 @Component({
     selector: 'app-post-page',

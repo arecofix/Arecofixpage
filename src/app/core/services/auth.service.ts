@@ -157,6 +157,8 @@ export class AuthService {
           const savedId = localStorage.getItem('arecofix_admin_branch_id');
           if (savedId) {
              await this.fetchBranchDetails(savedId);
+          } else {
+             this.currentBranchSubject.next(null);
           }
         }
 

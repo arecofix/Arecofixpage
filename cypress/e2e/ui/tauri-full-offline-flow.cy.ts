@@ -4,11 +4,6 @@ describe('Tauri Desktop App - Full Offline Flow', () => {
     // Limpiamos la caché local para iniciar desde cero
     cy.clearLocalStorage();
     cy.clearCookies();
-    // Limpiamos IndexedDB (Supabase custom cache)
-    cy.window().then((win) => {
-      const req = win.indexedDB.deleteDatabase('ArecofixOfflineDB');
-      req.onsuccess = () => console.log('Deleted database successfully');
-    });
     
     // Simular la ventana de escritorio inicial de Tauri
     cy.viewport(1280, 720);
@@ -16,26 +11,32 @@ describe('Tauri Desktop App - Full Offline Flow', () => {
 
   it('Debe cargar datos online y mantenerlos funcionales al quedarse offline', () => {
     
-    // ── Paso 1: Carga inicial ONLINE para popular IndexedDB ────────────────
-    cy.log('---- ESTADO: ONLINE (Populando Caché) ----');
+    // ── Paso 1: Carga inicial ────────────────
+
+    cy.log('---- ESTADO: INICIANDO ENTORNO FLASK/TAURI ----');
     
     // 1.a Login
-    cy.loginRealAdmin('/login?returnUrl=/admin/dashboard');
-    cy.wait(3000);
-    cy.url({ timeout: 10000 }).should('include', '/admin/dashboard');
+    cy.loginAsAdmin('/#/admin/dashboard', { isTauri: true });
+    
+    cy.get('body').then($body => {
+       if ($body.find('#debug-crash').length > 0) {
+          throw new Error('APP CRASHED: ' + $body.find('#debug-crash').text());
+       }
+    });
+
+    // 1.b Validar que se llegue al dashboard
+    cy.url({ timeout: 10000 }).should('include', 'admin/dashboard');
 
     // 1.b Visitar Productos
     cy.window().then(win => {
-      win.history.pushState(null, '', '/productos');
-      win.dispatchEvent(new PopStateEvent('popstate'));
+      win.location.hash = '#/productos';
     });
-    cy.wait(3000); // Esperar a que la petición a Supabase termine y se guarde en IndexedDB
+    cy.wait(3000); // Esperar a que la petición a Flask termine
     cy.get('body').should('contain', 'Productos');
 
     // 1.c Visitar Servicios
     cy.window().then(win => {
-      win.history.pushState(null, '', '/servicios');
-      win.dispatchEvent(new PopStateEvent('popstate'));
+      win.location.hash = '#/servicios';
     });
     cy.wait(3000);
     cy.get('body').should('contain', 'Servicios');
@@ -53,9 +54,12 @@ describe('Tauri Desktop App - Full Offline Flow', () => {
     });
     cy.window().its('navigator.onLine').should('equal', false);
 
-    // Interceptar peticiones a Supabase para simular falta de internet real hacia el backend
+    // Interceptar peticiones a Supabase para simular falta de internet real hacia el backend de la nube
     cy.intercept('**/rest/v1/*', { forceNetworkError: true }).as('offlineSupabase');
     cy.intercept('**/auth/v1/*', { forceNetworkError: true }).as('offlineAuth');
+    
+    // Validar que se está usando el puerto local (Flask) de Tauri
+    cy.intercept('GET', 'http://localhost:5000/api/productos*').as('flaskProducts');
 
 
     // ── Paso 3: Verificación de Flujo Offline ──────────────────────────────
@@ -63,18 +67,18 @@ describe('Tauri Desktop App - Full Offline Flow', () => {
 
     // 3.a Navegar a Productos usando el Router SPA (pushState)
     cy.window().then(win => {
-      win.history.pushState(null, '', '/productos');
-      win.dispatchEvent(new PopStateEvent('popstate'));
+      win.location.hash = '#/productos';
     });
-    // Debería cargar desde IndexedDB a través del SupabaseService
+    
+    // Debería cargar desde Flask (http://localhost:5000)
+    cy.wait('@flaskProducts', { timeout: 10000 });
     cy.get('body', { timeout: 8000 }).should('contain', 'Productos');
     // Verificar que un producto se renderiza
     cy.get('product-card', { timeout: 10000 }).should('exist');
 
     // 3.c Navegar a Servicios usando el Router SPA
     cy.window().then(win => {
-      win.history.pushState(null, '', '/servicios');
-      win.dispatchEvent(new PopStateEvent('popstate'));
+      win.location.hash = '#/servicios';
     });
     cy.get('body', { timeout: 8000 }).should('contain', 'Servicios');
 
