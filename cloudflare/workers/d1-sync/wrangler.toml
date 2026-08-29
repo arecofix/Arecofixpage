@@ -5,5 +5,5 @@ compatibility_date = "2024-01-01"
 # Bind a D1 database
 [[d1_databases]]
 binding = "DB"
-database_name = "arecofix-sync-db"
-database_id = "YOUR_D1_DATABASE_ID_HERE"
+database_name = "arecofix"
+database_id = "61a181ee-f5fb-41fd-b5a1-4123090e49ab"
