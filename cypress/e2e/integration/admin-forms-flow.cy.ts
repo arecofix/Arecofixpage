@@ -19,7 +19,7 @@ describe('Admin Forms Integration Flow', () => {
 
   // ─── Shared mock session injected before each test ───────────────────────
   const mockSession = {
-    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI5OTk5OTk5OTksInJvbGUiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoibW9jay11c2VyLWlkIn0.signature',
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk',
     expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     refresh_token: 'fake-refresh-token',
@@ -120,6 +120,7 @@ describe('Admin Forms Integration Flow', () => {
       failOnStatusCode: false,
       onBeforeLoad: (win) => {
         win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
+        win.localStorage.setItem('sb-127-auth-token', JSON.stringify(mockSession));
         win.localStorage.setItem('supabase-remember-me', 'true');
         win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
         win.localStorage.setItem('cypress-test', 'true');
@@ -270,7 +271,7 @@ describe('Admin Forms Integration Flow', () => {
     // Verify Messages Section
     cy.visit('/admin/messages');
     cy.wait('@getAdminMessages');
-    cy.contains('Mensajes de Contacto', { timeout: 10000 }).should('exist');
+    cy.contains('Buzón de Mensajes & Turnos', { timeout: 10000 }).should('exist');
     cy.contains(testData.contact.name).should('exist');
     cy.contains(testData.contact.message.substring(0, 20)).should('exist');
 

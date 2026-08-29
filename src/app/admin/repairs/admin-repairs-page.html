@@ -26,7 +26,7 @@
 
         <!-- Error State -->
         @if (error()) {
-            <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-l-red-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-red-700 dark:text-red-400 mb-8 border border-red-100 dark:border-red-900">
+            <div class="alert bg-red-50 dark:bg-red-500/10 border-l-4 border-l-red-500 p-4 rounded-r-xl flex justify-between items-center animate-fade-in text-red-700 dark:text-red-400 mb-8 border border-red-100 dark:border-red-900">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-exclamation-triangle text-xl"></i>
                     <span class="font-medium font-sm">{{ error() }}</span>

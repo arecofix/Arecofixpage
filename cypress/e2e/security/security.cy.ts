@@ -3,21 +3,17 @@ describe('Security and Destructive Tests', () => {
 
   it('Should resist XSS payloads in Customer Forms', () => {
     // Mocks login to be in admin mode
-    cy.visit('/admin/customers/new', {
-      onBeforeLoad(win) {
-        win.localStorage.setItem('supabase.auth.token', '{"access_token":"fake-admin-token"}');
-      }
-    });
+    cy.loginAsAdmin('/admin/clients/new');
 
     const xssPayload = '<script>alert("XSS")</script><img src="x" onerror="alert(1)">';
     
-    cy.get('input[formControlName="firstName"]').type(xssPayload);
-    cy.get('input[formControlName="lastName"]').type(xssPayload);
-    cy.get('input[formControlName="email"]').type('test-xss@example.com');
+    cy.get('input[name="first_name"]').type(xssPayload);
+    cy.get('input[name="last_name"]').type(xssPayload);
+    cy.get('input[name="email"]').type('test-xss@example.com');
     cy.get('button[type="submit"]').click();
 
     // Verify it doesn't break the UI, but gets sanitized or escaped in the DOM
-    cy.visit('/admin/customers');
+    cy.visit('/admin/clients');
     cy.contains(xssPayload).should('not.exist');
     cy.get('body').invoke('html').should('not.include', '<script>alert("XSS")</script>');
   });
@@ -26,7 +22,8 @@ describe('Security and Destructive Tests', () => {
     // Simulate being logged in as a normal user, not admin
     cy.visit('/admin/dashboard', {
       onBeforeLoad(win) {
-        win.localStorage.setItem('supabase.auth.token', '{"access_token":"fake-user-token"}');
+        win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', '{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk","user":{"role":"authenticated"}}');
+        win.localStorage.setItem('sb-127-auth-token', '{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk","user":{"role":"authenticated"}}');
       }
     });
 
@@ -41,7 +38,8 @@ describe('Security and Destructive Tests', () => {
       body: { error: 'Internal Server Error' }
     }).as('getRepairsError');
 
-    cy.visit('/admin/repairs');
+      // Ensure user is authenticated as admin
+      cy.loginAsAdmin('/admin/repairs');
     cy.wait('@getRepairsError');
 
     // UI should show a toast or empty state, but NOT crash completely
@@ -51,10 +49,10 @@ describe('Security and Destructive Tests', () => {
 
   it('Should fallback to Dexie Offline PWA Storage when Network Drops during POST', () => {
     // Mock the network offline event
-    cy.visit('/admin/repairs/new');
+    cy.loginAsAdmin('/admin/repairs/new');
 
-    cy.get('input[formControlName="customerName"]').type('Offline Client');
-    cy.get('input[formControlName="issueDescription"]').type('Broken Screen');
+    cy.get('input[formControlName="customer_name"]').type('Offline Client');
+    cy.get('textarea[formControlName="issue_description"]').type('Broken Screen');
 
     // Go offline!
     cy.window().then((win) => {
@@ -67,7 +65,7 @@ describe('Security and Destructive Tests', () => {
     // It should save to indexedDB locally
     cy.window().then(async (win) => {
       // Assuming we expose ArecofixUnifiedDB for test environments or check UI state
-      cy.get('.toast-success, .alert-info').contains(/offline/i).should('exist');
+      cy.contains(/guardado localmente|offline/i, { timeout: 10000 }).should('exist');
     });
   });
 

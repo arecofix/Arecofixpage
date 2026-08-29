@@ -97,11 +97,18 @@ export class SupabaseService {
           
           const response = await Promise.race([fetchPromise, timeoutPromise]);
           clearTimeout(timeoutId);
+
+          if (!response.ok && response.status >= 500) {
+              const errorText = await response.text().catch(() => 'No error body');
+              console.error(`[Supabase] 500 on ${url} - Details:`, errorText);
+              throw new Error(`Server Error: ${response.status} - ${errorText}`);
+          }
           
-          if (!response.ok && (response.status >= 500 || response.status === 402 || response.status === 429)) {
+          if (!response.ok && (response.status === 402 || response.status === 429)) {
               const errorText = await response.text().catch(() => 'No error body');
               console.error(`[Supabase] ${response.status} on ${url} - Details:`, errorText);
-              throw new Error(`Server Error or Quota Exceeded: ${response.status} - ${errorText}`);
+              lastError = new Error(`Quota Exceeded: ${response.status} - ${errorText}`);
+              break; // Skip retries, go straight to failover
           }
 
           if (isCacheable && response.ok) {
