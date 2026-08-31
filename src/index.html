@@ -1,328 +1,361 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self' https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com; worker-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://*.facebook.net https://*.facebook.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://apis.google.com https://sdk.mercadopago.com https://*.mercadolibre.com https://*.mercadopago.com https://http2.mlstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http://127.0.0.1:*; frame-src 'self' https://www.google.com https://www.youtube.com https://*.facebook.com https://*.firebaseapp.com; connect-src 'self' http://137.131.131.98 https://api.arecofix.com.ar http://localhost:5000 http://ipc.localhost tauri://localhost http://127.0.0.1:* ws://127.0.0.1:* https://api.mercadopago.com https://*.mercadopago.com https://*.mercadolibre.com https://db.arecofix.com.ar wss://db.arecofix.com.ar https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://us.posthog.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.google.com https://*.google.com.ar https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://*.facebook.com https://*.facebook.net https://huggingface.co https://ui-avatars.com https://stats.g.doubleclick.net https://dolarapi.com https://api.github.com https://ragchat-carreras.onrender.com https://cloudflareinsights.com https://*.workers.dev;"
-    />
 
-    <title>Arecofix - Sistemas de Gestión SaaS y Desarrollo de Software</title>
-    <base href="/" />
-    <link rel="canonical" href="https://arecofix.com.ar/" />
-    <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#1976d2">
-    <!-- Global Noise Suppressor (EXECUTE FIRST) -->
-    <script>
-      (function() {
-        'use strict';
-        const noise = [
-          'cross-origin-opener-policy', 'attribution-reporting', 'browsing-topics', 
-          'fbevents.js', 'google-analytics', 'googletagmanager', 'doubleclick', 
-          'facebook', 'gtm', 'gtag', 'user-agent-client-hints', 'permissions-policy', 
-          'unrecognized feature', 'private-state-token', 'join-ad-interest-group', 
-          'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
-          'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq'
-        ];
-        const isNoise = (args) => {
-          const msg = args.map(a => { 
-            try { return typeof a === 'string' ? a : JSON.stringify(a); } 
-            catch(e) { return String(a); } 
-          }).join(' ').toLowerCase();
-          return noise.some(n => msg.includes(n));
+<head>
+  <meta charset="utf-8" />
+
+  <title>Arecofix - Sistemas de Gestión SaaS y Desarrollo de Software</title>
+  <base href="/" />
+  <link rel="canonical" href="https://arecofix.com.ar/" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1976d2">
+  <!-- Global Noise Suppressor (EXECUTE FIRST) -->
+  <script>
+    (function () {
+      'use strict';
+      const noise = [
+        'cross-origin-opener-policy', 'attribution-reporting', 'browsing-topics',
+        'fbevents.js', 'google-analytics', 'googletagmanager', 'doubleclick',
+        'facebook', 'gtm', 'gtag', 'user-agent-client-hints', 'permissions-policy',
+        'unrecognized feature', 'private-state-token', 'join-ad-interest-group',
+        'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
+        'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq'
+      ];
+      const isNoise = (args) => {
+        const msg = args.map(a => {
+          try { return typeof a === 'string' ? a : JSON.stringify(a); }
+          catch (e) { return String(a); }
+        }).join(' ').toLowerCase();
+        return noise.some(n => msg.includes(n));
+      };
+      const _err = console.error, _wrn = console.warn, _log = console.log;
+      console.error = (...a) => { if (!isNoise(a)) _err.apply(console, a); };
+      console.warn = (...a) => { if (!isNoise(a)) _wrn.apply(console, a); };
+      console.log = (...a) => { if (!isNoise(a)) _log.apply(console, a); };
+
+      // Catch-all for browser-level logs that might not go through console.warn/error directly
+      const _debug = console.debug;
+      console.debug = (...a) => { if (!isNoise(a)) _debug.apply(console, a); };
+
+      window.addEventListener('error', (e) => {
+        if (isNoise([e.message, e.filename])) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+      window.addEventListener('unhandledrejection', (e) => {
+        if (isNoise([String(e.reason)])) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+
+      // Suppress specific library noise that bypasses standard listeners
+      if (window.console) {
+        const _err = console.error;
+        console.error = function () {
+          if (isNoise(Array.from(arguments))) return;
+          _err.apply(console, arguments);
         };
-        const _err = console.error, _wrn = console.warn, _log = console.log;
-        console.error = (...a) => { if (!isNoise(a)) _err.apply(console, a); };
-        console.warn = (...a) => { if (!isNoise(a)) _wrn.apply(console, a); };
-        console.log = (...a) => { if (!isNoise(a)) _log.apply(console, a); };
-        
-        // Catch-all for browser-level logs that might not go through console.warn/error directly
-        const _debug = console.debug;
-        console.debug = (...a) => { if (!isNoise(a)) _debug.apply(console, a); };
-
-        window.addEventListener('error', (e) => { 
-          if (isNoise([e.message, e.filename])) { 
-            e.stopImmediatePropagation(); 
-            e.preventDefault(); 
-          } 
-        }, true);
-        window.addEventListener('unhandledrejection', (e) => { 
-          if (isNoise([String(e.reason)])) { 
-            e.stopImmediatePropagation(); 
-            e.preventDefault(); 
-          } 
-        }, true);
-
-        // Suppress specific library noise that bypasses standard listeners
-        if (window.console) {
-            const _err = console.error;
-            console.error = function() {
-                if (isNoise(Array.from(arguments))) return;
-                _err.apply(console, arguments);
-            };
-        }
-
-        // Mock FeaturePolicy to prevent 'attribution-reporting' unrecognized feature warnings
-        try {
-          if (document.featurePolicy) {
-            if (typeof document.featurePolicy.allowsFeature === 'function') {
-              const origAllows = document.featurePolicy.allowsFeature;
-              document.featurePolicy.allowsFeature = function(f) {
-                if (f === 'attribution-reporting') return false;
-                try { return origAllows.call(this, f); } catch(e) { return false; }
-              };
-            }
-            if (typeof document.featurePolicy.features === 'function') {
-              const origFeatures = document.featurePolicy.features;
-              document.featurePolicy.features = function() {
-                try {
-                  return origFeatures.call(this).filter(f => f !== 'attribution-reporting');
-                } catch(e) {
-                  return [];
-                }
-              };
-            }
-            if (typeof document.featurePolicy.allowedFeatures === 'function') {
-              const origAllowed = document.featurePolicy.allowedFeatures;
-              document.featurePolicy.allowedFeatures = function() {
-                try {
-                  return origAllowed.call(this).filter(f => f !== 'attribution-reporting');
-                } catch(e) {
-                  return [];
-                }
-              };
-            }
-          }
-        } catch (e) {}
-      })();
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="robots" content="index, follow" />
-    <meta name="author" content="Arecofix" />
-    <meta name="description" content="Ofrecemos Sistemas de Gestión para tu empresa, SaaS, desarrollo de aplicaciones móviles y soluciones integrales en tecnología." />
-    <meta name="theme-color" content="#1f2136" />
-
-    <!-- Open Graph / Meta Tags -->
-    <meta property="og:title" content="Arecofix - Sistemas de Gestión SaaS" />
-    <meta property="og:description" content="Ofrecemos Sistemas de Gestión para tu empresa, SaaS, desarrollo de aplicaciones móviles y soluciones integrales en tecnología." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://arecofix.com.ar/" />
-    <meta property="og:image" content="https://arecofix.com.ar/assets/img/branding/inicio.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="fb:app_id" content="1209190100450173" />
-    <meta property="og:site_name" content="Arecofix" />
-    <meta name="twitter:card" content="summary_large_image" />
-
-    <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="assets/img/brands/logo/Logo.ico"
-    />
-    <link rel="apple-touch-icon" href="assets/img/brands/logo/Logo.png" />
-    <link rel="manifest" href="site.webmanifest" />
-
-    <!-- Preconnect to critical origins -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co" crossorigin />
-
-    <!-- DNS-prefetch for deferred third-party origins -->
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-
-    <!-- Critical fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media = 'all'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
-    <!-- Security & Policy Headers -->
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), attribution-reporting=()" />
-
-
-
-    <!-- Analytics Assets (GTAG & Facebook Pixel) - Deferred for performance -->
-    <script>
-      const initAnalytics = function() {
-        // GTAG Load
-        var gtagScript = document.createElement('script');
-        gtagScript.async = true;
-        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
-        document.head.appendChild(gtagScript);
-
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        window.gtag = gtag; // Export to window
-        gtag('js', new Date());
-        gtag('config', 'G-N7DQDV8MED', { 'send_page_view': false }); 
-
-        // Meta Pixel Code
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '1561498334311503');
-        fbq('track', 'PageView');
-      }; 
-      
-      if (document.readyState === 'complete') {
-        initAnalytics();
-      } else {
-        window.addEventListener('load', () => {
-          if ('requestIdleCallback' in window) {
-            requestIdleCallback(initAnalytics, { timeout: 2000 });
-          } else {
-            setTimeout(initAnalytics, 2000);
-          }
-        });
       }
-    </script>
-    <!-- End Deferred Meta Pixel & GTAG Code -->
 
-  </head>
+      // Mock FeaturePolicy to prevent 'attribution-reporting' unrecognized feature warnings
+      try {
+        if (document.featurePolicy) {
+          if (typeof document.featurePolicy.allowsFeature === 'function') {
+            const origAllows = document.featurePolicy.allowsFeature;
+            document.featurePolicy.allowsFeature = function (f) {
+              if (f === 'attribution-reporting') return false;
+              try { return origAllows.call(this, f); } catch (e) { return false; }
+            };
+          }
+          if (typeof document.featurePolicy.features === 'function') {
+            const origFeatures = document.featurePolicy.features;
+            document.featurePolicy.features = function () {
+              try {
+                return origFeatures.call(this).filter(f => f !== 'attribution-reporting');
+              } catch (e) {
+                return [];
+              }
+            };
+          }
+          if (typeof document.featurePolicy.allowedFeatures === 'function') {
+            const origAllowed = document.featurePolicy.allowedFeatures;
+            document.featurePolicy.allowedFeatures = function () {
+              try {
+                return origAllowed.call(this).filter(f => f !== 'attribution-reporting');
+              } catch (e) {
+                return [];
+              }
+            };
+          }
+        }
+      } catch (e) { }
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Arecofix" />
+  <meta name="description"
+    content="Ofrecemos Sistemas de Gestión para tu empresa, SaaS, desarrollo de aplicaciones móviles y soluciones integrales en tecnología." />
+  <meta name="theme-color" content="#1f2136" />
 
-  <body>
-    <app-root>
-      <!-- Initial Loader shown before Angular bootstraps -->
-      <style>
-        .initial-loader {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          width: 100vw;
-          background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-          color: white;
-          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-          position: fixed;
-          top: 0;
-          left: 0;
-          z-index: 99999;
+  <!-- Open Graph / Meta Tags -->
+  <meta property="og:title" content="Arecofix - Sistemas de Gestión SaaS" />
+  <meta property="og:description"
+    content="Ofrecemos Sistemas de Gestión para tu empresa, SaaS, desarrollo de aplicaciones móviles y soluciones integrales en tecnología." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://arecofix.com.ar/" />
+  <meta property="og:image" content="https://arecofix.com.ar/assets/img/branding/inicio.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="fb:app_id" content="1209190100450173" />
+  <meta property="og:site_name" content="Arecofix" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/img/brands/logo/Logo.ico" />
+  <link rel="apple-touch-icon" href="assets/img/brands/logo/Logo.png" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <!-- Preconnect to critical origins -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://jftiyfnnaogmgvksgkbn.supabase.co" crossorigin />
+
+  <!-- DNS-prefetch for deferred third-party origins -->
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+  <!-- Critical fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
+    rel="stylesheet" media="print" onload="this.media = 'all'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;700&display=swap"
+      rel="stylesheet" />
+  </noscript>
+  <!-- Security & Policy Headers -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), attribution-reporting=()" />
+
+
+
+  <!-- Analytics Assets (GTAG & Facebook Pixel) - Deferred for performance -->
+  <script>
+    const initAnalytics = function () {
+      // GTAG Load
+      var gtagScript = document.createElement('script');
+      gtagScript.async = true;
+      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
+      document.head.appendChild(gtagScript);
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      window.gtag = gtag; // Export to window
+      gtag('js', new Date());
+      gtag('config', 'G-N7DQDV8MED', { 'send_page_view': false });
+
+      // Meta Pixel Code
+      !function (f, b, e, v, n, t, s) {
+        if (f.fbq) return; n = f.fbq = function () {
+          n.callMethod ?
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+        };
+        if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+        n.queue = []; t = b.createElement(e); t.async = !0;
+        t.src = v; s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s)
+      }(window, document, 'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1561498334311503');
+      fbq('track', 'PageView');
+    };
+
+    if (document.readyState === 'complete') {
+      initAnalytics();
+    } else {
+      window.addEventListener('load', () => {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(initAnalytics, { timeout: 2000 });
+        } else {
+          setTimeout(initAnalytics, 2000);
         }
-        .loader-logo-container {
-          position: relative;
-          width: 80px;
-          height: 80px;
-          margin-bottom: 24px;
+      });
+    }
+  </script>
+  <!-- End Deferred Meta Pixel & GTAG Code -->
+
+</head>
+
+<body>
+  <app-root>
+    <!-- Initial Loader shown before Angular bootstraps -->
+    <style>
+      .initial-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        color: white;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 99999;
+      }
+
+      .loader-logo-container {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin-bottom: 24px;
+      }
+
+      .loader-ring {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 4px solid rgba(99, 102, 241, 0.1);
+        border-left-color: #6366f1;
+        /* Indigo 500 */
+        border-right-color: #8b5cf6;
+        /* Violet 500 */
+        border-radius: 50%;
+        animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      }
+
+      .loader-ring-inner {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+        border: 4px solid rgba(236, 72, 153, 0.1);
+        border-top-color: #ec4899;
+        /* Pink 500 */
+        border-bottom-color: #3b82f6;
+        /* Blue 500 */
+        border-radius: 50%;
+        animation: spin-reverse 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
-        .loader-ring {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: 4px solid rgba(99, 102, 241, 0.1);
-          border-left-color: #6366f1; /* Indigo 500 */
-          border-right-color: #8b5cf6; /* Violet 500 */
-          border-radius: 50%;
-          animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+
+        100% {
+          transform: rotate(360deg);
         }
-        .loader-ring-inner {
-          position: absolute;
-          top: 10px;
-          left: 10px;
-          width: calc(100% - 20px);
-          height: calc(100% - 20px);
-          border: 4px solid rgba(236, 72, 153, 0.1);
-          border-top-color: #ec4899; /* Pink 500 */
-          border-bottom-color: #3b82f6; /* Blue 500 */
-          border-radius: 50%;
-          animation: spin-reverse 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      }
+
+      @keyframes spin-reverse {
+        0% {
+          transform: rotate(360deg);
         }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+
+        100% {
+          transform: rotate(0deg);
         }
-        @keyframes spin-reverse {
-          0% { transform: rotate(360deg); }
-          100% { transform: rotate(0deg); }
+      }
+
+      .loading-text-container {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+      }
+
+      .loading-text {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        background: linear-gradient(to right, #6366f1, #ec4899);
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      .loading-dots::after {
+        content: '.';
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ec4899;
+        animation: dots 1.5s steps(4, end) infinite;
+      }
+
+      @keyframes pulse {
+
+        0%,
+        100% {
+          opacity: 1;
+          filter: brightness(1);
         }
-        .loading-text-container {
-          display: flex;
-          align-items: baseline;
-          gap: 4px;
+
+        50% {
+          opacity: 0.7;
+          filter: brightness(1.2);
         }
-        .loading-text {
-          font-size: 1.25rem;
-          font-weight: 700;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          background: linear-gradient(to right, #6366f1, #ec4899);
-          -webkit-background-clip: text;
-          color: transparent;
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      @keyframes dots {
+
+        0%,
+        20% {
+          color: rgba(236, 72, 153, 0);
+          text-shadow: .25em 0 0 rgba(236, 72, 153, 0), .5em 0 0 rgba(236, 72, 153, 0);
         }
-        .loading-dots::after {
-          content: '.';
-          font-size: 1.5rem;
-          font-weight: 700;
+
+        40% {
           color: #ec4899;
-          animation: dots 1.5s steps(4, end) infinite;
+          text-shadow: .25em 0 0 rgba(236, 72, 153, 0), .5em 0 0 rgba(236, 72, 153, 0);
         }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; filter: brightness(1); }
-          50% { opacity: 0.7; filter: brightness(1.2); }
+
+        60% {
+          text-shadow: .25em 0 0 #ec4899, .5em 0 0 rgba(236, 72, 153, 0);
         }
-        @keyframes dots {
-          0%, 20% { color: rgba(236,72,153,0); text-shadow: .25em 0 0 rgba(236,72,153,0), .5em 0 0 rgba(236,72,153,0); }
-          40% { color: #ec4899; text-shadow: .25em 0 0 rgba(236,72,153,0), .5em 0 0 rgba(236,72,153,0); }
-          60% { text-shadow: .25em 0 0 #ec4899, .5em 0 0 rgba(236,72,153,0); }
-          80%, 100% { text-shadow: .25em 0 0 #ec4899, .5em 0 0 #ec4899; }
+
+        80%,
+        100% {
+          text-shadow: .25em 0 0 #ec4899, .5em 0 0 #ec4899;
         }
-      </style>
-      <div class="initial-loader">
-        <div class="loader-logo-container">
-          <div class="loader-ring"></div>
-          <div class="loader-ring-inner"></div>
-        </div>
-        <div class="loading-text-container">
-          <div class="loading-text">Cargando Arecofix</div>
-          <div class="loading-dots"></div>
-        </div>
+      }
+    </style>
+    <div class="initial-loader">
+      <div class="loader-logo-container">
+        <div class="loader-ring"></div>
+        <div class="loader-ring-inner"></div>
       </div>
-    </app-root>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1561498334311503&ev=PageView&noscript=1"
-    /></noscript>
-    
-    <noscript>Please enable JavaScript to continue using this application.</noscript>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-NLVCRSJR"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-    ></iframe
-    ></noscript>
-    <!-- End Google Tag Manager (noscript) -->
+      <div class="loading-text-container">
+        <div class="loading-text">Cargando Arecofix</div>
+        <div class="loading-dots"></div>
+      </div>
+    </div>
+  </app-root>
+  <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1561498334311503&ev=PageView&noscript=1" /></noscript>
+
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NLVCRSJR" height="0" width="0"
+      style="display: none; visibility: hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
 
-    <noscript>
-      <div style="text-align: center; padding: 20px">
-        <h1>Arecofix - Soluciones Informáticas</h1>
-        <p>Este sitio requiere JavaScript. Servicio Tecnico de Celulares</p>
-        <p>
-          Si tenés problemas, escribinos a:
-          <a href="mailto:info@arecofix.com.ar" style="color: #5bbad5"
-            >info@arecofix.com.ar</a
-          >
-        </p>
-      </div>
-    </noscript>
-  </body>
+  <noscript>
+    <div style="text-align: center; padding: 20px">
+      <h1>Arecofix - Soluciones Informáticas</h1>
+      <p>Este sitio requiere JavaScript. Servicio Tecnico de Celulares</p>
+      <p>
+        Si tenés problemas, escribinos a:
+        <a href="mailto:info@arecofix.com.ar" style="color: #5bbad5">info@arecofix.com.ar</a>
+      </p>
+    </div>
+  </noscript>
+</body>
+
 </html>
