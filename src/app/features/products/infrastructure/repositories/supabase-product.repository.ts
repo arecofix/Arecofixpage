@@ -538,5 +538,16 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     };
     return from(fetchSummary());
   }
-}
 
+  // --- MERCADO LIBRE ---
+  syncWithMercadoLibre(id: string): Observable<{ success: boolean; ml_item_id: string }> {
+    const fn = async () => {
+      const { data, error } = await this.supabase.functions.invoke('ml-sync', {
+        body: { product_id: id }
+      });
+      if (error) throw error;
+      return data;
+    };
+    return from(fn());
+  }
+}

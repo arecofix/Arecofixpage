@@ -14,6 +14,18 @@ export interface Tenant {
   isMain: boolean;
   settings?: Record<string, unknown>;
   subscription_status?: 'active' | 'moroso' | 'cancelado' | 'suspendido';
+  // Mercado Libre integration
+  ml_access_token?: string;
+  ml_refresh_token?: string;
+  ml_user_id?: string;
+  ml_markup_percentage?: number;
+  ml_expires_in?: number;
+  ml_token_updated_at?: string;
+  // WhatsApp Meta Cloud API
+  whatsapp_access_token?: string;
+  whatsapp_phone_id?: string;
+  whatsapp_business_account_id?: string;
+  whatsapp_enabled?: boolean;
 }
 
 export interface UserProfile {

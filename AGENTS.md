@@ -9,7 +9,7 @@ This file helps AI coding agents understand the Arecofix codebase and be immedia
 - **UI**: TailwindCSS 4 + DaisyUI 5
 - **Mobile**: Capacitor (Android)
 - **Desktop**: Tauri + Flask backend
-- **Hosting**: Firebase
+- **Hosting**: Oracle Cloud VPS (Node.js/PM2)
 - **Testing**: Jest + Cypress + WebdriverIO
 - **Architecture**: Feature-based, repository pattern, multi-tenant SaaS
 - **Type Safety**: Strict mode enforced (`any` forbidden)
@@ -68,7 +68,7 @@ supabase/
 | Unit tests (watch) | `pnpm test:watch` |
 | E2E tests (interactive) | `pnpm run cypress:open` |
 | E2E tests (headless) | `pnpm run test:e2e` |
-| Deploy to Firebase | `pnpm run firebase:deploy` |
+| Deploy to VPS | `pnpm run build && scp -r dist/ ubuntu@<vps>:arecofix/ && pm2 restart arecofix-frontend` |
 | Tauri desktop dev | `pnpm run tauri:dev` |
 | Update SEO routes | `pnpm run routes:update` |
 
@@ -83,7 +83,7 @@ supabase/
 | `src/app/core/services/tenant.service.ts` | Multi-tenant resolver |
 | `supabase/rls_*.sql` | Security policies (enforce tenant isolation) |
 | `angular.json` | Angular CLI config, SSR settings, build targets |
-| `firebase.json` | Hosting rules, rewrites |
+| `dist/` | Angular SSR build output (deployed to VPS) |
 | `cypress.config.ts` | E2E test config with network interception |
 | `jest.config.js` | Unit test config |
 | `Back-End/app.py` | Flask API for offline Tauri support |
@@ -157,7 +157,6 @@ supabase/
 | **RLS policy denies access** | Overly restrictive policy | Check `supabase/rls_*.sql` matches user role/tenant |
 | **Stale cached data** | 60s cache TTL in custom Supabase service | Wait or manually clear cache for immediate refresh |
 | **Tauri backend starts late** | Flask startup race condition | `app.ts` includes 2s startup check; if still failing, increase delay |
-| **Firebase rewrites fail** | SSR prerendering mismatch | Verify `firebase.json` rewrites all paths to `/index.html` |
 | **CORS errors on localhost** | Backend CORS whitelist missing | Check `Back-End/app.py` includes `http://localhost:4200` |
 | **Routes not prerendering** | `routes.txt` is stale | Run `pnpm run routes:update` |
 | **Cypress intercepts miss** | Network timing race | Use explicit `cy.wait()` with sufficient timeout |
@@ -174,7 +173,6 @@ SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Optional:
 ```env
 TAURI_DEBUG=1
-FIREBASE_API_KEY=...
 ```
 
 ## 🔗 Additional Documentation
@@ -208,7 +206,8 @@ For deeper context, see repository memory files:
 
 5. **Deploy**:
    - Push to `main` branch
-   - GitHub Actions auto-builds, tests, deploys to Firebase
+   - Deploy to VPS manually or via CI scripts
+   - PM2 `arecofix-frontend` takes over serving SSR
 
 ## 💡 When You're Stuck
 

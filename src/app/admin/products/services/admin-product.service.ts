@@ -95,6 +95,11 @@ export class AdminProductService {
         return firstValueFrom(this.productRepo.getAll());
     }
 
+    // --- MERCADO LIBRE ---
+    async syncWithMercadoLibre(id: string): Promise<{ success: boolean; ml_item_id: string }> {
+        return firstValueFrom(this.productRepo.syncWithMercadoLibre(id));
+    }
+
     async getProductsPaginated(params: ProductsParams): Promise<ProductsResponse> {
         const contextBranchId = this.branchContextService.getBranchId();
         const profile = this.auth.getCurrentProfile();

@@ -45,6 +45,11 @@ export interface Product {
     meta_title?: string;
     meta_description?: string;
     og_image?: string;
+    // Mercado Libre integration
+    ml_item_id?: string;
+    ml_sync_status?: 'pending' | 'synced' | 'error';
+    ml_last_sync?: string;
+    ml_category_id?: string;
     // strategic fields for UI
     discount_percentage?: number;
     category_name?: string;
@@ -80,6 +85,7 @@ export interface CreateProductDto {
     meta_title?: string;
     meta_description?: string;
     og_image?: string;
+    ml_category_id?: string;
 }
 
 /**

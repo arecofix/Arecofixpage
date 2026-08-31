@@ -47,7 +47,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:4200")
 app = Flask(__name__)
 
 # 2. Habilitar CORS de manera robusta
-CORS(app, resources={r"/api/*": {"origins": [FRONTEND_URL, "http://localhost:4200", "http://localhost:1420"]}})
+CORS(app, resources={r"/api/*": {"origins": [FRONTEND_URL, "http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:1420", "https://arecofix.com.ar"]}})
 
 # --- SQLite LOCAL Configuration ---
 # Usamos pathlib para asegurar compatibilidad de barras
@@ -151,11 +151,14 @@ def get_marcas():
 @app.route('/api/marcas', methods=['POST'])
 def add_marca():
     data = request.json
-    nueva = Marca(
-        name=data.get('name'),
-        description=data.get('description'),
-        is_active=data.get('is_active', True)
-    )
+    nueva = Marca()
+    if 'name' in data:
+        nueva.name = data['name']
+    if 'description' in data:
+        nueva.description = data['description']
+    if 'is_active' in data:
+        nueva.is_active = data.get('is_active', True)
+    nueva.is_dirty = True
     db.session.add(nueva)
     db.session.commit()
     return jsonify(nueva.to_dict()), 201
@@ -189,12 +192,16 @@ def get_categorias():
 @app.route('/api/categorias', methods=['POST'])
 def add_categoria():
     data = request.json
-    nueva = Categoria(
-        name=data.get('name'),
-        description=data.get('description'),
-        is_active=data.get('is_active', True),
-        parent_id=data.get('parent_id')
-    )
+    nueva = Categoria()
+    if 'name' in data:
+        nueva.name = data['name']
+    if 'description' in data:
+        nueva.description = data['description']
+    if 'is_active' in data:
+        nueva.is_active = data.get('is_active', True)
+    if 'parent_id' in data:
+        nueva.parent_id = data['parent_id']
+    nueva.is_dirty = True
     db.session.add(nueva)
     db.session.commit()
     return jsonify(nueva.to_dict()), 201
@@ -253,17 +260,26 @@ def get_productos():
 @app.route('/api/productos', methods=['POST'])
 def add_producto():
     data = request.json
-    nuevo = Producto(
-        name=data.get('name'),
-        description=data.get('description'),
-        price=data.get('price', 0.0),
-        cost_price=data.get('cost_price', 0.0),
-        stock=data.get('stock', 0),
-        category_id=data.get('category_id'),
-        brand_id=data.get('brand_id'),
-        sku=data.get('sku'),
-        barcode=data.get('barcode')
-    )
+    nuevo = Producto()
+    if 'name' in data:
+        nuevo.name = data['name']
+    if 'description' in data:
+        nuevo.description = data['description']
+    if 'price' in data:
+        nuevo.price = data.get('price', 0.0)
+    if 'cost_price' in data:
+        nuevo.cost_price = data.get('cost_price', 0.0)
+    if 'stock' in data:
+        nuevo.stock = data.get('stock', 0)
+    if 'category_id' in data:
+        nuevo.category_id = data.get('category_id')
+    if 'brand_id' in data:
+        nuevo.brand_id = data.get('brand_id')
+    if 'sku' in data:
+        nuevo.sku = data.get('sku')
+    if 'barcode' in data:
+        nuevo.barcode = data.get('barcode')
+    nuevo.is_dirty = True
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
@@ -305,13 +321,18 @@ def get_clientes():
 @app.route('/api/clientes', methods=['POST'])
 def add_cliente():
     data = request.json
-    nuevo = Cliente(
-        first_name=data.get('first_name'),
-        last_name=data.get('last_name'),
-        phone=data.get('phone'),
-        dni=data.get('dni'),
-        email=data.get('email')
-    )
+    nuevo = Cliente()
+    if 'first_name' in data:
+        nuevo.first_name = data['first_name']
+    if 'last_name' in data:
+        nuevo.last_name = data['last_name']
+    if 'phone' in data:
+        nuevo.phone = data['phone']
+    if 'dni' in data:
+        nuevo.dni = data['dni']
+    if 'email' in data:
+        nuevo.email = data['email']
+    nuevo.is_dirty = True
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
@@ -349,14 +370,20 @@ def get_servicios():
 @app.route('/api/servicios', methods=['POST'])
 def add_servicio():
     data = request.json
-    nuevo = ServicioTecnico(
-        client_id=data.get('client_id'),
-        device_id=data.get('device_id'),
-        falla=data.get('falla'),
-        estado_id=data.get('estado_id', 1),
-        precio_presupuesto=data.get('precio_presupuesto', 0.0),
-        observaciones=data.get('observaciones')
-    )
+    nuevo = ServicioTecnico()
+    if 'client_id' in data:
+        nuevo.client_id = data['client_id']
+    if 'device_id' in data:
+        nuevo.device_id = data['device_id']
+    if 'falla' in data:
+        nuevo.falla = data['falla']
+    if 'estado_id' in data:
+        nuevo.estado_id = data.get('estado_id', 1)
+    if 'precio_presupuesto' in data:
+        nuevo.precio_presupuesto = data.get('precio_presupuesto', 0.0)
+    if 'observaciones' in data:
+        nuevo.observaciones = data.get('observaciones')
+    nuevo.is_dirty = True
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
@@ -417,20 +444,19 @@ def manage_finances():
         if not data:
             return jsonify({"error": "No data provided"}), 400
             
-        m = CashMovement(
-            id=data.get('id', str(uuid.uuid4())),
-            tenant_id=data.get('tenant_id'),
-            branch_id=data.get('branch_id'),
-            amount=data.get('amount', 0),
-            type=data.get('type', 'income'),
-            category=data.get('category', 'otros'),
-            payment_method=data.get('payment_method', 'cash'),
-            reference_id=data.get('reference_id'),
-            notes=data.get('notes'),
-            created_by=data.get('created_by'),
-            is_synced=False,
-            is_dirty=True
-        )
+        m = CashMovement()
+        m.id = data.get('id', str(uuid.uuid4()))
+        m.tenant_id = data.get('tenant_id')
+        m.branch_id = data.get('branch_id')
+        m.amount = data.get('amount', 0)
+        m.type = data.get('type', 'income')
+        m.category = data.get('category', 'otros')
+        m.payment_method = data.get('payment_method', 'cash')
+        m.reference_id = data.get('reference_id')
+        m.notes = data.get('notes')
+        m.created_by = data.get('created_by')
+        m.is_synced = False
+        m.is_dirty = True
         db.session.add(m)
         db.session.commit()
         return jsonify({"message": "Movimiento de caja creado localmente", "id": m.id}), 201
@@ -479,39 +505,37 @@ def manage_orders():
         if not data:
             return jsonify({"error": "No data provided"}), 400
             
-        o = Order(
-            id=data.get('id', str(uuid.uuid4())),
-            order_number=data.get('order_number'),
-            user_id=data.get('user_id'),
-            customer_name=data.get('customer_name', 'Invitado'),
-            customer_email=data.get('customer_email'),
-            customer_phone=data.get('customer_phone'),
-            shipping_address=json.dumps(data.get('shipping_address')) if data.get('shipping_address') else None,
-            status=data.get('status', 'pending'),
-            subtotal=data.get('subtotal', 0),
-            tax=data.get('tax', 0),
-            discount=data.get('discount', 0),
-            total=data.get('total', 0),
-            payment_method=data.get('payment_method'),
-            tenant_id=data.get('tenant_id'),
-            branch_id=data.get('branch_id'),
-            is_synced=False,
-            is_dirty=True
-        )
+        o = Order()
+        o.id = data.get('id', str(uuid.uuid4()))
+        o.order_number = data.get('order_number')
+        o.user_id = data.get('user_id')
+        o.customer_name = data.get('customer_name', 'Invitado')
+        o.customer_email = data.get('customer_email')
+        o.customer_phone = data.get('customer_phone')
+        o.shipping_address = json.dumps(data.get('shipping_address')) if data.get('shipping_address') else None
+        o.status = data.get('status', 'pending')
+        o.subtotal = data.get('subtotal', 0)
+        o.tax = data.get('tax', 0)
+        o.discount = data.get('discount', 0)
+        o.total = data.get('total', 0)
+        o.payment_method = data.get('payment_method')
+        o.tenant_id = data.get('tenant_id')
+        o.branch_id = data.get('branch_id')
+        o.is_synced = False
+        o.is_dirty = True
         
         items_data = data.get('items', [])
         for item_data in items_data:
-            item = OrderItem(
-                id=item_data.get('id', str(uuid.uuid4())),
-                order_id=o.id,
-                product_id=item_data.get('product_id'),
-                product_name=item_data.get('product_name'),
-                quantity=item_data.get('quantity', 1),
-                unit_price=item_data.get('unit_price', 0),
-                subtotal=item_data.get('subtotal', 0),
-                is_synced=False,
-                is_dirty=True
-            )
+            item = OrderItem()
+            item.id = item_data.get('id', str(uuid.uuid4()))
+            item.order_id = o.id
+            item.product_id = item_data.get('product_id')
+            item.product_name = item_data.get('product_name')
+            item.quantity = item_data.get('quantity', 1)
+            item.unit_price = item_data.get('unit_price', 0)
+            item.subtotal = item_data.get('subtotal', 0)
+            item.is_synced = False
+            item.is_dirty = True
             o.items.append(item)
             
         db.session.add(o)
@@ -567,18 +591,53 @@ def manage_single_order(order_id):
 
 # --- OFFLINE RAG CHATBOT ---
 
-LOCAL_DB_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+LOCAL_DB_URL = os.getenv('LOCAL_DB_URL')
+if not LOCAL_DB_URL:
+    # Optional fallback to Supabase DB URL if provided
+    LOCAL_DB_URL = os.getenv('SUPABASE_DB_URL')  # may be None
 OLLAMA_URL = "http://localhost:11434"
 
 @app.route('/api/chat/offline', methods=['POST'])
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    return chat_offline()
 def chat_offline():
-    data = request.json
-    question = data.get('question', '')
-    tenant_id = data.get('tenant_id')
+    # Detailed debugging of incoming request
+    print("[DEBUG] chat_offline called")
+    print("[DEBUG] Headers:", dict(request.headers))
+    raw_data = request.get_data(as_text=True)
+    print("[DEBUG] Raw request body:", raw_data)
+    # Robust JSON parsing that works even without a Content-Type header
+    data = request.get_json(force=True) or {}
+    if not isinstance(data, dict):
+        data = {}
+    # Fallback to manual JSON load if still empty or parsing failed
+    if not data:
+        try:
+            data = json.loads(request.get_data(as_text=True) or "{}")
+        except Exception:
+            data = {}
+    print("[DEBUG] Parsed data:", data)
+    # Ensure data is a dict
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON structure"}), 400
+    # Log exact received data
+    print("[DEBUG] DATA RECIBIDA:", data)
+    # Flexible extraction of question
+    question = data.get('question') or data.get('prompt') or data.get('message') or ''
+    if not question and isinstance(data, dict):
+        if data:
+            question = str(list(data.values())[0])
+        else:
+            question = "Hola"
+    if not question:
+        question = "Hola"
+    tenant_id = data.get('tenant_id', 'test-tenant')
     history = data.get('history', [])
 
-    if not question or not tenant_id:
-        return jsonify({"error": "Faltan datos requeridos"}), 400
+    # tenant_id is optional; if missing, set a default for backward compatibility
+    if not tenant_id:
+        tenant_id = "test-tenant"
 
     def generate_sse():
         try:
@@ -597,22 +656,27 @@ def chat_offline():
 
             print("[Offline RAG] 2. Buscando en Postgres local...")
             # 2. Búsqueda vectorial en PostgreSQL
-            conn = psycopg2.connect(LOCAL_DB_URL)
-            cur = conn.cursor()
-            
-            emb_str = f"[{','.join(map(str, embedding))}]"
-            
-            cur.execute("""
-                SELECT title, content, source_type, source_url
-                FROM public.knowledge_base
-                WHERE tenant_id = %s
-                ORDER BY embedding <=> %s::vector
-                LIMIT 5
-            """, (tenant_id, emb_str))
-            
-            results = cur.fetchall()
-            cur.close()
-            conn.close()
+            if not LOCAL_DB_URL:
+                print("[Offline RAG] No LOCAL_DB_URL configured, skipping DB query")
+                results = []
+            else:
+                try:
+                    conn = psycopg2.connect(LOCAL_DB_URL)
+                    cur = conn.cursor()
+                    emb_str = f"[{','.join(map(str, embedding))}]"
+                    cur.execute("""
+                        SELECT title, content, source_type, source_url
+                        FROM public.knowledge_base
+                        WHERE tenant_id = %s
+                        ORDER BY embedding <=> %s::vector
+                        LIMIT 5
+                    """, (tenant_id, emb_str))
+                    results = cur.fetchall()
+                    cur.close()
+                    conn.close()
+                except Exception as db_err:
+                    print(f"[Offline RAG] DB connection failed: {db_err}")
+                    results = []
 
             print(f"[Offline RAG] Encontrados {len(results)} fragmentos.")
             sources = []
@@ -687,4 +751,4 @@ if __name__ == '__main__':
     start_sync_thread(app)
             
     # Servidor local en el puerto 5000
-    app.run(debug=True, port=5000, use_reloader=False)
+    app.run(host='0.0.0.0', debug=True, port=5000, use_reloader=False)

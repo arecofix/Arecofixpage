@@ -16,15 +16,13 @@ export const environment: Environment = {
   baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
-  // TODO: Move to .env and use build-time replacement
-  supabaseUrl: 'http://127.0.0.1:54321',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
-
+  supabaseUrl: 'https://db.arecofix.com.ar',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTc4ODEzNjc2MywiZXhwIjoyMTAzNzEyNzYzfQ.fHsIZeWhpCS9Q-oRYvK2sQflcdNZusDI25klGsuXcb8',
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
 
   // RAG Chatbot Worker (Fase 3)
-  chatbotWorkerUrl: 'http://127.0.0.1:8788',
+  chatbotWorkerUrl: 'https://api.arecofix.com.ar/api',
   chatbotSecret: 'uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=',
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',

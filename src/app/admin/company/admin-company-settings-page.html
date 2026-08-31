@@ -165,6 +165,77 @@
                     }
                 </div>
 
+                <div class="divider text-sm font-medium text-gray-500">Integración con Mercado Libre</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Porcentaje de Recargo (Markup %)</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-arrow-up text-gray-400"></i>
+                            <input type="number" [(ngModel)]="form().ml_markup_percentage" name="ml_markup_percentage" class="grow" />
+                        </label>
+                        <span class="text-xs text-gray-500 mt-1">Este porcentaje se sumará al precio base de tus productos al sincronizarlos.</span>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Estado de Conexión</span>
+                        </label>
+                        @if (form().ml_connected) {
+                            <div class="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                <span class="text-green-700 font-medium">Cuenta Conectada</span>
+                            </div>
+                        } @else {
+                            <button type="button" class="btn btn-outline" (click)="connectMercadoLibre()">
+                                <i class="fas fa-link"></i>
+                                Conectar cuenta de Mercado Libre
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="divider text-sm font-medium text-gray-500">Integración con WhatsApp (Meta API)</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Phone Number ID</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fab fa-whatsapp text-green-500"></i>
+                            <input type="text" [(ngModel)]="form().whatsapp_phone_id" name="whatsapp_phone_id" class="grow" placeholder="Ej: 1058223..." />
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Business Account ID</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-briefcase text-gray-400"></i>
+                            <input type="text" [(ngModel)]="form().whatsapp_business_account_id" name="whatsapp_business_account_id" class="grow" placeholder="Ej: 10452..." />
+                        </label>
+                    </div>
+                    <div class="form-control md:col-span-2">
+                        <label class="label">
+                            <span class="label-text font-medium">Access Token Permanente</span>
+                        </label>
+                        <label class="input input-bordered flex items-center gap-2">
+                            <i class="fas fa-key text-gray-400"></i>
+                            <input type="password" [(ngModel)]="form().whatsapp_access_token" name="whatsapp_access_token" class="grow" placeholder="EAAB..." />
+                        </label>
+                        <span class="text-xs text-gray-500 mt-1">Este token se utiliza para autenticar las peticiones automáticas a Meta.</span>
+                    </div>
+                    <div class="form-control md:col-span-2">
+                        <label class="label cursor-pointer justify-start gap-4">
+                            <input type="checkbox" [(ngModel)]="form().whatsapp_enabled" name="whatsapp_enabled" class="toggle toggle-success" />
+                            <span class="label-text font-medium">Habilitar envíos automáticos de WhatsApp</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="flex justify-end gap-4 mt-8 pt-4 border-t border-base-200">
                     <button type="submit" class="btn btn-primary px-8" [disabled]="saving()">
                         @if (saving()) {
