@@ -215,6 +215,7 @@ export class NotificationService {
     }
 
     subscribeToRealtime() {
+        if (typeof window === 'undefined') return;
         const user = this.auth.getCurrentUser();
         if (!user) return;
 

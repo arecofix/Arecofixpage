@@ -129,8 +129,8 @@ export class ChatbotService {
     this.addToHistory('user', question);
 
     try {
-      let isOnline = navigator.onLine;
-      let targetUrl = isOnline ? `${this.workerUrl}/chat` : `http://localhost:5000/api/chat/offline`;
+      // Always use the production API endpoint; no localhost fallback.
+      const targetUrl = `http://137.131.131.98/api/chat/offline`;
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),
@@ -142,19 +142,7 @@ export class ChatbotService {
         }),
       };
 
-      let response: Response;
-      try {
-        response = await fetch(targetUrl, reqInit);
-      } catch (err) {
-        // Fallback si el Worker de Cloudflare está caído o apagado localmente
-        if (targetUrl !== `http://localhost:5000/api/chat/offline`) {
-          console.warn('Worker unreachable, falling back to local backend...');
-          targetUrl = `http://localhost:5000/api/chat/offline`;
-          response = await fetch(targetUrl, reqInit);
-        } else {
-          throw err;
-        }
-      }
+      const response = await fetch(targetUrl, reqInit);
 
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({})) as { error?: string };
@@ -207,7 +195,8 @@ export class ChatbotService {
 
     try {
       let isOnline = navigator.onLine;
-      let targetUrl = isOnline ? `${this.workerUrl}/chat/stream` : `http://localhost:5000/api/chat/offline`;
+      // Always use the production API endpoint; no localhost fallback.
+      const targetUrl = `http://137.131.131.98/api/chat/offline`;
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),
@@ -219,19 +208,7 @@ export class ChatbotService {
         }),
       };
 
-      let response: Response;
-      try {
-        response = await fetch(targetUrl, reqInit);
-      } catch (err) {
-        // Fallback si el Worker de Cloudflare está caído o apagado localmente
-        if (targetUrl !== `http://localhost:5000/api/chat/offline`) {
-          console.warn('Worker stream unreachable, falling back to local backend...');
-          targetUrl = `http://localhost:5000/api/chat/offline`;
-          response = await fetch(targetUrl, reqInit);
-        } else {
-          throw err;
-        }
-      }
+      const response = await fetch(targetUrl, reqInit);
 
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({})) as { error?: string };

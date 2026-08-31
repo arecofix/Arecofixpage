@@ -66,7 +66,7 @@ function visitWithAuth(url: string) {
         }
       };
 
-      win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
+      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(mockSession));
       win.localStorage.setItem('supabase-remember-me', 'true');
       // Cache profile so AuthService can read it (online mode reads from Supabase, but the
       // interceptor below also covers that path)

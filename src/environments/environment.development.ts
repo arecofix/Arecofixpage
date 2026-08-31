@@ -17,8 +17,9 @@ export const environment: Environment = {
   baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
-  supabaseUrl: 'http://127.0.0.1:54321',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+  // TODO: Move to .env and use build-time replacement
+  supabaseUrl: 'https://db.arecofix.com.ar',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTc4ODEzNjc2MywiZXhwIjoyMTAzNzEyNzYzfQ.fHsIZeWhpCS9Q-oRYvK2sQflcdNZusDI25klGsuXcb8',
 
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,

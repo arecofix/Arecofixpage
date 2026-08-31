@@ -60,7 +60,7 @@ beforeEach(function() {
                         user_metadata: { role: 'admin', tenant_id: 'tenant-b-id' }
                     }
                 };
-                win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
+                win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(mockSession));
                 win.localStorage.setItem('arecofix_profile_user-empresa-b', JSON.stringify({ id: 'user-empresa-b', role: 'admin', is_active: true }));
                 win.localStorage.setItem('arecofix_admin_branch_id', 'branch-b');
             }

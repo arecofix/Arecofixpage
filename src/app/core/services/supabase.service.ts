@@ -90,9 +90,14 @@ export class SupabaseService {
        for (let i = 0; i < MAX_RETRIES; i++) {
         let timeoutId: any;
         try {
-          const fetchPromise = fetch(url, options);
+          const controller = new AbortController();
+          const fetchOptions = { ...options, signal: controller.signal };
+          const fetchPromise = fetch(url, fetchOptions);
           const timeoutPromise = new Promise<Response>((_, reject) => {
-              timeoutId = setTimeout(() => reject(new Error(`Fetch timeout (${url})`)), 15000);
+              timeoutId = setTimeout(() => {
+                  controller.abort();
+                  reject(new Error(`Fetch timeout (${url})`));
+              }, 15000);
           });
           
           const response = await Promise.race([fetchPromise, timeoutPromise]);
@@ -228,10 +233,19 @@ export class SupabaseService {
     class DummyWebSocket {
       CONNECTING = 0; OPEN = 1; CLOSING = 2; CLOSED = 3;
       readyState = 3;
-      constructor() {}
+      constructor() {
+        Promise.resolve().then(() => {
+          if (typeof (this as any).onerror === 'function') (this as any).onerror(new Error('SSR'));
+          if (typeof (this as any).onclose === 'function') (this as any).onclose({ code: 1000 });
+        });
+      }
       close() {}
       send() {}
-      addEventListener() {}
+      addEventListener(type: string, listener: any) {
+        if (type === 'error' || type === 'close') {
+          Promise.resolve().then(() => listener({ code: 1000 }));
+        }
+      }
       removeEventListener() {}
       dispatchEvent() { return true; }
     }

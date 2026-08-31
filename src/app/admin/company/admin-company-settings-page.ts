@@ -55,6 +55,14 @@ export class AdminCompanySettingsPage implements OnInit {
     currency: 'ARS',
     usd_rate: 1,
     logo_url: '',
+    // Mercado Libre
+    ml_markup_percentage: 5,
+    ml_connected: false,
+    // WhatsApp Meta Cloud API
+    whatsapp_access_token: '',
+    whatsapp_phone_id: '',
+    whatsapp_business_account_id: '',
+    whatsapp_enabled: false,
   });
 
   loading = signal(true);
@@ -114,6 +122,12 @@ export class AdminCompanySettingsPage implements OnInit {
           currency: data.currency || 'ARS',
           usd_rate: Number(data.usd_rate || 1),
           logo_url: data.branding_settings?.logo_url || '',
+          ml_markup_percentage: data.ml_markup_percentage || 5,
+          ml_connected: !!data.ml_access_token,
+          whatsapp_access_token: data.whatsapp_access_token || '',
+          whatsapp_phone_id: data.whatsapp_phone_id || '',
+          whatsapp_business_account_id: data.whatsapp_business_account_id || '',
+          whatsapp_enabled: !!data.whatsapp_enabled,
         });
       }
 
@@ -164,6 +178,11 @@ export class AdminCompanySettingsPage implements OnInit {
         logo_url: payload.logo_url,
         primary_color: '#3b82f6',
       },
+      ml_markup_percentage: payload.ml_markup_percentage,
+      whatsapp_access_token: payload.whatsapp_access_token,
+      whatsapp_phone_id: payload.whatsapp_phone_id,
+      whatsapp_business_account_id: payload.whatsapp_business_account_id,
+      whatsapp_enabled: payload.whatsapp_enabled,
       updated_at: new Date().toISOString(),
     };
 
@@ -228,6 +247,22 @@ export class AdminCompanySettingsPage implements OnInit {
       this.updatingPassword.set(false);
       this.cdr.markForCheck();
     }
+  }
+
+  // --- MERCADO LIBRE ---
+  connectMercadoLibre() {
+    // You should replace these with your actual App ID and the Edge Function URL
+    const APP_ID = 'YOUR_ML_APP_ID'; 
+    const REDIRECT_URI = 'https://YOUR_SUPABASE_URL/functions/v1/ml-auth';
+    const tenantId = this.tenantService.getTenantId();
+    
+    if (!tenantId) {
+      this.error.set('No tenant ID found.');
+      return;
+    }
+    
+    const url = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${APP_ID}&redirect_uri=${REDIRECT_URI}&state=${tenantId}`;
+    window.location.href = url;
   }
 
   // --- BRANCHES MANAGEMENT ---

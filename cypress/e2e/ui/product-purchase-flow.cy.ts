@@ -21,7 +21,7 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
     // Para simplificar el test, mockeamos el login
     cy.window().then((win) => {
       // Simular sesión de Supabase con el project ID real
-      win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify({
+      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify({
         provider_token: null,
         access_token: 'fake-access-token',
         expires_in: 3600,

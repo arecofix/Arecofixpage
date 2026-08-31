@@ -17,7 +17,7 @@ describe('Flujo de Instructor en Academia', () => {
             }
         };
         
-        window.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
+        window.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(mockSession));
         
         cy.intercept('GET', '**/rest/v1/profiles*', {
             statusCode: 200,

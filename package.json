@@ -85,6 +85,7 @@
     "posthog-js": "^1.418.10",
     "rxjs": "7.8.2",
     "tslib": "^2.8.1",
+    "ws": "^8.21.3",
     "zone.js": "~0.16.2"
   },
   "devDependencies": {
@@ -101,6 +102,7 @@
     "@types/jest": "^30.0.0",
     "@types/k6": "^2.2.0",
     "@types/node": "^26.2.0",
+    "@types/ws": "^8.18.1",
     "autoprefixer": "^10.5.4",
     "cypress": "^15.21.0",
     "daisyui": "^5.7.20",

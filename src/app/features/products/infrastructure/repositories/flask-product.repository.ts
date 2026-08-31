@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ProductRepository, ImportProductSummary, BulkPriceUpdate } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
@@ -140,6 +140,13 @@ export class FlaskProductRepository implements ProductRepository {
 
     getPendingApprovalsCount(): Observable<number> {
         return of(0);
+    }
+
+    syncWithMercadoLibre(id: string): Observable<{ success: boolean; ml_item_id: string }> {
+        // Mercado Libre sync is typically handled by Supabase Edge Functions, 
+        // but for Flask offline mode we might just throw an error or handle it via Flask API.
+        // Assuming we don't support ML sync in offline desktop mode for now.
+        return from(Promise.reject(new Error('Mercado Libre sync is not supported in offline mode.')));
     }
 
     getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }> {

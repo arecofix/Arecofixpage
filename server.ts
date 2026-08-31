@@ -1,3 +1,26 @@
+// --- INICIO PARCHE SUPABASE SSR ---
+if (typeof globalThis.WebSocket === 'undefined') {
+  (globalThis as any).WebSocket = class {
+    CONNECTING = 0; OPEN = 1; CLOSING = 2; CLOSED = 3;
+    readyState = 3;
+    constructor(url: string, protocols?: string | string[]) {
+      Promise.resolve().then(() => {
+        if (typeof (this as any).onerror === 'function') (this as any).onerror(new Error('SSR'));
+        if (typeof (this as any).onclose === 'function') (this as any).onclose({ code: 1000 });
+      });
+    }
+    close() {}
+    send() {}
+    addEventListener(type: string, listener: any) {
+      if (type === 'error' || type === 'close') {
+        Promise.resolve().then(() => listener({ code: 1000 }));
+      }
+    }
+    removeEventListener() {}
+    dispatchEvent() { return true; }
+  };
+}
+// --- FIN PARCHE SUPABASE SSR ---
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
@@ -10,6 +33,13 @@ import { environment } from './src/environments/environment';
 export function app(): express.Express {
   const server = express();
   server.disable('x-powered-by'); // Prevent backend stack leakage
+  // Content Security Policy header
+  server.use((req, res, next) => {
+    const existing = res.getHeader('Content-Security-Policy') as string | undefined;
+    const csp = `default-src 'self'; connect-src 'self' https://api.arecofix.com.ar`;
+    res.setHeader('Content-Security-Policy', existing ? `${existing} ${csp}` : csp);
+    next();
+  });
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
@@ -18,6 +48,7 @@ export function app(): express.Express {
     allowedHosts: [
       'arecofix.com.ar',
       'www.arecofix.com.ar',
+      '137.131.131.98',
       'localhost',
       '127.0.0.1',
       'arecofix.web.app',
@@ -32,9 +63,9 @@ export function app(): express.Express {
   server.get('/sitemap.xml', async (req, res) => {
     try {
       const baseUrl = environment.baseUrl || 'https://arecofix.com.ar';
-      
+
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-      
+
       // Static key routes
       const staticRoutes = [
         { path: '/', priority: '1.0', freq: 'daily' },
@@ -75,7 +106,7 @@ export function app(): express.Express {
       }
 
       xml += `</urlset>`;
-      
+
       res.header('Content-Type', 'application/xml');
       // Cache sitemap in CDN for 24 hours, but let browsers cache it for 1 hour
       res.set('Cache-Control', 'public, max-age=3600, s-maxage=86400');
@@ -108,21 +139,21 @@ export function app(): express.Express {
 
       const brands = brandsRes.ok ? await brandsRes.json() : [];
       const categories = categoriesRes.ok ? await categoriesRes.json() : [];
-      
+
       const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
       const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
 
       // 2. Fetch Active Products (Including branch_id and sku)
       const productsRes = await fetch(`${environment.supabaseUrl}/rest/v1/products?select=id,name,description,price,currency,image_url,slug,stock,brand_id,category_id,branch_id,sku,is_active&is_active=eq.true&deleted_at=is.null&limit=15000`, fetchOptions);
       if (!productsRes.ok) return res.status(500).send('Error fetching products');
-      
+
       const rawProducts = await productsRes.json();
-      
+
       // Filter out invalid products and track unique identifiers
       const seenMetaIds = new Set();
       const seenSlugs = new Set();
       const seenSkus = new Set();
-      
+
       console.log(`[Meta Feed] Processing ${rawProducts.length} raw products.`);
 
       // 3. Build CSV Content
@@ -131,26 +162,26 @@ export function app(): express.Express {
         'retailer_id',    // Often SKU or unique ID
         'item_group_id',  // Used for variants
         'mpn',            // Manufacturer Part Number
-        'title', 
-        'description', 
-        'availability', 
-        'condition', 
-        'price', 
-        'link', 
-        'image_link', 
-        'brand', 
-        'quantity_to_sell_on_facebook', 
+        'title',
+        'description',
+        'availability',
+        'condition',
+        'price',
+        'link',
+        'image_link',
+        'brand',
+        'quantity_to_sell_on_facebook',
         'google_product_category',
         'custom_label_0'
       ];
-      
+
       const rows = rawProducts.map((p: any) => {
         // 1. Unique ID Generation: Some products share IDs across different tenants/branches
         // We append branch_id to ensure Meta sees them as distinct items
         const rawId = String(p.id || '').trim();
         const branchId = String(p.branch_id || 'default').substring(0, 8);
         let metaId = rawId;
-        
+
         if (seenMetaIds.has(metaId)) {
           metaId = `${rawId}_${branchId}`;
         }
@@ -163,20 +194,20 @@ export function app(): express.Express {
         }
         seenSlugs.add(slug);
         const productLink = `${baseUrl}/productos/detalle/${slug}`;
-        
+
         // 3. Image: Standardize and catch '_' or placeholders
         let imageLink = String(p.image_url || '').trim();
         const noImagePlaceholder = `${baseUrl}/assets/img/no-image.png`;
 
         if (!imageLink || imageLink === 'null' || imageLink === 'undefined' || imageLink === '' || imageLink === '_') {
-            imageLink = noImagePlaceholder;
+          imageLink = noImagePlaceholder;
         } else if (!imageLink.startsWith('http')) {
           const encodedPath = imageLink.split('/').map((s: string) => encodeURIComponent(s)).join('/');
           imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
         }
-        
+
         if (imageLink.startsWith('http:')) imageLink = imageLink.replace('http:', 'https:');
-        
+
         // 4. Availability & Quantity
         const isActuallyInStock = (p.is_active && (p.stock > 0 || p.stock === null));
         const availability = isActuallyInStock ? 'in stock' : 'out of stock';
@@ -186,22 +217,22 @@ export function app(): express.Express {
         // 5. Price & Currency: Force ARS if missing or invalid
         let priceValue = Number(p.price) || 0;
         if (priceValue <= 0) priceValue = 100.00;
-        const currency = 'ARS'; 
+        const currency = 'ARS';
         const formattedPrice = `${priceValue.toFixed(2)} ${currency}`;
-        
+
         // 6. Text fields & SKU
         const sanitize = (text: string, len: number) => {
           return String(text || '').replace(/"/g, '""')
-                        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-                        .replace(/\s+/g, ' ')
-                        .trim()
-                        .substring(0, len);
+            .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .substring(0, len);
         };
 
         const title = sanitize(p.name || 'Producto Arecofix', 150);
         const description = sanitize(p.description || title, 4999);
         const brand = sanitize(String(brandMap.get(p.brand_id) || 'Arecofix'), 100);
-        
+
         // SKU handling
         let sku = String(p.sku || p.id.substring(0, 8)).trim();
         if (seenSkus.has(sku)) {
@@ -228,7 +259,7 @@ export function app(): express.Express {
           quote(title),
           quote(description),
           quote(availability),
-          quote('new'), 
+          quote('new'),
           quote(formattedPrice),
           quote(productLink),
           quote(imageLink),
@@ -244,7 +275,7 @@ export function app(): express.Express {
 
       res.header('Content-Type', 'text/csv; charset=utf-8');
       res.header('Content-Disposition', 'attachment; filename=meta-catalog.csv');
-      res.set('Cache-Control', 'public, max-age=60, s-maxage=60'); 
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
       return res.send(csvContent);
     } catch (e) {
       console.error('Meta Feed Error:', e);
@@ -276,7 +307,7 @@ export function app(): express.Express {
       const brands = brandsRes.ok ? await brandsRes.json() : [];
       const categories = categoriesRes.ok ? await categoriesRes.json() : [];
       const rawProducts = productsRes.ok ? await productsRes.json() : [];
-      
+
       const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
       const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
 
@@ -309,7 +340,7 @@ export function app(): express.Express {
 
         const isActuallyInStock = (p.is_active && (p.stock > 0 || p.stock === null));
         const availability = isActuallyInStock ? 'in_stock' : 'out_of_stock';
-        
+
         const title = String(p.name || 'Producto').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const description = String(p.description || title).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 4999);
         const brand = String(brandMap.get(p.brand_id) || 'Arecofix').replace(/&/g, '&amp;');
@@ -339,7 +370,7 @@ export function app(): express.Express {
       xml += `  </channel>\n</rss>`;
 
       res.header('Content-Type', 'application/xml; charset=utf-8');
-      res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600'); 
+      res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
       return res.send(xml);
     } catch (e) {
       console.error('Google Merchant Feed Error:', e);
@@ -356,25 +387,25 @@ export function app(): express.Express {
   // All regular routes use the Angular Engine
   server.get(/(.*)/, (req, res, next) => {
     const { originalUrl, baseUrl, headers } = req;
-    
+
     // Check X-Forwarded-Proto for correct protocol behind proxies like Firebase / Cloud Functions
     const protocol = headers['x-forwarded-proto'] || req.protocol;
     const host = headers['x-forwarded-host'] || headers.host;
-    
+
     const fullUrl = `${protocol}://${host}${originalUrl}`;
 
     const userAgent = headers['user-agent']?.toLowerCase() || '';
     const isBot = /googlebot|facebookexternalhit|whatsapp|twitterbot|linkedinbot|bingbot|pinterest/i.test(userAgent);
-    
+
     // Setting optimal Cache-Control headers natively for Firebase Hosting to read
     if (isBot) {
-        // Bots: We want to cache metadata on the CDN for a shorter time or not at all
-        // to ensure link previews update quickly when changed.
-        res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+      // Bots: We want to cache metadata on the CDN for a shorter time or not at all
+      // to ensure link previews update quickly when changed.
+      res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
     } else {
-        // Regular Users: CDN cache for optimal performance (e.g., 1 hour)
-        // Adjust these values as needed for your content update frequency
-        res.set('Cache-Control', 'public, max-age=600, s-maxage=3600');
+      // Regular Users: CDN cache for optimal performance (e.g., 1 hour)
+      // Adjust these values as needed for your content update frequency
+      res.set('Cache-Control', 'public, max-age=600, s-maxage=3600');
     }
 
     commonEngine
@@ -384,7 +415,7 @@ export function app(): express.Express {
         url: fullUrl,
         publicPath: browserDistFolder,
         providers: [
-            { provide: APP_BASE_HREF, useValue: baseUrl },
+          { provide: APP_BASE_HREF, useValue: baseUrl },
         ],
       })
       .then((html) => {
@@ -414,7 +445,7 @@ export function app(): express.Express {
 }
 
 function run(): void {
-  const port = process.env['PORT'] || 4000;
+  const port = process.env['PORT'] || 4000; // Default port for SSR server
   const server = app();
   server.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
@@ -425,5 +456,5 @@ const mainModule = process.argv[1];
 const modulePath = fileURLToPath(import.meta.url);
 
 if (mainModule && (mainModule === modulePath || mainModule + '.mjs' === modulePath)) {
-    run();
+  run();
 }

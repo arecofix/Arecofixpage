@@ -10,6 +10,11 @@ def generate_uuid():
 class Admin(db.Model):
     """Gestión de Administradores (Offline Login)."""
     __tablename__ = 'admins'
+    def __init__(self, username: str, password_hash: str, branch_id: str = None, role: str = 'admin'):
+        self.username = username
+        self.password_hash = password_hash
+        self.branch_id = branch_id
+        self.role = role
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -78,6 +83,11 @@ class Categoria(db.Model):
 class Producto(db.Model):
     """Gestión de Inventario."""
     __tablename__ = 'productos'
+    def __init__(self, name: str, stock: int = 0, price: float = 0.0, **kwargs):
+        super().__init__(**kwargs)
+        self.name = name
+        self.stock = stock
+        self.price = price
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     name = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=True)

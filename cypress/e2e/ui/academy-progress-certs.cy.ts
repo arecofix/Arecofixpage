@@ -51,7 +51,7 @@ describe('Academy Progress and Certificates', () => {
 
     cy.visit(`/admin/courses/${courseId}/materials`, {
       onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
       }
     });
 
@@ -184,7 +184,7 @@ describe('Academy Progress and Certificates', () => {
     // Visit Campus directly while injecting token
     cy.visit('/academy/curso-e2e-test/aula', {
       onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
         win.localStorage.setItem('arecofix_profile_student-1', JSON.stringify(mockProfile));
       }
     });

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { TenantService } from './tenant.service';
 
 interface WhatsAppComponent {
     type: string;
@@ -19,6 +20,7 @@ interface WhatsAppComponent {
 })
 export class WhatsappService {
     private http = inject(HttpClient);
+    private tenantService = inject(TenantService);
     // Use Supabase Edge Function URL
     private functionUrl = `${environment.supabaseUrl}/functions/v1/send-whatsapp`;
     private supabaseKey = environment.supabaseKey;
@@ -40,6 +42,7 @@ export class WhatsappService {
         const body = {
             to: to,
             type: 'template',
+            tenant_id: this.tenantService.getTenantId(),
             template: {
                 name: templateName,
                 language: {
@@ -64,6 +67,7 @@ export class WhatsappService {
         const body = {
             to: to,
             type: 'text',
+            tenant_id: this.tenantService.getTenantId(),
             text: {
                 preview_url: false,
                 body: message
