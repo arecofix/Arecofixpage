@@ -1,6 +1,22 @@
 {
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
+  "dataGroups": [
+    {
+      "name": "chatbot-api",
+      "urls": [
+        "https://*.workers.dev/**",
+        "https://api.arecofix.com.ar/**",
+        "https://arecofix.com.ar/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 1,
+        "maxAge": "0u",
+        "timeout": "3s"
+      }
+    }
+  ],
   "assetGroups": [
     {
       "name": "app",

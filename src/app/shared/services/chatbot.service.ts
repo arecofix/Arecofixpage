@@ -78,6 +78,7 @@ export class ChatbotService {
     return {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.chatbotSecret}`,
+      'ngsw-bypass': '1',
     };
   }
 
@@ -93,7 +94,15 @@ export class ChatbotService {
     if (err instanceof TypeError && err.message.includes('fetch')) {
       return 'No se pudo conectar con el asistente. Verificá tu conexión.';
     }
-    if (err instanceof Error) return err.message;
+    if (err instanceof Error) {
+      if (err.message.includes('429') || err.message.includes('procesando muchas consultas')) {
+        return 'En este momento estoy procesando muchas consultas, intentá de nuevo en unos segundos.';
+      }
+      if (err.message.includes('500') || err.message.includes('Error interno del servidor')) {
+        return 'Hubo un error en el servidor. Intentá de nuevo más tarde.';
+      }
+      return err.message;
+    }
     return 'Error inesperado. Intentá de nuevo.';
   }
 
