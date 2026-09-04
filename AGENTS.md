@@ -69,6 +69,7 @@ supabase/
 | E2E tests (interactive) | `pnpm run cypress:open` |
 | E2E tests (headless) | `pnpm run test:e2e` |
 | Deploy to VPS | `pnpm run build && scp -r dist/ ubuntu@<vps>:arecofix/ && pm2 restart arecofix-frontend` |
+| Deploy via SSH Tunnel (Auto) | `pnpm run build && scp -i ssh-key-2026-08-30.key -r dist/ ubuntu@ssh.arecofix.com.ar:arecofix/ && ssh -i ssh-key-2026-08-30.key ubuntu@ssh.arecofix.com.ar 'pm2 restart arecofix-frontend'` |
 | Tauri desktop dev | `pnpm run tauri:dev` |
 | Update SEO routes | `pnpm run routes:update` |
 
@@ -206,7 +207,7 @@ For deeper context, see repository memory files:
 
 5. **Deploy**:
    - Push to `main` branch
-   - Deploy to VPS manually or via CI scripts
+   - Deploy to VPS manually or via CI scripts. To deploy via SSH tunnel to the VPS, ensure you use the key and tunnel endpoint: `pnpm run build && scp -i ssh-key-2026-08-30.key -r dist/ ubuntu@ssh.arecofix.com.ar:arecofix/ && ssh -i ssh-key-2026-08-30.key ubuntu@ssh.arecofix.com.ar 'pm2 restart arecofix-frontend'`
    - PM2 `arecofix-frontend` takes over serving SSR
 
 ## 💡 When You're Stuck

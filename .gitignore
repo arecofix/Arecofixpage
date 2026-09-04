@@ -156,3 +156,9 @@ Desktop.ini
 cypress/screenshots/
 cypress/videos/
 cypress/downloads/
+# -------------------------------------------------------------------------
+# CLAVES SSH Y DATOS SENSIBLES
+# -------------------------------------------------------------------------
+*.key
+*.pem
+*.ppk
