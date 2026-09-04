@@ -44,7 +44,6 @@ export class BranchService {
     const path = window.location.pathname;
     const pathSegments = path.split('/').filter(s => s);
     if (pathSegments.length > 0 && pathSegments[0] === 'admin') {
-      // console.log('[BranchService] Sede Central URL detected on initialization, bypassing localStorage hydration.');
       this.setCurrentBranch(null);
       return;
     }
@@ -54,7 +53,6 @@ export class BranchService {
       try {
         // We do it asynchronously to not block constructor, but set signal asap
         await this.setBranchById(savedId);
-        // console.log('[BranchService] Context hydrated from storage:', this._currentBranch()?.name);
       } catch (e) {
         console.warn('[BranchService] Hydration failed:', e);
       }

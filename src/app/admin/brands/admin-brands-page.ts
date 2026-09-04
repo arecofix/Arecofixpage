@@ -19,7 +19,7 @@ import { Pagination } from '@app/shared/components/pagination/pagination';
   selector: 'app-admin-brands-page',
   standalone: true,
   imports: [RouterLink, Pagination],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-brands-page.html',
 })
 export class AdminBrandsPage implements OnInit {

@@ -219,7 +219,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
         this.success = '¡Cuenta creada exitosamente! Redirigiendo...';
       }
 
-      console.log('SUCCESS MESSAGE SET TO:', this.success);
 
       // Redirigir según el tipo de registro
       setTimeout(async () => {

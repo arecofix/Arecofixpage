@@ -102,7 +102,6 @@ export class AdminRepairService {
         let customerId = dto.customer_id;
         
         if (!customerId && dto.customer_name) {
-            // console.log('🔍 [AdminRepairService] Resolviendo cliente por email/teléfono...');
             
             // Try to find existing first
             const existing = await this.customerService.findByEmailOrPhone(
@@ -126,10 +125,8 @@ export class AdminRepairService {
             }
 
             if (shouldReuse && existing) {
-                // console.log('✅ [AdminRepairService] Cliente existente encontrado:', existing.id);
                 customerId = existing.id;
             } else {
-                // console.log('🆕 [AdminRepairService] Creando nuevo cliente vía RPC...');
                 const nameParts = dto.customer_name.trim().split(' ');
                 const fn = nameParts[0] || '';
                 const ln = nameParts.slice(1).join(' ') || '';
