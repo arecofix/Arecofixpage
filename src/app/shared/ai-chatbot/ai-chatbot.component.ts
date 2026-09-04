@@ -143,7 +143,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
       {
         from: 'bot',
         type: 'text',
-        text: '¡Hola! Soy el asistente inteligente de Arecofix. Puedo ayudarte con consultas sobre productos, servicios, manuales técnicos y más. ¿En qué te puedo ayudar?',
+        text: '¡Hola! Soy el asistente de Arecofix. Puedo orientarte sobre productos, servicios y capacitaciones. ¿En qué te ayudo?',
       },
     ]);
   }

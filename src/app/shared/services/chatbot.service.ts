@@ -204,7 +204,7 @@ export class ChatbotService {
     try {
       let isOnline = navigator.onLine;
       // Use environment URL
-      const targetUrl = `${environment.chatbotWorkerUrl}/chat/offline`;
+      const targetUrl = `${environment.chatbotWorkerUrl}/chat/stream`;
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),
