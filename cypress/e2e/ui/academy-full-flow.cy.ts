@@ -170,7 +170,7 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
 
     cy.visit('/academy/curso-reparacion-celulares/aula', {
         onBeforeLoad: (win) => {
-            win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(mockStudentSession));
+            win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockStudentSession));
         }
     });
 

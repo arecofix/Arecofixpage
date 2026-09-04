@@ -1,4 +1,4 @@
-﻿import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '@app/core/services/translation.service';
 import { CommonModule } from '@angular/common';
 
@@ -19,10 +19,10 @@ import { CommonModule } from '@angular/common';
           <h1
             class="text-2xl font-black text-gray-900 dark:text-white tracking-tight"
           >
-            GestiÃ³n Contable
+            Gestión Contable
           </h1>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Resumen financiero y situaciÃ³n patrimonial.
+            Resumen financiero y situación patrimonial.
           </p>
         </div>
       </div>

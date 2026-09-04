@@ -238,7 +238,6 @@ export class CoursesService {
      */
     async checkEnrollment(courseId: string, email: string): Promise<{ enrolled: boolean, error: unknown }> {
         const trimmedEmail = (email || '').trim();
-        console.log('[checkEnrollment] checking:', { courseId, email: trimmedEmail });
         const { data, error } = await this.supabase
             .from('course_enrollments')
             .select('id, status')
@@ -246,7 +245,6 @@ export class CoursesService {
             .ilike('email', trimmedEmail)
             .eq('status', 'confirmed')
             .maybeSingle();
-        console.log('[checkEnrollment] result:', { data, error });
         if (error) {
             this.logger.error('checkEnrollment failed', error);
             return { enrolled: false, error };

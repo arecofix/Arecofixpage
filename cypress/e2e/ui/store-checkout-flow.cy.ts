@@ -55,6 +55,17 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
       body: []
     }).as('saveOrderItems');
 
+    cy.intercept({
+      method: 'POST',
+      url: /mercadopago-preferences/
+    }, {
+      statusCode: 200,
+      body: {
+        id: 'mock-preference-id',
+        init_point: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=mock-preference-id'
+      }
+    }).as('createPreference');
+
     // Suprimir logs de consola durante el test
     cy.on('window:before:load', (win) => {
       cy.stub(win.console, 'error').callsFake(() => {});
@@ -108,11 +119,12 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     });
 
     // El step debe cambiar y mostrar opciones de pago
-    cy.contains('h4', 'Mercado Pago', { timeout: 10000 }).click({ force: true });
+    cy.get('input[type="radio"][value="credit_card"]').closest('label').click({ force: true });
     cy.get('button').contains(/confirmar pedido/i, { matchCase: false }).click({ force: true });
     
     // Validaciones
     cy.wait('@saveOrder');
+    cy.wait('@createPreference');
     cy.contains(/Redirigiendo a Pago Seguro/i, { timeout: 8000 }).should('be.visible');
   });
 

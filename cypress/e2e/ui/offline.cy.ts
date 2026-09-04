@@ -13,7 +13,7 @@ describe('Offline Resiliency (Network Drop during Mutation)', () => {
     cy.get('textarea[formControlName="issue_description"]').type('Pantalla rota');
 
     // Forzar falla de red para el POST de Supabase
-    cy.intercept('POST', '**/rest/v1/repairs*', {
+    cy.intercept('POST', '**/rpc/save_repair_order*', {
       forceNetworkError: true
     }).as('repairPostFailed');
 

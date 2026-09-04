@@ -82,7 +82,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": {
-                  "inlineCritical": false,
+                  "inlineCritical": true,
                   "minify": true
                 },
                 "fonts": {
@@ -92,7 +92,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1.7mb",
+                  "maximumWarning": "1.5mb",
                   "maximumError": "2.5mb"
                 },
                 {
@@ -116,7 +116,7 @@
               "optimization": {
                 "scripts": true,
                 "styles": {
-                  "inlineCritical": false,
+                  "inlineCritical": true,
                   "minify": true
                 },
                 "fonts": {

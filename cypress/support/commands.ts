@@ -119,8 +119,8 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
       // Inject auth token BEFORE Angular initializes
-      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
       win.localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(fakeProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
@@ -188,7 +188,8 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
     role: 'super_admin',
     first_name: 'Admin',
     last_name: 'Test',
-    is_active: true
+    is_active: true,
+    branch_id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5'
   };
 
   cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
@@ -273,8 +274,8 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
   cy.visit(targetUrl, { 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
-      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
       win.localStorage.setItem('arecofix_profile_mock-admin-id', JSON.stringify(mockProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
@@ -297,8 +298,8 @@ Cypress.Commands.add('setupCheckoutSession', () => {
   // Inject session into local storage BEFORE anything loads
   cy.window().then(w => w.indexedDB.deleteDatabase('ArecofixOfflineDB'));
     cy.on('window:before:load', (win) => {
-    win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
-    win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
+    win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+    win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
     win.localStorage.setItem('arecofix_current_branch_id', branch.id);
   });
 

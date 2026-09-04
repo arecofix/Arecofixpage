@@ -127,10 +127,9 @@ export class ChatbotService {
     this.loading.set(true);
     this.error.set(null);
     this.addToHistory('user', question);
-
     try {
-      // Always use the production API endpoint; no localhost fallback.
-      const targetUrl = `http://137.131.131.98/api/chat/offline`;
+      // Use environment configuration for the production API endpoint
+      const targetUrl = `${environment.chatbotWorkerUrl}/chat/offline`;
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),
@@ -195,8 +194,8 @@ export class ChatbotService {
 
     try {
       let isOnline = navigator.onLine;
-      // Always use the production API endpoint; no localhost fallback.
-      const targetUrl = `http://137.131.131.98/api/chat/offline`;
+      // Use environment URL
+      const targetUrl = `${environment.chatbotWorkerUrl}/chat/offline`;
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),

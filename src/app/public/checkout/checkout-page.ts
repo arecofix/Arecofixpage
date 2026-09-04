@@ -314,7 +314,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
         .catch((e: any) =>
           console.warn('Contact message error (non-fatal):', e),
         );
-
+      
+      this.cartService.clearCart();
+        
       if (method === 'cash') {
         const ticket = this.paymentService.buildPaymentTicket(
           created.id!,

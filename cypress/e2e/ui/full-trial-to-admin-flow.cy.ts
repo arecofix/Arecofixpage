@@ -116,7 +116,7 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
           user_metadata: { role: 'tenant_owner' },
         }
       };
-      win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(mockSession));
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockSession));
       win.localStorage.setItem('supabase-remember-me', 'true');
     });
 

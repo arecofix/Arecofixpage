@@ -704,7 +704,7 @@ def chat_offline():
 
             # 4. Generación Streaming
             chat_res = requests.post(f"{OLLAMA_URL}/api/chat", json={
-                "model": "qwen2.5-coder:7b",
+                "model": "qwen2.5:7b",
                 "messages": messages,
                 "stream": True
             }, stream=True)

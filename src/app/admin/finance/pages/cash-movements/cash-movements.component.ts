@@ -1,4 +1,4 @@
-﻿import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '@app/core/services/translation.service';
 import { CommonModule } from '@angular/common';
 
@@ -23,7 +23,7 @@ import { CommonModule } from '@angular/common';
               {{ t().finance.cashMovements.title || 'Movimientos de Caja' }}
             </h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              Control de ingresos, egresos y conciliaciÃ³n.
+              Control de ingresos, egresos y conciliación.
             </p>
           </div>
         </div>
@@ -61,7 +61,7 @@ import { CommonModule } from '@angular/common';
               <tr class="text-gray-400 dark:text-gray-500">
                 <th>{{ t().finance.cashMovements.date || 'FECHA' }}</th>
                 <th>{{ t().finance.cashMovements.concept || 'CONCEPTO' }}</th>
-                <th>MÃ‰TODO</th>
+                <th>MÉTODO</th>
                 <th>{{ t().finance.cashMovements.type || 'TIPO' }}</th>
                 <th class="text-right">
                   {{ t().finance.cashMovements.amount || 'MONTO' }}

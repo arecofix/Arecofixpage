@@ -552,6 +552,7 @@
             <input
               type="radio"
               name="payment"
+              value="credit_card"
               class="peer sr-only"
               (change)="selectMethod('credit_card')"
               [checked]="selectedMethod() === 'credit_card'"
@@ -605,6 +606,7 @@
             <input
               type="radio"
               name="payment"
+              value="digital"
               class="peer sr-only"
               (change)="selectMethod('digital')"
               [checked]="selectedMethod() === 'digital'"
@@ -642,6 +644,7 @@
             <input
               type="radio"
               name="payment"
+              value="cash"
               class="peer sr-only"
               (change)="selectMethod('cash')"
               [checked]="selectedMethod() === 'cash'"

@@ -42,7 +42,7 @@ export class KnowledgeBaseAdminService {
   private readonly supabase = inject(SupabaseService);
   private readonly tenantService = inject(TenantService);
 
-  private readonly embeddingWorkerUrl = environment.chatbotWorkerUrl.replace('rag-chatbot', 'embedding-ingestion');
+  private readonly embeddingWorkerUrl = environment.embeddingWorkerUrl || environment.chatbotWorkerUrl.replace('rag-chatbot', 'embedding-ingestion');
   private readonly workerSecret = '0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=';
   private readonly flaskUrl = environment.apiUrl;
 

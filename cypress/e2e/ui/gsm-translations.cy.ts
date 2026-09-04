@@ -1,7 +1,7 @@
 describe('GSM Page Translations and Accessibility', () => {
   beforeEach(() => {
     cy.clearLocalStorage();
-    cy.loginRealAdmin('/gsm');
+    cy.loginAsAdmin('/gsm');
     // Ensure app is loaded and we are actually on /gsm and not login
     cy.get('h1').should('be.visible');
   });
@@ -19,7 +19,7 @@ describe('GSM Page Translations and Accessibility', () => {
     
     // Instead of reload which drops mock auth session in Supabase briefly,
     // we re-login and visit again.
-    cy.loginRealAdmin('/gsm');
+    cy.loginAsAdmin('/gsm');
     cy.get('h1').should('be.visible');
     cy.wait(500);
 

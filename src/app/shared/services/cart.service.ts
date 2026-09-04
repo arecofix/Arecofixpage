@@ -92,7 +92,6 @@ export class CartService {
 
         try {
             const activeOrder = await firstValueFrom(this.orderService.getActiveCart(userId, sessionId));
-            console.log('DEBUG: loadCart activeOrder:', activeOrder);
             this.currentOrderSignal.set(activeOrder);
 
             if (activeOrder && activeOrder.items) {
@@ -182,10 +181,8 @@ export class CartService {
     }
 
     async addToCart(product: Product) {
-        console.log("CART DEBUG: addToCart called with product", product?.id);
         try {
             const order = await this.getOrCreateActiveOrder();
-            console.log("CART DEBUG: getOrCreateActiveOrder returned", order?.id);
             const items = order.items ? [...order.items] : [];
 
             const existingItem = items.find(item => item.product_id === product.id);
@@ -216,11 +213,8 @@ export class CartService {
             order.total = subtotal;
             order.total_amount = subtotal;
 
-            console.log("CART DEBUG: updating order with items", items.length);
             const updatedOrder = await firstValueFrom(this.orderService.updateOrder(order.id!, order));
-            console.log("CART DEBUG: updateOrder succeeded", updatedOrder?.id);
             this.syncOrderState(updatedOrder);
-            console.log("CART DEBUG: syncOrderState done");
 
             this.logger.debug('Product added to cart', { productName: product.name });
             this.toastService.show('Agregaste un producto al carrito', 'success', () => this.openCart());

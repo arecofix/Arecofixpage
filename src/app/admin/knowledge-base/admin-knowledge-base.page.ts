@@ -8,6 +8,8 @@ import {
   KnowledgeDoc,
   IngestTextPayload,
 } from './knowledge-base-admin.service';
+import { VoiceRecognitionService } from '../../shared/services/voice-recognition.service';
+import { effect } from '@angular/core';
 
 type Tab = 'docs' | 'add-text' | 'add-file';
 type SourceType = IngestTextPayload['source_type'];
@@ -202,10 +204,25 @@ type SourceType = IngestTextPayload['source_type'];
               {{ textForm.content.length }}/15000
             </span>
           </label>
-          <textarea [(ngModel)]="textForm.content"
-            placeholder="Escribí o pegá el contenido aquí. El sistema lo dividirá automáticamente en chunks de 1500 caracteres con solapamiento para mayor precisión semántica."
-            class="textarea textarea-bordered dark:bg-slate-900 w-full h-52 resize-y leading-relaxed"
-            maxlength="15000"></textarea>
+          <div class="relative">
+            <textarea [(ngModel)]="textForm.content"
+              (input)="onTextFormContentChange()"
+              placeholder="Escribí o pegá el contenido aquí. El sistema lo dividirá automáticamente en chunks de 1500 caracteres con solapamiento para mayor precisión semántica."
+              class="textarea textarea-bordered dark:bg-slate-900 w-full h-52 resize-y leading-relaxed pr-12"
+              maxlength="15000"></textarea>
+            @if (voiceService.supported) {
+              <button
+                class="absolute bottom-4 right-4 btn btn-circle btn-sm shadow-md transition-colors"
+                [class.btn-error]="voiceService.isListening()"
+                [class.animate-pulse]="voiceService.isListening()"
+                (click)="toggleDictation()"
+                title="Dictar contenido por voz"
+                type="button"
+              >
+                <i class="fas fa-microphone"></i>
+              </button>
+            }
+          </div>
         </div>
       </div>
 
@@ -392,6 +409,7 @@ type SourceType = IngestTextPayload['source_type'];
 })
 export class AdminKnowledgeBasePage implements OnInit {
   readonly svc = inject(KnowledgeBaseAdminService);
+  readonly voiceService = inject(VoiceRecognitionService);
 
   // ── Estado de UI ──────────────────────────────────────────────────────────
   activeTab = signal<Tab>('docs');
@@ -412,6 +430,27 @@ export class AdminKnowledgeBasePage implements OnInit {
     title: '', source_type: 'manual',
   };
 
+  private textBeforeDictation = '';
+
+  constructor() {
+    effect(() => {
+      const transcript = this.voiceService.transcript();
+      const isListening = this.voiceService.isListening();
+      
+      if (isListening && this.activeTab() === 'add-text') {
+        const newText = (this.textBeforeDictation + ' ' + transcript).trim();
+        this.textForm.content = newText;
+      }
+    });
+
+    effect(() => {
+      const voiceErr = this.voiceService.error();
+      if (voiceErr && this.activeTab() === 'add-text') {
+        this.svc.error.set(voiceErr);
+      }
+    }, { allowSignalWrites: true });
+  }
+
   // ── Getters (reemplazan a computed porque dependen de objetos mutables) ──
   get textFormValid(): boolean {
     return this.textForm.title.trim().length > 2 && this.textForm.content.trim().length >= 10;
@@ -431,9 +470,27 @@ export class AdminKnowledgeBasePage implements OnInit {
   }
 
   // ── Texto ─────────────────────────────────────────────────────────────────
+  onTextFormContentChange(): void {
+    if (!this.voiceService.isListening()) {
+      this.textBeforeDictation = this.textForm.content;
+    }
+  }
+
+  toggleDictation(): void {
+    if (this.voiceService.isListening()) {
+      this.voiceService.stop();
+    } else {
+      this.textBeforeDictation = this.textForm.content;
+      this.voiceService.start({ continuous: true }); // Continuous mode for dictating long texts
+    }
+  }
+
   async submitText(): Promise<void> {
     if (!this.textFormValid) return;
     this.textSuccess.set('');
+    if (this.voiceService.isListening()) {
+      this.voiceService.stop();
+    }
     const tags = this.textTags.split(',').map(t => t.trim()).filter(Boolean);
     try {
       const { chunks_processed } = await this.svc.ingestText({
@@ -442,6 +499,7 @@ export class AdminKnowledgeBasePage implements OnInit {
       });
       this.textSuccess.set(`✅ Indexado correctamente en ${chunks_processed} chunk${chunks_processed !== 1 ? 's' : ''}.`);
       this.textForm = { title: '', content: '', source_type: 'service' };
+      this.textBeforeDictation = '';
       this.textTags = '';
       await this.loadDocs();
     } catch { /* error ya en svc.error() */ }

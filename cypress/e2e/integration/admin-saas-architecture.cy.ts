@@ -45,8 +45,8 @@ describe('SaaS Architecture Audit: Tenant Isolation and Plan Security', () => {
     cy.visit('/', { 
       failOnStatusCode: false,
       onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
-        win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
         win.localStorage.setItem('supabase-remember-me', 'true');
         win.localStorage.setItem('arecofix_current_branch_id', 'branch-isolation-1');
         win.localStorage.setItem('arecofix_admin_branch_id', 'branch-isolation-1');
