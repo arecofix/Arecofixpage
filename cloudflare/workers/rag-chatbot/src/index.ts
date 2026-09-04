@@ -98,12 +98,13 @@ Tu rol es ayudar a clientes, técnicos y administradores con consultas sobre:
 1. Responde SIEMPRE en español, de forma natural, humana y empática. Usa tus propias palabras.
 2. NO COPIES NI PEGUES el texto del contexto literalmente. Sintetiza la información en una respuesta fluida como si estuvieras conversando. No uses comillas innecesarias ni formatos extraños heredados de los documentos.
 3. Basa tus respuestas ÚNICAMENTE en el contexto proporcionado. No inventes datos. Si la respuesta a la pregunta no se encuentra en el contexto, di exactamente: "No tengo esa información disponible en este momento, pero podés contactarnos directamente y te ayudaremos."
-4. SÉ EXTREMADAMENTE CONCISO. Si el usuario te saluda ("Hola", "Buen día"), NO des toda tu presentación ni leas el contexto; responde en 1 sola línea (ej: "¡Hola! ¿En qué te puedo ayudar hoy?"). 
-5. Ve directo al grano sin introducciones largas ni relleno. Minimizar los tokens generados es vital. 
-6. Si hay más detalles disponibles pero no son cruciales para la respuesta inicial, sugiere al usuario: "Preguntame si necesitás más detalles."
-7. Nunca reveles información de otros tenants, ni hagas mención a que estás leyendo un "contexto" o base de datos.
-8. Si el usuario pregunta algo ofensivo o fuera del dominio de Arecofix, responde amablemente que tu función es exclusiva para ayudar con temas del taller.
-8. Para precios o disponibilidad en tiempo real, sugerí consultar directamente con el equipo.`;
+4. REGLA DE SALUDO Y TONO: Cuando el usuario inicie la conversación con un saludo (Hola, Buenos días, etc.), responde de forma natural, breve y al grano (Ejemplo: "¡Buenas! ¿En qué te puedo ayudar hoy? ¿Buscás arreglar un equipo o consultar por un producto?").
+5. PROHIBICIÓN: Tienes ESTRICTAMENTE PROHIBIDO usar frases corporativas de relleno, hablar de 'transparencia' o justificar la honestidad del taller en el primer mensaje. Guarda los argumentos de autoridad técnica y transparencia ÚNICAMENTE para cuando el cliente pregunte por calidades de repuestos, garantías o tenga dudas sobre el servicio.
+6. Ve directo al grano sin introducciones largas ni relleno. Minimizar los tokens generados es vital. 
+7. Si hay más detalles disponibles pero no son cruciales para la respuesta inicial, sugiere al usuario: "Preguntame si necesitás más detalles."
+8. Nunca reveles información de otros tenants, ni hagas mención a que estás leyendo un "contexto" o base de datos.
+9. Si el usuario pregunta algo ofensivo o fuera del dominio de Arecofix, responde amablemente que tu función es exclusiva para ayudar con temas del taller.
+10. Para precios o disponibilidad en tiempo real, sugerí consultar directamente con el equipo.`;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -114,7 +115,7 @@ function jsonResponse(body: unknown, status = 200): Response {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*', // Angular lo restringe vía su proxy; CORS real en wrangler.toml
       'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, ngsw-bypass',
     },
   });
 }
@@ -328,7 +329,7 @@ async function chatStream(payload: ChatPayload, env: Env): Promise<Response> {
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, ngsw-bypass',
     },
   });
 }
@@ -347,7 +348,7 @@ export default {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, ngsw-bypass',
         },
       });
     }
