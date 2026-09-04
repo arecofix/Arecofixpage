@@ -687,14 +687,12 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   async save() {
-    console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
     window.saveCalled = true;
     this.saving.set(true);
     this.error.set(null);
 
     try {
       // 1. Resolve branch ID with centralized logic
-      console.log('📍 [AdminRepairForm] Resolviendo sucursal...');
       const branchIdActual =
         await this.branchService.resolveEffectiveBranchId();
 
@@ -707,7 +705,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         this.saving.set(false);
         return;
       }
-      console.log('✅ [AdminRepairForm] Sucursal resuelta:', branchIdActual);
 
       // 2. Validate form
       if (this.repairForm.invalid) {
@@ -761,7 +758,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       }
 
       // 3. Prepare payload
-      console.log('📦 [AdminRepairForm] Preparando datos...');
       const rawData = this.repairForm.getRawValue();
 
       // Destructuramos para extraer campos del frontend que no existen en la tabla repairs
@@ -949,7 +945,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
       const isOffline = !navigator.onLine || window.forceOffline;
       if (!this.id && typeof navigator !== 'undefined' && isOffline) {
-        console.log('📶 [AdminRepairForm] Sin conexión, guardando offline...');
         this.offlineSyncService.saveOfflineRepair(payload);
         this.notificationService.showWarning(
           'Guardado localmente. Se sincronizará cuando haya conexión.',
@@ -983,7 +978,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         }
 
         try {
-          console.log('📄 [AdminRepairForm] Generando comprobante...');
           await this.printOrder();
         } catch (pdfErr) {
           console.error('Error generando PDF automático:', pdfErr);

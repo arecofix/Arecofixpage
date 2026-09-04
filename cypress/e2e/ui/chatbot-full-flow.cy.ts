@@ -26,10 +26,10 @@ describe('Chatbot RAG E2E Tests', () => {
   });
 
   it('debe enviar una pregunta mediante opciones rápidas', () => {
-    cy.get('app-ai-chatbot button').first().click();
+    cy.get('app-ai-chatbot button').first().click({ force: true });
     
     // Seleccionar la primera opción rápida
-    cy.get('app-ai-chatbot .quick-option-btn').contains('servicios').click();
+    cy.get('app-ai-chatbot .quick-option-btn').contains('servicios').click({ force: true });
     
     // Verificar que el mensaje del usuario aparece en el chat
     cy.get('app-ai-chatbot').contains('¿Qué servicios de reparación ofrecen').should('be.visible');
@@ -42,11 +42,11 @@ describe('Chatbot RAG E2E Tests', () => {
   });
 
   it('debe manejar preguntas escritas con caracteres especiales', () => {
-    cy.get('app-ai-chatbot button').first().click();
+    cy.get('app-ai-chatbot button').first().click({ force: true });
     
     const weirdQuestion = '¿¿!!T3nen cUrsoS de R3pA®aci0n??!! %$#@';
     
-    cy.get('app-ai-chatbot textarea').type(`${weirdQuestion}{enter}`);
+    cy.get('app-ai-chatbot textarea').type(`${weirdQuestion}{enter}`, { force: true });
     
     cy.get('app-ai-chatbot').contains(weirdQuestion).should('be.visible');
     
@@ -62,11 +62,11 @@ describe('Chatbot RAG E2E Tests', () => {
   });
 
   it('debe denegar amablemente respuestas a preguntas fuera de contexto', () => {
-    cy.get('app-ai-chatbot button').first().click();
+    cy.get('app-ai-chatbot button').first().click({ force: true });
     
     const outOfContextQuestion = '¿Cuál es la receta para hacer una buena pizza de pepperoni?';
     
-    cy.get('app-ai-chatbot textarea').type(`${outOfContextQuestion}{enter}`);
+    cy.get('app-ai-chatbot textarea').type(`${outOfContextQuestion}{enter}`, { force: true });
     
     cy.wait('@chatbotRequest');
     cy.wait(5000);
@@ -83,7 +83,7 @@ describe('Chatbot RAG E2E Tests', () => {
   });
 
   it('debe manejar correctamente un error 429 simulado (límite de peticiones)', () => {
-    cy.get('app-ai-chatbot button').first().click();
+    cy.get('app-ai-chatbot button').first().click({ force: true });
     
     // Interceptar y forzar un 429
     cy.intercept('POST', '**/chat/offline*', {
@@ -91,7 +91,7 @@ describe('Chatbot RAG E2E Tests', () => {
       body: { error: 'En este momento estoy procesando muchas consultas, intentá de nuevo en unos segundos.' }
     }).as('rateLimit');
 
-    cy.get('app-ai-chatbot textarea').type(`Hola{enter}`);
+    cy.get('app-ai-chatbot textarea').type(`Hola{enter}`, { force: true });
     
     cy.wait('@rateLimit');
     

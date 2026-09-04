@@ -343,10 +343,7 @@ export class AdminOrderFormPage implements OnInit {
   }
 
   async save() {
-    // console.log('[AdminOrderForm] SAVE BUTTON CLICKED');
 
-    // console.log('[AdminOrderForm] Starting save process...');
-    // console.log('[AdminOrderForm] Form status:', this.orderForm.status);
 
     if (this.orderForm.invalid) {
       console.warn(
