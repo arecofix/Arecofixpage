@@ -629,6 +629,48 @@
   height: 18px;
 }
 
+.chatbot-mic-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: 1.5px solid #e0e7ff;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chatbot-mic-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #4f46e5;
+}
+
+.chatbot-mic-btn.is-listening {
+  background: #fee2e2;
+  border-color: #f87171;
+  color: #ef4444;
+  animation: micPulse 1.5s infinite;
+}
+
+@keyframes micPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.chatbot-mic-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chatbot-mic-btn i {
+  font-size: 16px;
+}
+
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 400px) {
   .chatbot-window {

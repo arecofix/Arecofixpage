@@ -21,7 +21,7 @@ binding = "AI"
 #   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 #   npx wrangler secret put WORKER_SECRET
 [vars]
-SUPABASE_URL = "https://jftiyfnnaogmgvksgkbn.supabase.co"
+SUPABASE_URL = "https://db.arecofix.com.ar"
 
 # ── Entorno de desarrollo local ───────────────────────────────────────────────
 # Para desarrollo local, crea un archivo .dev.vars con:

@@ -90,7 +90,7 @@ describe('Instructor Assignment Flow', () => {
 
     cy.visit('/', {
       onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-127.0.0.1-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
         win.localStorage.setItem('arecofix_profile_student-123', JSON.stringify(mockProfile));
       }
     });

@@ -207,6 +207,19 @@
           maxlength="1000"
           [disabled]="isLoading() || isStreaming()"
         ></textarea>
+        @if (voiceService.supported) {
+          <button
+            class="chatbot-mic-btn"
+            [class.is-listening]="voiceService.isListening()"
+            (click)="toggleVoiceDictation()"
+            [disabled]="isLoading() || isStreaming()"
+            aria-label="Dictar por voz"
+            title="Dictar por voz"
+            type="button"
+          >
+            <i class="fas fa-microphone" [class.fa-fade]="voiceService.isListening()"></i>
+          </button>
+        }
         <button
           id="ai-chatbot-send-btn"
           class="chatbot-send-btn"

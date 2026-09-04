@@ -5,7 +5,7 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-client-info, X-Client-Info, Origin",
         },
       });
     }
@@ -57,6 +57,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-client-info, X-Client-Info, Origin",
         },
       });
     } catch (err) {

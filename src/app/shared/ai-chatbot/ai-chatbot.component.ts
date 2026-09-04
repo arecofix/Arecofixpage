@@ -16,6 +16,8 @@ import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
 import { ChatbotService, ChatSource } from '../services/chatbot.service';
+import { VoiceRecognitionService } from '../services/voice-recognition.service';
+import { effect } from '@angular/core';
 
 // ── Tipos locales ─────────────────────────────────────────────────────────────
 
@@ -55,6 +57,7 @@ const WA_CELULAR_URL = `https://wa.me/${WA_NUMBER}?text=Hola,%20necesito%20consu
 export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   private readonly router = inject(Router);
   private readonly chatbot = inject(ChatbotService);
+  public readonly voiceService = inject(VoiceRecognitionService);
 
   @ViewChild('chatBody') chatBodyRef!: ElementRef<HTMLDivElement>;
 
@@ -71,6 +74,31 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   readonly waUrl = WA_URL;
   readonly waCelularUrl = WA_CELULAR_URL;
+
+  // Estado para la voz
+  private textBeforeDictation = '';
+
+  constructor() {
+    // Sincronizar el transcrito con el input text
+    effect(() => {
+      const transcript = this.voiceService.transcript();
+      const isListening = this.voiceService.isListening();
+      
+      if (isListening) {
+        // Mientras escucha, combinamos el texto anterior con el nuevo transcrito
+        const newText = (this.textBeforeDictation + ' ' + transcript).trim();
+        this.inputText.set(newText);
+      }
+    });
+
+    // Mostrar errores del servicio de voz en el inputError del chat
+    effect(() => {
+      const voiceErr = this.voiceService.error();
+      if (voiceErr) {
+        this.showError(voiceErr);
+      }
+    });
+  }
 
   readonly isCelularRoute = computed(() => this.currentUrl() === '/celular');
 
@@ -154,11 +182,25 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
       // Limpiar historial al cerrar para empezar fresco la próxima vez
       // Comentar esta línea si preferís persistir la conversación
       this.chatbot.clearHistory();
+      this.voiceService.stop();
     }
   }
 
   onInputChange(value: string): void {
     this.inputText.set(value);
+    // Si el usuario tipea manualmente, actualizamos el texto base por si luego dicta
+    if (!this.voiceService.isListening()) {
+      this.textBeforeDictation = value;
+    }
+  }
+
+  toggleVoiceDictation(): void {
+    if (this.voiceService.isListening()) {
+      this.voiceService.stop();
+    } else {
+      this.textBeforeDictation = this.inputText();
+      this.voiceService.start({ continuous: false });
+    }
   }
 
   onKeydown(event: KeyboardEvent): void {

@@ -8,7 +8,7 @@ before(function() {
         failOnStatusCode: false
     }).then((res) => {
         if (res.status === 402) {
-            skip_tests = true;
+            // skip_tests = true; // Disabled to test mocks
         }
     });
 });
@@ -62,7 +62,7 @@ beforeEach(function() {
         cy.wait(200);
 
         // Intercept BEFORE clicking save (create uses RPC)
-        cy.intercept('POST', '**/rpc/save_repair_order*', { statusCode: 200, body: { id: 'mock-repair-123', tracking_code: 'AF-TEST-123' } }).as('postRepair');
+        cy.intercept('POST', '**/rest/v1/rpc/save_repair_order*', { statusCode: 200, body: { id: 'mock-repair-123', tracking_code: 'AF-TEST-123' } }).as('postRepair');
         cy.contains('button', 'GUARDAR ORDEN').click({ force: true });
 
         cy.wait('@postRepair', { timeout: 15000 }).then((interception) => {
@@ -111,9 +111,9 @@ beforeEach(function() {
             .should('exist');
 
         // El update usa PATCH directo a /rest/v1/repairs, no el RPC save_repair_order
-        cy.intercept('PATCH', '**/rest/v1/repairs*').as('saveRepair');
+        cy.intercept('POST', '**/rest/v1/rpc/update_repair_bypass*').as('patchRepair');
         cy.contains('button', 'GUARDAR ORDEN').click({ force: true });
-        cy.wait('@saveRepair', { timeout: 15000 }).then(interception => {
+        cy.wait('@patchRepair', { timeout: 15000 }).then(interception => {
             expect(interception.response?.statusCode).to.be.oneOf([200, 204]);
         });
     });

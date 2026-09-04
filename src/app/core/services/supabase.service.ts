@@ -17,21 +17,39 @@ export class SupabaseService {
   private pendingTasks = inject(PendingTasks);
 
   constructor() {
+    const dataBaseUrl = environment.supabaseDataUrl || environment.supabaseUrl;
+    const authBaseUrl = environment.supabaseUrl;
+
     // Custom fetch with cache and retry logic to reduce egress and handle network drops
     const customFetch = async (url: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
       const removeTask = this.pendingTasks.add();
       try {
         const urlStr = typeof url === 'string' ? url : (url as URL).toString();
-      const method = (options?.method || 'GET').toUpperCase();
-      const isCacheable = method === 'GET' && urlStr.includes('/rest/v1/');
-      const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && urlStr.includes('/rest/v1/') && !urlStr.includes('/rpc/');
+        const parsedUrl = new URL(urlStr);
+        const targetUrl = parsedUrl.pathname.includes('/rest/v1/')
+          ? new URL(urlStr.replace(new URL(urlStr).origin, new URL(dataBaseUrl).origin))
+          : new URL(urlStr);
+
+        // Remove x-client-info header to avoid CORS issues with custom PostgREST
+        if (options?.headers) {
+          const headers = new Headers(options.headers);
+          headers.delete('x-client-info');
+          headers.delete('X-Client-Info');
+          options.headers = headers;
+        }
+
+        const method = (options?.method || 'GET').toUpperCase();
+      const isCacheable = method === 'GET' && targetUrl.toString().includes('/rest/v1/');
+      const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && targetUrl.toString().includes('/rest/v1/') && !targetUrl.toString().includes('/rpc/');
       
       // Fast in-memory cache check for GET requests
       const CACHE_TTL = 60000;
+      const requestUrl = targetUrl.toString();
+
       if (isCacheable) {
-        const cached = this.cacheMap.get(urlStr);
+        const cached = this.cacheMap.get(requestUrl);
         if (cached && cached.expiresAt > Date.now()) {
-          this.logger.info(`[SupabaseCache] Serving from memory cache: ${urlStr}`);
+          this.logger.info(`[SupabaseCache] Serving from memory cache: ${requestUrl}`);
           return new Response(cached.data, {
             status: cached.status,
             statusText: cached.statusText,
@@ -92,7 +110,7 @@ export class SupabaseService {
         try {
           const controller = new AbortController();
           const fetchOptions = { ...options, signal: controller.signal };
-          const fetchPromise = fetch(url, fetchOptions);
+          const fetchPromise = fetch(requestUrl, fetchOptions);
           const timeoutPromise = new Promise<Response>((_, reject) => {
               timeoutId = setTimeout(() => {
                   controller.abort();
@@ -105,15 +123,44 @@ export class SupabaseService {
 
           if (!response.ok && response.status >= 500) {
               const errorText = await response.text().catch(() => 'No error body');
-              console.error(`[Supabase] 500 on ${url} - Details:`, errorText);
+              console.error(`[Supabase] 500 on ${requestUrl} - Details:`, errorText);
               throw new Error(`Server Error: ${response.status} - ${errorText}`);
           }
           
           if (!response.ok && (response.status === 402 || response.status === 429)) {
               const errorText = await response.text().catch(() => 'No error body');
-              console.error(`[Supabase] ${response.status} on ${url} - Details:`, errorText);
+              console.error(`[Supabase] ${response.status} on ${requestUrl} - Details:`, errorText);
               lastError = new Error(`Quota Exceeded: ${response.status} - ${errorText}`);
               break; // Skip retries, go straight to failover
+          }
+
+          // Intercept 401 JWT errors directly from PostgREST
+          if (!response.ok && response.status === 401) {
+             try {
+                const clonedResponse = response.clone();
+                const errorText = await clonedResponse.text();
+                if (errorText.includes('JWSError') || errorText.includes('PGRST301') || errorText.includes('Invalid number of parts')) {
+                   if (typeof window !== 'undefined') {
+                      console.warn('[SupabaseCache] Detected 401 JWT error from DB, clearing corrupted storage immediately.');
+                      localStorage.removeItem('supabase-auth-token');
+                      sessionStorage.removeItem('supabase-auth-token');
+                      Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('sb-') && key.endsWith('-auth-token')) localStorage.removeItem(key);
+                      });
+                      Object.keys(sessionStorage).forEach(key => {
+                        if (key.startsWith('sb-') && key.endsWith('-auth-token')) sessionStorage.removeItem(key);
+                      });
+                      // Only alert and reload if we haven't done it recently
+                      if (!sessionStorage.getItem('reloaded_from_jwt_error')) {
+                        sessionStorage.setItem('reloaded_from_jwt_error', 'true');
+                        alert('Tu sesión antigua no es compatible y fue borrada. Por favor vuelve a ingresar o navega normalmente.');
+                        window.location.reload();
+                      }
+                   }
+                }
+             } catch (e) {
+                // Ignore clone errors
+             }
           }
 
           if (isCacheable && response.ok) {
@@ -124,7 +171,7 @@ export class SupabaseService {
               headersArray.push([key, val]);
             });
 
-            this.cacheMap.set(urlStr, {
+            this.cacheMap.set(requestUrl, {
               data: textData,
               headers: headersArray,
               status: clonedResponse.status,
@@ -133,11 +180,11 @@ export class SupabaseService {
             });
             
             // Persist to IndexedDB for offline support
-            await this.syncService.cacheGetRequest(urlStr, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
+            await this.syncService.cacheGetRequest(requestUrl, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
           }
 
           if (isMutation && response.ok) {
-            this.logger.info(`[SupabaseCache] Mutation detected: ${method} ${urlStr}. Clearing cache.`);
+            this.logger.info(`[SupabaseCache] Mutation detected: ${method} ${requestUrl}. Clearing cache.`);
             this.cacheMap.clear();
             await this.syncService.clearCache();
           }
@@ -158,9 +205,9 @@ export class SupabaseService {
       // Try to read from IndexedDB as absolute fallback
       if (isCacheable) {
          try {
-           const cachedDB = await this.syncService.getCachedRequest(urlStr);
+           const cachedDB = await this.syncService.getCachedRequest(requestUrl);
            if (cachedDB) {
-             this.logger.warn(`[OfflineSync] Fallback to IndexedDB after fetch failure: ${urlStr}`);
+             this.logger.warn(`[OfflineSync] Fallback to IndexedDB after fetch failure: ${requestUrl}`);
              return new Response(cachedDB.data, {
                status: cachedDB.status,
                statusText: cachedDB.statusText,
@@ -170,22 +217,23 @@ export class SupabaseService {
          } catch (e) {}
          
          // D1 Failover si no hay cache en IndexedDB
-         this.logger.warn(`[Failover] No IndexedDB cache found. Attempting D1 Failover for: ${urlStr}`);
+         this.logger.warn(`[Failover] No IndexedDB cache found. Attempting D1 Failover for: ${requestUrl}`);
          try {
              const d1WorkerUrl = 'https://arecofix-d1-failover.ezequielenrico15.workers.dev';
-             const urlObj = new URL(urlStr);
+             const urlObj = new URL(requestUrl);
              const pathAndQuery = urlObj.pathname.replace('/rest/v1/', '') + urlObj.search;
              
              const d1Response = await fetch(`${d1WorkerUrl}/${pathAndQuery}`, {
                  method: 'GET',
                  headers: {
-                     'Accept': 'application/json'
+                     'Accept': 'application/json',
+                     'Origin': window.location.origin
                  }
              });
              
              if (d1Response.ok) {
                  const textData = await d1Response.text();
-                 this.logger.info(`[Failover] Successfully fetched from D1: ${urlStr}`);
+                 this.logger.info(`[Failover] Successfully fetched from D1: ${requestUrl}`);
                  return new Response(textData, {
                      status: 200,
                      statusText: 'OK',
@@ -195,11 +243,11 @@ export class SupabaseService {
                  this.logger.error(`[Failover] D1 responded with ${d1Response.status}`);
              }
          } catch (d1Error) {
-             this.logger.error(`[Failover] D1 Worker fetch failed for ${urlStr}`, d1Error);
+             this.logger.error(`[Failover] D1 Worker fetch failed for ${requestUrl}`, d1Error);
          }
       } else if (isMutation) {
          // Si es mutación y falló por timeout o error de red, encolar en IndexedDB
-         this.logger.warn(`[OfflineSync] Fallback to Queue after network failure: ${method} ${urlStr}`);
+         this.logger.warn(`[OfflineSync] Fallback to Queue after network failure: ${method} ${requestUrl}`);
          const headersArray: [string, string][] = [];
          if (options?.headers) {
            new Headers(options.headers).forEach((val, key) => headersArray.push([key, val]));
@@ -251,11 +299,14 @@ export class SupabaseService {
     }
 
     this.client = createClient(
-      environment.supabaseUrl,
+      authBaseUrl,
       environment.supabaseKey,
       {
         global: {
           fetch: customFetch
+        },
+        db: {
+          schema: 'public'
         },
         realtime: {
           params: {
@@ -330,14 +381,40 @@ export class SupabaseService {
       // Listen for unhandled promise rejections related to auth errors
       window.addEventListener('unhandledrejection', (event) => {
         const errorMessage = String(event.reason);
-        if (errorMessage.includes('Invalid Refresh Token') || 
+        
+        // Handle invalid refresh tokens and 4-part JWT errors from old sessions
+        if (
+            errorMessage.includes('Invalid Refresh Token') || 
             errorMessage.includes('Refresh Token Not Found') ||
-            errorMessage.includes('400') && errorMessage.includes('refresh_token')) {
-          this.logger.warn('Detected invalid refresh token in unhandled rejection, cleaning storage');
+            (errorMessage.includes('400') && errorMessage.includes('refresh_token')) ||
+            errorMessage.includes('JWSError') ||
+            errorMessage.includes('Invalid number of parts') ||
+            errorMessage.includes('PGRST301')
+        ) {
+          this.logger.warn('Detected invalid token or session in unhandled rejection, cleaning storage');
           event.preventDefault();
-          alert('Tu sesión ha expirado. Por favor, refresca la página y vuelve a ingresar.');
+          
+          // Clear all potentially corrupted storage directly
+          localStorage.removeItem('supabase-auth-token');
+          sessionStorage.removeItem('supabase-auth-token');
+          
+          // Iterar sobre las claves para borrar los del proyecto específico (ej: sb-db.arecofix.com.ar-auth-token)
+          Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+              localStorage.removeItem(key);
+            }
+          });
+          Object.keys(sessionStorage).forEach(key => {
+            if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+              sessionStorage.removeItem(key);
+            }
+          });
+          
+          alert('Tu sesión era inválida o ha expirado. Por favor, refresca la página y vuelve a ingresar.');
           this.client.auth.signOut().catch(err => {
             this.logger.error('Error signing out after invalid token detection', err);
+          }).finally(() => {
+            window.location.reload();
           });
         }
       });

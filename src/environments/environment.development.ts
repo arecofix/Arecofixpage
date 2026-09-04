@@ -17,15 +17,17 @@ export const environment: Environment = {
   baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
-  // TODO: Move to .env and use build-time replacement
+  // Auth y datos apuntan al entorno local en la VPS.
   supabaseUrl: 'https://db.arecofix.com.ar',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTc4ODEzNjc2MywiZXhwIjoyMTAzNzEyNzYzfQ.fHsIZeWhpCS9Q-oRYvK2sQflcdNZusDI25klGsuXcb8',
+  supabaseDataUrl: 'https://db.arecofix.com.ar',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs',
 
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
 
   // RAG Chatbot Worker (Fase 3)
-  chatbotWorkerUrl: 'http://127.0.0.1:8788',
+  chatbotWorkerUrl: 'https://api.arecofix.com.ar/api',
+  embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
   chatbotSecret: 'uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=',
 
   // Analytics Configuration Removed
