@@ -24,7 +24,7 @@ export const environment: Environment = {
   enableProfileUpsert: false,
 
   // RAG Chatbot Worker (Fase 3)
-  chatbotWorkerUrl: 'https://api.arecofix.com.ar/api',
+  chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
   embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
   chatbotSecret: 'uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=',
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
