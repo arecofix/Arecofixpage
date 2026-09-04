@@ -167,8 +167,11 @@ supabase/
 
 Required in `.env`:
 ```env
-SUPABASE_URL=https://jftiyfnnaogmgvksgkbn.supabase.co
+# URL for the self-hosted Supabase instance on the VPS
+SUPABASE_URL=https://db.arecofix.com.ar
 SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# ⚠️ DO NOT USE the old Supabase Cloud URL (https://jftiyfnnaogmgvksgkbn.supabase.co)
 ```
 
 Optional:
