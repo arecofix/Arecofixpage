@@ -59,207 +59,408 @@ db.init_app(app)
 
 # ----------------- Rutas de la API -----------------
 
+@app.route('/api/suggest', methods=['POST'])
+def suggest():
+    data = request.json
+    content = data.get('content')
+    if not content:
+        return jsonify({"error": "Content is required"}), 400
+        
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
+    
+    if not url or not key:
+        print("Sugerencia local:", content)
+        return jsonify({"message": "Local mode, suggestion received"}), 200
+        
+    # Get the tenant_id first
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        tenant_res = requests.get(f"{url}/rest/v1/tenants?limit=1&select=id", headers=headers)
+        tenant_id = None
+        if tenant_res.ok and len(tenant_res.json()) > 0:
+            tenant_id = tenant_res.json()[0]['id']
+            
+        payload = {
+            "name": "Usuario Anonimo (Chatbot)",
+            "email": "chatbot@arecofix.com.ar",
+            "phone": "N/A",
+            "subject": "Sugerencia para la IA",
+            "message": f"Contenido Sugerido:\n\n{content}",
+            "is_read": False,
+            "tenant_id": tenant_id
+        }
+        
+        headers["Prefer"] = "return=minimal"
+        res = requests.post(f"{url}/rest/v1/contact_messages", headers=headers, json=payload)
+        res.raise_for_status()
+        return jsonify({"message": "Sugerencia enviada correctamente"}), 200
+    except Exception as e:
+        print("Error submitting suggestion:", e)
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/', methods=['GET'])
 def home():
     """Ruta raíz con un chatbot en vivo."""
-    html = """
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Arecofix - Asistente Local</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-    <body class="bg-gray-50 h-screen flex flex-col items-center justify-center p-4 font-sans">
+    html = r"""
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arecofix - Asistente IA Avanzado</title>
+    <!-- Usamos el CSS compilado de producción para que cargue DaisyUI/Tailwind sin CDN warnings -->
+    <link rel="stylesheet" href="https://arecofix.com.ar/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom tweaks for the full page chat experience */
+        .chat-container { height: calc(100vh - 70px); }
+        .message-bubble { max-width: 85%; }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: oklch(var(--b3)); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: oklch(var(--bc) / 0.5); }
+    </style>
+</head>
+<body class="bg-base-200 text-base-content h-screen w-screen overflow-hidden flex flex-col md:flex-row">
+    
+    <!-- Sidebar (Desktop) / Drawer (Mobile) -->
+    <div class="drawer md:drawer-open w-auto z-50">
+        <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
         
-        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col h-[600px] max-h-full border border-gray-100">
-            
-            <!-- Header -->
-            <div class="bg-blue-600 p-4 text-white flex items-center gap-3 shadow-md z-10 relative">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                    <i class="fas fa-robot text-xl"></i>
+        <div class="drawer-content flex flex-col md:hidden w-full absolute top-0 left-0 p-2">
+            <!-- Mobile Header with Hamburger -->
+            <div class="navbar bg-base-100 rounded-box shadow-sm min-h-12 h-14">
+                <div class="flex-none">
+                    <label for="sidebar-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost btn-sm">
+                        <i class="fas fa-bars text-lg"></i>
+                    </label>
                 </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">Asistente Arecofix</h1>
-                    <p class="text-blue-100 text-xs flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> En línea (Motor Local)
-                    </p>
+                <div class="flex-1 px-2 font-bold text-primary">
+                    <i class="fas fa-robot mr-2"></i> Asistente IA
                 </div>
-            </div>
-
-            <!-- Messages Area -->
-            <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
-                <!-- Welcome Message -->
-                <div class="flex items-start gap-2">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1">
-                        <i class="fas fa-robot text-sm"></i>
-                    </div>
-                    <div class="bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-700 max-w-[85%] leading-relaxed">
-                        ¡Hola! Soy el asistente de Arecofix. ¿En qué te puedo ayudar hoy?
-                    </div>
+                <div class="flex-none">
+                    <button class="btn btn-square btn-ghost btn-sm theme-controller" onclick="toggleTheme()">
+                        <i class="fas fa-moon text-lg" id="theme-icon-mobile"></i>
+                    </button>
                 </div>
             </div>
+        </div> 
 
-            <!-- Input Area -->
-            <div class="p-3 bg-white border-t border-gray-100">
-                <form id="chat-form" class="flex items-end gap-2 relative">
+        <div class="drawer-side">
+            <label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label> 
+            <ul class="menu p-4 w-72 h-full bg-base-100 text-base-content flex flex-col shadow-xl md:shadow-none border-r border-base-300">
+                <!-- Sidebar Header -->
+                <li class="mb-4">
+                    <a href="https://arecofix.com.ar" class="text-xl font-black text-primary hover:bg-transparent">
+                        <i class="fas fa-microchip"></i> Arecofix Engine
+                    </a>
+                </li>
+                
+                <li class="menu-title"><span>Acciones</span></li>
+                <li><a onclick="clearChat()"><i class="fas fa-plus"></i> Nueva Conversación</a></li>
+                <li><a onclick="suggestMaterialModal.showModal()"><i class="fas fa-lightbulb text-warning"></i> Sugerir Conocimiento</a></li>
+                
+                <div class="divider"></div>
+                
+                <li class="menu-title"><span>Accesibilidad</span></li>
+                <li>
+                    <a onclick="toggleTheme()" class="flex justify-between">
+                        <span><i class="fas fa-palette w-5"></i> Tema</span>
+                        <span id="theme-text" class="text-xs font-bold badge badge-neutral">Claro</span>
+                    </a>
+                </li>
+                
+                <!-- Push to bottom -->
+                <div class="mt-auto">
+                    <div class="alert alert-info shadow-sm text-sm p-3 rounded-xl bg-info/10 border-info/20 text-info-content">
+                        <i class="fas fa-info-circle shrink-0"></i>
+                        <span>Motor Offline Llama 3 - Conectado a la API.</span>
+                    </div>
+                </div>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col h-screen relative bg-base-200">
+        
+        <!-- Desktop Header (Hidden on Mobile) -->
+        <div class="hidden md:flex items-center justify-between p-4 bg-base-100/50 backdrop-blur-md border-b border-base-300">
+            <div class="font-semibold text-lg flex items-center gap-2">
+                Asistente Virtual Arecofix <span class="badge badge-success badge-sm">En línea</span>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 pb-32">
+            <!-- Initial Welcome Message -->
+            <div class="chat chat-start animate-fade-in-up">
+                <div class="chat-image avatar">
+                    <div class="w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shadow-sm">
+                        <i class="fas fa-robot text-xl"></i>
+                    </div>
+                </div>
+                <div class="chat-header text-xs opacity-70 mb-1">Asistente IA</div>
+                <div class="chat-bubble chat-bubble-primary text-primary-content shadow-md text-sm md:text-base leading-relaxed">
+                    ¡Hola! Soy la IA de Arecofix. Puedo ayudarte a diagnosticar problemas con equipos, consultar por cursos, o ver nuestra oferta de servicios. ¿En qué te puedo ayudar?
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area (Fixed at bottom) -->
+        <div class="absolute bottom-0 w-full bg-gradient-to-t from-base-200 via-base-200 to-transparent pt-6 pb-4 px-4 md:px-8">
+            <div class="max-w-4xl mx-auto">
+                <form id="chat-form" class="relative bg-base-100 shadow-xl rounded-2xl border border-base-300 focus-within:border-primary transition-colors duration-300">
                     <textarea 
                         id="message-input" 
-                        class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none overflow-hidden min-h-[44px] max-h-[120px]" 
-                        placeholder="Escribe un mensaje..."
+                        class="textarea textarea-ghost w-full resize-none min-h-[56px] max-h-[200px] text-base leading-relaxed py-4 pl-4 pr-14 focus:bg-transparent focus:outline-none focus:ring-0" 
+                        placeholder="Preguntá cualquier cosa..."
                         rows="1"
                     ></textarea>
                     <button 
                         type="submit" 
                         id="send-btn"
-                        class="bg-blue-600 hover:bg-blue-700 text-white w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="absolute right-2 bottom-2 btn btn-circle btn-primary btn-sm shadow-md"
+                        disabled
                     >
-                        <i class="fas fa-paper-plane text-sm ml-1"></i>
+                        <i class="fas fa-arrow-up"></i>
                     </button>
                 </form>
                 <div class="text-center mt-2">
-                    <p class="text-[10px] text-gray-400">Desarrollado por Arecofix AI</p>
+                    <p class="text-xs text-base-content/50">La IA puede cometer errores. Considera verificar la información importante.</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <script>
-            const form = document.getElementById('chat-form');
-            const input = document.getElementById('message-input');
-            const container = document.getElementById('chat-container');
-            const sendBtn = document.getElementById('send-btn');
-            
-            // Auto-resize textarea
-            input.addEventListener('input', function() {
-                this.style.height = '44px';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-            
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if(this.value.trim()) form.dispatchEvent(new Event('submit'));
-                }
-            });
+    <!-- Modal: Suggest Material -->
+    <dialog id="suggestMaterialModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box bg-base-100">
+            <h3 class="font-bold text-lg"><i class="fas fa-lightbulb text-warning mr-2"></i> Sugerir Conocimiento</h3>
+            <p class="py-4 text-sm text-base-content/80">
+                ¿Tienes algún manual, link, o procedimiento que deberíamos enseñarle a la IA? Envíalo y el administrador lo revisará para agregarlo a la base de conocimiento.
+            </p>
+            <form id="suggest-form">
+                <textarea id="suggest-input" class="textarea textarea-bordered w-full h-32 text-sm" placeholder="Pega un link, manual o explicación detallada aquí..." required></textarea>
+                <div id="suggest-alert" class="alert alert-success mt-4 hidden text-sm py-2">
+                    <i class="fas fa-check-circle"></i> Sugerencia enviada al administrador. ¡Gracias!
+                </div>
+                <div id="suggest-error" class="alert alert-error mt-4 hidden text-sm py-2">
+                    <i class="fas fa-times-circle"></i> Error al enviar.
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn" onclick="suggestMaterialModal.close()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="suggest-submit-btn">Enviar Sugerencia</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 
-            function addMessage(content, isUser = false) {
-                const div = document.createElement('div');
-                div.className = \`flex items-start gap-2 \${isUser ? 'flex-row-reverse' : ''}\`;
-                
-                const avatar = isUser 
-                    ? \`<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0 text-gray-600 mt-1"><i class="fas fa-user text-sm"></i></div>\`
-                    : \`<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1"><i class="fas fa-robot text-sm"></i></div>\`;
-                
-                const bubbleClass = isUser 
-                    ? 'bg-blue-600 text-white p-3 rounded-2xl rounded-tr-sm shadow-sm text-sm max-w-[85%] leading-relaxed' 
-                    : 'bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-700 max-w-[85%] leading-relaxed';
-                
-                // Tratar el markdown básico si es necesario (el prompt nuevo dice texto plano, pero por las dudas)
-                // Usamos innerText para asegurar que no inyecte HTML, luego convertimos saltos de línea a <br>
-                const contentDiv = document.createElement('div');
-                contentDiv.className = bubbleClass;
-                contentDiv.innerText = content;
-                
-                div.innerHTML = \`
-                    \${avatar}
-                    <div class="\${bubbleClass}" style="white-space: pre-wrap;">\${content}</div>
-                \`;
-                
-                container.appendChild(div);
-                container.scrollTop = container.scrollHeight;
-                return div.querySelector('.' + (isUser ? 'bg-blue-600' : 'bg-white').split(' ')[0]);
-            }
+    <script>
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('message-input');
+        const container = document.getElementById('chat-container');
+        const sendBtn = document.getElementById('send-btn');
+        let currentTheme = 'light';
+        const waNumberRegex = /(whatsapp|1125960900|112596090|contacto)/i;
 
-            form.addEventListener('submit', async (e) => {
+        // Auto-resize textarea
+        input.addEventListener('input', function() {
+            this.style.height = '56px';
+            this.style.height = (this.scrollHeight) + 'px';
+            sendBtn.disabled = this.value.trim().length === 0;
+        });
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                const text = input.value.trim();
-                if (!text) return;
+                if(this.value.trim()) form.dispatchEvent(new Event('submit'));
+            }
+        });
 
-                input.value = '';
-                input.style.height = '44px';
-                input.disabled = true;
-                sendBtn.disabled = true;
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            document.getElementById('theme-text').innerText = currentTheme === 'light' ? 'Claro' : 'Oscuro';
+            document.getElementById('theme-icon-mobile').className = currentTheme === 'light' ? 'fas fa-moon text-lg' : 'fas fa-sun text-lg';
+        }
 
-                addMessage(text, true);
+        function clearChat() {
+            // Keep only the first welcome message
+            const welcome = container.firstElementChild;
+            container.innerHTML = '';
+            container.appendChild(welcome);
+            // Close drawer on mobile
+            document.getElementById('sidebar-drawer').checked = false;
+        }
+
+        function addMessage(content, isUser = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `chat ${isUser ? 'chat-end' : 'chat-start'} animate-fade-in-up`;
+            
+            const avatarHtml = isUser 
+                ? `<div class="w-10 rounded-full bg-base-300 text-base-content/70 flex items-center justify-center shadow-sm"><i class="fas fa-user"></i></div>`
+                : `<div class="w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shadow-sm"><i class="fas fa-robot text-xl"></i></div>`;
+            
+            const bubbleClass = isUser 
+                ? 'chat-bubble chat-bubble-neutral text-neutral-content shadow-md text-sm md:text-base leading-relaxed' 
+                : 'chat-bubble bg-base-100 border border-base-300 text-base-content shadow-md text-sm md:text-base leading-relaxed';
+            
+            wrapper.innerHTML = `
+                <div class="chat-image avatar">${avatarHtml}</div>
+                <div class="chat-header text-xs opacity-70 mb-1">${isUser ? 'Tú' : 'Asistente IA'}</div>
+                <div class="${bubbleClass}" style="white-space: pre-wrap;">${content}</div>
+            `;
+            
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+            return wrapper.querySelector('.chat-bubble');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            input.style.height = '56px';
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            addMessage(text, true);
+            
+            // Add loading typing indicator
+            const loadingWrapper = document.createElement('div');
+            loadingWrapper.className = 'chat chat-start';
+            loadingWrapper.innerHTML = `
+                <div class="chat-image avatar">
+                    <div class="w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shadow-sm"><i class="fas fa-robot text-xl"></i></div>
+                </div>
+                <div class="chat-bubble bg-base-100 border border-base-300 shadow-md flex items-center gap-1 px-4 py-3">
+                    <div class="w-2 h-2 rounded-full bg-base-content/40 typing-dot"></div>
+                    <div class="w-2 h-2 rounded-full bg-base-content/40 typing-dot"></div>
+                    <div class="w-2 h-2 rounded-full bg-base-content/40 typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(loadingWrapper);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const res = await fetch('https://arecofix-rag-chatbot.ezequielenrico15.workers.dev/chat/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
                 
-                // Add loading bubble
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'flex items-start gap-2';
-                loadingDiv.innerHTML = \`
-                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1"><i class="fas fa-robot text-sm"></i></div>
-                    <div class="bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-500 max-w-[85%] flex gap-1 items-center">
-                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
-                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                    </div>
-                \`;
-                container.appendChild(loadingDiv);
-                container.scrollTop = container.scrollHeight;
+                container.removeChild(loadingWrapper);
 
-                try {
-                    // Send to Cloudflare Worker RAG
-                    const res = await fetch('https://arecofix-rag-chatbot.ezequielenrico15.workers.dev/chat/stream', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: text })
-                    });
-                    
-                    container.removeChild(loadingDiv);
-
-                    if (!res.ok) {
-                        addMessage('En este momento estoy procesando muchas consultas, intentá de nuevo en unos segundos.');
-                        throw new Error('Network error');
-                    }
-                    
-                    // Manejar SSE (Server-Sent Events)
-                    const reader = res.body.getReader();
-                    const decoder = new TextDecoder();
-                    
-                    // Crear burbuja vacía para ir llenando
-                    const replyDiv = document.createElement('div');
-                    replyDiv.className = 'flex items-start gap-2';
-                    replyDiv.innerHTML = \`
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1"><i class="fas fa-robot text-sm"></i></div>
-                        <div class="bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-700 max-w-[85%] leading-relaxed streaming-content" style="white-space: pre-wrap;"></div>
-                    \`;
-                    container.appendChild(replyDiv);
-                    const contentSpan = replyDiv.querySelector('.streaming-content');
-                    
-                    let done = false;
-                    while (!done) {
-                        const { value, done: doneReading } = await reader.read();
-                        done = doneReading;
-                        if (value) {
-                            const chunk = decoder.decode(value, { stream: true });
-                            const lines = chunk.split('\\n');
-                            for (const line of lines) {
-                                if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                                    try {
-                                        const data = JSON.parse(line.substring(6));
-                                        if (data.response) {
-                                            contentSpan.innerText += data.response;
-                                            container.scrollTop = container.scrollHeight;
-                                        }
-                                    } catch (e) {}
-                                }
+                if (!res.ok) {
+                    addMessage('En este momento estoy procesando muchas consultas, intentá de nuevo en unos segundos.');
+                    throw new Error('Network error');
+                }
+                
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                
+                const replyBubble = addMessage('');
+                let fullResponse = '';
+                
+                let done = false;
+                while (!done) {
+                    const { value, done: doneReading } = await reader.read();
+                    done = doneReading;
+                    if (value) {
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                try {
+                                    const data = JSON.parse(line.substring(6));
+                                    if (data.response) {
+                                        fullResponse += data.response;
+                                        replyBubble.innerText = fullResponse;
+                                        container.scrollTop = container.scrollHeight;
+                                    }
+                                } catch (e) {}
                             }
                         }
                     }
-                    
-                } catch (err) {
-                    if (container.contains(loadingDiv)) container.removeChild(loadingDiv);
-                } finally {
-                    input.disabled = false;
-                    sendBtn.disabled = false;
-                    input.focus();
                 }
-            });
-        </script>
-    </body>
-    </html>
-    """
+                
+                // Si menciona WhatsApp, inyectar el botón
+                if(waNumberRegex.test(fullResponse)) {
+                    replyBubble.innerHTML += `
+                        <div class="mt-4">
+                            <a href="https://wa.me/541125960900" target="_blank" class="btn btn-sm btn-success rounded-full shadow-sm text-white border-none">
+                                <i class="fab fa-whatsapp text-lg"></i> Escribirnos por WhatsApp
+                            </a>
+                        </div>
+                    `;
+                    container.scrollTop = container.scrollHeight;
+                }
+                
+            } catch (err) {
+                if (container.contains(loadingWrapper)) container.removeChild(loadingWrapper);
+            } finally {
+                input.disabled = false;
+                input.focus();
+            }
+        });
+
+        // Handle Suggestions
+        document.getElementById('suggest-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = document.getElementById('suggest-input').value;
+            const btn = document.getElementById('suggest-submit-btn');
+            const success = document.getElementById('suggest-alert');
+            const err = document.getElementById('suggest-error');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Enviando...';
+            success.classList.add('hidden');
+            err.classList.add('hidden');
+            
+            try {
+                const res = await fetch('/api/suggest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: text })
+                });
+                if(res.ok) {
+                    success.classList.remove('hidden');
+                    document.getElementById('suggest-input').value = '';
+                    setTimeout(() => suggestMaterialModal.close(), 2000);
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch(e) {
+                err.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Enviar Sugerencia';
+            }
+        });
+    </script>
+</body>
+</html>
+"""
     return render_template_string(html)
 
 @app.route('/api/health', methods=['GET'])
