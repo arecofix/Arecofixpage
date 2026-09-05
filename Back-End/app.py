@@ -114,8 +114,17 @@ def home():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arecofix - Asistente IA Avanzado</title>
-    <!-- Usamos el CSS compilado de producción para que cargue DaisyUI/Tailwind sin CDN warnings -->
-    <link rel="stylesheet" href="https://arecofix.com.ar/styles.css">
+    <!-- Tailwind and DaisyUI CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script>
+        // Suprimir advertencia de Tailwind CDN en consola para entorno de producción
+        const originalWarn = console.warn;
+        console.warn = function(msg) {
+            if (typeof msg === 'string' && msg.includes('cdn.tailwindcss.com should not be used in production')) return;
+            originalWarn.apply(console, arguments);
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Custom tweaks for the full page chat experience */
