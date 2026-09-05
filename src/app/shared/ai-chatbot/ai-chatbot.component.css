@@ -386,7 +386,7 @@
 .chatbot-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 16px 16px 40px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
