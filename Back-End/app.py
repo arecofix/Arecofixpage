@@ -157,8 +157,8 @@ def home():
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: oklch(var(--b3)); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: oklch(var(--bc) / 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
     </style>
 </head>
 <body class="bg-base-200 text-base-content h-screen w-screen overflow-hidden flex flex-col md:flex-row">
@@ -253,7 +253,7 @@ def home():
                 <form id="chat-form" class="relative bg-base-100 shadow-xl rounded-2xl border border-base-300 focus-within:border-primary transition-colors duration-300">
                     <textarea 
                         id="message-input" 
-                        class="textarea textarea-ghost w-full resize-none min-h-[56px] max-h-[200px] text-base leading-relaxed py-4 pl-4 pr-14 focus:bg-transparent focus:outline-none focus:ring-0" 
+                        class="textarea textarea-ghost w-full resize-none min-h-[56px] max-h-[200px] text-base leading-relaxed py-4 pl-4 pr-14 focus:bg-transparent focus:outline-none focus:ring-0 overflow-hidden" 
                         placeholder="Preguntá cualquier cosa..."
                         rows="1"
                     ></textarea>
@@ -310,7 +310,13 @@ def home():
         // Auto-resize textarea
         input.addEventListener('input', function() {
             this.style.height = '56px';
-            this.style.height = (this.scrollHeight) + 'px';
+            const newHeight = this.scrollHeight;
+            this.style.height = newHeight + 'px';
+            if (newHeight >= 200) {
+                this.style.overflowY = 'auto';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
             sendBtn.disabled = this.value.trim().length === 0;
         });
         
