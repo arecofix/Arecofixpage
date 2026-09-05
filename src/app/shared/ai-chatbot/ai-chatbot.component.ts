@@ -151,11 +151,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
-    if (this.shouldScroll && this.chatBodyRef) {
-      const el = this.chatBodyRef.nativeElement;
-      el.scrollTop = el.scrollHeight;
-      this.shouldScroll = false;
-    }
+    // Scroll handled by setTimeout in scrollToBottom
   }
 
   toggleSources(index: number): void {
@@ -173,13 +169,18 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   private scrollToBottom(): void {
-    this.shouldScroll = true;
+    setTimeout(() => {
+      if (this.chatBodyRef) {
+        const el = this.chatBodyRef.nativeElement;
+        el.scrollTop = el.scrollHeight;
+      }
+    }, 50);
   }
 
   toggleChat(): void {
     this.isOpen.update((v) => !v);
     if (this.isOpen()) {
-      this.shouldScroll = true;
+      this.scrollToBottom();
     } else {
       // Limpiar historial al cerrar para empezar fresco la próxima vez
       // Comentar esta línea si preferís persistir la conversación
@@ -222,7 +223,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
         { from: 'user', type: 'text', text: option.label },
         option.response!,
       ]);
-      this.shouldScroll = true;
+      this.scrollToBottom();
       return;
     }
 
@@ -261,7 +262,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
       ...msgs,
       { from: 'user', type: 'text', text: displayText ?? question },
     ]);
-    this.shouldScroll = true;
+    this.scrollToBottom();
 
     // 2. Agregar bubble del bot en estado streaming (vacío al inicio)
     const streamingBubbleIndex = this.messages().length;
@@ -282,7 +283,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
           }
           return updated;
         });
-        this.shouldScroll = true;
+        this.scrollToBottom();
       },
 
       onSources: (sources) => {
@@ -324,7 +325,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
           }
           return updated;
         });
-        this.shouldScroll = true;
+        this.scrollToBottom();
       },
 
       onError: (msg) => {
@@ -339,7 +340,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
           };
           return updated;
         });
-        this.shouldScroll = true;
+        this.scrollToBottom();
       },
     });
   }
