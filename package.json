@@ -78,6 +78,7 @@
     "chart.js": "4.5.1",
     "dexie": "^4.4.5",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "ng2-charts": "10.0.0",

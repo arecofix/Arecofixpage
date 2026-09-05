@@ -16,7 +16,7 @@ binding = "AI"
 
 # ── Variables de entorno (no sensibles) ───────────────────────────────────────
 [vars]
-SUPABASE_URL = "https://jftiyfnnaogmgvksgkbn.supabase.co"
+SUPABASE_URL = "https://db.arecofix.com.ar"
 
 # ── Secrets requeridos (cargar con wrangler secret put) ───────────────────────
 # SUPABASE_SERVICE_ROLE_KEY  — misma key que en el Worker de embeddings

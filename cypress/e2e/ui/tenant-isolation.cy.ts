@@ -3,7 +3,7 @@ describe('Aislamiento Multi-Tenant (Row Level Security)', () => {
 before(function() {
     cy.request({
         method: 'GET',
-        url: 'https://jftiyfnnaogmgvksgkbn.supabase.co/rest/v1/tenants?limit=1',
+        url: 'https://db.arecofix.com.ar/rest/v1/tenants?limit=1',
         headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0' },
         failOnStatusCode: false
     }).then((res) => {
@@ -16,7 +16,7 @@ beforeEach(function() {
     if (skip_tests) this.skip();
 });
 
-    const supabaseUrl = 'https://jftiyfnnaogmgvksgkbn.supabase.co';
+    const supabaseUrl = 'https://db.arecofix.com.ar';
     const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
     
     it('1. El Frontend maneja correctamente la ausencia de datos debido a RLS (Tenant Mismatch)', function() {

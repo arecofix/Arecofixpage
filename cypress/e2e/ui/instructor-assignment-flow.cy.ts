@@ -42,11 +42,11 @@ describe('Instructor Assignment Flow', () => {
     // The courses page makes an API call
     cy.wait('@getInstructors', { timeout: 10000 });
 
-    cy.get('select[formControlName="author_id"]', { timeout: 10000 }).should('exist');
-    cy.get('select[formControlName="author_id"]').find('option[value="instructor-123"]').should('exist');
+    cy.get('select[name="author_id"]', { timeout: 10000 }).should('exist');
+    cy.get('select[name="author_id"]').find('option[value="instructor-123"]').should('exist');
     
-    cy.get('select[formControlName="author_id"]').select('instructor-123');
-    cy.get('select[formControlName="author_id"]').should('have.value', 'instructor-123');
+    cy.get('select[name="author_id"]').select('instructor-123');
+    cy.get('select[name="author_id"]').should('have.value', 'instructor-123');
   });
 
   it('shows Mi Academia in the dropdown when student is logged in', () => {

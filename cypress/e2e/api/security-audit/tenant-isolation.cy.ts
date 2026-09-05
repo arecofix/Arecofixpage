@@ -1,6 +1,6 @@
 describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
   let skip_all = false;
-  const supabaseUrl = 'https://jftiyfnnaogmgvksgkbn.supabase.co';
+  const supabaseUrl = 'https://db.arecofix.com.ar';
   const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
   let accessToken: string;
   let adminTenantId = 'bba26ccd-59ce-471c-aac0-4c1f5513de3b'; // Arecofix tenant

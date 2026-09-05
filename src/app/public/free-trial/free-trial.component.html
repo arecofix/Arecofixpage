@@ -38,7 +38,7 @@
           <!-- Business Name -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del negocio *</label>
-            <input type="text" formControlName="businessName" placeholder="Ej: FixCell" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+            <input type="text" formControlName="businessName" name="businessName" name="businessName" placeholder="Ej: FixCell" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
             <span *ngIf="trialForm.get('businessName')?.touched && trialForm.get('businessName')?.invalid" class="text-xs text-red-500 mt-1 block">
               Requerido (mínimo 3 caracteres)
             </span>
@@ -47,7 +47,7 @@
           <!-- Subtitle -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subtítulo / rubro</label>
-            <input type="text" formControlName="subtitle" placeholder="Ej: Reparación de celulares y PCs" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+            <input type="text" formControlName="subtitle" name="subtitle" name="subtitle" placeholder="Ej: Reparación de celulares y PCs" class="input input-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
           </div>
 
           <!-- WhatsApp -->
@@ -57,7 +57,7 @@
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
                 <i class="fab fa-whatsapp"></i>
               </span>
-              <input type="text" formControlName="whatsapp" placeholder="Ej: +541125960900" class="input input-bordered w-full pl-10 bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+              <input type="text" formControlName="whatsapp" name="whatsapp" name="whatsapp" placeholder="Ej: +541125960900" class="input input-bordered w-full pl-10 bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
             </div>
             <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Debe incluir código de país (ej. +54, +595, +52)</span>
             <span *ngIf="trialForm.get('whatsapp')?.touched && trialForm.get('whatsapp')?.invalid" class="text-xs text-red-500 mt-1 block">
@@ -72,7 +72,7 @@
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
                 <i class="far fa-envelope"></i>
               </span>
-              <input type="email" formControlName="email" placeholder="ejemplo@correo.com" class="input input-bordered w-full pl-10 bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+              <input type="email" formControlName="email" name="email" name="email" placeholder="ejemplo@correo.com" class="input input-bordered w-full pl-10 bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
             </div>
             <span *ngIf="trialForm.get('email')?.touched && trialForm.get('email')?.invalid" class="text-xs text-red-500 mt-1 block">
               Correo inválido.
@@ -82,7 +82,7 @@
           <!-- Currency/Country -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">País / moneda *</label>
-            <select formControlName="currency" class="select select-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
+            <select formControlName="currency" name="currency" name="currency" class="select select-bordered w-full bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white">
               <option value="ARS">Argentina - ARS ($)</option>
               <option value="USD">Internacional - USD ($)</option>
               <option value="MXN">México - MXN ($)</option>

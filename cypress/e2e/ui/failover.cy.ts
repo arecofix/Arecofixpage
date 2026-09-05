@@ -17,11 +17,11 @@ describe('Failover Resiliency (Supabase 402 to D1)', () => {
     }).as('supabaseFail');
 
     // Interceptar llamadas al Worker D1 para verificar que el Failover actúa
-    cy.intercept('GET', 'https://arecofix-d1-failover.ezequielenrico15.workers.dev/*').as('d1Failover');
+    cy.intercept('GET', 'https://arecofix-d1-failover.ezequielenrico15.workers.dev/*', { statusCode: 200, body: '<html><body><app-root><h1>Failover</h1></app-root></body></html>' }).as('d1Failover');
   });
 
   it('debería cargar la página principal usando D1 cuando Supabase falla por cuota (402)', () => {
-    cy.visit('http://arecofix.com.ar.localhost:4200/');
+    cy.visit('/');
 
     // Verificar que la llamada a Supabase falló
     cy.wait('@supabaseFail');

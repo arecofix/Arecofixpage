@@ -84,19 +84,19 @@ describe('Authentication Flow - Normal User', () => {
     cy.wait(5000);
     
     // Type slowly and assert values to ensure Reactive Forms state is updated
-    cy.get('input[formControlName="first_name"]').clear().type('Test', { delay: 50 }).should('have.value', 'Test');
-    cy.get('input[formControlName="last_name"]').clear().type('User', { delay: 50 }).should('have.value', 'User');
-    cy.get('input[formControlName="email"]').clear().type(testEmail, { delay: 50 }).should('have.value', testEmail);
-    cy.get('input[formControlName="phone"]').clear().type('1234567890', { delay: 50 }).should('have.value', '1234567890');
+    cy.get('input[name="first_name"]').clear().type('Test', { delay: 50 }).should('have.value', 'Test');
+    cy.get('input[name="last_name"]').clear().type('User', { delay: 50 }).should('have.value', 'User');
+    cy.get('input[name="email"]').clear().type(testEmail, { delay: 50 }).should('have.value', testEmail);
+    cy.get('input[name="phone"]').clear().type('1234567890', { delay: 50 }).should('have.value', '1234567890');
     cy.get('button').find('i.fa-eye').first().click({force: true});
-    cy.get('input[formControlName="password"]').clear().type(testPassword, { delay: 50 }).should('have.value', testPassword);
-    cy.get('input[formControlName="confirmPassword"]').clear().type(testPassword, { delay: 50 }).should('have.value', testPassword);
+    cy.get('input[name="password"]').clear().type(testPassword, { delay: 50 }).should('have.value', testPassword);
+    cy.get('input[name="confirmPassword"]').clear().type(testPassword, { delay: 50 }).should('have.value', testPassword);
     
     // Add wait to ensure validators run
     cy.wait(1000);
 
     // Accept terms
-    cy.get('input[formControlName="terms"]').check({ force: true }).should('be.checked');
+    cy.get('input[name="terms"]').check({ force: true }).should('be.checked');
 
     // Intercept Supabase signup request
     cy.intercept('POST', '**/auth/v1/signup*').as('signupRequest');
@@ -144,8 +144,8 @@ describe('Authentication Flow - Normal User', () => {
     cy.visit('/login');
     cy.wait(2000);
 
-    cy.get('input[formControlName="email"]').type(testEmail);
-    cy.get('input[formControlName="password"]').type(testPassword);
+    cy.get('input[name="email"]').type(testEmail);
+    cy.get('input[name="password"]').type(testPassword);
 
     cy.get('button[type="submit"]').click();
 

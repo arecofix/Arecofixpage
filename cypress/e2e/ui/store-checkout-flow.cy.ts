@@ -93,14 +93,14 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.url().should('include', '/checkout');
     
     // Formularios (Datos de contacto y envío)
-    cy.get('input[formControlName="name"]').clear().type('Juan Perez', { delay: 50 }).blur();
-    cy.get('input[formControlName="email"]').clear().type('juan@ejemplo.com', { delay: 50 }).blur();
-    cy.get('input[formControlName="phone"]').clear().type('1122334455', { delay: 50 }).blur();
+    cy.get('input[name="name"]').clear().type('Juan Perez', { delay: 50 }).blur();
+    cy.get('input[name="email"]').clear().type('juan@ejemplo.com', { delay: 50 }).blur();
+    cy.get('input[name="phone"]').clear().type('1122334455', { delay: 50 }).blur();
     
-    cy.get('input[formControlName="street"]').clear().type('Av. Siempreviva', { delay: 50 }).blur();
-    cy.get('input[formControlName="number"]').clear().type('742', { delay: 50 }).blur();
-    cy.get('input[formControlName="city"]').clear().type('Springfield', { delay: 50 }).blur();
-    cy.get('input[formControlName="postal_code"]').clear().type('1000', { delay: 50 }).blur();
+    cy.get('input[name="street"]').clear().type('Av. Siempreviva', { delay: 50 }).blur();
+    cy.get('input[name="number"]').clear().type('742', { delay: 50 }).blur();
+    cy.get('input[name="city"]').clear().type('Springfield', { delay: 50 }).blur();
+    cy.get('input[name="postal_code"]').clear().type('1000', { delay: 50 }).blur();
     
     // Esperar a que el formulario debounce actualice el costo de envío
     cy.wait(1000);
@@ -146,14 +146,14 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.get('button[aria-label="Carrito"]').click({ force: true });
     cy.get('a[href="/checkout"]').click({ force: true });
     
-    cy.get('input[formControlName="name"]').clear().type('Maria Gomez', { delay: 50 }).blur();
-    cy.get('input[formControlName="email"]').clear().type('maria@ejemplo.com', { delay: 50 }).blur();
-    cy.get('input[formControlName="phone"]').clear().type('1133445566', { delay: 50 }).blur();
+    cy.get('input[name="name"]').clear().type('Maria Gomez', { delay: 50 }).blur();
+    cy.get('input[name="email"]').clear().type('maria@ejemplo.com', { delay: 50 }).blur();
+    cy.get('input[name="phone"]').clear().type('1133445566', { delay: 50 }).blur();
     
-    cy.get('input[formControlName="street"]').clear().type('Calle Falsa', { delay: 50 }).blur();
-    cy.get('input[formControlName="number"]').clear().type('123', { delay: 50 }).blur();
-    cy.get('input[formControlName="city"]').clear().type('Springfield', { delay: 50 }).blur();
-    cy.get('input[formControlName="postal_code"]').clear().type('1000', { delay: 50 }).blur();
+    cy.get('input[name="street"]').clear().type('Calle Falsa', { delay: 50 }).blur();
+    cy.get('input[name="number"]').clear().type('123', { delay: 50 }).blur();
+    cy.get('input[name="city"]').clear().type('Springfield', { delay: 50 }).blur();
+    cy.get('input[name="postal_code"]').clear().type('1000', { delay: 50 }).blur();
     
     cy.wait(1000);
 

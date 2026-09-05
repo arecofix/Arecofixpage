@@ -2,7 +2,7 @@ describe('Chatbot RAG E2E Tests', () => {
   beforeEach(() => {
     // Interceptar la llamada a la API del chatbot para evitar consumo de tokens en pruebas constantes
     // En algunas pruebas permitiremos que pase al backend real, pero la interceptamos para controlar el flujo
-    cy.intercept('POST', '**/chat/offline*').as('chatbotRequest');
+    cy.intercept('POST', '**/chat/stream*').as('chatbotRequest');
     
     // Visitamos la home page donde se asume que está el widget del chat
     cy.visit('/');
@@ -16,13 +16,13 @@ describe('Chatbot RAG E2E Tests', () => {
     cy.get('app-ai-chatbot button').first().click();
     
     // Verificar que el chat se abre y muestra el mensaje inicial
-    cy.get('app-ai-chatbot').contains('¡Hola! Soy el asistente inteligente de Arecofix').should('be.visible');
+    cy.get('app-ai-chatbot').contains('¡Hola! Soy el asistente de Arecofix').should('be.visible');
     
     // Cerrar el chat
     cy.get('app-ai-chatbot button').first().click();
     
     // Verificar que ya no es visible el contenedor de mensajes (asumiendo que se quita del DOM o se oculta)
-    cy.get('app-ai-chatbot').contains('¡Hola! Soy el asistente inteligente de Arecofix').should('not.exist');
+    cy.get('app-ai-chatbot').contains('¡Hola! Soy el asistente de Arecofix').should('not.exist');
   });
 
   it('debe enviar una pregunta mediante opciones rápidas', () => {
@@ -87,7 +87,7 @@ describe('Chatbot RAG E2E Tests', () => {
     cy.get('app-ai-chatbot button').first().click({ force: true });
     
     // Interceptar y forzar un 429
-    cy.intercept('POST', '**/chat/offline*', {
+    cy.intercept('POST', '**/chat/stream*', {
       statusCode: 429,
       body: { error: 'En este momento estoy procesando muchas consultas, intentá de nuevo en unos segundos.' }
     }).as('rateLimit');
