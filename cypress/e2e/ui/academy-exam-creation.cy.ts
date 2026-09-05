@@ -3,6 +3,7 @@ describe('Academy Exam Creation', () => {
   const moduleId = '22222222-2222-2222-2222-222222222222';
 
   beforeEach(() => {
+    cy.loginAsAdmin('/');
     // Intercept courses API
     cy.intercept('GET', '**/rest/v1/courses*', {
       statusCode: 200,
@@ -61,15 +62,11 @@ describe('Academy Exam Creation', () => {
     };
     cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: session.user }).as('getUser');
     cy.intercept('GET', '**/rest/v1/profiles*', { statusCode: 200, body: [mockProfile] }).as('getProfile');
-
-    cy.visit(`/admin/courses/${courseId}/materials`, {
-      onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-      }
-    });
   });
 
   it('should create an exam and correctly send the payload with correct_option_index', () => {
+    cy.visit(`/admin/courses/${courseId}/materials`);
+    
     cy.wait('@getModules');
     cy.wait('@getContents');
 

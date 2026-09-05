@@ -87,10 +87,10 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
     
     cy.wait(1000); // Esperamos hidratación Angular
 
-    cy.get('input[formControlName="businessName"]').type('Taller Mock E2E', { delay: 50 });
-    cy.get('input[formControlName="userName"]').type('Usuario Mock', { delay: 50 });
-    cy.get('input[formControlName="whatsapp"]').type('1122334455', { delay: 50 });
-    cy.get('input[formControlName="email"]').type(mockUser.email, { delay: 50 });
+    cy.get('input[name="businessName"]').type('Taller Mock E2E', { delay: 50 });
+    cy.get('input[name="userName"]').type('Usuario Mock', { delay: 50 });
+    cy.get('input[name="whatsapp"]').type('1122334455', { delay: 50 });
+    cy.get('input[name="email"]').type(mockUser.email, { delay: 50 });
 
     cy.get('button[type="submit"]').contains('Solicitar Prueba Gratis').click({ force: true });
 
@@ -149,10 +149,10 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
         cy.get(selector, { timeout: 10000 }).first().invoke('val', value).trigger('input').blur();
     };
 
-    setInputValue('input[formControlName="customer_name"]', 'Cliente Offline Tauri');
-    setInputValue('input[formControlName="device_model"]', 'iPhone 12 Offline');
-    setInputValue('textarea[formControlName="issue_description"]', 'Pantalla rota simulando sin internet');
-    setInputValue('input[formControlName="estimated_cost"]', '45000');
+    setInputValue('input[name="customer_name"]', 'Cliente Offline Tauri');
+    setInputValue('input[name="device_model"]', 'iPhone 12 Offline');
+    setInputValue('textarea[name="issue_description"]', 'Pantalla rota simulando sin internet');
+    setInputValue('input[name="estimated_cost"]', '45000');
     
     // Interceptar la llamada RPC de Supabase para cuando vuelva la red (o si falla)
     cy.intercept('POST', '**/rpc/save_repair_order*').as('postRepair');

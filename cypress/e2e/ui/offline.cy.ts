@@ -2,15 +2,15 @@ describe('Offline Resiliency (Network Drop during Mutation)', () => {
   beforeEach(() => {
     // Setup normal intercept for GET requests to work fine
     cy.loginAsAdmin('/admin/repairs/new');
-    cy.get('input[formControlName="customer_name"]').should('be.visible');
+    cy.get('input[name="customer_name"]').should('be.visible');
   });
 
   it('debería encolar la operación en IndexedDB si se corta la red al enviar', () => {
     // Llenar el formulario
-    cy.get('input[formControlName="customer_name"]').type('Cliente Offline');
-    cy.get('input[formControlName="customer_phone"]').type('123123123');
-    cy.get('input[formControlName="device_model"]').type('Samsung S21');
-    cy.get('textarea[formControlName="issue_description"]').type('Pantalla rota');
+    cy.get('input[name="customer_name"]').type('Cliente Offline');
+    cy.get('input[name="customer_phone"]').type('123123123');
+    cy.get('input[name="device_model"]').type('Samsung S21');
+    cy.get('textarea[name="issue_description"]').type('Pantalla rota');
 
     // Forzar falla de red para el POST de Supabase
     cy.intercept('POST', '**/rpc/save_repair_order*', {

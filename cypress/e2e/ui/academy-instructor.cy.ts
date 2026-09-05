@@ -4,6 +4,7 @@ describe('Flujo de Instructor en Academia', () => {
     });
 
     beforeEach(() => {
+    cy.loginAsAdmin('/');
         const mockSession = {
             access_token: 'fake-jwt',
             expires_in: 3600,
@@ -64,6 +65,7 @@ describe('Flujo de Instructor en Academia', () => {
 
     it('1. El instructor ingresa a la vista de creación/edición de contenido', () => {
         // En una app real navegaria a su panel y luego a builder/curso-test-1
+        
         cy.visit('/instructor/builder/11111111-1111-1111-1111-111111111111');
         cy.url().should('include', '/instructor/builder');
         

@@ -3,7 +3,7 @@ describe('Flujo Completo de Reparación y Seguimiento', () => {
 before(function() {
     cy.request({
         method: 'GET',
-        url: 'https://jftiyfnnaogmgvksgkbn.supabase.co/rest/v1/tenants?limit=1',
+        url: 'https://db.arecofix.com.ar/rest/v1/tenants?limit=1',
         headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0' },
         failOnStatusCode: false
     }).then((res) => {
@@ -47,17 +47,17 @@ beforeEach(function() {
             cy.get(selector).first().invoke('val', value).trigger('input').blur();
         };
 
-        setInputValue('input[formControlName="customer_name"]', customerName);
-        setInputValue('input[formControlName="device_model"]', deviceModel);
-        setInputValue('textarea[formControlName="issue_description"]', issueDescription);
-        setInputValue('input[formControlName="estimated_cost"]', '45000');
-        setInputValue('input[formControlName="imei"]', '123456789012345');
+        setInputValue('input[name="customer_name"]', customerName);
+        setInputValue('input[name="device_model"]', deviceModel);
+        setInputValue('textarea[name="issue_description"]', issueDescription);
+        setInputValue('input[name="estimated_cost"]', '45000');
+        setInputValue('input[name="imei"]', '123456789012345');
 
         // Dropdown de accesorios: es un div[role="button"], no un <button>.
         cy.get('#btn-accesorios-toggle').first().click({ force: true });
         cy.wait(400);
-        cy.get('input[formControlName="charger"]').first().check({ force: true });
-        cy.get('input[formControlName="case"]').first().check({ force: true });
+        cy.get('input[name="charger"]').first().check({ force: true });
+        cy.get('input[name="case"]').first().check({ force: true });
         cy.get('body').click(0, 0);
         cy.wait(200);
 
@@ -223,7 +223,7 @@ beforeEach(function() {
 
     after(() => {
         if (shared.repairId) {
-            const supabaseUrl = 'https://jftiyfnnaogmgvksgkbn.supabase.co';
+            const supabaseUrl = 'https://db.arecofix.com.ar';
             const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
             cy.request({
                 method: 'DELETE',

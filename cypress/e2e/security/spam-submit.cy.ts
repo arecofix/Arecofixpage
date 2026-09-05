@@ -1,7 +1,7 @@
 describe('Hostile UI Interactions (Spam Submit)', () => {
   beforeEach(() => {
     cy.loginAsAdmin('/admin/repairs/new');
-    cy.get('input[formControlName="customer_name"]').should('be.visible');
+    cy.get('input[name="customer_name"]').should('be.visible');
   });
 
   it('no debería permitir envíos duplicados si el usuario hace spam de clicks', () => {
@@ -13,10 +13,10 @@ describe('Hostile UI Interactions (Spam Submit)', () => {
     }).as('repairPost');
 
     // Llenar el formulario
-    cy.get('input[formControlName="customer_name"]').type('Cliente Spam');
-    cy.get('input[formControlName="customer_phone"]').type('11111111');
-    cy.get('input[formControlName="device_model"]').type('Motorola G20');
-    cy.get('textarea[formControlName="issue_description"]').type('Bateria hinchada');
+    cy.get('input[name="customer_name"]').type('Cliente Spam');
+    cy.get('input[name="customer_phone"]').type('11111111');
+    cy.get('input[name="device_model"]').type('Motorola G20');
+    cy.get('textarea[name="issue_description"]').type('Bateria hinchada');
 
     // Hacer spam de clicks (simulando 10 clicks super rápidos)
     const submitBtn = cy.get('button[type="submit"]');

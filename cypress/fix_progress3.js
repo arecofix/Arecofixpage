@@ -1,4 +1,8 @@
-describe('Academy Progress and Certificates', () => {
+const fs = require('fs');
+
+function fixAcademyProgressCerts() {
+  const file = 'cypress/e2e/ui/academy-progress-certs.cy.ts';
+  let c = `describe('Academy Progress and Certificates', () => {
   const studentEmail = 'student@arecofix.com';
   const courseId = '22222222-2222-2222-2222-222222222222';
   const moduleId = '33333333-3333-3333-3333-333333333333';
@@ -10,7 +14,7 @@ describe('Academy Progress and Certificates', () => {
       body: [{ id: courseId, title: 'Curso E2E Test', slug: 'curso-e2e-test' }]
     }).as('getCourses');
     
-    cy.intercept('GET', '**/rest/v1/course_modules*', {
+    cy.intercept('GET', '**/rest/v1/course_modules?*', {
       statusCode: 200,
       body: [{ id: moduleId, course_id: courseId, title: 'Modulo 1', order_index: 1 }]
     }).as('getModules');
@@ -42,7 +46,7 @@ describe('Academy Progress and Certificates', () => {
     cy.clearLocalStorage();
     cy.clearCookies();
     cy.loginAsAdmin('/');
-    cy.visit(`/admin/courses/${courseId}/materials`);
+    cy.visit(\`/admin/courses/\${courseId}/materials\`);
     
     cy.wait('@getModules', { timeout: 10000 });
     cy.wait('@getContents', { timeout: 10000 });
@@ -152,7 +156,7 @@ describe('Academy Progress and Certificates', () => {
       body: [{ id: '99999999-9999-9999-9999-999999999999', course_id: courseId, user_id: '77777777-7777-7777-7777-777777777777', email: studentEmail, status: 'confirmed' }]
     }).as('getEnrollment');
 
-    cy.intercept('GET', '**/rest/v1/course_modules*', {
+    cy.intercept('GET', '**/rest/v1/course_modules?*', {
       statusCode: 200,
       body: [{ id: moduleId, course_id: courseId, title: 'Modulo 1', order_index: 1, unlock_date: '2020-01-01T00:00:00Z' }]
     }).as('getModules');
@@ -175,7 +179,7 @@ describe('Academy Progress and Certificates', () => {
       win.localStorage.setItem('supabase.auth.token', JSON.stringify(session));
     });
 
-    cy.visit(`/academy/curso-e2e-test/aula`);
+    cy.visit(\`/academy/curso-e2e-test/aula\`);
 
     cy.wait('@getModules', { timeout: 10000 });
     cy.wait('@getProgress', { timeout: 10000 });
@@ -228,4 +232,8 @@ describe('Academy Progress and Certificates', () => {
     cy.contains('Estudiante Cypress').should('be.visible');
     cy.contains('Curso Cypress E2E').should('be.visible');
   });
-});
+});`;
+  fs.writeFileSync(file, c);
+  console.log('Fixed academy progress certs');
+}
+fixAcademyProgressCerts();

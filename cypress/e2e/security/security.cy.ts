@@ -51,8 +51,8 @@ describe('Security and Destructive Tests', () => {
     // Mock the network offline event
     cy.loginAsAdmin('/admin/repairs/new');
 
-    cy.get('input[formControlName="customer_name"]').type('Offline Client');
-    cy.get('textarea[formControlName="issue_description"]').type('Broken Screen');
+    cy.get('input[name="customer_name"]').type('Offline Client');
+    cy.get('textarea[name="issue_description"]').type('Broken Screen');
 
     // Go offline!
     cy.window().then((win) => {
