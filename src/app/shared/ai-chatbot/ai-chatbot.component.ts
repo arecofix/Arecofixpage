@@ -33,6 +33,8 @@ interface ChatMessage {
   isSourcesExpanded?: boolean;
   /** Indica si este bubble aún está recibiendo tokens (streaming activo) */
   isStreaming?: boolean;
+  /** Indica si debe mostrar el botón dinámico de WhatsApp */
+  hasWhatsappButton?: boolean;
 }
 
 interface QuickOption {
@@ -311,10 +313,13 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
           const updated = [...msgs];
           const bubble = updated[streamingBubbleIndex];
           if (bubble) {
+            // Detect if the bot mentioned WhatsApp or phone number
+            const hasWa = /(whatsapp|1125960900|112596090|11\s?2596\s?0900)/i.test(bubble.text);
             updated[streamingBubbleIndex] = {
               ...bubble,
               type: 'text',
               isStreaming: false,
+              hasWhatsappButton: hasWa,
             };
           }
           return updated;
