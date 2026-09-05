@@ -104,9 +104,26 @@ def suggest():
         print("Error submitting suggestion:", e)
         return jsonify({"error": str(e)}), 500
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/', methods=['GET'])
 def home():
     """Ruta raíz con un chatbot en vivo."""
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
+    chatbot_secret = os.getenv("CHATBOT_SECRET", "uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=")
+    tenant_id = "00000000-0000-0000-0000-000000000000"
+    if url and key:
+        try:
+            headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+            tenant_res = requests.get(f"{url}/rest/v1/tenants?limit=1&select=id", headers=headers)
+            if tenant_res.ok and len(tenant_res.json()) > 0:
+                tenant_id = tenant_res.json()[0]['id']
+        except Exception:
+            pass
+            
     html = r"""
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
@@ -374,8 +391,14 @@ def home():
             try {
                 const res = await fetch('https://arecofix-rag-chatbot.ezequielenrico15.workers.dev/chat/stream', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer {{ CHATBOT_SECRET }}'
+                    },
+                    body: JSON.stringify({ 
+                        question: text,
+                        tenant_id: '{{ TENANT_ID }}'
+                    })
                 });
                 
                 container.removeChild(loadingWrapper);
@@ -470,7 +493,7 @@ def home():
 </body>
 </html>
 """
-    return render_template_string(html)
+    return render_template_string(html, CHATBOT_SECRET=chatbot_secret, TENANT_ID=tenant_id)
 
 @app.route('/api/health', methods=['GET'])
 def get_health():
