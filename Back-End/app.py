@@ -1,6 +1,6 @@
 import os
 import uuid
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template_string
 from flask_cors import CORS
 from dotenv import load_dotenv
 from pathlib import Path
@@ -61,10 +61,206 @@ db.init_app(app)
 
 @app.route('/', methods=['GET'])
 def home():
-    """Ruta raíz para verificar desde el navegador sin recibir 404."""
-    return jsonify({
-        "message": "¡Motor Local de Arecofix funcionando! Para verificar el estado de la API, visita /api/health"
-    })
+    """Ruta raíz con un chatbot en vivo."""
+    html = """
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Arecofix - Asistente Local</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    </head>
+    <body class="bg-gray-50 h-screen flex flex-col items-center justify-center p-4 font-sans">
+        
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col h-[600px] max-h-full border border-gray-100">
+            
+            <!-- Header -->
+            <div class="bg-blue-600 p-4 text-white flex items-center gap-3 shadow-md z-10 relative">
+                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <i class="fas fa-robot text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Asistente Arecofix</h1>
+                    <p class="text-blue-100 text-xs flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> En línea (Motor Local)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+                <!-- Welcome Message -->
+                <div class="flex items-start gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1">
+                        <i class="fas fa-robot text-sm"></i>
+                    </div>
+                    <div class="bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-700 max-w-[85%] leading-relaxed">
+                        ¡Hola! Soy el asistente de Arecofix. ¿En qué te puedo ayudar hoy?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 bg-white border-t border-gray-100">
+                <form id="chat-form" class="flex items-end gap-2 relative">
+                    <textarea 
+                        id="message-input" 
+                        class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none overflow-hidden min-h-[44px] max-h-[120px]" 
+                        placeholder="Escribe un mensaje..."
+                        rows="1"
+                    ></textarea>
+                    <button 
+                        type="submit" 
+                        id="send-btn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i class="fas fa-paper-plane text-sm ml-1"></i>
+                    </button>
+                </form>
+                <div class="text-center mt-2">
+                    <p class="text-[10px] text-gray-400">Desarrollado por Arecofix AI</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('message-input');
+            const container = document.getElementById('chat-container');
+            const sendBtn = document.getElementById('send-btn');
+            
+            // Auto-resize textarea
+            input.addEventListener('input', function() {
+                this.style.height = '44px';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if(this.value.trim()) form.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            function addMessage(content, isUser = false) {
+                const div = document.createElement('div');
+                div.className = \`flex items-start gap-2 \${isUser ? 'flex-row-reverse' : ''}\`;
+                
+                const avatar = isUser 
+                    ? \`<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0 text-gray-600 mt-1"><i class="fas fa-user text-sm"></i></div>\`
+                    : \`<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1"><i class="fas fa-robot text-sm"></i></div>\`;
+                
+                const bubbleClass = isUser 
+                    ? 'bg-blue-600 text-white p-3 rounded-2xl rounded-tr-sm shadow-sm text-sm max-w-[85%] leading-relaxed' 
+                    : 'bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-700 max-w-[85%] leading-relaxed';
+                
+                // Tratar el markdown básico si es necesario (el prompt nuevo dice texto plano, pero por las dudas)
+                // Usamos innerText para asegurar que no inyecte HTML, luego convertimos saltos de línea a <br>
+                const contentDiv = document.createElement('div');
+                contentDiv.className = bubbleClass;
+                contentDiv.innerText = content;
+                
+                div.innerHTML = \`
+                    \${avatar}
+                    <div class="\${bubbleClass}" style="white-space: pre-wrap;">\${content}</div>
+                \`;
+                
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+                return div.querySelector('.' + (isUser ? 'bg-blue-600' : 'bg-white').split(' ')[0]);
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const text = input.value.trim();
+                if (!text) return;
+
+                input.value = '';
+                input.style.height = '44px';
+                input.disabled = true;
+                sendBtn.disabled = true;
+
+                addMessage(text, true);
+                
+                // Add loading bubble
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'flex items-start gap-2';
+                loadingDiv.innerHTML = \`
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1"><i class="fas fa-robot text-sm"></i></div>
+                    <div class="bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-500 max-w-[85%] flex gap-1 items-center">
+                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                        <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                    </div>
+                \`;
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+
+                try {
+                    // Send to Cloudflare Worker RAG
+                    const res = await fetch('https://arecofix-rag-chatbot.ezequielenrico15.workers.dev/chat/stream', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    });
+                    
+                    container.removeChild(loadingDiv);
+
+                    if (!res.ok) {
+                        addMessage('En este momento estoy procesando muchas consultas, intentá de nuevo en unos segundos.');
+                        throw new Error('Network error');
+                    }
+                    
+                    // Manejar SSE (Server-Sent Events)
+                    const reader = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    
+                    // Crear burbuja vacía para ir llenando
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'flex items-start gap-2';
+                    replyDiv.innerHTML = \`
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 mt-1"><i class="fas fa-robot text-sm"></i></div>
+                        <div class="bg-white border border-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm text-gray-700 max-w-[85%] leading-relaxed streaming-content" style="white-space: pre-wrap;"></div>
+                    \`;
+                    container.appendChild(replyDiv);
+                    const contentSpan = replyDiv.querySelector('.streaming-content');
+                    
+                    let done = false;
+                    while (!done) {
+                        const { value, done: doneReading } = await reader.read();
+                        done = doneReading;
+                        if (value) {
+                            const chunk = decoder.decode(value, { stream: true });
+                            const lines = chunk.split('\\n');
+                            for (const line of lines) {
+                                if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                    try {
+                                        const data = JSON.parse(line.substring(6));
+                                        if (data.response) {
+                                            contentSpan.innerText += data.response;
+                                            container.scrollTop = container.scrollHeight;
+                                        }
+                                    } catch (e) {}
+                                }
+                            }
+                        }
+                    }
+                    
+                } catch (err) {
+                    if (container.contains(loadingDiv)) container.removeChild(loadingDiv);
+                } finally {
+                    input.disabled = false;
+                    sendBtn.disabled = false;
+                    input.focus();
+                }
+            });
+        </script>
+    </body>
+    </html>
+    """
+    return render_template_string(html)
 
 @app.route('/api/health', methods=['GET'])
 def get_health():
