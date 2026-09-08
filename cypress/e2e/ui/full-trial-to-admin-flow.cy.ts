@@ -77,11 +77,15 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
 
   it('Debe crear una cuenta, iniciar sesión simulado, usar el panel y testear offline sync', () => {
     
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     // ==========================================
     // FASE 1: Registro vía /prueba-gratis
     // ==========================================
     cy.visit('/fixtecnicos');
     
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     cy.get('a[routerLink="/prueba-gratis"], a[href="/prueba-gratis"]').first().click({ force: true });
     cy.url().should('include', '/prueba-gratis');
     
@@ -95,6 +99,8 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
     cy.get('button[type="submit"]').contains('Solicitar Prueba Gratis').click({ force: true });
 
     cy.wait('@createTrialTenant');
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     cy.contains('¡Tu sucursal ha sido creada!').should('be.visible');
 
     // ==========================================
@@ -122,6 +128,8 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
 
     // Navegamos al panel de reparaciones
     cy.visit('/admin/repairs');
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     // cy.wait(['@getProfile', '@getTenants', '@getBranches']);
     cy.url({ timeout: 10000 }).should('include', '/admin/repairs');
 

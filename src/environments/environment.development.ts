@@ -26,9 +26,9 @@ export const environment: Environment = {
   enableProfileUpsert: false,
 
   // RAG Chatbot Worker (Fase 3)
-  chatbotWorkerUrl: 'https://api.arecofix.com.ar/api',
+  chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
   embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
-  chatbotSecret: 'uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=',
+  chatbotSecret: '0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=',
 
   // Analytics Configuration Removed
 

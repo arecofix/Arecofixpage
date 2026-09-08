@@ -139,7 +139,12 @@ export class AuthService {
 
       if (error) {
         this.logger.error('Session retrieval error', error);
-        if (error.message.includes('Refresh Token') && navigator.onLine) {
+        if (navigator.onLine) {
+           // Limpiar cualquier token zombi en localStorage (ej. de la nube anterior)
+           if (typeof localStorage !== 'undefined') {
+             const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+             keys.forEach(k => localStorage.removeItem(k));
+           }
            await this.supabase.auth.signOut();
         }
       }
@@ -184,6 +189,10 @@ export class AuthService {
         this.logger.info(`Auth Event: ${event}`);
         
         if (event === 'SIGNED_OUT') {
+           if (typeof localStorage !== 'undefined') {
+             const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+             keys.forEach(k => localStorage.removeItem(k));
+           }
            this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
            this.isSuperAdmin.set(false);
            this.currentBranchSubject.next(null);

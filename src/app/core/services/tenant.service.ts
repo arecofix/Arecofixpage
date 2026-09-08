@@ -93,7 +93,15 @@ export class TenantService {
     if (isPlatformBrowser(this.platformId)) {
       // Intenta recuperar de localStorage en entornos browser como fallback temporal si Signal cayó (ej: F5)
       const storedId = localStorage.getItem('arecofix_tenant_id');
-      if (storedId) return storedId;
+      if (storedId) {
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storedId);
+        if (isUUID) {
+          return storedId;
+        } else {
+          // Limpiar caché corrupto (ej: guardaron un slug 'arecofix' en vez de UUID)
+          localStorage.removeItem('arecofix_tenant_id');
+        }
+      }
       
       // Fallback instead of throwing to avoid component init crash before resolveTenant finishes
       return TENANT_CONSTANTS.FALLBACK_ID;

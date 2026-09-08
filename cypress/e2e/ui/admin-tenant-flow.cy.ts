@@ -36,6 +36,11 @@ const MOCK_BRANCHES = [
 describe('Admin Tenant Flow (Multi-tenant & RLS Isolation)', () => {
 
   beforeEach(() => {
+    // ── Login and Setup ────────────────────────────────────────────────────────
+    cy.clearLocalStorage();
+    cy.clearCookies();
+    cy.loginAsAdmin('/');
+
     // ── Auth ──────────────────────────────────────────────────────────────────
     cy.intercept('GET', '**/auth/v1/user', {
       statusCode: 200,
@@ -43,9 +48,12 @@ describe('Admin Tenant Flow (Multi-tenant & RLS Isolation)', () => {
     }).as('getUser');
 
     // ── Profiles ──────────────────────────────────────────────────────────────
-    cy.intercept('GET', '**/rest/v1/profiles*', {
-      statusCode: 200,
-      body: [MOCK_PROFILE]
+    cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+      const isSingle = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+      req.reply({
+        statusCode: 200,
+        body: isSingle ? MOCK_PROFILE : [MOCK_PROFILE]
+      });
     }).as('getProfile');
 
     // ── Tenants ───────────────────────────────────────────────────────────────
@@ -61,16 +69,16 @@ describe('Admin Tenant Flow (Multi-tenant & RLS Isolation)', () => {
 
     cy.intercept('GET', '**/rest/v1/tenants*', {
       statusCode: 200,
+      headers: { 'Content-Range': '0-0/1' },
       body: [MOCK_TENANT]
     }).as('getTenants');
 
-    // ── Branches ──────────────────────────────────────────────────────────────
+    // ── Branches (Paginated) ──────────────────────────────────────────────────
     cy.intercept('GET', '**/rest/v1/branches*', {
       statusCode: 200,
+      headers: { 'Content-Range': '0-1/2' },
       body: MOCK_BRANCHES
     }).as('getBranches');
-    
-    cy.loginAsAdmin('/');
   });
 
   // ── Test 1: create new tenant ───────────────────────────────────────────────

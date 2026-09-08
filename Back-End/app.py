@@ -47,7 +47,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:4200")
 app = Flask(__name__)
 
 # 2. Habilitar CORS de manera robusta
-CORS(app, resources={r"/api/*": {"origins": [FRONTEND_URL, "http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:1420", "https://arecofix.com.ar"]}})
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": [FRONTEND_URL, "http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:1420", "https://arecofix.com.ar"]}})
 
 # --- SQLite LOCAL Configuration ---
 # Usamos pathlib para asegurar compatibilidad de barras
@@ -113,7 +113,7 @@ def home():
     """Ruta raíz con un chatbot en vivo."""
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_KEY")
-    chatbot_secret = os.getenv("CHATBOT_SECRET", "uid7TWvDNnttQEYRgrJE3JP7h1fxkafjPUhWqvgeBe0=")
+    chatbot_secret = os.getenv("CHATBOT_SECRET", "0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=")
     tenant_id = "00000000-0000-0000-0000-000000000000"
     if url and key:
         try:
@@ -131,6 +131,8 @@ def home():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arecofix - Asistente IA Avanzado</title>
+    <link rel="icon" type="image/x-icon" href="https://arecofix.com.ar/assets/img/brands/logo/Logo.ico" />
+    <link rel="apple-touch-icon" href="https://arecofix.com.ar/assets/img/brands/logo/Logo.png" />
     <!-- Tailwind and DaisyUI CDN -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script>
@@ -241,15 +243,15 @@ def home():
                     </div>
                 </div>
                 <div class="chat-header text-xs opacity-70 mb-1">Asistente IA</div>
-                <div class="chat-bubble chat-bubble-primary text-primary-content shadow-md text-sm md:text-base leading-relaxed">
+                <div class="chat-bubble bg-[#eefbf4] border border-[#22c55e]/30 text-neutral-900 shadow-md text-sm md:text-base leading-relaxed">
                     ¡Hola! Soy la IA de Arecofix. Puedo ayudarte a diagnosticar problemas con equipos, consultar por cursos, o ver nuestra oferta de servicios. ¿En qué te puedo ayudar?
                 </div>
             </div>
         </div>
 
         <!-- Input Area (Fixed at bottom) -->
-        <div class="absolute bottom-0 w-full bg-gradient-to-t from-base-200 via-base-200 to-transparent pt-6 pb-4 px-4 md:px-8">
-            <div class="max-w-4xl mx-auto">
+        <div class="absolute bottom-0 w-full bg-gradient-to-t from-base-200 via-base-200 to-transparent pt-6 pb-4 px-4 md:px-6">
+            <div class="w-full">
                 <form id="chat-form" class="relative bg-base-100 shadow-xl rounded-2xl border border-base-300 focus-within:border-primary transition-colors duration-300">
                     <textarea 
                         id="message-input" 
@@ -257,6 +259,14 @@ def home():
                         placeholder="Preguntá cualquier cosa..."
                         rows="1"
                     ></textarea>
+                    <button 
+                        type="button" 
+                        id="mic-btn"
+                        class="absolute right-12 bottom-2 btn btn-circle btn-ghost btn-sm text-gray-500"
+                        title="Dictado por voz"
+                    >
+                        <i class="fas fa-microphone"></i>
+                    </button>
                     <button 
                         type="submit" 
                         id="send-btn"
@@ -302,10 +312,12 @@ def home():
     <script>
         const form = document.getElementById('chat-form');
         const input = document.getElementById('message-input');
+        let chatHistory = [];
+        
         const container = document.getElementById('chat-container');
         const sendBtn = document.getElementById('send-btn');
         let currentTheme = 'light';
-        const waNumberRegex = /(whatsapp|1125960900|112596090|contacto)/i;
+        const waNumberRegex = /(whatsapp|11\s*2596\s*0900?|contacto)/i;
 
         // Auto-resize textarea
         input.addEventListener('input', function() {
@@ -323,7 +335,7 @@ def home():
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                if(this.value.trim()) form.dispatchEvent(new Event('submit'));
+                if(this.value.trim()) form.requestSubmit();
             }
         });
 
@@ -339,6 +351,7 @@ def home():
             const welcome = container.firstElementChild;
             container.innerHTML = '';
             container.appendChild(welcome);
+            chatHistory = [];
             // Close drawer on mobile
             document.getElementById('sidebar-drawer').checked = false;
         }
@@ -353,7 +366,7 @@ def home():
             
             const bubbleClass = isUser 
                 ? 'chat-bubble chat-bubble-neutral text-neutral-content shadow-md text-sm md:text-base leading-relaxed' 
-                : 'chat-bubble bg-base-100 border border-base-300 text-base-content shadow-md text-sm md:text-base leading-relaxed';
+                : 'chat-bubble bg-[#eefbf4] border border-[#22c55e]/30 text-neutral-900 shadow-md text-sm md:text-base leading-relaxed';
             
             wrapper.innerHTML = `
                 <div class="chat-image avatar">${avatarHtml}</div>
@@ -377,6 +390,7 @@ def home():
             sendBtn.disabled = true;
 
             addMessage(text, true);
+            chatHistory.push({ role: 'user', content: text });
             
             // Add loading typing indicator
             const loadingWrapper = document.createElement('div');
@@ -403,7 +417,8 @@ def home():
                     },
                     body: JSON.stringify({ 
                         question: text,
-                        tenant_id: '{{ TENANT_ID }}'
+                        tenant_id: '{{ TENANT_ID }}',
+                        history: chatHistory.slice(-6)
                     })
                 });
                 
@@ -419,14 +434,16 @@ def home():
                 
                 const replyBubble = addMessage('');
                 let fullResponse = '';
+                let buffer = '';
                 
                 let done = false;
                 while (!done) {
                     const { value, done: doneReading } = await reader.read();
                     done = doneReading;
                     if (value) {
-                        const chunk = decoder.decode(value, { stream: true });
-                        const lines = chunk.split('\n');
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop() || '';
                         for (const line of lines) {
                             if (line.startsWith('data: ') && line !== 'data: [DONE]') {
                                 try {
@@ -441,6 +458,13 @@ def home():
                         }
                     }
                 }
+                
+                // Parche para el número de WhatsApp con formato espaciado
+                fullResponse = fullResponse.replace(/11\s*2596\s*0900?\b/g, '11 2596 0900');
+                replyBubble.innerHTML = md.render(fullResponse);
+                
+                // Guardar respuesta del bot en historial
+                chatHistory.push({ role: 'assistant', content: fullResponse });
                 
                 // Si menciona WhatsApp, inyectar el botón
                 if(waNumberRegex.test(fullResponse)) {
@@ -495,6 +519,54 @@ def home():
                 btn.innerText = 'Enviar Sugerencia';
             }
         });
+        // Voice Recognition Support
+        const micBtn = document.getElementById('mic-btn');
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'es-AR';
+
+            let isRecording = false;
+
+            recognition.onstart = function() {
+                isRecording = true;
+                micBtn.classList.add('text-error', 'animate-pulse');
+                micBtn.classList.remove('text-gray-500');
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                input.value += (input.value ? ' ' : '') + transcript;
+                input.dispatchEvent(new Event('input')); // trigger resize and enable send
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                stopRecordingUI();
+            };
+
+            recognition.onend = function() {
+                stopRecordingUI();
+            };
+
+            function stopRecordingUI() {
+                isRecording = false;
+                micBtn.classList.remove('text-error', 'animate-pulse');
+                micBtn.classList.add('text-gray-500');
+            }
+
+            micBtn.addEventListener('click', () => {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
+        } else {
+            micBtn.style.display = 'none'; // Hide if not supported
+        }
     </script>
 </body>
 </html>
@@ -684,6 +756,118 @@ def get_file(filename):
     from flask import send_from_directory
     upload_folder = os.path.join(app.root_path, 'data', 'uploads')
     return send_from_directory(upload_folder, filename)
+
+# --- CLOUDFLARE R2 & RAG IA ---
+
+def get_s3_client():
+    import boto3
+    from botocore.config import Config
+    account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
+    access_key = os.getenv('R2_ACCESS_KEY_ID')
+    secret_key = os.getenv('R2_SECRET_ACCESS_KEY')
+    
+    if not account_id or not access_key or not secret_key:
+        raise Exception("Faltan credenciales de Cloudflare R2 en el archivo .env")
+        
+    return boto3.client(
+        's3',
+        endpoint_url=f'https://{account_id}.r2.cloudflarestorage.com',
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        config=Config(signature_version='s3v4'),
+        region_name='auto'
+    )
+
+@app.route('/api/storage/presigned-upload', methods=['GET', 'OPTIONS'])
+def get_presigned_upload():
+    if request.method == 'OPTIONS':
+        return '', 204
+    try:
+        folder = request.args.get('folder', 'rag/general')
+        filename = request.args.get('filename')
+        content_type = request.args.get('content_type', 'application/octet-stream')
+        bucket_name = os.getenv('R2_BUCKET_NAME')
+        public_url_base = os.getenv('R2_PUBLIC_URL', '').rstrip('/')
+        
+        if not filename or not bucket_name:
+            return jsonify({"error": "filename and R2_BUCKET_NAME are required"}), 400
+            
+        object_name = f"{folder}/{filename}"
+        s3 = get_s3_client()
+        
+        presigned_url = s3.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': bucket_name,
+                'Key': object_name,
+                'ContentType': content_type
+            },
+            ExpiresIn=3600
+        )
+        
+        public_url = f"{public_url_base}/{object_name}" if public_url_base else f"https://{bucket_name}.r2.cloudflarestorage.com/{object_name}"
+        
+        return jsonify({
+            "upload_url": presigned_url,
+            "public_url": public_url
+        }), 200
+    except Exception as e:
+        print(f"Error generando URL de R2: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/rag/extract-pdf', methods=['POST'])
+def extract_pdf():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+        
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Empty file"}), 400
+
+    # Limite de tamano: 50 MB
+    MAX_SIZE_BYTES = 50 * 1024 * 1024
+    file.seek(0, 2)  # Seek al final
+    file_size = file.tell()
+    file.seek(0)     # Reset
+    if file_size > MAX_SIZE_BYTES:
+        return jsonify({
+            "error": f"El archivo es demasiado grande ({file_size // (1024*1024)} MB). El limite es 50 MB. Comprimilo o dividi el PDF en partes mas pequenas."
+        }), 413
+        
+    try:
+        import PyPDF2
+        reader = PyPDF2.PdfReader(file)
+        total_pages = len(reader.pages)
+        MAX_PAGES = 300
+        MAX_CHARS = 800_000  # ~200k tokens, seguro para chunking
+
+        text_parts = []
+        char_count = 0
+        pages_processed = 0
+
+        for page in reader.pages[:MAX_PAGES]:
+            page_text = page.extract_text()
+            if page_text:
+                remaining = MAX_CHARS - char_count
+                if remaining <= 0:
+                    break
+                text_parts.append(page_text[:remaining])
+                char_count += len(page_text)
+            pages_processed += 1
+
+        text = "\n".join(text_parts)
+        truncated = total_pages > MAX_PAGES or char_count >= MAX_CHARS
+
+        return jsonify({
+            "text": text,
+            "pages_total": total_pages,
+            "pages_processed": pages_processed,
+            "chars_extracted": len(text),
+            "truncated": truncated
+        }), 200
+    except Exception as e:
+        print(f"Error extracting PDF text: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # --- INVENTARIO (PRODUCTOS) ---
 
