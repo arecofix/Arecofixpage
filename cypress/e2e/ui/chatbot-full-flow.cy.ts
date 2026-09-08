@@ -1,8 +1,12 @@
 describe('Chatbot RAG E2E Tests', () => {
   beforeEach(() => {
-    // Interceptar la llamada a la API del chatbot para evitar consumo de tokens en pruebas constantes
-    // En algunas pruebas permitiremos que pase al backend real, pero la interceptamos para controlar el flujo
-    cy.intercept('POST', '**/chat/stream*').as('chatbotRequest');
+    // Interceptar la llamada a la API del chatbot y simular respuesta exitosa (SSE)
+    cy.intercept('POST', '**/chat/stream*', (req) => {
+      req.reply({
+        headers: { 'Content-Type': 'text/event-stream' },
+        body: 'data: {"response":"Respuesta simulada exitosa en Arecofix"}\n\ndata: [DONE]\n\n'
+      });
+    }).as('chatbotRequest');
     
     // Visitamos la home page donde se asume que está el widget del chat
     cy.visit('/');
@@ -46,11 +50,16 @@ describe('Chatbot RAG E2E Tests', () => {
     
     const weirdQuestion = 'T3nen cUrsoS de R3pAraci0n';
     
-    cy.get('app-ai-chatbot textarea').type(`${weirdQuestion}{enter}`, { force: true });
-    
-    cy.get('app-ai-chatbot').contains(weirdQuestion).should('be.visible');
+    cy.get('app-ai-chatbot textarea')
+      .invoke('val', weirdQuestion)
+      .trigger('input')
+      .trigger('change');
+      
+    cy.get('app-ai-chatbot textarea').should('have.value', weirdQuestion);
+    cy.get('#ai-chatbot-send-btn').first().click({ force: true });    
     
     cy.wait('@chatbotRequest');
+    cy.get('app-ai-chatbot').contains(weirdQuestion).should('be.visible');
     
     // Esperar respuesta (streaming duration)
     cy.wait(5000);

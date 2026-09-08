@@ -44,7 +44,7 @@ export class KnowledgeBaseAdminService {
 
   private readonly embeddingWorkerUrl = environment.embeddingWorkerUrl || environment.chatbotWorkerUrl.replace('rag-chatbot', 'embedding-ingestion');
   private readonly workerSecret = '0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=';
-  private readonly flaskUrl = environment.apiUrl;
+  private readonly flaskUrl = 'https://api.arecofix.com.ar';
 
   /** Señales de estado */
   readonly loading = signal(false);
@@ -124,10 +124,13 @@ export class KnowledgeBaseAdminService {
       if (!uploadRes.ok) throw new Error(`Error al subir a R2: ${uploadRes.status}`);
 
       // ── c) Extraer texto del archivo ─────────────────────────────────────
-      const textContent = await this.extractText(file);
-      if (!textContent || textContent.trim().length < 20) {
+      const rawTextContent = await this.extractText(file);
+      if (!rawTextContent || rawTextContent.trim().length < 20) {
         throw new Error('No se pudo extraer texto del archivo. Asegurate de que el PDF tenga texto seleccionable.');
       }
+      
+      // PostgreSQL no soporta el caracter nulo \u0000 en campos de texto, lo sanitizamos.
+      const textContent = rawTextContent.replace(/\0/g, '');
 
       // ── d) Indexar en knowledge_base via Worker ───────────────────────────
       const ingestRes = await fetch(`${this.embeddingWorkerUrl}/ingest`, {
@@ -187,30 +190,60 @@ export class KnowledgeBaseAdminService {
     });
   }
 
-  /** Extrae texto de PDF usando el endpoint de Flask (que usa pdfplumber en Python) */
+  /** Extrae texto de PDF usando el endpoint de Flask (que usa PyPDF2 en Python) */
   private async extractPdfText(file: File): Promise<string> {
+    // Validacion de tamano en el cliente: rechazar antes de subir al servidor
+    const MAX_MB = 50;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      throw new Error(
+        `El archivo es demasiado grande (${(file.size / 1024 / 1024).toFixed(0)} MB). El limite para extraccion automatica es ${MAX_MB} MB. Comprimilo o dividi el PDF en partes mas pequenas.`
+      );
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${this.flaskUrl}/api/rag/extract-pdf`, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-    });
+    // Timeout de 90 segundos para PDFs grandes
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90_000);
 
-    if (!res.ok) {
-      // Fallback: intentar leer el PDF en el browser con la API nativa de texto
-      console.warn('[KnowledgeBaseAdmin] Flask PDF extraction failed, trying client-side fallback');
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve((reader.result as string).replace(/[^\x20-\x7E\n\r\t\u00C0-\u024F]/g, ' ').trim());
-        reader.onerror = () => reject(new Error('No se pudo extraer texto del PDF.'));
-        reader.readAsText(file);
+    try {
+      const res = await fetch(`${this.flaskUrl}/api/rag/extract-pdf`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        signal: controller.signal,
       });
-    }
+      clearTimeout(timeoutId);
 
-    const data = await res.json() as { text: string };
-    return data.text;
+      if (res.status === 413) {
+        const body = await res.json() as { error?: string };
+        throw new Error(body['error'] ?? 'El archivo supera el limite de tamano del servidor (50 MB).');
+      }
+
+      if (!res.ok) {
+        // Fallback: intentar leer el PDF en el browser
+        console.warn('[KnowledgeBaseAdmin] Flask PDF extraction failed, trying client-side fallback');
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).replace(/[^\x20-\x7E\n\r\t\u00C0-\u024F]/g, ' ').trim());
+          reader.onerror = () => reject(new Error('No se pudo extraer texto del PDF.'));
+          reader.readAsText(file);
+        });
+      }
+
+      const data = await res.json() as { text: string; truncated?: boolean; pages_total?: number };
+      if (data.truncated) {
+        console.warn(`[KnowledgeBaseAdmin] PDF truncado: solo se indexaron los primeros 300 paginas o 800k caracteres de ${data.pages_total} paginas totales.`);
+      }
+      return data.text;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw new Error('La extraccion de texto tomo demasiado tiempo (>90s). El archivo puede ser muy grande o tener muchas imagenes escaneadas. Intentá dividir el PDF en partes mas chicas.');
+      }
+      throw err;
+    }
   }
 
   // ── 3. Listar documentos indexados ────────────────────────────────────────

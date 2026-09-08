@@ -124,7 +124,8 @@ function chunkText(text: string): string[] {
     }
 
     chunks.push(normalized.slice(start, end).trim());
-    start = Math.max(start + 1, end - CHUNK_OVERLAP_CHARS);
+    const nextStart = Math.max(start + 1, end - CHUNK_OVERLAP_CHARS);
+    start = nextStart <= start ? start + 1 : nextStart;
   }
 
   return chunks.filter((c) => c.length > 0);
@@ -158,20 +159,21 @@ function jsonResponse(body: unknown, status = 200): Response {
 // ─── Core: Generación de embedding vía Workers AI ─────────────────────────────
 
 /**
- * Genera el vector de embedding para un texto usando Workers AI.
- * Retorna un array de 768 floats.
+ * Genera el vector de embedding para un lote de textos usando Workers AI.
+ * Retorna un array de arrays (vectores).
  */
-async function generateEmbedding(text: string, env: Env): Promise<number[]> {
+async function generateEmbeddings(texts: string[], env: Env): Promise<number[][]> {
   // La API de Workers AI para embeddings devuelve { data: number[][] }
-  const response = await env.AI.run(EMBEDDING_MODEL, { text: [text] });
+  // y acepta un array de strings, lo que nos ahorra "subrequests" de Cloudflare.
+  const response = await env.AI.run(EMBEDDING_MODEL, { text: texts });
 
-  // Normalización defensiva del output (la forma puede variar levemente entre modelos)
+  // Normalización defensiva del output
   const data = (response as { data?: number[][] }).data;
   if (!data || data.length === 0 || !Array.isArray(data[0])) {
     throw new Error(`Workers AI devolvió un formato inesperado: ${JSON.stringify(response)}`);
   }
 
-  return data[0];
+  return data;
 }
 
 // ─── Core: Guardar en Supabase ────────────────────────────────────────────────
@@ -211,7 +213,7 @@ async function deleteBySourceId(
 ): Promise<void> {
   const url =
     `${env.SUPABASE_URL}/rest/v1/knowledge_base` +
-    `?source_id=eq.${sourceId}&tenant_id=eq.${tenantId}`;
+    `?source_id=eq.${encodeURIComponent(sourceId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`;
 
   const response = await fetch(url, {
     method: 'DELETE',
@@ -238,19 +240,21 @@ async function ingestDocument(
   payload: IngestPayload,
   env: Env,
 ): Promise<{ chunks_processed: number; title: string }> {
-  // 1. Dividir en chunks
-  const chunks = chunkText(payload.content);
+  // 0. Eliminar caracteres nulos (\u0000) que rompen PostgreSQL
+  const sanitizedContent = payload.content.replace(/\0/g, '');
 
-  // 2. Generar embeddings en paralelo (hasta 10 a la vez para no saturar Workers AI)
-  const BATCH_SIZE = 10;
+  // 1. Dividir en chunks
+  const chunks = chunkText(sanitizedContent);
+
+  // 2. Generar embeddings en paralelo (batch de 20 para reducir "subrequests" al límite de CF)
+  const BATCH_SIZE = 20;
   const rows: KnowledgeBaseRow[] = [];
 
   for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
     const batchChunks = chunks.slice(i, i + BATCH_SIZE);
 
-    const embeddings = await Promise.all(
-      batchChunks.map((chunk) => generateEmbedding(chunk, env)),
-    );
+    // Hacemos un SOLO subrequest a la IA enviando todo el array de textos
+    const embeddings = await generateEmbeddings(batchChunks, env);
 
     batchChunks.forEach((chunk, idx) => {
       rows.push({
@@ -336,8 +340,8 @@ export default {
           return jsonResponse({ error: 'El campo "documents" debe ser un array no vacío.' }, 400);
         }
 
-        if (body.documents.length > 50) {
-          return jsonResponse({ error: 'Máximo 50 documentos por batch.' }, 400);
+        if (body.documents.length > 15) {
+          return jsonResponse({ error: 'Máximo 15 documentos por batch para evitar el límite de subrequests.' }, 400);
         }
 
         // Procesar en serie para no agotar el límite de CPU del Worker

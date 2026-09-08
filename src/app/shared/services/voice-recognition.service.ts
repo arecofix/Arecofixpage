@@ -44,8 +44,9 @@ export class VoiceRecognitionService {
         };
 
         this.recognition.onerror = (event: any) => {
+          console.error('[VoiceRecognition] Falló con event.error:', event.error, event);
           this.isListening.set(false);
-          let msg = 'Error en reconocimiento de voz';
+          let msg = 'Error en reconocimiento de voz: ' + event.error;
           if (event.error === 'not-allowed') {
             msg = 'Permiso de micrófono denegado. Por favor, habilitalo en tu navegador.';
           } else if (event.error === 'no-speech') {

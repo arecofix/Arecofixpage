@@ -33,8 +33,6 @@ interface ChatMessage {
   isSourcesExpanded?: boolean;
   /** Indica si este bubble aún está recibiendo tokens (streaming activo) */
   isStreaming?: boolean;
-  /** Indica si debe mostrar el botón dinámico de WhatsApp */
-  hasWhatsappButton?: boolean;
 }
 
 interface QuickOption {
@@ -131,8 +129,8 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
       label: '💬 Contactar por WhatsApp',
       response: {
         from: 'bot',
-        type: 'whatsapp-btn',
-        text: 'Para una atención rápida y personalizada, escribinos directamente por WhatsApp:',
+        type: 'text',
+        text: 'Podés escribirnos a nuestro WhatsApp al 11 2596 0900 para una atención rápida y personalizada.',
       },
     },
   ];
@@ -314,13 +312,10 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
           const updated = [...msgs];
           const bubble = updated[streamingBubbleIndex];
           if (bubble) {
-            // Detect if the bot mentioned WhatsApp or phone number
-            const hasWa = /(whatsapp|1125960900|112596090|11\s?2596\s?0900)/i.test(bubble.text);
             updated[streamingBubbleIndex] = {
               ...bubble,
               type: 'text',
               isStreaming: false,
-              hasWhatsappButton: hasWa,
             };
           }
           return updated;

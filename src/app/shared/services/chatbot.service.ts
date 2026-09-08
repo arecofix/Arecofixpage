@@ -281,6 +281,7 @@ export class ChatbotService {
       if (fullAnswer) this.addToHistory('assistant', fullAnswer);
       callbacks.onDone?.();
     } catch (err) {
+      console.error('[ChatbotService] askStream error:', err);
       const msg = this.handleError(err);
       this.error.set(msg);
       callbacks.onError?.(msg);
