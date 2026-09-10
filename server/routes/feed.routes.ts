@@ -157,32 +157,33 @@ router.get('/google-merchant.xml', async (req: Request, res: Response): Promise<
     const brandMap = new Map(brands.map((b: any) => [b.id, b.name]));
     const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
 
-    let xml = \`<?xml version="1.0" encoding="UTF-8"?>
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
   <channel>
     <title>Arecofix Catálogo</title>
-    <link>\${baseUrl}</link>
-    <description>Catálogo de productos de Arecofix - Equipos y Repuestos</description>\n\`;
+    <link>${baseUrl}</link>
+    <description>Catálogo de productos de Arecofix - Equipos y Repuestos</description>
+`;
 
     const seenSlugs = new Set();
 
     rawProducts.forEach((p: any) => {
       let slug = String(p.slug || '').trim();
       if (!slug || slug === '_' || seenSlugs.has(slug)) {
-        slug = \`\${slug && slug !== '_' ? slug : 'p'}-\${p.id.substring(0, 5)}\`;
+        slug = `${slug && slug !== '_' ? slug : 'p'}-${p.id.substring(0, 5)}`;
       }
       seenSlugs.add(slug);
-      const productLink = \`\${baseUrl}/productos/detalle/\${slug}\`;
+      const productLink = `${baseUrl}/productos/detalle/${slug}`;
 
       let imageLink = String(p.image_url || '').trim();
-      const noImagePlaceholder = \`\${baseUrl}/assets/img/no-image.png\`;
+      const noImagePlaceholder = `${baseUrl}/assets/img/no-image.png`;
       if (!imageLink || imageLink === 'null' || imageLink === '_') imageLink = noImagePlaceholder;
-      else if (!imageLink.startsWith('http')) imageLink = \`\${environment.supabaseUrl}/storage/v1/object/public/public-assets/\${imageLink.split('/').map((s: string) => encodeURIComponent(s)).join('/')}\`;
+      else if (!imageLink.startsWith('http')) imageLink = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${imageLink.split('/').map((s: string) => encodeURIComponent(s)).join('/')}`;
       if (imageLink.startsWith('http:')) imageLink = imageLink.replace('http:', 'https:');
 
       let priceValue = Number(p.price) || 0;
       if (priceValue <= 0) priceValue = 100.00;
-      const formattedPrice = \`\${priceValue.toFixed(2)} ARS\`;
+      const formattedPrice = `${priceValue.toFixed(2)} ARS`;
 
       const isActuallyInStock = (p.is_active && (p.stock > 0 || p.stock === null));
       const availability = isActuallyInStock ? 'in_stock' : 'out_of_stock';
@@ -196,23 +197,25 @@ router.get('/google-merchant.xml', async (req: Request, res: Response): Promise<
       const isRepuesto = categoryName.toLowerCase().includes('repuesto') || categoryName.toLowerCase().includes('módulo') || categoryName.toLowerCase().includes('pantalla') || title.toLowerCase().includes('repuesto');
       const customLabel0 = isRepuesto ? 'Repuestos' : 'Equipos';
 
-      xml += \`    <item>
-      <g:id>\${p.id}</g:id>
-      <g:title>\${title}</g:title>
-      <g:description>\${description}</g:description>
-      <g:link>\${productLink}</g:link>
-      <g:image_link>\${imageLink}</g:image_link>
+      xml += `    <item>
+      <g:id>${p.id}</g:id>
+      <g:title>${title}</g:title>
+      <g:description>${description}</g:description>
+      <g:link>${productLink}</g:link>
+      <g:image_link>${imageLink}</g:image_link>
       <g:condition>new</g:condition>
-      <g:availability>\${availability}</g:availability>
-      <g:price>\${formattedPrice}</g:price>
-      <g:brand>\${brand}</g:brand>
-      <g:google_product_category>\${googleCategory}</g:google_product_category>
-      <g:custom_label_0>\${customLabel0}</g:custom_label_0>
-      <g:mpn>\${p.sku || p.id.substring(0, 8)}</g:mpn>
-    </item>\n\`;
+      <g:availability>${availability}</g:availability>
+      <g:price>${formattedPrice}</g:price>
+      <g:brand>${brand}</g:brand>
+      <g:google_product_category>${googleCategory}</g:google_product_category>
+      <g:custom_label_0>${customLabel0}</g:custom_label_0>
+      <g:mpn>${p.sku || p.id.substring(0, 8)}</g:mpn>
+    </item>
+`;
     });
 
-    xml += \`  </channel>\n</rss>\`;
+    xml += `  </channel>
+</rss>`;
 
     res.header('Content-Type', 'application/xml; charset=utf-8');
     res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
