@@ -125,6 +125,8 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         delete (dbPayload as any).device_model;
         delete (dbPayload as any).brand_id;
         delete (dbPayload as any).imei;
+        delete (dbPayload as any).payment_method;
+        delete (dbPayload as any).surcharge_percentage;
 
         const tenantId = this.tenantService.getTenantId();
 
@@ -195,6 +197,8 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             'technical_report', 'technical_labor_cost', 'deposit_amount',
             'completed_at', 'assigned_technician_id', 'glass_upsell',
             'security_pin', 'security_pattern', 'device_passcode', 'checklist',
+            'issue_description', 'spare_part_cost', 'warranty', 'supplier_id',
+            'whatsapp_notifications', 'branch_id', 'client_id', 'device_id', 'received_by'
         ];
         for (const key of criticalKeys) {
             if (payload[key] !== undefined) safeFields[key] = payload[key];
@@ -429,11 +433,13 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             checklist: r.checklist,
             security_pin: r.security_pin || null,
             security_pattern: r.security_pattern || null,
+            device_passcode: r.device_passcode || null,
             glass_upsell: r.glass_upsell || false,
             spare_part_cost: r.spare_part_cost || 0,
             whatsapp_notifications: r.whatsapp_notifications ?? true,
             supplier_id: r.supplier_id || null,
-            warranty: r.warranty || null
+            warranty: r.warranty || null,
+            payment_method: r.payment_method || null
         };
     }
 
