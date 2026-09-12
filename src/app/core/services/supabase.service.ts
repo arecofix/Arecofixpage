@@ -83,7 +83,7 @@ export class SupabaseService {
            await this.syncService.enqueueMutation(urlStr, method, headersArray, typeof options?.body === 'string' ? options.body : null);
            
            // Mock successful response based on payload to keep UI functioning
-           let mockResponseData: any[] = [];
+           let mockResponseData: unknown[] = [];
            if (options?.body && typeof options.body === 'string') {
               try {
                 const parsed = JSON.parse(options.body);
@@ -103,10 +103,10 @@ export class SupabaseService {
 
       const MAX_RETRIES = 3;
       const RETRY_DELAY = 1500;
-      let lastError: any;
+      let lastError: unknown;
 
        for (let i = 0; i < MAX_RETRIES; i++) {
-        let timeoutId: any;
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
         try {
           const controller = new AbortController();
           const fetchOptions = { ...options, signal: controller.signal };
