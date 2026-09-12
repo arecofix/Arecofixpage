@@ -68,6 +68,36 @@ export function app(): express.Express {
     res.status(404).send('Service Worker is disabled to clear cache.');
   });
   
+  // Página de recuperación de emergencia para clientes trabados
+  server.get('/recover', (req, res) => {
+    res.setHeader('Clear-Site-Data', '"cache", "storage", "executionContexts"');
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Recuperando Arecofix...</title>
+      </head>
+      <body>
+        <h1>Actualizando sistema... por favor espere.</h1>
+        <script>
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              for(let registration of registrations) {
+                registration.unregister();
+              }
+              setTimeout(() => {
+                window.location.href = '/login';
+              }, 1500);
+            });
+          } else {
+            window.location.href = '/login';
+          }
+        </script>
+      </body>
+      </html>
+    `);
+  });
+
   // Serve static files from /browser AFTER dynamic routes
   server.use(express.static(browserDistFolder, {
     maxAge: '1y',
