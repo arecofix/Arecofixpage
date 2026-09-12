@@ -48,6 +48,7 @@ beforeEach(function() {
         };
 
         setInputValue('input[name="customer_name"]', customerName);
+        setInputValue('input[name="customer_phone"]', '1122334455');
         setInputValue('input[name="device_model"]', deviceModel);
         setInputValue('textarea[name="issue_description"]', issueDescription);
         setInputValue('input[name="estimated_cost"]', '45000');

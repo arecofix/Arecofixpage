@@ -82,6 +82,9 @@ export interface Repair {
     readonly security_pattern?: string;
     readonly device_passcode?: string;
     
+    readonly payment_method?: string;
+    readonly surcharge_percentage?: number;
+    
     // Relations (opt-in)
     readonly parts?: RepairPart[];
 }
@@ -124,6 +127,8 @@ export interface CreateRepairDto {
     tracking_code?: string;
     spare_part_cost?: number;
     parts?: RepairPart[];
+    payment_method?: string;
+    surcharge_percentage?: number;
 }
 
 /**
