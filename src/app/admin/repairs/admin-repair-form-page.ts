@@ -38,7 +38,10 @@ import {
   CreateRepairDto,
   RepairStatus,
   UpdateRepairDto,
+  Repair,
+  RepairPart
 } from '@app/features/repairs/domain/entities/repair.entity';
+import { Customer } from '@app/features/customers/domain/entities/customer.entity';
 import { PricingService } from '@app/core/services/pricing.service';
 import { environment } from '@env/environment';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
@@ -139,7 +142,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     technical_labor_cost: 0,
     technical_report: '',
     parts:
-      [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
+      [] as RepairPart[],
     glass_upsell: false,
     whatsapp_notifications: true,
     spare_part_cost: 0,
@@ -197,7 +200,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   readonly TAX_RATE = 0.21;
   searchQuery = signal('');
   parts = signal<
-    import('../../features/repairs/domain/entities/repair.entity').RepairPart[]
+    RepairPart[]
   >([]);
   images = signal<string[]>([]);
   brands = signal<{ id: string; name: string }[]>([]);
@@ -268,7 +271,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       )
       .subscribe((data) => {
         if (data) {
-          this.clients.set(data.map((c) => this.clientView(c as any)));
+          this.clients.set(data.map((c) => this.clientView(c as unknown as Partial<UserProfile>)));
         }
       });
   }
@@ -298,7 +301,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     try {
       const data = await this.customerService.getRecentClients();
       if (data) {
-        this.clients.set(data.map((c) => this.clientView(c as any)));
+        this.clients.set(data.map((c) => this.clientView(c as unknown as Partial<UserProfile>)));
       }
     } catch (e) {
       console.error('Error loading clients', e);
@@ -449,7 +452,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       const currentImages = this.images();
       this.images.set([...currentImages, ...uploadedUrls]);
       this.notificationService.showSuccess('Imágenes subidas correctamente.');
-    } catch (e: any) {
+    } catch (e) {
       console.error('Error uploading images:', e);
       const message = e instanceof Error ? e.message : 'Unknown error';
       this.notificationService.showError('Error al subir imágenes: ' + message);
@@ -561,7 +564,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   onPartsListChange(
-    parts: import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
+    parts: RepairPart[],
   ) {
     this.parts.set(parts);
     this.calculateFinalCost();
@@ -625,7 +628,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
           customer_dni: data.customer_dni || '',
           device_model: data.device_model,
           device_type: data.device_type,
-          brand_id: (data as any).brand_id || null,
+          brand_id: data.brand_id || null,
           imei: data.imei,
           issue_description: data.issue_description,
           current_status_id: data.current_status_id,
@@ -643,9 +646,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
           glass_upsell: data.glass_upsell,
           whatsapp_notifications: data.whatsapp_notifications,
           spare_part_cost: data.spare_part_cost,
-          payment_method: (data as any).payment_method || 'efectivo',
-          warranty: (data as any).warranty || '',
-          supplier_id: (data as any).supplier_id || null,
+          payment_method: data.payment_method || 'efectivo',
+          warranty: data.warranty || '',
+          supplier_id: data.supplier_id || null,
         });
 
         if (data.checklist) {
@@ -663,7 +666,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         this.parts.set(data.parts || []);
         this.images.set(data.images || []);
       }
-    } catch (e: any) {
+    } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error';
       this.error.set('Error cargando reparación: ' + message);
     }
@@ -797,25 +800,26 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
           } else {
             throw new Error('No se obtuvo el ID del cliente.');
           }
-        } catch (err: any) {
+        } catch (err) {
           console.error('[AdminRepairForm] Error creating guest profile:', err);
           this.notificationService.showError(
             'Error al crear o buscar el cliente: ' +
-              (err.message || 'Verifique los datos.'),
+              (err instanceof Error ? err.message : 'Verifique los datos.'),
           );
           this.saving.set(false);
           return;
         }
       } else if (finalClientId) {
         // Actualizar datos si se editó un cliente existente
-        const updateData: any = {};
-        if (customer_dni !== undefined) updateData.dni = customer_dni || null;
-        if (customer_phone !== undefined) updateData.phone = customer_phone || null;
-        if (customer_email !== undefined) updateData.email = customer_email || null;
-        if (customer_name !== undefined) {
-          const nameParts = (customer_name || '').trim().split(' ');
-          updateData.first_name = nameParts[0] || '';
-          updateData.last_name = nameParts.slice(1).join(' ') || '';
+        const updateData: Record<string, unknown> = {};
+        if (customer_dni !== undefined) updateData['dni'] = customer_dni || null;
+        if (customer_phone !== undefined) updateData['phone'] = customer_phone || null;
+        if (customer_email !== undefined) updateData['email'] = customer_email || null;
+        
+        if (customer_name) {
+          const nameParts = customer_name.split(' ');
+          updateData['first_name'] = nameParts[0] || '';
+          updateData['last_name'] = nameParts.slice(1).join(' ') || '';
         }
 
         try {
@@ -897,12 +901,12 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       } else if (finalDeviceId) {
         // Si hay un dispositivo asociado, actualizar sus datos
         try {
-          const deviceUpdatePayload: any = {
+          const deviceUpdatePayload: Record<string, unknown> = {
             imei: imei || null,
             passcode: device_passcode || null,
           };
-          if (modelId) deviceUpdatePayload.model_id = modelId;
-          if (device_type) deviceUpdatePayload.type = device_type;
+        if (modelId) deviceUpdatePayload['model_id'] = modelId;
+        if (device_type) deviceUpdatePayload['type'] = device_type;
 
           await this.supabaseService
             .getClient()
@@ -995,12 +999,13 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       console.log(
         '🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...',
       );
+      await this.supabaseService.clearCache();
       this.router.navigate(['/admin/repairs']);
-    } catch (e: any) {
+    } catch (e) {
       console.error('💥 [AdminRepairForm] Error crítico en save():', e);
       const message =
-        e?.message ||
-        e?.error?.message ||
+        (e as Error)?.message ||
+        (e as any)?.error?.message ||
         (typeof e === 'string'
           ? e
           : 'Error desconocido al procesar la solicitud.');
@@ -1023,7 +1028,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       }
 
       // Need a Repair typed object for the service
-      const repairData: any = {
+      const repairData: Partial<Repair> = {
         ...rawData,
         brand_name: brandName,
         parts: this.parts(),
@@ -1034,7 +1039,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         repairData as import('../../features/repairs/domain/entities/repair.entity').Repair,
         this.company(),
       );
-    } catch (e: any) {
+    } catch (e) {
       console.error('PDF Error:', e);
       const message =
         e instanceof Error ? e.message : 'Error desconocido al generar PDF';

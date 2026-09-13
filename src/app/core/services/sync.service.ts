@@ -85,7 +85,7 @@ export class SyncService implements StorageAdapter {
     }
   }
 
-  async saveData(tableName: string, payload: any): Promise<any> {
+  async saveData(tableName: string, payload: Record<string, unknown>): Promise<unknown> {
     if (this.isOnline()) {
       try {
         await this.syncToCloudflareD1(tableName, payload, 'INSERT');
@@ -99,7 +99,7 @@ export class SyncService implements StorageAdapter {
     }
   }
 
-  async saveToLocal(tableName: string, payload: any, operation: string): Promise<{ local: boolean, success: boolean }> {
+  async saveToLocal(tableName: string, payload: Record<string, unknown>, operation: string): Promise<{ local: boolean, success: boolean }> {
     try {
       if (this.storageMode === 'CAPACITOR' && this.capDb) {
         await this.capDb.run(
@@ -127,7 +127,7 @@ export class SyncService implements StorageAdapter {
     }
   }
 
-  async getPendingData(): Promise<any[]> {
+  async getPendingData(): Promise<Record<string, unknown>[]> {
     if (this.storageMode === 'CAPACITOR' && this.capDb) {
       const res = await this.capDb.query('SELECT * FROM pending_sync');
       return res.values || [];
@@ -159,7 +159,7 @@ export class SyncService implements StorageAdapter {
     }
   }
 
-  private async syncToCloudflareD1(tableName: string, payload: any, operation: string) {
+  private async syncToCloudflareD1(tableName: string, payload: Record<string, unknown>, operation: string) {
     try {
       await fetch(`${this.cloudflareD1Url}/sync`, {
         method: 'POST',
@@ -178,11 +178,11 @@ export class SyncService implements StorageAdapter {
       if (pending.length === 0) return;
 
       for (const item of pending) {
-        if (item.operation === 'INSERT') {
-          const payload = JSON.parse(item.payload);
-          await this.syncToCloudflareD1(item.table_name, payload, 'INSERT');
-          await this.supabase.getClient().from(item.table_name).insert(payload);
-          await this.deletePendingData(item.id);
+        if (item['operation'] === 'INSERT') {
+          const payload = JSON.parse(item['payload'] as string);
+          await this.syncToCloudflareD1(item['table_name'] as string, payload, 'INSERT');
+          await this.supabase.getClient().from(item['table_name'] as string).insert(payload);
+          await this.deletePendingData(item['id'] as number);
         }
       }
     } catch(e) {

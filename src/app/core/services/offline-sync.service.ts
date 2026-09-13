@@ -2,6 +2,11 @@ import { Injectable, inject, signal, Injector, NgZone } from '@angular/core';
 import { LoggerService } from './logger.service';
 import { firstValueFrom } from 'rxjs';
 import { RepairRepository } from '../../features/repairs/domain/repositories/repair.repository';
+import {
+  RepairStatus,
+  Repair,
+  CreateRepairDto
+} from '@app/features/repairs/domain/entities/repair.entity';
 import { NotificationService } from './notification.service';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -27,13 +32,13 @@ export interface QueuedMutation {
 
 export interface MasterData {
   key: string;
-  data: any;
+  data: Record<string, unknown>;
   timestamp: number;
 }
 
 export interface OfflineRepair {
   id: string;
-  payload: any;
+  payload: Record<string, unknown>;
   timestamp: number;
 }
 
@@ -181,7 +186,7 @@ export class OfflineSyncService {
     await this.db.requestsCache.clear();
   }
 
-  async saveMasterData(key: string, data: any): Promise<void> {
+  async saveMasterData(key: string, data: Record<string, unknown>): Promise<void> {
     if (!this.isReady) return;
     await this.db.masterData.put({ key, data, timestamp: Date.now() });
   }
@@ -194,7 +199,7 @@ export class OfflineSyncService {
 
   // --- REPAIR EXPLICIT OFFLINE QUEUE --- //
   
-  async saveOfflineRepair(payload: any): Promise<void> {
+  async saveOfflineRepair(payload: Record<string, unknown>): Promise<void> {
     if (!this.isReady) return;
     await this.db.offlineRepairs.add({
       id: crypto.randomUUID(),
@@ -231,7 +236,8 @@ export class OfflineSyncService {
 
     for (const item of repairs) {
       try {
-        await firstValueFrom(this.repairRepo.create(item.payload));
+        // Assume the payload contains all necessary fields for CreateRepairDto 
+        await firstValueFrom(this.repairRepo.create(item.payload as unknown as CreateRepairDto));
         await this.db.offlineRepairs.delete(item.id);
         successCount++;
       } catch (err) {

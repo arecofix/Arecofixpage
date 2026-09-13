@@ -271,7 +271,8 @@ export class RepuestosComponent implements OnInit, OnDestroy {
                     'repuesto', 'modulo', 'módulo', 'bateria', 'batería', 'display', 'screen', 'pantalla', 
                     'flex', 'pin', 'microfono', 'micrófono', 
                     'camara', 'cámara', 'lente', 'touch', 'bandeja', 'sim', 'buzzer', 'speaker', 
-                    'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power'
+                    'altavoz', 'parlante', 'vibrador', 'sensor', 'boton', 'tecla', 'home', 'volumen', 'power',
+                    'tapa', 'huella', 'placa'
                 ];
                 
                 const relevantCategories = allCategories.filter((c: iCategory) => 
