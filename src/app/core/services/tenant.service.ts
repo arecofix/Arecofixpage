@@ -117,6 +117,21 @@ export class TenantService {
   async resolveTenantByHostname(hostname: string): Promise<Tenant | null> {
     // console.debug(`Resolving tenant for hostname: ${hostname}`);
     try {
+      // TEMPORARY HOTFIX: Database contains duplicate 'arecofix' slugs and an empty 0000... tenant bound to custom_domain.
+      // Force the correct tenant ID for the main site to restore public functionality.
+      if (hostname === 'arecofix.com.ar' || hostname === 'www.arecofix.com.ar' || hostname === 'localhost') {
+        const { data: realData } = await this.supabase
+          .from('tenants')
+          .select('*')
+          .eq('id', 'bba26ccd-59ce-471c-aac0-4c1f5513de3b')
+          .single();
+          
+        if (realData) {
+          this.setTenantContext(realData);
+          return realData;
+        }
+      }
+
       // 1. Buscamos primero si el negocio configuró un Custom Domain (Ej: mibau.com.ar)
       // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET):
       // GET https://<TU_SUPABASE_URL>/rest/v1/tenants?select=*&custom_domain=eq.<hostname>&is_active=eq.true
