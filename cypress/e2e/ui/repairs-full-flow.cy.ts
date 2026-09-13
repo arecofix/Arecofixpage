@@ -38,7 +38,7 @@ beforeEach(function() {
             }
         });
 
-        cy.get('a[href="/admin/repairs/new"]').first().click({ force: true });
+        cy.get('a[href="/admin/repairs/new"], a[routerLink="/admin/repairs/new"]').first().click({ force: true });
         cy.url().should('include', '/admin/repairs/new');
         cy.wait(1500);
 

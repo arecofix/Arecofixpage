@@ -115,7 +115,7 @@ describe('SEO Meta Tags & Full Validation', () => {
     cy.visit('/productos/detalle/joystick-play-station-4');
     
     // Validamos que el producto use sus propios datos
-    checkSeoTags('Joystick Play Station 4', 'En venta Joystick nuevo', '1000028937.jpg', '/productos/detalle/joystick-play-station-4', true);
+    checkSeoTags('Joystick Play Station 4', 'Comprá Joystick Play Station 4', '1000028937.jpg', '/productos/detalle/joystick-play-station-4', true);
   });
 
   // cy.intercept no intercepta peticiones hechas desde el servidor (SSR), por lo que este test falla en prod.

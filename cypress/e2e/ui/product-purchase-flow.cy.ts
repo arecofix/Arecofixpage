@@ -31,44 +31,7 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
     cy.contains('INICIA SESIÓN O REGÍSTRATE', { matchCase: false }).should('be.visible');
 
     // 2. Iniciamos sesión con un usuario común
-    // Para simplificar el test, mockeamos el login
-    cy.window().then((win) => {
-      // Simular sesión de Supabase con el project ID real
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify({
-        provider_token: null,
-        access_token: 'fake-access-token',
-        expires_in: 3600,
-        expires_at: Math.floor(Date.now() / 1000) + 3600,
-        refresh_token: 'fake-refresh-token',
-        token_type: 'bearer',
-        user: { 
-          id: '123', 
-          email: 'test@usuario.com', 
-          aud: 'authenticated', 
-          role: 'authenticated', 
-          created_at: new Date().toISOString() 
-        }
-      }));
-      win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
-    });
-
-    // Añadir mocks para la sesión autenticada
-    cy.intercept('GET', '**/auth/v1/user', {
-      statusCode: 200,
-      body: { 
-        id: '123', 
-        email: 'test@usuario.com',
-        aud: 'authenticated',
-        role: 'authenticated',
-        app_metadata: { provider: 'email', providers: ['email'] },
-        user_metadata: {}
-      }
-    }).as('getUser');
-
-    cy.intercept('GET', '**/rest/v1/profiles*', {
-      statusCode: 200,
-      body: [{ id: '123', email: 'test@usuario.com', role: 'user', first_name: 'Test', is_active: true, tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b' }]
-    }).as('getProfile');
+    cy.setupCheckoutSession();
 
     // 3. Volvemos al producto
     cy.visit(PRODUCT_URL);
