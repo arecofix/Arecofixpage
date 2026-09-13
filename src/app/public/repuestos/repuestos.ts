@@ -292,6 +292,7 @@ export class RepuestosComponent implements OnInit, OnDestroy {
             if (allIds.size > 0) {
                 this.repuestosRootId.set(repuestosCat?.id || null);
                 this.repuestosCategoryIds.set(Array.from(allIds));
+                this.initError.set(null);
                 this.isInitialized.set(true);
                 this.productsRs.reload(); // Trigger stream now that we have categories
             } else {
