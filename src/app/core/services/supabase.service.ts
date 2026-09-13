@@ -110,7 +110,8 @@ export class SupabaseService {
         try {
           const controller = new AbortController();
           const fetchOptions = { ...options, signal: controller.signal };
-          const fetchPromise = fetch(requestUrl, fetchOptions);
+          // Use window.fetch explicitly so Cypress can intercept it properly
+          const fetchPromise = (window as any).fetch ? window.fetch(requestUrl, fetchOptions) : fetch(requestUrl, fetchOptions);
           const timeoutPromise = new Promise<Response>((_, reject) => {
               timeoutId = setTimeout(() => {
                   controller.abort();

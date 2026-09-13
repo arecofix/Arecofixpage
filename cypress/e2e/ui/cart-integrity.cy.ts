@@ -12,10 +12,10 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
       cy.stub(win.console, 'warn').callsFake(() => {});
     });
 
-    cy.intercept('GET', '**/rest/v1/products*', (req) => {
+    cy.intercept('GET', 'https://db.arecofix.com.ar/rest/v1/products*', (req) => {
       req.reply({
         statusCode: 200,
-        headers: { 'Content-Range': '0-1/2', 'Content-Type': 'application/json' },
+        headers: { 'Content-Range': '0-1/2', 'Content-Type': 'application/json', 'access-control-allow-origin': '*' },
         body: [productA, productB]
       });
     }).as('getProducts');
@@ -46,6 +46,7 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
 
   it('debería calcular el subtotal correctamente y permitir vaciar el carrito (QA #26-36)', () => {
     cy.visit('/productos');
+    cy.wait('@getProducts');
     cy.wait('@getProducts');
     
     // Add product A

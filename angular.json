@@ -144,8 +144,15 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
+            },
+            "cypress": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "ssr": false
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
@@ -156,6 +163,12 @@
             "development": {
               "buildTarget": "arecofix:build:development",
               "hmr": false
+            },
+            "cypress": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "ssr": false
             }
           },
           "defaultConfiguration": "development"

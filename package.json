@@ -13,7 +13,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:api": "start-server-and-test start http://127.0.0.1:4200 \"cypress run --spec 'cypress/e2e/api/**/*.cy.{js,ts}'\"",
-    "test:e2e": "start-server-and-test start http://127.0.0.1:4200 \"cypress run --spec 'cypress/e2e/ui/**/*.cy.{js,ts}'\"",
+    "test:e2e": "start-server-and-test \"npx ng serve --host 127.0.0.1 --configuration=cypress\" http://127.0.0.1:4200 \"cypress run --spec 'cypress/e2e/ui/**/*.cy.{js,ts}'\"",
     "cypress:open": "start-server-and-test start http://127.0.0.1:4200 \"cypress open\"",
     "test:load": "k6 run load-test.js",
     "generate-sitemap": "node scripts/sync-seo.mjs",

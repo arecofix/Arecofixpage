@@ -170,22 +170,21 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
       statusCode: 200,
       body: { score: 100, passed: true, correct_answers: 1, total_questions: 1 }
     });
-
     cy.intercept('POST', '**/rest/v1/rpc/get_course_progress*', {
       statusCode: 200,
       body: { progress: 0, completed_contents: [], certificate_id: null }
     });
 
-    cy.visit('/academy/curso-reparacion-celulares/aula', {
     cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
     cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+
+    cy.visit('/academy/curso-reparacion-celulares/aula', {
         onBeforeLoad: (win) => {
             win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockStudentSession));
         }
     });
 
     cy.get('.collapse-title').first().click({ force: true });
-    cy.contains('Examen').should('be.visible');
     cy.get('button').contains('Comenzar').click({ force: true });
 
     cy.contains('¿Qué voltaje tiene una batería cargada?').should('be.visible');

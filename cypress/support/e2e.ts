@@ -65,6 +65,15 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 });
 
 beforeEach(() => {
+  if (window.navigator && navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => {
+        registrations.forEach((registration) => {
+          registration.unregister()
+        })
+      })
+  }
+
   cy.clearLocalStorage();
   cy.clearCookies();
   // Bloquear llamadas a Google Analytics, Tag Manager y PostHog para evitar timeouts y datos de test
@@ -73,6 +82,24 @@ beforeEach(() => {
   cy.intercept('https://us.i.posthog.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://us-assets.i.posthog.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://connect.facebook.net/**', { statusCode: 200, body: '' });
+
+  // Manejar preflights OPTIONS para todas las llamadas REST y RPC a Supabase
+  cy.intercept('OPTIONS', '**/rest/v1/**', {
+    statusCode: 200,
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'access-control-allow-headers': '*'
+    }
+  });
+  cy.intercept('OPTIONS', '**/rpc/**', {
+    statusCode: 200,
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'access-control-allow-headers': '*'
+    }
+  });
 
   // Align zaona user profile's tenant_id to Arecofix tenant to avoid branch/profile tenant mismatch
   cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
