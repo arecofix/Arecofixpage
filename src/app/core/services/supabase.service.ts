@@ -190,14 +190,12 @@ export class SupabaseService {
           }
 
           return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
           clearTimeout(timeoutId);
           lastError = error;
-          this.logger.warn(`Supabase fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, error.message);
-          
-          if (i < MAX_RETRIES - 1) {
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
-          }
+          console.warn(`[SupabaseService] GET ${url} fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, (error as Error).message);
+          if (i === MAX_RETRIES - 1) throw error;
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
         }
       }
       
@@ -255,7 +253,7 @@ export class SupabaseService {
          
          await this.syncService.enqueueMutation(urlStr, method, headersArray, typeof options?.body === 'string' ? options.body : null);
          
-         let mockResponseData: any[] = [];
+         let mockResponseData: Record<string, unknown>[] = [];
          if (options?.body && typeof options.body === 'string') {
             try {
               const parsed = JSON.parse(options.body);
@@ -289,9 +287,9 @@ export class SupabaseService {
       }
       close() {}
       send() {}
-      addEventListener(type: string, listener: any) {
+      addEventListener(type: string, listener: unknown) {
         if (type === 'error' || type === 'close') {
-          Promise.resolve().then(() => listener({ code: 1000 }));
+          Promise.resolve().then(() => (listener as Function)({ code: 1000 }));
         }
       }
       removeEventListener() {}

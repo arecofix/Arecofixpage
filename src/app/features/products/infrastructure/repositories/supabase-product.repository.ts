@@ -337,7 +337,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         delete copy.convertedPrice;
         delete copy.category_name;
         delete copy.branch_stock;
-        delete copy.branches;
+        delete copy['branches'];
         return copy;
     });
     // 👇 EQUIVALENTE A POSTMAN (PETICIÓN POST para crear/upsert):
@@ -417,7 +417,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     return new Observable<Product[]>(subscriber => {
       let isSubscribed = true;
       
-      Promise.resolve(supabaseQuery).then(({ data, error }: any) => {
+      Promise.resolve(supabaseQuery).then(({ data, error }: { data: Record<string, unknown>[] | null, error: unknown }) => {
         if (!isSubscribed) return;
         
         if (error) {
@@ -471,7 +471,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
         .select('*', { count: 'exact', head: true })
         .eq('is_active', false)
     );
-    return from(query as any).pipe(map(({ count }: any) => count || 0));
+    return from(query as unknown as PromiseLike<{ count: number | null }>).pipe(map(({ count }) => count || 0));
   }
 
   getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }> {
@@ -490,26 +490,29 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             const results = data || [];
             
             // Un producto se considera "en inventario de la sucursal" si tiene stock asociado o si pertenece nativamente a la sucursal
-            const branchProducts = results.filter((item: any) => {
-                const hasStockEntry = item.branch_stock && Array.isArray(item.branch_stock) && item.branch_stock.some((s: any) => s.branch_id === branch_id);
-                return item.branch_id === branch_id || hasStockEntry;
+            const branchProducts = results.filter((item: Record<string, unknown>) => {
+                const bStock = item['branch_stock'];
+                const hasStockEntry = bStock && Array.isArray(bStock) && bStock.some((s: Record<string, unknown>) => s['branch_id'] === branch_id);
+                return item['branch_id'] === branch_id || hasStockEntry;
             });
 
             const totalItems = branchProducts.length;
             const totalValue = branchProducts.reduce((acc: number, item: any) => {
-                const price = Number(item.price || 0);
-                const stockList = item.branch_stock && Array.isArray(item.branch_stock) ? item.branch_stock : [];
-                const branchStock = stockList.find((s: any) => s.branch_id === branch_id);
-                const quantity = branchStock ? Number(branchStock.quantity || 0) : 0;
+                const price = Number(item['price'] || 0);
+                const bStock = item['branch_stock'];
+                const stockList = bStock && Array.isArray(bStock) ? bStock : [];
+                const branchStock = stockList.find((s: Record<string, unknown>) => s['branch_id'] === branch_id);
+                const quantity = branchStock ? Number(branchStock['quantity'] || 0) : 0;
                 return acc + (price * quantity);
             }, 0);
 
-            const lowStockCount = branchProducts.filter((item: any) => {
-                const stockList = item.branch_stock && Array.isArray(item.branch_stock) ? item.branch_stock : [];
-                const branchStock = stockList.find((s: any) => s.branch_id === branch_id);
+            const lowStockCount = branchProducts.filter((item: Record<string, unknown>) => {
+                const bStock = item['branch_stock'];
+                const stockList = bStock && Array.isArray(bStock) ? bStock : [];
+                const branchStock = stockList.find((s: Record<string, unknown>) => s['branch_id'] === branch_id);
                 if (!branchStock) return false;
-                const quantity = Number(branchStock.quantity || 0);
-                const threshold = Number(branchStock.min_stock_alert ?? 5);
+                const quantity = Number(branchStock['quantity'] || 0);
+                const threshold = Number(branchStock['min_stock_alert'] ?? 5);
                 return quantity > 0 && quantity <= threshold;
             }).length;
 
@@ -527,9 +530,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             const results = data || [];
             const totalItems = results.length;
             const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
-            const lowStockCount = results.filter((p: any) => {
-                const stockVal = Number(p.stock || 0);
-                const threshold = Number(p.min_stock_alert ?? 5);
+            const lowStockCount = results.filter((p: Record<string, unknown>) => {
+                const stockVal = Number(p['stock'] || 0);
+                const threshold = Number(p['min_stock_alert'] ?? 5);
                 return stockVal > 0 && stockVal <= threshold;
             }).length;
 

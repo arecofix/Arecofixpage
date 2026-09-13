@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, from, map, switchMap } from 'rxjs';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
-import { Repair, CreateRepairDto, UpdateRepairDto, RepairPart } from '../../domain/entities/repair.entity';
+import { Repair, CreateRepairDto, UpdateRepairDto, RepairPart, RepairChecklist } from '../../domain/entities/repair.entity';
 import { LoggerService } from '@app/core/services/logger.service';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
@@ -360,53 +360,60 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         }
     }
 
-    private mapFromDb(p: any): Repair {
+    private mapFromDb(p: Record<string, unknown>): Repair {
+        const client = p['client'] as Record<string, unknown> | null;
+        const device = p['device'] as Record<string, unknown> | null;
+        const model = device?.['model'] as Record<string, unknown> | null;
+        const brand = model?.['brand'] as Record<string, unknown> | null;
+        const rawImages = p['images'] as { image_url: string }[] | null;
+        const rawParts = p['parts'] as (RepairPart & { product?: { name?: string }; name?: string; product_name?: string })[] | null;
+
         return {
-            id: p.id,
-            tracking_code: p.tracking_code,
-            customer_id: p.client_id,
-            customer_name: p.client ? `${p.client.first_name || ''} ${p.client.last_name || ''}`.trim() : (p.customer_name || 'Cliente'),
-            customer_phone: p.client?.phone || p.customer_phone,
-            customer_dni: p.client?.dni || p.customer_dni || undefined,
-            device_type: p.device?.type || p.device_type,
-            brand_id: p.device?.brand_id || p.device?.model?.brand_id || p.brand_id,
-            brand_name: p.device?.model?.brand?.name || p.brand?.name || p.device_brand || undefined,
+            id: p['id'] as string,
+            tracking_code: p['tracking_code'] as string,
+            customer_id: p['client_id'] as string,
+            customer_name: client ? `${client['first_name'] || ''} ${client['last_name'] || ''}`.trim() : (p['customer_name'] as string || 'Cliente'),
+            customer_phone: (client?.['phone'] as string) || (p['customer_phone'] as string),
+            customer_dni: (client?.['dni'] as string) || (p['customer_dni'] as string) || undefined,
+            device_type: (device?.['type'] as string) || (p['device_type'] as string),
+            brand_id: (device?.['brand_id'] as string) || (model?.['brand_id'] as string) || (p['brand_id'] as string),
+            brand_name: (brand?.['name'] as string) || ((p['brand'] as Record<string, unknown>)?.['name'] as string) || (p['device_brand'] as string) || undefined,
             device_model: (() => {
-                const resolved = p.device?.model?.name || p.device_model || 'Equipo Genérico';
+                const resolved = (model?.['name'] as string) || (p['device_model'] as string) || 'Equipo Genérico';
                 return resolved;
             })(),
-            imei: p.device?.imei || p.imei,
-            repair_number: p.repair_number,
-            issue_description: p.issue_description,
-            current_status_id: p.current_status_id,
-            estimated_cost: Number(p.estimated_cost || 0),
-            final_cost: Number(p.final_cost || 0),
-            deposit_amount: Number(p.deposit_amount || 0),
-            technical_labor_cost: Number(p.technical_labor_cost || 0),
-            notes: p.technician_notes, // DB uses technician_notes
-            technician_notes: p.technician_notes,
-            technical_report: p.technical_report,
-            received_at: p.received_at,
-            created_at: p.created_at,
-            updated_at: p.updated_at,
-            completed_at: p.completed_at,
-            images: p.images?.map((img: any) => img.image_url) || [],
-            parts: p.parts?.map((part: any) => ({
+            imei: (device?.['imei'] as string) || (p['imei'] as string),
+            repair_number: p['repair_number'] as number,
+            issue_description: p['issue_description'] as string,
+            current_status_id: p['current_status_id'] as number,
+            estimated_cost: Number(p['estimated_cost'] || 0),
+            final_cost: Number(p['final_cost'] || 0),
+            deposit_amount: Number(p['deposit_amount'] || 0),
+            technical_labor_cost: Number(p['technical_labor_cost'] || 0),
+            notes: p['technician_notes'] as string, // DB uses technician_notes
+            technician_notes: p['technician_notes'] as string,
+            technical_report: p['technical_report'] as string,
+            received_at: p['received_at'] as string,
+            created_at: p['created_at'] as string,
+            updated_at: p['updated_at'] as string,
+            completed_at: p['completed_at'] as string,
+            images: rawImages?.map((img: { image_url: string }) => img.image_url) || [],
+            parts: rawParts?.map((part) => ({
                 ...part,
                 name: part.product?.name || part.name || part.product_name || 'Repuesto (Sin nombre)',
                 product_name: part.product?.name || part.name || part.product_name || 'Repuesto (Sin nombre)'
             })) || [],
-            branch_id: p.branch_id,
-            received_by: p.received_by,
-            assigned_technician_id: p.assigned_technician_id,
-            checklist: p.checklist,
-            security_pin: p.security_pin,
-            security_pattern: p.security_pattern,
-            device_passcode: p.device?.passcode,
-            glass_upsell: p.glass_upsell,
-            spare_part_cost: Number(p.spare_part_cost || 0),
-            supplier_id: p.supplier_id,
-            warranty: p.warranty
+            branch_id: p['branch_id'] as string,
+            received_by: p['received_by'] as string,
+            assigned_technician_id: p['assigned_technician_id'] as string,
+            checklist: (p['checklist'] || {}) as RepairChecklist,
+            security_pin: p['security_pin'] as string,
+            security_pattern: p['security_pattern'] as string,
+            device_passcode: device?.['passcode'] as string,
+            glass_upsell: p['glass_upsell'] as boolean,
+            spare_part_cost: Number(p['spare_part_cost'] || 0),
+            supplier_id: p['supplier_id'] as string,
+            warranty: p['warranty'] as string
         };
     }
 

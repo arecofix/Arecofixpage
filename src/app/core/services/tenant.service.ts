@@ -296,9 +296,9 @@ export class TenantService {
   /**
    * Obtiene todas las sucursales (async para cumplimiento de guardias legacy)
    */
-  getBranches(): any[] {
+  getBranches(): Record<string, unknown>[] {
      const current = this._currentTenant();
-     return current && !this.isMainTenant() ? [current] : [];
+     return current && !this.isMainTenant() ? [current as unknown as Record<string, unknown>] : [];
   }
 
   /**

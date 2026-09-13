@@ -1,0 +1,150 @@
+{
+  "required": [
+    "id",
+    "received_at",
+    "created_at",
+    "tenant_id"
+  ],
+  "properties": {
+    "id": {
+      "default": "gen_random_uuid()",
+      "description": "Note:\nThis is a Primary Key.<pk/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "issue_description": {
+      "format": "text",
+      "type": "string"
+    },
+    "estimated_cost": {
+      "format": "numeric",
+      "type": "number"
+    },
+    "final_cost": {
+      "format": "numeric",
+      "type": "number"
+    },
+    "technician_notes": {
+      "format": "text",
+      "type": "string"
+    },
+    "received_at": {
+      "default": "timezone('utc'::text, now())",
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "completed_at": {
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "current_status_id": {
+      "default": 1,
+      "description": "Estado actual de la reparación\n\nNote:\nThis is a Foreign Key to `repair_status_types.id`.<fk table='repair_status_types' column='id'/>",
+      "format": "integer",
+      "type": "integer"
+    },
+    "whatsapp_notifications": {
+      "default": true,
+      "description": "Si el cliente quiere recibir notificaciones por WhatsApp",
+      "format": "boolean",
+      "type": "boolean"
+    },
+    "tracking_code": {
+      "default": "('AF-'::text || lpad((nextval('public.repair_tracking_seq'::regclass))::text, 3, '0'::text))",
+      "description": "Código único para tracking público",
+      "format": "text",
+      "type": "string"
+    },
+    "checklist": {
+      "format": "jsonb"
+    },
+    "security_pin": {
+      "format": "text",
+      "type": "string"
+    },
+    "security_pattern": {
+      "format": "text",
+      "type": "string"
+    },
+    "deposit_amount": {
+      "default": 0,
+      "format": "numeric",
+      "type": "number"
+    },
+    "created_at": {
+      "default": "timezone('utc'::text, now())",
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "repair_number": {
+      "format": "integer",
+      "type": "integer"
+    },
+    "client_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "technical_report": {
+      "format": "text",
+      "type": "string"
+    },
+    "device_id": {
+      "description": "Note:\nThis is a Foreign Key to `customer_devices.id`.<fk table='customer_devices' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "branch_id": {
+      "description": "Note:\nThis is a Foreign Key to `branches.id`.<fk table='branches' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "received_by": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "assigned_technician_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "technical_labor_cost": {
+      "default": 0,
+      "format": "numeric",
+      "type": "number"
+    },
+    "tenant_id": {
+      "default": "public.get_my_tenant()",
+      "description": "Note:\nThis is a Foreign Key to `tenants.id`.<fk table='tenants' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "deleted_at": {
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "updated_at": {
+      "default": "timezone('utc'::text, now())",
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "glass_upsell": {
+      "default": false,
+      "format": "boolean",
+      "type": "boolean"
+    },
+    "spare_part_cost": {
+      "default": 0,
+      "format": "numeric",
+      "type": "number"
+    },
+    "warranty": {
+      "format": "text",
+      "type": "string"
+    },
+    "supplier_id": {
+      "description": "Note:\nThis is a Foreign Key to `suppliers.id`.<fk table='suppliers' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
