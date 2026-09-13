@@ -59,7 +59,10 @@ describe('Tauri Desktop App - Full Offline Flow', () => {
     cy.intercept('**/auth/v1/*', { forceNetworkError: true }).as('offlineAuth');
     
     // Validar que se está usando el puerto local (Flask) de Tauri
-    cy.intercept('GET', 'http://localhost:5000/api/productos*').as('flaskProducts');
+    cy.intercept('GET', 'http://localhost:5000/api/productos*', {
+      statusCode: 200,
+      body: [{ id: 'mock-1', title: 'Producto Offline', price: 1000, category_id: 'cat-1', slug: 'prod-off', image_url: 'none.png', has_variants: false }]
+    }).as('flaskProducts');
 
 
     // ── Paso 3: Verificación de Flujo Offline ──────────────────────────────

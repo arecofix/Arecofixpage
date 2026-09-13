@@ -89,9 +89,11 @@ beforeEach(function() {
                 this.skip();
                 return;
             }
-            // Sin un token de un tenant válido, RLS no debe devolver registros
-            expect(response.status).to.eq(200);
-            expect(response.body).to.be.an('array').that.is.empty;
+            // Sin un token de un tenant válido, RLS no debe devolver registros o puede devolver 401/403
+            expect(response.status).to.be.oneOf([200, 401, 403]);
+            if (response.status === 200) {
+                expect(response.body).to.be.an('array').that.is.empty;
+            }
         });
     });
 });

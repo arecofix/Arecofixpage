@@ -96,6 +96,6 @@ describe('Instructor Assignment Flow', () => {
     });
     
     cy.get('[aria-label="Menú de usuario"]').click();
-    cy.get('a[routerLink="/academy/mis-cursos"]').should('be.visible').and('contain', 'Mi Academia');
+    cy.get('a[href="/academy/mis-cursos"], a[routerLink="/academy/mis-cursos"]').should('be.visible').and('contain', 'Mi Academia');
   });
 });
