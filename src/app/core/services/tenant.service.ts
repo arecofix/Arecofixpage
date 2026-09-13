@@ -127,7 +127,7 @@ export class TenantService {
           .single();
           
         if (realData) {
-          this.setTenantContext(realData);
+          this.setTenant(realData);
           return realData;
         }
       }
