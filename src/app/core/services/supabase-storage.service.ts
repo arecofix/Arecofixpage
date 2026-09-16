@@ -45,7 +45,11 @@ export class SupabaseStorageService {
         const expiresAt = session.expires_at || 0;
         const now = Math.floor(Date.now() / 1000);
         if (expiresAt - now < 300) {
-          await this.auth.refreshSession();
+          try {
+            await this.auth.refreshSession();
+          } catch (e) {
+            this.logger.warn('Failed to proactively refresh session before upload, continuing anyway', e);
+          }
         }
       }
 
@@ -91,8 +95,7 @@ export class SupabaseStorageService {
 
       // 2. Upload directly to Cloudflare R2 using the Presigned URL
       const fetchHeaders: Record<string, string> = {
-        'Content-Type': fileToUpload.type,
-        'cache-control': cacheHeader
+        'Content-Type': fileToUpload.type
       };
 
       const uploadPromise = fetch(uploadUrl, {
