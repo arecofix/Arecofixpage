@@ -66,35 +66,6 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       this.initAuth();
       this.setupDeepLinks();
-      this.setupVisibilityListener();
-    }
-  }
-
-  /**
-   * Monitor tab visibility to wake up the session after long idle periods
-   */
-  private setupVisibilityListener() {
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'visible') {
-           this.logger.info('Tab became visible, checking session integrity...');
-           const session = this.getCurrentSession();
-           
-           if (session) {
-              const expiresAt = session.expires_at || 0;
-              const now = Math.floor(Date.now() / 1000);
-              
-              // If session expires in less than 5 minutes or is already expired
-              if (expiresAt - now < 300) {
-                 this.logger.info('Session nearing expiration or expired after dormant period, refreshing...');
-                 await this.refreshSession();
-              }
-           } else {
-             // Try to recover session if it was lost
-             await this.getSession();
-           }
-        }
-      });
     }
   }
 
@@ -186,7 +157,8 @@ export class AuthService {
 
     this.supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
-        this.logger.info(`Auth Event: ${event}`);
+        // Silenced Auth Event logs to reduce console noise during background syncs
+        // this.logger.info(`Auth Event: ${event}`);
         
         if (event === 'SIGNED_OUT') {
            if (typeof localStorage !== 'undefined') {
@@ -218,6 +190,9 @@ export class AuthService {
             }
           }
 
+          // Verificar si ya estábamos iniciados en sesión (background sync o refresh de tab)
+          const wasAlreadyInitialized = this.authState.value.isInitialized && this.authState.value.user !== null;
+
           if (profile) {
             this.authState.next({ session, user: session.user, profile, isInitialized: true });
           } else {
@@ -234,7 +209,7 @@ export class AuthService {
             }
             
             const isOAuthRedirect = window.location.hash.includes('access_token');
-            if (isOAuthRedirect) {
+            if (isOAuthRedirect && !wasAlreadyInitialized) {
                const toastService = this.injector.get(ToastService);
                toastService.show(`Bienvenido${profile?.first_name ? ' ' + profile.first_name : ''}! Has iniciado sesión correctamente.`, 'success');
             }
@@ -252,14 +227,17 @@ export class AuthService {
               const currentPath = window.location.pathname;
               const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/' || currentPath.includes('/auth/');
               
-              if (hasExplicitReturnUrl) {
-                 if (currentPath !== returnUrl) {
-                     router.navigateByUrl(returnUrl);
-                 }
-              } else if (isAuthPage) {
-                 if (currentPath !== returnUrl) {
-                     router.navigateByUrl(returnUrl);
-                 }
+              // Evitar redirección si el usuario ya estaba validado en la UI (tab recovery, background token refresh)
+              if (!wasAlreadyInitialized || isOAuthRedirect) {
+                if (hasExplicitReturnUrl) {
+                   if (currentPath !== returnUrl) {
+                       router.navigateByUrl(returnUrl);
+                   }
+                } else if (isAuthPage) {
+                   if (currentPath !== returnUrl) {
+                       router.navigateByUrl(returnUrl);
+                   }
+                }
               }
               
               if (isOAuthRedirect) {

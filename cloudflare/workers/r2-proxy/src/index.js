@@ -4,6 +4,18 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // 0. MANEJADOR CORS PREFLIGHT (OPTIONS)
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
+          'Access-Control-Max-Age': '86400',
+        }
+      });
+    }
+
     // 1. GENERADOR DE PRESIGNED URLS PARA R2 (SUBIDAS DESDE FRONTEND)
     if (request.method === 'POST' && url.pathname === '/api/get-upload-url') {
       return await handlePresignedUrl(request, env);

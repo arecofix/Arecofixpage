@@ -24,6 +24,19 @@ module.exports = {
       env: {
         FLASK_ENV: 'production'
       }
+    },
+    {
+      name: 'arecofix-ai-worker',
+      cwd: './Back-End',
+      script: './venv/bin/python',
+      args: 'scripts/ai_enrichment_worker.py',
+      instances: 1,
+      exec_mode: 'fork',
+      interpreter: 'none',
+      env_file: '../.env',
+      env: {
+        PYTHONUNBUFFERED: '1'
+      }
     }
   ]
 };

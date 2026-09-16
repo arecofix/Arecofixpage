@@ -587,6 +587,77 @@ def get_health():
         "mode": "Offline-First"
     })
 
+# --- WHATSAPP WEBHOOK ---
+
+@app.route('/webhook', methods=['GET'])
+def verify_webhook():
+    mode = request.args.get('hub.mode')
+    token = request.args.get('hub.verify_token')
+    challenge = request.args.get('hub.challenge')
+    
+    # Token de verificación para Meta
+    VERIFY_TOKEN = os.getenv('WHATSAPP_VERIFY_TOKEN', 'arecofix_secreto_123')
+    
+    if mode and token:
+        if mode == 'subscribe' and token == VERIFY_TOKEN:
+            print("WEBHOOK VERIFICADO")
+            return challenge, 200
+        else:
+            return 'Forbidden', 403
+    return 'Bad Request', 400
+
+@app.route('/webhook', methods=['POST'])
+def handle_webhook():
+    body = request.json
+    
+    WHATSAPP_TOKEN = os.getenv('WHATSAPP_TOKEN', 'EAARLwIJnO30BSffKUOP87hknZCXDIo4rHfHpPLr7if3yVIg5CYByC5j6XvHBVhRVjvZBlSKKuoPKoYz0x4ASmSwLNAqk6C2bGclXvV3FxJsDGO6we7lg6luv0aBsFZBZASQqlfptsMxToIlD3H0ewcaooQIZBgCA7t4CXW9mLjygRnKThCAdo1tpjI3swKZAMQ0gZDZD')
+    PHONE_NUMBER_ID = os.getenv('WHATSAPP_PHONE_ID', '3084224258535964') # Número Real
+    
+    if body.get('object') == 'whatsapp_business_account':
+        try:
+            entry = body.get('entry', [])[0]
+            changes = entry.get('changes', [])[0]
+            value = changes.get('value', {})
+            messages = value.get('messages', [])
+            
+            if messages:
+                message = messages[0]
+                from_phone = message.get('from')
+                msg_type = message.get('type')
+                
+                msg_text = ""
+                if msg_type == 'text':
+                    msg_text = message.get('text', {}).get('body', '')
+                
+                print(f"Mensaje recibido de {from_phone}: {msg_text}")
+                
+                # Enviar respuesta automática (Mensaje de texto simple)
+                url = f"https://graph.facebook.com/v25.0/{PHONE_NUMBER_ID}/messages"
+                headers = {
+                    'Authorization': f'Bearer {WHATSAPP_TOKEN}',
+                    'Content-Type': 'application/json'
+                }
+                payload = {
+                    "messaging_product": "whatsapp",
+                    "to": from_phone,
+                    "type": "text",
+                    "text": {
+                        "body": f"¡Hola! Somos Arecofix. Hemos recibido tu mensaje: '{msg_text}'. ¿En qué te podemos ayudar hoy?"
+                    }
+                }
+                
+                res = requests.post(url, headers=headers, json=payload)
+                if not res.ok:
+                    print("Error enviando mensaje de WhatsApp:", res.text)
+                else:
+                    print("Respuesta de WhatsApp enviada exitosamente")
+        except Exception as e:
+            print("Error procesando webhook:", e)
+            
+        return 'EVENT_RECEIVED', 200
+    else:
+        return 'Not Found', 404
+
 # --- AUTHENTICATION & JWT DECORATOR ---
 
 def token_required(f):
