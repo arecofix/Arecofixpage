@@ -244,12 +244,12 @@ export class CoursesService {
             .eq('course_id', courseId)
             .ilike('email', trimmedEmail)
             .eq('status', 'confirmed')
-            .maybeSingle();
+            .limit(1);
         if (error) {
             this.logger.error('checkEnrollment failed', error);
             return { enrolled: false, error };
         }
-        return { enrolled: !!data, error: null };
+        return { enrolled: data && data.length > 0, error: null };
     }
 
     async enrollStudentManually(courseId: string, email: string, fullName: string, phone?: string): Promise<{ data: any, error: any }> {
