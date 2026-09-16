@@ -20,7 +20,7 @@ export class SupabaseStorageService {
   /**
    * Cloudflare CDN Base URL
    */
-  private readonly CDN_URL = 'https://cdn.arecofix.com.ar';
+  private readonly CDN_URL = 'https://worker.arecofix.com.ar/public-assets';
   
   /**
    * Cloudflare Worker API URL (For Presigned URLs)
