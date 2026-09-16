@@ -5,7 +5,7 @@ compatibility_date = "2023-10-30"
 # Si quieres que el worker responda en un subdominio específico
 # (Por ejemplo, worker.arecofix.com.ar en lugar del genérico de workers.dev)
 routes = [
-  { pattern = "api.arecofix.com.ar", custom_domain = true }
+  { pattern = "worker.arecofix.com.ar", custom_domain = true }
 ]
 
 [vars]
