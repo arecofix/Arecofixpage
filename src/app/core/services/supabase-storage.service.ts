@@ -25,7 +25,7 @@ export class SupabaseStorageService {
   /**
    * Cloudflare Worker API URL (For Presigned URLs)
    */
-  private readonly WORKER_API_URL = 'https://api.arecofix.com.ar';
+  private readonly WORKER_API_URL = 'https://worker.arecofix.com.ar';
 
   /**
    * Uploads a file with automatic multi-tenant path isolation.
