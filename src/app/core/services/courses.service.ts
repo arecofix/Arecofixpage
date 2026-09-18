@@ -194,7 +194,7 @@ export class CoursesService {
         .order('created_at', { ascending: false });
 
         if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
-            query = query.or(`tenant_id.eq.${tenantId},tenant_id.is.null`);
+            query = query.or(`tenant_id.eq.${tenantId},tenant_id.is.null,tenant_id.eq.00000000-0000-0000-0000-000000000000`);
         }
 
         return from(query).pipe(
