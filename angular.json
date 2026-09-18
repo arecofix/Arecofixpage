@@ -36,7 +36,6 @@
       "architect": {
         "build": {
           "builder": "@angular/build:application",
-          "defaultConfiguration": "production",
           "options": {
             "outputPath": {
               "base": "dist/arecofix",
@@ -165,10 +164,7 @@
               "hmr": false
             },
             "cypress": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "ssr": false
+              "buildTarget": "arecofix:build:cypress"
             }
           },
           "defaultConfiguration": "development"
