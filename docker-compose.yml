@@ -53,7 +53,7 @@ services:
       - ./supabase/kong.yml:/var/lib/kong/kong.yml
 
   meta:
-    image: supabase/postgres-meta:v0.84.2
+    image: supabase/postgres-meta:v0.99.0
     container_name: supabase-meta
     restart: always
     depends_on:
@@ -68,7 +68,7 @@ services:
       - "8080:8080"
 
   studio:
-    image: supabase/studio:20240715-1b08a55
+    image: supabase/studio:latest
     container_name: supabase-studio
     restart: always
     depends_on:
@@ -83,7 +83,7 @@ services:
       SUPABASE_ANON_KEY: anon-key-placeholder
       SUPABASE_SERVICE_KEY: service-key-placeholder
     ports:
-      - "3000:3000"
+      - "54323:3000"
     # Note: If port 3000 is taken by rest, you may need to map it differently, e.g. "54323:3000"
     # Actually, changing to "54323:3000" to avoid conflict with rest which is on 3000:3000.
 
