@@ -62,12 +62,7 @@ export function app(): express.Express {
   server.use('/', sitemapRoutes);
   server.use('/feed', feedRoutes);
 
-  // Kill-switch para el Service Worker trabado
-  // Esto fuerza a los navegadores a desinstalar el SW viejo que tiene cacheado el CSP incorrecto
-  server.get('/ngsw.json', (req, res) => {
-    res.status(404).send('Service Worker is disabled to clear cache.');
-  });
-  
+
   // Página de recuperación de emergencia para clientes trabados
   server.get('/recover', (req, res) => {
     res.setHeader('Clear-Site-Data', '"cache", "storage", "executionContexts"');

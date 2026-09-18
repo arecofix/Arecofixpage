@@ -194,7 +194,7 @@ export class SupabaseService {
         } catch (error: unknown) {
           clearTimeout(timeoutId);
           lastError = error;
-          console.warn(`[SupabaseService] GET ${url} fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, (error as Error).message);
+          console.warn(`[SupabaseService] ${method} ${url} fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, (error as Error).message);
           if (i === MAX_RETRIES - 1) throw error;
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
         }
