@@ -84,8 +84,32 @@ services:
       SUPABASE_SERVICE_KEY: service-key-placeholder
     ports:
       - "54323:3000"
-    # Note: If port 3000 is taken by rest, you may need to map it differently, e.g. "54323:3000"
-    # Actually, changing to "54323:3000" to avoid conflict with rest which is on 3000:3000.
+
+  auth:
+    image: supabase/gotrue:v2.164.0
+    container_name: supabase-auth
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "9999:9999"
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:eze321@db:5432/postgres?search_path=auth,public
+      API_EXTERNAL_URL: https://db.arecofix.com.ar
+      GOTRUE_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      GOTRUE_SITE_URL: https://arecofix.com.ar
+      GOTRUE_URI_ALLOW_LIST: https://arecofix.com.ar,http://localhost:4200,http://127.0.0.1:4200
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_EXTERNAL_GOOGLE_ENABLED: "true"
+      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: 106654865765-bnbl62r3n8vadq50dslbdtek2armh46v.apps.googleusercontent.com
+      GOTRUE_EXTERNAL_GOOGLE_SECRET: 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
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: https://db.arecofix.com.ar/auth/v1/callback
+      GOTRUE_MAILER_EXTERNAL_HOSTS: db.arecofix.com.ar
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_DB_MIGRATIONS_PATH: /usr/local/etc/auth/migrations
 
 volumes:
   pgdata:
