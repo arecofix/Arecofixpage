@@ -270,6 +270,12 @@ export class SupabaseService {
       }
       
       this.logger.error('Supabase fetch critically failed after retries', lastError);
+      
+      // Dispatch custom event so the UI can show a friendly offline/error banner
+      if (typeof window !== 'undefined') {
+         window.dispatchEvent(new CustomEvent('supabase-down', { detail: lastError }));
+      }
+      
       throw lastError;
       } finally {
         removeTask();

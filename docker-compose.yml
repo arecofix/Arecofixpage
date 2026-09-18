@@ -52,5 +52,40 @@ services:
     volumes:
       - ./supabase/kong.yml:/var/lib/kong/kong.yml
 
+  meta:
+    image: supabase/postgres-meta:v0.84.2
+    container_name: supabase-meta
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: eze321
+    ports:
+      - "8080:8080"
+
+  studio:
+    image: supabase/studio:20240715-1b08a55
+    container_name: supabase-studio
+    restart: always
+    depends_on:
+      - meta
+      - rest
+      - db
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: eze321
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_PUBLIC_URL: http://localhost:8000
+      SUPABASE_ANON_KEY: anon-key-placeholder
+      SUPABASE_SERVICE_KEY: service-key-placeholder
+    ports:
+      - "3000:3000"
+    # Note: If port 3000 is taken by rest, you may need to map it differently, e.g. "54323:3000"
+    # Actually, changing to "54323:3000" to avoid conflict with rest which is on 3000:3000.
+
 volumes:
   pgdata:
