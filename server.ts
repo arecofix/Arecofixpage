@@ -93,6 +93,12 @@ export function app(): express.Express {
     `);
   });
 
+  // Asegurar que los archivos del service worker nunca se cacheen ni por el navegador ni por Cloudflare
+  server.get(['/ngsw.json', '/ngsw-worker.js'], (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    next();
+  });
+
   // Serve static files from /browser AFTER dynamic routes
   server.use(express.static(browserDistFolder, {
     maxAge: '1y',

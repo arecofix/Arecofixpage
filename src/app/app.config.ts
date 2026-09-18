@@ -127,7 +127,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([timeoutInterceptor, globalErrorInterceptor]),
     ),
-    provideServiceWorker('ngsw-worker.js', {
+    provideServiceWorker('ngsw-worker.js?v=2', {
       enabled: !isDevMode() && !isTauri,
       registrationStrategy: 'registerWhenStable:30000',
     }),
