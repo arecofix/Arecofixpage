@@ -252,16 +252,40 @@ export class CoursesService {
         return { enrolled: data && data.length > 0, error: null };
     }
 
-    async enrollStudentManually(courseId: string, email: string, fullName: string, phone?: string): Promise<{ data: any, error: any }> {
-        const enrollment: StudentEnrollment = {
-            course_id: courseId,
-            full_name: fullName,
-            email: email,
-            phone: phone || '',
-            status: 'confirmed',
-            tenant_id: this.tenantService.getTenantId()
-        };
+    async enrollStudentManually(courseId: string, email: string, fullName: string, phone?: string, userId?: string): Promise<{ data: any, error: any }> {
+        const trimmedEmail = (email || '').trim();
+        
         try {
+            // Check if enrollment already exists
+            const { data: existing } = await this.supabase
+                .from('course_enrollments')
+                .select('id')
+                .eq('course_id', courseId)
+                .ilike('email', trimmedEmail)
+                .limit(1);
+
+            if (existing && existing.length > 0) {
+                // Update the existing record instead of inserting a duplicate
+                const { error: updateErr } = await this.supabase
+                    .from('course_enrollments')
+                    .update({ status: 'confirmed', user_id: userId || null, full_name: fullName, phone: phone || '' })
+                    .eq('id', existing[0].id);
+                return { data: existing[0], error: updateErr };
+            }
+
+            // Insert new record
+            const enrollment: any = {
+                course_id: courseId,
+                full_name: fullName,
+                email: trimmedEmail,
+                phone: phone || '',
+                status: 'confirmed',
+                tenant_id: this.tenantService.getTenantId()
+            };
+            if (userId) {
+                enrollment.user_id = userId;
+            }
+            
             const result = await this.repository.enrollStudent(enrollment);
             return { data: result, error: null };
         } catch (error) {

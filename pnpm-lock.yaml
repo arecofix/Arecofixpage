@@ -77,6 +77,9 @@ importers:
       dexie:
         specifier: ^4.4.5
         version: 4.4.5
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       express:
         specifier: ^5.2.1
         version: 5.2.1(supports-color@8.1.1)
@@ -116,7 +119,7 @@ importers:
         version: 22.1.5(3e4cc3744175af02b4c5d00de5d879e5)
       '@angular/build':
         specifier: 22.1.5
-        version: 22.1.5(fedb1a69221e95cd3679126befc9b531)
+        version: 22.1.5(df1e069443f274cb9a75843165ae81ca)
       '@angular/cli':
         specifier: 22.1.5
         version: 22.1.5(@types/node@26.2.0)(chokidar@5.0.0)
@@ -4683,6 +4686,10 @@ packages:
   domutils@3.2.2:
     resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
+  dotenv@17.4.2:
+    resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -7954,7 +7961,7 @@ snapshots:
       beasties: 0.4.3
       browserslist: 4.28.4
       esbuild: 0.28.2
-      https-proxy-agent: 9.1.0
+      https-proxy-agent: 9.1.0(supports-color@8.1.1)
       jsonc-parser: 3.3.1
       listr2: 11.0.0
       magic-string: 1.0.0
@@ -7998,7 +8005,7 @@ snapshots:
       - tsx
       - yaml
 
-  '@angular/build@22.1.5(fedb1a69221e95cd3679126befc9b531)':
+  '@angular/build@22.1.5(df1e069443f274cb9a75843165ae81ca)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.2201.5(chokidar@5.0.0)
@@ -8012,7 +8019,7 @@ snapshots:
       beasties: 0.4.3
       browserslist: 4.28.4
       esbuild: 0.28.2
-      https-proxy-agent: 9.1.0
+      https-proxy-agent: 9.1.0(supports-color@8.1.1)
       jsonc-parser: 3.3.1
       listr2: 11.0.0
       magic-string: 1.0.0
@@ -12345,6 +12352,8 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.3
 
+  dotenv@17.4.2: {}
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -13086,7 +13095,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@9.1.0:
+  https-proxy-agent@9.1.0(supports-color@8.1.1):
     dependencies:
       agent-base: 9.0.0
       debug: 4.4.3(supports-color@8.1.1)
