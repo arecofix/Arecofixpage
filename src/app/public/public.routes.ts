@@ -317,6 +317,7 @@ export const publicRoutes: Routes = [
       {
         title: 'Campus Virtual',
         path: 'academy/:slug/aula',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('@app/public/cursos/campus/student-campus-page').then(
             (m) => m.StudentCampusPage

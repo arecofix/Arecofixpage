@@ -352,6 +352,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
       'Email already exists': 'Este email ya está registrado.',
       'Password should be different':
         'La contraseña debe ser diferente a la anterior.',
+      // GoTrue v2.164.0 returns this 500 error when email already exists (duplicate key constraint)
+      'Database error saving new user': 'Este email ya está registrado. Intentá iniciar sesión.',
+      'duplicate key value violates unique constraint': 'Este email ya está registrado. Intentá iniciar sesión.',
+      'unexpected_failure': 'Este email ya está registrado. Intentá iniciar sesión.',
     };
 
     for (const [key, value] of Object.entries(errorMap)) {
