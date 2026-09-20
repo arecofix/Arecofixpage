@@ -40,6 +40,11 @@ declare global {
       loginAsAdmin(url?: string, options?: { isTauri?: boolean }): Chainable<void>;
       loginRealAdmin(url?: string, options?: { isTauri?: boolean }): Chainable<void>;
       setupCheckoutSession(): Chainable<void>;
+      /**
+       * Login as any user by providing a custom session and profile.
+       * Use this for testing student/non-admin user flows.
+       */
+      loginAsUser(url: string, session: Record<string, unknown>, profile: Record<string, unknown>): Chainable<void>;
     }
   }
 }
@@ -331,4 +336,107 @@ Cypress.Commands.add('setupCheckoutSession', () => {
     statusCode: 200,
     body: session.user
   }).as('getUser');
+});
+
+/**
+ * Login as any user — accepts a custom session and profile.
+ * Ideal for testing student or customer role flows.
+ * 
+ * IMPORTANT: Uses a real JWT structure (same admin JWT) but overrides profile/user
+ * intercepts to simulate a different role. This ensures authGuard passes (it validates
+ * the JWT signature via supabase.auth.getSession) while the component sees the desired profile.
+ */
+Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknown>, profile: Record<string, unknown>) => {
+  const user = session['user'] as Record<string, unknown>;
+  const userId = user?.['id'] as string;
+  const userEmail = user?.['email'] as string;
+
+  // We must use the valid admin JWT structure for the access_token since Supabase client
+  // validates the token signature. We then override all profile/user endpoints to return
+  // the desired user data (student, customer, etc.)
+  const validAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJjdXN0b21lciJ9fQ.placeholder';
+
+  // Build the full session object to inject
+  const fullSession = {
+    ...session,
+    access_token: validAccessToken,
+    user: {
+      ...user,
+      // Override user_metadata to match the desired role (not super_admin)
+      user_metadata: { role: (profile as any)['role'] || 'customer' }
+    }
+  };
+
+  // Set up catch-all as LOW-PRIORITY fallback (registered before specific intercepts)
+  // Note: specific intercepts registered in beforeEach() BEFORE calling loginAsUser() take priority.
+  cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
+
+  // ── Auth endpoints ──────────────────────────────────────────────────────────
+
+  // Override /auth/v1/user to return the user data
+  cy.intercept('GET', '**/auth/v1/user', {
+    statusCode: 200,
+    body: { ...user, user_metadata: { role: (profile as any)['role'] || 'customer' } }
+  }).as('getAuthUser');
+
+  // Intercept the session validation endpoint
+  cy.intercept('GET', '**/auth/v1/session', {
+    statusCode: 200,
+    body: {
+      access_token: validAccessToken,
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      refresh_token: 'fake-refresh-token',
+      user: { ...user, user_metadata: { role: (profile as any)['role'] || 'customer' } }
+    }
+  }).as('getSession');
+
+  cy.intercept('POST', '**/auth/v1/token*', {
+    statusCode: 200,
+    body: {
+      access_token: validAccessToken,
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      refresh_token: 'fake-refresh-token',
+      user: { ...user, user_metadata: { role: (profile as any)['role'] || 'customer' } }
+    }
+  }).as('refreshToken');
+
+  // ── REST endpoints ──────────────────────────────────────────────────────────
+
+  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+    const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+    req.reply({ statusCode: 200, body: wantsObject ? profile : [profile] });
+  }).as('getProfile');
+
+  cy.intercept('GET', '**/rest/v1/tenants*', {
+    statusCode: 200,
+    body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }]
+  }).as('getTenants');
+
+  cy.intercept('GET', '**/rest/v1/branches*', {
+    statusCode: 200,
+    body: [{ id: 'branch-1', name: 'Sede Central' }]
+  }).as('getBranches');
+
+  // Visit with token pre-injected so Supabase can bootstrap from localStorage
+  cy.visit(url, {
+    failOnStatusCode: false,
+    onBeforeLoad: (win) => {
+      // Store the session in the same format Supabase expects
+      const storageKey = `sb-db-auth-token`;
+      win.localStorage.setItem(storageKey, JSON.stringify(fullSession));
+      win.localStorage.setItem(`arecofix_profile_${userId}`, JSON.stringify(profile));
+      win.localStorage.setItem('supabase-remember-me', 'true');
+      win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
+      win.localStorage.setItem('cypress-test', 'true');
+      
+      // Clear IndexedDB cache to prevent stale data from prior tests
+      if ((win as any).indexedDB) {
+        (win as any).indexedDB.deleteDatabase('ArecofixOfflineDB');
+      }
+    }
+  });
 });
