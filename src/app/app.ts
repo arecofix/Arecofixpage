@@ -61,11 +61,16 @@ export class App implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       // Auto-recarga cuando hay una nueva versión (evita errores MIME y ChunkLoad)
       if (this.swUpdate?.isEnabled) {
-        this.swUpdate.versionUpdates.subscribe((evt) => {
+        // Forzar detección inmediata del nuevo SW (sin esperar el intervalo de polling)
+        this.swUpdate.checkForUpdate().catch(() => {});
+
+        this.swUpdate.versionUpdates.subscribe(async (evt) => {
           if (evt.type === 'VERSION_READY') {
             this.logger.info(
-              'Nueva versión detectada. Recargando la aplicación...',
+              'Nueva versión detectada. Activando y recargando...',
             );
+            // Activar el nuevo SW ANTES de recargar para que tome control inmediatamente
+            await this.swUpdate!.activateUpdate();
             window.location.reload();
           }
         });
