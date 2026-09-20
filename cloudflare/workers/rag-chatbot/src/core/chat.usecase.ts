@@ -136,7 +136,7 @@ export class ChatUseCase {
   }
 
   private buildMessages(question: string, contextBlock: string, history: ChatMessage[]): RoleScopedChatInput[] {
-    let combinedSystemPrompt = buildSystemPrompt(this.env) + "\n\n";
+    let combinedSystemPrompt = buildSystemPrompt() + "\n\n";
 
     if (contextBlock) {
       combinedSystemPrompt += `A continuación encontrarás información relevante de la base de conocimiento de Arecofix para responder la pregunta del usuario:\n\n${contextBlock}\n\nUsa SOLO esta información para responder. Si no es suficiente, indícalo.`;

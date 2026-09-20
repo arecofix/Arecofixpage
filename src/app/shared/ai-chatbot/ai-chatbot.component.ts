@@ -129,8 +129,8 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
       label: '💬 Contactar por WhatsApp',
       response: {
         from: 'bot',
-        type: 'text',
-        text: 'Podés escribirnos a nuestro WhatsApp al 11 2596 0900 para una atención rápida y personalizada.',
+        type: 'whatsapp-btn',
+        text: '¡Claro! Podés contactarnos directamente por WhatsApp para una atención rápida y personalizada 👇',
       },
     },
   ];
@@ -276,8 +276,29 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
         this.messages.update((msgs) => {
           const updated = [...msgs];
           const bubble = updated[streamingBubbleIndex];
-          if (bubble) {
-            updated[streamingBubbleIndex] = { ...bubble, text: bubble.text + chunk };
+          if (!bubble) return updated;
+
+          const accumulated = bubble.text + chunk;
+          const tokenIdx = accumulated.indexOf('[CONTACTO_WHATSAPP]');
+
+          if (tokenIdx !== -1) {
+            // Texto antes del token (puede estar vacío)
+            const textBefore = accumulated.slice(0, tokenIdx).trim();
+            updated[streamingBubbleIndex] = {
+              ...bubble,
+              type: 'text',
+              text: textBefore,
+              isStreaming: false,
+            };
+            // Agregar bubble de botón de WhatsApp después
+            updated.push({
+              from: 'bot',
+              type: 'whatsapp-btn',
+              text: '',
+              isStreaming: false,
+            });
+          } else {
+            updated[streamingBubbleIndex] = { ...bubble, text: accumulated };
           }
           return updated;
         });
@@ -311,7 +332,25 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
         this.messages.update((msgs) => {
           const updated = [...msgs];
           const bubble = updated[streamingBubbleIndex];
-          if (bubble) {
+          if (!bubble) return updated;
+
+          // Si por algún motivo el token llegó al final sin procesarse en onToken
+          const tokenIdx = bubble.text.indexOf('[CONTACTO_WHATSAPP]');
+          if (tokenIdx !== -1) {
+            const textBefore = bubble.text.slice(0, tokenIdx).trim();
+            updated[streamingBubbleIndex] = {
+              ...bubble,
+              type: 'text',
+              text: textBefore,
+              isStreaming: false,
+            };
+            updated.push({
+              from: 'bot',
+              type: 'whatsapp-btn',
+              text: '',
+              isStreaming: false,
+            });
+          } else {
             updated[streamingBubbleIndex] = {
               ...bubble,
               type: 'text',
