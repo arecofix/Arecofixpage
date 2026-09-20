@@ -42,8 +42,6 @@ export class ImageOptimizerService {
       const objectUrl = URL.createObjectURL(file);
 
       img.onload = () => {
-        // Clean up the object URL immediately after loading the image
-        URL.revokeObjectURL(objectUrl);
 
         let width = img.naturalWidth || img.width;
         let height = img.naturalHeight || img.height;
@@ -78,6 +76,9 @@ export class ImageOptimizerService {
 
         // Draw image onto canvas
         ctx.drawImage(img, 0, 0, width, height);
+
+        // Clean up the object URL AFTER drawing to canvas to prevent WebKit decoding bugs
+        URL.revokeObjectURL(objectUrl);
 
         // Convert canvas content to blob
         canvas.toBlob(

@@ -20,6 +20,15 @@ export class SupabaseService {
     const dataBaseUrl = environment.supabaseDataUrl || environment.supabaseUrl;
     const authBaseUrl = environment.supabaseUrl;
 
+    // Expose cache clearing hook for Cypress E2E tests
+    // This allows test cleanup between test runs without full page reloads
+    if (typeof window !== 'undefined') {
+      (window as any).__clearSupabaseCache = () => {
+        this.cacheMap.clear();
+        this.logger.info('[SupabaseCache] Cache cleared by test hook.');
+      };
+    }
+
     // Custom fetch with cache and retry logic to reduce egress and handle network drops
     const customFetch = async (url: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
       const removeTask = this.pendingTasks.add();
