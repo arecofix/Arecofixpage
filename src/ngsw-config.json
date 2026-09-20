@@ -3,21 +3,6 @@
   "index": "/index.html",
   "dataGroups": [
     {
-      "name": "chatbot-api",
-      "urls": [
-        "https://*.workers.dev/**",
-        "https://api.arecofix.com.ar/**",
-        "https://worker.arecofix.com.ar/**",
-        "https://arecofix.com.ar/**"
-      ],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 1,
-        "maxAge": "0u",
-        "timeout": "3s"
-      }
-    },
-    {
       "name": "external-apis",
       "urls": [
         "https://db.arecofix.com.ar/**",

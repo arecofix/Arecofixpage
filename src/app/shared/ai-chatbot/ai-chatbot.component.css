@@ -677,6 +677,46 @@
   font-size: 16px;
 }
 
+/* ── WhatsApp button bubble ────────────────────────────────── */
+.message-bubble--whatsapp {
+  background: transparent;
+  box-shadow: none;
+  padding: 4px 0;
+}
+
+.wa-intro-text {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.wa-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 10px rgba(37, 211, 102, 0.35);
+}
+
+.wa-contact-btn:hover {
+  background: #1ebe5d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.45);
+}
+
+.wa-contact-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 400px) {
   .chatbot-window {
