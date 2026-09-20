@@ -77,12 +77,13 @@ export class ImageOptimizerService {
         // Draw image onto canvas
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Clean up the object URL AFTER drawing to canvas to prevent WebKit decoding bugs
-        URL.revokeObjectURL(objectUrl);
 
-        // Convert canvas content to blob
+
         canvas.toBlob(
           (blob) => {
+            // Clean up the object URL AFTER the blob is generated to prevent WebKit lazy decoding bugs
+            URL.revokeObjectURL(objectUrl);
+
             if (!blob) {
               console.warn('[ImageOptimizerService] Canvas compression failed. Falling back to original file.');
               return resolve(file);
