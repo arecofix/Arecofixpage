@@ -7,6 +7,7 @@ import { Product } from '../interfaces/product.interface';
 import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../features/orders/application/services/order.service';
 import { SUPABASE_CLIENT } from '../../core/di/supabase-token';
+import { GsmService } from '../../public/gsm/services/gsm.service';
 import { BehaviorSubject, of } from 'rxjs';
 
 describe('CartService (QA & Testing)', () => {
@@ -16,6 +17,7 @@ describe('CartService (QA & Testing)', () => {
   let authMock: any;
   let orderMock: any;
   let supabaseMock: any;
+  let gsmMock: any;
 
   let fakeOrder: any;
 
@@ -57,6 +59,10 @@ describe('CartService (QA & Testing)', () => {
       })
     };
 
+    gsmMock = {
+      getUsdtRate: jest.fn().mockReturnValue(of(1000)) // For easy math: 1 USD = 1000 ARS
+    };
+
     localStorage.clear();
 
     TestBed.configureTestingModule({
@@ -67,7 +73,8 @@ describe('CartService (QA & Testing)', () => {
         { provide: PLATFORM_ID, useValue: 'browser' },
         { provide: AuthService, useValue: authMock },
         { provide: OrderService, useValue: orderMock },
-        { provide: SUPABASE_CLIENT, useValue: supabaseMock }
+        { provide: SUPABASE_CLIENT, useValue: supabaseMock },
+        { provide: GsmService, useValue: gsmMock }
       ]
     });
     service = TestBed.inject(CartService);
@@ -96,6 +103,19 @@ describe('CartService (QA & Testing)', () => {
     expect(service.cartItems()[0].quantity).toBe(1);
     expect(service.totalPrice()).toBe(15000);
     expect(toastMock.show).toHaveBeenCalled();
+  });
+
+  it('debería aplicar la conversión a ARS si el producto está en USD (Unit Test: USD Price)', async () => {
+    const usdProduct: Product = {
+      id: 'prod-usd', name: 'MacBook Pro', price: 2, slug: 'macbook-pro', currency: 'USD'
+    } as Product;
+
+    await service.addToCart(usdProduct);
+    
+    // rate is mocked to 1000, so $2 USD = $2000 ARS
+    expect(service.cartItems().length).toBe(1);
+    expect(service.cartItems()[0].product.convertedPrice).toBe(2000);
+    expect(service.totalPrice()).toBe(2000);
   });
 
   it('debería incrementar la cantidad si el producto ya existe (Unit Test: Duplicates)', async () => {
