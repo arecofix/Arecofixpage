@@ -3,22 +3,16 @@
   "index": "/index.html",
   "dataGroups": [
     {
-      "name": "external-apis",
+      "name": "supabase-api",
       "urls": [
         "https://db.arecofix.com.ar/**",
-        "https://*.supabase.co/**",
-        "https://static.cloudflareinsights.com/**",
-        "https://us.i.posthog.com/**",
-        "https://*.posthog.com/**",
-        "https://connect.facebook.net/**",
-        "https://www.googletagmanager.com/**",
-        "https://analytics.google.com/**"
+        "https://*.supabase.co/**"
       ],
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 100,
         "maxAge": "1h",
-        "timeout": "5s"
+        "timeout": "10s"
       }
     }
   ],
