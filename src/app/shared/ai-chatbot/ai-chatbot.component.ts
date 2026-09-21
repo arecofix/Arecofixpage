@@ -100,7 +100,7 @@ export class AiChatbotComponent implements OnInit, AfterViewChecked, OnDestroy {
     });
   }
 
-  readonly isCelularRoute = computed(() => this.currentUrl() === '/celular');
+  readonly isCelularRoute = computed(() => this.currentUrl().includes('/celular'));
 
   private readonly currentUrl = toSignal(
     this.router.events.pipe(
