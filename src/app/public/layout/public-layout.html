@@ -6,11 +6,18 @@
     preferencesService.getBackgroundClass((preferencesService.theme$ | async)!),
     (preferencesService.highContrast$ | async) ? 'high-contrast' : '',
   ]"
-  class="min-h-screen transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans pt-16"
+  class="min-h-[100dvh] flex flex-col transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans pt-16"
 >
-  <router-outlet></router-outlet>
+  <main class="flex-grow flex flex-col relative w-full">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <div class="mt-auto">
+    <app-footer></app-footer>
+    <!-- Spacer for floating action buttons (FABs) and Safe Area on mobile -->
+    <div class="h-24 lg:h-0 w-full" style="padding-bottom: env(safe-area-inset-bottom);"></div>
+  </div>
 </div>
 
 <app-accessibility-sidebar></app-accessibility-sidebar>
 <app-ai-chatbot></app-ai-chatbot>
-<app-footer></app-footer>

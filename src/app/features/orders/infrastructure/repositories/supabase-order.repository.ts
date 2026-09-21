@@ -146,10 +146,12 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
         // cost_price is a column on `products`, NOT on `order_items` — omitted intentionally
         subtotal:     item.subtotal,
       } as any);
+      
+      // La tabla `order_items` no tiene columna `branch_id`, pero el BaseRepository
+      // la inyecta globalmente si `useStrictBranchIsolation` está activado en `orders`.
+      delete (sanitized as any).branch_id;
+      
       sanitized.tenant_id = tenantId;
-      if (branchId && !sanitized.branch_id) {
-        sanitized.branch_id = branchId;
-      }
       return sanitized;
     });
 

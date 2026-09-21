@@ -1,30 +1,36 @@
 describe('Checkout Flow (End-to-End)', () => {
   beforeEach(() => {
     // Intercept Supabase API calls to avoid polluting the DB during tests
-    cy.intercept('GET', '**/rest/v1/products*', {
-      statusCode: 200,
-      body: [
-        {
-          id: 'test-usd-product',
-          name: 'iPhone 15 Pro (Test)',
-          price: 1000,
-          currency: 'USD',
-          stock: 10,
-          is_active: true,
-          slug: 'iphone-15-pro-test',
-          image_url: 'https://via.placeholder.com/150'
+    cy.intercept('GET', '**/rest/v1/products*', (req) => {
+      req.reply({
+        statusCode: 200,
+        headers: {
+          'Content-Range': '0-1/2',
+          'Content-Type': 'application/json'
         },
-        {
-          id: 'test-ars-product',
-          name: 'Funda (Test)',
-          price: 5000,
-          currency: 'ARS',
-          stock: 50,
-          is_active: true,
-          slug: 'funda-test',
-          image_url: 'https://via.placeholder.com/150'
-        }
-      ]
+        body: [
+          {
+            id: 'test-usd-product',
+            name: 'iPhone 15 Pro (Test)',
+            price: 1000,
+            currency: 'USD',
+            stock: 10,
+            is_active: true,
+            slug: 'iphone-15-pro-test',
+            image_url: 'https://via.placeholder.com/150'
+          },
+          {
+            id: 'test-ars-product',
+            name: 'Funda (Test)',
+            price: 5000,
+            currency: 'ARS',
+            stock: 50,
+            is_active: true,
+            slug: 'funda-test',
+            image_url: 'https://via.placeholder.com/150'
+          }
+        ]
+      });
     }).as('getProducts');
 
     cy.intercept('GET', 'https://dolarapi.com/v1/dolares/cripto', {
@@ -63,21 +69,21 @@ describe('Checkout Flow (End-to-End)', () => {
 
     // Go to products page
     cy.visit('/productos');
-    cy.wait(['@getProducts', '@getUsdRate']);
+    cy.wait('@getProducts');
   });
 
   it('debería calcular el carrito y el checkout con la conversión de USD a ARS', () => {
     // 1. Verificar que el precio se muestre convertido en la lista de productos
     // El iPhone (1000 USD) debe mostrarse como $1.000.000 ARS
     cy.contains('iPhone 15 Pro (Test)')
-      .parents('.card') // Ajustar según el selector real
-      .should('contain', '1,000,000') // Verifica formato de precio
+      .closest('.group') // Ajustar según el selector real
+      .should('contain', '1.000.000') // Verifica formato de precio
       .contains('Añadir') // Botón de agregar
       .click();
 
     // 2. Verificar que se abra el carrito y el subtotal sea 1.000.000 ARS
     cy.get('.drawer-side').should('be.visible');
-    cy.contains('1,000,000'); // Verifica subtotal en el carrito
+    cy.contains('1.000.000'); // Verifica subtotal en el carrito
 
     // 3. Ir al checkout
     cy.contains('Finalizar Compra').click();
@@ -91,8 +97,8 @@ describe('Checkout Flow (End-to-End)', () => {
     cy.get('input[formControlName="number"]').type('123');
     cy.get('input[formControlName="postal_code"]').type('1234');
     
-    // El total debe ser $1,000,000
-    cy.contains('1,000,000');
+    // El total debe ser $1.000.000
+    cy.contains('1.000.000');
 
     // 5. Ir a método de pago
     cy.contains('Continuar').click();
@@ -110,14 +116,14 @@ describe('Checkout Flow (End-to-End)', () => {
 
     cy.wait('@mercadopagoWebhook').then((interception) => {
       const mpBody = interception.request.body;
-      expect(mpBody.items[0].unit_price).to.eq(1000000); // 1,000,000 ARS
+      expect(mpBody.items[0].unit_price).to.eq(1000000); // 1.000.000 ARS
       expect(mpBody.items[0].subtotal).to.eq(1000000);
     });
   });
 
   it('debería calcular correctamente al seleccionar Efectivo', () => {
     // Add product to cart
-    cy.contains('iPhone 15 Pro (Test)').parents('.card').contains('Añadir').click();
+    cy.contains('iPhone 15 Pro (Test)').closest('.group').contains('Añadir').click();
     cy.contains('Finalizar Compra').click();
 
     // Fill form
@@ -136,6 +142,6 @@ describe('Checkout Flow (End-to-End)', () => {
 
     // Verify ticket creation
     cy.contains('AF-TEST-1234');
-    cy.contains('1,000,000');
+    cy.contains('1.000.000');
   });
 });

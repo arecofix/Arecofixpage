@@ -76,6 +76,10 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     return this.router.url.includes('/academy');
   }
 
+  get isCelularLandingMode(): boolean {
+    return this.router.url.includes('/celular');
+  }
+
   /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
   public searchFocusRequested = signal(false);
 
