@@ -301,9 +301,14 @@ export class ProductsDetailsPage {
   });
 
   // Strategic Computeds
+
+  isTechnicalCategory = computed(() => {
+      const p = this.product();
+      return p ? this.strategicService.isTechnicalCategory(p) : false;
+  });
+
   showPriceAndBuy = computed(() => {
       const p = this.product();
-      this.authState(); // Track auth state for reactivity
       return p ? this.strategicService.canViewPriceAndBuy(p) : false;
   });
 
