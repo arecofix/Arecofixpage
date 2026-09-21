@@ -55,6 +55,7 @@ export class ProductMapper {
           slug: p['slug'] as string,
           description: p['description'] as string,
           price: Number(p['price']),
+          retail_price: p['retail_price'] !== undefined && p['retail_price'] !== null ? Number(p['retail_price']) : undefined,
           image_url: this.sanitizeImageUrl(p['image_url']),
           gallery_urls: sanitizedGallery,
           media_metadata: (p['media_metadata'] || []) as Product['media_metadata'],

@@ -171,6 +171,11 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
 
   // ── Cart ──────────────────────────────────────────
   public isCartOpen = this.cartService.isCartOpen;
+  
+  get showCart(): boolean {
+    return this.router.url !== '/' && !this.isCelularLandingMode && !this.isAcademyMode;
+  }
+
   public toggleCart() {
     this.cartService.toggleCart();
   }

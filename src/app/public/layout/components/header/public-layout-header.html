@@ -379,7 +379,7 @@
     </div>
 
     <!-- Cart -->
-    @if (!isCelularLandingMode) {
+    @if (showCart) {
     <button (click)="toggleCart()"
             class="btn btn-ghost w-11 h-11 flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10
                    text-gray-700 dark:text-white transition-all cursor-pointer" aria-label="Carrito">
