@@ -16,7 +16,7 @@ export class SupabaseCustomerDeviceRepository implements ICustomerDeviceReposito
 
     return from(
       this.supabase
-        .from('device_models')
+        .from('models')
         .select('id')
         .eq('slug', slug)
         .eq('tenant_id', tenantId)
@@ -34,7 +34,7 @@ export class SupabaseCustomerDeviceRepository implements ICustomerDeviceReposito
 
         return from(
           this.supabase
-            .from('device_models')
+            .from('models')
             .insert({
               name: name,
               slug: slug,
