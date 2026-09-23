@@ -119,15 +119,6 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         delete (dbPayload as any).tenant_id;
         delete (dbPayload as any).id;
         
-        // Remove device-specific columns that do not exist in the repairs table
-        // to prevent PostgREST from returning a 400 Bad Request.
-        delete (dbPayload as any).device_type;
-        delete (dbPayload as any).device_model;
-        delete (dbPayload as any).brand_id;
-        delete (dbPayload as any).imei;
-        delete (dbPayload as any).payment_method;
-        delete (dbPayload as any).surcharge_percentage;
-
         const tenantId = this.tenantService.getTenantId();
 
         return from(
@@ -322,7 +313,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         if (parts.length > 0) {
             const partsToInsert = parts.map(p => ({
                 repair_id: repairId,
-                product_id: p.product_id,
+                product_id: p.product_id || null,
                 quantity: Number(p.quantity) || 1,
                 unit_price_at_time: Number(p.unit_price_at_time) || 0,
                 cost_at_time: Number(p.cost_at_time) || 0,
@@ -421,10 +412,6 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         return {
             client_id: r.customer_id || null, 
             device_id: r.device_id || null,
-            device_type: r.device_type || null,
-            device_model: r.device_model || null,
-            brand_id: r.brand_id || null,
-            imei: r.imei || null,
             issue_description: r.issue_description,
             current_status_id: r.current_status_id,
             estimated_cost: r.estimated_cost,
@@ -444,8 +431,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             spare_part_cost: r.spare_part_cost || 0,
             whatsapp_notifications: r.whatsapp_notifications ?? true,
             supplier_id: r.supplier_id || null,
-            warranty: r.warranty || null,
-            payment_method: r.payment_method || null
+            warranty: r.warranty || null
         };
     }
 
