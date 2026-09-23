@@ -398,7 +398,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     } else {
       this.repairForm.patchValue(
         {
-          customer_id: '',
+          customer_id: null,
+          client_id: null,
           customer_name: clientName,
         },
         { emitEvent: false },
