@@ -77,7 +77,8 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   }
 
   get isCelularLandingMode(): boolean {
-    return this.router.url.includes('/celular');
+    const urlPath = this.router.url.split('?')[0];
+    return urlPath === '/celular' || urlPath.startsWith('/celular/');
   }
 
   /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
