@@ -29,7 +29,7 @@ import {
 } from '@app/core/services/contact.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
-import { ProductCarouselComponent } from '@app/shared/components/product-carousel/product-carousel.component';
+
 import { BreadcrumbsComponent } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import {
   APP_INFO,
@@ -65,7 +65,6 @@ interface GalleryItem {
     RouterModule,
     FormsModule,
     ReservationCalendar,
-    ProductCarouselComponent,
     BreadcrumbsComponent,
     NgOptimizedImage,
   ],

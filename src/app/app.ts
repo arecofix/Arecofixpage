@@ -29,7 +29,6 @@ import { AiChatbotComponent } from './shared/ai-chatbot/ai-chatbot.component';
     RouterOutlet,
     ToastComponent,
     RibbonMenuComponent,
-    AiChatbotComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.Eager,

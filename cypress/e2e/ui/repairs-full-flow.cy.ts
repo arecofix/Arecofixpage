@@ -53,6 +53,7 @@ beforeEach(function() {
         setInputValue('textarea[name="issue_description"]', issueDescription);
         setInputValue('input[name="estimated_cost"]', '45000');
         setInputValue('input[name="imei"]', '123456789012345');
+        setInputValue('input[name="device_passcode"]', '0000');
 
         // Dropdown de accesorios: es un div[role="button"], no un <button>.
         cy.get('#btn-accesorios-toggle').first().click({ force: true });

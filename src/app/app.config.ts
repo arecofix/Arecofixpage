@@ -61,6 +61,8 @@ import { AnalyticsRepository } from './features/analytics/domain/repositories/an
 import { SupabaseAnalyticsRepository } from './features/analytics/infrastructure/repositories/supabase-analytics.repository';
 import { UserProfileRepository } from './core/repositories/user-profile.repository';
 import { SupabaseUserProfileRepository } from './core/infrastructure/repositories/supabase-user-profile.repository';
+import { ICustomerDeviceRepository } from './features/devices/domain/repositories/customer-device.repository';
+import { SupabaseCustomerDeviceRepository } from './features/devices/infrastructure/repositories/supabase-customer-device.repository';
 import { OrderRepository } from './features/orders/domain/repositories/order.repository';
 import { SupabaseOrderRepository } from './features/orders/infrastructure/repositories/supabase-order.repository';
 import { FlaskOrderRepository } from './features/orders/infrastructure/repositories/flask-order.repository';
@@ -195,5 +197,6 @@ export const appConfig: ApplicationConfig = {
       provide: NotificationBaseRepository,
       useClass: SupabaseNotificationRepository,
     },
+    { provide: ICustomerDeviceRepository, useClass: SupabaseCustomerDeviceRepository },
   ],
 };

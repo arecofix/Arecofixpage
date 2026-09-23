@@ -58,6 +58,7 @@ import { OfflineSyncService } from '@app/core/services/offline-sync.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
+import { ICustomerDeviceRepository } from '@app/features/devices/domain/repositories/customer-device.repository';
 
 interface ClientView extends Partial<UserProfile> {
   displayName: string;
@@ -103,6 +104,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   public offlineSyncService = inject(OfflineSyncService);
   private adminLayout = inject(AdminLayout, { optional: true });
   private destroyRef = inject(DestroyRef);
+  private customerDeviceRepository = inject(ICustomerDeviceRepository);
 
   repairForm!: FormGroup;
 
@@ -835,89 +837,25 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       // Buscar o crear modelo (siempre que haya device_model)
       let modelId: string | null = null;
       if (device_model) {
-        try {
-          const { data: existingModel } = await this.supabaseService
-            .getClient()
-            .from('models')
-            .select('id')
-            .ilike('name', device_model.trim())
-            .limit(1);
-
-          if (existingModel && existingModel.length > 0) {
-            modelId = existingModel[0].id;
-          } else {
-            const modelName = device_model.trim();
-            const generatedSlug =
-              modelName
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, '') ||
-              'model-' + Math.random().toString(36).substring(2, 9);
-
-            const { data: newModel } = await this.supabaseService
-              .getClient()
-              .from('models')
-              .insert({
-                name: modelName,
-                slug: generatedSlug,
-                brand_id: brand_id || null,
-                tenant_id: this.tenantService.getTenantId(),
-              })
-              .select('id')
-              .single();
-            if (newModel) modelId = newModel.id;
-          }
-        } catch (modelErr) {
-          console.error('[AdminRepairForm] Error resolving model:', modelErr);
-        }
+        const modelName = device_model.trim();
+        const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
+        modelId = await firstValueFrom(this.customerDeviceRepository.ensureModelExists(modelName, generatedSlug, brand_id));
       }
 
-      // Si hay cliente pero no equipo asociado, crearlo
-      if (finalClientId && !finalDeviceId && device_model) {
-        try {
-          const { data: newDevice, error: devErr } = await this.supabaseService
-            .getClient()
-            .from('customer_devices')
-            .insert({
-              user_id: finalClientId,
-              model_id: modelId,
-              type: device_type || null,
-              imei: imei || null,
-              passcode: device_passcode || null,
-              tenant_id: this.tenantService.getTenantId(),
-            })
-            .select('id')
-            .single();
-
-          if (newDevice) finalDeviceId = newDevice.id;
-          if (devErr)
-            console.error('[AdminRepairForm] Error inserting device:', devErr);
-        } catch (devErr) {
-          console.error(
-            '[AdminRepairForm] Exception inserting device:',
-            devErr,
-          );
-        }
-      } else if (finalDeviceId) {
-        // Si hay un dispositivo asociado, actualizar sus datos
-        try {
-          const deviceUpdatePayload: Record<string, unknown> = {
-            imei: imei || null,
-            passcode: device_passcode || null,
-          };
-        if (modelId) deviceUpdatePayload['model_id'] = modelId;
-        if (device_type) deviceUpdatePayload['type'] = device_type;
-
-          await this.supabaseService
-            .getClient()
-            .from('customer_devices')
-            .update(deviceUpdatePayload)
-            .eq('id', finalDeviceId);
-        } catch (devUpdateErr) {
-          console.error(
-            '[AdminRepairForm] Error updating device:',
-            devUpdateErr,
-          );
+      if (finalClientId && device_model) {
+        // Creará o actualizará el dispositivo
+        const savedDeviceId = await firstValueFrom(
+          this.customerDeviceRepository.upsertDevice({
+            deviceId: finalDeviceId,
+            userId: finalClientId,
+            modelId: modelId,
+            type: device_type,
+            imei: imei,
+            passcode: device_passcode,
+          })
+        );
+        if (savedDeviceId) {
+          finalDeviceId = savedDeviceId;
         }
       }
 
