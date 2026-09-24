@@ -58,7 +58,7 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
     refresh_token: 'fake-refresh-token',
     token_type: 'bearer',
     user: {
-      id: 'mock-admin-id',
+      id: '00000000-0000-0000-0000-000000000000',
       aud: 'authenticated',
       role: 'authenticated',
       email: 'admin@arecofix.com.ar',
@@ -124,13 +124,19 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
       // Inject auth token BEFORE Angular initializes
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
       win.localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(fakeProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
       win.localStorage.setItem('arecofix_admin_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
       win.localStorage.setItem('cypress-test', 'true');
+        win.localStorage.removeItem('cart_session_id');
+        win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
       
       if (options.isTauri) {
         // Forzar Tauri para validación offline absoluta
@@ -149,7 +155,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
     refresh_token: 'fake-refresh-token',
     token_type: 'bearer',
     user: {
-      id: 'mock-admin-id',
+      id: '00000000-0000-0000-0000-000000000000',
       aud: 'authenticated',
       role: 'authenticated',
       email: 'admin@arecofix.com',
@@ -188,7 +194,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
   }).as('refreshToken');
 
   const mockProfile = {
-    id: 'mock-admin-id',
+    id: '00000000-0000-0000-0000-000000000000',
     email: 'admin@arecofix.com',
     role: 'super_admin',
     first_name: 'Admin',
@@ -279,13 +285,19 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
   cy.visit(targetUrl, { 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
       win.localStorage.setItem('arecofix_profile_mock-admin-id', JSON.stringify(mockProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
       win.localStorage.setItem('arecofix_admin_branch_id', 'branch-1');
       win.localStorage.setItem('cypress-test', 'true');
+        win.localStorage.removeItem('cart_session_id');
+        win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
       
       if (options.isTauri) {
         (win as any).__TAURI__ = true;
@@ -303,8 +315,12 @@ Cypress.Commands.add('setupCheckoutSession', () => {
   // Inject session into local storage BEFORE anything loads
   cy.window().then(w => w.indexedDB.deleteDatabase('ArecofixOfflineDB'));
     cy.on('window:before:load', (win) => {
-    win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-    win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+    win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+    win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
     win.localStorage.setItem('arecofix_current_branch_id', branch.id);
   });
 
@@ -432,6 +448,8 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
       win.localStorage.setItem('cypress-test', 'true');
+        win.localStorage.removeItem('cart_session_id');
+        win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
       
       // Clear IndexedDB cache to prevent stale data from prior tests
       if ((win as any).indexedDB) {

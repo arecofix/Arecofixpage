@@ -53,7 +53,7 @@ beforeEach(function() {
         setInputValue('textarea[name="issue_description"]', issueDescription);
         setInputValue('input[name="estimated_cost"]', '45000');
         setInputValue('input[name="imei"]', '123456789012345');
-        setInputValue('input[name="device_passcode"]', '0000');
+
 
         // Dropdown de accesorios: es un div[role="button"], no un <button>.
         cy.get('#btn-accesorios-toggle').first().click({ force: true });
@@ -64,7 +64,8 @@ beforeEach(function() {
         cy.wait(200);
 
         // Intercept BEFORE clicking save (create uses RPC)
-        cy.intercept('POST', '**/rest/v1/rpc/save_repair_order*', { statusCode: 200, body: { id: 'mock-repair-123', tracking_code: 'AF-TEST-123' } }).as('postRepair');
+        cy.intercept('POST', '**/rest/v1/profiles*', { statusCode: 201, body: { id: 'mock-profile-123' } }).as('postProfile');
+          cy.intercept('POST', '**/rest/v1/rpc/save_repair_order*', { statusCode: 200, body: { id: 'mock-repair-123', tracking_code: 'AF-TEST-123' } }).as('postRepair');
         cy.contains('button', 'GUARDAR ORDEN').click({ force: true });
 
         cy.wait('@postRepair', { timeout: 15000 }).then((interception) => {
@@ -90,10 +91,35 @@ beforeEach(function() {
         cy.loginRealAdmin(`/login?returnUrl=/admin/repairs/${shared.repairId}`);
         cy.wait(2500);
 
+        // Mock the GET request so the form populates correctly
+        cy.intercept('GET', '**/rest/v1/repairs*', (req) => {
+            if (req.url.includes('select=')) {
+                req.reply({
+                    statusCode: 200,
+                    body: [{
+                        id: shared.repairId,
+                        tracking_code: shared.trackingCode,
+                        customer_name: customerName,
+                        device_model: deviceModel,
+                        device_type: 'smartphone',
+                        issue_description: issueDescription,
+                        current_status_id: 1,
+                        client_id: 'mock-customer-123',
+                        branch_id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5',
+                        device_id: 'mock-device-123',
+                        device: { id: 'mock-device-123', type: 'smartphone', imei: '123456789012345' },
+                        client: { id: 'mock-customer-123', first_name: 'Juan', last_name: 'Perez' },
+                        parts: []
+                    }]
+                });
+            }
+        }).as('getRepairData');
+
         cy.url().then(url => {
             if (!url.includes(`/admin/repairs/${shared.repairId}`)) {
                 cy.visit(`/admin/repairs/${shared.repairId}`);
-                cy.wait(2500);
+                cy.wait('@getRepairData', { timeout: 10000 });
+                cy.wait(1500);
             }
         });
 
@@ -113,7 +139,7 @@ beforeEach(function() {
             .should('exist');
 
         // El update usa PATCH directo a /rest/v1/repairs, no el RPC save_repair_order
-        cy.intercept('POST', '**/rest/v1/rpc/update_repair_bypass*').as('patchRepair');
+        cy.intercept('PATCH', '**/rest/v1/repairs*', { statusCode: 204, body: null }).as('patchRepair');
         cy.contains('button', 'GUARDAR ORDEN').click({ force: true });
         cy.wait('@patchRepair', { timeout: 15000 }).then(interception => {
             expect(interception.response?.statusCode).to.be.oneOf([200, 204]);

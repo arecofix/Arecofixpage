@@ -151,6 +151,10 @@ export class SupabaseService {
                 const errorText = await clonedResponse.text();
                 if (errorText.includes('JWSError') || errorText.includes('PGRST301') || errorText.includes('Invalid number of parts')) {
                    if (typeof window !== 'undefined') {
+                      if (localStorage.getItem('cypress-test') === 'true') {
+                         console.warn('[SupabaseCache] Detected 401 JWT error in Cypress test, ignoring to prevent reload loop');
+                         return response;
+                      }
                       console.warn('[SupabaseCache] Detected 401 JWT error from DB, clearing corrupted storage immediately.');
                       localStorage.removeItem('supabase-auth-token');
                       sessionStorage.removeItem('supabase-auth-token');

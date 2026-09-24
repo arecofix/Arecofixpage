@@ -411,7 +411,15 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     private mapToDb(r: any): any {
         return {
             client_id: r.customer_id || null, 
+            customer_name: r.customer_name || null,
+            customer_phone: r.customer_phone || null,
+            customer_email: r.customer_email || null,
+            customer_dni: r.customer_dni || null,
             device_id: r.device_id || null,
+            device_model: r.device_model || null,
+            device_type: r.device_type || null,
+            brand_id: r.brand_id || null,
+            imei: r.imei || null,
             issue_description: r.issue_description,
             current_status_id: r.current_status_id,
             estimated_cost: r.estimated_cost,
