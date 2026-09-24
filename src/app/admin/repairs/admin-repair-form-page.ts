@@ -286,6 +286,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   saving = signal<boolean>(false);
+  private lastSelectedClientName = '';
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
   company = signal<unknown>(null);
@@ -388,6 +389,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     const client = this.clients().find((c) => c.displayName === clientName);
     if (client) {
+      this.lastSelectedClientName = client.displayName || '';
       this.repairForm.patchValue({
         customer_id: client.id,
         customer_name: client.displayName,
@@ -415,6 +417,17 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     this.id = this.route.snapshot.paramMap.get('id');
     this.setupForm();
     this.setupSearchStreams();
+
+    // Listen to changes in customer_name to clear customer_id if typed manually
+    this.repairForm.get('customer_name')?.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((newName) => {
+      const currentClientId = this.repairForm.get('customer_id')?.value;
+      // If the name changed and it doesn't match the last explicitly selected or loaded client, clear the ID
+      if (currentClientId && newName !== this.lastSelectedClientName) {
+        this.repairForm.patchValue({ customer_id: null }, { emitEvent: false });
+      }
+    });
 
     await Promise.all([
       this.loadCompanySettings(),
@@ -622,6 +635,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     try {
       const data = await this.repairService.getById(this.id);
       if (data) {
+        this.lastSelectedClientName = data.customer_name || '';
         this.repairForm.patchValue({
           customer_id: data.customer_id,
           device_id: data.device_id || '',
@@ -827,7 +841,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
         try {
           if (Object.keys(updateData).length > 0) {
+            console.log('[AdminRepairForm] Calling customerService.update with finalClientId:', finalClientId, 'updateData:', updateData);
             await this.customerService.update(finalClientId, updateData);
+            console.log('[AdminRepairForm] customerService.update finished successfully');
           }
         } catch (err) {
           console.error('[AdminRepairForm] Error updating customer data:', err);
