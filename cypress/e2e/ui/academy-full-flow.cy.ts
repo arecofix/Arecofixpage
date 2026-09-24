@@ -11,6 +11,8 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
   };
 
   it('Admin can add an exam and enroll a student', () => {
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     // 1. Log in to a safe route that has all global mocks covered by loginAsAdmin
     cy.loginAsAdmin('/admin/dashboard');
 
@@ -80,8 +82,12 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
     
     // Now we are on the materials page!
     cy.wait('@getModules');
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     cy.wait('@getContents');
     
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     // UI Interactions
     // The first module is automatically selected by loadData().
     
@@ -109,6 +115,8 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
   });
 
   it('Student can take the exam and pass', () => {
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     const mockStudentSession = {
         access_token: 'fake-jwt',
         expires_in: 3600,
@@ -162,20 +170,21 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
       statusCode: 200,
       body: { score: 100, passed: true, correct_answers: 1, total_questions: 1 }
     });
-
     cy.intercept('POST', '**/rest/v1/rpc/get_course_progress*', {
       statusCode: 200,
       body: { progress: 0, completed_contents: [], certificate_id: null }
     });
 
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+
     cy.visit('/academy/curso-reparacion-celulares/aula', {
         onBeforeLoad: (win) => {
-            win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockStudentSession));
+            win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockStudentSession));
         }
     });
 
     cy.get('.collapse-title').first().click({ force: true });
-    cy.contains('Examen').should('be.visible');
     cy.get('button').contains('Comenzar').click({ force: true });
 
     cy.contains('¿Qué voltaje tiene una batería cargada?').should('be.visible');

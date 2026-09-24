@@ -1,6 +1,6 @@
 import { GsmTool, BrandService, DownloadItem } from '@app/public/gsm/services/gsm.service';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '@env/environment';
 
 export const GSM_TOOLS: GsmTool[] = [
   {

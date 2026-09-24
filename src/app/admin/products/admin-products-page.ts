@@ -83,6 +83,9 @@ export class AdminProductsPage implements OnInit {
   public editingStock = signal<string | null>(null);
   public tempStock = signal<number>(0);
 
+  // ML Sync state
+  public syncingMl = signal<string | null>(null);
+
   private searchSubject = new Subject<string>();
   private router = inject(Router);
 
@@ -416,5 +419,35 @@ export class AdminProductsPage implements OnInit {
   cancelStockEdit() {
     this.editingStock.set(null);
     this.tempStock.set(0);
+  }
+
+  async syncWithMercadoLibre(product: Product) {
+    if (this.syncingMl() === product.id) return;
+    this.syncingMl.set(product.id);
+    this.error.set(null);
+
+    try {
+      const result = await this.productService.syncWithMercadoLibre(product.id);
+      
+      // Update local state
+      this.products.update(products => 
+        products.map(p => p.id === product.id ? { 
+          ...p, 
+          ml_sync_status: 'synced', 
+          ml_item_id: result.ml_item_id,
+          ml_last_sync: new Date().toISOString()
+        } : p)
+      );
+
+      alert('Producto sincronizado con éxito: ' + result.ml_item_id);
+    } catch (e: any) {
+      this.error.set('Error al sincronizar con Mercado Libre: ' + e.message);
+      this.products.update(products => 
+        products.map(p => p.id === product.id ? { ...p, ml_sync_status: 'error' } : p)
+      );
+    } finally {
+      this.syncingMl.set(null);
+      this.cdr.detectChanges();
+    }
   }
 }

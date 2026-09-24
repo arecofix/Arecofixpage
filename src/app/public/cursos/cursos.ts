@@ -1,5 +1,5 @@
-import { Component, OnInit, computed, signal, inject, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, signal, inject, ChangeDetectionStrategy, DestroyRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,6 +44,7 @@ export class CursosComponent implements OnInit {
     private destroyRef = inject(DestroyRef);
     public paginationService = inject(PaginationService);
     public authService = inject(AuthService);
+    private platformId = inject(PLATFORM_ID);
     private tenant$ = toObservable(this.tenantService.currentTenant);
 
     whatsappNumber = environment.contact.whatsappNumber;
@@ -178,13 +179,15 @@ export class CursosComponent implements OnInit {
             });
 
         // Auto-play slider
-        const intervalId = setInterval(() => {
-            this.nextSlide();
-        }, 5000);
+        if (isPlatformBrowser(this.platformId)) {
+            const intervalId = setInterval(() => {
+                this.nextSlide();
+            }, 5000);
 
-        this.destroyRef.onDestroy(() => {
-            clearInterval(intervalId);
-        });
+            this.destroyRef.onDestroy(() => {
+                clearInterval(intervalId);
+            });
+        }
     }
 
     // Combined Filtered List

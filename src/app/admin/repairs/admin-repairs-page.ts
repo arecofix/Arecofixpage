@@ -61,7 +61,7 @@ export class AdminRepairsPage implements OnInit {
   error = signal<string | null>(null);
 
   // Statistics and Summary
-  summary = signal<any>({
+  summary = signal<{ inWorkshop: number; pendingParts: number; readyToPickup: number; thisMonthProfit: number }>({
     inWorkshop: 0,
     readyToPickup: 0,
     pendingParts: 0,
@@ -78,7 +78,7 @@ export class AdminRepairsPage implements OnInit {
   hasMore = signal(true);
   loadingMore = signal(false);
 
-  private searchTimeout?: any;
+  private searchTimeout?: ReturnType<typeof setTimeout>;
 
   // Mapped repairs with precalculated UI properties to avoid template function calls
   mappedRepairs = computed(() => {
@@ -182,8 +182,8 @@ export class AdminRepairsPage implements OnInit {
       }
 
       this.hasMore.set(data.length === this.pageSize());
-    } catch (e: any) {
-      this.error.set('Error al cargar las reparaciones: ' + e.message);
+    } catch (e) {
+      this.error.set('Error al cargar las reparaciones: ' + (e as Error).message);
     } finally {
       this.loading.set(false);
       this.loadingMore.set(false);
@@ -218,10 +218,10 @@ export class AdminRepairsPage implements OnInit {
       await this.repairService.delete(id);
       // Optional: updated summary after deletion
       this.loadSummary();
-    } catch (e: any) {
+    } catch (e) {
       // 3. Rollback
       this.repairs.set(previousRepairs);
-      alert('Error al eliminar la reparación: ' + e.message);
+      alert('Error al eliminar la reparación: ' + (e as Error).message);
     }
   }
 
@@ -247,7 +247,7 @@ export class AdminRepairsPage implements OnInit {
     this.loadSummary();
   }
 
-  trackById(index: number, item: any): string {
+  trackById(index: number, item: Repair): string {
     return item.id;
   }
 }

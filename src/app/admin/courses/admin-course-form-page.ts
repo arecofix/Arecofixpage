@@ -432,6 +432,7 @@ import { signal } from '@angular/core';
                     ></i>
                     <select
                       formControlName="author_id"
+                      name="author_id"
                       class="grow bg-transparent outline-none"
                     >
                       <option value="">-- Sin Instructor Asignado --</option>

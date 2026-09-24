@@ -33,15 +33,13 @@ export class ProductStrategicService {
   }
 
   /**
-   * REGLAS DE NEGOCIO ESTRATÉGICAS (Lead Generation / Guest Checkout):
-   * Los repuestos y microelectrónica requieren sesión activa para comprar.
-   * El resto de productos (Fundas, Cargadores, etc.) pueden comprarse como invitado.
+   * REGLAS DE NEGOCIO ESTRATÉGICAS (Doble Esquema de Precios):
+   * Todos los usuarios pueden ver precios y comprar.
+   * Los repuestos y microelectrónica muestran el Precio Minorista para invitados
+   * y el Precio Gremio para usuarios logueados.
    */
   canViewPriceAndBuy(product: Product): boolean {
-    if (this.isTechnicalCategory(product)) {
-      return !!this.authService.getCurrentProfile();
-    }
-    return true; // Guest Checkout allowed for non-technical
+    return true; // Guest Checkout is now allowed for all categories
   }
 
   /**

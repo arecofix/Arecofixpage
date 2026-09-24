@@ -76,6 +76,11 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
     return this.router.url.includes('/academy');
   }
 
+  get isCelularLandingMode(): boolean {
+    const urlPath = this.router.url.split('?')[0];
+    return urlPath === '/celular' || urlPath.startsWith('/celular/');
+  }
+
   /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
   public searchFocusRequested = signal(false);
 
@@ -167,6 +172,11 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
 
   // ── Cart ──────────────────────────────────────────
   public isCartOpen = this.cartService.isCartOpen;
+  
+  get showCart(): boolean {
+    return this.router.url !== '/' && !this.isCelularLandingMode && !this.isAcademyMode;
+  }
+
   public toggleCart() {
     this.cartService.toggleCart();
   }

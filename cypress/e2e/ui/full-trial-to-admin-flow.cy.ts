@@ -6,7 +6,7 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
   };
 
   const mockTenant = {
-    id: 'mock-tenant-id',
+    id: '11111111-1111-1111-1111-111111111111',
     name: 'Taller Mock E2E',
     slug: 'taller-mock-e2e',
     is_active: true,
@@ -77,24 +77,30 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
 
   it('Debe crear una cuenta, iniciar sesión simulado, usar el panel y testear offline sync', () => {
     
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     // ==========================================
     // FASE 1: Registro vía /prueba-gratis
     // ==========================================
     cy.visit('/fixtecnicos');
     
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     cy.get('a[routerLink="/prueba-gratis"], a[href="/prueba-gratis"]').first().click({ force: true });
     cy.url().should('include', '/prueba-gratis');
     
     cy.wait(1000); // Esperamos hidratación Angular
 
-    cy.get('input[formControlName="businessName"]').type('Taller Mock E2E', { delay: 50 });
-    cy.get('input[formControlName="userName"]').type('Usuario Mock', { delay: 50 });
-    cy.get('input[formControlName="whatsapp"]').type('1122334455', { delay: 50 });
-    cy.get('input[formControlName="email"]').type(mockUser.email, { delay: 50 });
+    cy.get('input[name="businessName"]').type('Taller Mock E2E', { delay: 50 });
+    cy.get('input[name="userName"]').type('Usuario Mock', { delay: 50 });
+    cy.get('input[name="whatsapp"]').type('1122334455', { delay: 50 });
+    cy.get('input[name="email"]').type(mockUser.email, { delay: 50 });
 
     cy.get('button[type="submit"]').contains('Solicitar Prueba Gratis').click({ force: true });
 
     cy.wait('@createTrialTenant');
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     cy.contains('¡Tu sucursal ha sido creada!').should('be.visible');
 
     // ==========================================
@@ -116,12 +122,14 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
           user_metadata: { role: 'tenant_owner' },
         }
       };
-      win.localStorage.setItem('sb-jftiyfnnaogmgvksgkbn-auth-token', JSON.stringify(mockSession));
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockSession));
       win.localStorage.setItem('supabase-remember-me', 'true');
     });
 
     // Navegamos al panel de reparaciones
     cy.visit('/admin/repairs');
+    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
+    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
     // cy.wait(['@getProfile', '@getTenants', '@getBranches']);
     cy.url({ timeout: 10000 }).should('include', '/admin/repairs');
 
@@ -149,10 +157,10 @@ describe('Full E2E Flow: Free Trial -> Admin -> Offline Sync', () => {
         cy.get(selector, { timeout: 10000 }).first().invoke('val', value).trigger('input').blur();
     };
 
-    setInputValue('input[formControlName="customer_name"]', 'Cliente Offline Tauri');
-    setInputValue('input[formControlName="device_model"]', 'iPhone 12 Offline');
-    setInputValue('textarea[formControlName="issue_description"]', 'Pantalla rota simulando sin internet');
-    setInputValue('input[formControlName="estimated_cost"]', '45000');
+    setInputValue('input[name="customer_name"]', 'Cliente Offline Tauri');
+    setInputValue('input[name="device_model"]', 'iPhone 12 Offline');
+    setInputValue('textarea[name="issue_description"]', 'Pantalla rota simulando sin internet');
+    setInputValue('input[name="estimated_cost"]', '45000');
     
     // Interceptar la llamada RPC de Supabase para cuando vuelva la red (o si falla)
     cy.intercept('POST', '**/rpc/save_repair_order*').as('postRepair');

@@ -33,6 +33,14 @@ export interface CompanySettings {
   phone?: string;
   logo_url?: string;
   contact_phone_whatsapp?: string;
+  // Mercado Libre integration
+  ml_markup_percentage?: number;
+  ml_access_token?: string;
+  // WhatsApp Meta Cloud API
+  whatsapp_access_token?: string;
+  whatsapp_phone_id?: string;
+  whatsapp_business_account_id?: string;
+  whatsapp_enabled?: boolean;
 }
 
 @Injectable({

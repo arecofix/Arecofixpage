@@ -115,6 +115,16 @@
                 </select>
              </div>
            </div>
+
+           <div class="form-control">
+              <label class="label font-semibold">
+                Categoría de Mercado Libre (ID)
+                <a href="https://api.mercadolibre.com/sites/MLA/categories" target="_blank" class="text-xs text-indigo-500 font-normal hover:underline ml-2">Ver Categorías</a>
+              </label>
+              <input type="text" [(ngModel)]="formVal.ml_category_id" name="ml_category_id"
+                class="input input-bordered w-full font-mono text-sm" placeholder="Ej: MLA1055" />
+              <p class="text-[10px] text-gray-500 mt-1">Requerido para sincronizar con Mercado Libre</p>
+           </div>
            
            <!-- NEW QUALITY AND COLORS FIELDS -->
            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

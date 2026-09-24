@@ -276,13 +276,16 @@ export class CheckoutPage implements OnInit, OnDestroy {
       branch_id: this.branchService.getCurrentBranchId() || undefined,
     };
 
-    const orderItems: OrderItem[] = cartItems.map((item) => ({
-      product_name: item.product.name,
-      product_id: item.product.id,
-      quantity: item.quantity,
-      unit_price: item.product.price,
-      subtotal: item.product.price * item.quantity,
-    }));
+    const orderItems: OrderItem[] = cartItems.map((item) => {
+      const finalPrice = item.product.convertedPrice || item.product.price;
+      return {
+        product_name: item.product.name,
+        product_id: item.product.id,
+        quantity: item.quantity,
+        unit_price: finalPrice,
+        subtotal: finalPrice * item.quantity,
+      };
+    });
 
     try {
       order.items = orderItems;
@@ -298,8 +301,10 @@ export class CheckoutPage implements OnInit, OnDestroy {
       // Save contact message (non-fatal)
       const itemsList = cartItems
         .map(
-          (i) =>
-            `- ${i.product.name} (x${i.quantity}) - $${(i.product.price * i.quantity).toFixed(2)}`,
+          (i) => {
+            const p = i.product.convertedPrice || i.product.price;
+            return `- ${i.product.name} (x${i.quantity}) - $${(p * i.quantity).toFixed(2)}`;
+          }
         )
         .join('\n');
 
@@ -314,7 +319,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
         .catch((e: any) =>
           console.warn('Contact message error (non-fatal):', e),
         );
-
+      
+      this.cartService.clearCart();
+        
       if (method === 'cash') {
         const ticket = this.paymentService.buildPaymentTicket(
           created.id!,

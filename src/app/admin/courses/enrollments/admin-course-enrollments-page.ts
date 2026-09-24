@@ -130,6 +130,7 @@ export class AdminCourseEnrollmentsPage implements OnInit {
       user.email,
       fullName,
       user.phone,
+      user.id
     );
 
     this.isEnrolling.set(false);

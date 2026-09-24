@@ -16,12 +16,17 @@ export const environment: Environment = {
   baseUrl: 'https://arecofix.com.ar',
 
   // Supabase Configuration
-  // TODO: Move to .env and use build-time replacement
-  supabaseUrl: 'https://jftiyfnnaogmgvksgkbn.supabase.co',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0',
-
+  // Auth y datos apuntan al entorno local en la VPS.
+  supabaseUrl: 'https://db.arecofix.com.ar',
+  supabaseDataUrl: 'https://db.arecofix.com.ar',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs',
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
+
+  // RAG Chatbot Worker (Fase 3)
+  chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
+  embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
+  chatbotSecret: '0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=',
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
   // WhatsApp Configuration

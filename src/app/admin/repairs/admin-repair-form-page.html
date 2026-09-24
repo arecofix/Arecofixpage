@@ -91,7 +91,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-user text-indigo-400"></i> Nombre Completo *</label>
-                                    <input type="text" formControlName="customer_name" list="repair-clients-list" (input)="onSelectClient($any($event.target).value)" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched" placeholder="Buscar o escribir nombre..." autocomplete="off">
+                                    <input type="text" formControlName="customer_name" name="customer_name" list="repair-clients-list" (input)="onSelectClient($any($event.target).value)" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched" placeholder="Buscar o escribir nombre..." autocomplete="off">
                                     @if (repairForm.get('customer_name')?.invalid && repairForm.get('customer_name')?.touched) {
                                         <p class="text-[10px] text-red-500 mt-1 font-semibold">El nombre es obligatorio (mín. 3 letras).</p>
                                     }
@@ -103,21 +103,21 @@
                                 </div>
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fab fa-whatsapp text-emerald-500"></i> Teléfono WhatsApp</label>
-                                    <input type="text" formControlName="customer_phone" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="Ej: 1125960900">
+                                    <input type="text" formControlName="customer_phone" name="customer_phone" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="Ej: 1125960900">
                                 </div>
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-envelope text-yellow-500"></i> Correo Electrónico</label>
-                                    <input type="email" formControlName="customer_email" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="cliente@correo.com">
+                                    <input type="email" formControlName="customer_email" name="customer_email" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="cliente@correo.com">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t border-gray-200 dark:border-gray-700/40 pt-4">
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-id-card text-purple-400"></i> DNI / Identificación</label>
-                                    <input type="text" formControlName="customer_dni" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="Nro de DNI o documento">
+                                    <input type="text" formControlName="customer_dni" name="customer_dni" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="Nro de DNI o documento">
                                 </div>
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-money-bill-wave text-emerald-500"></i> Forma de Pago</label>
-                                    <select formControlName="payment_method" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all select select-bordered">
+                                    <select formControlName="payment_method" name="payment_method" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all select select-bordered">
                                         <option value="efectivo">Efectivo</option>
                                         <option value="transferencia">Transferencia / QR</option>
                                         <option value="tarjeta">Tarjeta de Crédito/Débito</option>
@@ -137,43 +137,43 @@
                                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Tipo de Dispositivo</label>
                                     <div class="flex flex-wrap gap-2">
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="Celular">
-                                            <input type="radio" formControlName="device_type" value="smartphone" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="smartphone" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-mobile-alt text-lg"></i>
                                             </div>
                                         </label>
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="Tablet">
-                                            <input type="radio" formControlName="device_type" value="tablet" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="tablet" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-tablet-alt text-lg"></i>
                                             </div>
                                         </label>
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="Notebook">
-                                            <input type="radio" formControlName="device_type" value="notebook" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="notebook" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-laptop text-lg"></i>
                                             </div>
                                         </label>
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="PC / Desktop">
-                                            <input type="radio" formControlName="device_type" value="pc" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="pc" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-desktop text-lg"></i>
                                             </div>
                                         </label>
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="Consola">
-                                            <input type="radio" formControlName="device_type" value="console" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="console" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-gamepad text-lg"></i>
                                             </div>
                                         </label>
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="Impresora">
-                                            <input type="radio" formControlName="device_type" value="printer" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="printer" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-print text-lg"></i>
                                             </div>
                                         </label>
                                         <label class="flex-1 min-w-[3rem] cursor-pointer" title="Otros">
-                                            <input type="radio" formControlName="device_type" value="other" class="peer sr-only">
+                                            <input type="radio" formControlName="device_type" name="device_type" value="other" class="peer sr-only">
                                             <div class="h-11 bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 peer-checked:border-indigo-500 peer-checked:text-indigo-500 peer-checked:bg-indigo-55/50 dark:peer-checked:bg-indigo-500/10 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <i class="fas fa-box-open text-lg"></i>
                                             </div>
@@ -182,7 +182,7 @@
                                 </div>
                                 <div class="md:col-span-3">
                                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Marca</label>
-                                    <select formControlName="brand_id" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all select select-bordered">
+                                    <select formControlName="brand_id" name="brand_id" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all select select-bordered">
                                         <option [ngValue]="null">Seleccionar Marca</option>
                                         @for (brand of brands(); track brand.id) {
                                             <option [value]="brand.id">{{ brand.name }}</option>
@@ -191,7 +191,7 @@
                                 </div>
                                 <div class="md:col-span-5">
                                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Modelo *</label>
-                                    <input type="text" formControlName="device_model" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('device_model')?.invalid && repairForm.get('device_model')?.touched" placeholder="Ej: Galaxy S23, iPhone 15 Pro">
+                                    <input type="text" formControlName="device_model" name="device_model" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('device_model')?.invalid && repairForm.get('device_model')?.touched" placeholder="Ej: Galaxy S23, iPhone 15 Pro">
                                     @if (repairForm.get('device_model')?.invalid && repairForm.get('device_model')?.touched) {
                                         <p class="text-[10px] text-red-500 mt-1 font-semibold">El modelo es obligatorio.</p>
                                     }
@@ -201,7 +201,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t border-gray-200 dark:border-gray-700/40 pt-4">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">IMEI / Nro de Serie</label>
-                                    <input type="text" formControlName="imei" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono placeholder-gray-400 dark:placeholder-gray-500" placeholder="15 dígitos o serie del fabricante">
+                                    <input type="text" formControlName="imei" name="imei" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono placeholder-gray-400 dark:placeholder-gray-500" placeholder="15 dígitos o serie del fabricante">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Accesorios Dejados</label>
@@ -211,11 +211,11 @@
                                             <i class="fas fa-chevron-down text-xs"></i>
                                         </div>
                                         <ul tabindex="0" class="dropdown-content z-50 menu p-3 shadow-xl bg-white dark:bg-[#101828] rounded-xl w-full mt-1 border border-gray-200 dark:border-gray-700">
-                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="charger" class="checkbox checkbox-sm checkbox-primary"> Cargador</label></li>
-                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="battery" class="checkbox checkbox-sm checkbox-primary"> Batería</label></li>
-                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="chip" class="checkbox checkbox-sm checkbox-primary"> Chip/SIM</label></li>
-                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="sd" class="checkbox checkbox-sm checkbox-primary"> MicroSD</label></li>
-                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="case" class="checkbox checkbox-sm checkbox-primary"> Funda</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="charger" name="charger" class="checkbox checkbox-sm checkbox-primary"> Cargador</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="battery" name="battery" class="checkbox checkbox-sm checkbox-primary"> Batería</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="chip" name="chip" class="checkbox checkbox-sm checkbox-primary"> Chip/SIM</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="sd" name="sd" class="checkbox checkbox-sm checkbox-primary"> MicroSD</label></li>
+                                            <li><label class="flex items-center gap-3 text-sm p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><input type="checkbox" formControlName="case" name="case" class="checkbox checkbox-sm checkbox-primary"> Funda</label></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -230,14 +230,14 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-exclamation-circle text-rose-500"></i> Falla Declarada *</label>
-                                    <textarea formControlName="issue_description" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('issue_description')?.invalid && repairForm.get('issue_description')?.touched" placeholder="Detalle de la falla reportada por el cliente..."></textarea>
+                                    <textarea formControlName="issue_description" name="issue_description" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder-gray-400 dark:placeholder-gray-500" [class.border-red-500]="repairForm.get('issue_description')?.invalid && repairForm.get('issue_description')?.touched" placeholder="Detalle de la falla reportada por el cliente..."></textarea>
                                     @if (repairForm.get('issue_description')?.invalid && repairForm.get('issue_description')?.touched) {
                                         <p class="text-[10px] text-red-500 mt-1 font-semibold">La falla declarada es obligatoria.</p>
                                     }
                                 </div>
                                 <div>
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-eye text-amber-500"></i> Estado Físico / Observaciones</label>
-                                    <textarea formControlName="technician_notes" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder-gray-400 dark:placeholder-gray-500" placeholder="Ej: Pantalla astillada, rayones de uso..."></textarea>
+                                    <textarea formControlName="technician_notes" name="technician_notes" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder-gray-400 dark:placeholder-gray-500" placeholder="Ej: Pantalla astillada, rayones de uso..."></textarea>
                                 </div>
                                 <div class="md:col-span-2">
                                     <div class="flex justify-between items-center mb-1.5">
@@ -263,11 +263,11 @@
                                         </div>
                                     }
                                     
-                                    <textarea formControlName="technical_report" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder-gray-400 dark:placeholder-gray-500" placeholder="Descripción detallada del informe técnico..."></textarea>
+                                    <textarea formControlName="technical_report" name="technical_report" rows="3" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder-gray-400 dark:placeholder-gray-500" placeholder="Descripción detallada del informe técnico..."></textarea>
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="flex text-xs font-semibold text-gray-700 dark:text-gray-300 items-center gap-1 mb-1.5"><i class="fas fa-shield-alt text-purple-400"></i> Garantía Otorgada</label>
-                                    <input type="text" formControlName="warranty" placeholder="Ej: 90 días en pantalla" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500">
+                                    <input type="text" formControlName="warranty" name="warranty" placeholder="Ej: 90 días en pantalla" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500">
                                 </div>
                             </div>
                             
@@ -315,14 +315,14 @@
                                 <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Presupuesto Estimado</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
-                                    <input type="number" formControlName="estimated_cost" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg pl-7 pr-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30">
+                                    <input type="number" formControlName="estimated_cost" name="estimated_cost" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg pl-7 pr-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">Cobrado / Seña</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 font-bold">$</span>
-                                    <input type="number" formControlName="deposit_amount" class="w-full bg-white dark:bg-[#101828] border border-emerald-500/50 rounded-lg pl-7 pr-3 py-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm focus:outline-none focus:border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                    <input type="number" formControlName="deposit_amount" name="deposit_amount" class="w-full bg-white dark:bg-[#101828] border border-emerald-500/50 rounded-lg pl-7 pr-3 py-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm focus:outline-none focus:border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                                 </div>
                             </div>
                         </div>
@@ -332,7 +332,7 @@
                             <div class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Recargo %</span>
                                 <div class="relative w-full max-w-[80px]">
-                                    <input type="number" formControlName="surcharge_percentage" class="bg-transparent text-xl font-bold text-gray-900 dark:text-white text-center w-full focus:outline-none border-b border-gray-300 dark:border-gray-600 focus:border-indigo-500">
+                                    <input type="number" formControlName="surcharge_percentage" name="surcharge_percentage" class="bg-transparent text-xl font-bold text-gray-900 dark:text-white text-center w-full focus:outline-none border-b border-gray-300 dark:border-gray-600 focus:border-indigo-500">
                                 </div>
                             </div>
                             <div class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center">
@@ -341,7 +341,7 @@
                             </div>
                             <div class="bg-white dark:bg-[#101828] border border-[#3498DB]/50 shadow-[0_0_15px_rgba(52,152,219,0.15)] rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-[#3498DB] uppercase tracking-wider mb-1">Total Servicio</span>
-                                <input type="number" formControlName="final_cost" class="bg-transparent text-2xl font-black text-gray-900 dark:text-white text-center w-full focus:outline-none">
+                                <input type="number" formControlName="final_cost" name="final_cost" class="bg-transparent text-2xl font-black text-gray-900 dark:text-white text-center w-full focus:outline-none">
                             </div>
                             <div class="bg-white dark:bg-[#101828] border border-[#F39C12]/50 shadow-[0_0_15px_rgba(243,156,18,0.15)] rounded-xl p-4 flex flex-col justify-center items-center">
                                 <span class="text-xs font-semibold text-[#F39C12] uppercase tracking-wider mb-1">Saldo a Cobrar</span>
@@ -416,13 +416,13 @@
                             </div>
                             
                             @if (activeSecurityTab() === 'pin') {
-                                <input type="text" formControlName="security_pin" placeholder="****" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
+                                <input type="text" formControlName="security_pin" name="security_pin" placeholder="****" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
                             }
                             @if (activeSecurityTab() === 'pattern') {
-                                <input type="text" formControlName="security_pattern" placeholder="Ej: L, Z, U..." class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
+                                <input type="text" formControlName="security_pattern" name="security_pattern" placeholder="Ej: L, Z, U..." class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
                             }
                             @if (activeSecurityTab() === 'passcode') {
-                                <input type="text" formControlName="device_passcode" placeholder="Escribir clave..." class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
+                                <input type="text" formControlName="device_passcode" name="device_passcode" placeholder="Escribir clave..." class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 text-center text-gray-900 dark:text-white text-lg tracking-widest font-mono focus:outline-none focus:border-purple-500 mb-2">
                             }
                         </div>
 
@@ -430,7 +430,7 @@
 
                         <div>
                             <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><i class="fas fa-truck text-orange-400"></i> Proveedor de Repuesto</h3>
-                            <select formControlName="supplier_id" class="w-full bg-white dark:bg-[#101828] border border-orange-500/30 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-orange-500 shadow-[0_0_10px_rgba(243,156,18,0.05)]">
+                            <select formControlName="supplier_id" name="supplier_id" class="w-full bg-white dark:bg-[#101828] border border-orange-500/30 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-orange-500 shadow-[0_0_10px_rgba(243,156,18,0.05)]">
                                 <option [ngValue]="null">Sin proveedor / No aplica</option>
                                 @for (s of suppliers(); track s.id) {
                                     <option [value]="s.id">{{ s.name }}</option>

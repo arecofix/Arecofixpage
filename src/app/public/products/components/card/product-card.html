@@ -88,56 +88,64 @@
 
     <!-- Strategic Action Block (Unified UI) -->
     <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
-      
-      @if (!showPriceAndBuy()) {
-        <!-- CAPTURA DE LEAD: Ingresar para ver precios -->
-        <div class="flex flex-col gap-3">
-          <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 rounded-xl p-3 text-center">
-            <p class="text-[10px] font-bold text-indigo-800 dark:text-indigo-400 uppercase tracking-tight flex justify-center items-center mb-1">
-              <i class="fas fa-lock mr-2"></i> Iniciá Sesión
-            </p>
-            <p class="text-[11px] leading-tight text-indigo-700 dark:text-indigo-500">
-              Registrate gratis para ver precios y comprar online.
-            </p>
-          </div>
-          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }"
-             class="w-full btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-lg h-10 shadow-sm">
-            Ingresar / Registrarse
-          </a>
-        </div>
-      } @else {
-        <!-- CONVERSION BLOCK: Price + Buy -->
-        <div class="flex flex-col gap-3">
-          <div class="flex justify-between items-end">
-            <div class="flex flex-col">
-              <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-0.5">
-                Precio Web Autogestionado
-              </span>
-              <span class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tighter flex flex-col">
-                <span>{{ product().price | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}</span>
-                @if (product().currency === 'USD' && product().convertedPrice) {
-                  <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 flex items-center gap-1">
-                    <i class="fas fa-exchange-alt text-[9px]"></i> {{ product().convertedPrice | currency: 'ARS': 'symbol-narrow': '1.0-0': 'es-AR' }}
-                  </span>
+      <!-- CONVERSION BLOCK: Price + Buy -->
+      <div class="flex flex-col gap-3">
+        <div class="flex justify-between items-end">
+          <div class="flex flex-col">
+            <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-0.5">
+              @if (!isLoggedIn() && isTechnicalCategory()) {
+                 Precio Minorista
+              } @else {
+                 Precio Web Autogestionado
+              }
+            </span>
+            <span class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tighter flex flex-col">
+              <span>
+                @if (!isLoggedIn() && isTechnicalCategory() && product().retail_price) {
+                   {{ product().retail_price | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                } @else {
+                   {{ product().price | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
                 }
               </span>
-            </div>
-            
-            @if (product().discount_percentage) {
-              <div class="flex flex-col items-end mb-1">
-                <span class="text-[10px] line-through text-gray-400">
-                  {{ (product().price / (1 - (product().discount_percentage || 0)/100)) | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+              @if (product().currency === 'USD' && product().convertedPrice) {
+                <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 flex items-center gap-1">
+                  <i class="fas fa-exchange-alt text-[9px]"></i> {{ (!isLoggedIn() && isTechnicalCategory() && product().retail_price ? product().retail_price! : product().price) * (product().convertedPrice! / product().price) | currency: 'ARS': 'symbol-narrow': '1.0-0': 'es-AR' }}
                 </span>
-                <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
-                  -{{ product().discount_percentage }}%
-                </span>
-              </div>
-            }
+              }
+            </span>
           </div>
+          
+          @if (isLoggedIn() && isTechnicalCategory() && product().retail_price && product().retail_price! > product().price) {
+            <div class="flex flex-col items-end mb-1">
+              <span class="text-[10px] line-through text-gray-400">
+                {{ product().retail_price! | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+              </span>
+              <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
+                -{{ ((1 - (product().price / product().retail_price!)) * 100).toFixed(0) }}% Gremio
+              </span>
+            </div>
+          } @else if (product().discount_percentage) {
+            <div class="flex flex-col items-end mb-1">
+              <span class="text-[10px] line-through text-gray-400">
+                {{ (product().price / (1 - (product().discount_percentage || 0)/100)) | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+              </span>
+              <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
+                -{{ product().discount_percentage }}%
+              </span>
+            </div>
+          }
+        </div>
 
-          <!-- Direct Purchase Action -->
-          <div class="flex flex-col gap-2">
-            @if (isInStock()) {
+        <!-- BANNER DE LEAD MINIATURA -->
+        @if (!isLoggedIn() && isTechnicalCategory()) {
+          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: router.url }" class="w-full btn btn-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg h-8 shadow-sm justify-start font-medium text-xs">
+            <i class="fas fa-tools mr-1 opacity-70"></i> ¿Sos técnico? Iniciá sesión
+          </a>
+        }
+
+        <!-- Direct Purchase Action -->
+        <div class="flex flex-col gap-2">
+          @if (isInStock()) {
               <button (click)="addToCart($event)" 
                       class="w-full btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-lg h-10 shadow-lg shadow-indigo-500/20 group/buy">
                 <i class="fas fa-cart-plus mr-2 group-hover/buy:scale-110 transition-transform"></i>
@@ -155,8 +163,6 @@
             </p>
           </div>
         </div>
-      }
-
       <!-- Detailed View Link (Clean Footer) -->
       <a [routerLink]="['/productos/detalle', product().slug]" 
          class="mt-3 block text-center text-[11px] font-bold text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 uppercase tracking-widest transition-colors py-2">

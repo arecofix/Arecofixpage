@@ -50,4 +50,5 @@ export abstract class ProductRepository {
     abstract rejectProduct(id: string): Observable<void>;
     abstract getPendingApprovalsCount(): Observable<number>;
     abstract getInventorySummary(branch_id?: string): Observable<{ totalItems: number, totalValue: number, lowStockCount: number }>;
+    abstract syncWithMercadoLibre(id: string): Observable<{ success: boolean; ml_item_id: string }>;
 }

@@ -32,7 +32,7 @@ export class SupabaseProductStockRepository implements ProductStockRepository {
         .insert({
           product_id: productId,
           branch_id: branchId,
-          tenant_id: tenantId === TENANT_CONSTANTS.FALLBACK_ID ? null : tenantId,
+          tenant_id: tenantId,
           quantity,
           updated_at: new Date().toISOString()
         });
@@ -43,7 +43,7 @@ export class SupabaseProductStockRepository implements ProductStockRepository {
   }
 
   async deductStock(productId: string, branchId: string, quantityToDeduct: number, tenantId: string | null): Promise<void> {
-    const cleanTenantId = tenantId === TENANT_CONSTANTS.FALLBACK_ID ? null : tenantId;
+    const cleanTenantId = tenantId;
 
     const { error } = await this.supabase.rpc('deduct_product_stock_v3', {
       p_product_id: productId,

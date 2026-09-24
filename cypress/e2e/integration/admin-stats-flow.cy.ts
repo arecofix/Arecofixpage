@@ -142,19 +142,19 @@ describe('Admin Statistics computational and rendering audit', () => {
 
     // 5. Assert Mathematical Computations on the UI
     // Revenue should be only repair 1 + repair 2 = 30000
-    cy.contains('30.000').should('exist'); 
+    cy.contains('$30k').should('exist'); 
     
     // Costo Insumos should be repair 1 + repair 2 = 7000
-    cy.contains('7.000').should('exist'); 
+    cy.contains('$7k').should('exist'); 
 
     // Ganancia Real should be 30000 - 7000 = 23000
-    cy.contains('23.000').should('exist');
+    cy.contains('$23k').should('exist');
 
     // Ticket Promedio = 30000 / 2 = 15000
-    cy.contains('15.000').should('exist');
+    cy.contains('$15k').should('exist');
 
     // Ingresos Consolidados (Global) = Taller (30000) + Tienda Online (15000) = 45000
-    cy.contains('45.000').should('exist');
+    cy.contains('$45k').should('exist');
 
     // Equipos Entregados = 1 (status 6)
     cy.contains('Equipos Entregados').parent().contains('1').should('exist');

@@ -51,6 +51,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     meta_title: '',
     meta_description: '',
     og_image: '',
+    ml_category_id: '',
   };
 
   // Resources
@@ -109,6 +110,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             meta_title: data.meta_title || '',
             meta_description: data.meta_description || '',
             og_image: data.og_image || '',
+            ml_category_id: data.ml_category_id || '',
           };
         }
       } else {
@@ -194,6 +196,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       meta_title: formVal.meta_title?.trim() || formVal.name?.trim() || null,
       meta_description: formVal.meta_description?.trim() || (formVal.description ? formVal.description.substring(0, 160).trim() : null),
       og_image: formVal.og_image?.trim() || (formVal.images.length > 0 ? formVal.images[0].url : null),
+      ml_category_id: formVal.ml_category_id || null,
     };
 
     // Add optional fields only if they have values

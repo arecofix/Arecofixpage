@@ -5,7 +5,7 @@ describe('Repair Tracking Flow', () => {
     // Intercept Supabase tenant checks
     cy.intercept('GET', '**/rest/v1/tenants*', {
       statusCode: 200,
-      body: [{ id: 'mock-tenant-id', name: 'Arecofix', is_active: true }]
+      body: [{ id: '11111111-1111-1111-1111-111111111111', name: 'Arecofix', is_active: true }]
     }).as('tenantCheck');
 
     // Intercept RPC call for tracking

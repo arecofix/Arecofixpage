@@ -44,14 +44,12 @@ export class TenantIsolationGuard implements CanActivate {
       
       if (targetTenant) {
         if (!this.tenantService.isCurrentTenant(targetTenant.id)) {
-          // console.log(`[TenantGuard v2] Switching to branch: ${targetTenant.name}`);
           await this.tenantService.setCurrentTenant(targetTenant.id);
           currentTenant = this.tenantService.getCurrentTenant();
         }
       } else {
         // No es una sucursal conocida, asegurar que estamos en el tenant principal si estamos en el dominio base
         if (this.tenantService.isMainDomain() && !this.tenantService.isMainTenant()) {
-          // console.log('[TenantGuard v2] Unknown slug on main domain, switching to central');
           await this.tenantService.setCurrentTenant('central');
           currentTenant = this.tenantService.getCurrentTenant();
         }

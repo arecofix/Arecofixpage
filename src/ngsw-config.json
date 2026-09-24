@@ -1,6 +1,21 @@
 {
-  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "$schema": "../node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
+  "dataGroups": [
+    {
+      "name": "supabase-api",
+      "urls": [
+        "https://db.arecofix.com.ar/**",
+        "https://*.supabase.co/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "1h",
+        "timeout": "10s"
+      }
+    }
+  ],
   "assetGroups": [
     {
       "name": "app",
@@ -23,6 +38,10 @@
         "files": [
           "/assets/**",
           "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
+        ],
+        "urls": [
+          "https://fonts.googleapis.com/**",
+          "https://fonts.gstatic.com/**"
         ]
       }
     }

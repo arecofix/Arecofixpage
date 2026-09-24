@@ -38,7 +38,10 @@ import {
   CreateRepairDto,
   RepairStatus,
   UpdateRepairDto,
+  Repair,
+  RepairPart
 } from '@app/features/repairs/domain/entities/repair.entity';
+import { Customer } from '@app/features/customers/domain/entities/customer.entity';
 import { PricingService } from '@app/core/services/pricing.service';
 import { environment } from '@env/environment';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
@@ -55,6 +58,7 @@ import { OfflineSyncService } from '@app/core/services/offline-sync.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
+import { ICustomerDeviceRepository } from '@app/features/devices/domain/repositories/customer-device.repository';
 
 interface ClientView extends Partial<UserProfile> {
   displayName: string;
@@ -100,6 +104,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   public offlineSyncService = inject(OfflineSyncService);
   private adminLayout = inject(AdminLayout, { optional: true });
   private destroyRef = inject(DestroyRef);
+  private customerDeviceRepository = inject(ICustomerDeviceRepository);
 
   repairForm!: FormGroup;
 
@@ -139,7 +144,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     technical_labor_cost: 0,
     technical_report: '',
     parts:
-      [] as import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
+      [] as RepairPart[],
     glass_upsell: false,
     whatsapp_notifications: true,
     spare_part_cost: 0,
@@ -197,7 +202,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   readonly TAX_RATE = 0.21;
   searchQuery = signal('');
   parts = signal<
-    import('../../features/repairs/domain/entities/repair.entity').RepairPart[]
+    RepairPart[]
   >([]);
   images = signal<string[]>([]);
   brands = signal<{ id: string; name: string }[]>([]);
@@ -268,7 +273,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       )
       .subscribe((data) => {
         if (data) {
-          this.clients.set(data.map((c) => this.clientView(c as any)));
+          this.clients.set(data.map((c) => this.clientView(c as unknown as Partial<UserProfile>)));
         }
       });
   }
@@ -281,6 +286,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   saving = signal<boolean>(false);
+  private lastSelectedClientName = '';
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
   company = signal<unknown>(null);
@@ -298,7 +304,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     try {
       const data = await this.customerService.getRecentClients();
       if (data) {
-        this.clients.set(data.map((c) => this.clientView(c as any)));
+        this.clients.set(data.map((c) => this.clientView(c as unknown as Partial<UserProfile>)));
       }
     } catch (e) {
       console.error('Error loading clients', e);
@@ -383,6 +389,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     const client = this.clients().find((c) => c.displayName === clientName);
     if (client) {
+      this.lastSelectedClientName = client.displayName || '';
       this.repairForm.patchValue({
         customer_id: client.id,
         customer_name: client.displayName,
@@ -393,7 +400,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     } else {
       this.repairForm.patchValue(
         {
-          customer_id: '',
+          customer_id: null,
+          client_id: null,
           customer_name: clientName,
         },
         { emitEvent: false },
@@ -409,6 +417,17 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     this.id = this.route.snapshot.paramMap.get('id');
     this.setupForm();
     this.setupSearchStreams();
+
+    // Listen to changes in customer_name to clear customer_id if typed manually
+    this.repairForm.get('customer_name')?.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((newName) => {
+      const currentClientId = this.repairForm.get('customer_id')?.value;
+      // If the name changed and it doesn't match the last explicitly selected or loaded client, clear the ID
+      if (currentClientId && newName !== this.lastSelectedClientName) {
+        this.repairForm.patchValue({ customer_id: null }, { emitEvent: false });
+      }
+    });
 
     await Promise.all([
       this.loadCompanySettings(),
@@ -449,7 +468,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       const currentImages = this.images();
       this.images.set([...currentImages, ...uploadedUrls]);
       this.notificationService.showSuccess('Imágenes subidas correctamente.');
-    } catch (e: any) {
+    } catch (e) {
       console.error('Error uploading images:', e);
       const message = e instanceof Error ? e.message : 'Unknown error';
       this.notificationService.showError('Error al subir imágenes: ' + message);
@@ -561,7 +580,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   onPartsListChange(
-    parts: import('../../features/repairs/domain/entities/repair.entity').RepairPart[],
+    parts: RepairPart[],
   ) {
     this.parts.set(parts);
     this.calculateFinalCost();
@@ -616,6 +635,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     try {
       const data = await this.repairService.getById(this.id);
       if (data) {
+        this.lastSelectedClientName = data.customer_name || '';
         this.repairForm.patchValue({
           customer_id: data.customer_id,
           device_id: data.device_id || '',
@@ -625,7 +645,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
           customer_dni: data.customer_dni || '',
           device_model: data.device_model,
           device_type: data.device_type,
-          brand_id: (data as any).brand_id || null,
+          brand_id: data.brand_id || null,
           imei: data.imei,
           issue_description: data.issue_description,
           current_status_id: data.current_status_id,
@@ -643,9 +663,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
           glass_upsell: data.glass_upsell,
           whatsapp_notifications: data.whatsapp_notifications,
           spare_part_cost: data.spare_part_cost,
-          payment_method: (data as any).payment_method || 'efectivo',
-          warranty: (data as any).warranty || '',
-          supplier_id: (data as any).supplier_id || null,
+          payment_method: data.payment_method || 'efectivo',
+          warranty: data.warranty || '',
+          supplier_id: data.supplier_id || null,
         });
 
         if (data.checklist) {
@@ -663,7 +683,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         this.parts.set(data.parts || []);
         this.images.set(data.images || []);
       }
-    } catch (e: any) {
+    } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error';
       this.error.set('Error cargando reparación: ' + message);
     }
@@ -687,14 +707,12 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   async save() {
-    console.log('🚀 [AdminRepairForm] Iniciando proceso de guardado...');
     window.saveCalled = true;
     this.saving.set(true);
     this.error.set(null);
 
     try {
       // 1. Resolve branch ID with centralized logic
-      console.log('📍 [AdminRepairForm] Resolviendo sucursal...');
       const branchIdActual =
         await this.branchService.resolveEffectiveBranchId();
 
@@ -707,7 +725,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         this.saving.set(false);
         return;
       }
-      console.log('✅ [AdminRepairForm] Sucursal resuelta:', branchIdActual);
 
       // 2. Validate form
       if (this.repairForm.invalid) {
@@ -761,7 +778,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       }
 
       // 3. Prepare payload
-      console.log('📦 [AdminRepairForm] Preparando datos...');
       const rawData = this.repairForm.getRawValue();
 
       // Destructuramos para extraer campos del frontend que no existen en la tabla repairs
@@ -801,34 +817,33 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
           } else {
             throw new Error('No se obtuvo el ID del cliente.');
           }
-        } catch (err: any) {
+        } catch (err) {
           console.error('[AdminRepairForm] Error creating guest profile:', err);
           this.notificationService.showError(
             'Error al crear o buscar el cliente: ' +
-              (err.message || 'Verifique los datos.'),
+              (err instanceof Error ? err.message : 'Verifique los datos.'),
           );
           this.saving.set(false);
           return;
         }
       } else if (finalClientId) {
         // Actualizar datos si se editó un cliente existente
-        const updateData: any = {};
-        if (customer_dni) updateData.dni = customer_dni;
-        if (customer_phone) updateData.phone = customer_phone;
-        if (customer_email) updateData.email = customer_email;
+        const updateData: Record<string, unknown> = {};
+        if (customer_dni !== undefined) updateData['dni'] = customer_dni || null;
+        if (customer_phone !== undefined) updateData['phone'] = customer_phone || null;
+        if (customer_email !== undefined) updateData['email'] = customer_email || null;
+        
         if (customer_name) {
-          const nameParts = customer_name.trim().split(' ');
-          updateData.first_name = nameParts[0] || '';
-          updateData.last_name = nameParts.slice(1).join(' ') || '';
+          const nameParts = customer_name.split(' ');
+          updateData['first_name'] = nameParts[0] || '';
+          updateData['last_name'] = nameParts.slice(1).join(' ') || '';
         }
 
         try {
           if (Object.keys(updateData).length > 0) {
-            await this.supabaseService
-              .getClient()
-              .from('profiles')
-              .update(updateData)
-              .eq('id', finalClientId);
+            console.log('[AdminRepairForm] Calling customerService.update with finalClientId:', finalClientId, 'updateData:', updateData);
+            await this.customerService.update(finalClientId, updateData);
+            console.log('[AdminRepairForm] customerService.update finished successfully');
           }
         } catch (err) {
           console.error('[AdminRepairForm] Error updating customer data:', err);
@@ -839,89 +854,25 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       // Buscar o crear modelo (siempre que haya device_model)
       let modelId: string | null = null;
       if (device_model) {
-        try {
-          const { data: existingModel } = await this.supabaseService
-            .getClient()
-            .from('models')
-            .select('id')
-            .ilike('name', device_model.trim())
-            .limit(1);
-
-          if (existingModel && existingModel.length > 0) {
-            modelId = existingModel[0].id;
-          } else {
-            const modelName = device_model.trim();
-            const generatedSlug =
-              modelName
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, '') ||
-              'model-' + Math.random().toString(36).substring(2, 9);
-
-            const { data: newModel } = await this.supabaseService
-              .getClient()
-              .from('models')
-              .insert({
-                name: modelName,
-                slug: generatedSlug,
-                brand_id: brand_id || null,
-                tenant_id: this.tenantService.getTenantId(),
-              })
-              .select('id')
-              .single();
-            if (newModel) modelId = newModel.id;
-          }
-        } catch (modelErr) {
-          console.error('[AdminRepairForm] Error resolving model:', modelErr);
-        }
+        const modelName = device_model.trim();
+        const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
+        modelId = await firstValueFrom(this.customerDeviceRepository.ensureModelExists(modelName, generatedSlug, brand_id));
       }
 
-      // Si hay cliente pero no equipo asociado, crearlo
-      if (finalClientId && !finalDeviceId && device_model) {
-        try {
-          const { data: newDevice, error: devErr } = await this.supabaseService
-            .getClient()
-            .from('customer_devices')
-            .insert({
-              user_id: finalClientId,
-              model_id: modelId,
-              type: device_type || null,
-              imei: imei || null,
-              passcode: device_passcode || null,
-              tenant_id: this.tenantService.getTenantId(),
-            })
-            .select('id')
-            .single();
-
-          if (newDevice) finalDeviceId = newDevice.id;
-          if (devErr)
-            console.error('[AdminRepairForm] Error inserting device:', devErr);
-        } catch (devErr) {
-          console.error(
-            '[AdminRepairForm] Exception inserting device:',
-            devErr,
-          );
-        }
-      } else if (finalDeviceId) {
-        // Si hay un dispositivo asociado, actualizar sus datos
-        try {
-          const deviceUpdatePayload: any = {
-            imei: imei || null,
-            passcode: device_passcode || null,
-          };
-          if (modelId) deviceUpdatePayload.model_id = modelId;
-          if (device_type) deviceUpdatePayload.type = device_type;
-
-          await this.supabaseService
-            .getClient()
-            .from('customer_devices')
-            .update(deviceUpdatePayload)
-            .eq('id', finalDeviceId);
-        } catch (devUpdateErr) {
-          console.error(
-            '[AdminRepairForm] Error updating device:',
-            devUpdateErr,
-          );
+      if (finalClientId && device_model) {
+        // Creará o actualizará el dispositivo
+        const savedDeviceId = await firstValueFrom(
+          this.customerDeviceRepository.upsertDevice({
+            deviceId: finalDeviceId,
+            userId: finalClientId,
+            modelId: modelId,
+            type: device_type,
+            imei: imei,
+            passcode: device_passcode,
+          })
+        );
+        if (savedDeviceId) {
+          finalDeviceId = savedDeviceId;
         }
       }
 
@@ -953,7 +904,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
       const isOffline = !navigator.onLine || window.forceOffline;
       if (!this.id && typeof navigator !== 'undefined' && isOffline) {
-        console.log('📶 [AdminRepairForm] Sin conexión, guardando offline...');
         this.offlineSyncService.saveOfflineRepair(payload);
         this.notificationService.showWarning(
           'Guardado localmente. Se sincronizará cuando haya conexión.',
@@ -987,7 +937,6 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         }
 
         try {
-          console.log('📄 [AdminRepairForm] Generando comprobante...');
           await this.printOrder();
         } catch (pdfErr) {
           console.error('Error generando PDF automático:', pdfErr);
@@ -1005,12 +954,13 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       console.log(
         '🏁 [AdminRepairForm] Guardado finalizado con éxito. Navegando...',
       );
+      await this.supabaseService.clearCache();
       this.router.navigate(['/admin/repairs']);
-    } catch (e: any) {
+    } catch (e) {
       console.error('💥 [AdminRepairForm] Error crítico en save():', e);
       const message =
-        e?.message ||
-        e?.error?.message ||
+        (e as Error)?.message ||
+        (e as any)?.error?.message ||
         (typeof e === 'string'
           ? e
           : 'Error desconocido al procesar la solicitud.');
@@ -1033,7 +983,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       }
 
       // Need a Repair typed object for the service
-      const repairData: any = {
+      const repairData: Partial<Repair> = {
         ...rawData,
         brand_name: brandName,
         parts: this.parts(),
@@ -1044,7 +994,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         repairData as import('../../features/repairs/domain/entities/repair.entity').Repair,
         this.company(),
       );
-    } catch (e: any) {
+    } catch (e) {
       console.error('PDF Error:', e);
       const message =
         e instanceof Error ? e.message : 'Error desconocido al generar PDF';

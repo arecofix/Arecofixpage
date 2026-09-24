@@ -1,0 +1,22 @@
+{
+  "name": "arecofix-embedding-ingestion",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker — Generador de Embeddings (Fase 2 del sistema RAG de Arecofix)",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250430.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.101.0"
+  },
+  "allowScripts": {
+    "esbuild@0.17.19": true,
+    "sharp@0.33.5": true,
+    "workerd@1.20250718.0": true
+  }
+}
