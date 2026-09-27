@@ -91,7 +91,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
         if (state.user) {
-          this.router.navigate([this.returnUrl || '/']);
+          this.router.navigateByUrl(this.returnUrl || '/');
         }
       });
 

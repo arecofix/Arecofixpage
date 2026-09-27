@@ -50,7 +50,7 @@ describe('Admin Forms Integration Flow', () => {
 
   beforeEach(() => {
     // ── 1. Catch-all: prevent any unmatched REST call from leaking 401 ───────
-    cy.intercept('**/rest/v1/**', (req) => {
+    cy.intercept('GET', '**/rest/v1/**', (req) => {
       req.reply({ statusCode: 200, body: [] });
     }).as('catchAllSupabase');
 

@@ -1,24 +1,34 @@
 import { Product } from '../../domain/entities/product.entity';
+import { environment } from '@env/environment';
 
 export class ProductMapper {
   private static sanitizeImageUrl(url: unknown): string {
+    let sanitized = '';
     if (!url) return '';
     if (typeof url === 'string') {
         // Check if it's a stringified JSON object
         if (url.trim().startsWith('{')) {
             try {
                 const parsed = JSON.parse(url);
-                return parsed.url || '';
+                sanitized = parsed.url || '';
             } catch {
-                return url;
+                sanitized = url;
             }
+        } else {
+            sanitized = url;
         }
-        return url;
+    } else if (typeof url === 'object' && (url as {url?: string}).url) {
+        sanitized = (url as {url?: string}).url as string;
+    } else {
+        sanitized = String(url);
     }
-    if (typeof url === 'object' && (url as {url?: string}).url) {
-        return (url as {url?: string}).url as string;
+    
+    if (sanitized && !sanitized.startsWith('http') && sanitized !== '_' && sanitized !== 'null' && !sanitized.startsWith('assets/')) {
+        const encodedPath = sanitized.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+        return `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
     }
-    return String(url);
+    
+    return sanitized;
   }
 
   static mapFromDb(p: Record<string, unknown>, branchId?: string): Product {

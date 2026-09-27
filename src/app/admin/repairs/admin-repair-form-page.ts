@@ -797,90 +797,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         ...validFormData
       } = rawData;
 
-      let finalClientId = customer_id || validFormData.client_id || null;
-      let finalDeviceId = validFormData.device_id || null;
-
-      // Si es un cliente nuevo ingresado manualmente, crear perfil invitado vía RPC
-      if (!finalClientId && customer_name) {
-        try {
-          const client = await this.customerService.create({
-            first_name: customer_name,
-            last_name: '',
-            email: customer_email || null,
-            phone: customer_phone || null,
-            dni: customer_dni || null,
-            tenant_id: this.tenantService.getTenantId(),
-            branch_id: branchIdActual,
-          });
-          if (client && client.id) {
-            finalClientId = client.id;
-          } else {
-            throw new Error('No se obtuvo el ID del cliente.');
-          }
-        } catch (err) {
-          console.error('[AdminRepairForm] Error creating guest profile:', err);
-          this.notificationService.showError(
-            'Error al crear o buscar el cliente: ' +
-              (err instanceof Error ? err.message : 'Verifique los datos.'),
-          );
-          this.saving.set(false);
-          return;
-        }
-      } else if (finalClientId) {
-        // Actualizar datos si se editó un cliente existente
-        const updateData: Record<string, unknown> = {};
-        if (customer_dni !== undefined) updateData['dni'] = customer_dni || null;
-        if (customer_phone !== undefined) updateData['phone'] = customer_phone || null;
-        if (customer_email !== undefined) updateData['email'] = customer_email || null;
-        
-        if (customer_name) {
-          const nameParts = customer_name.split(' ');
-          updateData['first_name'] = nameParts[0] || '';
-          updateData['last_name'] = nameParts.slice(1).join(' ') || '';
-        }
-
-        try {
-          if (Object.keys(updateData).length > 0) {
-            console.log('[AdminRepairForm] Calling customerService.update with finalClientId:', finalClientId, 'updateData:', updateData);
-            await this.customerService.update(finalClientId, updateData);
-            console.log('[AdminRepairForm] customerService.update finished successfully');
-          }
-        } catch (err) {
-          console.error('[AdminRepairForm] Error updating customer data:', err);
-        }
-      }
-
-      // Si hay cliente pero no equipo asociado, crearlo
-      // Buscar o crear modelo (siempre que haya device_model)
-      let modelId: string | null = null;
-      if (device_model) {
-        const modelName = device_model.trim();
-        const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
-        modelId = await firstValueFrom(this.customerDeviceRepository.ensureModelExists(modelName, generatedSlug, brand_id));
-      }
-
-      if (finalClientId && device_model) {
-        // Creará o actualizará el dispositivo
-        const savedDeviceId = await firstValueFrom(
-          this.customerDeviceRepository.upsertDevice({
-            deviceId: finalDeviceId,
-            userId: finalClientId,
-            modelId: modelId,
-            type: device_type,
-            imei: imei,
-            passcode: device_passcode,
-          })
-        );
-        if (savedDeviceId) {
-          finalDeviceId = savedDeviceId;
-        }
-      }
-
       const payload = {
         ...validFormData,
-        customer_id: finalClientId,
-        client_id: finalClientId,
-        device_id: finalDeviceId,
+        customer_id: customer_id,
+        device_id: rawData.device_id || null, // Will be resolved/created in service
         images: this.images(),
         parts: this.parts(),
         branch_id: branchIdActual,

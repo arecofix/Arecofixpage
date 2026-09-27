@@ -170,16 +170,18 @@
       fbq('track', 'PageView');
     };
 
-    if (document.readyState === 'complete') {
-      initAnalytics();
-    } else {
-      window.addEventListener('load', () => {
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(initAnalytics, { timeout: 2000 });
-        } else {
-          setTimeout(initAnalytics, 2000);
-        }
-      });
+    if (window.location.hostname !== 'localhost') {
+      if (document.readyState === 'complete') {
+        initAnalytics();
+      } else {
+        window.addEventListener('load', () => {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(initAnalytics, { timeout: 2000 });
+          } else {
+            setTimeout(initAnalytics, 2000);
+          }
+        });
+      }
     }
   </script>
   <!-- End Deferred Meta Pixel & GTAG Code -->

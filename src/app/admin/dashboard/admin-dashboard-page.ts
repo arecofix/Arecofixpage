@@ -110,6 +110,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     repairs_revenue: 0,
     repairs_profit: 0,
     devices_fixed: 0,
+    pending_approvals: 0,
     total_gross_revenue: 0,
     total_cost: 0,
     total_net_profit: 0,

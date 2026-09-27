@@ -44,7 +44,7 @@ export class AnalyticsService {
     }
 
     private async initPostHog() {
-        if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey)) {
+        if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey) && window.location.hostname !== 'localhost') {
             try {
                 const ph = await import('posthog-js');
                 posthogInstance = ph.default || ph;

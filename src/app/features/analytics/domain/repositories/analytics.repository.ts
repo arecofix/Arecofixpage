@@ -21,7 +21,7 @@ export interface DashboardStats {
   repairs_revenue: number;
   repairs_profit: number;
   devices_fixed: number;
-  pending_approvals?: number;
+  pending_approvals: number;
   // Totales reales
   total_gross_revenue: number;  // Ingresos brutos totales del negocio
   total_cost: number;           // Costos totales (repuestos + productos)

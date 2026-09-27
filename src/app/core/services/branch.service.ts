@@ -308,7 +308,10 @@ export class BranchService {
   }
 
   async deleteBranch(id: string): Promise<void> {
-    await firstValueFrom(this.branchRepo.delete(id));
+    // Soft delete to maintain foreign key integrity (profiles, orders, etc.)
+    await firstValueFrom(this.branchRepo.update(id, { 
+      is_active: false
+    } as any));
   }
 
   async toggleBranchStatus(branch: Branch): Promise<void> {

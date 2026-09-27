@@ -437,7 +437,7 @@
           </li>
         } @else {
           <li>
-            <a routerLink="/login" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
+            <a [routerLink]="['/login']" [queryParams]="{returnUrl: currentUrl()}" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
               <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </a>
           </li>
@@ -645,7 +645,7 @@
         <i class="fas fa-sign-out-alt text-[10px]"></i> Cerrar Sesión
       </button>
     } @else {
-      <a routerLink="/login" (click)="closeMobileMenu()"
+      <a [routerLink]="['/login']" [queryParams]="{returnUrl: currentUrl()}" (click)="closeMobileMenu()"
          class="btn btn-xs btn-primary w-full rounded-lg gap-2 font-medium">
         <i class="fas fa-sign-in-alt text-[10px]"></i> Iniciar Sesión
       </a>

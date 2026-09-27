@@ -79,6 +79,20 @@ beforeEach(() => {
 
   cy.clearLocalStorage();
   cy.clearCookies();
+  
+  // Clear IndexedDB to prevent SupabaseCache from intercepting requests
+  cy.window().then((win) => {
+    if (win.indexedDB && win.indexedDB.databases) {
+      win.indexedDB.databases().then((dbs) => {
+        dbs.forEach(db => { if (db.name) win.indexedDB.deleteDatabase(db.name); });
+      });
+    }
+  });
+
+  // Block Service Worker registration to prevent it from hijacking fetch requests in Cypress
+  cy.intercept('GET', '**/ngsw-worker.js*', { statusCode: 404, body: '' }).as('blockSw');
+  cy.intercept('GET', '**/ngsw.json*', { statusCode: 404, body: '' }).as('blockSwJson');
+
   // Bloquear llamadas a Google Analytics, Tag Manager y PostHog para evitar timeouts y datos de test
   cy.intercept('https://www.google-analytics.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://www.googletagmanager.com/**', { statusCode: 200, body: '' });

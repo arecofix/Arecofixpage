@@ -72,6 +72,8 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
 
   public user$ = this.authService.authState$.pipe(map((state) => state.profile || (state.user as any)));
 
+  public currentUrl = signal<string>(this.router.url);
+
   get isAcademyMode(): boolean {
     return this.router.url.includes('/academy');
   }
@@ -214,6 +216,16 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
         }, 2000);
       }
     }
+
+    // Keep currentUrl up to date
+    this.subscriptions.add(
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        this.currentUrl.set(this.router.url);
+        this.cdr.markForCheck();
+      })
+    );
 
     // Reset navbar visibility on navigation
     this.subscriptions.add(

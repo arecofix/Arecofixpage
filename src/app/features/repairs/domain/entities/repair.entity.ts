@@ -102,6 +102,7 @@ export interface RepairChecklist {
  */
 export interface CreateRepairDto {
     customer_id?: string;
+    device_id?: string;
     customer_name?: string;
     customer_phone?: string;
     customer_email?: string;

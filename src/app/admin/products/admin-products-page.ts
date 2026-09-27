@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
-import { AdminProductService, ImportReport } from './services/admin-product.service';
+import { AdminProductService } from './services/admin-product.service';
+import { AdminProductImportService, ImportReport } from './services/admin-product-import.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
@@ -26,6 +27,7 @@ import { BranchService } from '@app/core/services/branch.service';
 })
 export class AdminProductsPage implements OnInit {
   private productService = inject(AdminProductService);
+  private productImportService = inject(AdminProductImportService);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private branchContextService = inject(BranchContextService);
@@ -311,7 +313,7 @@ export class AdminProductsPage implements OnInit {
 
   async exportProducts() {
     try {
-      await this.productService.exportProductsToCSV();
+      await this.productImportService.exportProductsToCSV();
     } catch (e: any) {
       this.error.set('Error al exportar: ' + e.message);
     }
@@ -319,7 +321,7 @@ export class AdminProductsPage implements OnInit {
 
   async exportMetaCatalog() {
     try {
-      await this.productService.exportToMetaCSV();
+      await this.productImportService.exportToMetaCSV();
     } catch (e: any) {
       this.error.set('Error al exportar para Meta: ' + e.message);
     }
@@ -329,7 +331,7 @@ export class AdminProductsPage implements OnInit {
     this.validating.set(true);
     this.error.set(null);
     try {
-      const results = await this.productService.validateProductsForMeta();
+      const results = await this.productImportService.validateProductsForMeta();
       this.validationResults.set(results);
       this.showValidationModal.set(true);
     } catch (e: any) {
@@ -361,7 +363,7 @@ export class AdminProductsPage implements OnInit {
       this.error.set(null);
       this.cdr.detectChanges();
 
-      const report = await this.productService.importProductsFromCSV(file);
+      const report = await this.productImportService.importProductsFromCSV(file);
 
       this.importProgress.set('');
       this.importReport.set(report);
