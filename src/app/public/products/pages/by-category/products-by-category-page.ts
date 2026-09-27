@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -68,7 +68,7 @@ export class ProductsByCategoryPage {
   // Crear observables en el contexto de inyección correcto (field initializer)
   private tenant$ = toObservable(this.tenantService.currentTenant);
   private routeParams$ = combineLatest([
-    this.route.params.pipe(map(({ categorySlug }) => categorySlug as string)),
+    this.route.paramMap.pipe(map(params => params.get('categorySlug') || '')),
     this.route.queryParams,
   ]);
 

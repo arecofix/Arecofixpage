@@ -93,7 +93,15 @@ export class TenantService {
     if (isPlatformBrowser(this.platformId)) {
       // Intenta recuperar de localStorage en entornos browser como fallback temporal si Signal cayó (ej: F5)
       const storedId = localStorage.getItem('arecofix_tenant_id');
-      if (storedId) return storedId;
+      if (storedId) {
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storedId);
+        if (isUUID) {
+          return storedId;
+        } else {
+          // Limpiar caché corrupto (ej: guardaron un slug 'arecofix' en vez de UUID)
+          localStorage.removeItem('arecofix_tenant_id');
+        }
+      }
       
       // Fallback instead of throwing to avoid component init crash before resolveTenant finishes
       return TENANT_CONSTANTS.FALLBACK_ID;
@@ -109,6 +117,21 @@ export class TenantService {
   async resolveTenantByHostname(hostname: string): Promise<Tenant | null> {
     // console.debug(`Resolving tenant for hostname: ${hostname}`);
     try {
+      // TEMPORARY HOTFIX: Database contains duplicate 'arecofix' slugs and an empty 0000... tenant bound to custom_domain.
+      // Force the correct tenant ID for the main site to restore public functionality.
+      if (hostname === 'arecofix.com.ar' || hostname === 'www.arecofix.com.ar' || hostname === 'localhost') {
+        const { data: realData } = await this.supabase
+          .from('tenants')
+          .select('*')
+          .eq('id', 'bba26ccd-59ce-471c-aac0-4c1f5513de3b')
+          .single();
+          
+        if (realData) {
+          this.setTenant(realData);
+          return realData;
+        }
+      }
+
       // 1. Buscamos primero si el negocio configuró un Custom Domain (Ej: mibau.com.ar)
       // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET):
       // GET https://<TU_SUPABASE_URL>/rest/v1/tenants?select=*&custom_domain=eq.<hostname>&is_active=eq.true
@@ -288,9 +311,9 @@ export class TenantService {
   /**
    * Obtiene todas las sucursales (async para cumplimiento de guardias legacy)
    */
-  getBranches(): any[] {
+  getBranches(): Record<string, unknown>[] {
      const current = this._currentTenant();
-     return current && !this.isMainTenant() ? [current] : [];
+     return current && !this.isMainTenant() ? [current as unknown as Record<string, unknown>] : [];
   }
 
   /**

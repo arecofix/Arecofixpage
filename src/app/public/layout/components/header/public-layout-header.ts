@@ -72,8 +72,15 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
 
   public user$ = this.authService.authState$.pipe(map((state) => state.profile || (state.user as any)));
 
+  public currentUrl = signal<string>(this.router.url);
+
   get isAcademyMode(): boolean {
     return this.router.url.includes('/academy');
+  }
+
+  get isCelularLandingMode(): boolean {
+    const urlPath = this.router.url.split('?')[0];
+    return urlPath === '/celular' || urlPath.startsWith('/celular/');
   }
 
   /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
@@ -167,6 +174,11 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
 
   // ── Cart ──────────────────────────────────────────
   public isCartOpen = this.cartService.isCartOpen;
+  
+  get showCart(): boolean {
+    return this.router.url !== '/' && !this.isCelularLandingMode && !this.isAcademyMode;
+  }
+
   public toggleCart() {
     this.cartService.toggleCart();
   }
@@ -204,6 +216,16 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
         }, 2000);
       }
     }
+
+    // Keep currentUrl up to date
+    this.subscriptions.add(
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        this.currentUrl.set(this.router.url);
+        this.cdr.markForCheck();
+      })
+    );
 
     // Reset navbar visibility on navigation
     this.subscriptions.add(

@@ -332,6 +332,13 @@
                         </div>
                       </td>
                       <td class="text-right" (click)="$event.stopPropagation()">
+                        <button class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left" data-tip="Sincronizar ML" (click)="syncWithMercadoLibre(product)" [disabled]="syncingMl() === product.id">
+                          @if (syncingMl() === product.id) {
+                            <span class="loading loading-spinner loading-xs"></span>
+                          } @else {
+                            <i class="fas fa-sync" [class.text-green-500]="product.ml_sync_status === 'synced'" [class.text-red-500]="product.ml_sync_status === 'error'" [class.text-gray-400]="!product.ml_sync_status || product.ml_sync_status === 'pending'"></i>
+                          }
+                        </button>
                         <a [routerLink]="['/admin/products', product.id]" class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left" data-tip="Editar">
                           <i class="fas fa-pen text-gray-500 hover:text-indigo-500"></i>
                         </a>
@@ -394,8 +401,16 @@
                         </div>
                       </div>
                       <!-- Card Actions -->
-                      <div class="card-actions border-t border-gray-100 dark:border-gray-700 p-2 flex justify-end bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
-                        <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost w-full">
+                      <div class="card-actions border-t border-gray-100 dark:border-gray-700 p-2 flex justify-end gap-2 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
+                        <button class="btn btn-sm btn-ghost" (click)="syncWithMercadoLibre(product)" [disabled]="syncingMl() === product.id">
+                          @if (syncingMl() === product.id) {
+                            <span class="loading loading-spinner loading-xs"></span>
+                          } @else {
+                            <i class="fas fa-sync" [class.text-green-500]="product.ml_sync_status === 'synced'" [class.text-red-500]="product.ml_sync_status === 'error'" [class.text-gray-400]="!product.ml_sync_status || product.ml_sync_status === 'pending'"></i>
+                          }
+                          ML Sync
+                        </button>
+                        <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost">
                           {{ t().products.mobile.editDetails }} <i class="fas fa-arrow-right ml-2 opacity-50"></i>
                         </a>
                       </div>

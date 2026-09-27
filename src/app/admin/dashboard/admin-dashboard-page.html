@@ -111,7 +111,7 @@
                     <div class="badge badge-success text-[10px] text-white border-none font-bold">{{ t().repairs.dashboard.profit || 'GANANCIA' }}</div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.estProfit || 'Ganancia Estimada' }}</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_profit | number:'1.0-0' }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
             </div>
 
             <!-- KPI: Equipos Arreglados -->

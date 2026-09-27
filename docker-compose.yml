@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  db:
+    image: supabase/postgres:15.1.0.117
+    container_name: supabase-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: eze321
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - pgaudit.log=all
+
+  rest:
+    image: postgrest/postgrest:v12.0.2
+    container_name: supabase-rest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PGRST_DB_URI: postgres://postgres:eze321@db:5432/postgres
+      PGRST_DB_SCHEMA: public,storage,graphql_public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      PGRST_SERVER_PORT: 3000
+    ports:
+      - "3000:3000"
+
+  kong:
+    image: kong:2.8.1
+    container_name: supabase-kong
+    restart: always
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+    volumes:
+      - ./supabase/kong.yml:/var/lib/kong/kong.yml
+
+  meta:
+    image: supabase/postgres-meta:v0.99.0
+    container_name: supabase-meta
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: eze321
+    ports:
+      - "8080:8080"
+
+  studio:
+    image: supabase/studio:latest
+    container_name: supabase-studio
+    restart: always
+    depends_on:
+      - meta
+      - rest
+      - db
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: eze321
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_PUBLIC_URL: http://localhost:8000
+      SUPABASE_ANON_KEY: anon-key-placeholder
+      SUPABASE_SERVICE_KEY: service-key-placeholder
+    ports:
+      - "54323:3000"
+
+  auth:
+    image: supabase/gotrue:v2.164.0
+    container_name: supabase-auth
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "9999:9999"
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:eze321@db:5432/postgres?search_path=auth,public
+      API_EXTERNAL_URL: https://db.arecofix.com.ar
+      GOTRUE_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      GOTRUE_SITE_URL: https://arecofix.com.ar
+      GOTRUE_URI_ALLOW_LIST: https://arecofix.com.ar,http://localhost:4200,http://127.0.0.1:4200
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_EXTERNAL_GOOGLE_ENABLED: "true"
+      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: 106654865765-bnbl62r3n8vadq50dslbdtek2armh46v.apps.googleusercontent.com
+      GOTRUE_EXTERNAL_GOOGLE_SECRET: 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
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: https://db.arecofix.com.ar/auth/v1/callback
+      GOTRUE_MAILER_EXTERNAL_HOSTS: db.arecofix.com.ar
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_DB_MIGRATIONS_PATH: /usr/local/etc/auth/migrations
+
+volumes:
+  pgdata:

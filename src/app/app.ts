@@ -20,7 +20,7 @@ import { ScannerService } from './core/services/scanner.service';
 import { ShortcutService } from './core/services/shortcut.service';
 import { SupabaseService } from './core/services/supabase.service';
 import { SwUpdate } from '@angular/service-worker';
-import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
+import { AiChatbotComponent } from './shared/ai-chatbot/ai-chatbot.component';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +29,6 @@ import { ChatbotComponent } from './shared/components/chatbot/chatbot.component'
     RouterOutlet,
     ToastComponent,
     RibbonMenuComponent,
-    ChatbotComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -61,11 +60,16 @@ export class App implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       // Auto-recarga cuando hay una nueva versión (evita errores MIME y ChunkLoad)
       if (this.swUpdate?.isEnabled) {
-        this.swUpdate.versionUpdates.subscribe((evt) => {
+        // Forzar detección inmediata del nuevo SW (sin esperar el intervalo de polling)
+        this.swUpdate.checkForUpdate().catch(() => {});
+
+        this.swUpdate.versionUpdates.subscribe(async (evt) => {
           if (evt.type === 'VERSION_READY') {
             this.logger.info(
-              'Nueva versión detectada. Recargando la aplicación...',
+              'Nueva versión detectada. Activando y recargando...',
             );
+            // Activar el nuevo SW ANTES de recargar para que tome control inmediatamente
+            await this.swUpdate!.activateUpdate();
             window.location.reload();
           }
         });

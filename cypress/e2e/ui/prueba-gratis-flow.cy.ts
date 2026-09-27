@@ -7,7 +7,7 @@ describe('Flujo de Prueba Gratis - Arecofix', () => {
       statusCode: 200,
       body: {
         success: true,
-        tenantId: 'mock-tenant-id'
+        tenantId: '11111111-1111-1111-1111-111111111111'
       },
     }).as('createTrialTenant');
 
@@ -26,10 +26,10 @@ describe('Flujo de Prueba Gratis - Arecofix', () => {
     cy.wait(1000); // Esperamos a que Angular inicialice los Reactive Forms
 
     // 4. Llenamos el formulario con un ligero delay para asegurar que Angular detecte los cambios
-    cy.get('input[formControlName="businessName"]').type('Taller Test E2E', { delay: 50 });
-    cy.get('input[formControlName="userName"]').type('Usuario QA', { delay: 50 });
-    cy.get('input[formControlName="whatsapp"]').type('1122334455', { delay: 50 });
-    cy.get('input[formControlName="email"]').type('qa.test@arecofix.com.ar', { delay: 50 });
+    cy.get('input[name="businessName"]').type('Taller Test E2E', { delay: 50 });
+    cy.get('input[name="userName"]').type('Usuario QA', { delay: 50 });
+    cy.get('input[name="whatsapp"]').type('1122334455', { delay: 50 });
+    cy.get('input[name="email"]').type('qa.test@arecofix.com.ar', { delay: 50 });
 
     // 5. Enviamos el formulario
     cy.get('button[type="submit"]').contains('Solicitar Prueba Gratis').click();

@@ -60,19 +60,64 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   if (err.message.includes('Cannot read properties of null (reading \'document\')')) {
     return false;
   }
+  if (err.message.includes('NG0505') || err.message.includes('NG02952') || err.message.includes('Angular hydration')) {
+    return false;
+  }
   // Se puede retornar false para ignorar TODOS los errores, pero es mejor ser específico
   return false;
 });
 
 beforeEach(() => {
+  if (window.navigator && navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => {
+        registrations.forEach((registration) => {
+          registration.unregister()
+        })
+      })
+  }
+
   cy.clearLocalStorage();
   cy.clearCookies();
+  
+  // Clear IndexedDB to prevent SupabaseCache from intercepting requests
+  cy.window().then((win) => {
+    if (win.indexedDB && win.indexedDB.databases) {
+      win.indexedDB.databases().then((dbs) => {
+        dbs.forEach(db => { if (db.name) win.indexedDB.deleteDatabase(db.name); });
+      });
+    }
+  });
+
+  // Block Service Worker registration to prevent it from hijacking fetch requests in Cypress
+  cy.intercept('GET', '**/ngsw-worker.js*', { statusCode: 404, body: '' }).as('blockSw');
+  cy.intercept('GET', '**/ngsw.json*', { statusCode: 404, body: '' }).as('blockSwJson');
+
   // Bloquear llamadas a Google Analytics, Tag Manager y PostHog para evitar timeouts y datos de test
   cy.intercept('https://www.google-analytics.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://www.googletagmanager.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://us.i.posthog.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://us-assets.i.posthog.com/**', { statusCode: 200, body: '' });
   cy.intercept('https://connect.facebook.net/**', { statusCode: 200, body: '' });
+  cy.intercept('GET', 'https://dolarapi.com/v1/dolares/cripto', { statusCode: 200, body: { compra: 1000 } }).as('globalUsdRate');
+
+  // Manejar preflights OPTIONS para todas las llamadas REST y RPC a Supabase
+  cy.intercept('OPTIONS', '**/rest/v1/**', {
+    statusCode: 200,
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'access-control-allow-headers': '*'
+    }
+  });
+  cy.intercept('OPTIONS', '**/rpc/**', {
+    statusCode: 200,
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      'access-control-allow-headers': '*'
+    }
+  });
 
   // Align zaona user profile's tenant_id to Arecofix tenant to avoid branch/profile tenant mismatch
   cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
@@ -106,6 +151,16 @@ beforeEach(() => {
         } else if (typeof res.body === 'object') {
           res.body.slug = null;
         }
+      }
+    });
+  });
+
+  // Polyfill global para asegurar que los mocks de listas de Supabase devuelvan Content-Range
+  cy.intercept('GET', '**/rest/v1/*', (req) => {
+    req.continue((res) => {
+      // Si la respuesta es un array (típico de Supabase GET lists) y no tiene Content-Range
+      if (Array.isArray(res.body) && !res.headers['content-range'] && !res.headers['Content-Range']) {
+        res.headers['content-range'] = `0-${Math.max(0, res.body.length - 1)}/${res.body.length}`;
       }
     });
   });

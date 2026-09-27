@@ -178,7 +178,7 @@ import { FormsModule } from '@angular/forms';
 
               <div class="space-y-4">
                 @for (mod of modules(); track mod.id; let i = $index) {
-                  @if (isModuleUnlocked(mod) || isAuthor()) {
+                  @if (isModuleUnlocked(mod) || isAuthor() || isAdmin()) {
                     <!-- UNLOCKED MODULE — normal accordion -->
                     <div
                       class="collapse collapse-arrow bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 rounded-2xl"
@@ -198,10 +198,10 @@ import { FormsModule } from '@angular/forms';
                           {{ i + 1 }}
                         </div>
                         {{ mod.title }}
-                        @if (isAuthor() && !isModuleUnlocked(mod)) {
+                        @if ((isAuthor() || isAdmin()) && !isModuleUnlocked(mod)) {
                           <span
                             class="badge badge-warning badge-sm ml-2 font-normal"
-                            >Bloqueado (solo tú lo ves)</span
+                            >Bloqueado (vista admin)</span
                           >
                         }
                       </div>
@@ -668,6 +668,7 @@ export class StudentCampusPage implements OnInit {
   markingCompleted = signal<Record<string, boolean>>({});
 
   isAuthor = signal(false);
+  isAdmin = signal(false);
 
   // Exam state
   activeExam: ModuleContent | null = null;
@@ -713,6 +714,7 @@ export class StudentCampusPage implements OnInit {
         ['admin', 'staff', 'super_admin', 'tenant_owner'].includes(userRole)
       ) {
         accessConfirmed = true;
+        this.isAdmin.set(true);
       }
 
       // 2b. Course author always has access
@@ -745,7 +747,7 @@ export class StudentCampusPage implements OnInit {
               for (const mod of modulesRes.data) {
                 // Only fetch contents for unlocked modules (or for admins/authors)
                 const shouldLoad =
-                  this.isModuleUnlocked(mod) || this.isAuthor();
+                  this.isModuleUnlocked(mod) || this.isAuthor() || this.isAdmin();
                 if (!shouldLoad) continue;
                 try {
                   const contentsRes = await this.coursesService

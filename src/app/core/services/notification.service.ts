@@ -215,6 +215,7 @@ export class NotificationService {
     }
 
     subscribeToRealtime() {
+        if (typeof window === 'undefined') return;
         const user = this.auth.getCurrentUser();
         if (!user) return;
 
@@ -246,7 +247,14 @@ export class NotificationService {
                     this.showInfo(newNotif.title + ' - ' + newNotif.message);
                 }
             )
-            .subscribe();
+            .subscribe((status: string, err?: Error) => {
+                // If the WebSocket/Realtime service is unreachable (e.g. VPS self-hosted),
+                // unsubscribe immediately to stop the Phoenix reconnection loop from
+                // flooding the console with failed WebSocket attempts.
+                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    this.unsubscribe();
+                }
+            });
     }
 
     unsubscribe() {

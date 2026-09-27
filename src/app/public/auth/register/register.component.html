@@ -85,6 +85,7 @@
             <input
               type="text"
               id="first_name"
+              name="first_name"
               formControlName="first_name"
               autocomplete="given-name"
               placeholder="Juan"
@@ -110,6 +111,7 @@
             <input
               type="text"
               id="last_name"
+              name="last_name"
               formControlName="last_name"
               autocomplete="family-name"
               placeholder="Pérez"
@@ -138,6 +140,7 @@
             <input
               type="email"
               id="email"
+              name="email"
               formControlName="email"
               autocomplete="email"
               placeholder="nombre@empresa.com"
@@ -163,6 +166,7 @@
             <input
               type="tel"
               id="phone"
+              name="phone"
               formControlName="phone"
               autocomplete="tel"
               placeholder="+54 11 1234-5678"
@@ -192,6 +196,7 @@
               <input
                 [type]="showPassword ? 'text' : 'password'"
                 id="password"
+                name="password"
                 formControlName="password"
                 autocomplete="new-password"
                 placeholder="••••••••"
@@ -216,6 +221,7 @@
               <input
                 [type]="showConfirmPassword ? 'text' : 'password'"
                 id="confirmPassword"
+                name="confirmPassword"
                 formControlName="confirmPassword"
                 autocomplete="new-password"
                 placeholder="••••••••"
@@ -296,6 +302,7 @@
           <input
             type="checkbox"
             id="terms"
+            name="terms"
             formControlName="terms"
             class="w-4 h-4 mt-0.5 text-indigo-600 bg-white dark:bg-[#0a0a0a] border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer transition-colors"
           />

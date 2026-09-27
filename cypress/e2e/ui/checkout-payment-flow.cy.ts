@@ -20,13 +20,13 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
   const fillShippingForm = () => {
     // Wait for Angular SSR hydration to complete before typing!
     cy.wait(1500);
-    cy.get('input[formControlName="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
-    cy.get('input[formControlName="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
-    cy.get('input[formControlName="phone"]').clear().invoke('val', '1122334455').trigger('input');
-    cy.get('input[formControlName="street"]').clear().invoke('val', 'Av. Siempreviva').trigger('input');
-    cy.get('input[formControlName="number"]').clear().invoke('val', '742').trigger('input');
-    cy.get('input[formControlName="city"]').clear().invoke('val', 'Springfield').trigger('input');
-    cy.get('input[formControlName="postal_code"]').clear().invoke('val', '1000').trigger('input').trigger('blur');
+    cy.get('input[name="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
+    cy.get('input[name="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
+    cy.get('input[name="phone"]').clear().invoke('val', '1122334455').trigger('input');
+    cy.get('input[name="street"]').clear().invoke('val', 'Av. Siempreviva').trigger('input');
+    cy.get('input[name="number"]').clear().invoke('val', '742').trigger('input');
+    cy.get('input[name="city"]').clear().invoke('val', 'Springfield').trigger('input');
+    cy.get('input[name="postal_code"]').clear().invoke('val', '1000').trigger('input').trigger('blur');
     
     cy.window().then((win: any) => {
       win.captchaResolved = true; 

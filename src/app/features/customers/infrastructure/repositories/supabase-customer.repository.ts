@@ -14,6 +14,7 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
   protected override tableName = 'profiles'; // Point directly to profiles table
   protected override isGlobalTable = false;
   protected override useStrictBranchIsolation = true;
+  protected override useSoftDeletes = true;
 
   private authService = inject(AuthService);
   protected override branchContextService = inject(BranchContextService);
@@ -167,9 +168,8 @@ export class SupabaseCustomerRepository extends BaseRepository<UserProfile> {
 
     let dbQuery = this.supabase
       .from('v_unified_clients')
-      .select('*', { count: 'exact' });
-
-    dbQuery = this.applyTenantFilter(dbQuery);
+      .select('*', { count: 'exact' })
+      .eq('tenant_id', this.tenantService.getTenantId());
     // Removed applyBranchFilter so clients are visible tenant-wide
 
     if (searchTerm && searchTerm.trim()) {

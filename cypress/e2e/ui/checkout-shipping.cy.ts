@@ -30,24 +30,24 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.get('#btn-go-payment').click({ force: true });
     
     // Deberían mostrarse errores de validación (clases rojas o mensajes)
-    cy.get('input[formControlName="name"]').should('have.class', 'ng-invalid');
-    cy.get('input[formControlName="email"]').should('have.class', 'ng-invalid');
+    cy.get('input[name="name"]').should('have.class', 'ng-invalid');
+    cy.get('input[name="email"]').should('have.class', 'ng-invalid');
     
     // Formato de email inválido
-    cy.get('input[formControlName="email"]').type('correo_sin_arroba.com', { force: true });
+    cy.get('input[name="email"]').type('correo_sin_arroba.com', { force: true });
     cy.get('#btn-go-payment').click({ force: true });
-    cy.get('input[formControlName="email"]').should('have.class', 'ng-invalid');
+    cy.get('input[name="email"]').should('have.class', 'ng-invalid');
     
     // Formato de email válido
     cy.wait(500);
-    cy.get('input[formControlName="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
-    cy.get('input[formControlName="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
-    cy.get('input[formControlName="phone"]').clear().invoke('val', '1122334455').trigger('input');
-    cy.get('input[formControlName="street"]').clear().invoke('val', 'Av. Falsa').trigger('input');
-    cy.get('input[formControlName="number"]').clear().invoke('val', '123').trigger('input');
-    cy.get('input[formControlName="city"]').clear().invoke('val', 'Springfield').trigger('input');
+    cy.get('input[name="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
+    cy.get('input[name="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
+    cy.get('input[name="phone"]').clear().invoke('val', '1122334455').trigger('input');
+    cy.get('input[name="street"]').clear().invoke('val', 'Av. Falsa').trigger('input');
+    cy.get('input[name="number"]').clear().invoke('val', '123').trigger('input');
+    cy.get('input[name="city"]').clear().invoke('val', 'Springfield').trigger('input');
     
-    cy.get('input[formControlName="postal_code"]').clear().invoke('val', '9999').trigger('input').trigger('blur');
+    cy.get('input[name="postal_code"]').clear().invoke('val', '9999').trigger('input').trigger('blur');
     
     // Verificamos que desaparezca el texto "Calculando envío..."
     cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');
@@ -61,15 +61,15 @@ describe('Datos de Envío, Facturación y Sucursales (E2E)', () => {
     cy.wait(500);
     
     // Rellenar lo mínimo necesario
-    cy.get('input[formControlName="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
-    cy.get('input[formControlName="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
-    cy.get('input[formControlName="phone"]').clear().invoke('val', '1122334455').trigger('input');
-    cy.get('input[formControlName="street"]').clear().invoke('val', 'Av. Falsa').trigger('input');
-    cy.get('input[formControlName="number"]').clear().invoke('val', '123').trigger('input');
-    cy.get('input[formControlName="city"]').clear().invoke('val', 'Springfield').trigger('input');
+    cy.get('input[name="name"]').clear().invoke('val', 'Juan Perez').trigger('input');
+    cy.get('input[name="email"]').clear().invoke('val', 'juan@ejemplo.com').trigger('input');
+    cy.get('input[name="phone"]').clear().invoke('val', '1122334455').trigger('input');
+    cy.get('input[name="street"]').clear().invoke('val', 'Av. Falsa').trigger('input');
+    cy.get('input[name="number"]').clear().invoke('val', '123').trigger('input');
+    cy.get('input[name="city"]').clear().invoke('val', 'Springfield').trigger('input');
     
     // Al tipear el CP debería reflejarse el costo de envío (mockeado)
-    cy.get('input[formControlName="postal_code"]').clear().invoke('val', '1000').trigger('input').trigger('blur');
+    cy.get('input[name="postal_code"]').clear().invoke('val', '1000').trigger('input').trigger('blur');
     
     // Verificamos que desaparezca el estado de calculando
     cy.contains('Calculando envío...', { timeout: 2000 }).should('not.exist');

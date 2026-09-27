@@ -122,7 +122,7 @@
               <input
                 type="text"
                 id="input-businessName"
-                formControlName="businessName"
+                formControlName="businessName" name="businessName" name="businessName"
                 placeholder="Ej: FixCell"
                 class="input input-bordered w-full bg-white text-gray-800"
                 [class.input-error]="trialForm.get('businessName')?.invalid && trialForm.get('businessName')?.touched" />
@@ -138,7 +138,7 @@
                 <input
                   type="text"
                   id="input-userName"
-                  formControlName="userName"
+                  formControlName="userName" name="userName" name="userName"
                   placeholder="Juan Pérez"
                   class="input input-bordered w-full bg-white text-gray-800"
                   [class.input-error]="trialForm.get('userName')?.invalid && trialForm.get('userName')?.touched" />
@@ -151,7 +151,7 @@
                 <input
                   type="tel"
                   id="input-whatsapp"
-                  formControlName="whatsapp"
+                  formControlName="whatsapp" name="whatsapp" name="whatsapp"
                   placeholder="+54 9..."
                   class="input input-bordered w-full bg-white text-gray-800"
                   [class.input-error]="trialForm.get('whatsapp')?.invalid && trialForm.get('whatsapp')?.touched" />
@@ -167,7 +167,7 @@
               <input
                 type="email"
                 id="input-email"
-                formControlName="email"
+                formControlName="email" name="email" name="email"
                 placeholder="tucorreo@ejemplo.com"
                 class="input input-bordered w-full bg-white text-gray-800"
                 [class.input-error]="trialForm.get('email')?.invalid && trialForm.get('email')?.touched" />

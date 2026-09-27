@@ -105,7 +105,6 @@ export class AdminLayout implements OnInit, OnDestroy {
     effect(() => {
       const branch = this.branchService.currentBranch();
       const lang = this.currentLang();
-      // console.log('[AdminLayout] Active branch changed dynamically:', branch?.name || 'Sede Central');
       this.updateBranchMenu(branch, lang);
       this.updateBranding(branch);
     });
@@ -177,7 +176,6 @@ export class AdminLayout implements OnInit, OnDestroy {
 
           if (isSedeCentralUrl) {
             if (this.branchService.getCurrentBranchId() !== null) {
-              // console.log('[AdminLayout NavigationEnd] Sede Central detected. Resetting active branch to Central (null)');
               this.branchService.setCurrentBranch(null);
               this.updateBranding(null);
             }

@@ -293,6 +293,7 @@ export class CourseBuilderComponent implements OnInit {
       this.errorMsg.set('Error al subir la imagen de portada');
     } finally {
       this.uploadingImage.set(false);
+      input.value = ''; // Clear the input so the same file can be selected again
       this.cd.detectChanges();
     }
   }
@@ -312,6 +313,7 @@ export class CourseBuilderComponent implements OnInit {
       this.errorMsg.set('Error al subir el avatar del instructor');
     } finally {
       this.uploadingAvatar.set(false);
+      input.value = ''; // Clear the input so the same file can be selected again
       this.cd.detectChanges();
     }
   }

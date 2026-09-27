@@ -28,13 +28,15 @@ export class TenantScopedQueryService {
     return this.supabase.from(table);
   }
 
-  /** Applies tenant_id filter when the query builder supports .eq() */
+  /** Applies tenant_id filter when the query builder supports .or() */
   withTenantScope<T>(query: T): T {
     if (!this.shouldScopeByTenant()) {
       return query;
     }
-    const scoped = query as { eq: (column: string, value: string) => T };
-    return scoped.eq('tenant_id', this.getTenantId());
+    // Usamos .or() para permitir tanto el tenant del usuario como el tenant global
+    const scoped = query as unknown as { or: (filter: string) => T };
+    const tenantId = this.getTenantId();
+    return scoped.or(`tenant_id.eq.${tenantId},tenant_id.is.null,tenant_id.eq.${TENANT_CONSTANTS.FALLBACK_ID}`);
   }
 
   withTenant<T extends object>(payload: T): T & { tenant_id: string } {

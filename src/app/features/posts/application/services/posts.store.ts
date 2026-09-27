@@ -43,11 +43,9 @@ export class PostsStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.LIST_TTL)) {
-      // console.log(`[PostsStore] 🎯 Cache HIT (Recent Posts) para clave: "${cacheKey}".`);
       return of(cached.data);
     }
 
-    // console.log(`[PostsStore] 🌐 Cache MISS (Recent Posts) para clave: "${cacheKey}".`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -91,11 +89,9 @@ export class PostsStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.LIST_TTL)) {
-      // console.log(`[PostsStore] 🎯 Cache HIT (Admin Posts) para clave: "${cacheKey}".`);
       return of(cached.data);
     }
 
-    // console.log(`[PostsStore] 🌐 Cache MISS (Admin Posts) para clave: "${cacheKey}".`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -143,11 +139,9 @@ export class PostsStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.DETAIL_TTL)) {
-      // console.log(`[PostsStore] 🎯 Cache HIT (Post Detail Slug) para: "${slug}".`);
       return of(cached.data);
     }
 
-    // console.log(`[PostsStore] 🌐 Cache MISS (Post Detail Slug) para: "${slug}".`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -190,11 +184,9 @@ export class PostsStore {
     const now = Date.now();
 
     if (cached && (now - cached.timestamp < this.DETAIL_TTL)) {
-      // console.log(`[PostsStore] 🎯 Cache HIT (Post Detail ID) para: "${id}".`);
       return of(cached.data);
     }
 
-    // console.log(`[PostsStore] 🌐 Cache MISS (Post Detail ID) para: "${id}".`);
     this.loading.set(true);
     this.error.set(null);
 
@@ -234,7 +226,6 @@ export class PostsStore {
    * Limpia toda la caché.
    */
   clearCache(): void {
-    // console.log('[PostsStore] 🧹 Limpiando caché de blog.');
     this.listCache.set({});
     this.detailCache.set({});
   }

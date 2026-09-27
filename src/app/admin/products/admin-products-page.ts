@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
-import { AdminProductService, ImportReport } from './services/admin-product.service';
+import { AdminProductService } from './services/admin-product.service';
+import { AdminProductImportService, ImportReport } from './services/admin-product-import.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
@@ -26,6 +27,7 @@ import { BranchService } from '@app/core/services/branch.service';
 })
 export class AdminProductsPage implements OnInit {
   private productService = inject(AdminProductService);
+  private productImportService = inject(AdminProductImportService);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private branchContextService = inject(BranchContextService);
@@ -82,6 +84,9 @@ export class AdminProductsPage implements OnInit {
   // Stock editing
   public editingStock = signal<string | null>(null);
   public tempStock = signal<number>(0);
+
+  // ML Sync state
+  public syncingMl = signal<string | null>(null);
 
   private searchSubject = new Subject<string>();
   private router = inject(Router);
@@ -308,7 +313,7 @@ export class AdminProductsPage implements OnInit {
 
   async exportProducts() {
     try {
-      await this.productService.exportProductsToCSV();
+      await this.productImportService.exportProductsToCSV();
     } catch (e: any) {
       this.error.set('Error al exportar: ' + e.message);
     }
@@ -316,7 +321,7 @@ export class AdminProductsPage implements OnInit {
 
   async exportMetaCatalog() {
     try {
-      await this.productService.exportToMetaCSV();
+      await this.productImportService.exportToMetaCSV();
     } catch (e: any) {
       this.error.set('Error al exportar para Meta: ' + e.message);
     }
@@ -326,7 +331,7 @@ export class AdminProductsPage implements OnInit {
     this.validating.set(true);
     this.error.set(null);
     try {
-      const results = await this.productService.validateProductsForMeta();
+      const results = await this.productImportService.validateProductsForMeta();
       this.validationResults.set(results);
       this.showValidationModal.set(true);
     } catch (e: any) {
@@ -358,7 +363,7 @@ export class AdminProductsPage implements OnInit {
       this.error.set(null);
       this.cdr.detectChanges();
 
-      const report = await this.productService.importProductsFromCSV(file);
+      const report = await this.productImportService.importProductsFromCSV(file);
 
       this.importProgress.set('');
       this.importReport.set(report);
@@ -416,5 +421,35 @@ export class AdminProductsPage implements OnInit {
   cancelStockEdit() {
     this.editingStock.set(null);
     this.tempStock.set(0);
+  }
+
+  async syncWithMercadoLibre(product: Product) {
+    if (this.syncingMl() === product.id) return;
+    this.syncingMl.set(product.id);
+    this.error.set(null);
+
+    try {
+      const result = await this.productService.syncWithMercadoLibre(product.id);
+      
+      // Update local state
+      this.products.update(products => 
+        products.map(p => p.id === product.id ? { 
+          ...p, 
+          ml_sync_status: 'synced', 
+          ml_item_id: result.ml_item_id,
+          ml_last_sync: new Date().toISOString()
+        } : p)
+      );
+
+      alert('Producto sincronizado con éxito: ' + result.ml_item_id);
+    } catch (e: any) {
+      this.error.set('Error al sincronizar con Mercado Libre: ' + e.message);
+      this.products.update(products => 
+        products.map(p => p.id === product.id ? { ...p, ml_sync_status: 'error' } : p)
+      );
+    } finally {
+      this.syncingMl.set(null);
+      this.cdr.detectChanges();
+    }
   }
 }

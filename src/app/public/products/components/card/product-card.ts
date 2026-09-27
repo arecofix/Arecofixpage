@@ -37,11 +37,14 @@ export class ProductCard {
   private cartService = inject(CartService);
   private favoritesService = inject(FavoritesService);
   private strategicService = inject(ProductStrategicService);
+  private authService = inject(AuthService);
   router = inject(Router);
 
   isFavorite = computed(() => this.favoritesService.isFavorite(this.product().id));
 
   // Strategic Computeds
+  isLoggedIn = computed(() => !!this.authService.getCurrentProfile());
+  isTechnicalCategory = computed(() => this.strategicService.isTechnicalCategory(this.product()));
   showPriceAndBuy = computed(() => this.strategicService.canViewPriceAndBuy(this.product()));
   showWishlist = computed(() => this.strategicService.canShowWishlist(this.product()));
   valueProposition = computed(() => this.strategicService.getValueProposition(this.product()));

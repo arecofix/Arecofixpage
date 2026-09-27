@@ -194,6 +194,7 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
                 .single()
         ).pipe(
             map(({ data, error }) => {
+                console.error(`[CYPRESS DEBUG] BaseRepository.create ${this.tableName}:`, { data, error });
                 if (error) {
                     this.errorHandler.handleError(error, `create ${this.tableName}`, this.suppressAuthNotifications);
                 }

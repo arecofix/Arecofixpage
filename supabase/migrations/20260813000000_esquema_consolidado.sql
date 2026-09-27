@@ -50,10 +50,10 @@ CREATE TABLE IF NOT EXISTS public.course_modules (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 2. Create course_module_contents table
-CREATE TABLE IF NOT EXISTS public.course_module_contents (
+-- 2. Create course_lessons table
+CREATE TABLE IF NOT EXISTS public.course_lessons (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    lesson_id UUID NOT NULL REFERENCES public.course_modules(id) ON DELETE CASCADE,
+    module_id UUID NOT NULL REFERENCES public.course_modules(id) ON DELETE CASCADE,
     tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     type TEXT NOT NULL CHECK (type IN ('video', 'image', 'document', 'link', 'text')),
     title TEXT,
@@ -65,11 +65,11 @@ CREATE TABLE IF NOT EXISTS public.course_module_contents (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_course_modules_course_id ON public.course_modules(course_id);
-CREATE INDEX IF NOT EXISTS idx_course_module_contents_lesson_id ON public.course_module_contents(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_course_lessons_module_id ON public.course_lessons(module_id);
 
 -- Enable RLS
 ALTER TABLE public.course_modules ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.course_module_contents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_lessons ENABLE ROW LEVEL SECURITY;
 
 -- 3. RLS Policies for course_modules
 
@@ -115,12 +115,12 @@ USING (
 );
 
 
--- 4. RLS Policies for course_module_contents
+-- 4. RLS Policies for course_lessons
 
 -- Admin can do everything on contents
-DROP POLICY IF EXISTS "Admins can manage course contents" ON public.course_module_contents;
+DROP POLICY IF EXISTS "Admins can manage course contents" ON public.course_lessons;
 CREATE POLICY "Admins can manage course contents" 
-ON public.course_module_contents 
+ON public.course_lessons 
 FOR ALL 
 TO authenticated 
 USING (
@@ -128,16 +128,16 @@ USING (
 );
 
 -- Enrolled students can read contents
-DROP POLICY IF EXISTS "Students can view contents" ON public.course_module_contents;
+DROP POLICY IF EXISTS "Students can view contents" ON public.course_lessons;
 CREATE POLICY "Students can view contents" 
-ON public.course_module_contents 
+ON public.course_lessons 
 FOR SELECT 
 TO authenticated
 USING (
   EXISTS (
       SELECT 1 FROM public.course_modules cm
       JOIN public.course_enrollments ce ON ce.course_id = cm.course_id
-      WHERE cm.id = course_module_contents.lesson_id
+      WHERE cm.id = course_lessons.module_id
       AND ce.status = 'confirmed'
       AND ce.email = (auth.jwt() ->> 'email')
   )
@@ -150,14 +150,14 @@ USING (
 -- Migration: Course Exams (Questions and Submissions)
 -- Description: Adds tables and RPCs for secure exam processing.
 
--- 1. Modify existing check constraint on course_module_contents to allow 'exam' type
-ALTER TABLE public.course_module_contents DROP CONSTRAINT IF EXISTS course_module_contents_type_check;
-ALTER TABLE public.course_module_contents ADD CONSTRAINT course_module_contents_type_check CHECK (type IN ('video', 'image', 'document', 'link', 'text', 'exam'));
+-- 1. Modify existing check constraint on course_lessons to allow 'exam' type
+ALTER TABLE public.course_lessons DROP CONSTRAINT IF EXISTS course_lessons_type_check;
+ALTER TABLE public.course_lessons ADD CONSTRAINT course_lessons_type_check CHECK (type IN ('video', 'image', 'document', 'link', 'text', 'exam'));
 
 -- 2. Create course_exam_questions table
 CREATE TABLE IF NOT EXISTS public.course_exam_questions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    content_id UUID NOT NULL REFERENCES public.course_module_contents(id) ON DELETE CASCADE,
+    content_id UUID NOT NULL REFERENCES public.course_lessons(id) ON DELETE CASCADE,
     tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
     options JSONB NOT NULL, -- Array of strings
@@ -183,7 +183,7 @@ USING (
 -- 3. Create course_exam_submissions table
 CREATE TABLE IF NOT EXISTS public.course_exam_submissions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    content_id UUID NOT NULL REFERENCES public.course_module_contents(id) ON DELETE CASCADE,
+    content_id UUID NOT NULL REFERENCES public.course_lessons(id) ON DELETE CASCADE,
     tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
     answers JSONB NOT NULL, -- Array of selected option indexes
@@ -233,8 +233,8 @@ BEGIN
     ELSE
         -- Check if student is enrolled
         IF v_email IS NOT NULL AND EXISTS (
-            SELECT 1 FROM public.course_module_contents c
-            JOIN public.course_modules cm ON cm.id = c.lesson_id
+            SELECT 1 FROM public.course_lessons c
+            JOIN public.course_modules cm ON cm.id = c.module_id
             JOIN public.course_enrollments ce ON ce.course_id = cm.course_id
             WHERE c.id = p_content_id AND ce.email = v_email AND ce.status = 'confirmed'
         ) THEN
@@ -284,7 +284,7 @@ BEGIN
 
     -- Get content details
     SELECT tenant_id, metadata INTO v_tenant_id, v_metadata
-    FROM public.course_module_contents
+    FROM public.course_lessons
     WHERE id = p_content_id;
 
     IF v_tenant_id IS NULL THEN
@@ -296,8 +296,8 @@ BEGIN
         v_has_access := true;
     ELSE
         IF EXISTS (
-            SELECT 1 FROM public.course_module_contents c
-            JOIN public.course_modules cm ON cm.id = c.lesson_id
+            SELECT 1 FROM public.course_lessons c
+            JOIN public.course_modules cm ON cm.id = c.module_id
             JOIN public.course_enrollments ce ON ce.course_id = cm.course_id
             WHERE c.id = p_content_id AND ce.email = v_email AND ce.status = 'confirmed'
         ) THEN
@@ -376,9 +376,10 @@ CREATE POLICY "Staff can insert orders for their tenant"
     ON public.orders FOR INSERT
     WITH CHECK (
         EXISTS (
-            SELECT 1 FROM public.staff s 
+            SELECT 1 FROM public.profiles s 
             WHERE s.id = auth.uid() 
             AND s.tenant_id = orders.tenant_id
+            AND s.role IN ('staff', 'admin', 'super_admin', 'tenant_owner')
         )
     );
 
@@ -411,7 +412,7 @@ CREATE TABLE IF NOT EXISTS public.course_progress (
     tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
     course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
-    content_id UUID NOT NULL REFERENCES public.course_module_contents(id) ON DELETE CASCADE,
+    content_id UUID NOT NULL REFERENCES public.course_lessons(id) ON DELETE CASCADE,
     completed_at TIMESTAMPTZ DEFAULT now(),
     UNIQUE(email, content_id)
 );
@@ -492,8 +493,8 @@ BEGIN
 
     -- Get content details
     SELECT c.tenant_id, m.course_id INTO v_tenant_id, v_course_id
-    FROM public.course_module_contents c
-    JOIN public.course_modules m ON m.id = c.lesson_id
+    FROM public.course_lessons c
+    JOIN public.course_modules m ON m.id = c.module_id
     WHERE c.id = p_content_id;
 
     IF v_tenant_id IS NULL THEN
@@ -515,8 +516,8 @@ BEGIN
 
     -- Calculate progress
     SELECT COUNT(*) INTO v_total_contents
-    FROM public.course_module_contents c
-    JOIN public.course_modules m ON m.id = c.lesson_id
+    FROM public.course_lessons c
+    JOIN public.course_modules m ON m.id = c.module_id
     WHERE m.course_id = v_course_id;
 
     SELECT COUNT(*) INTO v_completed_contents
@@ -577,7 +578,7 @@ BEGIN
     END IF;
 
     SELECT tenant_id, metadata INTO v_tenant_id, v_metadata
-    FROM public.course_module_contents WHERE id = p_content_id;
+    FROM public.course_lessons WHERE id = p_content_id;
 
     IF v_tenant_id IS NULL THEN RAISE EXCEPTION 'Exam not found'; END IF;
 
@@ -585,8 +586,8 @@ BEGIN
         v_has_access := true;
     ELSE
         IF EXISTS (
-            SELECT 1 FROM public.course_module_contents c
-            JOIN public.course_modules cm ON cm.id = c.lesson_id
+            SELECT 1 FROM public.course_lessons c
+            JOIN public.course_modules cm ON cm.id = c.module_id
             JOIN public.course_enrollments ce ON ce.course_id = cm.course_id
             WHERE c.id = p_content_id AND ce.email = v_email AND ce.status = 'confirmed'
         ) THEN v_has_access := true; END IF;
@@ -654,16 +655,16 @@ USING (
 );
 
 -- 3. Permisos para que el instructor pueda subir videos/documentos a los módulos
-DROP POLICY IF EXISTS "Authors can manage course contents" ON public.course_module_contents;
+DROP POLICY IF EXISTS "Authors can manage course contents" ON public.course_lessons;
 CREATE POLICY "Authors can manage course contents" 
-ON public.course_module_contents 
+ON public.course_lessons 
 FOR ALL 
 TO authenticated 
 USING (
   EXISTS (
     SELECT 1 FROM public.course_modules cm
     JOIN public.courses c ON c.id = cm.course_id
-    WHERE cm.id = course_module_contents.lesson_id AND c.author_id = auth.uid()
+    WHERE cm.id = course_lessons.module_id AND c.author_id = auth.uid()
   )
 );
 
@@ -1079,15 +1080,15 @@ USING (
 );
 
 -- ─────────────────────────────────────────────────────────────
--- 3. ACTUALIZAR RLS DE course_module_contents (CONTENIDO REAL)
+-- 3. ACTUALIZAR RLS DE course_lessons (CONTENIDO REAL)
 -- ─────────────────────────────────────────────────────────────
 
-DROP POLICY IF EXISTS "Students can view contents" ON public.course_module_contents;
-DROP POLICY IF EXISTS "Admins can manage course contents" ON public.course_module_contents;
+DROP POLICY IF EXISTS "Students can view contents" ON public.course_lessons;
+DROP POLICY IF EXISTS "Admins can manage course contents" ON public.course_lessons;
 
 -- 3.1 LECTURA: Solo alumnos inscriptos con fecha cumplida, o administradores
 CREATE POLICY "module_contents_select_policy"
-ON public.course_module_contents
+ON public.course_lessons
 FOR SELECT
 TO authenticated
 USING (
@@ -1095,7 +1096,7 @@ USING (
     SELECT 1
     FROM public.course_modules cm
     JOIN public.course_enrollments ce ON ce.course_id = cm.course_id
-    WHERE cm.id = course_module_contents.lesson_id
+    WHERE cm.id = course_lessons.module_id
       AND ce.status = 'confirmed'
       AND lower(ce.email) = lower(auth.jwt() ->> 'email')
       AND cm.unlock_date IS NOT NULL
@@ -1106,7 +1107,7 @@ USING (
 
 -- 3.2 GESTIÓN: Solo los admins pueden insertar, actualizar o borrar contenido
 CREATE POLICY "module_contents_all_admin_policy"
-ON public.course_module_contents
+ON public.course_lessons
 FOR ALL
 TO authenticated
 USING (public.is_admin_of_tenant(tenant_id))
@@ -1139,10 +1140,10 @@ BEGIN
         VALUES (v_new_module_id, v_lesson.course_id, v_lesson.title, 'Módulo recuperado de lecciones antiguas', v_lesson.tenant_id, v_lesson.order_index);
         
         -- Mueve los contenidos a la tabla principal
-        INSERT INTO public.course_module_contents (id, lesson_id, tenant_id, type, title, url, metadata, order_index, created_at)
+        INSERT INTO public.course_lessons (id, module_id, tenant_id, type, title, url, metadata, order_index, created_at)
         SELECT id, v_new_module_id, tenant_id, type, title, url, metadata, order_index, created_at
         FROM public.lesson_contents
-        WHERE lesson_id = v_lesson.id;
+        WHERE module_id = v_lesson.id;
       END LOOP;
   END IF;
 END $$;
@@ -1156,10 +1157,10 @@ DROP TABLE IF EXISTS public.lessons CASCADE;
 -- Estructura final: courses -> course_modules -> course_lessons
 -- ─────────────────────────────────────────────────────────────
 -- Arreglamos la columna confusa (ahora los contenidos apuntan al module_id)
-ALTER TABLE public.course_module_contents RENAME COLUMN lesson_id TO module_id;
+-- ALTER TABLE public.course_lessons RENAME COLUMN module_id TO module_id;
 
 -- Renombramos la tabla para que el código frontend sea más limpio
-ALTER TABLE public.course_module_contents RENAME TO course_lessons;
+-- ALTER TABLE public.course_lessons RENAME TO course_lessons;
 
 -- ─────────────────────────────────────────────────────────────
 -- PASO 3: BORRADO EN CASCADA (ON DELETE CASCADE)
@@ -1172,7 +1173,7 @@ ALTER TABLE public.course_modules
   FOREIGN KEY (course_id) REFERENCES public.courses(id) ON DELETE CASCADE;
 
 -- Cascada: Lecciones -> Módulos
-ALTER TABLE public.course_lessons DROP CONSTRAINT IF EXISTS course_module_contents_lesson_id_fkey;
+ALTER TABLE public.course_lessons DROP CONSTRAINT IF EXISTS course_lessons_module_id_fkey;
 ALTER TABLE public.course_lessons 
   ADD CONSTRAINT course_lessons_module_id_fkey 
   FOREIGN KEY (module_id) REFERENCES public.course_modules(id) ON DELETE CASCADE;

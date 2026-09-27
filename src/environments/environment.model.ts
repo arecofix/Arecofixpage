@@ -4,9 +4,15 @@ export interface Environment {
   apiUrl: string;
   baseUrl: string;
   supabaseUrl: string;
+  supabaseDataUrl?: string;
   supabaseKey: string;
   authRedirectUrl: string;
   enableProfileUpsert: boolean;
+  /** URL del Worker RAG chatbot (Fase 3) */
+  chatbotWorkerUrl: string;
+  embeddingWorkerUrl?: string;
+  /** Secret Bearer para autenticar las peticiones al chatbot Worker */
+  chatbotSecret: string;
   posthogKey?: string;
   posthogHost?: string;
   // WhatsApp Configuration (Optional as it might not be in all envs or handled differently)

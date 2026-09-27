@@ -11,13 +11,21 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 };
 
-// DTO del cliente Angular
 interface MassMessagePayload {
+  tenant_id: string; // REQUERIDO
   targetType: 'suppliers' | 'clients';
   messageTemplate: string;
-  templateLanguage: string; // Ej: 'es_AR'
+  templateLanguage: string;
   variables?: string[];
-  testNumber?: string; // Para enviar prueba a 1 solo numero
+  testNumber?: string;
+}
+
+interface DirectMessagePayload {
+  tenant_id: string; // REQUERIDO
+  to: string;
+  type: string;
+  template?: any;
+  text?: any;
 }
 
 serve(async (req: Request) => {
@@ -28,11 +36,36 @@ serve(async (req: Request) => {
   try {
     const payload = await req.json();
 
-    const WHATSAPP_TOKEN = Deno.env.get('WHATSAPP_API_TOKEN');
-    const WHATSAPP_PHONE_ID = Deno.env.get('WHATSAPP_PHONE_ID');
+    const tenantId = payload.tenant_id;
+    if (!tenantId) {
+        throw new Error("Missing tenant_id in payload.");
+    }
+
+    // Inicializar Supabase Client con Service Role para leer credenciales del tenant
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Obtener credenciales de Meta del tenant
+    const { data: tenantData, error: tenantError } = await supabaseAdmin
+        .from('tenants')
+        .select('whatsapp_access_token, whatsapp_phone_id, whatsapp_enabled')
+        .eq('id', tenantId)
+        .single();
+
+    if (tenantError || !tenantData) {
+        throw new Error("Tenant not found or error retrieving tenant data.");
+    }
+
+    if (!tenantData.whatsapp_enabled) {
+        throw new Error("WhatsApp integration is not enabled for this tenant.");
+    }
+
+    const WHATSAPP_TOKEN = tenantData.whatsapp_access_token;
+    const WHATSAPP_PHONE_ID = tenantData.whatsapp_phone_id;
     
     if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID) {
-        throw new Error("Missing WhatsApp API Configuration in environment variables.");
+        throw new Error("Missing WhatsApp API Configuration for this tenant.");
     }
 
     const apiUrl = `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`;
@@ -41,14 +74,15 @@ serve(async (req: Request) => {
     // FORMATO 1: Envío Directo (desde whatsapp.service.ts)
     // ----------------------------------------------------
     if (payload.to && payload.type) {
-        const formatPhone = payload.to.replace(/\D/g, '');
+        const directPayload = payload as DirectMessagePayload;
+        const formatPhone = directPayload.to.replace(/\D/g, '');
         
         const messageBody = {
             messaging_product: "whatsapp",
             to: formatPhone,
-            type: payload.type,
-            ...(payload.type === 'template' ? { template: payload.template } : {}),
-            ...(payload.type === 'text' ? { text: payload.text } : {})
+            type: directPayload.type,
+            ...(directPayload.type === 'template' ? { template: directPayload.template } : {}),
+            ...(directPayload.type === 'text' ? { text: directPayload.text } : {})
         };
 
         const apiResp = await fetch(apiUrl, {
@@ -80,22 +114,17 @@ serve(async (req: Request) => {
     // ----------------------------------------------------
     const massPayload = payload as MassMessagePayload;
     
-    // Inicializar Supabase Client para consultas a BDD
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
     let recipients: string[] = [];
 
     // Recolectar a quienes se les enviará
     if (massPayload.testNumber) {
         recipients.push(massPayload.testNumber);
     } else if (massPayload.targetType === 'suppliers') {
-        const { data: suppliers, error } = await supabase.from('suppliers').select('phone').eq('is_active', true);
+        const { data: suppliers, error } = await supabaseAdmin.from('suppliers').select('phone').eq('is_active', true).eq('tenant_id', tenantId);
         if (error) throw error;
         recipients = suppliers.map((s: any) => s.phone).filter((p: any) => !!p);
     } else if (massPayload.targetType === 'clients') {
-        const { data: clients, error } = await supabase.from('profiles').select('phone').eq('is_active', true).eq('role', 'user');
+        const { data: clients, error } = await supabaseAdmin.from('profiles').select('phone').eq('is_active', true).eq('role', 'user').eq('tenant_id', tenantId);
         if (error) throw error;
         recipients = clients.map((c: any) => c.phone).filter((p: any) => !!p);
     } else {

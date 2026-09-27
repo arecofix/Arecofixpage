@@ -1,35 +1,45 @@
 import { Product } from '../../domain/entities/product.entity';
+import { environment } from '@env/environment';
 
 export class ProductMapper {
-  private static sanitizeImageUrl(url: any): string {
+  private static sanitizeImageUrl(url: unknown): string {
+    let sanitized = '';
     if (!url) return '';
     if (typeof url === 'string') {
         // Check if it's a stringified JSON object
         if (url.trim().startsWith('{')) {
             try {
                 const parsed = JSON.parse(url);
-                return parsed.url || '';
+                sanitized = parsed.url || '';
             } catch {
-                return url;
+                sanitized = url;
             }
+        } else {
+            sanitized = url;
         }
-        return url;
+    } else if (typeof url === 'object' && (url as {url?: string}).url) {
+        sanitized = (url as {url?: string}).url as string;
+    } else {
+        sanitized = String(url);
     }
-    if (typeof url === 'object' && url.url) {
-        return url.url;
+    
+    if (sanitized && !sanitized.startsWith('http') && sanitized !== '_' && sanitized !== 'null' && !sanitized.startsWith('assets/')) {
+        const encodedPath = sanitized.split('/').map((s: string) => encodeURIComponent(s)).join('/');
+        return `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
     }
-    return String(url);
+    
+    return sanitized;
   }
 
-  static mapFromDb(p: any, branchId?: string): Product {
+  static mapFromDb(p: Record<string, unknown>, branchId?: string): Product {
     const isFeatured = Boolean(p['featured'] ?? p['is_featured'] ?? false);
     let displayedStock = 0;
-    const branchStockList = p.branch_stock && Array.isArray(p.branch_stock) ? p.branch_stock : [];
+    const branchStockList = p['branch_stock'] && Array.isArray(p['branch_stock']) ? p['branch_stock'] : [];
     
     if (branchId) {
-       const specificBranch = branchStockList.find((b: any) => b.branch_id === branchId);
+       const specificBranch = branchStockList.find((b: Record<string, unknown>) => b['branch_id'] === branchId);
        if (specificBranch) {
-           displayedStock = Number(specificBranch.quantity);
+           displayedStock = Number(specificBranch['quantity']);
        } else if (p['stock'] !== undefined && p['stock'] !== null) {
            // Fallback general stock si no hay registro específico o si RLS bloquea branch_stock
            displayedStock = Number(p['stock']);
@@ -55,9 +65,10 @@ export class ProductMapper {
           slug: p['slug'] as string,
           description: p['description'] as string,
           price: Number(p['price']),
+          retail_price: p['retail_price'] !== undefined && p['retail_price'] !== null ? Number(p['retail_price']) : undefined,
           image_url: this.sanitizeImageUrl(p['image_url']),
           gallery_urls: sanitizedGallery,
-          media_metadata: p['media_metadata'] || [],
+          media_metadata: (p['media_metadata'] || []) as Product['media_metadata'],
           category_id: p['category_id'] as string,
           brand_id: p['brand_id'] as string,
           stock: displayedStock,
@@ -71,8 +82,8 @@ export class ProductMapper {
           is_global: Boolean(p['is_global']),
           created_at: p['created_at'] as string,
           updated_at: p['updated_at'] as string,
-          branch_stock: p.branch_stock,
-          branches: p.branches
+          branch_stock: p['branch_stock'] as Product['branch_stock'],
+          branches: p['branches'] as Product['branches']
     };
   }
 }

@@ -1,9 +1,6 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "esModuleInterop": true,
     "strict": true,
     "noImplicitOverride": true,
@@ -18,10 +15,13 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
-    "ignoreDeprecations": "6.0",
     "paths": {
-      "@app/*": ["src/app/*"],
-      "@env/*": ["src/environments/*"]
+      "@app/*": [
+        "./src/app/*"
+      ],
+      "@env/*": [
+        "./src/environments/*"
+      ]
     }
   },
   "angularCompilerOptions": {
@@ -32,7 +32,10 @@
     "strictTemplates": true
   },
   "files": [],
-  "exclude": ["supabase", "cypress"],
+  "exclude": [
+    "supabase",
+    "cypress"
+  ],
   "references": [
     {
       "path": "./tsconfig.app.json"

@@ -9,6 +9,7 @@ import { BranchContextService } from '@app/core/services/branch-context.service'
 import { BranchService } from '@app/core/services/branch.service';
 import { WhatsappService } from '@app/core/services/whatsapp.service';
 import { RepairWorkflowService } from './repair-workflow.service';
+import { ICustomerDeviceRepository } from '@app/features/devices/domain/repositories/customer-device.repository';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -23,6 +24,7 @@ export class AdminRepairService {
     private customerService = inject(CustomerService);
     private whatsappService = inject(WhatsappService);
     private repairWorkflowService = inject(RepairWorkflowService);
+    private customerDeviceRepository = inject(ICustomerDeviceRepository);
 
     // Status logic
     private readonly STATUS_DELIVERED = RepairStatus.DELIVERED;
@@ -102,7 +104,6 @@ export class AdminRepairService {
         let customerId = dto.customer_id;
         
         if (!customerId && dto.customer_name) {
-            // console.log('🔍 [AdminRepairService] Resolviendo cliente por email/teléfono...');
             
             // Try to find existing first
             const existing = await this.customerService.findByEmailOrPhone(
@@ -126,10 +127,27 @@ export class AdminRepairService {
             }
 
             if (shouldReuse && existing) {
-                // console.log('✅ [AdminRepairService] Cliente existente encontrado:', existing.id);
                 customerId = existing.id;
+                // Actualizar datos si se editó un cliente existente
+                const updateData: Record<string, unknown> = {};
+                if (dto.customer_dni !== undefined) updateData['dni'] = dto.customer_dni || null;
+                if (dto.customer_phone !== undefined) updateData['phone'] = dto.customer_phone || null;
+                if (dto.customer_email !== undefined) updateData['email'] = dto.customer_email || null;
+                
+                if (dto.customer_name) {
+                    const nameParts = dto.customer_name.trim().split(' ');
+                    updateData['first_name'] = nameParts[0] || '';
+                    updateData['last_name'] = nameParts.slice(1).join(' ') || '';
+                }
+
+                try {
+                    if (Object.keys(updateData).length > 0) {
+                        await this.customerService.update(customerId, updateData);
+                    }
+                } catch (err) {
+                    console.error('[AdminRepairService] Error updating existing customer data:', err);
+                }
             } else {
-                // console.log('🆕 [AdminRepairService] Creando nuevo cliente vía RPC...');
                 const nameParts = dto.customer_name.trim().split(' ');
                 const fn = nameParts[0] || '';
                 const ln = nameParts.slice(1).join(' ') || '';
@@ -179,10 +197,37 @@ export class AdminRepairService {
             throw new Error('Integridad de Datos: No se pudo determinar un ID de cliente válido para la ficha.');
         }
 
+        // 2.5 Resolve/Create Device
+        let finalDeviceId = dto.device_id;
+        if (dto.device_model) {
+            let modelId: string | null = null;
+            const modelName = dto.device_model.trim();
+            const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
+            
+            // Ensure model exists
+            modelId = await firstValueFrom(this.customerDeviceRepository.ensureModelExists(modelName, generatedSlug, dto.brand_id));
+            
+            // Upsert device
+            const savedDeviceId = await firstValueFrom(
+                this.customerDeviceRepository.upsertDevice({
+                    deviceId: finalDeviceId || null,
+                    userId: customerId,
+                    modelId: modelId,
+                    type: dto.device_type,
+                    imei: dto.imei,
+                    passcode: dto.device_passcode,
+                })
+            );
+            if (savedDeviceId) {
+                finalDeviceId = savedDeviceId;
+            }
+        }
+
         // 3. Prepare DTO with metadata
         const workflowDto: CreateRepairDto = {
             ...dto,
             customer_id: customerId,
+            device_id: finalDeviceId,
             received_by: user.id,
             assigned_technician_id: dto.assigned_technician_id || user.id
         };
@@ -201,10 +246,56 @@ export class AdminRepairService {
 
         return savedRepair;
     }
-
     async update(id: string, dto: UpdateRepairDto): Promise<void> {
         const payload = { ...dto };
         const originalRepair = await this.getById(id);
+
+        if (!originalRepair) throw new Error('Reparación no encontrada');
+
+        // Logic: Update customer info if changed
+        if (originalRepair.customer_id) {
+            const updateData: Record<string, unknown> = {};
+            if (dto.customer_dni !== undefined) updateData['dni'] = dto.customer_dni || null;
+            if (dto.customer_phone !== undefined) updateData['phone'] = dto.customer_phone || null;
+            if (dto.customer_email !== undefined) updateData['email'] = dto.customer_email || null;
+            
+            if (dto.customer_name) {
+                const nameParts = dto.customer_name.trim().split(' ');
+                updateData['first_name'] = nameParts[0] || '';
+                updateData['last_name'] = nameParts.slice(1).join(' ') || '';
+            }
+
+            try {
+                if (Object.keys(updateData).length > 0) {
+                    await this.customerService.update(originalRepair.customer_id, updateData);
+                }
+            } catch (err) {
+                console.error('[AdminRepairService] Error updating existing customer data during repair update:', err);
+            }
+        }
+
+        // Logic: Update device info if changed
+        if (originalRepair.customer_id && dto.device_model) {
+            let modelId: string | null = null;
+            const modelName = dto.device_model.trim();
+            const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
+            
+            modelId = await firstValueFrom(this.customerDeviceRepository.ensureModelExists(modelName, generatedSlug, dto.brand_id));
+            
+            const savedDeviceId = await firstValueFrom(
+                this.customerDeviceRepository.upsertDevice({
+                    deviceId: originalRepair.device_id || null,
+                    userId: originalRepair.customer_id,
+                    modelId: modelId,
+                    type: dto.device_type,
+                    imei: dto.imei,
+                    passcode: dto.device_passcode,
+                })
+            );
+            if (savedDeviceId) {
+                payload.device_id = savedDeviceId;
+            }
+        }
 
         // Logic: Set completed_at if status changes to final
         if (payload.current_status_id && this.isFinalStatus(payload.current_status_id)) {

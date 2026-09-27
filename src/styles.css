@@ -68,8 +68,8 @@
   --base-content: #1f2937;
 
   /* Font Families */
-  --font-heading: "Exo 2", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-heading: "Montserrat", sans-serif;
+  --font-body: "Montserrat", sans-serif;
 }
 
 .dark {
@@ -82,7 +82,7 @@
 /* Global Styles */
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
   font-family: var(--font-body);
 }

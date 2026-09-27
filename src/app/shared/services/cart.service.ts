@@ -9,6 +9,7 @@ import { Order, OrderItem } from '@app/features/orders/domain/entities/order.ent
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { ToastService } from './toast.service';
 import { firstValueFrom } from 'rxjs';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
 
 export interface CartItem {
     product: Product;
@@ -25,17 +26,23 @@ export class CartService {
     private authService = inject(AuthService);
     private orderService = inject(OrderService);
     private supabase = inject(SUPABASE_CLIENT);
+    private gsmService = inject(GsmService);
     
     cartItems = signal<CartItem[]>([]);
     currentOrderSignal = signal<Order | null>(null);
+    usdRate = signal<number>(1240);
 
     // Cart Visibility State
     isCartOpen = signal(false);
 
     constructor() {
         if (isPlatformBrowser(this.platformId)) {
-            // Load cart from DB/Local storage on init
-            this.loadCart();
+            // Load USD rate first
+            this.gsmService.getUsdtRate().subscribe(rate => {
+                this.usdRate.set(rate);
+                // Load cart from DB/Local storage after getting rate
+                this.loadCart();
+            });
 
             // Listen for auth state changes to switch carts and merge if needed
             this.authService.authState$.subscribe((state) => {
@@ -49,8 +56,21 @@ export class CartService {
     private getOrCreateSessionId(): string {
         if (!isPlatformBrowser(this.platformId)) return '';
         let sessionId = localStorage.getItem('cart_session_id');
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
+        if (!sessionId || sessionId === 'undefined') {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                try {
+                    sessionId = crypto.randomUUID();
+                } catch (e) {
+                    sessionId = null;
+                }
+            }
+            if (!sessionId) {
+                // Fallback for insecure contexts (e.g., some CI/Cypress environments)
+                sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
             localStorage.setItem('cart_session_id', sessionId);
         }
         return sessionId;
@@ -92,16 +112,26 @@ export class CartService {
 
         try {
             const activeOrder = await firstValueFrom(this.orderService.getActiveCart(userId, sessionId));
-            console.log('DEBUG: loadCart activeOrder:', activeOrder);
             this.currentOrderSignal.set(activeOrder);
 
             if (activeOrder && activeOrder.items) {
                 const items: CartItem[] = activeOrder.items
                     .filter(item => item.product)
-                    .map(item => ({
-                        product: item.product,
-                        quantity: item.quantity
-                    }));
+                    .map(item => {
+                        const prod = item.product!;
+                        if (prod.currency === 'USD' && !prod.convertedPrice) {
+                            prod.convertedPrice = prod.price * this.usdRate();
+                        }
+                        // Always ensure unit_price matches the potentially converted price to avoid sync issues
+                        const finalPrice = prod.convertedPrice || prod.price;
+                        item.unit_price = finalPrice;
+                        item.subtotal = finalPrice * item.quantity;
+                        
+                        return {
+                            product: prod,
+                            quantity: item.quantity
+                        };
+                    });
                 this.cartItems.set(items);
             } else {
                 this.cartItems.set([]);
@@ -117,16 +147,23 @@ export class CartService {
 
         for (const guestItem of (guestCart.items || [])) {
             const existing = userItems.find(item => item.product_id === guestItem.product_id);
+            const prod = guestItem.product;
+            if (prod && prod.currency === 'USD' && !prod.convertedPrice) {
+                prod.convertedPrice = prod.price * this.usdRate();
+            }
+            const priceToUse = prod?.convertedPrice || prod?.price || guestItem.unit_price;
+
             if (existing) {
                 existing.quantity += guestItem.quantity;
-                existing.subtotal = existing.quantity * existing.unit_price;
+                existing.subtotal = existing.quantity * priceToUse;
+                existing.unit_price = priceToUse;
             } else {
                 userItems.push({
                     product_id: guestItem.product_id,
                     product_name: guestItem.product_name,
                     quantity: guestItem.quantity,
-                    unit_price: guestItem.unit_price,
-                    subtotal: guestItem.subtotal,
+                    unit_price: priceToUse,
+                    subtotal: guestItem.quantity * priceToUse,
                     product: guestItem.product
                 });
             }
@@ -182,10 +219,8 @@ export class CartService {
     }
 
     async addToCart(product: Product) {
-        console.log("CART DEBUG: addToCart called with product", product?.id);
         try {
             const order = await this.getOrCreateActiveOrder();
-            console.log("CART DEBUG: getOrCreateActiveOrder returned", order?.id);
             const items = order.items ? [...order.items] : [];
 
             const existingItem = items.find(item => item.product_id === product.id);
@@ -196,16 +231,22 @@ export class CartService {
                 return;
             }
 
+            if (product.currency === 'USD' && !product.convertedPrice) {
+                product.convertedPrice = product.price * this.usdRate();
+            }
+            const priceToUse = product.convertedPrice || product.price;
+
             if (existingItem) {
                 existingItem.quantity += 1;
-                existingItem.subtotal = existingItem.quantity * existingItem.unit_price;
+                existingItem.subtotal = existingItem.quantity * priceToUse;
+                existingItem.unit_price = priceToUse;
             } else {
                 items.push({
                     product_id: product.id,
                     product_name: product.name,
                     quantity: 1,
-                    unit_price: product.price,
-                    subtotal: product.price,
+                    unit_price: priceToUse,
+                    subtotal: priceToUse,
                     product: product
                 });
             }
@@ -216,11 +257,8 @@ export class CartService {
             order.total = subtotal;
             order.total_amount = subtotal;
 
-            console.log("CART DEBUG: updating order with items", items.length);
             const updatedOrder = await firstValueFrom(this.orderService.updateOrder(order.id!, order));
-            console.log("CART DEBUG: updateOrder succeeded", updatedOrder?.id);
             this.syncOrderState(updatedOrder);
-            console.log("CART DEBUG: syncOrderState done");
 
             this.logger.debug('Product added to cart', { productName: product.name });
             this.toastService.show('Agregaste un producto al carrito', 'success', () => this.openCart());
@@ -262,8 +300,11 @@ export class CartService {
             const item = items.find(i => i.product_id === productId);
             if (!item) return;
 
+            const priceToUse = item.product?.convertedPrice || item.product?.price || item.unit_price;
+
             item.quantity = quantity;
-            item.subtotal = quantity * item.unit_price;
+            item.unit_price = priceToUse;
+            item.subtotal = quantity * priceToUse;
 
             const subtotal = items.reduce((acc, i) => acc + i.subtotal, 0);
             order.items = items;
@@ -294,7 +335,7 @@ export class CartService {
     }
 
     totalItems = computed(() => this.cartItems().reduce((acc, item) => acc + (item.quantity || 0), 0));
-    totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + ((item.product?.price || 0) * (item.quantity || 0)), 0));
+    totalPrice = computed(() => this.cartItems().reduce((acc, item) => acc + ((item.product?.convertedPrice || item.product?.price || 0) * (item.quantity || 0)), 0));
 
     openCart() {
         this.isCartOpen.set(true);

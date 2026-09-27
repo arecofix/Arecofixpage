@@ -146,10 +146,12 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
         // cost_price is a column on `products`, NOT on `order_items` — omitted intentionally
         subtotal:     item.subtotal,
       } as any);
+      
+      // La tabla `order_items` no tiene columna `branch_id`, pero el BaseRepository
+      // la inyecta globalmente si `useStrictBranchIsolation` está activado en `orders`.
+      delete (sanitized as any).branch_id;
+      
       sanitized.tenant_id = tenantId;
-      if (branchId && !sanitized.branch_id) {
-        sanitized.branch_id = branchId;
-      }
       return sanitized;
     });
 
@@ -186,12 +188,12 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
 
     query = this.applyTenantFilter(query);
 
-    return from((query as any).maybeSingle()).pipe(
+    return from((query as any).order('created_at', { ascending: false }).limit(1)).pipe(
       map(({ data, error }: any) => {
         if (error) {
           this.errorHandler.handleError(error, 'getActiveCart');
         }
-        return data ? OrderMapper.toDomain(data) : null;
+        return data && data.length > 0 ? OrderMapper.toDomain(data[0]) : null;
       })
     );
   }
