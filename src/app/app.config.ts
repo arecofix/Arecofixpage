@@ -25,7 +25,7 @@ import {
   withFetch,
   withInterceptors,
 } from '@angular/common/http';
-import { registerLocaleData } from '@angular/common';
+import { registerLocaleData, IMAGE_CONFIG } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { AppTitleStrategy } from './core/strategies/app-title.strategy';
 
@@ -78,6 +78,8 @@ import { SupabaseCourseRepository } from './features/courses/infrastructure/repo
 import { NotificationBaseRepository } from './features/messages/domain/repositories/notification.repository';
 import { SupabaseNotificationRepository } from './features/messages/infrastructure/repositories/supabase-notification.repository';
 import { TenantService } from './core/services/tenant.service';
+import { AccountRepository } from './features/accounts/domain/repositories/account.repository';
+import { SupabaseAccountRepository } from './features/accounts/infrastructure/repositories/supabase-account.repository';
 
 const isTauri =
   typeof window !== 'undefined' &&
@@ -85,6 +87,12 @@ const isTauri =
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    {
+      provide: IMAGE_CONFIG,
+      useValue: {
+        domains: ['db.arecofix.com.ar', 'jftiyfnnaogmgvksgkbn.supabase.co', 'lh3.googleusercontent.com', 'avatars.githubusercontent.com', 'platform-lookaside.fbsbx.com'],
+      },
+    },
     // Locale provider
     { provide: LOCALE_ID, useValue: 'es-AR' },
 
@@ -171,6 +179,7 @@ export const appConfig: ApplicationConfig = {
     },
     { provide: AnalyticsRepository, useClass: SupabaseAnalyticsRepository },
     { provide: UserProfileRepository, useClass: SupabaseUserProfileRepository },
+    { provide: AccountRepository, useClass: SupabaseAccountRepository },
     { 
       provide: OrderRepository, 
       useFactory: () => {

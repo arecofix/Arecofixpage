@@ -114,12 +114,13 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         return {
           users: legacyData.users || 0,
           products: legacyData.products || 0,
-          sales: legacyData.sales || 0,
-          revenue: true_total_gross_all_time,
+          sales: statsData.total_sales,
+          revenue: total_sales_revenue_all_time,
           repairs_month: cm ? cm.repairs_revenue : 0,
           repairs_revenue: additionalCosts.repairsRevenueTotal,
           repairs_profit: true_repairs_profit_all_time,
-          devices_fixed: legacyData.devices_fixed || 0,
+          devices_fixed: statsData.devices_fixed,
+          pending_approvals: statsData.pending_approvals,
           total_gross_revenue: true_total_gross_all_time,
           total_cost: total_cost_safe,
           total_net_profit: safe_total_net,
@@ -206,7 +207,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
     return result;
   }
 
-  private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[]}> {
+  private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[], total_sales: number, devices_fixed: number, pending_approvals: number}> {
     try {
       const productStats = new Map<string, number>();
       const categoryStats = new Map<string, number>();
@@ -286,10 +287,24 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         .slice(0, 5)
         .map(([name, count]) => ({ name, count }));
         
-      return { products_chart, category_chart };
+      // 3. Count Pending Approvals (Pending Diagnosis = 1, Supply Management = 2, In Progress = 3)
+      let pendingQuery = this.supabase
+        .from('repairs')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .in('current_status_id', [1, 2, 3]);
+      
+      if (branchId) pendingQuery = pendingQuery.eq('branch_id', branchId);
+      
+      const { count: pending_approvals } = await pendingQuery;
+
+      const total_sales = orders ? orders.length : 0;
+      const devices_fixed = repairs ? repairs.length : 0;
+
+      return { products_chart, category_chart, total_sales, devices_fixed, pending_approvals: pending_approvals || 0 };
     } catch (e) {
       console.error('Error fetching stats data', e);
-      return { products_chart: [], category_chart: [] };
+      return { products_chart: [], category_chart: [], total_sales: 0, devices_fixed: 0, pending_approvals: 0 };
     }
   }
 

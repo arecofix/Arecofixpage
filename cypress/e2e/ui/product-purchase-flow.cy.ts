@@ -2,7 +2,7 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
   const PRODUCT_URL = '/productos/detalle/modulo-ejemplo-123'; // Ajustar a un slug real o interceptar
 
   beforeEach(() => {
-    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllSupabase');
+    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllSupabase');
     cy.intercept('GET', '**/rest/v1/products*slug=eq.modulo-ejemplo-123*', {
       statusCode: 200,
       body: [{

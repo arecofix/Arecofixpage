@@ -170,8 +170,9 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
 
   // 1. PRIMERO definimos los interceptores
 
-  cy.intercept('**/rest/v1/**', {
+  cy.intercept('GET', '**/rest/v1/**', {
     statusCode: 200,
+    headers: { 'content-range': '0-0/0', 'Content-Range': '0-0/0' },
     body: []
   }).as('catchAllSupabase');
 
@@ -385,7 +386,7 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
 
   // Set up catch-all as LOW-PRIORITY fallback (registered before specific intercepts)
   // Note: specific intercepts registered in beforeEach() BEFORE calling loginAsUser() take priority.
-  cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
+  cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
 
   // ── Auth endpoints ──────────────────────────────────────────────────────────
 

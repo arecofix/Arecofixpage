@@ -113,6 +113,7 @@ export class AdminUsersPage implements OnInit {
   bulkMessage = signal<string>('Hola {nombre}, te contacto desde Arecofix. ');
 
   userProfile = signal<UserProfile | null>(null);
+  clientToDelete = signal<ClientRow | null>(null);
 
   async ngOnInit() {
     this.authService.authState$.subscribe((state) => {
@@ -393,6 +394,22 @@ export class AdminUsersPage implements OnInit {
     if (page < 1 || page > this.totalClientsPages()) return;
     this.clientsCurrentPage.set(page);
     this.loadClients();
+  }
+
+  async deleteClient() {
+    const client = this.clientToDelete();
+    if (!client) return;
+
+    try {
+      await this.customerService.delete(client.id);
+      this.notificationService.showSuccess(`El cliente ${client.first_name || 'seleccionado'} ha sido dado de baja correctamente.`);
+      await this.loadClients();
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      this.notificationService.showError('Ocurrió un error al intentar eliminar el cliente.');
+    } finally {
+      this.clientToDelete.set(null);
+    }
   }
 
   async downloadCSV() {

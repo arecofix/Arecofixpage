@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { SupabaseRepairRepository } from '../../infrastructure/repositories/supabase-repair.repository';
+import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { StockManagementService } from '@app/features/products/application/services/stock-management.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { FinanceService } from '@app/features/finance/application/services/finance.service';
 import { CreateRepairDto, RepairPart, RepairStatus } from '../../domain/entities/repair.entity';
 import { firstValueFrom } from 'rxjs';
 
@@ -14,9 +15,10 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root'
 })
 export class RepairWorkflowService {
-  private repairRepo = inject(SupabaseRepairRepository);
+  private repairRepo = inject(RepairRepository);
   private stockService = inject(StockManagementService);
   private tenantService = inject(TenantService);
+  private financeService = inject(FinanceService);
 
   /**
    * Ejecuta el flujo completo de "Guardar Ficha" como un caso de uso (UseCase)
@@ -130,8 +132,7 @@ export class RepairWorkflowService {
   }
 
   private async registerPaymentMovement(repairId: string, branchId: string, amount: number, notes: string): Promise<void> {
-     const supabase = (this.repairRepo as any).supabase; 
-     await supabase.from('cash_movements').insert({
+     await this.financeService.recordMovement({
          tenant_id: this.tenantService.getTenantId(),
          branch_id: branchId,
          amount: amount,

@@ -227,23 +227,27 @@ export class AuthService {
               const currentPath = window.location.pathname;
               const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/' || currentPath.includes('/auth/');
               
+              let navigated = false;
+
               // Evitar redirección si el usuario ya estaba validado en la UI (tab recovery, background token refresh)
               if (!wasAlreadyInitialized || isOAuthRedirect) {
                 if (hasExplicitReturnUrl) {
                    if (currentPath !== returnUrl) {
-                       router.navigateByUrl(returnUrl);
+                       await router.navigateByUrl(returnUrl);
+                       navigated = true;
                    }
                 } else if (isAuthPage) {
                    if (currentPath !== returnUrl) {
-                       router.navigateByUrl(returnUrl);
+                       await router.navigateByUrl(returnUrl);
+                       navigated = true;
                    }
                 }
               }
               
-              if (isOAuthRedirect) {
+              if (isOAuthRedirect && !navigated) {
                  history.replaceState(null, '', window.location.pathname + window.location.search);
               }
-            }, 100);
+            }, 500);
           }
 
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {

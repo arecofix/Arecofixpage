@@ -80,8 +80,8 @@ describe('Academy: Comprehensive Access Control', () => {
   // Helper: visit a URL as a student user (bypasses authGuard via localStorage + intercepts)
   const visitAsStudent = (url: string) => {
     // Set up all REST intercepts FIRST, before visit
-    cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
-    cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
+    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
+    cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
     cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: studentUser }).as('getAuthUser');
     cy.intercept('POST', '**/auth/v1/token*', { statusCode: 200, body: { ...studentSession, user: studentUser } }).as('refreshToken');
     cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
@@ -132,7 +132,7 @@ describe('Academy: Comprehensive Access Control', () => {
   describe('Enrolled Student (Happy Path)', () => {
     it('shows enrolled courses in /academy/mis-cursos', () => {
       // Override specific intercepts AFTER setting catch-all
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
       cy.intercept('GET', '**/rest/v1/course_enrollments*', {
         statusCode: 200,
         body: [confirmedEnrollment]
@@ -161,7 +161,7 @@ describe('Academy: Comprehensive Access Control', () => {
     });
 
     it('can access the classroom /aula when enrolled', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
       cy.intercept('GET', '**/rest/v1/courses*', (req) => {
         const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
         req.reply({ statusCode: 200, body: wantsObject ? courseMock : [courseMock] });
@@ -190,7 +190,7 @@ describe('Academy: Comprehensive Access Control', () => {
     });
 
     it('shows unlocked module content in the classroom', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/courses*', (req) => {
         req.reply({ statusCode: 200, body: [courseMock] });
       }).as('getCourse');
@@ -218,7 +218,7 @@ describe('Academy: Comprehensive Access Control', () => {
     });
 
     it('hides lessons inside locked modules for students', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/courses*', (req) => {
         req.reply({ statusCode: 200, body: [courseMock] });
       }).as('getCourse');
@@ -251,7 +251,7 @@ describe('Academy: Comprehensive Access Control', () => {
 
   describe('Unenrolled Student (Access Denied)', () => {
     it('shows "Acceso Restringido" when not enrolled', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/courses*', (req) => {
         const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
         req.reply({ statusCode: 200, body: wantsObject ? courseMock : [courseMock] });
@@ -278,7 +278,7 @@ describe('Academy: Comprehensive Access Control', () => {
     });
 
     it('shows empty state in /mis-cursos when not enrolled', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/course_enrollments*', { statusCode: 200, body: [] }).as('getEnrollmentEmpty');
       cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: studentUser });
       cy.intercept('GET', '**/rest/v1/tenants*', { statusCode: 200, body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }] });
@@ -303,7 +303,7 @@ describe('Academy: Comprehensive Access Control', () => {
 
   describe('Admin (Enrollment Bypass)', () => {
     it('can access the classroom without enrollment', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/courses*', (req) => {
         const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
         req.reply({ statusCode: 200, body: wantsObject ? courseMock : [courseMock] });
@@ -319,7 +319,7 @@ describe('Academy: Comprehensive Access Control', () => {
     });
 
     it('can see locked modules with "Bloqueado (vista admin)" badge', () => {
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/courses*', (req) => {
         req.reply({ statusCode: 200, body: [courseMock] });
       }).as('getCourse');
@@ -342,7 +342,7 @@ describe('Academy: Comprehensive Access Control', () => {
     it('shows all enrolled courses', () => {
       const course2 = { id: 'course-second-456', title: 'Curso de Soldadura Electronica', slug: 'soldadura-electronica', is_active: true, author_id: 'instructor-789', tenant_id: '00000000-0000-0000-0000-000000000000', thumbnail_url: null, price: 8000 };
 
-      cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] });
+      cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] });
       cy.intercept('GET', '**/rest/v1/course_enrollments*', {
         statusCode: 200,
         body: [

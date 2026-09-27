@@ -60,7 +60,11 @@ export class CustomerService {
   }
 
   async delete(id: string): Promise<void> {
-    return firstValueFrom(this.customerRepository.delete(id));
+    // Soft delete para mantener la integridad de órdenes y reparaciones
+    await firstValueFrom(this.customerRepository.update(id, { 
+      is_active: false, 
+      deleted_at: new Date().toISOString() 
+    } as any));
   }
 
   async searchClients(query: string, limit: number = 20): Promise<UserProfile[]> {
