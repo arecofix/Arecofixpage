@@ -18,8 +18,12 @@ export const adminRoutes: Routes = [
       provideCharts(withDefaultRegisterables()),
     ],
     children: [
-        { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
+      { path: 'settings', redirectTo: 'company', pathMatch: 'full' },
+      { path: 'identidad', redirectTo: 'company', pathMatch: 'full' },
+      { path: 'configuracion', redirectTo: 'company', pathMatch: 'full' },
+      { path: 'empresa', redirectTo: 'company', pathMatch: 'full' },
       // Note: /admin/suppliers is the dedicated supplier manager (ABM)
       // /admin/users has a 'suppliers' tab for a unified people view
       {

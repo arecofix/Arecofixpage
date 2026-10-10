@@ -1,17 +1,36 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 import { CanActivateFn, Router } from '@angular/router';
 import { PermissionService } from '../services/permission.service';
+import { AuthService } from '../services/auth.service';
+import { ROLES } from '../constants/roles.constants';
 
 export const permissionGuard = (permissions: string | string[]): CanActivateFn => {
   return async (route, state) => {
+    const platformId = inject(PLATFORM_ID);
+    if (isPlatformServer(platformId)) {
+      return true;
+    }
+
     const permissionService = inject(PermissionService);
+    const authService = inject(AuthService);
     const router = inject(Router);
 
-    // If permissions aren't loaded yet (e.g. direct URL hit), we should probably wait
-    // We can call loadPermissions here if not loaded, or assume auth guard handles it.
-    // Assuming auth guard happens first, permissionService should ideally be loaded.
+    const profile = authService.getCurrentProfile();
+    const role = profile?.role;
+
+    // Super Admin, Tenant Owner, and Branch Admin always have administrative access
+    if (
+      authService.isSuperAdmin() ||
+      role === ROLES.SUPER_ADMIN ||
+      role === ROLES.TENANT_OWNER ||
+      role === ROLES.ADMIN
+    ) {
+      return true;
+    }
+
     if (!permissionService.isLoaded()) {
-       await permissionService.loadPermissions();
+      await permissionService.loadPermissions();
     }
 
     const permsArray = Array.isArray(permissions) ? permissions : [permissions];
@@ -20,8 +39,7 @@ export const permissionGuard = (permissions: string | string[]): CanActivateFn =
     const hasAccess = permsArray.some(p => permissionService.hasPermission(p));
 
     if (!hasAccess) {
-      // Redirect to a 403 Forbidden page or dashboard
-      return router.createUrlTree(['/403']); // assuming 403 route exists, else fallback to home
+      return router.createUrlTree(['/403']);
     }
 
     return true;

@@ -1,4 +1,5 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { BranchService } from '@app/core/services/branch.service';
@@ -14,6 +15,11 @@ import { of, firstValueFrom } from 'rxjs';
  * - Staff solo pasa si su profile.branch_id (o slug asociado) coincide con la ruta.
  */
 export const branchAdminGuard: CanActivateFn = async (route, state) => {
+  const platformId = inject(PLATFORM_ID);
+  if (isPlatformServer(platformId)) {
+    return true;
+  }
+
   const authService = inject(AuthService);
   const branchService = inject(BranchService);
   const router = inject(Router);
@@ -46,7 +52,7 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
 
     const role = userProfile.role || ROLES.USER;
     const userEmail = userProfile.email;
-    const branchSlug = route.paramMap.get('branchSlug');
+    const branchSlug = route.paramMap.get('branchSlug') || route.paramMap.get('branch-slug');
 
     // 1. Validar Acceso
     let hasAccess = false;

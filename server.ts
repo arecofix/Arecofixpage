@@ -151,7 +151,8 @@ export function app(): express.Express {
           '/login', '/register', '/admin', '/upgrade-required', '/diagnostico',
           '/Zona-Norte',
         ];
-        const isKnownRoute = validPrefixes.some(
+        const isBranchRoute = /^\/[a-zA-Z0-9_-]+(\/admin(\/.*)?)?$/.test(pathname);
+        const isKnownRoute = isBranchRoute || validPrefixes.some(
           (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
         );
         if (!isKnownRoute) {
