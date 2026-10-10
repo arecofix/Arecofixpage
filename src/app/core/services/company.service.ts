@@ -94,6 +94,7 @@ export class CompanyService {
     if (branchId) {
         // Actualizamos la sucursal específica
         const branchPayload: Partial<Branch> = {
+            name: updateData.name,
             official_name: updateData.name,
             address: updateData.location,
             contact_email: updateData.contact_email,

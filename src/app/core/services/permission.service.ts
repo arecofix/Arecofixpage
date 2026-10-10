@@ -1,11 +1,13 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, Injector } from '@angular/core';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PermissionService {
   private supabase = inject(SUPABASE_CLIENT);
+  private injector = inject(Injector);
   
   // Cache of permissions for the current user
   private permissionsCache = signal<Set<string>>(new Set());
@@ -47,11 +49,15 @@ export class PermissionService {
    * Note: This checks the cached permissions. `loadPermissions()` must be called upon login.
    */
   hasPermission(permission: string): boolean {
+    try {
+      const auth = this.injector.get(AuthService);
+      if (auth.isSuperAdmin() || auth.getCurrentProfile()?.role === 'super_admin') {
+        return true;
+      }
+    } catch {}
+
     if (!this.loaded()) {
       console.warn(`Permission checked before loaded: ${permission}`);
-      // In a real app we might want to await initialization, but since this is used
-      // synchronously by directives/guards, we return false or fallback.
-      // The guard will have to wait for initialization.
     }
     return this.permissionsCache().has(permission);
   }
