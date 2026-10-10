@@ -268,6 +268,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
           this.prepareCharts(stats);
         }
         this.loading.set(false);
+        this.loadPendingProductsCount();
       });
 
     // React to branch changes globally
