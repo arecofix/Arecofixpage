@@ -129,14 +129,11 @@
            <!-- NEW QUALITY AND COLORS FIELDS -->
            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
              <div class="form-control">
-                <label class="label font-semibold">Calidad (Opcional)</label>
-                <select [(ngModel)]="formVal.specifications['quality']" name="quality" tabindex="8" class="select select-bordered w-full">
-                  <option value="">Seleccionar calidad...</option>
-                  <option value="Original">Original</option>
-                  <option value="Original Desmontaje">Original Desmontaje</option>
-                  <option value="Premium">Premium</option>
-                  <option value="AAA">AAA</option>
-                  <option value="Genérico">Genérico</option>
+                <label class="label font-semibold">Condición</label>
+                <select [(ngModel)]="formVal.condition" name="condition" tabindex="8" class="select select-bordered w-full">
+                  <option value="Nuevo">Nuevo</option>
+                  <option value="Usado">Usado</option>
+                  <option value="Reacondicionado">Reacondicionado</option>
                 </select>
              </div>
 
@@ -148,11 +145,19 @@
              </div>
            </div>
            
-           <div class="form-control">
-             <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-               <input type="checkbox" [(ngModel)]="formVal.is_active" name="is_active" tabindex="9" class="toggle toggle-success" />
-               <span class="label-text font-bold">Producto Publicado (Visible al público)</span>
-             </label>
+           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+             <div class="form-control">
+               <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                 <input type="checkbox" [(ngModel)]="formVal.is_active" name="is_active" tabindex="9" class="toggle toggle-success" />
+                 <span class="label-text font-bold">Publicado (Visible)</span>
+               </label>
+             </div>
+             <div class="form-control">
+               <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition">
+                 <input type="checkbox" [(ngModel)]="formVal.is_featured" name="is_featured" class="toggle toggle-primary" />
+                 <span class="label-text font-bold text-indigo-700 dark:text-indigo-400">Destacar Producto</span>
+               </label>
+             </div>
            </div>
         </div>
       </div>
@@ -231,7 +236,7 @@
     <!-- Section SEO: Custom Meta Tags -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
       <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
-        <i class="fas fa-search text-orange-500"></i> Configuración SEO Custom (Opcional)
+        <i class="fas fa-search text-orange-500"></i> Configuración SEO Custom y Etiquetas (Opcional)
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="space-y-4">
@@ -247,18 +252,164 @@
               class="input input-bordered w-full" placeholder="https://..." />
             <p class="text-xs text-gray-400 mt-1">Si lo dejas vacío, se usará la imagen principal.</p>
           </div>
+          <div class="form-control">
+            <label class="label font-semibold">Palabras Clave (SEO Keywords)</label>
+            <input type="text" [(ngModel)]="formVal.seo_keywords" name="seo_keywords"
+              class="input input-bordered w-full" placeholder="oferta, barato, mejor precio..." />
+          </div>
+          <div class="form-control">
+            <label class="label font-semibold">Etiquetas Internas (Tags)</label>
+            <input type="text" [(ngModel)]="formVal.tags" name="tags"
+              class="input input-bordered w-full" placeholder="nuevo, destacado, promo_verano..." />
+          </div>
         </div>
         <div class="space-y-4">
           <div class="form-control h-full">
             <label class="label font-semibold">Meta Description</label>
             <textarea [(ngModel)]="formVal.meta_description" name="meta_description"
-              class="textarea textarea-bordered h-full flex-1 min-h-[120px]" placeholder="Breve descripción para los resultados de búsqueda..."></textarea>
+              class="textarea textarea-bordered h-32 flex-1" placeholder="Breve descripción para los resultados de búsqueda..."></textarea>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Section 3: Media -->
+    <!-- Section 4: Logística, Impuestos y Proveedor -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
+        <i class="fas fa-truck text-blue-500"></i> Logística, Proveedor e Impuestos
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="form-control">
+           <label class="label font-semibold">ID Proveedor (Opcional)</label>
+           <input type="text" [(ngModel)]="formVal.supplier_id" name="supplier_id" class="input input-bordered w-full" placeholder="UUID del proveedor" />
+        </div>
+        <div class="form-control">
+          <label class="label font-semibold">Peso (kg)</label>
+          <input type="number" [(ngModel)]="formVal.weight" name="weight" class="input input-bordered w-full" placeholder="0.5" />
+        </div>
+        <div class="form-control">
+          <label class="label font-semibold">Días de Garantía</label>
+          <input type="number" [(ngModel)]="formVal.warranty_days" name="warranty_days" class="input input-bordered w-full" placeholder="30" />
+        </div>
+        <div class="form-control">
+          <label class="label font-semibold">Tipo Garantía</label>
+          <select [(ngModel)]="formVal.warranty_type" name="warranty_type" class="select select-bordered w-full">
+             <option value="Sin garantía">Sin garantía</option>
+             <option value="Fábrica">Fábrica</option>
+             <option value="Vendedor">Vendedor</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+        <div class="form-control">
+           <label class="label font-semibold">Impuesto (IVA %)</label>
+           <input type="number" [(ngModel)]="formVal.tax_percentage" name="tax_percentage" class="input input-bordered w-full" placeholder="21" />
+        </div>
+        <div class="form-control col-span-2">
+           <label class="label font-semibold">Dimensiones (cm) - Largo x Ancho x Alto</label>
+           <div class="flex gap-2">
+             <input type="number" [(ngModel)]="formVal.dimensions.length" name="dim_l" class="input input-bordered w-full" placeholder="Largo" title="Largo (cm)"/>
+             <input type="number" [(ngModel)]="formVal.dimensions.width" name="dim_w" class="input input-bordered w-full" placeholder="Ancho" title="Ancho (cm)"/>
+             <input type="number" [(ngModel)]="formVal.dimensions.height" name="dim_h" class="input input-bordered w-full" placeholder="Alto" title="Alto (cm)"/>
+           </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 border-t border-gray-100 dark:border-gray-700 pt-6">
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition border">
+            <input type="checkbox" [(ngModel)]="formVal.includes_tax" name="includes_tax" class="toggle toggle-success" />
+            <span class="label-text font-bold">Precio Incluye IVA</span>
+          </label>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition border">
+            <input type="checkbox" [(ngModel)]="formVal.free_shipping" name="free_shipping" class="toggle toggle-info" />
+            <span class="label-text font-bold">Envío Gratis</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Ofertas y Cotización -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
+        <i class="fas fa-tags text-pink-500"></i> Ofertas Especiales y Cotización
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+         <div class="form-control">
+           <label class="label font-semibold">Precio de Oferta</label>
+           <div class="relative w-full">
+             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-pink-500 font-bold text-lg">$</span>
+             <input type="number" [(ngModel)]="formVal.sale_price" name="sale_price" class="input input-bordered w-full pl-8 text-lg font-bold text-pink-500 focus:border-pink-300" placeholder="0.00" min="0" />
+           </div>
+         </div>
+         <div class="form-control">
+           <label class="label font-semibold">Tasa de Cambio (Ref)</label>
+           <input type="number" [(ngModel)]="formVal.reference_exchange_rate" name="reference_exchange_rate" class="input input-bordered w-full" placeholder="1000.00" min="0" />
+         </div>
+         <div class="form-control">
+           <label class="label font-semibold">Inicio Oferta</label>
+           <input type="datetime-local" [(ngModel)]="formVal.offer_start_date" name="offer_start_date" class="input input-bordered w-full" />
+         </div>
+         <div class="form-control">
+           <label class="label font-semibold">Fin Oferta</label>
+           <input type="datetime-local" [(ngModel)]="formVal.offer_end_date" name="offer_end_date" class="input input-bordered w-full" />
+         </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Variantes -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <div class="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-2">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <i class="fas fa-layer-group text-cyan-500"></i> Variantes del Producto
+        </h3>
+        <button type="button" (click)="addVariant()" class="btn btn-sm btn-outline btn-primary">
+          <i class="fas fa-plus mr-1"></i> Agregar Variante
+        </button>
+      </div>
+
+      @if (formVal.variants.length === 0) {
+        <div class="text-center py-6 text-gray-500 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+          <i class="fas fa-info-circle text-2xl mb-2 text-gray-400"></i>
+          <p>Este producto no tiene variantes configuradas.</p>
+          <p class="text-sm">Se usará el inventario y precio general.</p>
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for (variant of formVal.variants; track variant.id; let i = $index) {
+            <div class="p-4 border rounded-xl bg-gray-50 dark:bg-gray-900/30 dark:border-gray-700 relative">
+              <button type="button" (click)="removeVariant(i)" class="btn btn-sm btn-circle btn-ghost text-error absolute top-2 right-2">
+                <i class="fas fa-times"></i>
+              </button>
+              
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pr-8">
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">Nombre Variante (ej: Rojo L)</label>
+                  <input type="text" [(ngModel)]="variant.name" [name]="'var_name_'+i" class="input input-bordered input-sm w-full" placeholder="Nombre..." />
+                </div>
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">SKU</label>
+                  <input type="text" [(ngModel)]="variant.sku" [name]="'var_sku_'+i" class="input input-bordered input-sm w-full font-mono uppercase" placeholder="SKU Variante" />
+                </div>
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">Precio (Opcional)</label>
+                  <input type="number" [(ngModel)]="variant.price" [name]="'var_price_'+i" class="input input-bordered input-sm w-full text-success" placeholder="Sobrescribe el base" />
+                </div>
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">Stock</label>
+                  <input type="number" [(ngModel)]="variant.stock" [name]="'var_stock_'+i" class="input input-bordered input-sm w-full font-mono" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Section 7: Media -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
       <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
         <i class="fas fa-images text-purple-500"></i> Galería Multimedia

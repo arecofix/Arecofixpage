@@ -17,11 +17,12 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { TranslationService } from '@app/core/services/translation.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { BranchService } from '@app/core/services/branch.service';
+import { ImgFallbackDirective } from '@app/shared/directives/img-fallback.directive';
 
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent, MetaValidationModalComponent],
+  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent, MetaValidationModalComponent, ImgFallbackDirective],
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

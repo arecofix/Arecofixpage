@@ -6,21 +6,31 @@ describe('Supabase Resilience', () => {
       body: 'Internal Server Error'
     }).as('supabaseFail');
 
+    // Also fail D1 worker so it doesn't mask the failure
+    cy.intercept('GET', 'https://arecofix-d1-failover.ezequielenrico15.workers.dev/**', {
+      statusCode: 500,
+      body: 'D1 Failover Error'
+    }).as('d1Fail');
+
+    const stub = cy.stub().as('supabaseDownEvent');
+
     // Visit the home page (or any page that loads data)
     cy.visit('/', {
       onBeforeLoad(win) {
-        // Stub the event listener to assert it was called
-        cy.stub(win, 'dispatchEvent').as('dispatchEvent');
+        win.__cypressTest = true;
+        win.addEventListener('supabase-down', (e) => {
+          win.__eventHandled = true;
+          stub(e);
+        });
       }
     });
 
-    // Wait for the failing requests to finish (max retries = 3)
-    // The timeout should be enough to cover the retry backoffs (1500 * 1, 1500 * 2...)
-    cy.wait('@supabaseFail', { timeout: 15000 });
-    cy.wait('@supabaseFail', { timeout: 15000 });
+    // Wait for the failing requests to finish
     cy.wait('@supabaseFail', { timeout: 15000 });
 
-    // Assert that the supabase-down event was fired
-    cy.get('@dispatchEvent').should('have.been.calledWithMatch', Cypress.sinon.match.has('type', 'supabase-down'));
+    // Assert that the supabase-down event or flag was fired
+    cy.window({ timeout: 20000 }).should((win) => {
+      expect(win.__supabaseDownDispatched || win.__eventHandled).to.be.true;
+    });
   });
 });

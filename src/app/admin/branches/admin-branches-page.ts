@@ -6,7 +6,10 @@ import {
   computed,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -30,6 +33,7 @@ export class AdminBranchesPage implements OnInit {
   public auth = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   branches = signal<Branch[]>([]);
   loading = signal(true);
@@ -110,8 +114,16 @@ export class AdminBranchesPage implements OnInit {
     }
   }
 
-  async ngOnInit() {
-    await this.loadBranches();
+  ngOnInit() {
+    this.auth.authState$
+      .pipe(
+        filter((state) => state.isInitialized),
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(async () => {
+        await this.loadBranches();
+      });
   }
 
   async loadBranches() {

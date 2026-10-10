@@ -14,11 +14,12 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { ImgFallbackDirective } from '@app/shared/directives/img-fallback.directive';
 
 @Component({
   selector: 'app-admin-brands-page',
   standalone: true,
-  imports: [RouterLink, Pagination],
+  imports: [RouterLink, Pagination, ImgFallbackDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-brands-page.html',
 })

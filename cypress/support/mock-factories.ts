@@ -63,6 +63,13 @@ export function buildMockTenant(overrides: Record<string, unknown> = {}) {
     // Must be 'localhost' so TenantService resolves correctly in Cypress
     custom_domain: 'localhost',
     is_active:     true,
+    features: {
+      hasProducts: true,
+      hasServices: true,
+      hasCourses: true,
+      hasRepairs: true,
+      hasBlog: true,
+    },
     ...overrides,
   };
 }

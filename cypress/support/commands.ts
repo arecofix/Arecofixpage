@@ -91,15 +91,9 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
   }).as('getProfile');
 
   // Intercept other basic things like branches/tenants that could fail in online mock mode
-  cy.intercept('GET', '**/rest/v1/tenants*', {
-    statusCode: 200,
-    body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }]
-  }).as('getTenants');
+  cy.intercept('GET', '**/rest/v1/tenants*', (req) => { const mock = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, features: { hasProducts: true, hasServices: true, hasCourses: true, hasRepairs: true, hasBlog: true } }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getTenants');
 
-  cy.intercept('GET', '**/rest/v1/branches*', {
-    statusCode: 200,
-    body: [{ id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5', name: 'Sede Central' }]
-  }).as('getBranches');
+  cy.intercept('GET', '**/rest/v1/branches*', (req) => { const mock = { id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5', name: 'Sede Central' }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getBranches');
 
   cy.intercept('GET', '**/auth/v1/user', {
     statusCode: 200,
@@ -333,20 +327,14 @@ Cypress.Commands.add('setupCheckoutSession', () => {
     });
   }).as('getProfile');
 
-  cy.intercept('GET', '**/rest/v1/tenants*', {
-    statusCode: 200,
-    body: [tenant]
-  }).as('getTenant');
+  cy.intercept('GET', '**/rest/v1/tenants*', (req) => { req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? tenant : [tenant] }); }).as('getTenant');
 
   cy.intercept('GET', '**/rest/v1/companies*', {
     statusCode: 200,
     body: [{ id: 'company-1', name: 'Arecofix' }]
   }).as('getCompany');
 
-  cy.intercept('GET', '**/rest/v1/branches*', {
-    statusCode: 200,
-    body: [branch]
-  }).as('getBranch');
+  cy.intercept('GET', '**/rest/v1/branches*', (req) => { req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? branch : [branch] }); }).as('getBranch');
 
   // Supabase auth user
   cy.intercept('GET', '**/auth/v1/user', {
@@ -428,10 +416,7 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
     req.reply({ statusCode: 200, body: wantsObject ? profile : [profile] });
   }).as('getProfile');
 
-  cy.intercept('GET', '**/rest/v1/tenants*', {
-    statusCode: 200,
-    body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }]
-  }).as('getTenants');
+  cy.intercept('GET', '**/rest/v1/tenants*', (req) => { const mock = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getTenants');
 
   cy.intercept('GET', '**/rest/v1/branches*', {
     statusCode: 200,
@@ -459,3 +444,5 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
     }
   });
 });
+
+

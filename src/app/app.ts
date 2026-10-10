@@ -1,3 +1,4 @@
+import { environment } from '@env/environment';
 import {
   Component,
   inject,
@@ -141,7 +142,7 @@ export class App implements OnInit {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch(`${environment.flaskApiUrl}/login`, {
         method: 'OPTIONS', // Fast preflight
         signal: controller.signal,
       });

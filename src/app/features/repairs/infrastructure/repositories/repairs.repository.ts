@@ -147,9 +147,9 @@ export class RepairsRepository {
           data: (data || []).map((r: any) => ({
             id: r.id,
             tracking_code: r.tracking_code,
-            customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : 'Cliente',
+            customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : '',
             device_brand: '', 
-            device_model: r.device?.model?.name || 'Equipo Genérico',
+            device_model: r.device?.model?.name || '',
             device_type: r.device?.type,
             current_status_id: r.current_status_id,
             created_at: r.created_at,
@@ -199,11 +199,11 @@ export class RepairsRepository {
         const r = data as any;
         return {
           ...r,
-          customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : 'Cliente',
+          customer_name: r.client ? `${r.client.first_name || ''} ${r.client.last_name || ''}`.trim() : '',
           customer_phone: r.client?.phone,
           device_type: r.device?.type,
           device_brand: '',
-          device_model: r.device?.model?.name || 'Equipo Genérico',
+          device_model: r.device?.model?.name || '',
           imei: r.device?.imei,
           device_passcode: r.device?.passcode
         } as RepairDetailDto | null;

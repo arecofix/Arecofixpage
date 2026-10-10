@@ -15,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
 import { TenantService } from './tenant.service';
+import { PermissionService } from './permission.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
@@ -34,6 +35,7 @@ export class AuthService {
   private tenantService = inject(TenantService);
   private ngZone = inject(NgZone);
   private injector = inject(Injector);
+  private permissionService = inject(PermissionService);
   
   // Súper Administrador Global
   public isSuperAdmin = signal<boolean>(false);
@@ -138,14 +140,15 @@ export class AuthService {
           }
         }
 
-        if (profile) {
-           this.authState.next({ session, user: session.user, profile, isInitialized: true });
-        } else {
-           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
-        }
-
         if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
           this.isSuperAdmin.set(true);
+        }
+
+        if (profile) {
+           this.authState.next({ session, user: session.user, profile, isInitialized: true });
+           await this.permissionService.loadPermissions();
+        } else {
+           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
         }
       } else {
         this.authState.next({ ...this.authState.value, isInitialized: true });
@@ -168,6 +171,7 @@ export class AuthService {
            this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
            this.isSuperAdmin.set(false);
            this.currentBranchSubject.next(null);
+           this.permissionService.clear();
            return;
         }
 
@@ -195,6 +199,7 @@ export class AuthService {
 
           if (profile) {
             this.authState.next({ session, user: session.user, profile, isInitialized: true });
+            await this.permissionService.loadPermissions();
           } else {
             // Keep existing profile if we failed to fetch
             this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
@@ -503,7 +508,7 @@ export class AuthService {
         
         let response;
         try {
-          response = await fetch('http://localhost:5000/api/login', {
+          response = await fetch(`${environment.flaskApiUrl}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: email, password: password }),

@@ -9,6 +9,7 @@ import { BranchContextService } from '@app/core/services/branch-context.service'
 import { BranchService } from '@app/core/services/branch.service';
 import { WhatsappService } from '@app/core/services/whatsapp.service';
 import { RepairWorkflowService } from './repair-workflow.service';
+import { ICustomerDeviceRepository } from '@app/features/devices/domain/repositories/customer-device.repository';
 import { of } from 'rxjs';
 
 describe('AdminRepairService', () => {
@@ -50,7 +51,8 @@ describe('AdminRepairService', () => {
                 { provide: BranchContextService, useValue: mockBranchContextService },
                 { provide: BranchService, useValue: mockBranchService },
                 { provide: WhatsappService, useValue: {} },
-                { provide: RepairWorkflowService, useValue: {} }
+                { provide: RepairWorkflowService, useValue: {} },
+                { provide: ICustomerDeviceRepository, useValue: {} }
             ]
         });
 

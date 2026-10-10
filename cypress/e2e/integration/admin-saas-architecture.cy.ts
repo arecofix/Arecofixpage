@@ -11,6 +11,8 @@ describe('SaaS Architecture Audit: Tenant Isolation and Plan Security', () => {
           id: 'mock-admin-id',
           email: 'admin@arecofix.com',
           role: 'admin', // Clave para probar los Planes
+          tenant_id: MOCK_TENANT_ID,
+          branch_id: 'branch-isolation-1',
           first_name: 'Admin',
           last_name: 'Test',
           is_active: true
@@ -41,16 +43,15 @@ describe('SaaS Architecture Audit: Tenant Isolation and Plan Security', () => {
 
     cy.intercept('GET', '**/auth/v1/user', { statusCode: 200, body: session.user });
     
-    // Set custom session
-    cy.visit('/', { 
-      failOnStatusCode: false,
-      onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-        win.localStorage.setItem('supabase-remember-me', 'true');
-        win.localStorage.setItem('arecofix_current_branch_id', 'branch-isolation-1');
-        win.localStorage.setItem('arecofix_admin_branch_id', 'branch-isolation-1');
-      }
+    // Set custom session before any page loads without extra cy.visit('/')
+    cy.on('window:before:load', (win) => {
+      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+      win.localStorage.setItem('supabase-remember-me', 'true');
+      win.localStorage.setItem('cypress-test', 'true');
+      win.localStorage.setItem('arecofix_tenant_id', MOCK_TENANT_ID);
+      win.localStorage.setItem('arecofix_current_branch_id', 'branch-isolation-1');
+      win.localStorage.setItem('arecofix_admin_branch_id', 'branch-isolation-1');
     });
   });
 

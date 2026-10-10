@@ -41,7 +41,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     stock: 0,
     brand_id: '',
     category_id: '',
-    is_active: true,
+    is_active: true, is_featured: false,
     is_global: true,
     branch_id: '',
     model_id: '',
@@ -52,6 +52,26 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     meta_description: '',
     og_image: '',
     ml_category_id: '',
+    
+    // Marketing & Logistics
+    offer_start_date: '',
+    offer_end_date: '',
+    warranty_days: 0,
+    tax_percentage: 21,
+    weight: 0,
+    dimensions: { length: 0, width: 0, height: 0 },
+    seo_keywords: '',
+    sale_price: 0,
+    reference_exchange_rate: 0,
+    free_shipping: false,
+    supplier_id: '',
+    condition: 'Nuevo',
+    warranty_type: 'Sin garantía',
+    includes_tax: true,
+    tags: '',
+    
+    // Variants
+    variants: [] as any[],
   };
 
   // Resources
@@ -98,7 +118,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             stock: data.stock || 0,
             brand_id: data.brand_id || '',
             category_id: data.category_id || '',
-            is_active: data.is_active ?? true,
+            is_active: data.is_active ?? true, is_featured: data.is_featured ?? false,
             is_global: data.is_global ?? true,
             branch_id: data.branch_id || '',
             model_id: data.model_id || '',
@@ -111,6 +131,22 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             meta_description: data.meta_description || '',
             og_image: data.og_image || '',
             ml_category_id: data.ml_category_id || '',
+            offer_start_date: data.offer_start_date || '',
+            offer_end_date: data.offer_end_date || '',
+            warranty_days: data.warranty_days || 0,
+            tax_percentage: data.tax_percentage || 21,
+            weight: data.weight || 0,
+            dimensions: data.dimensions || { length: 0, width: 0, height: 0 },
+            seo_keywords: data.seo_keywords || '',
+            sale_price: data.sale_price || 0,
+            reference_exchange_rate: data.reference_exchange_rate || 0,
+            free_shipping: data.free_shipping || false,
+            supplier_id: data.supplier_id || '',
+            condition: data.condition || 'Nuevo',
+            warranty_type: data.warranty_type || 'Sin garantía',
+            includes_tax: data.includes_tax ?? true,
+            tags: data.tags ? data.tags.join(', ') : '',
+            variants: data.variants ? [...data.variants] : [],
           };
         }
       } else {
@@ -158,6 +194,25 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     }
   }
 
+  addVariant() {
+    this.formVal.variants.push({
+      id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: '',
+      sku: '',
+      barcode: '',
+      price: null,
+      stock: 0,
+      attributes: {},
+      is_active: true
+    });
+    this.cdr.markForCheck();
+  }
+
+  removeVariant(index: number) {
+    this.formVal.variants.splice(index, 1);
+    this.cdr.markForCheck();
+  }
+
   async save() {
     this.saving.set(true);
     this.error.set(null);
@@ -186,7 +241,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       stock: formVal.stock,
       brand_id: formVal.brand_id || null,
       category_id: formVal.category_id || null,
-      is_active: formVal.is_active,
+      is_active: formVal.is_active, is_featured: formVal.is_featured,
       is_global: formVal.is_global,
       branch_id: formVal.branch_id || null,
       model_id: formVal.model_id || null,
@@ -197,6 +252,26 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       meta_description: formVal.meta_description?.trim() || (formVal.description ? formVal.description.substring(0, 160).trim() : null),
       og_image: formVal.og_image?.trim() || (formVal.images.length > 0 ? formVal.images[0].url : null),
       ml_category_id: formVal.ml_category_id || null,
+      
+      // Marketing & Logistics
+      offer_start_date: formVal.offer_start_date || null,
+      offer_end_date: formVal.offer_end_date || null,
+      warranty_days: formVal.warranty_days || 0,
+      tax_percentage: formVal.tax_percentage || 21,
+      weight: formVal.weight || 0,
+      dimensions: formVal.dimensions || { length: 0, width: 0, height: 0 },
+      seo_keywords: formVal.seo_keywords || null,
+      sale_price: formVal.sale_price || null,
+      reference_exchange_rate: formVal.reference_exchange_rate || null,
+      free_shipping: formVal.free_shipping,
+      supplier_id: formVal.supplier_id || null,
+      condition: formVal.condition || 'Nuevo',
+      warranty_type: formVal.warranty_type || 'Sin garantía',
+      includes_tax: formVal.includes_tax,
+      tags: formVal.tags ? formVal.tags.split(',').map(t => t.trim()).filter(t => t) : [],
+      
+      // Variants
+      variants: formVal.variants
     };
 
     // Add optional fields only if they have values
@@ -248,3 +323,4 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     }
   }
 }
+

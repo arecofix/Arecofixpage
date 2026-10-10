@@ -5,12 +5,14 @@ import { map } from 'rxjs/operators';
 import { CategoryRepository } from '../../domain/repositories/category.repository';
 import { Category } from '../../domain/entities/category.entity';
 
+import { environment } from '@env/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class FlaskCategoryRepository implements CategoryRepository {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:5000/api/categorias';
+    private apiUrl = `${environment.flaskApiUrl}/categorias`;
 
     getPaginated(page: number, limit: number, options?: { column?: string; ascending?: boolean; select?: string }): Observable<{ data: Category[]; total: number }> {
         return this.http.get<{ data: Category[]; total: number }>(this.apiUrl).pipe(

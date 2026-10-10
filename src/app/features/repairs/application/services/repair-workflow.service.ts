@@ -3,6 +3,7 @@ import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { StockManagementService } from '@app/features/products/application/services/stock-management.service';
 import { TenantService } from '@app/core/services/tenant.service';
 import { FinanceService } from '@app/features/finance/application/services/finance.service';
+import { WhatsappService } from '@app/core/services/whatsapp.service';
 import { CreateRepairDto, RepairPart, RepairStatus } from '../../domain/entities/repair.entity';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,6 +20,7 @@ export class RepairWorkflowService {
   private stockService = inject(StockManagementService);
   private tenantService = inject(TenantService);
   private financeService = inject(FinanceService);
+  private whatsappService = inject(WhatsappService);
 
   /**
    * Ejecuta el flujo completo de "Guardar Ficha" como un caso de uso (UseCase)
@@ -53,6 +55,22 @@ export class RepairWorkflowService {
     // 4. Finanzas (Seña inicial)
     if (depositAmount > 0) {
         await this.registerDepositMovement(savedRepair.id, currentBranchId, depositAmount, savedRepair.tracking_code);
+    }
+
+    // 5. WhatsApp Automático (Ingreso)
+    if (savedRepair.customer_phone && savedRepair.whatsapp_notifications !== false) {
+        this.whatsappService.sendTemplateMessage(savedRepair.customer_phone, 'repair_received', 'es_AR', [
+            {
+                type: 'body',
+                parameters: [
+                    { type: 'text', text: savedRepair.customer_name || 'Cliente' },
+                    { type: 'text', text: savedRepair.device_model || 'Equipo' },
+                    { type: 'text', text: savedRepair.tracking_code }
+                ]
+            }
+        ]).subscribe({
+            error: (err) => console.error('Error sending WhatsApp repair_received:', err)
+        });
     }
 
     return savedRepair;
@@ -93,6 +111,35 @@ export class RepairWorkflowService {
                 balance, 
                 `Saldo final cobrado al entregar equipo #${original.tracking_code || id.substring(0,8)}`
             );
+        }
+    }
+
+    // 4. WhatsApp Automático (Cambio de Estado)
+    if (newStatus !== oldStatus && original.customer_phone && original.whatsapp_notifications !== false) {
+        if (newStatus === 2) { // 2 = SUPPLY_MANAGEMENT (Presupuestado / Esperando Repuesto)
+            const estimatedCost = dto.estimated_cost ?? original.estimated_cost ?? 0;
+            if (estimatedCost > 0) {
+                this.whatsappService.sendTemplateMessage(original.customer_phone, 'quote_ready', 'es_AR', [
+                    {
+                        type: 'body',
+                        parameters: [
+                            { type: 'text', text: original.customer_name || 'Cliente' },
+                            { type: 'text', text: original.device_model || 'Equipo' },
+                            { type: 'text', text: `$${estimatedCost}` }
+                        ]
+                    }
+                ]).subscribe({ error: e => console.error(e) });
+            }
+        } else if (newStatus === 5) { // 5 = READY_FOR_PICKUP (Terminado)
+            this.whatsappService.sendTemplateMessage(original.customer_phone, 'repair_finished', 'es_AR', [
+                {
+                    type: 'body',
+                    parameters: [
+                        { type: 'text', text: original.customer_name || 'Cliente' },
+                        { type: 'text', text: original.device_model || 'Equipo' }
+                    ]
+                }
+            ]).subscribe({ error: e => console.error(e) });
         }
     }
   }

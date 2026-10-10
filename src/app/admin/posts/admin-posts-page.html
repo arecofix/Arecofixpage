@@ -93,6 +93,7 @@
                                 <div class="h-10 w-10 shrink-0">
                                     @if (post.image) {
                                     <img class="h-10 w-10 rounded-lg object-cover" [src]="post.image"
+                                        appFallback="/assets/img/no-image.svg"
                                         [alt]="post.title">
                                     } @else {
                                     <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">

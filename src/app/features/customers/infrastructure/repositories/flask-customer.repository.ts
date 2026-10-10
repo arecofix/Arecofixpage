@@ -5,12 +5,14 @@ import { map } from 'rxjs/operators';
 import { CustomerRepository } from '../../domain/repositories/customer.repository';
 import { UserProfile } from '@app/features/authentication/domain/entities/user.entity';
 
+import { environment } from '@env/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class FlaskCustomerRepository implements CustomerRepository {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:5000/api/clientes';
+    private apiUrl = `${environment.flaskApiUrl}/clientes`;
 
     getAll(): Observable<UserProfile[]> {
         return this.http.get<{ data: UserProfile[]; total: number }>(this.apiUrl).pipe(

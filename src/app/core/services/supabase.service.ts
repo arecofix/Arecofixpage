@@ -21,7 +21,6 @@ export class SupabaseService {
     const authBaseUrl = environment.supabaseUrl;
 
     // Expose cache clearing hook for Cypress E2E tests
-    // This allows test cleanup between test runs without full page reloads
     if (typeof window !== 'undefined') {
       (window as any).__clearSupabaseCache = () => {
         this.cacheMap.clear();
@@ -49,7 +48,7 @@ export class SupabaseService {
 
         const method = (options?.method || 'GET').toUpperCase();
       const isCacheable = method === 'GET' && targetUrl.toString().includes('/rest/v1/');
-      const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && targetUrl.toString().includes('/rest/v1/') && !targetUrl.toString().includes('/rpc/');
+      const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && (targetUrl.toString().includes('/rest/v1/') || targetUrl.toString().includes('/rpc/'));
       
       // Fast in-memory cache check for GET requests
       const CACHE_TTL = 60000;
@@ -208,8 +207,9 @@ export class SupabaseService {
           clearTimeout(timeoutId);
           lastError = error;
           console.warn(`[SupabaseService] ${method} ${url} fetch failed (attempt ${i + 1}/${MAX_RETRIES}):`, (error as Error).message);
-          if (i === MAX_RETRIES - 1) throw error;
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
+          if (i < MAX_RETRIES - 1) {
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
+          }
         }
       }
       
@@ -286,6 +286,7 @@ export class SupabaseService {
       
       // Dispatch custom event so the UI can show a friendly offline/error banner
       if (typeof window !== 'undefined') {
+         (window as any).__supabaseDownDispatched = true;
          window.dispatchEvent(new CustomEvent('supabase-down', { detail: lastError }));
       }
       
@@ -447,6 +448,21 @@ export class SupabaseService {
     this.logger.info('[SupabaseCache] Manually clearing cache.');
     this.cacheMap.clear();
     await this.syncService.clearCache();
+  }
+
+  /**
+   * Invalida todas las entradas de caché de una tabla específica.
+   * Útil tras mutaciones directas al cliente Supabase (sin pasar por customFetch).
+   */
+  clearCacheForTable(tableName: string): void {
+    let cleared = 0;
+    for (const key of this.cacheMap.keys()) {
+      if (key.includes(`/rest/v1/${tableName}`)) {
+        this.cacheMap.delete(key);
+        cleared++;
+      }
+    }
+    this.logger.info(`[SupabaseCache] Cleared ${cleared} cache entries for table: ${tableName}`);
   }
 
   async testConnection(): Promise<boolean> {
