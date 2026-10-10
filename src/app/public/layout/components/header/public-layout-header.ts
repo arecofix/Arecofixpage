@@ -34,6 +34,7 @@ import { map, switchMap, catchError, filter } from 'rxjs/operators';
 import { Subscription, firstValueFrom, of } from 'rxjs';
 
 import { NavigationStateService } from '@app/core/services/navigation-state.service';
+import { HasPermissionDirective } from '@app/shared/directives/has-permission.directive';
 
 @Component({
   selector: 'public-layout-header',
@@ -46,6 +47,7 @@ import { NavigationStateService } from '@app/core/services/navigation-state.serv
     ThemeToggleComponent,
     AutoFocusDirective,
     NgOptimizedImage,
+    HasPermissionDirective,
   ],
   templateUrl: './public-layout-header.html',
   styles: `

@@ -21,6 +21,8 @@ import { UserProfileRepository } from '@app/core/repositories/user-profile.repos
 import { ProductsParams, ProductsResponse } from '@app/shared/interfaces/product.interface';
 import { ProductsStore } from '@app/features/products/application/services/products.store';
 import { StockManagementService } from '@app/features/products/application/services/stock-management.service';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { ProductVariant } from '@app/features/products/domain/entities/product.entity';
 
 // Extracted to AdminProductImportService
 
@@ -41,6 +43,23 @@ export class AdminProductService {
     private userProfileRepo = inject(UserProfileRepository);
     private productsStore = inject(ProductsStore);
     private stockService = inject(StockManagementService);
+    private supabase = inject(SUPABASE_CLIENT);
+
+    async saveVariants(productId: string, variants: Partial<ProductVariant>[]): Promise<void> {
+        if (!variants || variants.length === 0) return;
+        const tenantId = this.tenantService.getTenantId();
+        
+        const cleanData = variants.map(v => {
+            const copy: any = { ...v, product_id: productId, tenant_id: tenantId, updated_at: new Date().toISOString() };
+            if (copy.id && copy.id.startsWith('temp-')) {
+                delete copy.id;
+            }
+            return copy;
+        });
+
+        const { error } = await this.supabase.from('product_variants').upsert(cleanData, { onConflict: 'id' });
+        if (error) throw error;
+    }
 
     async getProducts(): Promise<Product[]> {
         const user = this.auth.getCurrentUser();
@@ -134,8 +153,11 @@ export class AdminProductService {
     async createProduct(payload: Partial<Product>): Promise<void> {
         const user = this.auth.getCurrentUser();
         
-        // Extract stock and branch_id
+        // Extract variants and stock
         const initialStock = payload.stock;
+        const variants = payload.variants || [];
+        delete payload.variants;
+
         let branchId = payload.branch_id || this.branchContextService.getBranchId() || 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
         
         // 🐛 BUGFIX: Anteriormente se eliminaba el branch_id aquí. Ahora lo asignamos
@@ -177,12 +199,19 @@ export class AdminProductService {
             await this.stockService.updateStock(createdProduct.id, branchId, initialStock);
         }
         
+        if (createdProduct && createdProduct.id && variants.length > 0) {
+            await this.saveVariants(createdProduct.id, variants);
+        }
+        
         this.productsStore.clearCache();
     }
 
     async updateProduct(id: string, payload: Partial<Product>): Promise<void> {
-        // Extract stock and branch_id
+        // Extract variants, stock and branch_id
         const initialStock = payload.stock;
+        const variants = payload.variants || [];
+        delete payload.variants;
+
         const branchId = payload.branch_id || this.branchContextService.getBranchId() || 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
         
         // 🐛 BUGFIX: Mantener el branch_id para no perder la asignación del producto.
@@ -192,6 +221,10 @@ export class AdminProductService {
 
         if (branchId && initialStock !== undefined) {
             await this.stockService.updateStock(id, branchId, initialStock);
+        }
+
+        if (variants.length > 0) {
+            await this.saveVariants(id, variants);
         }
 
         this.productsStore.clearCache();

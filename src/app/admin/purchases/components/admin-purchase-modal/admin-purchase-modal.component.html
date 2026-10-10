@@ -1,0 +1,193 @@
+<dialog class="modal modal-open bg-gray-900/40 backdrop-blur-sm z-[100]" (click)="closeModal()">
+  <div class="modal-box max-w-4xl w-full p-0 bg-gray-50 dark:bg-[#0f172a] rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 dark:border-gray-800" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="px-8 py-6 bg-white dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 z-10 backdrop-blur-lg">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+          <i class="fas fa-file-invoice text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Registrar Compra</h2>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">Ingresa los datos de la factura o remito del proveedor</p>
+        </div>
+      </div>
+      <button class="btn btn-circle btn-ghost btn-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" (click)="closeModal()">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-8 overflow-y-auto max-h-[calc(100vh-12rem)] space-y-8">
+      
+      <!-- Section: Datos de la Factura / Remito -->
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <i class="fas fa-file-invoice-dollar text-emerald-500"></i>
+          <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Datos de la Factura / Remito</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Proveedor -->
+          <div class="form-control">
+            <div class="flex justify-between items-center mb-1">
+              <label class="label p-0">
+                <span class="label-text font-bold text-gray-600 dark:text-gray-400">Proveedor</span>
+              </label>
+              <a href="/admin/suppliers/new" target="_blank" class="text-[10px] font-bold text-emerald-500 hover:text-emerald-600 flex items-center gap-1 transition-colors">
+                <i class="fas fa-plus"></i> Nuevo
+              </a>
+            </div>
+            <div class="relative">
+              <i class="fas fa-truck absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <select [(ngModel)]="formData.proveedor" class="select select-bordered w-full bg-white dark:bg-gray-800/80 pl-11 rounded-xl shadow-sm border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="" disabled selected>Seleccione proveedor</option>
+                @for (supplier of suppliers(); track supplier.id) {
+                  <option [value]="supplier.id">{{ supplier.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Sucursal (Destino) -->
+          <div class="form-control">
+            <label class="label p-0 mb-1">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400">Sucursal (Destino)</span>
+            </label>
+            <div class="relative">
+              <i class="fas fa-store absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <select [(ngModel)]="formData.sucursal" class="select select-bordered w-full bg-white dark:bg-gray-800/80 pl-11 rounded-xl shadow-sm border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="" disabled selected>Seleccione sucursal</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [value]="branch.id">{{ branch.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Fecha Carga -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400">Fecha Carga</span>
+            </label>
+            <div class="relative">
+              <i class="far fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="date" [(ngModel)]="formData.fechaCarga" class="input input-bordered w-full bg-white dark:bg-gray-800/80 pl-11 rounded-xl shadow-sm border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500 text-gray-700 dark:text-gray-300 font-medium" />
+            </div>
+          </div>
+
+          <!-- Estado -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400">Estado</span>
+            </label>
+            <div class="relative">
+              <i class="fas fa-info-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <select [(ngModel)]="formData.estado" class="select select-bordered w-full bg-white dark:bg-gray-800/80 pl-11 rounded-xl shadow-sm border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="pendiente">Pendiente</option>
+                <option value="recibido">Recibido</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Método de Pago -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400">Método de Pago</span>
+            </label>
+            <div class="relative">
+              <i class="fas fa-wallet absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <select [(ngModel)]="formData.metodoPago" class="select select-bordered w-full bg-white dark:bg-gray-800/80 pl-11 rounded-xl shadow-sm border-gray-200 dark:border-gray-700 focus:border-emerald-500 focus:ring-emerald-500">
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="tarjeta">Tarjeta</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Detalle de Artículos -->
+      <section class="bg-white dark:bg-gray-800/30 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-box-open text-blue-500"></i>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Detalle de Artículos</h3>
+          </div>
+          <div class="w-full md:w-96 relative">
+            <i class="fas fa-search md:fa-barcode absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" [(ngModel)]="formData.searchQuery" placeholder="Escanear o buscar producto por código o nombre..." class="input input-bordered w-full bg-gray-50 dark:bg-gray-900/50 pl-11 pr-4 rounded-xl shadow-inner border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500 text-sm font-medium transition-all" />
+            
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+               <button class="btn btn-sm btn-circle btn-ghost text-gray-400 hover:text-emerald-500" title="Activar Escáner">
+                  <i class="fas fa-camera"></i>
+               </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div class="bg-gray-50/50 dark:bg-gray-900/20 border-2 border-dashed border-gray-200 dark:border-gray-700/50 rounded-2xl p-12 flex flex-col items-center justify-center text-center transition-all hover:bg-gray-50 dark:hover:bg-gray-800/40">
+          <div class="w-20 h-20 rounded-full bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center mb-4 text-gray-300 dark:text-gray-600">
+            <i class="fas fa-barcode text-3xl"></i>
+          </div>
+          <h4 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Escanea o busca los repuestos para listarlos aquí</h4>
+          <p class="text-sm text-gray-500">Los artículos agregados aparecerán en este panel para definir su cantidad y costo.</p>
+        </div>
+      </section>
+
+      <!-- Section: Resumen Inversión -->
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <i class="fas fa-chart-pie text-purple-500"></i>
+          <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Resumen Inversión</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white dark:bg-gray-800/60 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Artículos Mapeados</p>
+              <h4 class="text-2xl font-black text-gray-800 dark:text-gray-100">{{ totalItems }}</h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500">
+              <i class="fas fa-boxes"></i>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800/60 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Costo Pre-Impuestos</p>
+              <h4 class="text-2xl font-black text-gray-800 dark:text-gray-100">$ {{ preTaxCost }}</h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center text-orange-500">
+              <i class="fas fa-calculator"></i>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-br from-emerald-500 to-green-600 p-5 rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center justify-between text-white border border-emerald-400/30">
+            <div>
+              <p class="text-xs font-bold text-emerald-100 uppercase tracking-widest mb-1">Total de la Orden</p>
+              <h4 class="text-3xl font-black">$ {{ totalAmount }}</h4>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+              <i class="fas fa-dollar-sign text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="px-8 py-5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3 rounded-b-3xl">
+      <button type="button" class="btn btn-ghost text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-xl" (click)="closeModal()">
+        Cancelar
+      </button>
+      <button type="button" class="btn bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white border-none rounded-xl shadow-lg shadow-emerald-500/30 px-8">
+        <i class="fas fa-save mr-2"></i> Registrar Compra
+      </button>
+    </div>
+    
+  </div>
+</dialog>

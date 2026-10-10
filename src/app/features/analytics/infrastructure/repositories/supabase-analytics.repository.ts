@@ -156,7 +156,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
 
         let partsQuery = this.supabase
             .from('repairs')
-            .select(`created_at, current_status_id, final_cost, completed_at, repair_parts_used(quantity, cost_at_time, unit_price_at_time)`)
+            .select(`created_at, current_status_id, final_cost, estimated_cost, completed_at, repair_parts_used(quantity, cost_at_time, unit_price_at_time)`)
             .eq('tenant_id', tenantId);
         if (branchId) partsQuery = partsQuery.eq('branch_id', branchId);
 
@@ -180,7 +180,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
                     const revDate = repair.completed_at || repair.created_at || new Date().toISOString();
                     const date = new Date(revDate);
                     const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                    const rev = Number(repair.final_cost || 0);
+                    const rev = Number(repair.final_cost || repair.estimated_cost || 0);
                     result.repairsRevenueTotal += rev;
                     result.repairsRevenueByMonth.set(period, (result.repairsRevenueByMonth.get(period) || 0) + rev);
                 }

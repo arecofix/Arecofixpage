@@ -7,6 +7,22 @@ export interface ProductStockPerBranch {
     updated_at: string;
 }
 
+export interface ProductVariant {
+    id: string;
+    product_id: string;
+    tenant_id?: string;
+    name: string;
+    sku?: string;
+    barcode?: string;
+    price?: number;
+    stock: number;
+    attributes: Record<string, any>;
+    is_active: boolean;
+    image_url?: string;
+    created_at: string;
+    updated_at: string;
+}
+
 /**
  * Product Entity
  * Represents a product in the catalog
@@ -46,6 +62,24 @@ export interface Product {
     meta_title?: string;
     meta_description?: string;
     og_image?: string;
+    seo_keywords?: string;
+    
+    // Marketing & Logistics
+    offer_start_date?: string; // fecha_inicio_oferta
+    offer_end_date?: string; // fecha_fin_oferta
+    warranty_days?: number; // garantia_meses
+    tax_percentage?: number; // porcentaje_impuesto
+    weight?: number; // peso_kg
+    dimensions?: { length: number; width: number; height: number }; // largo_cm, ancho_cm, alto_cm
+    cross_sell_products?: string[]; // productos_relacionados
+    reference_exchange_rate?: number; // tasa_cambio_referencia
+    free_shipping?: boolean; // envio_gratis
+    supplier_id?: string; // proveedor_id
+    condition?: 'Nuevo' | 'Usado' | 'Reacondicionado'; // condicion
+    warranty_type?: 'Fábrica' | 'Vendedor' | 'Sin garantía'; // tipo_garantia
+    includes_tax?: boolean; // incluye_iva
+    tags?: string[]; // etiquetas_tags
+
     // Mercado Libre integration
     ml_item_id?: string;
     ml_sync_status?: 'pending' | 'synced' | 'error';
@@ -58,6 +92,7 @@ export interface Product {
     // Relations
     branch_stock?: ProductStockPerBranch[];
     branches?: { name: string };
+    variants?: ProductVariant[];
 }
 
 /**
@@ -86,7 +121,26 @@ export interface CreateProductDto {
     meta_title?: string;
     meta_description?: string;
     og_image?: string;
+    seo_keywords?: string;
+    
+    offer_start_date?: string;
+    offer_end_date?: string;
+    warranty_days?: number;
+    tax_percentage?: number;
+    weight?: number;
+    dimensions?: { length: number; width: number; height: number };
+    cross_sell_products?: string[];
+    reference_exchange_rate?: number;
+    free_shipping?: boolean;
+    supplier_id?: string;
+    condition?: 'Nuevo' | 'Usado' | 'Reacondicionado';
+    warranty_type?: 'Fábrica' | 'Vendedor' | 'Sin garantía';
+    includes_tax?: boolean;
+    tags?: string[];
+    
     ml_category_id?: string;
+    
+    variants?: Partial<ProductVariant>[];
 }
 
 /**

@@ -11,6 +11,7 @@ import { Branch } from '@app/shared/interfaces/branch.interface';
 export type { Branch };
 
 import { BranchContextService } from './branch-context.service';
+import { SupabaseService } from './supabase.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class BranchService {
   private tenantService = inject(TenantService);
   private branchRepo = inject(BranchRepository);
   private supabase = inject(SUPABASE_CLIENT);
+  private supabaseService = inject(SupabaseService);
   private logger = inject(LoggerService);
   private branchContextService = inject(BranchContextService);
   
@@ -214,7 +216,7 @@ export class BranchService {
 
   // --- ADMIN SETTINGS METHODS ---
 
-  async getAllAdminBranches(): Promise<Branch[]> {
+  async getAllAdminBranches(includeInactive = false): Promise<Branch[]> {
     if (!this.auth.isSuperAdmin()) {
       // Non-superadmins only see their own branch
       const branchId = this.getCurrentBranchId() || this.auth.getCurrentProfile()?.branch_id;
@@ -229,15 +231,21 @@ export class BranchService {
       return [];
     }
     // SuperAdmin: fetch ALL branches across ALL tenants without tenant_id filter
-    const { data, error } = await this.supabase
+    let query = this.supabase
       .from('branches')
       .select('*')
       .order('name', { ascending: true });
+
+    if (!includeInactive) {
+      query = query.eq('is_active', true);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return (data as Branch[]) || [];
   }
 
-  async getPaginatedAdminBranches(page: number, limit: number): Promise<{ data: Branch[], total: number }> {
+  async getPaginatedAdminBranches(page: number, limit: number, includeInactive = false): Promise<{ data: Branch[], total: number }> {
     if (!this.auth.isSuperAdmin()) {
       // Non-superadmins only see their own branch
       const branches = await this.getAllAdminBranches();
@@ -247,12 +255,17 @@ export class BranchService {
     const start = (page - 1) * limit;
     const end = start + limit - 1;
 
-    const { data, count, error } = await this.supabase
+    let query = this.supabase
       .from('branches')
       .select('*', { count: 'exact' })
       .order('name', { ascending: true })
       .range(start, end);
+
+    if (!includeInactive) {
+      query = query.eq('is_active', true);
+    }
       
+    const { data, count, error } = await query;
     if (error) throw error;
     return { data: (data as Branch[]) || [], total: count || 0 };
   }
@@ -308,14 +321,41 @@ export class BranchService {
   }
 
   async deleteBranch(id: string): Promise<void> {
-    // Soft delete to maintain foreign key integrity (profiles, orders, etc.)
-    await firstValueFrom(this.branchRepo.update(id, { 
-      is_active: false
-    } as any));
+    // Soft delete: desactiva la sucursal manteniendo la integridad referencial.
+    const { error } = await this.supabase
+      .from('branches')
+      .update({ is_active: false })
+      .eq('id', id);
+
+    if (error) {
+      this.logger.error('[BranchService] Error al desactivar sucursal', error);
+      throw new Error(error.message || 'No se pudo desactivar la sucursal.');
+    }
+
+    // Invalida el caché del SupabaseService para la tabla branches
+    this.supabaseService.clearCacheForTable('branches');
+    // Limpia el caché local en memoria por slug
+    this.branchCache.clear();
+    // Si la sucursal borrada era la activa, la desestablece
+    if (this._currentBranch()?.id === id) {
+      this.setCurrentBranch(null);
+    }
   }
 
   async toggleBranchStatus(branch: Branch): Promise<void> {
-    await firstValueFrom(this.branchRepo.update(branch.id, { is_active: !branch.is_active }));
+    const { error } = await this.supabase
+      .from('branches')
+      .update({ is_active: !branch.is_active })
+      .eq('id', branch.id);
+
+    if (error) {
+      this.logger.error('[BranchService] Error al cambiar estado de sucursal', error);
+      throw new Error(error.message || 'No se pudo cambiar el estado de la sucursal.');
+    }
+
+    // Invalida el caché del SupabaseService para la tabla branches
+    this.supabaseService.clearCacheForTable('branches');
+    this.branchCache.clear();
   }
 
   async uploadLogo(file: File): Promise<string> {

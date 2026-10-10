@@ -95,6 +95,7 @@ export interface RepairChecklist {
     chip: boolean;
     sd: boolean;
     case: boolean;
+    physical_condition?: string;
 }
 
 /**

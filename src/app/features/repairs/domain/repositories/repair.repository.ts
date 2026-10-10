@@ -3,9 +3,10 @@ import { Repair, CreateRepairDto, UpdateRepairDto } from '../entities/repair.ent
 
 export abstract class RepairRepository {
     abstract getById(id: string): Observable<Repair | null>;
-    abstract getAll(limit?: number, offset?: number): Observable<Repair[]>;
+    abstract getAll(options?: { column?: string; ascending?: boolean; select?: string }): Observable<Repair[]>;
+    abstract getRepairs(limit?: number, offset?: number, branchId?: string): Observable<Repair[]>;
     abstract create(repair: CreateRepairDto): Observable<Repair>;
-    abstract update(id: string, repair: UpdateRepairDto): Observable<void>;
+    abstract update(id: string, repair: Partial<Repair>): Observable<Repair>;
     abstract delete(id: string): Observable<void>;
     abstract getByTrackingCode(code: string): Observable<Repair | null>;
     abstract uploadImage(file: File): Promise<string>;

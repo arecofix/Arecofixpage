@@ -423,13 +423,13 @@
               <i class="fas fa-graduation-cap"></i> Mi Academia
             </a>
           </li>
-          @if (activeUser?.role === 'super_admin' || activeUser?.role === 'admin') {
+          <ng-container *hasPermission="['admin.panel:access:branch', 'admin.panel:access:global']">
             <li>
               <a routerLink="/admin/dashboard" class="rounded-xl hover:bg-blue-50 dark:hover:bg-white/5 cursor-pointer">
                 <i class="fas fa-shield-alt"></i> Panel Admin
               </a>
             </li>
-          }
+          </ng-container>
           <li>
             <button (click)="logout()" class="rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500">
               <i class="fas fa-sign-out-alt"></i> Cerrar Sesión

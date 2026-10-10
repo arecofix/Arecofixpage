@@ -4,6 +4,7 @@ import { roleGuard } from '@app/guards/role.guard';
 import { tenantStatusGuard } from '@app/guards/tenant-status.guard';
 import { moduleGuard } from '@app/guards/module.guard';
 import { tenantOwnerGuard } from '@app/guards/tenant-owner.guard';
+import { permissionGuard } from '@app/core/guards/permission.guard';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const adminRoutes: Routes = [
@@ -35,6 +36,12 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('@app/admin/products/admin-products.routes').then(m => m.ADMIN_PRODUCTS_ROUTES)
       },
       {
+        path: 'inventory',
+        canActivate: [moduleGuard],
+        data: { module: 'inventory' },
+        loadChildren: () => import('@app/admin/products/admin-products.routes').then(m => m.ADMIN_PRODUCTS_ROUTES)
+      },
+      {
         path: 'categories',
         loadChildren: () => import('@app/admin/categories/admin-categories.routes').then(m => m.ADMIN_CATEGORIES_ROUTES)
       },
@@ -54,6 +61,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'company',
+        canActivate: [permissionGuard(['company.identity:edit:global', 'admin.panel:access:branch'])],
         loadChildren: () => import('@app/admin/company/admin-company.routes').then(m => m.ADMIN_COMPANY_ROUTES)
       },
       {

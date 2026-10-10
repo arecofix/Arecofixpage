@@ -12,7 +12,7 @@ import { environment } from '@env/environment';
 export class FlaskBrandRepository implements BrandRepository {
     private http = inject(HttpClient);
     // Asumimos que Flask corre en el puerto 5000 localmente cuando usamos Tauri
-    private apiUrl = 'http://localhost:5000/api/marcas';
+    private apiUrl = `${environment.flaskApiUrl}/marcas`;
 
     getPaginated(page: number, limit: number, options?: { column?: string; ascending?: boolean; select?: string }): Observable<{ data: Brand[]; total: number }> {
         return this.http.get<{ data: Brand[]; total: number }>(this.apiUrl).pipe(

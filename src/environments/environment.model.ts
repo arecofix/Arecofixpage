@@ -8,6 +8,7 @@ export interface Environment {
   supabaseKey: string;
   authRedirectUrl: string;
   enableProfileUpsert: boolean;
+  flaskApiUrl?: string;
   /** URL del Worker RAG chatbot (Fase 3) */
   chatbotWorkerUrl: string;
   embeddingWorkerUrl?: string;

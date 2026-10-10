@@ -8,7 +8,7 @@ export class PostService {
 
   async getPostBySlug(slug: string): Promise<Post | null> {
     const { data, error } = await this.scoped
-      .withTenantScope(this.scoped.from('blog_posts').select('*'))
+      .withTenantScope(this.scoped.from('blog_posts').select('*, profiles(role)'))
       .eq('slug', slug)
       .eq('status', 'published')
       .maybeSingle();

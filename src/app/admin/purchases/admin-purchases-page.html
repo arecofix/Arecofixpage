@@ -13,9 +13,9 @@
         </div>
       </div>
       <div>
-        <a routerLink="/admin/purchases/new" class="btn bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white border-none rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50">
+        <button (click)="isModalOpen.set(true)" class="btn bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white border-none rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50">
             <i class="fas fa-plus"></i> Registrar Compra
-        </a>
+        </button>
       </div>
     </div>
     
@@ -134,3 +134,7 @@
     }
   </div>
 </div>
+
+@if (isModalOpen()) {
+    <app-admin-purchase-modal (close)="isModalOpen.set(false)"></app-admin-purchase-modal>
+}

@@ -448,7 +448,7 @@ export class AdminKnowledgeBasePage implements OnInit {
       if (voiceErr && this.activeTab() === 'add-text') {
         this.svc.error.set(voiceErr);
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   // ── Getters (reemplazan a computed porque dependen de objetos mutables) ──
