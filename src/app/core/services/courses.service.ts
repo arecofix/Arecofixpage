@@ -152,12 +152,12 @@ export class CoursesService {
                     tenant_id: this.tenantService.getTenantId()
                 });
                 
-                // 3. Create explicit Admin Notification
-                await this.supabase.from('notifications').insert({
+                // 3. Create explicit Admin Notification in admin_notifications table
+                await this.supabase.from('admin_notifications').insert({
                     title: '🎓 Nueva Inscripción a Curso',
                     message: `${data.full_name} se ha inscripto al curso de ${data.course_title || 'N/A'}.`,
                     type: 'info',
-                    scope: 'admin',
+                    source: 'academy',
                     is_read: false,
                     tenant_id: this.tenantService.getTenantId()
                 });

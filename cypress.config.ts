@@ -4,7 +4,8 @@ import { resetTestTenant } from "./cypress/support/seed-db";
 export default defineConfig({
   projectId: 'hfghsi',
   e2e: {
-    testIsolation: false,
+    chromeWebSecurity: false,
+    testIsolation: true,
     video: true,
     trashAssetsBeforeRuns: false,
     pageLoadTimeout: 120000,
