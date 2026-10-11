@@ -4,31 +4,10 @@ describe('Flujo de Instructor en Academia', () => {
     });
 
     beforeEach(() => {
-    cy.loginAsAdmin('/');
-        const mockSession = {
-            access_token: 'fake-jwt',
-            expires_in: 3600,
-            expires_at: Math.floor(Date.now() / 1000) + 3600,
-            refresh_token: 'fake-refresh',
-            token_type: 'bearer',
-            user: {
-                id: 'instructor-123',
-                role: 'authenticated',
-                email: 'instructor@arecofix.com'
-            }
-        };
-        
-        window.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockSession));
-        
-        cy.intercept('GET', '**/rest/v1/profiles*', {
-            statusCode: 200,
-            body: [{
-                id: 'instructor-123',
-                first_name: 'Profe',
-                last_name: 'Test',
-                role: 'instructor'
-            }]
-        }).as('getProfile');
+        const mockSession = { user: { id: 'instructor-123', role: 'authenticated', email: 'instructor@arecofix.com' } };
+        const mockProfile = { id: 'instructor-123', email: 'instructor@arecofix.com', first_name: 'Profe', last_name: 'Test', role: 'instructor', tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', branch_id: 'branch-1', is_active: true };
+
+        cy.loginAsUser('/instructor/builder/11111111-1111-1111-1111-111111111111', mockSession, mockProfile);
 
         cy.intercept('GET', '**/rest/v1/course_instructors*', {
             statusCode: 200,
@@ -55,18 +34,24 @@ describe('Flujo de Instructor en Academia', () => {
             body: []
         }).as('getModules');
 
-        // Mock storage upload with delay to ensure 'Subiendo' state is visible
+        // Mock storage upload
+        cy.intercept('POST', '**/api/get-upload-url*', {
+            statusCode: 200,
+            body: { uploadUrl: 'http://localhost:4200/mock-upload' }
+        }).as('getUploadUrl');
+
+        cy.intercept('PUT', '**/mock-upload*', {
+            statusCode: 200,
+            body: {}
+        }).as('uploadR2');
+
         cy.intercept('POST', '**/storage/v1/object/**', {
-            delay: 3000,
             statusCode: 200,
             body: { Key: 'test/path.mp4' }
         }).as('uploadFile');
     });
 
     it('1. El instructor ingresa a la vista de creación/edición de contenido', () => {
-        // En una app real navegaria a su panel y luego a builder/curso-test-1
-        
-        cy.visit('/instructor/builder/11111111-1111-1111-1111-111111111111');
         cy.url().should('include', '/instructor/builder');
         
         // Ir a la pestaña de Módulos
@@ -81,8 +66,6 @@ describe('Flujo de Instructor en Academia', () => {
     });
 
     it('2. El instructor simula la subida de un archivo al módulo', () => {
-        cy.visit('/instructor/builder/11111111-1111-1111-1111-111111111111');
-        
         // Ir a la pestaña de Módulos
         cy.contains('Modulos y Clases').click();
 
@@ -96,11 +79,8 @@ describe('Flujo de Instructor en Academia', () => {
             mimeType: 'video/mp4'
         }, { force: true });
         
-        // Al subirlo, el componente local (simulado) mostrará el archivo en la lista
-        cy.contains('test-video.mp4', { timeout: 15000 }).should('exist');
-        
-        // Después de 2 segundos (simulados en handleFiles), la barra de progreso finaliza y desaparece
-        cy.wait(2500);
-        cy.get('progress').should('not.exist');
+        // Al subirlo, el componente local mostrará el archivo en el input de título de contenido
+        cy.get('input[placeholder="Titulo del contenido"]', { timeout: 15000 })
+            .should('have.value', 'test-video.mp4');
     });
 });

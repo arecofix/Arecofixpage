@@ -10,6 +10,17 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CoursesService } from '@app/core/services/courses.service';
 import { TenantService } from '@app/core/services/tenant.service';
 
+export interface CertificateDetail {
+  id: string;
+  student_name: string;
+  student_dni?: string;
+  course_id: string;
+  issued_at: string;
+  courses?: {
+    title: string;
+  };
+}
+
 @Component({
   selector: 'app-certificate-page',
   standalone: true,
@@ -238,14 +249,16 @@ export class CertificatePageComponent implements OnInit {
   public tenantService = inject(TenantService);
 
   loading = signal(true);
-  certificate = signal<any>(null);
+  certificate = signal<CertificateDetail | null>(null);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.coursesService.getCertificate(id).subscribe((res) => {
-        if (res.data) {
-          this.certificate.set(res.data);
+        if (res.data && typeof res.data === 'object' && Object.keys(res.data).length > 0 && (res.data as any).id) {
+          this.certificate.set(res.data as CertificateDetail);
+        } else {
+          this.certificate.set(null);
         }
         this.loading.set(false);
       });

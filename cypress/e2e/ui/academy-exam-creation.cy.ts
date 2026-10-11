@@ -75,7 +75,7 @@ describe('Academy Exam Creation', () => {
 
     // Add Exam Resource
     cy.contains('Agregar Recurso').click({ force: true });
-    cy.contains('Examen').click({ force: true });
+    cy.contains('Examen (Cuestionario)').click({ force: true });
 
     // Exam should appear in list
     cy.get('input[placeholder="Título del recurso..."]').should('exist');

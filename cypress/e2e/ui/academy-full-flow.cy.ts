@@ -1,18 +1,8 @@
 describe('Academy Full Flow: Exams and Enrollments', () => {
   const courseId = 'test-course-id';
 
-  const mockAdminSession = {
-      access_token: 'fake-jwt',
-      expires_in: 3600,
-      expires_at: Math.floor(Date.now() / 1000) + 3600,
-      refresh_token: 'fake-refresh',
-      token_type: 'bearer',
-      user: { id: 'admin-123', role: 'authenticated', email: 'admin@arecofix.com' }
-  };
-
   it('Admin can add an exam and enroll a student', () => {
-    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
-    cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+
     // 1. Log in to a safe route that has all global mocks covered by loginAsAdmin
     cy.loginAsAdmin('/admin/dashboard');
 
@@ -82,12 +72,10 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
     
     // Now we are on the materials page!
     cy.wait('@getModules');
-    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
-    cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+
     cy.wait('@getContents');
     
-    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
-    cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+
     // UI Interactions
     // The first module is automatically selected by loadData().
     
@@ -115,36 +103,54 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
   });
 
   it('Student can take the exam and pass', () => {
-    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
-    cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+
     const mockStudentSession = {
-        access_token: 'fake-jwt',
-        expires_in: 3600,
-        expires_at: Math.floor(Date.now() / 1000) + 3600,
-        refresh_token: 'fake-refresh',
-        token_type: 'bearer',
-        user: { id: 'student-123', role: 'authenticated', email: 'student@example.com' }
+      access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      refresh_token: 'fake-refresh',
+      token_type: 'bearer',
+      user: {
+        id: 'student-123',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'student@example.com',
+        email_confirmed_at: new Date().toISOString(),
+        app_metadata: { provider: 'email', providers: ['email'] },
+        user_metadata: { role: 'customer' },
+        identities: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
     };
-    
-    cy.intercept('GET', '**/rest/v1/profiles*', {
-        statusCode: 200,
-        body: [{ id: 'student-123', first_name: 'Estudiante', last_name: 'Test', role: 'customer' }]
-    }).as('getProfile');
+    const mockProfile = {
+      id: 'student-123',
+      email: 'student@example.com',
+      first_name: 'Estudiante',
+      last_name: 'Test',
+      role: 'customer',
+      tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b',
+      branch_id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5',
+      is_active: true
+    };
 
     cy.intercept('GET', '**/rest/v1/course_enrollments?*', {
       statusCode: 200,
       body: [{ id: 'enrollment-1', course_id: courseId, user_id: 'student-123', email: 'student@example.com', status: 'confirmed' }]
     }).as('getEnrollment');
 
-    cy.intercept('GET', '**/rest/v1/courses*', {
-      statusCode: 200,
-      body: [{ id: courseId, title: 'Curso de Reparación', slug: 'curso-reparacion-celulares', is_active: true }]
-    });
+    const courseData = { id: courseId, title: 'Curso de Reparación', slug: 'curso-reparacion-celulares', is_active: true };
+    cy.intercept('GET', '**/rest/v1/courses*', (req) => {
+      req.reply({
+        statusCode: 200,
+        body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? courseData : [courseData]
+      });
+    }).as('getCourse');
 
     cy.intercept('GET', '**/rest/v1/course_modules*', {
       statusCode: 200,
       body: [{ id: 'module-1', course_id: courseId, title: 'Unidad 1', order_index: 1, unlock_date: '2020-01-01T00:00:00Z' }]
-    });
+    }).as('getModules');
 
     cy.intercept('GET', '**/rest/v1/course_lessons*', {
       statusCode: 200, 
@@ -155,7 +161,12 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
         title: 'Nuevo Examen',
         metadata: { passing_score: 70 }
       }]
-    });
+    }).as('getLessons');
+
+    cy.intercept('GET', '**/rest/v1/course_progress*', {
+      statusCode: 200,
+      body: []
+    }).as('getProgress');
 
     cy.intercept('POST', '**/rest/v1/rpc/get_exam_questions*', {
       statusCode: 200, 
@@ -170,19 +181,12 @@ describe('Academy Full Flow: Exams and Enrollments', () => {
       statusCode: 200,
       body: { score: 100, passed: true, correct_answers: 1, total_questions: 1 }
     });
-    cy.intercept('POST', '**/rest/v1/rpc/get_course_progress*', {
-      statusCode: 200,
-      body: { progress: 0, completed_contents: [], certificate_id: null }
-    });
 
-    cy.intercept('GET', '**/rest/v1/**', { statusCode: 200, body: [] }).as('mockRestCatchAll');
-    cy.intercept('GET', '**/rpc/**', { statusCode: 200, body: [] }).as('mockRpcCatchAll');
+    cy.loginAsUser('/academy/curso-reparacion-celulares/aula', mockStudentSession, mockProfile);
 
-    cy.visit('/academy/curso-reparacion-celulares/aula', {
-        onBeforeLoad: (win) => {
-            win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockStudentSession));
-        }
-    });
+    cy.wait('@getCourse');
+    cy.wait('@getEnrollment');
+    cy.wait('@getModules');
 
     cy.get('.collapse-title').first().click({ force: true });
     cy.get('button').contains('Comenzar').click({ force: true });
