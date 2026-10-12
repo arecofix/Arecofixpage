@@ -3,7 +3,6 @@ import {
   inject,
   OnInit,
   signal,
-  computed,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16,44 +15,25 @@ import { NotificationService } from '@app/core/services/notification.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import {
   Invoice,
-  InvoiceItem,
-  InvoiceType,
+  CreateInvoiceDto,
 } from '@app/features/sales/domain/entities/invoice.entity';
-
-/** Reactive form model for the manual invoice modal */
-interface ManualInvoiceForm {
-  customerName: string;
-  customerEmail: string;
-  type: InvoiceType;
-  discount: number;
-  notes: string;
-  items: ManualItemRow[];
-}
-
-interface ManualItemRow {
-  description: string;
-  quantity: number;
-  unit_price: number;
-  tax_rate: number; // 0 = exento, 0.105 = 10.5%, 0.21 = 21%
-}
-
-const DEFAULT_ITEM: ManualItemRow = {
-  description: '',
-  quantity: 1,
-  unit_price: 0,
-  tax_rate: 0.21,
-};
+import { InvoicePdfExportService } from '@app/features/sales/application/services/invoice-pdf-export.service';
+import { CompanyService } from '@app/core/services/company.service';
+import { InvoiceFormModalComponent } from './components/invoice-form-modal/invoice-form-modal.component';
+import { ArcaEmitterData } from '@app/features/sales/domain/entities/arca.entity';
 
 @Component({
   selector: 'app-admin-invoices-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, InvoiceFormModalComponent],
   templateUrl: './admin-invoices-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminInvoicesPage implements OnInit {
   public t = inject(TranslationService).t;
   private invoiceService = inject(InvoiceService);
+  private pdfExportService = inject(InvoicePdfExportService);
+  private companyService = inject(CompanyService);
   private notificationService = inject(NotificationService);
   private logger = inject(LoggerService);
 
@@ -72,30 +52,15 @@ export class AdminInvoicesPage implements OnInit {
 
   // ── Modal State ─────────────────────────────────────────────────────────────
   isModalOpen = signal(false);
-  form = signal<ManualInvoiceForm>({
-    customerName: '',
-    customerEmail: '',
-    type: 'B',
-    discount: 0,
-    notes: '',
-    items: [{ ...DEFAULT_ITEM }],
-  });
-
-  // ── Computed Totals (live preview in the modal) ─────────────────────────────
-  formTotals = computed(() => {
-    const f = this.form();
-    return this.invoiceService.calculateTotals(f.items, f.discount);
-  });
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
   async ngOnInit() {
-    this.search$.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    ).subscribe(term => {
-      this.searchTerm.set(term);
-      this.loadInvoices();
-    });
+    this.search$
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((term) => {
+        this.searchTerm.set(term);
+        this.loadInvoices();
+      });
 
     await this.loadInvoices();
   }
@@ -115,13 +80,13 @@ export class AdminInvoicesPage implements OnInit {
         this.pageOffset(),
         this.searchTerm()
       );
-      
+
       if (append) {
         this.invoices.set([...this.invoices(), ...data]);
       } else {
         this.invoices.set(data);
       }
-      
+
       this.hasMore.set(data.length === this.pageSize());
     } catch (e) {
       this.notificationService.showError('Error al cargar comprobantes');
@@ -134,7 +99,7 @@ export class AdminInvoicesPage implements OnInit {
 
   loadMore() {
     if (this.loading() || this.loadingMore() || !this.hasMore()) return;
-    this.pageOffset.update(v => v + this.pageSize());
+    this.pageOffset.update((v) => v + this.pageSize());
     this.loadInvoices(true);
   }
 
@@ -144,15 +109,6 @@ export class AdminInvoicesPage implements OnInit {
 
   // ── Modal Controls ──────────────────────────────────────────────────────────
   openModal() {
-    this.form.set({
-      customerName: '',
-      customerEmail: '',
-      type: 'B',
-      discount: 0,
-      notes: '',
-      items: [{ ...DEFAULT_ITEM }],
-    });
-    
     this.isModalOpen.set(true);
   }
 
@@ -160,110 +116,73 @@ export class AdminInvoicesPage implements OnInit {
     this.isModalOpen.set(false);
   }
 
-  // ── Line Item Helpers ───────────────────────────────────────────────────────
-  addItem() {
-    this.form.update(f => ({
-      ...f,
-      items: [...f.items, { ...DEFAULT_ITEM }],
-    }));
-  }
-
-  removeItem(index: number) {
-    this.form.update(f => ({
-      ...f,
-      items: f.items.filter((_, i) => i !== index),
-    }));
-  }
-
-  updateItem(index: number, field: keyof ManualItemRow, value: any) {
-    this.form.update(f => {
-      const items = f.items.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      );
-      return { ...f, items };
-    });
-  }
-
-  updateField<K extends keyof ManualInvoiceForm>(key: K, value: ManualInvoiceForm[K]) {
-    this.form.update(f => ({ ...f, [key]: value }));
-  }
-
-  // ── Submit ──────────────────────────────────────────────────────────────────
-  async submitManualInvoice() {
-    const f = this.form();
-
-    if (f.items.length === 0) {
-      this.notificationService.showWarning('Agregá al menos un ítem a la factura.');
-      return;
-    }
-
-    const hasEmptyDesc = f.items.some(i => !i.description.trim());
-    if (hasEmptyDesc) {
-      this.notificationService.showWarning('Completá la descripción de todos los ítems.');
-      return;
-    }
-
+  async onInvoiceCreated(dto: CreateInvoiceDto) {
     this.saving.set(true);
-    this.logger.debug('Starting manual invoice generation', f);
-
     try {
-      // Build InvoiceItems using the service helper (single formula)
-      const items: InvoiceItem[] = f.items.map(row =>
-        this.invoiceService.buildItem(
-          row.description,
-          row.quantity,
-          row.unit_price,
-          row.tax_rate
-        )
-      );
-
-      const { subtotal, taxAmount, total } = this.invoiceService.calculateTotals(
-        f.items,
-        f.discount
-      );
-
-      this.logger.debug('Calculated totals', { subtotal, taxAmount, total });
-
-      const result = await this.invoiceService.generateInvoice({
-        customer_name:  f.customerName || 'Consumidor Final',
-        customer_email: f.customerEmail || undefined,
-        type:           f.type,
-        origin:         'manual',
-        subtotal,
-        tax_amount:     taxAmount,
-        discount:       f.discount,
-        total_amount:   total,
-        items,
-        notes:          f.notes || undefined,
-      });
-
-      this.logger.debug('GenerateInvoice result', result);
-
-      if (result.error) {
-        this.logger.warn('Service returned error', result.error);
-        this.notificationService.showError('Error al generar la factura: ' + (result.error.message || 'Error desconocido'));
+      const res = await this.invoiceService.generateInvoice(dto);
+      if (res.error) {
+        this.notificationService.showError(
+          'Error al emitir factura: ' + (res.error.message || 'Desconocido')
+        );
         return;
       }
-
-      this.notificationService.showSuccess('✅ Factura manual generada correctamente.');
+      this.notificationService.showSuccess('✅ Factura emitida con éxito conforme ARCA.');
       this.closeModal();
-      await this.loadInvoices(); // Refresh list
-    } catch (error: any) {
-      this.logger.error('Catastrophic error in submitManualInvoice', error);
-      this.notificationService.showError('Ocurrió un error inesperado al procesar la factura.');
+      await this.loadInvoices();
+    } catch (e) {
+      this.logger.error('Error in onInvoiceCreated', e);
+      this.notificationService.showError('No se pudo generar la factura.');
     } finally {
       this.saving.set(false);
     }
   }
 
-  /** Track function for @for loops */
-  trackByIndex = (i: number) => i;
+  // ── PDF & Sharing Actions ───────────────────────────────────────────────────
+  async downloadInvoicePdf(invoice: Invoice, event?: Event) {
+    if (event) event.stopPropagation();
+    try {
+      this.notificationService.showInfo('Generando PDF oficial A4...');
+      const { items } = await this.invoiceService.getInvoiceWithDetails(invoice.id);
+      const emitter = await this.getEmitterData();
+      await this.pdfExportService.downloadPdf(invoice, emitter, items);
+      this.notificationService.showSuccess('Factura descargada en formato A4.');
+    } catch (e) {
+      this.logger.error('Failed to download invoice PDF', e);
+      this.notificationService.showError('Error al generar PDF de la factura.');
+    }
+  }
 
-  /** Tax rate display labels */
-  taxLabels: Record<number, string> = {
-    0:     'Exento (0%)',
-    0.105: 'IVA 10.5%',
-    0.21:  'IVA 21%',
-  };
+  async shareInvoice(invoice: Invoice, event?: Event) {
+    if (event) event.stopPropagation();
+    try {
+      const { items } = await this.invoiceService.getInvoiceWithDetails(invoice.id);
+      const emitter = await this.getEmitterData();
+      const res = await this.pdfExportService.shareOrDownload(invoice, emitter, items);
+
+      if (res.shared) {
+        this.notificationService.showSuccess('Comprobante compartido correctamente.');
+      } else if (res.downloaded) {
+        this.notificationService.showSuccess('Comprobante descargado.');
+      }
+    } catch (e) {
+      this.logger.error('Failed to share invoice', e);
+      this.notificationService.showError('No se pudo compartir el comprobante.');
+    }
+  }
+
+  private async getEmitterData(): Promise<ArcaEmitterData> {
+    const company = await this.companyService.getSettings();
+    return {
+      businessName: company?.name || 'ARECOFIX SERVICIOS INTEGRALES',
+      cuit: company?.tax_id || '30-71649281-9',
+      commercialAddress: company?.address || company?.location || 'Buenos Aires, Argentina',
+      vatCondition: (company as any)?.vat_condition || 'IVA Responsable Inscripto',
+      iibb: (company as any)?.iibb || company?.tax_id || '30-71649281-9',
+      activityStartDate: (company as any)?.activity_start_date || '01/03/2021',
+      pointOfSale: (company as any)?.point_of_sale || '00004',
+      phone: company?.phone || '',
+      email: company?.email || '',
+      logoUrl: company?.logo_url || '',
+    };
+  }
 }
-

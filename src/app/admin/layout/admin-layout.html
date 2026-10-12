@@ -259,32 +259,9 @@
       </div>
     </header>
 
-    <!-- Tabs Bar -->
-    @if ((tabService.tabs$ | async)?.length) {
-      <div
-        class="w-full bg-gray-100 dark:bg-slate-900/50 border-b border-gray-200 dark:border-slate-800 flex items-center overflow-x-auto hide-scrollbar px-2 pt-2"
-      >
-        @for (tab of tabService.tabs$ | async; track tab.url; let i = $index) {
-          <div
-            class="flex items-center group cursor-pointer px-4 py-2 text-sm font-bold border-t-2 border-x border-transparent rounded-t-lg transition-all"
-            [ngClass]="
-              tab.active
-                ? 'bg-white dark:bg-slate-900 border-t-indigo-500 border-x-gray-200 dark:border-x-slate-800 text-indigo-600 dark:text-indigo-400'
-                : 'text-gray-500 hover:bg-gray-200/50 dark:hover:bg-slate-800/50'
-            "
-            (click)="router.navigateByUrl(tab.url)"
-          >
-            <span class="mr-2 whitespace-nowrap">{{ tab.title }}</span>
-            <button
-              class="w-5 h-5 rounded-full flex items-center justify-center hover:bg-gray-300 dark:hover:bg-slate-700 text-gray-400 hover:text-red-500 transition-colors"
-              (click)="tabService.closeTab(i); $event.stopPropagation()"
-            >
-              <i class="fas fa-times text-[10px]"></i>
-            </button>
-          </div>
-        }
-      </div>
-    }
+    <!-- Tabs Bar (Accessible, Touch-Enabled for Mobile & Desktop) -->
+    <app-admin-tab-bar></app-admin-tab-bar>
+
 
     <!-- Main Content Area -->
     <main
