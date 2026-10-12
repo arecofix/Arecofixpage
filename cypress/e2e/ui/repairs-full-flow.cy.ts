@@ -65,7 +65,7 @@ beforeEach(function() {
 
         // Intercept BEFORE clicking save (create uses RPC)
         cy.intercept('POST', '**/rest/v1/profiles*', { statusCode: 201, body: { id: 'mock-profile-123' } }).as('postProfile');
-          cy.intercept('POST', '**/rest/v1/rpc/save_repair_order*', { statusCode: 200, body: { id: 'mock-repair-123', tracking_code: 'AF-TEST-123' } }).as('postRepair');
+        cy.intercept('POST', '**/rest/v1/rpc/save_repair_order*', { statusCode: 200, body: { id: '00000000-0000-0000-0000-000000000123', tracking_code: 'AF-TEST-123' } }).as('postRepair');
         cy.contains('button', 'GUARDAR ORDEN').click({ force: true });
 
         cy.wait('@postRepair', { timeout: 15000 }).then((interception) => {
@@ -88,10 +88,7 @@ beforeEach(function() {
     it('2. El administrador edita la reparación y cambia el estado a Gestión de Repuestos usando la línea de tiempo interactiva', function() {
         expect(shared.repairId, 'repairId debe existir desde el test 1').to.be.a('string').and.not.be.empty;
 
-        cy.loginRealAdmin(`/login?returnUrl=/admin/repairs/${shared.repairId}`);
-        cy.wait(2500);
-
-        // Mock the GET request so the form populates correctly
+        // Mock the GET request BEFORE navigation so the form populates correctly without race conditions
         cy.intercept('GET', '**/rest/v1/repairs*', (req) => {
             if (req.url.includes('select=')) {
                 req.reply({
@@ -114,6 +111,9 @@ beforeEach(function() {
                 });
             }
         }).as('getRepairData');
+
+        cy.loginRealAdmin(`/login?returnUrl=/admin/repairs/${shared.repairId}`);
+        cy.wait(2500);
 
         cy.url().then(url => {
             if (!url.includes(`/admin/repairs/${shared.repairId}`)) {
