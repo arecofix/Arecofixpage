@@ -47,32 +47,38 @@ export class SupabaseService {
         }
 
         const method = (options?.method || 'GET').toUpperCase();
-      const isCacheable = method === 'GET' && targetUrl.toString().includes('/rest/v1/');
-      const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) && (targetUrl.toString().includes('/rest/v1/') || targetUrl.toString().includes('/rpc/'));
-      
-      // Fast in-memory cache check for GET requests
-      const CACHE_TTL = 60000;
-      const requestUrl = targetUrl.toString();
+        const requestUrl = targetUrl.toString();
+        const isRpc = targetUrl.pathname.includes('/rpc/');
+        const isReadRpc = isRpc && /\/rpc\/(get_|read_|fetch_|search_|calculate_|list_|check_|is_|count_|view_)/i.test(targetUrl.pathname);
+        const isCacheable = (method === 'GET' && requestUrl.includes('/rest/v1/')) || (method === 'POST' && isReadRpc);
+        const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) &&
+          (requestUrl.includes('/rest/v1/') || isRpc) &&
+          !isReadRpc;
+        
+        // Fast in-memory cache check (key includes body for POST read RPC queries)
+        const CACHE_TTL = 60000;
+        const bodyPayload = typeof options?.body === 'string' ? options.body : '';
+        const cacheKey = (method === 'POST' && isReadRpc) ? `${requestUrl}#${bodyPayload}` : requestUrl;
 
-      if (isCacheable) {
-        const cached = this.cacheMap.get(requestUrl);
-        if (cached && cached.expiresAt > Date.now()) {
-          this.logger.info(`[SupabaseCache] Serving from memory cache: ${requestUrl}`);
-          return new Response(cached.data, {
-            status: cached.status,
-            statusText: cached.statusText,
-            headers: new Headers(cached.headers)
-          });
+        if (isCacheable) {
+          const cached = this.cacheMap.get(cacheKey);
+          if (cached && cached.expiresAt > Date.now()) {
+            this.logger.info(`[SupabaseCache] Serving from memory cache: ${requestUrl}`);
+            return new Response(cached.data, {
+              status: cached.status,
+              statusText: cached.statusText,
+              headers: new Headers(cached.headers)
+            });
+          }
         }
-      }
       const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
       if (isOffline) {
          if (isCacheable) {
            try {
-             const cachedDB = await this.syncService.getCachedRequest(urlStr);
+             const cachedDB = await this.syncService.getCachedRequest(cacheKey);
              if (cachedDB) {
-               this.logger.info(`[OfflineSync] Serving from IndexedDB cache: ${urlStr}`);
+               this.logger.info(`[OfflineSync] Serving from IndexedDB cache: ${requestUrl}`);
                return new Response(cachedDB.data, {
                  status: cachedDB.status,
                  statusText: cachedDB.statusText,
@@ -143,6 +149,20 @@ export class SupabaseService {
               break; // Skip retries, go straight to failover
           }
 
+          // Intercept 400 refresh token expiration without throwing disruptive errors
+          if (!response.ok && response.status === 400 && (requestUrl.includes('grant_type=refresh_token') || requestUrl.includes('/auth/v1/token'))) {
+             if (typeof window !== 'undefined') {
+                localStorage.removeItem('supabase-auth-token');
+                sessionStorage.removeItem('supabase-auth-token');
+                Object.keys(localStorage).forEach(key => {
+                  if (key.startsWith('sb-') && key.endsWith('-auth-token')) localStorage.removeItem(key);
+                });
+                Object.keys(sessionStorage).forEach(key => {
+                  if (key.startsWith('sb-') && key.endsWith('-auth-token')) sessionStorage.removeItem(key);
+                });
+             }
+          }
+
           // Intercept 401 JWT errors directly from PostgREST
           if (!response.ok && response.status === 401) {
              try {
@@ -184,7 +204,7 @@ export class SupabaseService {
               headersArray.push([key, val]);
             });
 
-            this.cacheMap.set(requestUrl, {
+            this.cacheMap.set(cacheKey, {
               data: textData,
               headers: headersArray,
               status: clonedResponse.status,
@@ -193,7 +213,7 @@ export class SupabaseService {
             });
             
             // Persist to IndexedDB for offline support
-            await this.syncService.cacheGetRequest(requestUrl, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
+            await this.syncService.cacheGetRequest(cacheKey, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
           }
 
           if (isMutation && response.ok) {
@@ -217,7 +237,7 @@ export class SupabaseService {
       // Try to read from IndexedDB as absolute fallback
       if (isCacheable) {
          try {
-           const cachedDB = await this.syncService.getCachedRequest(requestUrl);
+           const cachedDB = await this.syncService.getCachedRequest(cacheKey);
            if (cachedDB) {
              this.logger.warn(`[OfflineSync] Fallback to IndexedDB after fetch failure: ${requestUrl}`);
              return new Response(cachedDB.data, {
@@ -338,9 +358,23 @@ export class SupabaseService {
             getItem: (key) => {
               if (typeof window === 'undefined') return null;
               const rememberMe = localStorage.getItem('supabase-remember-me') === 'true';
-              if (rememberMe) return localStorage.getItem(key);
-              // Fallback to local storage if it was previously set, but we prefer session
-              return sessionStorage.getItem(key) || localStorage.getItem(key);
+              const raw = rememberMe ? localStorage.getItem(key) : (sessionStorage.getItem(key) || localStorage.getItem(key));
+              if (!raw) return null;
+              try {
+                const parsed = JSON.parse(raw);
+                if (key.includes('auth-token') && parsed && typeof parsed === 'object') {
+                  if (!parsed.access_token && !parsed.refresh_token) {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                    return null;
+                  }
+                }
+              } catch {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+                return null;
+              }
+              return raw;
             },
             setItem: (key, value) => {
               if (typeof window === 'undefined') return;
@@ -369,7 +403,7 @@ export class SupabaseService {
     // Handle auth state changes and clean up invalid refresh tokens
     if (typeof window !== 'undefined') {
       this.client.auth.onAuthStateChange((event, session) => {
-        this.logger.info(`Auth Event: ${event}`, session ? 'Session exists' : 'No session');
+        // Silenced Auth Event logs to reduce console noise during background syncs
         
         // If initial session fails or refresh token is invalid, clean up storage
         if (event === 'INITIAL_SESSION') {
@@ -383,11 +417,8 @@ export class SupabaseService {
         // If token refresh fails, sign out cleanly to allow public navigation
         if (event === 'TOKEN_REFRESHED') {
           if (!session) {
-            this.logger.warn('Token refresh failed, signing out to allow public navigation');
-            alert('Tu sesión ha expirado por seguridad. Por favor, refresca la página y vuelve a ingresar.');
-            this.client.auth.signOut().catch(err => {
-              this.logger.error('Error signing out after failed refresh', err);
-            });
+            this.logger.info('Token refresh expired, signed out cleanly');
+            this.client.auth.signOut().catch(() => {});
           }
         }
         
@@ -429,12 +460,7 @@ export class SupabaseService {
             }
           });
           
-          alert('Tu sesión era inválida o ha expirado. Por favor, refresca la página y vuelve a ingresar.');
-          this.client.auth.signOut().catch(err => {
-            this.logger.error('Error signing out after invalid token detection', err);
-          }).finally(() => {
-            window.location.reload();
-          });
+          this.client.auth.signOut().catch(() => {});
         }
       });
     }

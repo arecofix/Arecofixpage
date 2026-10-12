@@ -21,7 +21,10 @@
         'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
         'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq',
         'cloudflareinsights', 'beacon.min.js', 'dead-clicks', 'posthog-recorder',
-        'us.i.posthog.com', 'us-assets.i.posthog.com', '504', 'gateway timeout'
+        'us.i.posthog.com', 'us-assets.i.posthog.com', '504', 'gateway timeout',
+        'preloadresponse', 'navigation preload', 'service worker navigation preload',
+        'maps.googleapis.com', 'gen_204', 'csp_test', 'err_blocked_by_client',
+        'grant_type=refresh_token', 'invalid_grant', 'refresh token not found'
       ];
       const isNoise = (args) => {
         const msg = args.map(a => {
@@ -34,6 +37,13 @@
       console.error = (...a) => { if (!isNoise(a)) _err.apply(console, a); };
       console.warn = (...a) => { if (!isNoise(a)) _wrn.apply(console, a); };
       console.log = (...a) => { if (!isNoise(a)) _log.apply(console, a); };
+
+      // Immediately unregister stale service workers when debugging on local host
+      if (['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
+        }).catch(function() {});
+      }
 
       // Catch-all for browser-level logs that might not go through console.warn/error directly
       const _debug = console.debug;
@@ -183,7 +193,8 @@
       } catch (e) {}
     };
 
-    if (window.location.hostname !== 'localhost') {
+    var isLocalDev = ['localhost', '127.0.0.1', '0.0.0.0', '::1'].includes(window.location.hostname) || window.location.hostname.endsWith('.local');
+    if (!isLocalDev) {
       if (document.readyState === 'complete') {
         initAnalytics();
       } else {

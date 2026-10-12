@@ -37,17 +37,13 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
 
     const session = authState.session;
     if (!session) {
-      console.warn('🚫 No session found, redirecting to login');
-      router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-      return false;
+      return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
     }
 
     const userProfile = authState.profile;
     
     if (!userProfile) {
-      console.warn('🚫 No user profile found, redirecting to home');
-      router.navigate(['/']);
-      return false;
+      return router.createUrlTree(['/']);
     }
 
     const role = userProfile.role || ROLES.USER;
@@ -73,9 +69,7 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
     }
 
     if (!hasAccess) {
-      console.warn('🚫 Access denied for user:', userEmail, 'role:', role);
-      router.navigate(['/']);
-      return false;
+      return router.createUrlTree(['/']);
     }
 
     // 2. Sincronizar Contexto de Sucursal
@@ -90,7 +84,6 @@ export const branchAdminGuard: CanActivateFn = async (route, state) => {
 
   } catch (error) {
     console.error('❌ Error in branchAdminGuard:', error);
-    router.navigate(['/']);
-    return false;
+    return router.createUrlTree(['/']);
   }
 };
