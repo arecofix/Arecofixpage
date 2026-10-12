@@ -13,6 +13,7 @@ export class SupabaseService {
   private client: SupabaseClient;
 
   private cacheMap = new Map<string, { data: string; headers: [string, string][]; status: number; statusText: string; expiresAt: number }>();
+  private cacheEpoch = 0;
 
   private pendingTasks = inject(PendingTasks);
 
@@ -23,6 +24,7 @@ export class SupabaseService {
     // Expose cache clearing hook for Cypress E2E tests
     if (typeof window !== 'undefined') {
       (window as any).__clearSupabaseCache = () => {
+        this.cacheEpoch++;
         this.cacheMap.clear();
         this.logger.info('[SupabaseCache] Cache cleared by test hook.');
       };
@@ -59,6 +61,7 @@ export class SupabaseService {
         const CACHE_TTL = 60000;
         const bodyPayload = typeof options?.body === 'string' ? options.body : '';
         const cacheKey = (method === 'POST' && isReadRpc) ? `${requestUrl}#${bodyPayload}` : requestUrl;
+        const requestEpoch = this.cacheEpoch;
 
         if (isCacheable) {
           const cached = this.cacheMap.get(cacheKey);
@@ -196,7 +199,7 @@ export class SupabaseService {
              }
           }
 
-          if (isCacheable && response.ok) {
+          if (isCacheable && response.ok && requestEpoch === this.cacheEpoch) {
             const clonedResponse = response.clone();
             const textData = await clonedResponse.text();
             const headersArray: [string, string][] = [];
@@ -218,6 +221,7 @@ export class SupabaseService {
 
           if (isMutation && response.ok) {
             this.logger.info(`[SupabaseCache] Mutation detected: ${method} ${requestUrl}. Clearing cache.`);
+            this.cacheEpoch++;
             this.cacheMap.clear();
             await this.syncService.clearCache();
           }
@@ -472,6 +476,7 @@ export class SupabaseService {
 
   async clearCache(): Promise<void> {
     this.logger.info('[SupabaseCache] Manually clearing cache.');
+    this.cacheEpoch++;
     this.cacheMap.clear();
     await this.syncService.clearCache();
   }
@@ -482,6 +487,7 @@ export class SupabaseService {
    */
   clearCacheForTable(tableName: string): void {
     let cleared = 0;
+    this.cacheEpoch++;
     for (const key of this.cacheMap.keys()) {
       if (key.includes(`/rest/v1/${tableName}`)) {
         this.cacheMap.delete(key);

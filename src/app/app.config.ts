@@ -85,6 +85,14 @@ const isTauri =
   typeof window !== 'undefined' &&
   (!!(window as any)['__TAURI_INTERNALS__'] || !!(window as any)['__TAURI__']);
 
+const isBrowser = typeof document !== 'undefined';
+const hasServerHydration = !isBrowser || (
+  !isTauri && (
+    !!document.querySelector('[ng-server-context]') || 
+    !!document.getElementById('ng-state')
+  )
+);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     {
@@ -139,7 +147,7 @@ export const appConfig: ApplicationConfig = {
     // Core Angular providers
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay(), withNoIncrementalHydration()),
+    ...(hasServerHydration ? [provideClientHydration(withEventReplay(), withNoIncrementalHydration())] : []),
     provideRouter(
       routes,
       withInMemoryScrolling({

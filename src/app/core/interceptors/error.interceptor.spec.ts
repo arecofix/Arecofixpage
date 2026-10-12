@@ -21,7 +21,7 @@ describe('globalErrorInterceptor (QA Network Protection)', () => {
 
   beforeEach(() => {
     mockNotification = { showError: jest.fn() };
-    mockLogger = { error: jest.fn() };
+    mockLogger = { error: jest.fn(), warn: jest.fn() };
 
     TestBed.configureTestingModule({
       providers: [
@@ -108,5 +108,19 @@ describe('globalErrorInterceptor (QA Network Protection)', () => {
       { message: 'El ticket promedio ya fue calculado.' },
       { status: 400, statusText: 'Bad Request' },
     );
+  });
+
+  it('should suppress error notifications and error logs for silent endpoints', () => {
+    http.post('/functions/v1/send-whatsapp', { to: '123' }).subscribe({
+      next: () => fail('request should have failed'),
+      error: () => {
+        expect(mockLogger.error).not.toHaveBeenCalled();
+        expect(mockLogger.warn).toHaveBeenCalled();
+        expect(mockNotification.showError).not.toHaveBeenCalled();
+      },
+    });
+
+    const req = httpMock.expectOne('/functions/v1/send-whatsapp');
+    req.flush('CORS error or network failure', { status: 0, statusText: 'Unknown Error' });
   });
 });
