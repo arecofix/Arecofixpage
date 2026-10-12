@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AdminRepairService } from './admin-repair.service';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { AuthService } from '@app/core/services/auth.service';
-import { InvoiceService } from '@app/features/sales/application/invoice.service';
+import { IEventBus } from '@app/core/events/event-bus.interface';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { BranchService } from '@app/core/services/branch.service';
@@ -18,6 +18,7 @@ describe('AdminRepairService', () => {
     let mockAuthService: any;
     let mockBranchContextService: any;
     let mockBranchService: any;
+    let mockEventBus: any;
 
     beforeEach(() => {
         mockRepository = {
@@ -42,12 +43,17 @@ describe('AdminRepairService', () => {
             resolveEffectiveBranchId: jest.fn()
         };
 
+        mockEventBus = {
+            publish: jest.fn(),
+            on: jest.fn().mockReturnValue(of()),
+        };
+
         TestBed.configureTestingModule({
             providers: [
                 AdminRepairService,
                 { provide: RepairRepository, useValue: mockRepository },
                 { provide: AuthService, useValue: mockAuthService },
-                { provide: InvoiceService, useValue: {} },
+                { provide: IEventBus, useValue: mockEventBus },
                 { provide: CustomerService, useValue: {} },
                 { provide: BranchContextService, useValue: mockBranchContextService },
                 { provide: BranchService, useValue: mockBranchService },

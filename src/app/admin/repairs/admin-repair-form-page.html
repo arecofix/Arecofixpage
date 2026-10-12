@@ -23,6 +23,10 @@
                 <div class="divider divider-horizontal mx-0 before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 hidden xl:flex"></div>
                 
                 @if (id) {
+                    <app-generate-invoice-button
+                        [repairId]="id"
+                        [trackingCode]="repairForm.get('tracking_code')?.value"
+                    ></app-generate-invoice-button>
                     <div class="dropdown dropdown-end">
                         <div tabindex="0" role="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
                             <i class="fas fa-print"></i> Imprimir <i class="fas fa-chevron-down ml-1 text-xs"></i>

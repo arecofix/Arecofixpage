@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TabService, TabInfo } from '@app/core/services/tab.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { InvoiceService } from '@app/features/sales/application/invoice.service';
+import { OnInit, signal } from '@angular/core';
 
 @Component({
   selector: 'app-admin-tab-bar',
@@ -48,14 +50,18 @@ import { toSignal } from '@angular/core/rxjs-interop';
     `,
   ],
 })
-export class AdminTabBarComponent implements AfterViewInit {
+export class AdminTabBarComponent implements AfterViewInit, OnInit {
   public tabService = inject(TabService);
   private router = inject(Router);
+  private invoiceService = inject(InvoiceService, { optional: true });
 
   @ViewChild('tabsContainer') tabsContainerRef?: ElementRef<HTMLDivElement>;
 
   // Convert observable to signal for reactive performance
   tabs = toSignal(this.tabService.tabs$, { initialValue: [] as TabInfo[] });
+
+  // Pending invoice drafts counter for badge display
+  pendingDraftCount = signal<number>(0);
 
   // Touch tracking state to prevent conflicts between tapping and scrolling
   private touchStartX = 0;
@@ -73,6 +79,17 @@ export class AdminTabBarComponent implements AfterViewInit {
         setTimeout(() => this.scrollActiveTabIntoView(), 60);
       }
     });
+  }
+
+  async ngOnInit(): Promise<void> {
+    if (this.invoiceService) {
+      try {
+        const count = await this.invoiceService.getDraftCount();
+        this.pendingDraftCount.set(count);
+      } catch {
+        // Ignore failure
+      }
+    }
   }
 
   ngAfterViewInit(): void {

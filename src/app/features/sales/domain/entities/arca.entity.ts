@@ -186,9 +186,68 @@ export interface ArcaTaxBreakdown {
   vatAmount27: number;
   exemptAmount: number;
   totalNet: number; // Subtotal neto gravado
-  totalVat: number; // Total IVA liquidado
+  totalVat: number; // Total IVA liquidado (informativo en B, no discriminado en factura)
   discount: number; // Descuento aplicado
+  surcharge: number; // Recargo aplicado
   grandTotal: number; // Total final facturado
+  advancePayment: number; // Seña o anticipo abonado
+  balanceDue: number; // Saldo pendiente a cobrar
+  isVatIncluded: boolean; // True en Factura B (el IVA está incluido en el precio)
+  isVatExempt: boolean; // True en Factura C / X (sin IVA ni discriminación)
+  vatIncludedLegend?: string; // "El IVA se encuentra incluido en el precio" (RG 5614/2024)
+  transparencyLegend?: string; // Ley 27.743 / RG 5614
+}
+
+/**
+ * Mapeo de tipos de documento a códigos numéricos oficiales de ARCA
+ */
+export const ARCA_DOC_TYPE_CODES: Record<ArcaDocType, number> = {
+  CUIT: 80,
+  CUIL: 86,
+  DNI: 96,
+  Pasaporte: 94,
+  'Sin Identificar': 99,
+};
+
+/**
+ * Mapeo de tipos de comprobante a códigos numéricos oficiales de ARCA
+ */
+export const ARCA_INVOICE_NUMERIC_CODES: Record<ArcaInvoiceType, number> = {
+  A: 1,
+  B: 6,
+  C: 11,
+  X: 99,
+};
+
+/**
+ * Leyendas oficiales y normativas de ARCA
+ */
+export const ARCA_LEGENDS = {
+  VAT_INCLUDED_B: 'El IVA se encuentra incluido en el precio',
+  TRANSPARENCY_FISCAL: 'Régimen de Transparencia Fiscal al Consumidor (Ley 27.743 / RG 5614)',
+  DRAFT_NO_CAE: 'Este comprobante es un borrador interno. No tiene validez fiscal hasta obtener el CAE de ARCA.',
+  AUTHORIZED_VOUCHER: 'Comprobante autorizado por ARCA (ex AFIP) - Régimen de Factura Electrónica',
+  VALID_DOCUMENT: 'Documento válido como Factura Electrónica conforme R.G. AFIP/ARCA.',
+  CAE_PENDING: 'PENDIENTE DE CAE',
+};
+
+/**
+ * Estructura oficial del código QR según RG 4892/2020 de ARCA
+ */
+export interface ArcaQrData {
+  ver: number;
+  fecha: string; // YYYY-MM-DD
+  cuit: number; // CUIT sin guiones (11 dígitos)
+  ptoVta: number;
+  tipoCmp: number; // 1: A, 6: B, 11: C, 99: X
+  nroCmp: number;
+  importe: number;
+  moneda: string; // 'PES'
+  ctz: number; // 1
+  tipoDocRec?: number;
+  nroDocRec?: number;
+  tipoCodAut: string; // 'E'
+  codAut: number | null; // CAE o null si está pendiente
 }
 
 /**
@@ -201,3 +260,4 @@ export interface ArcaValidationResult {
   requiresIdentification: boolean;
   currentThreshold: number;
 }
+

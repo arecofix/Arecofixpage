@@ -4,7 +4,13 @@ import { Repair, CreateRepairDto, UpdateRepairDto, RepairStatus, RepairPart } fr
 import { Observable, firstValueFrom } from 'rxjs';
 import { User } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
-import { InvoiceService } from '@app/features/sales/application/invoice.service';
+import { IEventBus } from '@app/core/events/event-bus.interface';
+import {
+    RepairOrderReadyForInvoicingEvent,
+    RepairOrderCancelledEvent,
+    RepairOrderRolledBackEvent,
+    RepairOrderItemSnapshot,
+} from '../../domain/events/repair-order-ready-for-invoicing.event';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { BranchService } from '@app/core/services/branch.service';
@@ -19,7 +25,7 @@ import { environment } from '@env/environment';
 export class AdminRepairService {
     private repository = inject(RepairRepository);
     private auth = inject(AuthService);
-    private invoiceService = inject(InvoiceService);
+    private eventBus = inject(IEventBus);
     private branchContextService = inject(BranchContextService);
     private branchService = inject(BranchService);
     private customerService = inject(CustomerService);
@@ -339,45 +345,104 @@ export class AdminRepairService {
             }
         }
 
-        // [USER-REQ-5] AUTOMATIC INVOICING TRIGGER
-        // If status changed to DELIVERED and there is a total balance to pay, generate invoice.
-        // We check if it WASN'T delivered before to avoid duplicate invoices on repetitive saves.
-        if (payload.current_status_id === this.STATUS_DELIVERED && 
-            originalRepair && 
-            originalRepair.current_status_id !== this.STATUS_DELIVERED) {
-            
-            const totalToInvoice = payload.final_cost ?? originalRepair.final_cost;
-            
-            if (totalToInvoice && totalToInvoice > 0) {
-                try {
-                    await this.invoiceService.generateInvoice({
-                        customer_id: originalRepair.customer_id,
-                        customer_name: originalRepair.customer_name || 'Cliente Taller',
-                        type: 'B',
-                        origin: 'repair',
-                        repair_id: id as any,
-                        subtotal: totalToInvoice,
-                        tax_amount: 0,
-                        discount: 0,
-                        total_amount: totalToInvoice,
-                        notes: `Liquidación de Reparación #${originalRepair.tracking_code}`,
-                        items: [
-                            {
-                                description: `Servicio Técnico: ${originalRepair.device_model || 'Equipo'} - ${originalRepair.issue_description?.substring(0, 50)}...`,
-                                quantity: 1,
-                                unit_price: totalToInvoice,
-                                tax_rate: 0,
-                                subtotal: totalToInvoice,
-                                total: totalToInvoice
-                            }
-                        ]
-                    });
-                } catch (invoiceErr) {
-                    // We don't block the repair update if invoice fails, but we log it.
-                    console.error('Error al generar factura automática para la reparación', invoiceErr);
-                }
+        // [EVENT-DRIVEN] Domain events for Invoicing and Lifecycle
+        if (payload.current_status_id && originalRepair && originalRepair.current_status_id !== payload.current_status_id) {
+            // 1. Transition to READY_FOR_PICKUP (5) -> Emit RepairOrderReadyForInvoicing
+            if (payload.current_status_id === RepairStatus.READY_FOR_PICKUP) {
+                await this.publishReadyForInvoicingEvent(originalRepair, payload);
+            }
+            // 2. Transition to CANCELLED (7) -> Emit RepairOrderCancelled
+            else if (payload.current_status_id === RepairStatus.CANCELLED) {
+                this.eventBus.publish(new RepairOrderCancelledEvent({
+                    repairOrderId: id,
+                    cancelledAt: new Date().toISOString(),
+                    reason: 'Orden cancelada desde administración',
+                    tenantId: originalRepair.tenant_id,
+                }));
+            }
+            // 3. Rollback from READY_FOR_PICKUP to an earlier state -> Emit RepairOrderRolledBack
+            else if (originalRepair.current_status_id === RepairStatus.READY_FOR_PICKUP && payload.current_status_id < RepairStatus.READY_FOR_PICKUP) {
+                this.eventBus.publish(new RepairOrderRolledBackEvent({
+                    repairOrderId: id,
+                    previousStatusId: originalRepair.current_status_id,
+                    newStatusId: payload.current_status_id,
+                    rolledBackAt: new Date().toISOString(),
+                    tenantId: originalRepair.tenant_id,
+                }));
             }
         }
+    }
+
+    /**
+     * Contextual trigger for manual invoice draft generation from UI button
+     */
+    async triggerInvoicingDraft(repairId: string): Promise<void> {
+        const repair = await this.getById(repairId);
+        if (!repair) throw new Error('Reparación no encontrada');
+        await this.publishReadyForInvoicingEvent(repair, {});
+    }
+
+    private async publishReadyForInvoicingEvent(originalRepair: Repair, updatePayload: Partial<Repair>): Promise<void> {
+        const laborCost = updatePayload.technical_labor_cost ?? originalRepair.technical_labor_cost ?? 0;
+        const parts = originalRepair.parts || [];
+        const partsCost = parts.reduce((acc, p) => acc + ((p.quantity || 1) * (p.unit_price_at_time || p.cost_at_time || 0)), 0);
+        const surchargePercentage = updatePayload.surcharge_percentage ?? originalRepair.surcharge_percentage ?? 0;
+        const subtotalPreSurcharge = laborCost + partsCost;
+        const surchargeAmount = surchargePercentage > 0 ? (subtotalPreSurcharge * surchargePercentage / 100) : 0;
+        const depositAmount = updatePayload.deposit_amount ?? originalRepair.deposit_amount ?? 0;
+        const totalAmount = updatePayload.final_cost ?? originalRepair.final_cost ?? (subtotalPreSurcharge + surchargeAmount);
+        const balanceDue = Math.max(0, totalAmount - depositAmount);
+
+        const itemsSnapshot: RepairOrderItemSnapshot[] = [
+            {
+                type: 'labor',
+                description: `Servicio Técnico: ${originalRepair.device_model || 'Equipo'} - ${originalRepair.issue_description?.substring(0, 100) || 'Reparación'}`,
+                quantity: 1,
+                unitPrice: laborCost,
+                taxRate: 0.21,
+                subtotal: laborCost,
+                isLabor: true,
+            },
+            ...parts.map((p): RepairOrderItemSnapshot => ({
+                id: p.id,
+                productId: p.product_id,
+                type: 'part',
+                description: p.name || p.product_name || 'Repuesto',
+                quantity: p.quantity || 1,
+                unitPrice: p.unit_price_at_time || p.cost_at_time || 0,
+                taxRate: 0.21,
+                subtotal: (p.quantity || 1) * (p.unit_price_at_time || p.cost_at_time || 0),
+                isLabor: false,
+            })),
+        ];
+
+        this.eventBus.publish(new RepairOrderReadyForInvoicingEvent({
+            repairOrderId: originalRepair.id,
+            trackingCode: originalRepair.tracking_code,
+            customerSnapshot: {
+                customerId: originalRepair.customer_id,
+                name: updatePayload.customer_name ?? originalRepair.customer_name ?? 'Cliente de Taller',
+                taxId: updatePayload.customer_dni ?? originalRepair.customer_dni,
+                phone: updatePayload.customer_phone ?? originalRepair.customer_phone,
+                email: updatePayload.customer_email ?? originalRepair.customer_email,
+            },
+            itemsSnapshot,
+            totalsSnapshot: {
+                technicalLaborCost: laborCost,
+                sparePartsCost: partsCost,
+                surchargePercentage,
+                surchargeAmount,
+                depositAmount,
+                totalAmount,
+                balanceDue,
+            },
+            issuedAt: new Date().toISOString(),
+            warranty: originalRepair.warranty,
+            paymentMethod: updatePayload.payment_method ?? originalRepair.payment_method,
+            notes: originalRepair.notes,
+            technicalReport: originalRepair.technical_report || originalRepair.technician_notes,
+            tenantId: originalRepair.tenant_id,
+        }));
     }
 
     async uploadImage(file: File): Promise<string> {

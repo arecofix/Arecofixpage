@@ -3,6 +3,7 @@ import { AdminTabBarComponent } from './admin-tab-bar.component';
 import { TabService, TabInfo } from '@app/core/services/tab.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { InvoiceService } from '@app/features/sales/application/invoice.service';
 
 describe('AdminTabBarComponent', () => {
   let component: AdminTabBarComponent;
@@ -28,11 +29,16 @@ describe('AdminTabBarComponent', () => {
       navigateByUrl: jest.fn(),
     };
 
+    const mockInvoiceService = {
+      getDraftCount: jest.fn().mockResolvedValue(0),
+    };
+
     await TestBed.configureTestingModule({
       imports: [AdminTabBarComponent],
       providers: [
         { provide: TabService, useValue: mockTabService },
         { provide: Router, useValue: mockRouter },
+        { provide: InvoiceService, useValue: mockInvoiceService },
       ],
     }).compileComponents();
 
@@ -113,5 +119,16 @@ describe('AdminTabBarComponent', () => {
     expect(stopPropagation).toHaveBeenCalled();
     expect(preventDefault).toHaveBeenCalled();
     expect(mockTabService.closeTab).toHaveBeenCalledWith(1);
+  });
+
+  it('should display pending draft badge when pendingDraftCount > 0 on Facturación tab', () => {
+    component.pendingDraftCount.set(3);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const badge = compiled.querySelector('#tab-pending-drafts-badge');
+
+    expect(badge).toBeTruthy();
+    expect(badge?.textContent?.trim()).toBe('3');
   });
 });

@@ -1,5 +1,5 @@
 <!-- Modal Facturación ARCA (ex AFIP) -->
-<div class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fade-in" id="arca-invoice-modal">
+<div class="fixed inset-0 z-[70] overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fade-in" id="arca-invoice-modal">
   <div class="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] animate-scale-up">
 
     <!-- ── MODAL HEADER ── -->
@@ -412,64 +412,100 @@
         </div>
       </section>
 
-      <!-- 6. CUADRO DE DESGLOSE DE IVA Y TOTALES (Ley 27.743 y RG 5614/2024) -->
+      <!-- 6. CUADRO DE DESGLOSE FISCAL Y TOTALES (Ley 27.743 y RG 5614/2024) -->
       <section class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900 text-gray-200 rounded-3xl p-5 shadow-inner">
-        <!-- Régimen de Transparencia Fiscal -->
-        <div class="space-y-2 text-xs border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-[10px]">
-            <i class="fas fa-scale-balanced"></i> Transparencia Fiscal al Consumidor (Ley 27.743)
+        <!-- Régimen de Transparencia Fiscal (Solo Factura A y B) -->
+        @if (invoiceType() === 'A' || invoiceType() === 'B') {
+          <div class="space-y-2 text-xs border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
+            <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-[10px]">
+              <i class="fas fa-scale-balanced"></i>
+              @if (invoiceType() === 'B') {
+                Transparencia Fiscal al Consumidor (Ley 27.743 / RG 5614)
+              } @else {
+                IVA Discriminado por Alícuota (Ley 27.743 / RG 5614)
+              }
+            </div>
+
+            <div class="space-y-1 pt-1 text-slate-400">
+              <div class="flex justify-between">
+                <span>Neto Gravado al 21%:</span>
+                <span class="font-mono text-slate-200">${{ taxBreakdown().netAmount21 | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>IVA Liquidado al 21%:</span>
+                <span class="font-mono text-slate-200">${{ taxBreakdown().vatAmount21 | number:'1.2-2' }}</span>
+              </div>
+
+              @if (taxBreakdown().netAmount105 > 0) {
+                <div class="flex justify-between">
+                  <span>Neto Gravado al 10.5%:</span>
+                  <span class="font-mono text-slate-200">${{ taxBreakdown().netAmount105 | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>IVA Liquidado al 10.5%:</span>
+                  <span class="font-mono text-slate-200">${{ taxBreakdown().vatAmount105 | number:'1.2-2' }}</span>
+                </div>
+              }
+
+              @if (taxBreakdown().netAmount27 > 0) {
+                <div class="flex justify-between">
+                  <span>Neto Gravado al 27%:</span>
+                  <span class="font-mono text-slate-200">${{ taxBreakdown().netAmount27 | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>IVA Liquidado al 27%:</span>
+                  <span class="font-mono text-slate-200">${{ taxBreakdown().vatAmount27 | number:'1.2-2' }}</span>
+                </div>
+              }
+
+              @if (taxBreakdown().exemptAmount > 0) {
+                <div class="flex justify-between">
+                  <span>Op. Exentas / No Gravadas:</span>
+                  <span class="font-mono text-slate-200">${{ taxBreakdown().exemptAmount | number:'1.2-2' }}</span>
+                </div>
+              }
+
+              <div class="flex justify-between text-slate-300 font-bold pt-1 border-t border-slate-800">
+                <span>{{ invoiceType() === 'B' ? 'IVA Estimado en el Precio:' : 'Total IVA Discriminado:' }}</span>
+                <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+              </div>
+            </div>
           </div>
-
-          <div class="space-y-1 pt-1 text-slate-400">
-            <div class="flex justify-between">
-              <span>Neto Gravado al 21%:</span>
-              <span class="font-mono text-slate-200">${{ taxBreakdown().netAmount21 | number:'1.2-2' }}</span>
+        } @else {
+          <!-- Factura C / X: Régimen Simplificado (Sin IVA ni Transparencia Fiscal) -->
+          <div class="space-y-2 text-xs border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4 flex flex-col justify-center">
+            <div class="flex items-center gap-2 text-emerald-400 font-bold uppercase tracking-wider text-[10px]">
+              <i class="fas fa-clipboard-check"></i> Régimen Simplificado (Monotributo)
             </div>
-            <div class="flex justify-between">
-              <span>IVA Liquidado al 21%:</span>
-              <span class="font-mono text-slate-200">${{ taxBreakdown().vatAmount21 | number:'1.2-2' }}</span>
-            </div>
-
-            <div class="flex justify-between">
-              <span>Neto Gravado al 10.5%:</span>
-              <span class="font-mono text-slate-200">${{ taxBreakdown().netAmount105 | number:'1.2-2' }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>IVA Liquidado al 10.5%:</span>
-              <span class="font-mono text-slate-200">${{ taxBreakdown().vatAmount105 | number:'1.2-2' }}</span>
-            </div>
-
-            @if (taxBreakdown().netAmount27 > 0) {
-              <div class="flex justify-between">
-                <span>Neto Gravado al 27%:</span>
-                <span class="font-mono text-slate-200">${{ taxBreakdown().netAmount27 | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>IVA Liquidado al 27%:</span>
-                <span class="font-mono text-slate-200">${{ taxBreakdown().vatAmount27 | number:'1.2-2' }}</span>
-              </div>
-            }
-
-            @if (taxBreakdown().exemptAmount > 0) {
-              <div class="flex justify-between">
-                <span>Op. Exentas / No Gravadas:</span>
-                <span class="font-mono text-slate-200">${{ taxBreakdown().exemptAmount | number:'1.2-2' }}</span>
-              </div>
-            }
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Operación no gravada con IVA conforme a la Ley de Monotributo. Este comprobante no genera crédito fiscal.
+            </p>
           </div>
-        </div>
+        }
 
         <!-- Totales Finales -->
         <div class="space-y-3 flex flex-col justify-between pl-0 md:pl-2">
           <div class="space-y-1.5 text-xs text-slate-400">
             <div class="flex justify-between">
-              <span>Subtotal Neto:</span>
+              <span>Subtotal:</span>
               <span class="font-mono text-slate-200">${{ taxBreakdown().totalNet | number:'1.2-2' }}</span>
             </div>
-            <div class="flex justify-between text-indigo-300 font-bold">
-              <span>Total IVA Discriminado:</span>
-              <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
-            </div>
+
+            <!-- Factura A: IVA Discriminado -->
+            @if (invoiceType() === 'A') {
+              <div class="flex justify-between text-indigo-300 font-bold">
+                <span>Total IVA Discriminado:</span>
+                <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+              </div>
+            }
+
+            <!-- Factura B: Leyenda obligatoria RG 5614/2024 -->
+            @if (invoiceType() === 'B') {
+              <div class="text-[11px] font-bold text-slate-400 italic py-1 border-y border-slate-800 text-center">
+                El IVA se encuentra incluido en el precio
+              </div>
+            }
+
             @if (taxBreakdown().discount > 0) {
               <div class="flex justify-between text-rose-400 font-bold">
                 <span>Descuento aplicado:</span>
@@ -537,7 +573,7 @@
      SUB-MODAL: SELECTOR DE CATÁLOGO DE PRODUCTOS
      ═══════════════════════════════════════════════════════════════════════════ -->
 @if (isCatalogOpen()) {
-  <div class="fixed inset-0 z-60 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+  <div class="fixed inset-0 z-[80] bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
     <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col max-h-[80vh]">
 
       <!-- Header Selector -->

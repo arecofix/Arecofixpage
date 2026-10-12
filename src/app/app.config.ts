@@ -80,6 +80,8 @@ import { SupabaseNotificationRepository } from './features/messages/infrastructu
 import { TenantService } from './core/services/tenant.service';
 import { AccountRepository } from './features/accounts/domain/repositories/account.repository';
 import { SupabaseAccountRepository } from './features/accounts/infrastructure/repositories/supabase-account.repository';
+import { IEventBus } from './core/events/event-bus.interface';
+import { EventBusService } from './core/events/event-bus.service';
 
 const isTauri =
   typeof window !== 'undefined' &&
@@ -230,5 +232,6 @@ export const appConfig: ApplicationConfig = {
       useClass: SupabaseNotificationRepository,
     },
     { provide: ICustomerDeviceRepository, useClass: SupabaseCustomerDeviceRepository },
+    { provide: IEventBus, useClass: EventBusService },
   ],
 };

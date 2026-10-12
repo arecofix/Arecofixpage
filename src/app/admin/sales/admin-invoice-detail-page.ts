@@ -19,6 +19,7 @@ import {
   InvoiceItem,
 } from '@app/features/sales/domain/entities/invoice.entity';
 import { InvoicePdfExportService } from '@app/features/sales/application/services/invoice-pdf-export.service';
+import { QrGeneratorService } from '@app/features/sales/application/services/qr-generator.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import {
   ARCA_ITEM_TYPES,
@@ -26,27 +27,38 @@ import {
   ArcaItemType,
 } from '@app/features/sales/domain/entities/arca.entity';
 import { CalculateArcaTotalsUseCase } from '@app/features/sales/domain/usecases/calculate-arca-totals.usecase';
+import { ValidateArcaInvoiceUseCase } from '@app/features/sales/domain/usecases/validate-arca-invoice.usecase';
+import { InvoiceDraftBannerComponent } from './components/invoice-draft-banner/invoice-draft-banner.component';
 
 @Component({
   selector: 'app-admin-invoice-detail-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, InvoiceDraftBannerComponent],
   templateUrl: './admin-invoice-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
-      /* Configuración global de impresión A4 conforme a Ley 27.743 y ARCA */
+      /* Configuración global de impresión A4 conforme a Ley 27.743 y RG 4892 */
       @page {
         size: A4;
-        margin: 10mm;
+        margin: 10mm 12mm;
       }
 
       @media print {
-        /* Ocultar elementos de UI no imprimibles */
+        body {
+          visibility: hidden !important;
+          background: #ffffff !important;
+          color: #000000 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
         .no-print,
         header,
         aside,
         nav,
+        button,
+        .toolbar,
         .drawer-side,
         .navbar,
         .tab-bar-container {
@@ -54,38 +66,35 @@ import { CalculateArcaTotalsUseCase } from '@app/features/sales/domain/usecases/
           visibility: hidden !important;
         }
 
-        body {
-          visibility: hidden !important;
-          background: #ffffff !important;
-          color: #000000 !important;
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-
         /* Contenedor oficial de la factura para evitar hoja en blanco */
-        .factura-container,
-        .print-container {
+        .factura-container {
           visibility: visible !important;
-          display: block !important;
           position: absolute !important;
           left: 0 !important;
           top: 0 !important;
           width: 100% !important;
-          margin: 0 !important;
-          padding: 0 !important;
           background: #ffffff !important;
           color: #000000 !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
           box-shadow: none !important;
           border: none !important;
         }
 
-        .factura-container *,
-        .print-container * {
+        .factura-container * {
           visibility: visible !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
+        }
+
+        .qr-container {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+        }
+
+        .no-break {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
         }
 
         /* Modo Ticket Térmico 80mm */
@@ -118,6 +127,7 @@ export class AdminInvoiceDetailPage implements OnInit {
   private companyService = inject(CompanyService);
   private invoiceService = inject(InvoiceService);
   private pdfExportService = inject(InvoicePdfExportService);
+  private qrGenerator = inject(QrGeneratorService);
   private notificationService = inject(NotificationService);
   public t = inject(TranslationService).t;
 
@@ -127,6 +137,7 @@ export class AdminInvoiceDetailPage implements OnInit {
   loading = signal(true);
   sharing = signal(false);
   error = signal('');
+  qrCodeDataUrl = signal<string>('');
 
   /** Controls print rendering mode: 'a4' for full invoice, 'pos' for 80mm ticket */
   printMode = signal<'a4' | 'pos'>('a4');
@@ -135,7 +146,17 @@ export class AdminInvoiceDetailPage implements OnInit {
   taxBreakdown = computed(() => {
     const currentItems = this.items();
     const inv = this.invoice();
-    return CalculateArcaTotalsUseCase.execute(currentItems, inv?.discount || 0);
+    return CalculateArcaTotalsUseCase.execute(
+      currentItems,
+      inv?.discount || 0,
+      inv?.type || 'B',
+      inv?.surcharge || 0,
+      inv?.advance_payment || 0
+    );
+  });
+
+  emitterVatCondition = computed(() => {
+    return this.getEmitterData().vatCondition;
   });
 
   async ngOnInit() {
@@ -153,6 +174,16 @@ export class AdminInvoiceDetailPage implements OnInit {
         if (result.invoice) {
           this.invoice.set(result.invoice);
           this.items.set(result.items);
+          // Generate official ARCA QR code (RG 4892/2020)
+          try {
+            const qrUrl = await this.qrGenerator.generateInvoiceQrDataUrl(
+              result.invoice,
+              this.getEmitterData()
+            );
+            this.qrCodeDataUrl.set(qrUrl);
+          } catch (qrErr) {
+            console.warn('[AdminInvoiceDetailPage] Failed to generate QR', qrErr);
+          }
         } else {
           this.error.set('Factura no encontrada');
         }
@@ -229,6 +260,95 @@ export class AdminInvoiceDetailPage implements OnInit {
   getItemTypeLabel(type?: string): string {
     if (!type) return 'General';
     return ARCA_ITEM_TYPES[type as ArcaItemType]?.label || type;
+  }
+
+  confirming = signal(false);
+
+  /**
+   * Confirma el borrador de factura aplicando reglas fiscales ARCA y validación de umbrales
+   */
+  async handleConfirmDraft(): Promise<void> {
+    const inv = this.invoice();
+    if (!inv) return;
+
+    const emitter = this.getEmitterData();
+    const isMonotributo =
+      emitter.vatCondition.toLowerCase().includes('monotributo') ||
+      emitter.vatCondition.toLowerCase() === 'monotributista';
+
+    // Regla: Si el emisor es Monotributista, mostrar advertencia
+    if (isMonotributo) {
+      this.notificationService.showInfo(
+        'Como Monotributista, solo podés emitir Factura C. El IVA no se discrimina.'
+      );
+    }
+
+    // Regla: Aplicar validaciones de umbrales ARCA ($208.644 / $417.288) al confirmar
+    const validation = ValidateArcaInvoiceUseCase.execute({
+      type: inv.type,
+      customer: {
+        docType: (inv.customer_doc_type as any) || 'DNI',
+        docNumber: inv.customer_tax_id || '',
+        name: inv.customer_name || '',
+        address: inv.customer_address || '',
+        vatCondition: (inv.customer_vat_condition as any) || 'Consumidor Final',
+      },
+      items: this.items().map((it) => ({
+        description: it.description,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        tax_rate: it.tax_rate,
+      })),
+      paymentMethod: (inv.payment_method as any) || 'cash',
+      grandTotal: inv.total_amount,
+      emitterVatCondition: emitter.vatCondition,
+    });
+
+    if (!validation.isValid) {
+      this.notificationService.showError(
+        validation.errors[0] || 'Comprobante no cumple con la normativa ARCA'
+      );
+      return;
+    }
+
+    this.confirming.set(true);
+    try {
+      await this.invoiceService.confirmDraft(inv.id);
+      this.notificationService.showSuccess('Borrador de factura confirmado exitosamente.');
+
+      // Recargar detalles actualizados
+      const updated = await this.invoiceService.getInvoiceWithDetails(inv.id);
+      if (updated.invoice) {
+        this.invoice.set(updated.invoice);
+        this.items.set(updated.items);
+      }
+    } catch (e: unknown) {
+      console.error('Error confirming invoice draft:', e);
+      const msg = e instanceof Error ? e.message : 'Error al confirmar la factura';
+      this.notificationService.showError(msg);
+    } finally {
+      this.confirming.set(false);
+    }
+  }
+
+  formatPtoVta(val?: string | number): string {
+    const num = parseInt(String(val || 1), 10);
+    return isNaN(num) ? '00001' : String(num).padStart(5, '0');
+  }
+
+  formatCompNro(val?: string | number): string {
+    const num = parseInt(String(val || 1), 10);
+    return isNaN(num) ? '00000001' : String(num).padStart(8, '0');
+  }
+
+  getTypeCode(type?: string): string {
+    switch (type) {
+      case 'A': return '001';
+      case 'B': return '006';
+      case 'C': return '011';
+      case 'X': return '099';
+      default: return '006';
+    }
   }
 
   private getEmitterData(): ArcaEmitterData {
