@@ -19,6 +19,7 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
   }): Promise<Invoice[]> {
     const selectFields = `
       id, invoice_number, order_id, repair_id, customer_name, customer_email, 
+      customer_tax_id, customer_address, notes,
       issued_at, subtotal, discount, tenant_id,
       type, origin, tax_amount, total_amount
     `;

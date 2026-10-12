@@ -26,6 +26,7 @@ import { PreferencesService } from '@app/shared/services/preferences.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { AccessibilitySidebarComponent } from '@app/shared/components/accessibility-sidebar/accessibility-sidebar.component';
 import { LockScreenComponent } from '@app/shared/components/lock-screen/lock-screen.component';
+import { AdminTabBarComponent } from './components/admin-tab-bar/admin-tab-bar.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TabService } from '@app/core/services/tab.service';
 import {
@@ -48,6 +49,7 @@ import {
     RouterLinkActive,
     AccessibilitySidebarComponent,
     LockScreenComponent,
+    AdminTabBarComponent,
   ],
   templateUrl: './admin-layout.html',
   changeDetection: ChangeDetectionStrategy.Eager,

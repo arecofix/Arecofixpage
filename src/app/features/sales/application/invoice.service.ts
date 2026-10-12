@@ -10,6 +10,8 @@ import {
 import { InvoiceRepository } from '../domain/repositories/invoice.repository';
 import { InvoicesStore } from './services/invoices.store';
 import { firstValueFrom } from 'rxjs';
+import { CalculateArcaTotalsUseCase } from '../domain/usecases/calculate-arca-totals.usecase';
+import { ValidateArcaInvoiceUseCase } from '../domain/usecases/validate-arca-invoice.usecase';
 
 /**
  * InvoiceService — Application Layer (Use Case)
@@ -47,13 +49,15 @@ export class InvoiceService {
       const finalTotal   = dto.items?.length ? verifiedTotals.total     : dto.total_amount;
 
       // ── Persist ────────────────────────────────────────────────────────────
-      const payload = {
+      const payload: Record<string, unknown> = {
         tenant_id:       tenantId,
         order_id:        dto.order_id       ?? null,
         repair_id:       dto.repair_id      ?? null,
         customer_id:     dto.customer_id    ?? null,
         customer_name:   dto.customer_name  ?? 'Consumidor Final',
         customer_email:  dto.customer_email ?? null,
+        customer_tax_id: dto.customer_tax_id ?? null,
+        customer_address: dto.customer_address ?? null,
         type:            dto.type,
         origin:          dto.origin,
         subtotal:        finalSubtotal,
@@ -87,28 +91,28 @@ export class InvoiceService {
   async getAll(limit: number = 20, offset: number = 0, searchTerm?: string): Promise<Invoice[]> {
     const tenantId = this.tenantService.getTenantId();
     try {
-        return await firstValueFrom(this.invoicesStore.getInvoicesList({ limit, offset, tenantId, searchTerm }));
+      return await firstValueFrom(this.invoicesStore.getInvoicesList({ limit, offset, tenantId, searchTerm }));
     } catch (error) {
-        this.logger.error('[InvoiceService] getAll failed', error);
-        return [];
+      this.logger.error('[InvoiceService] getAll failed', error);
+      return [];
     }
   }
 
   async getInvoicesCount(searchTerm?: string): Promise<number> {
     const tenantId = this.tenantService.getTenantId();
     try {
-        return await this.repository.getCount({ tenantId, searchTerm });
+      return await this.repository.getCount({ tenantId, searchTerm });
     } catch (error) {
-        return 0;
+      return 0;
     }
   }
 
   async getById(id: string): Promise<Invoice | null> {
     const tenantId = this.tenantService.getTenantId();
     try {
-        return await firstValueFrom(this.invoicesStore.getInvoiceDetail(id, tenantId));
+      return await firstValueFrom(this.invoicesStore.getInvoiceDetail(id, tenantId));
     } catch (error) {
-        return null;
+      return null;
     }
   }
 
@@ -123,25 +127,25 @@ export class InvoiceService {
     let items: InvoiceItem[] = [];
 
     try {
-        const referenceId = invoice.order_id ?? invoice.repair_id;
-        if (referenceId) {
-            items = await this.repository.getLineItems({
-                origin: invoice.origin,
-                referenceId,
-                tenantId,
-                embeddedItems: invoice.items,
-            }) as InvoiceItem[];
-        } else {
-            items = invoice.items ?? [];
-        }
+      const referenceId = invoice.order_id ?? invoice.repair_id;
+      if (referenceId) {
+        items = await this.repository.getLineItems({
+          origin: invoice.origin,
+          referenceId,
+          tenantId,
+          embeddedItems: invoice.items,
+        }) as InvoiceItem[];
+      } else {
+        items = invoice.items ?? [];
+      }
     } catch (error) {
-        this.logger.error('Error fetching invoice items', error);
+      this.logger.error('Error fetching invoice items', error);
     }
 
     return { invoice, items };
   }
 
-  // ─── Domain Utilities (Pure Functions) ─────────────────────────────────────
+  // ─── Domain Utilities (Pure Functions / ARCA Standards) ────────────────────
 
   calculateTotals(
     items: Pick<InvoiceItem, 'quantity' | 'unit_price' | 'tax_rate'>[],
@@ -158,7 +162,25 @@ export class InvoiceService {
     };
   }
 
-  buildItem(description: string, quantity: number, unitPrice: number, taxRate: number = 0.21): InvoiceItem {
+  calculateArcaTotals(
+    items: Array<Pick<InvoiceItem, 'quantity' | 'unit_price' | 'tax_rate'>>,
+    discount: number = 0
+  ) {
+    return CalculateArcaTotalsUseCase.execute(items, discount);
+  }
+
+  validateArca(params: Parameters<typeof ValidateArcaInvoiceUseCase.execute>[0]) {
+    return ValidateArcaInvoiceUseCase.execute(params);
+  }
+
+  buildItem(
+    description: string,
+    quantity: number,
+    unitPrice: number,
+    taxRate: number = 0.21,
+    itemType: any = 'product',
+    productId?: string
+  ): InvoiceItem {
     const subtotal = quantity * unitPrice;
     const total    = subtotal * (1 + taxRate);
     return {
@@ -168,6 +190,8 @@ export class InvoiceService {
       tax_rate:   taxRate,
       subtotal:   +subtotal.toFixed(2),
       total:      +total.toFixed(2),
+      item_type:  itemType,
+      product_id: productId,
     };
   }
 }
