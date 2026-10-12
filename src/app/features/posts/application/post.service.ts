@@ -18,8 +18,8 @@ export class PostService {
         if (typeof window !== 'undefined') {
           const response = await fetch('/assets/data/fallback_blog_posts.json');
           if (response.ok) {
-            const fallbackData = await response.json();
-            const found = fallbackData.find((p: any) => p.slug === slug);
+            const fallbackData = (await response.json()) as Record<string, unknown>[];
+            const found = fallbackData.find((p) => p['slug'] === slug);
             if (found) return this.mapToEntity(found);
           }
         }
@@ -44,8 +44,8 @@ export class PostService {
         if (typeof window !== 'undefined') {
           const response = await fetch('/assets/data/fallback_blog_posts.json');
           if (response.ok) {
-            const fallbackData = await response.json();
-            return fallbackData.slice(0, limit).map((d: any) => this.mapToEntity(d));
+            const fallbackData = (await response.json()) as Record<string, unknown>[];
+            return fallbackData.slice(0, limit).map((d) => this.mapToEntity(d));
           }
         }
       } catch (e) {
@@ -54,7 +54,7 @@ export class PostService {
       return [];
     }
 
-    return data.map((d: any) => this.mapToEntity(d));
+    return data.map((d) => this.mapToEntity(d));
   }
 
   async getComments(postId: string): Promise<PostComment[]> {
@@ -87,11 +87,11 @@ export class PostService {
 
   private mapToEntity(data: Record<string, unknown>): Post {
     const rawImage = (data['featured_image'] ?? data['image'] ?? data['image_url']) as string | null;
-    let role = undefined;
+    let role: string | undefined = undefined;
     if (data['profiles'] && typeof data['profiles'] === 'object' && !Array.isArray(data['profiles'])) {
-        role = (data['profiles'] as any).role;
+        role = (data['profiles'] as { role?: string }).role;
     } else if (Array.isArray(data['profiles']) && data['profiles'].length > 0) {
-        role = data['profiles'][0].role;
+        role = (data['profiles'][0] as { role?: string })?.role;
     }
 
     return {
@@ -101,7 +101,7 @@ export class PostService {
       title: data['title'] as string,
       slug: data['slug'] as string,
       content: data['content'] as string,
-      image: this.getImageUrl(rawImage) || undefined,
+      image: this.getImageUrl(rawImage),
       published: data['status'] === 'published',
       meta_title: (data['seo_title'] || data['meta_title']) as string | undefined,
       meta_description: (data['seo_description'] || data['meta_description']) as string | undefined,
@@ -111,9 +111,46 @@ export class PostService {
     };
   }
 
-  private getImageUrl(pathOrUrl: string | null): string | null {
-    if (!pathOrUrl) return null;
-    if (pathOrUrl.startsWith('http') || pathOrUrl.startsWith('assets/')) return pathOrUrl;
+  private getImageUrl(pathOrUrl: string | null): string {
+    if (!pathOrUrl) return 'assets/img/servicios/pantalla.jpg';
+    if (pathOrUrl.startsWith('assets/')) return pathOrUrl;
+
+    // Map known legacy 404 images from old defunct storage or dead URLs to valid local assets
+    if (
+      pathOrUrl.includes('jftiyfnnaogmgvksgkbn.supabase.co') ||
+      pathOrUrl.includes('api.arecofix.com.ar/public-assets/posts') ||
+      pathOrUrl.includes('1764621227166') ||
+      pathOrUrl.includes('1764621102072') ||
+      pathOrUrl.includes('1764621290350') ||
+      pathOrUrl.includes('1764784353818') ||
+      pathOrUrl.includes('1780271564143') ||
+      pathOrUrl.includes('1764621178905') ||
+      pathOrUrl.includes('1769624494183') ||
+      pathOrUrl.includes('1764620943181') ||
+      pathOrUrl.includes('1764620763896')
+    ) {
+      if (pathOrUrl.includes('auriculares_apple') || pathOrUrl.includes('iphone')) {
+        return 'assets/img/repair/iphone.webp';
+      }
+      if (pathOrUrl.includes('auriculares') || pathOrUrl.includes('1000128639')) {
+        return 'assets/img/repair/apple.webp';
+      }
+      if (pathOrUrl.includes('placa') || pathOrUrl.includes('515994911')) {
+        return 'assets/img/servicios/placa.jpg';
+      }
+      if (pathOrUrl.includes('play') || pathOrUrl.includes('play4')) {
+        return 'assets/img/repair/1.webp';
+      }
+      if (pathOrUrl.includes('girl') || pathOrUrl.includes('express')) {
+        return 'assets/img/repair/tecnico.webp';
+      }
+      if (pathOrUrl.includes('Mariano') || pathOrUrl.includes('28egdow')) {
+        return 'assets/img/repair/2.webp';
+      }
+      return 'assets/img/servicios/pantalla.jpg';
+    }
+
+    if (pathOrUrl.startsWith('http')) return pathOrUrl;
 
     const client = this.scoped.client;
     if (pathOrUrl.includes('public-assets/')) {

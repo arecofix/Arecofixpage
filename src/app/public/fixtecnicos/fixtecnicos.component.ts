@@ -83,4 +83,12 @@ export class FixtecnicosComponent {
     link.click();
     alert('Descargando Guía para Técnicos...');
   }
+
+  onImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img && !img.dataset['fallback']) {
+      img.dataset['fallback'] = '1';
+      img.src = 'assets/img/repair/1.webp';
+    }
+  }
 }

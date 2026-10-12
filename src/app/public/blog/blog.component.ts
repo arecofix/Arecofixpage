@@ -66,4 +66,12 @@ export class BlogComponent {
       this.loading.set(false);
     }
   }
+
+  onImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img && !img.dataset['fallback']) {
+      img.dataset['fallback'] = '1';
+      img.src = 'assets/img/servicios/pantalla.jpg';
+    }
+  }
 }
