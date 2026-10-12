@@ -10,7 +10,7 @@ import {
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
@@ -438,6 +438,22 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.authState.value.user;
+  }
+
+  async waitForAuth(): Promise<{ session: Session | null; user: User | null; profile: UserProfile | null; isInitialized: boolean }> {
+    if (this.authState.value.isInitialized) {
+      return this.authState.value;
+    }
+    return new Promise((resolve) => {
+      const sub = this.authState$.pipe(filter(s => s.isInitialized)).subscribe(state => {
+        sub.unsubscribe();
+        resolve(state);
+      });
+      setTimeout(() => {
+        sub.unsubscribe();
+        resolve(this.authState.value);
+      }, 3000);
+    });
   }
 
   async getUser(): Promise<User | null> {

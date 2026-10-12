@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto, RepairStatus, RepairPart } from '../../domain/entities/repair.entity';
 import { Observable, firstValueFrom } from 'rxjs';
+import { User } from '@supabase/supabase-js';
 import { AuthService } from '@app/core/services/auth.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
@@ -34,8 +35,20 @@ export class AdminRepairService {
         return firstValueFrom(this.repository.getById(id));
     }
 
+    private async resolveCurrentUser(): Promise<User | null> {
+        let user = this.auth.getCurrentUser();
+        if (!user && typeof this.auth.waitForAuth === 'function') {
+            const authState = await this.auth.waitForAuth();
+            user = authState?.user || null;
+        }
+        if (!user && typeof this.auth.getUser === 'function') {
+            user = await this.auth.getUser();
+        }
+        return user;
+    }
+
     async getAdminList(limit?: number, offset?: number, searchTerm?: string): Promise<Repair[]> {
-        const user = this.auth.getCurrentUser();
+        const user = await this.resolveCurrentUser();
         if (!user) throw new Error('Usuario no autenticado');
  
         const profile = await this.auth.getUserProfile(user.id);
@@ -53,8 +66,15 @@ export class AdminRepairService {
     }
 
     async getWorkshopSummary(month?: number, year?: number): Promise<any> {
-        const user = this.auth.getCurrentUser();
-        if (!user) throw new Error('Usuario no autenticado');
+        const user = await this.resolveCurrentUser();
+        if (!user) {
+            return {
+                inWorkshop: 0,
+                readyToPickup: 0,
+                pendingParts: 0,
+                thisMonthProfit: 0
+            };
+        }
 
         const profile = await this.auth.getUserProfile(user.id);
         const contextBranchId = this.branchContextService.getBranchId();
@@ -87,7 +107,7 @@ export class AdminRepairService {
     }
 
     async create(dto: CreateRepairDto): Promise<Repair> {
-        const user = this.auth.getCurrentUser();
+        const user = await this.resolveCurrentUser();
         if (!user) throw new Error('Usuario no autenticado');
 
         const profile = await this.auth.getUserProfile(user.id);

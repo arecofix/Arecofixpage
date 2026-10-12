@@ -157,7 +157,7 @@ export class AdminRepairsPage implements OnInit {
       const summary = await this.repairService.getWorkshopSummary();
       this.summary.set(summary);
     } catch (e) {
-      console.error('Error loading workshop summary', e);
+      console.warn('Error loading workshop summary', e);
     }
   }
 

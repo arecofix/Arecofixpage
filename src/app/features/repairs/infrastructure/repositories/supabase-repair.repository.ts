@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, switchMap } from 'rxjs';
+import { Observable, from, map, switchMap, of } from 'rxjs';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto, RepairPart, RepairChecklist } from '../../domain/entities/repair.entity';
 import { LoggerService } from '@app/core/services/logger.service';
@@ -25,7 +25,13 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         super(supabase, logger);
     }
 
+    private static readonly UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
     override getById(id: string): Observable<Repair | null> {
+        if (!id || !SupabaseRepairRepository.UUID_REGEX.test(id)) {
+            return of(null);
+        }
+
         let query = this.supabase.from(this.tableName)
             .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, type, imei, passcode, model:models(name, brand_id))')
             .eq('id', id);

@@ -28,6 +28,7 @@ describe('AdminRepairService', () => {
 
         mockAuthService = {
             getCurrentUser: jest.fn(),
+            waitForAuth: jest.fn().mockResolvedValue({ user: null, session: null, profile: null }),
             getUserProfile: jest.fn()
         };
 
