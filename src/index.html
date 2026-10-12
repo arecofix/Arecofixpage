@@ -19,7 +19,9 @@
         'facebook', 'gtm', 'gtag', 'user-agent-client-hints', 'permissions-policy',
         'unrecognized feature', 'private-state-token', 'join-ad-interest-group',
         'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
-        'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq'
+        'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq',
+        'cloudflareinsights', 'beacon.min.js', 'dead-clicks', 'posthog-recorder',
+        'us.i.posthog.com', 'us-assets.i.posthog.com', '504', 'gateway timeout'
       ];
       const isNoise = (args) => {
         const msg = args.map(a => {
@@ -38,6 +40,12 @@
       console.debug = (...a) => { if (!isNoise(a)) _debug.apply(console, a); };
 
       window.addEventListener('error', (e) => {
+        const target = e.target;
+        if (target && target.tagName === 'SCRIPT' && target.src && isNoise([target.src])) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          return true;
+        }
         if (isNoise([e.message, e.filename])) {
           e.stopImmediatePropagation();
           e.preventDefault();
@@ -146,6 +154,7 @@
       var gtagScript = document.createElement('script');
       gtagScript.async = true;
       gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
+      gtagScript.onerror = function () { /* Silently ignore ad-blocker or gateway timeout */ };
       document.head.appendChild(gtagScript);
 
       window.dataLayer = window.dataLayer || [];
@@ -162,12 +171,16 @@
         };
         if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
         n.queue = []; t = b.createElement(e); t.async = !0;
-        t.src = v; s = b.getElementsByTagName(e)[0];
+        t.src = v;
+        t.onerror = function () { /* Silently ignore ad-blocker or gateway timeout */ };
+        s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s)
       }(window, document, 'script',
         'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1561498334311503');
-      fbq('track', 'PageView');
+      try {
+        fbq('init', '1561498334311503');
+        fbq('track', 'PageView');
+      } catch (e) {}
     };
 
     if (window.location.hostname !== 'localhost') {

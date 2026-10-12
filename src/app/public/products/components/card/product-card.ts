@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, inject, output, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject, output, computed, signal } from '@angular/core';
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Product } from '../../interfaces';
@@ -40,6 +40,7 @@ export class ProductCard {
   private authService = inject(AuthService);
   router = inject(Router);
 
+  hasImageError = signal(false);
   isFavorite = computed(() => this.favoritesService.isFavorite(this.product().id));
 
   // Strategic Computeds
@@ -64,5 +65,9 @@ export class ProductCard {
     event.preventDefault();
     event.stopPropagation();
     this.cartService.addToCart(this.product());
+  }
+
+  onImageError() {
+    this.hasImageError.set(true);
   }
 }
