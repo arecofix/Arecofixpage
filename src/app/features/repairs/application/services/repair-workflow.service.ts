@@ -69,7 +69,7 @@ export class RepairWorkflowService {
                 ]
             }
         ]).subscribe({
-            error: (err) => console.error('Error sending WhatsApp repair_received:', err)
+            error: (err) => console.warn('[WhatsApp] Best-effort repair_received notification skipped:', err?.message || err)
         });
     }
 
@@ -128,7 +128,9 @@ export class RepairWorkflowService {
                             { type: 'text', text: `$${estimatedCost}` }
                         ]
                     }
-                ]).subscribe({ error: e => console.error(e) });
+                ]).subscribe({
+                    error: (err) => console.warn('[WhatsApp] Best-effort quote_ready notification skipped:', err?.message || err)
+                });
             }
         } else if (newStatus === 5) { // 5 = READY_FOR_PICKUP (Terminado)
             this.whatsappService.sendTemplateMessage(original.customer_phone, 'repair_finished', 'es_AR', [
@@ -139,7 +141,9 @@ export class RepairWorkflowService {
                         { type: 'text', text: original.device_model || 'Equipo' }
                     ]
                 }
-            ]).subscribe({ error: e => console.error(e) });
+            ]).subscribe({
+                error: (err) => console.warn('[WhatsApp] Best-effort repair_finished notification skipped:', err?.message || err)
+            });
         }
     }
   }

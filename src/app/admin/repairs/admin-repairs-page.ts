@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   effect,
+  untracked,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -49,11 +50,13 @@ export class AdminRepairsPage implements OnInit {
   }
 
   constructor() {
-    // React to branch changes globally
+    // React to branch changes globally (also runs on initial component creation)
     effect(() => {
       const branchId = this.branchContextService.currentBranchId();
-      this.loadRepairs();
-      this.loadSummary();
+      untracked(() => {
+        this.loadRepairs();
+        this.loadSummary();
+      });
     });
   }
   repairs = signal<Repair[]>([]);
@@ -146,7 +149,7 @@ export class AdminRepairsPage implements OnInit {
   date = new Date();
 
   async ngOnInit() {
-    await Promise.all([this.loadRepairs(), this.loadSummary()]);
+    // Initial data loading is already performed reactively by constructor effect on branch context resolution.
   }
 
   async loadSummary() {
