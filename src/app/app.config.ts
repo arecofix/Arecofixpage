@@ -113,6 +113,21 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
 
+    // Clean up any stale service workers in dev mode (prevents cancelled preload warnings)
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {
+        if (isDevMode() && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (const registration of registrations) {
+              registration.unregister().catch(() => {});
+            }
+          }).catch(() => {});
+        }
+      },
+      multi: true,
+    },
+
     // Supabase Client Provider via SupabaseService
     {
       provide: SUPABASE_CLIENT,

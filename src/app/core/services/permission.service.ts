@@ -12,6 +12,7 @@ export class PermissionService {
   // Cache of permissions for the current user
   private permissionsCache = signal<Set<string>>(new Set());
   private loaded = signal<boolean>(false);
+  private loadInFlight: Promise<void> | null = null;
 
   constructor() { }
 
@@ -19,29 +20,42 @@ export class PermissionService {
    * Loads the atomic permissions for the current user from the database.
    * This calls the UDF `get_my_permissions()`.
    */
-  async loadPermissions(): Promise<void> {
-    try {
-      const { data, error } = await this.supabase.rpc('get_my_permissions');
-      if (error) {
-        console.error('Error fetching permissions:', error);
-        this.permissionsCache.set(new Set());
-        return;
-      }
-      
-      const permSet = new Set<string>();
-      if (data && Array.isArray(data)) {
-        data.forEach(p => {
-          if (p && p.permission) {
-            permSet.add(p.permission);
-          }
-        });
-      }
-      this.permissionsCache.set(permSet);
-      this.loaded.set(true);
-    } catch (err) {
-      console.error('Unexpected error loading permissions', err);
-      this.permissionsCache.set(new Set());
+  async loadPermissions(force = false): Promise<void> {
+    if (!force && this.loaded()) {
+      return;
     }
+    if (this.loadInFlight) {
+      return this.loadInFlight;
+    }
+
+    this.loadInFlight = (async () => {
+      try {
+        const { data, error } = await this.supabase.rpc('get_my_permissions');
+        if (error) {
+          console.error('Error fetching permissions:', error);
+          this.permissionsCache.set(new Set());
+          return;
+        }
+        
+        const permSet = new Set<string>();
+        if (data && Array.isArray(data)) {
+          data.forEach(p => {
+            if (p && p.permission) {
+              permSet.add(p.permission);
+            }
+          });
+        }
+        this.permissionsCache.set(permSet);
+        this.loaded.set(true);
+      } catch (err) {
+        console.error('Unexpected error loading permissions', err);
+        this.permissionsCache.set(new Set());
+      } finally {
+        this.loadInFlight = null;
+      }
+    })();
+
+    return this.loadInFlight;
   }
 
   /**

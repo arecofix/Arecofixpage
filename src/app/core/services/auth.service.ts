@@ -176,6 +176,19 @@ export class AuthService {
         }
 
         if (session) {
+          const current = this.authState.value;
+          const isSameUser = current.user?.id === session.user.id;
+          const wasAlreadyInitialized = current.isInitialized && isSameUser && current.profile !== null;
+          const isOAuthRedirect = typeof window !== 'undefined' && window.location.hash.includes('access_token');
+
+          // If the user session is already initialized and this is a duplicate event or token refresh, skip redundant fetches
+          if (wasAlreadyInitialized && !isOAuthRedirect && (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN')) {
+             if (current.session?.access_token !== session.access_token) {
+               this.authState.next({ ...current, session, user: session.user });
+             }
+             return;
+          }
+
           const profile = await this.ensureProfile(session);
           
           if (profile?.tenant_id) {
@@ -193,9 +206,6 @@ export class AuthService {
                await this.fetchBranchDetails(savedId);
             }
           }
-
-          // Verificar si ya estábamos iniciados en sesión (background sync o refresh de tab)
-          const wasAlreadyInitialized = this.authState.value.isInitialized && this.authState.value.user !== null;
 
           if (profile) {
             this.authState.next({ session, user: session.user, profile, isInitialized: true });
@@ -311,36 +321,48 @@ export class AuthService {
     }
   }
 
+  private profileInFlightPromise: Promise<UserProfile | null> | null = null;
+
   /**
    * Ensures a profile row exists for the given session user.
    */
   private async ensureProfile(session: Session): Promise<UserProfile | null> {
-    try {
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
-        if (cached) return JSON.parse(cached);
-      }
+    const current = this.authState.value;
+    if (current.user?.id === session.user.id && current.profile) {
+      return current.profile;
+    }
 
-      const existingProfile = await this.profileService.getProfile(session.user.id);
-      const meta = session.user.user_metadata || {};
-      const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+    if (this.profileInFlightPromise) {
+      return this.profileInFlightPromise;
+    }
 
-      if (existingProfile) {
-         if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
-             const { data: updatedProfile, error } = await this.supabase
-                 .from('profiles')
-                 .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
-                 .eq('id', session.user.id)
-                 .select()
-                 .maybeSingle();
-             if (!error && updatedProfile) {
-                 localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
-                 return updatedProfile as UserProfile;
-             }
-         }
-         localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
-         return existingProfile;
-      }
+    this.profileInFlightPromise = (async () => {
+      try {
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
+          if (cached) return JSON.parse(cached);
+        }
+
+        const existingProfile = await this.profileService.getProfile(session.user.id);
+        const meta = session.user.user_metadata || {};
+        const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+
+        if (existingProfile) {
+           if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
+               const { data: updatedProfile, error } = await this.supabase
+                   .from('profiles')
+                   .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
+                   .eq('id', session.user.id)
+                   .select()
+                   .maybeSingle();
+               if (!error && updatedProfile) {
+                   localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
+                   return updatedProfile as UserProfile;
+               }
+           }
+           localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
+           return existingProfile;
+        }
 
       const currentTenantId = this.tenantService.getTenantId();
       const isFallback = currentTenantId === TENANT_CONSTANTS.FALLBACK_ID;
@@ -392,8 +414,13 @@ export class AuthService {
       const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
       if (cached) return JSON.parse(cached);
       return null;
+    } finally {
+      this.profileInFlightPromise = null;
     }
-  }
+  })();
+
+  return this.profileInFlightPromise;
+}
 
   async signOut(): Promise<string | null> {
     const { isTauri } = await import('@tauri-apps/api/core');
