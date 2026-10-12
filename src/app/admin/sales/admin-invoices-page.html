@@ -31,13 +31,50 @@
     </div>
     
     <!-- ── Search Bar ── -->
-    <div class="mb-8 w-full animate-fade-in-up" style="animation-delay: 100ms;">
+    <div class="mb-4 w-full animate-fade-in-up" style="animation-delay: 100ms;">
         <div class="relative group">
             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
             <input type="text" [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)"
                 placeholder="Buscar por cliente, notas o número de comprobante..."
                 class="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-gray-100 dark:border-gray-700 transition-all font-medium text-gray-800 dark:text-gray-200" />
         </div>
+    </div>
+
+    <!-- ── Status Filter Tabs & Draft Counter Badge ── -->
+    <div class="mb-6 flex flex-wrap items-center gap-2 animate-fade-in-up" style="animation-delay: 150ms;">
+      <button
+        type="button"
+        (click)="setStatusFilter('all')"
+        class="btn btn-sm rounded-xl font-bold transition-all"
+        [ngClass]="selectedStatusFilter() === 'all' ? 'btn-primary' : 'btn-ghost bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700'"
+      >
+        Todas las facturas
+      </button>
+
+      <button
+        type="button"
+        (click)="setStatusFilter('draft')"
+        class="btn btn-sm rounded-xl font-bold transition-all flex items-center gap-2"
+        [ngClass]="selectedStatusFilter() === 'draft' ? 'btn-warning text-gray-900 shadow-md shadow-amber-500/20' : 'btn-ghost bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700'"
+        id="btn-filter-drafts"
+      >
+        <i class="fas fa-file-signature text-xs"></i>
+        <span>Borradores Pendientes</span>
+        @if (pendingDraftCount() > 0) {
+          <span class="badge badge-sm badge-error font-extrabold text-white animate-pulse" id="badge-pending-drafts">
+            {{ pendingDraftCount() }}
+          </span>
+        }
+      </button>
+
+      <button
+        type="button"
+        (click)="setStatusFilter('issued')"
+        class="btn btn-sm rounded-xl font-bold transition-all"
+        [ngClass]="selectedStatusFilter() === 'issued' ? 'btn-primary' : 'btn-ghost bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700'"
+      >
+        Emitidas
+      </button>
     </div>
 
     <!-- ── Content ── -->

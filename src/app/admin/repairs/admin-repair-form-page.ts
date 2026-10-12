@@ -60,6 +60,7 @@ import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
 import { ICustomerDeviceRepository } from '@app/features/devices/domain/repositories/customer-device.repository';
+import { GenerateInvoiceButtonComponent } from './components/generate-invoice-button/generate-invoice-button.component';
 
 interface QuickShortcut {
   id: string;
@@ -76,7 +77,7 @@ interface ClientView extends Partial<UserProfile> {
 @Component({
   selector: 'app-admin-repair-form-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, GenerateInvoiceButtonComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-repair-form-page.html',
   styles: [`

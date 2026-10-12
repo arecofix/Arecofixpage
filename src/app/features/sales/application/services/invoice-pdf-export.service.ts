@@ -2,18 +2,21 @@ import { Injectable, inject } from '@angular/core';
 import {
   ARCA_CONSTANTS,
   ARCA_ITEM_TYPES,
+  ARCA_LEGENDS,
   ArcaEmitterData,
   ArcaInvoiceType,
 } from '../../domain/entities/arca.entity';
 import { Invoice, InvoiceItem } from '../../domain/entities/invoice.entity';
 import { CalculateArcaTotalsUseCase } from '../../domain/usecases/calculate-arca-totals.usecase';
 import { LoggerService } from '@app/core/services/logger.service';
+import { QrGeneratorService } from './qr-generator.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InvoicePdfExportService {
   private logger = inject(LoggerService);
+  private qrGenerator = inject(QrGeneratorService);
 
   /**
    * Lazily loads jsPDF and jspdf-autotable
@@ -52,7 +55,17 @@ export class InvoicePdfExportService {
 
     const totals = CalculateArcaTotalsUseCase.execute(
       items,
-      invoice.discount || 0
+      {
+        type: invoiceType,
+        discount: invoice.discount || 0,
+        advancePayment: invoice.advance_payment || 0,
+      }
+    );
+
+    // Generar código QR oficial ARCA RG 4892/2020
+    const { dataUrl: qrDataUrl } = await this.qrGenerator.generateFromInvoice(
+      invoice,
+      emitter
     );
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -249,44 +262,83 @@ export class InvoicePdfExportService {
     const finalTableY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : tableStartY + 40;
 
     // ──────────────────────────────────────────────────────────────────────────
-    // 6. APARTADO DE DESGLOSE DE IVA (Ley 27.743 y RG 5614/2024)
+    // 6. APARTADO DE DESGLOSE DE IVA / RÉGIMEN DE TRANSPARENCIA FISCAL
     // ──────────────────────────────────────────────────────────────────────────
     const taxBoxY = finalTableY + 4;
     const taxBoxHeight = 36;
-
-    // Caja de IVA (Ley 27.743 Transparencia Fiscal)
     const taxBoxWidth = contentWidth * 0.58;
+
     doc.rect(marginLeft, taxBoxY, taxBoxWidth, taxBoxHeight);
 
-    doc.setFillColor(248, 250, 252);
-    doc.rect(marginLeft, taxBoxY, taxBoxWidth, 6, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.setTextColor(30, 41, 59);
-    doc.text('RÉGIMEN DE TRANSPARENCIA FISCAL AL CONSUMIDOR (LEY 27.743 / RG 5614)', marginLeft + 2, taxBoxY + 4.2);
+    if (invoiceType === 'C' || invoiceType === 'X') {
+      // Factura C / X: Monotributo sin IVA
+      doc.setFillColor(248, 250, 252);
+      doc.rect(marginLeft, taxBoxY, taxBoxWidth, 6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(30, 41, 59);
+      doc.text('RÉGIMEN SIMPLIFICADO PARA PEQUEÑOS CONTRIBUYENTES (MONOTRIBUTO)', marginLeft + 2, taxBoxY + 4.2);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(70, 70, 70);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(70, 70, 70);
+      doc.text('Operación sin discriminación de IVA conforme a la Ley de Monotributo.', marginLeft + 3, taxBoxY + 13);
+      doc.text('Documento no computable para cómputo de crédito fiscal de IVA.', marginLeft + 3, taxBoxY + 19);
+    } else if (invoiceType === 'B') {
+      // Factura B: Leyenda obligatoria RG 5614/2024 + Transparencia informativa
+      doc.setFillColor(248, 250, 252);
+      doc.rect(marginLeft, taxBoxY, taxBoxWidth, 6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(30, 41, 59);
+      doc.text('RÉGIMEN DE TRANSPARENCIA FISCAL AL CONSUMIDOR (LEY 27.743 / RG 5614)', marginLeft + 2, taxBoxY + 4.2);
 
-    let tRowY = taxBoxY + 10;
-    doc.text(`Neto Gravado 21%: $ ${totals.netAmount21.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
-    doc.text(`IVA 21%: $ ${totals.vatAmount21.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+      // Leyenda obligatoria destacada
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(ARCA_LEGENDS.VAT_INCLUDED_B, marginLeft + 3, taxBoxY + 11);
 
-    tRowY += 4.5;
-    doc.text(`Neto Gravado 10.5%: $ ${totals.netAmount105.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
-    doc.text(`IVA 10.5%: $ ${totals.vatAmount105.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(70, 70, 70);
+      let tRowY = taxBoxY + 17;
+      doc.text(`Neto Gravado (Informativo): $ ${totals.totalNet.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      doc.text(`IVA Contenido (Informativo): $ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+      tRowY += 5;
+      doc.text('El monto de IVA no se discrimina en el precio final al consumidor.', marginLeft + 3, tRowY);
+    } else {
+      // Factura A: IVA discriminado formal
+      doc.setFillColor(248, 250, 252);
+      doc.rect(marginLeft, taxBoxY, taxBoxWidth, 6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(30, 41, 59);
+      doc.text('DISCRIMINACIÓN DE ALÍCUOTAS DE IVA (FACTURA A)', marginLeft + 2, taxBoxY + 4.2);
 
-    tRowY += 4.5;
-    doc.text(`Neto Gravado 27%: $ ${totals.netAmount27.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
-    doc.text(`IVA 27%: $ ${totals.vatAmount27.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(70, 70, 70);
 
-    tRowY += 4.5;
-    doc.text(`Op. Exentas / No Gravadas: $ ${totals.exemptAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      let tRowY = taxBoxY + 10;
+      doc.text(`Neto Gravado 21%: $ ${totals.netAmount21.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      doc.text(`IVA 21%: $ ${totals.vatAmount21.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
 
-    tRowY += 5;
-    doc.setFont('helvetica', 'bold');
-    doc.text(`TOTAL IVA DISCRIMINADO: $ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      tRowY += 4.5;
+      doc.text(`Neto Gravado 10.5%: $ ${totals.netAmount105.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      doc.text(`IVA 10.5%: $ ${totals.vatAmount105.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+
+      tRowY += 4.5;
+      doc.text(`Neto Gravado 27%: $ ${totals.netAmount27.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      doc.text(`IVA 27%: $ ${totals.vatAmount27.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+
+      tRowY += 4.5;
+      doc.text(`Op. Exentas / No Gravadas: $ ${totals.exemptAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+
+      tRowY += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.text(`TOTAL IVA DISCRIMINADO: $ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+    }
 
     // ──────────────────────────────────────────────────────────────────────────
     // 7. CUADRO DE TOTALES (Lado Derecho)
@@ -301,19 +353,21 @@ export class InvoicePdfExportService {
     doc.text('Subtotal:', totalsBoxX + 3, totRowY);
     doc.text(`$ ${totals.totalNet.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, totRowY, { align: 'right' });
 
-    totRowY += 6;
-    doc.text('IVA Total:', totalsBoxX + 3, totRowY);
-    doc.text(`$ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, totRowY, { align: 'right' });
+    if (invoiceType !== 'C' && invoiceType !== 'X') {
+      totRowY += 5.5;
+      doc.text('IVA Total:', totalsBoxX + 3, totRowY);
+      doc.text(`$ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, totRowY, { align: 'right' });
+    }
 
     if (totals.discount > 0) {
-      totRowY += 6;
+      totRowY += 5.5;
       doc.setTextColor(220, 38, 38);
       doc.text('Descuento:', totalsBoxX + 3, totRowY);
       doc.text(`-$ ${totals.discount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, totRowY, { align: 'right' });
       doc.setTextColor(70, 70, 70);
     }
 
-    // Grand total bar
+    // Barra de Total
     const grandBarY = taxBoxY + taxBoxHeight - 11;
     doc.setFillColor(30, 41, 59);
     doc.rect(totalsBoxX, grandBarY, totalsBoxWidth, 11, 'F');
@@ -325,31 +379,53 @@ export class InvoicePdfExportService {
     doc.text(`$ ${totals.grandTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, grandBarY + 7, { align: 'right' });
 
     // ──────────────────────────────────────────────────────────────────────────
-    // 8. PIE FISCAL ARCA: CAE, VENCIMIENTO Y CÓDIGO QR / BARRAS
+    // 8. PIE FISCAL ARCA: CÓDIGO QR OBLIGATORIO (RG 4892) Y CAE REAL O PENDIENTE
     // ──────────────────────────────────────────────────────────────────────────
     const footerY = taxBoxY + taxBoxHeight + 4;
     doc.setDrawColor(180, 180, 180);
     doc.line(marginLeft, footerY, marginLeft + contentWidth, footerY);
 
-    const caeNumber = invoice.cae || '74128956321458';
-    const caeVto = invoice.cae_expires_at
-      ? new Date(invoice.cae_expires_at).toLocaleDateString('es-AR')
-      : new Date(Date.now() + 10 * 24 * 3600 * 1000).toLocaleDateString('es-AR');
+    // Incrustar QR obligatorio de 30mm x 30mm (RG 4892/2020) en esquina inferior izquierda
+    if (qrDataUrl) {
+      doc.addImage(qrDataUrl, 'PNG', marginLeft, footerY + 3, 30, 30);
+    }
 
+    // Leyendas oficiales ARCA al lado del QR
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(30, 41, 59);
-    doc.text(`CAE N°: ${caeNumber}`, marginLeft + contentWidth - 3, footerY + 6, { align: 'right' });
-    doc.text(`Fecha de Vto. de CAE: ${caeVto}`, marginLeft + contentWidth - 3, footerY + 11, { align: 'right' });
-
-    // ARCA official logo/text
     doc.setFontSize(9);
-    doc.text('ARCA', marginLeft + 3, footerY + 6);
+    doc.setTextColor(30, 41, 59);
+    doc.text('ARCA', marginLeft + 33, footerY + 8);
+
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
-    doc.text('Agencia de Recaudación y Control Aduanero - Comprobante Autorizado', marginLeft + 3, footerY + 10);
-    doc.text('Documento válido como Factura Electrónica conforme R.G. AFIP/ARCA.', marginLeft + 3, footerY + 14);
+    doc.text(ARCA_LEGENDS.AUTHORIZED_VOUCHER, marginLeft + 33, footerY + 12);
+    doc.text(ARCA_LEGENDS.VALID_DOCUMENT, marginLeft + 33, footerY + 16);
+
+    // CAE y Vencimiento a la derecha (o advertencia de borrador interno)
+    if (invoice.cae) {
+      const caeVto = invoice.cae_expires_at
+        ? new Date(invoice.cae_expires_at).toLocaleDateString('es-AR')
+        : new Date(Date.now() + 10 * 24 * 3600 * 1000).toLocaleDateString('es-AR');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(30, 41, 59);
+      doc.text(`CAE N°: ${invoice.cae}`, marginLeft + contentWidth - 3, footerY + 8, { align: 'right' });
+      doc.text(`Fecha de Vto. de CAE: ${caeVto}`, marginLeft + contentWidth - 3, footerY + 13, { align: 'right' });
+    } else {
+      // Sin CAE real (integración pendiente): NUNCA imprimir CAE ficticio
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(220, 38, 38);
+      doc.text(`CAE: ${ARCA_LEGENDS.CAE_PENDING}`, marginLeft + contentWidth - 3, footerY + 8, { align: 'right' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(100, 100, 100);
+      doc.text(ARCA_LEGENDS.DRAFT_NO_CAE, marginLeft + 33, footerY + 22);
+      doc.text('Documento de control interno no válido como factura fiscal.', marginLeft + contentWidth - 3, footerY + 13, { align: 'right' });
+    }
 
     return doc;
   }

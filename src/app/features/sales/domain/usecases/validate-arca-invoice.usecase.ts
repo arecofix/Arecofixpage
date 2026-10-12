@@ -6,6 +6,7 @@ import {
   ArcaInvoiceType,
   ArcaPaymentMethod,
   ArcaValidationResult,
+  ArcaVatCondition,
 } from '../entities/arca.entity';
 import { InvoiceItem } from '../entities/invoice.entity';
 
@@ -16,20 +17,40 @@ export interface ValidateArcaInvoiceParams {
     description: string;
     quantity: number;
     unit_price: number;
-    tax_rate: number;
+    tax_rate?: number;
   }>;
   paymentMethod: ArcaPaymentMethod;
   grandTotal: number;
+  emitterVatCondition?: ArcaVatCondition | string;
 }
 
 /**
  * Clean Architecture Use Case: Validates ARCA (ex AFIP) fiscal rules.
- * Strictly enforces identification limits and document requirements.
+ * Strictly enforces identification limits, emitter eligibility, and document requirements.
  */
 export class ValidateArcaInvoiceUseCase {
   static execute(params: ValidateArcaInvoiceParams): ArcaValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
+
+    // 0. Validar Condición del Emisor (Monotributista vs Responsable Inscripto)
+    if (params.emitterVatCondition) {
+      const emitterCond = params.emitterVatCondition.toString().toLowerCase().trim();
+      const isMonotributista =
+        emitterCond.includes('monotribut') || emitterCond === 'responsable monotributo';
+
+      if (isMonotributista) {
+        if (params.type === 'A') {
+          errors.push(
+            'Un contribuyente Monotributista solo puede emitir Factura C o comprobantes internos X, no puede emitir Factura A.'
+          );
+        } else if (params.type === 'B') {
+          errors.push(
+            'Un contribuyente Monotributista solo puede emitir Factura C o comprobantes internos X, no puede emitir Factura B.'
+          );
+        }
+      }
+    }
 
     // 1. Validar Ítems
     if (!params.items || params.items.length === 0) {
@@ -97,7 +118,12 @@ export class ValidateArcaInvoiceUseCase {
     // 4. Reglas específicas para Factura A
     if (params.type === 'A') {
       if (params.customer.vatCondition === 'Consumidor Final') {
-        errors.push('No se puede emitir Factura "A" a un Consumidor Final. Debe ser Responsable Inscripto o Monotributista.');
+        errors.push(
+          'No se puede emitir Factura "A" a un Consumidor Final. Debe ser Responsable Inscripto o Monotributista.'
+        );
+      }
+      if (params.customer.docType !== 'CUIT') {
+        errors.push('La Factura "A" requiere obligatoriamente el CUIT del cliente (no se admite DNI).');
       }
       if (!hasDocNumber) {
         errors.push('La Factura "A" requiere obligatoriamente el CUIT del cliente.');
@@ -121,3 +147,4 @@ export class ValidateArcaInvoiceUseCase {
     };
   }
 }
+

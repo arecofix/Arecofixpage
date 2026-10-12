@@ -1,24 +1,212 @@
-import { ArcaTaxBreakdown } from '../entities/arca.entity';
+import {
+  ARCA_LEGENDS,
+  ArcaInvoiceType,
+  ArcaTaxBreakdown,
+} from '../entities/arca.entity';
 
 export interface ArcaItemCalcInput {
   quantity: number;
   unit_price: number;
-  tax_rate: number;
+  tax_rate?: number;
+}
+
+export interface CalculateArcaTotalsOptions {
+  type?: ArcaInvoiceType;
+  discount?: number;
+  surcharge?: number;
+  advancePayment?: number;
 }
 
 /**
  * Clean Architecture Use Case: Pure domain calculations for Argentine ARCA Invoices.
- * Compliant with Ley 27.743 and RG 5614/2024 (Régimen de Transparencia Fiscal).
+ * Compliant with Ley 27.743 and RG 5614/2024 (Régimen de Transparencia Fiscal al Consumidor).
+ *
+ * Reglas fiscales por tipo de comprobante:
+ * - Factura A: El IVA se discrimina explícitamente por alícuota (21%, 10.5%, 27%). Total = Subtotal Neto + IVA - Descuento + Recargo.
+ * - Factura B: El precio unitario tiene el IVA INCLUIDO. Total = Subtotal Bruto - Descuento + Recargo.
+ *              Subtotal Neto = Total / (1 + Alícuota), IVA = Total - Subtotal Neto (informativo Ley 27.743, no discriminado en ítem).
+ * - Factura C: Monotributista. Operación sin IVA. Total = Subtotal - Descuento + Recargo. Sin cuadro de transparencia fiscal.
+ * - Factura X: Comprobante interno no fiscal. Sin discriminación impositiva.
  */
 export class CalculateArcaTotalsUseCase {
   static execute(
     items: ArcaItemCalcInput[],
-    discount: number = 0
+    discountOrOptions: number | CalculateArcaTotalsOptions = 0,
+    explicitType: ArcaInvoiceType = 'B',
+    explicitSurcharge: number = 0,
+    explicitAdvancePayment: number = 0
   ): ArcaTaxBreakdown {
+    let type: ArcaInvoiceType = explicitType;
+    let discount = 0;
+    let surcharge = explicitSurcharge;
+    let advancePayment = explicitAdvancePayment;
+
+    if (typeof discountOrOptions === 'object' && discountOrOptions !== null) {
+      type = discountOrOptions.type || 'B';
+      discount = discountOrOptions.discount || 0;
+      surcharge = discountOrOptions.surcharge || 0;
+      advancePayment = discountOrOptions.advancePayment || 0;
+    } else {
+      discount = Number(discountOrOptions) || 0;
+    }
+
+    const safeDiscount = Math.max(0, Number(discount) || 0);
+    const safeSurcharge = Math.max(0, Number(surcharge) || 0);
+    const safeAdvancePayment = Math.max(0, Number(advancePayment) || 0);
+
+    // ────────────────────────────────────────────────────────────────────────
+    // 1. FACTURA C o X: Sin IVA (Monotributo o Comprobante Interno)
+    // ────────────────────────────────────────────────────────────────────────
+    if (type === 'C' || type === 'X') {
+      const grossSubtotal = items.reduce((sum, item) => {
+        const qty = Number(item.quantity) || 0;
+        const price = Number(item.unit_price) || 0;
+        return sum + qty * price;
+      }, 0);
+
+      const netWithAdjustments = Math.max(
+        0,
+        grossSubtotal - safeDiscount + safeSurcharge
+      );
+      const grandTotal = this.round(netWithAdjustments);
+      const balanceDue = this.round(Math.max(0, grandTotal - safeAdvancePayment));
+
+      return {
+        netAmount21: 0,
+        vatAmount21: 0,
+        netAmount105: 0,
+        vatAmount105: 0,
+        netAmount27: 0,
+        vatAmount27: 0,
+        exemptAmount: grandTotal,
+        totalNet: grandTotal,
+        totalVat: 0,
+        discount: this.round(safeDiscount),
+        surcharge: this.round(safeSurcharge),
+        grandTotal,
+        advancePayment: this.round(safeAdvancePayment),
+        balanceDue,
+        isVatIncluded: false,
+        isVatExempt: true,
+      };
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // 2. FACTURA B: IVA INCLUIDO en el precio (Consumidor Final)
+    // ────────────────────────────────────────────────────────────────────────
+    if (type === 'B') {
+      // En Factura B los precios unitarios son brutos (IVA ya incluido)
+      let grossSubtotal = 0;
+      let weightedTaxRateSum = 0;
+
+      for (const item of items) {
+        const qty = Number(item.quantity) || 0;
+        const price = Number(item.unit_price) || 0;
+        const rate = Number(item.tax_rate) ?? 0.21;
+        const itemGross = qty * price;
+        grossSubtotal += itemGross;
+        weightedTaxRateSum += itemGross * rate;
+      }
+
+      // Tasa media ponderada para prorratear desglose informativo
+      const effectiveRate =
+        grossSubtotal > 0 ? weightedTaxRateSum / grossSubtotal : 0.21;
+
+      // El total a abonar es bruto menos descuento más recargo
+      const grandTotal = this.round(
+        Math.max(0, grossSubtotal - safeDiscount + safeSurcharge)
+      );
+
+      // Desglose informativo para Transparencia Fiscal (Ley 27.743 / RG 5614)
+      // Neto = Total / (1 + Tasa)
+      const totalNet =
+        effectiveRate > 0
+          ? this.round(grandTotal / (1 + effectiveRate))
+          : grandTotal;
+      const totalVat = this.round(Math.max(0, grandTotal - totalNet));
+
+      // Asignación de importes netos e IVA informativos por alícuota
+      let net21 = 0;
+      let vat21 = 0;
+      let net105 = 0;
+      let vat105 = 0;
+      let net27 = 0;
+      let vat27 = 0;
+      let exempt = 0;
+
+      const factor = grossSubtotal > 0 ? grandTotal / grossSubtotal : 1;
+
+      for (const item of items) {
+        const qty = Number(item.quantity) || 0;
+        const price = Number(item.unit_price) || 0;
+        const rate = Number(item.tax_rate) ?? 0.21;
+        const adjustedGrossItem = qty * price * factor;
+
+        if (rate > 0) {
+          const itemNet = adjustedGrossItem / (1 + rate);
+          const itemVat = adjustedGrossItem - itemNet;
+
+          if (Math.abs(rate - 0.21) < 0.001) {
+            net21 += itemNet;
+            vat21 += itemVat;
+          } else if (Math.abs(rate - 0.105) < 0.001) {
+            net105 += itemNet;
+            vat105 += itemVat;
+          } else if (Math.abs(rate - 0.27) < 0.001) {
+            net27 += itemNet;
+            vat27 += itemVat;
+          } else {
+            exempt += adjustedGrossItem;
+          }
+        } else {
+          exempt += adjustedGrossItem;
+        }
+      }
+
+      const balanceDue = this.round(Math.max(0, grandTotal - safeAdvancePayment));
+
+      return {
+        netAmount21: this.round(net21),
+        vatAmount21: this.round(vat21),
+        netAmount105: this.round(net105),
+        vatAmount105: this.round(vat105),
+        netAmount27: this.round(net27),
+        vatAmount27: this.round(vat27),
+        exemptAmount: this.round(exempt),
+        totalNet,
+        totalVat,
+        discount: this.round(safeDiscount),
+        surcharge: this.round(safeSurcharge),
+        grandTotal,
+        advancePayment: this.round(safeAdvancePayment),
+        balanceDue,
+        isVatIncluded: true,
+        isVatExempt: false,
+        vatIncludedLegend: ARCA_LEGENDS.VAT_INCLUDED_B,
+        transparencyLegend: ARCA_LEGENDS.TRANSPARENCY_FISCAL,
+      };
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // 3. FACTURA A: IVA DISCRIMINADO (Responsable Inscripto a Responsable Inscripto)
+    // ────────────────────────────────────────────────────────────────────────
     let net21 = 0;
     let net105 = 0;
     let net27 = 0;
     let exempt = 0;
+
+    let baseGrossNet = 0;
+    for (const item of items) {
+      const qty = Number(item.quantity) || 0;
+      const price = Number(item.unit_price) || 0;
+      baseGrossNet += qty * price;
+    }
+
+    // Aplicar descuento y recargo proporcionalmente sobre subtotal antes del IVA
+    const netAdjustmentFactor =
+      baseGrossNet > 0
+        ? Math.max(0, baseGrossNet - safeDiscount + safeSurcharge) / baseGrossNet
+        : 1;
 
     let vat21 = 0;
     let vat105 = 0;
@@ -29,7 +217,7 @@ export class CalculateArcaTotalsUseCase {
       const price = Number(item.unit_price) || 0;
       const rate = Number(item.tax_rate) || 0;
 
-      const itemNet = qty * price;
+      const itemNet = qty * price * netAdjustmentFactor;
 
       if (Math.abs(rate - 0.21) < 0.001) {
         net21 += itemNet;
@@ -45,10 +233,10 @@ export class CalculateArcaTotalsUseCase {
       }
     }
 
-    const totalNet = net21 + net105 + net27 + exempt;
-    const totalVat = vat21 + vat105 + vat27;
-    const safeDiscount = Math.max(0, Number(discount) || 0);
-    const grandTotal = Math.max(0, totalNet + totalVat - safeDiscount);
+    const totalNet = this.round(net21 + net105 + net27 + exempt);
+    const totalVat = this.round(vat21 + vat105 + vat27);
+    const grandTotal = this.round(totalNet + totalVat);
+    const balanceDue = this.round(Math.max(0, grandTotal - safeAdvancePayment));
 
     return {
       netAmount21: this.round(net21),
@@ -58,10 +246,16 @@ export class CalculateArcaTotalsUseCase {
       netAmount27: this.round(net27),
       vatAmount27: this.round(vat27),
       exemptAmount: this.round(exempt),
-      totalNet: this.round(totalNet),
-      totalVat: this.round(totalVat),
+      totalNet,
+      totalVat,
       discount: this.round(safeDiscount),
-      grandTotal: this.round(grandTotal),
+      surcharge: this.round(safeSurcharge),
+      grandTotal,
+      advancePayment: this.round(safeAdvancePayment),
+      balanceDue,
+      isVatIncluded: false,
+      isVatExempt: false,
+      transparencyLegend: ARCA_LEGENDS.TRANSPARENCY_FISCAL,
     };
   }
 
@@ -69,3 +263,4 @@ export class CalculateArcaTotalsUseCase {
     return Math.round((val + Number.EPSILON) * 100) / 100;
   }
 }
+

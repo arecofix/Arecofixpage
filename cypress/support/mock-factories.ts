@@ -70,6 +70,7 @@ export function buildMockTenant(overrides: Record<string, unknown> = {}) {
       hasRepairs: true,
       hasBlog: true,
     },
+    usd_rate: 1000,
     ...overrides,
   };
 }

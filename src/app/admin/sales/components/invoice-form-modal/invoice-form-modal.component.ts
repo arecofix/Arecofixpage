@@ -150,7 +150,7 @@ export class InvoiceFormModalComponent implements OnInit {
       unit_price: i.unitPrice,
       tax_rate: i.taxRate,
     }));
-    return CalculateArcaTotalsUseCase.execute(list, this.discount());
+    return CalculateArcaTotalsUseCase.execute(list, this.discount(), this.invoiceType());
   });
 
   // ── Computed ARCA Compliance Validation ─────────────────────────────────────
@@ -170,6 +170,7 @@ export class InvoiceFormModalComponent implements OnInit {
       items: rows,
       paymentMethod: this.paymentMethod(),
       grandTotal: totals.grandTotal,
+      emitterVatCondition: this.emitter().vatCondition,
     });
   });
 

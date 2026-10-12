@@ -74,6 +74,14 @@
       </div>
     </div>
 
+    <!-- ── DRAFT ORIGIN & REVIEW BANNER ── -->
+    <app-invoice-draft-banner
+      [invoice]="invoice()"
+      [emitterVatCondition]="emitterVatCondition()"
+      [confirming]="confirming()"
+      (confirmRequested)="handleConfirmDraft()"
+    ></app-invoice-draft-banner>
+
     <!-- ═══════════════════════════════════════════════════════════════════════════
          DOCUMENTO FISCAL A4 OFICIAL (ARCA / LEY 27.743)
          ═══════════════════════════════════════════════════════════════════════════ -->
@@ -88,29 +96,55 @@
         style="width: 100%; position: relative;"
       >
 
-        <!-- 1. HEADER FISCAL ARCA: Emisor | Letra Central | Datos de Comprobante -->
-        <div class="border-2 border-gray-800 dark:border-gray-600 rounded-2xl relative mb-4">
-          <!-- Letra Central Oficial AFIP/ARCA -->
-          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-900 border-2 border-gray-800 dark:border-gray-600 rounded-xl w-14 h-14 flex flex-col items-center justify-center z-10 shadow-xs">
-            <span class="text-2xl font-black leading-none text-gray-900 dark:text-white">
-              {{ invoice()?.type || 'B' }}
-            </span>
-            <span class="text-[8px] font-bold tracking-tighter text-gray-500 dark:text-gray-400 mt-0.5">
-              COD. {{ invoice()?.type === 'A' ? '001' : (invoice()?.type === 'C' ? '011' : (invoice()?.type === 'X' ? '099' : '006')) }}
-            </span>
+        <!-- 1. HEADER FISCAL ARCA (RG 1415/03 y RG 3822/94): Emisor | Letra Independiente | Datos de Comprobante -->
+        <div class="border-2 border-gray-900 dark:border-gray-600 rounded-2xl relative mb-4 overflow-hidden">
+          
+          <!-- Barra superior de Identificación del Comprobante -->
+          <div class="flex flex-col sm:flex-row items-stretch border-b-2 border-gray-900 dark:border-gray-600 bg-gray-50/80 dark:bg-slate-800/60 p-3 sm:p-4 gap-4">
+            <!-- Letra en Recuadro Independiente a la izquierda (~1 cm x 1 cm / 44px) -->
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 min-w-12 border-2 border-gray-900 dark:border-white rounded-xl flex flex-col items-center justify-center bg-white dark:bg-slate-900 shadow-xs">
+                <span class="text-2xl font-black leading-none text-gray-900 dark:text-white">
+                  {{ invoice()?.type || 'B' }}
+                </span>
+                <span class="text-[7.5px] font-black tracking-tighter text-gray-600 dark:text-gray-300">
+                  CÓD. {{ getTypeCode(invoice()?.type) }}
+                </span>
+              </div>
+              <div class="flex flex-col justify-center">
+                <h2 class="text-lg sm:text-xl font-black tracking-tight uppercase text-gray-900 dark:text-white leading-tight">
+                  {{ invoice()?.type === 'X' ? 'COMPROBANTE INTERNO' : 'FACTURA ' + (invoice()?.type || 'B') }}
+                </h2>
+                <div class="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                  <span class="badge badge-xs badge-neutral">ORIGINAL</span>
+                  <span>Cód. {{ getTypeCode(invoice()?.type) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Punto de Venta y Comp. Nro alineados a la derecha -->
+            <div class="sm:ml-auto flex flex-col justify-center sm:text-right">
+              <p class="font-mono text-base sm:text-lg font-black text-indigo-700 dark:text-indigo-400">
+                Punto de Venta: {{ formatPtoVta($any(company())?.point_of_sale || 4) }} &nbsp; Comp. Nro: {{ formatCompNro(invoice()?.invoice_number) }}
+              </p>
+              <p class="text-[11px] text-gray-600 dark:text-gray-400 font-semibold">
+                <strong>Fecha de Emisión:</strong> {{ (invoice()?.issued_at || invoice()?.created_at) | date:'dd/MM/yyyy' }}
+              </p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x-2 divide-gray-800 dark:divide-gray-600 p-4 sm:p-6">
+          <!-- Dos Columnas: Emisor (Izquierda) y Datos Fiscales (Derecha) con margen interno min 4mm -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x-2 divide-gray-900 dark:divide-gray-600 p-4 sm:p-6 gap-y-4">
             <!-- Emisor (Izquierda) -->
-            <div class="pr-0 sm:pr-8 pb-4 sm:pb-0 space-y-1">
+            <div class="pr-0 sm:pr-6 space-y-1.5">
               <div class="flex items-center gap-2 mb-2">
                 @if (company()?.logo_url) {
                   <img [src]="company()?.logo_url" alt="Logo" class="h-10 object-contain" />
                 }
                 <div>
-                  <h2 class="text-base sm:text-lg font-black tracking-tight leading-tight">
+                  <h3 class="text-base sm:text-lg font-black tracking-tight leading-tight text-gray-900 dark:text-white">
                     {{ company()?.name || 'ARECOFIX' }}
-                  </h2>
+                  </h3>
                   <span class="text-[9px] uppercase font-bold text-gray-400 tracking-wider">
                     {{ company()?.location || 'Servicios Técnicos e Instalaciones' }}
                   </span>
@@ -118,32 +152,28 @@
               </div>
 
               <div class="text-[11px] text-gray-600 dark:text-gray-400 space-y-0.5">
-                <p><strong>Razón Social:</strong> {{ company()?.name || 'ARECOFIX' }}</p>
-                <p><strong>Domicilio Comercial:</strong> {{ company()?.address || 'San Antonio de Areco, Bs. As.' }}</p>
-                <p><strong>Condición IVA:</strong> {{ $any(company())?.vat_condition || 'IVA Responsable Inscripto' }}</p>
+                <p><strong>Razón Social:</strong> {{ company()?.name || 'ARECOFIX SERVICIOS INTEGRALES' }}</p>
+                <p><strong>Domicilio Comercial:</strong> {{ company()?.address || company()?.location || 'San Antonio de Areco, Bs. As.' }}</p>
+                <p><strong>Condición frente al IVA:</strong> {{ $any(company())?.vat_condition || 'IVA Responsable Inscripto' }}</p>
+                @if (company()?.phone || company()?.email) {
+                  <p><strong>Contacto:</strong> {{ company()?.phone || '' }} {{ company()?.email ? ' | ' + company()?.email : '' }}</p>
+                }
               </div>
             </div>
 
-            <!-- Datos de Factura (Derecha) -->
-            <div class="pl-0 sm:pl-8 pt-4 sm:pt-0 space-y-1 sm:text-right">
-              <h2 class="text-base sm:text-xl font-black tracking-tight uppercase text-indigo-600 dark:text-indigo-400">
-                {{ invoice()?.type === 'X' ? 'COMPROBANTE INTERNO' : 'FACTURA' }}
-              </h2>
-              <p class="font-mono text-sm sm:text-base font-black">
-                Punto de Venta: {{ $any(company())?.point_of_sale || '00004' }} &nbsp; Comp. Nro: {{ invoice()?.invoice_number || '00000001' }}
-              </p>
-              <div class="text-[11px] text-gray-600 dark:text-gray-400 space-y-0.5 sm:text-right">
-                <p><strong>Fecha de Emisión:</strong> {{ invoice()?.issued_at | date:'dd/MM/yyyy' }}</p>
-                <p><strong>CUIT:</strong> {{ company()?.tax_id || '30-71649281-9' }}</p>
-                <p><strong>Ingresos Brutos:</strong> {{ $any(company())?.iibb || company()?.tax_id || '30-71649281-9' }}</p>
-                <p><strong>Inicio de Actividades:</strong> {{ $any(company())?.activity_start_date || '01/03/2021' }}</p>
+            <!-- Datos Fiscales Emisor (Derecha) -->
+            <div class="pl-0 sm:pl-6 pt-4 sm:pt-0 space-y-1.5 sm:text-right">
+              <div class="text-[11px] text-gray-600 dark:text-gray-400 space-y-1">
+                <p><strong>CUIT:</strong> <span class="font-mono font-bold text-gray-900 dark:text-white">{{ company()?.tax_id || '30-71649281-9' }}</span></p>
+                <p><strong>Ingresos Brutos:</strong> <span class="font-mono">{{ $any(company())?.iibb || company()?.tax_id || '30-71649281-9' }}</span></p>
+                <p class="mb-4"><strong>Fecha de Inicio de Actividades:</strong> {{ $any(company())?.activity_start_date || '01/03/2021' }}</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 2. RECEPTOR / CLIENTE -->
-        <div class="border-2 border-gray-800 dark:border-gray-600 rounded-2xl p-4 sm:p-5 mb-4 text-xs space-y-2">
+        <div class="border-2 border-gray-900 dark:border-gray-600 rounded-2xl p-4 sm:p-5 mb-4 text-xs space-y-2">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <p><strong>Apellido y Nombre / Razón Social:</strong> {{ invoice()?.customer_name || 'Consumidor Final' }}</p>
@@ -151,23 +181,23 @@
               <p><strong>Condición de Venta:</strong> {{ invoice()?.sale_condition || 'Contado' }}</p>
             </div>
             <div class="sm:text-right">
-              <p><strong>DNI / CUIT / CUIL:</strong> {{ invoice()?.customer_tax_id || '---' }}</p>
-              <p><strong>Domicilio:</strong> {{ invoice()?.customer_address || '---' }}</p>
+              <p><strong>DNI / CUIT / CUIL:</strong> {{ invoice()?.customer_tax_id || 'No informado' }}</p>
+              <p><strong>Domicilio:</strong> {{ invoice()?.customer_address || 'No informado' }}</p>
               <p><strong>Medio de Pago:</strong> {{ invoice()?.payment_method === 'cash' ? 'Efectivo' : 'Medios Electrónicos / Transferencia' }}</p>
             </div>
           </div>
         </div>
 
         <!-- 3. TABLA DE ÍTEMS CON CLASIFICACIÓN (Mano de obra, Repuestos, Productos, Servicios) -->
-        <div class="border-2 border-gray-800 dark:border-gray-600 rounded-2xl overflow-hidden mb-4">
+        <div class="border-2 border-gray-900 dark:border-gray-600 rounded-2xl overflow-hidden mb-4">
           <div class="overflow-x-auto w-full">
             <table class="w-full text-left text-xs border-collapse">
-              <thead class="bg-gray-100 dark:bg-slate-800 font-bold uppercase text-[10px] tracking-wider border-b-2 border-gray-800 dark:border-gray-600">
+              <thead class="bg-gray-100 dark:bg-slate-800 font-bold uppercase text-[10px] tracking-wider border-b-2 border-gray-900 dark:border-gray-600">
                 <tr>
-                  <th class="py-2.5 px-3 w-28">Tipo</th>
+                  <th class="py-2.5 px-3 w-32">Tipo</th>
                   <th class="py-2.5 px-3">Descripción</th>
                   <th class="py-2.5 px-3 text-center w-16">Cant.</th>
-                  <th class="py-2.5 px-3 text-right w-24">Precio Unit.</th>
+                  <th class="py-2.5 px-3 text-right w-28">Precio Unit.</th>
                   <th class="py-2.5 px-3 text-center w-20">Alíc. IVA</th>
                   <th class="py-2.5 px-3 text-right w-28">Subtotal</th>
                 </tr>
@@ -175,8 +205,24 @@
               <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
                 @for (item of items(); track $index) {
                   <tr class="hover:bg-gray-50/50 dark:hover:bg-slate-800/50">
-                    <td class="py-2.5 px-3 font-bold text-gray-500 text-[10px]">
-                      {{ getItemTypeLabel(item.item_type) }}
+                    <td class="py-2.5 px-3">
+                      @if (item.item_type === 'labor' || item.is_labor) {
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                          <i class="fas fa-wrench text-[9px]"></i> Mano de obra
+                        </span>
+                      } @else if (item.item_type === 'part') {
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                          <i class="fas fa-microchip text-[9px]"></i> Repuesto
+                        </span>
+                      } @else if (item.item_type === 'service') {
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                          <i class="fas fa-hand-holding-gear text-[9px]"></i> Servicio
+                        </span>
+                      } @else {
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          <i class="fas fa-box text-[9px]"></i> Producto
+                        </span>
+                      }
                     </td>
                     <td class="py-2.5 px-3 font-bold text-gray-900 dark:text-white">
                       {{ item.description || 'Ítem sin descripción' }}
@@ -188,7 +234,11 @@
                       {{ item.unit_price | currency:'ARS':'symbol':'1.2-2' }}
                     </td>
                     <td class="py-2.5 px-3 text-center font-mono">
-                      {{ ((item.tax_rate || 0.21) * 100) | number:'1.0-1' }}%
+                      @if (invoice()?.type === 'C' || invoice()?.type === 'X') {
+                        0%
+                      } @else {
+                        {{ ((item.tax_rate || 0.21) * 100) | number:'1.0-1' }}%
+                      }
                     </td>
                     <td class="py-2.5 px-3 text-right font-mono font-black text-gray-900 dark:text-white">
                       {{ (item.subtotal || (item.quantity * item.unit_price)) | currency:'ARS':'symbol':'1.2-2' }}
@@ -200,101 +250,181 @@
           </div>
         </div>
 
-        <!-- 4. DESGLOSE DE IVA (Ley 27.743 y RG 5614/2024) Y TOTALES -->
+        <!-- 4. DESGLOSE FISCAL POR TIPO DE COMPROBANTE Y TOTALES -->
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6">
-          <!-- Cuadro de Transparencia Fiscal -->
-          <div class="sm:col-span-7 border-2 border-gray-800 dark:border-gray-600 rounded-2xl p-4 text-xs space-y-2">
-            <div class="font-black text-[10px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400 border-b border-gray-200 dark:border-gray-700 pb-1 flex items-center gap-1.5">
-              <i class="fas fa-scale-balanced"></i> Régimen de Transparencia Fiscal (Ley 27.743 / RG 5614)
+          
+          <!-- Columna Izquierda: Información Fiscal según Tipo (A, B, C, X) -->
+          @if (invoice()?.type === 'A' || invoice()?.type === 'B') {
+            <!-- Cuadro de Transparencia Fiscal (Ley 27.743 / RG 5614) para A y B -->
+            <div class="sm:col-span-7 border-2 border-gray-900 dark:border-gray-600 rounded-2xl p-4 text-xs space-y-2">
+              <div class="font-black text-[10px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400 border-b border-gray-200 dark:border-gray-700 pb-1 flex items-center gap-1.5">
+                <i class="fas fa-scale-balanced"></i>
+                @if (invoice()?.type === 'B') {
+                  Régimen de Transparencia Fiscal al Consumidor (Ley 27.743 / RG 5614)
+                } @else {
+                  IVA Discriminado por Alícuota (Ley 27.743 / RG 5614)
+                }
+              </div>
+
+              <div class="space-y-1 text-gray-600 dark:text-gray-400 text-[11px]">
+                <div class="flex justify-between">
+                  <span>Neto Gravado al 21%:</span>
+                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().netAmount21 | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>IVA Liquidado al 21%:</span>
+                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().vatAmount21 | number:'1.2-2' }}</span>
+                </div>
+
+                @if (taxBreakdown().netAmount105 > 0) {
+                  <div class="flex justify-between">
+                    <span>Neto Gravado al 10.5%:</span>
+                    <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().netAmount105 | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>IVA Liquidado al 10.5%:</span>
+                    <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().vatAmount105 | number:'1.2-2' }}</span>
+                  </div>
+                }
+
+                @if (taxBreakdown().netAmount27 > 0) {
+                  <div class="flex justify-between">
+                    <span>Neto Gravado al 27%:</span>
+                    <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().netAmount27 | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>IVA Liquidado al 27%:</span>
+                    <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().vatAmount27 | number:'1.2-2' }}</span>
+                  </div>
+                }
+
+                @if (taxBreakdown().exemptAmount > 0) {
+                  <div class="flex justify-between">
+                    <span>Op. Exentas / No Gravadas:</span>
+                    <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().exemptAmount | number:'1.2-2' }}</span>
+                  </div>
+                }
+
+                <div class="flex justify-between font-bold text-gray-900 dark:text-white pt-1 border-t border-gray-200 dark:border-gray-700">
+                  <span>{{ invoice()?.type === 'B' ? 'IVA Estimado en el Precio:' : 'Total IVA Discriminado:' }}</span>
+                  <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+                </div>
+              </div>
             </div>
-
-            <div class="space-y-1 text-gray-600 dark:text-gray-400 text-[11px]">
-              <div class="flex justify-between">
-                <span>Neto Gravado al 21%:</span>
-                <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().netAmount21 | number:'1.2-2' }}</span>
+          } @else {
+            <!-- Factura C / X: Régimen Simplificado (Sin IVA ni Transparencia Fiscal) -->
+            <div class="sm:col-span-7 border-2 border-gray-900 dark:border-gray-600 rounded-2xl p-4 text-xs space-y-2 flex flex-col justify-center">
+              <div class="font-black text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 border-b border-gray-200 dark:border-gray-700 pb-1 flex items-center gap-1.5">
+                <i class="fas fa-clipboard-check"></i> Régimen Simplificado para Pequeños Contribuyentes
               </div>
-              <div class="flex justify-between">
-                <span>IVA Liquidado al 21%:</span>
-                <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().vatAmount21 | number:'1.2-2' }}</span>
-              </div>
-
-              @if (taxBreakdown().netAmount105 > 0) {
-                <div class="flex justify-between">
-                  <span>Neto Gravado al 10.5%:</span>
-                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().netAmount105 | number:'1.2-2' }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>IVA Liquidado al 10.5%:</span>
-                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().vatAmount105 | number:'1.2-2' }}</span>
-                </div>
-              }
-
-              @if (taxBreakdown().netAmount27 > 0) {
-                <div class="flex justify-between">
-                  <span>Neto Gravado al 27%:</span>
-                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().netAmount27 | number:'1.2-2' }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>IVA Liquidado al 27%:</span>
-                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().vatAmount27 | number:'1.2-2' }}</span>
-                </div>
-              }
-
-              @if (taxBreakdown().exemptAmount > 0) {
-                <div class="flex justify-between">
-                  <span>Op. Exentas / No Gravadas:</span>
-                  <span class="font-mono text-gray-900 dark:text-white font-bold">${{ taxBreakdown().exemptAmount | number:'1.2-2' }}</span>
-                </div>
-              }
-
-              <div class="flex justify-between font-bold text-gray-900 dark:text-white pt-1 border-t border-gray-200 dark:border-gray-700">
-                <span>Total IVA Discriminado:</span>
-                <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
-              </div>
+              <p class="text-[11px] text-gray-600 dark:text-gray-400">
+                Operación no gravada con IVA conforme al régimen de Monotributo (Ley 24.977). No genera crédito fiscal.
+              </p>
             </div>
-          </div>
+          }
 
-          <!-- Cuadro de Totales -->
-          <div class="sm:col-span-5 border-2 border-gray-800 dark:border-gray-600 rounded-2xl p-4 flex flex-col justify-between text-xs space-y-2">
+          <!-- Columna Derecha: Cuadro de Totales -->
+          <div class="sm:col-span-5 border-2 border-gray-900 dark:border-gray-600 rounded-2xl p-4 flex flex-col justify-between text-xs space-y-2">
             <div class="space-y-1.5 text-gray-600 dark:text-gray-400">
               <div class="flex justify-between">
-                <span>Subtotal Neto:</span>
+                <span>Subtotal:</span>
                 <span class="font-mono font-bold text-gray-900 dark:text-white">${{ taxBreakdown().totalNet | number:'1.2-2' }}</span>
               </div>
-              <div class="flex justify-between">
-                <span>IVA:</span>
-                <span class="font-mono font-bold text-gray-900 dark:text-white">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
-              </div>
+
+              <!-- Factura A: IVA discriminado en los totales -->
+              @if (invoice()?.type === 'A') {
+                <div class="flex justify-between text-indigo-600 dark:text-indigo-400 font-bold">
+                  <span>IVA Discriminado:</span>
+                  <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+                </div>
+              }
+
+              <!-- Factura B: Leyenda obligatoria RG 5614/2024 -->
+              @if (invoice()?.type === 'B') {
+                <div class="text-[11px] font-bold text-gray-500 italic py-0.5 border-y border-gray-200 dark:border-gray-700 text-center">
+                  El IVA se encuentra incluido en el precio
+                </div>
+              }
+
+              <!-- Descuento si existe -->
               @if (taxBreakdown().discount > 0) {
                 <div class="flex justify-between text-rose-600">
                   <span>Descuento:</span>
                   <span class="font-mono font-bold">-${{ taxBreakdown().discount | number:'1.2-2' }}</span>
                 </div>
               }
+
+              <!-- Recargo si existe -->
+              @if (taxBreakdown().surcharge > 0) {
+                <div class="flex justify-between text-amber-600">
+                  <span>Recargo:</span>
+                  <span class="font-mono font-bold">+${{ taxBreakdown().surcharge | number:'1.2-2' }}</span>
+                </div>
+              }
             </div>
 
+            <!-- Importe Total -->
             <div class="bg-gray-900 text-white p-3 rounded-xl flex justify-between items-end mt-2">
               <span class="font-black uppercase tracking-wider text-xs">Importe Total:</span>
               <span class="font-black font-mono text-xl sm:text-2xl text-emerald-400">
                 ${{ taxBreakdown().grandTotal | number:'1.2-2' }}
               </span>
             </div>
+
+            <!-- Seña y Saldo a Cobrar -->
+            @if ((invoice()?.advance_payment ?? 0) > 0) {
+              <div class="border-t border-gray-200 dark:border-gray-700 pt-2 space-y-1 text-xs mt-2">
+                <div class="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span><i class="fas fa-hand-holding-usd mr-1"></i> Seña Abonada:</span>
+                  <span class="font-mono">-${{ invoice()?.advance_payment | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex justify-between text-amber-600 dark:text-amber-400 font-extrabold text-sm">
+                  <span><i class="fas fa-coins mr-1"></i> Saldo a Cobrar:</span>
+                  <span class="font-mono">${{ (invoice()?.balance_due ?? (taxBreakdown().grandTotal - (invoice()?.advance_payment ?? 0))) | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            }
           </div>
         </div>
 
-        <!-- 5. PIE FISCAL ARCA: CAE, VENCIMIENTO Y LOGO FISCAL -->
-        <div class="border-t-2 border-gray-800 dark:border-gray-600 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-[11px] text-gray-500">
-          <div>
-            <div class="flex items-center gap-2 font-black text-gray-900 dark:text-white">
-              <span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-slate-800 border text-[10px]">ARCA</span>
-              <span>Comprobante Autorizado por ARCA (ex AFIP)</span>
+        <!-- 5. PIE FISCAL ARCA: QR OBLIGATORIO (RG 4892/2020), LEYENDAS Y CAE -->
+        <div class="border-t-2 border-gray-900 dark:border-gray-600 pt-4 flex flex-col sm:flex-row justify-between items-end gap-4 text-[11px] text-gray-500">
+          
+          <!-- Esquina Inferior Izquierda: QR RG 4892/2020 (Mínimo 3 cm x 3 cm) -->
+          <div class="qr-container flex items-center gap-3">
+            @if (qrCodeDataUrl()) {
+              <img
+                [src]="qrCodeDataUrl()"
+                alt="Código QR ARCA RG 4892/2020"
+                class="w-[30mm] h-[30mm] min-w-[30mm] min-h-[30mm] object-contain border border-gray-300 dark:border-gray-700 p-1 bg-white rounded-lg shadow-xs"
+              />
+            }
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2 font-black text-gray-900 dark:text-white">
+                <span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-slate-800 border text-[10px]">ARCA</span>
+                <span>Comprobante autorizado por ARCA (ex AFIP) - Régimen de Factura Electrónica</span>
+              </div>
+              <p class="text-[9px] text-gray-400">Documento válido como Factura Electrónica conforme R.G. AFIP/ARCA.</p>
+              <p class="text-[8px] text-gray-400 font-mono">RG AFIP N° 4892/2020 - Verificación Digital de Comprobantes</p>
             </div>
-            <p class="text-[9px] text-gray-400 mt-0.5">Régimen Especial de Emisión y Almacenamiento Electrónico de Comprobantes.</p>
           </div>
 
-          <div class="text-left sm:text-right font-mono space-y-0.5">
-            <p><strong class="text-gray-800 dark:text-gray-200">CAE N°:</strong> {{ invoice()?.cae || '74128956321458' }}</p>
-            <p><strong class="text-gray-800 dark:text-gray-200">Fecha Vto. CAE:</strong> {{ (invoice()?.cae_expires_at || invoice()?.issued_at) | date:'dd/MM/yyyy' }}</p>
+          <!-- Esquina Inferior Derecha: CAE N° / PENDIENTE DE CAE -->
+          <div class="text-left sm:text-right font-mono space-y-1">
+            @if (invoice()?.cae) {
+              <p><strong class="text-gray-900 dark:text-white">CAE N°:</strong> {{ invoice()?.cae }}</p>
+              <p><strong class="text-gray-900 dark:text-white">Fecha Vto. CAE:</strong> {{ invoice()?.cae_expires_at | date:'dd/MM/yyyy' }}</p>
+            } @else {
+              <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700/50 rounded-xl p-2.5 text-right font-sans">
+                <p class="text-amber-800 dark:text-amber-300 font-black text-xs font-mono">
+                  CAE: PENDIENTE DE CAE
+                </p>
+                <p class="text-[9px] text-amber-700 dark:text-amber-400 mt-0.5">
+                  Este comprobante es un borrador interno.<br/>
+                  No tiene validez fiscal hasta obtener el CAE de ARCA.
+                </p>
+              </div>
+            }
           </div>
         </div>
 
@@ -327,18 +457,18 @@
       </p>
       <p style="font-size: 9px; margin: 2px 0;">{{ company()?.address || 'Buenos Aires' }}</p>
       <p style="font-size: 9px; margin: 1px 0;">CUIT: {{ company()?.tax_id || '30-71649281-9' }}</p>
-      <p style="font-size: 9px; margin: 1px 0;">P.Vta: {{ $any(company())?.point_of_sale || '00004' }}</p>
+      <p style="font-size: 9px; margin: 1px 0;">P.Vta: {{ formatPtoVta($any(company())?.point_of_sale || 4) }}</p>
     </div>
 
     <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
       <p style="font-size: 12px; font-weight: 900; margin: 0;">
-        FACTURA {{ invoice()?.type || 'B' }} (COD. {{ invoice()?.type === 'A' ? '001' : '006' }})
+        FACTURA {{ invoice()?.type || 'B' }} (COD. {{ getTypeCode(invoice()?.type) }})
       </p>
       <p style="font-size: 11px; font-weight: bold; margin: 2px 0;">
-        N° {{ invoice()?.invoice_number || '---' }}
+        N° {{ formatCompNro(invoice()?.invoice_number) }}
       </p>
       <p style="font-size: 9px; margin: 1px 0;">
-        Fecha: {{ invoice()?.issued_at | date:'dd/MM/yyyy HH:mm' }}
+        Fecha: {{ (invoice()?.issued_at || invoice()?.created_at) | date:'dd/MM/yyyy HH:mm' }}
       </p>
     </div>
 
@@ -355,7 +485,7 @@
         <div style="margin-bottom: 4px;">
           <p style="margin: 0;">{{ item.description }}</p>
           <div style="display: flex; justify-content: space-between;">
-            <span>{{ item.quantity }}x ${{ item.unit_price | number:'1.2-2' }} (IVA {{ ((item.tax_rate || 0.21) * 100) }}%)</span>
+            <span>{{ item.quantity }}x ${{ item.unit_price | number:'1.2-2' }}</span>
             <span style="font-weight: bold;">${{ (item.subtotal || (item.quantity * item.unit_price)) | number:'1.2-2' }}</span>
           </div>
         </div>
@@ -364,13 +494,19 @@
 
     <div style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
       <div style="display: flex; justify-content: space-between;">
-        <span>Subtotal Neto:</span>
+        <span>Subtotal:</span>
         <span>${{ taxBreakdown().totalNet | number:'1.2-2' }}</span>
       </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>IVA Total:</span>
-        <span>${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
-      </div>
+      @if (invoice()?.type === 'A') {
+        <div style="display: flex; justify-content: space-between;">
+          <span>IVA Total:</span>
+          <span>${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+        </div>
+      } @else if (invoice()?.type === 'B') {
+        <div style="text-align: center; font-size: 8px; font-style: italic; margin: 2px 0;">
+          El IVA se encuentra incluido en el precio
+        </div>
+      }
       @if (taxBreakdown().discount > 0) {
         <div style="display: flex; justify-content: space-between;">
           <span>Descuento:</span>
@@ -384,8 +520,13 @@
     </div>
 
     <div style="text-align: center; font-size: 8px; margin-top: 8px;">
-      <p style="margin: 1px 0;">CAE N°: {{ invoice()?.cae || '74128956321458' }}</p>
-      <p style="margin: 1px 0;">Vto CAE: {{ invoice()?.issued_at | date:'dd/MM/yyyy' }}</p>
+      @if (invoice()?.cae) {
+        <p style="margin: 1px 0;">CAE N°: {{ invoice()?.cae }}</p>
+        <p style="margin: 1px 0;">Vto CAE: {{ invoice()?.cae_expires_at | date:'dd/MM/yyyy' }}</p>
+      } @else {
+        <p style="margin: 1px 0; font-weight: bold;">CAE: PENDIENTE DE CAE</p>
+        <p style="margin: 1px 0;">Borrador interno sin validez fiscal</p>
+      }
       <p style="margin: 4px 0 0;">¡Gracias por su compra!</p>
     </div>
   </div>
