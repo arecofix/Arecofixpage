@@ -47,6 +47,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     super(supabase, logger);
   }
 
+  getBySlug(slug: string): Observable<Product | null> {
+    return this.findWithFilters({ slug, _page: 1, _per_page: 1, minimal: false }).pipe(
+      map(res => (res.data && res.data.length > 0 ? (res.data[0] as unknown as Product) : null))
+    );
+  }
+
   findWithFilters(params: ProductsParams = {}): Observable<ProductsResponse> {
     const {
       _page = 1,
@@ -60,9 +66,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       price,
       slug,
       min_price,
-      max_price,
-      minimal = true
+      max_price
     } = params;
+
+    // Automatic minimal inference: single item lookups by slug or id require full fields by default
+    const isSingleLookup = Boolean(slug || id);
+    const minimal = params.minimal !== undefined ? params.minimal : !isSingleLookup;
     
     const hasExplicitBranch = 'branch_id' in params;
     const branch_id = hasExplicitBranch ? params.branch_id : (this.branchContextService?.getBranchId() || undefined);
@@ -77,7 +86,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     selectFields += `, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert), variants:product_variants(*)`;
 
     if (!minimal) {
-      selectFields += ', description, media_metadata, gallery_urls';
+      selectFields += ', description, media_metadata, gallery_urls, specifications, meta_title, meta_description, og_image, seo_keywords, warranty_days, tax_percentage, weight, dimensions, cross_sell_products, offer_start_date, offer_end_date';
     }
 
     // GET https://<TU_SUPABASE_URL>/rest/v1/products?select=...

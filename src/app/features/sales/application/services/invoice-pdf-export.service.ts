@@ -303,10 +303,10 @@ export class InvoicePdfExportService {
       doc.setFontSize(6.5);
       doc.setTextColor(70, 70, 70);
       let tRowY = taxBoxY + 17;
-      doc.text(`Neto Gravado (Informativo): $ ${totals.totalNet.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
-      doc.text(`IVA Contenido (Informativo): $ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
+      doc.text(`Importe Neto: $ ${totals.totalNet.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
+      doc.text(`IVA Incluido: $ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 55, tRowY);
       tRowY += 5;
-      doc.text('El monto de IVA no se discrimina en el precio final al consumidor.', marginLeft + 3, tRowY);
+      doc.text(`Importe Total: $ ${totals.grandTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, marginLeft + 3, tRowY);
     } else {
       // Factura A: IVA discriminado formal
       doc.setFillColor(248, 250, 252);
@@ -353,7 +353,7 @@ export class InvoicePdfExportService {
     doc.text('Subtotal:', totalsBoxX + 3, totRowY);
     doc.text(`$ ${totals.totalNet.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, totRowY, { align: 'right' });
 
-    if (invoiceType !== 'C' && invoiceType !== 'X') {
+    if (invoiceType === 'A') {
       totRowY += 5.5;
       doc.text('IVA Total:', totalsBoxX + 3, totRowY);
       doc.text(`$ ${totals.totalVat.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`, totalsBoxX + totalsBoxWidth - 3, totRowY, { align: 'right' });

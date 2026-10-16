@@ -195,12 +195,24 @@ export class AdminProductService {
         }
         const createdProduct = await firstValueFrom(this.productRepo.create(payload as Product));
         
-        if (createdProduct && createdProduct.id && branchId && initialStock !== undefined) {
-            await this.stockService.updateStock(createdProduct.id, branchId, initialStock);
-        }
-        
-        if (createdProduct && createdProduct.id && variants.length > 0) {
-            await this.saveVariants(createdProduct.id, variants);
+        try {
+            if (createdProduct && createdProduct.id && branchId && initialStock !== undefined) {
+                await this.stockService.updateStock(createdProduct.id, branchId, initialStock);
+            }
+            
+            if (createdProduct && createdProduct.id && variants.length > 0) {
+                await this.saveVariants(createdProduct.id, variants);
+            }
+        } catch (subError) {
+            // Rollback compensatorio para evitar productos huérfanos con stock/variantes rotas
+            if (createdProduct && createdProduct.id) {
+                try {
+                    await firstValueFrom(this.productRepo.delete(createdProduct.id));
+                } catch (rollbackErr) {
+                    console.error('[AdminProductService] Fallo al revertir producto huérfano:', rollbackErr);
+                }
+            }
+            throw subError;
         }
         
         this.productsStore.clearCache();

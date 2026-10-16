@@ -64,11 +64,9 @@ export class CalculateArcaTotalsUseCase {
         return sum + qty * price;
       }, 0);
 
-      const netWithAdjustments = Math.max(
-        0,
-        grossSubtotal - safeDiscount + safeSurcharge
+      const grandTotal = this.round(
+        Math.max(0, grossSubtotal - safeDiscount + safeSurcharge)
       );
-      const grandTotal = this.round(netWithAdjustments);
       const balanceDue = this.round(Math.max(0, grandTotal - safeAdvancePayment));
 
       return {
@@ -95,43 +93,22 @@ export class CalculateArcaTotalsUseCase {
     // 2. FACTURA B: IVA INCLUIDO en el precio (Consumidor Final)
     // ────────────────────────────────────────────────────────────────────────
     if (type === 'B') {
-      // En Factura B los precios unitarios son brutos (IVA ya incluido)
-      let grossSubtotal = 0;
-      let weightedTaxRateSum = 0;
-
-      for (const item of items) {
+      // En Factura B los precios unitarios son finales (IVA ya incluido en el precio)
+      const grossSubtotal = items.reduce((sum, item) => {
         const qty = Number(item.quantity) || 0;
         const price = Number(item.unit_price) || 0;
-        const rate = Number(item.tax_rate) ?? 0.21;
-        const itemGross = qty * price;
-        grossSubtotal += itemGross;
-        weightedTaxRateSum += itemGross * rate;
-      }
+        return sum + qty * price;
+      }, 0);
 
-      // Tasa media ponderada para prorratear desglose informativo
-      const effectiveRate =
-        grossSubtotal > 0 ? weightedTaxRateSum / grossSubtotal : 0.21;
-
-      // El total a abonar es bruto menos descuento más recargo
+      // El total a abonar es el precio final menos descuento más recargo
       const grandTotal = this.round(
         Math.max(0, grossSubtotal - safeDiscount + safeSurcharge)
       );
 
-      // Desglose informativo para Transparencia Fiscal (Ley 27.743 / RG 5614)
-      // Neto = Total / (1 + Tasa)
-      const totalNet =
-        effectiveRate > 0
-          ? this.round(grandTotal / (1 + effectiveRate))
-          : grandTotal;
-      const totalVat = this.round(Math.max(0, grandTotal - totalNet));
-
-      // Asignación de importes netos e IVA informativos por alícuota
+      // Prorrateo del total para cálculo del neto implícito por alícuota
       let net21 = 0;
-      let vat21 = 0;
       let net105 = 0;
-      let vat105 = 0;
       let net27 = 0;
-      let vat27 = 0;
       let exempt = 0;
 
       const factor = grossSubtotal > 0 ? grandTotal / grossSubtotal : 1;
@@ -139,22 +116,18 @@ export class CalculateArcaTotalsUseCase {
       for (const item of items) {
         const qty = Number(item.quantity) || 0;
         const price = Number(item.unit_price) || 0;
-        const rate = Number(item.tax_rate) ?? 0.21;
+        const rate = Number(item.tax_rate ?? 0.21);
         const adjustedGrossItem = qty * price * factor;
 
         if (rate > 0) {
           const itemNet = adjustedGrossItem / (1 + rate);
-          const itemVat = adjustedGrossItem - itemNet;
 
           if (Math.abs(rate - 0.21) < 0.001) {
             net21 += itemNet;
-            vat21 += itemVat;
           } else if (Math.abs(rate - 0.105) < 0.001) {
             net105 += itemNet;
-            vat105 += itemVat;
           } else if (Math.abs(rate - 0.27) < 0.001) {
             net27 += itemNet;
-            vat27 += itemVat;
           } else {
             exempt += adjustedGrossItem;
           }
@@ -162,6 +135,12 @@ export class CalculateArcaTotalsUseCase {
           exempt += adjustedGrossItem;
         }
       }
+
+      const totalNet = this.round(net21 + net105 + net27 + exempt);
+      const totalVat = this.round(Math.max(0, grandTotal - totalNet));
+      const vat21 = this.round(grandTotal > 0 && totalNet > 0 ? (net21 * 0.21) * factor : 0);
+      const vat105 = this.round(grandTotal > 0 && totalNet > 0 ? (net105 * 0.105) * factor : 0);
+      const vat27 = this.round(grandTotal > 0 && totalNet > 0 ? (net27 * 0.27) * factor : 0);
 
       const balanceDue = this.round(Math.max(0, grandTotal - safeAdvancePayment));
 
@@ -188,54 +167,41 @@ export class CalculateArcaTotalsUseCase {
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // 3. FACTURA A: IVA DISCRIMINADO (Responsable Inscripto a Responsable Inscripto)
+    // 3. FACTURA A: IVA DISCRIMINADO (Precios Netos, se adiciona IVA)
     // ────────────────────────────────────────────────────────────────────────
     let net21 = 0;
     let net105 = 0;
     let net27 = 0;
     let exempt = 0;
 
-    let baseGrossNet = 0;
-    for (const item of items) {
-      const qty = Number(item.quantity) || 0;
-      const price = Number(item.unit_price) || 0;
-      baseGrossNet += qty * price;
-    }
-
-    // Aplicar descuento y recargo proporcionalmente sobre subtotal antes del IVA
-    const netAdjustmentFactor =
-      baseGrossNet > 0
-        ? Math.max(0, baseGrossNet - safeDiscount + safeSurcharge) / baseGrossNet
-        : 1;
-
-    let vat21 = 0;
-    let vat105 = 0;
-    let vat27 = 0;
-
+    let subtotalNet = 0;
     for (const item of items) {
       const qty = Number(item.quantity) || 0;
       const price = Number(item.unit_price) || 0;
       const rate = Number(item.tax_rate) || 0;
-
-      const itemNet = qty * price * netAdjustmentFactor;
+      const itemNet = qty * price;
+      subtotalNet += itemNet;
 
       if (Math.abs(rate - 0.21) < 0.001) {
         net21 += itemNet;
-        vat21 += itemNet * 0.21;
       } else if (Math.abs(rate - 0.105) < 0.001) {
         net105 += itemNet;
-        vat105 += itemNet * 0.105;
       } else if (Math.abs(rate - 0.27) < 0.001) {
         net27 += itemNet;
-        vat27 += itemNet * 0.27;
       } else {
         exempt += itemNet;
       }
     }
 
-    const totalNet = this.round(net21 + net105 + net27 + exempt);
+    const vat21 = this.round(net21 * 0.21);
+    const vat105 = this.round(net105 * 0.105);
+    const vat27 = this.round(net27 * 0.27);
     const totalVat = this.round(vat21 + vat105 + vat27);
-    const grandTotal = this.round(totalNet + totalVat);
+    const totalNet = this.round(subtotalNet);
+    // En Factura A: Total = Subtotal Neto + Total IVA - Descuento + Recargo
+    const grandTotal = this.round(
+      Math.max(0, totalNet + totalVat - safeDiscount + safeSurcharge)
+    );
     const balanceDue = this.round(Math.max(0, grandTotal - safeAdvancePayment));
 
     return {

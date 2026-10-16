@@ -36,6 +36,9 @@ export interface StaleInvoiceDraftResult {
  * - Single Responsibility: Only orchestrates draft lifecycle from domain events (SRP)
  * - Idempotent: Never duplicates invoices on repeated event delivery
  */
+import { Injectable } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
 export class CreateInvoiceDraftFromRepairOrderUseCase {
   constructor(private readonly invoiceRepository: InvoiceRepository) {}
 

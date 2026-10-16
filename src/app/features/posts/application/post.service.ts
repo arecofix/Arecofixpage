@@ -118,7 +118,7 @@ export class PostService {
     // Map known legacy 404 images from old defunct storage or dead URLs to valid local assets
     if (
       pathOrUrl.includes('jftiyfnnaogmgvksgkbn.supabase.co') ||
-      pathOrUrl.includes('api.arecofix.com.ar/public-assets/posts') ||
+      pathOrUrl.includes('api.arecofix.com.ar/public-assets') ||
       pathOrUrl.includes('1764621227166') ||
       pathOrUrl.includes('1764621102072') ||
       pathOrUrl.includes('1764621290350') ||

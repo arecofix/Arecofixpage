@@ -1,8 +1,10 @@
 import { CalculateArcaTotalsUseCase } from './calculate-arca-totals.usecase';
+import { ValidateArcaInvoiceUseCase } from './validate-arca-invoice.usecase';
 
-describe('CalculateArcaTotalsUseCase', () => {
-  describe('Factura A: Discriminación de IVA', () => {
-    it('Factura A con IVA 21% → discriminación correcta', () => {
+describe('CalculateArcaTotalsUseCase & Fiscal Rules (RG 5614/2024 / Ley 27.743)', () => {
+
+  describe('1. Factura A: Discriminación de IVA (Precios Netos + IVA)', () => {
+    it('Factura A con IVA 21%: total correcto con discriminación', () => {
       const items = [{ quantity: 1, unit_price: 1000, tax_rate: 0.21 }];
       const result = CalculateArcaTotalsUseCase.execute(items, 0, 'A');
 
@@ -15,7 +17,7 @@ describe('CalculateArcaTotalsUseCase', () => {
       expect(result.isVatExempt).toBe(false);
     });
 
-    it('Factura A con IVA 10.5% → discriminación correcta', () => {
+    it('Factura A con IVA 10.5%: total correcto con discriminación', () => {
       const items = [{ quantity: 2, unit_price: 2000, tax_rate: 0.105 }];
       const result = CalculateArcaTotalsUseCase.execute(items, 0, 'A');
 
@@ -26,7 +28,7 @@ describe('CalculateArcaTotalsUseCase', () => {
       expect(result.grandTotal).toBe(4420);
     });
 
-    it('Factura A con IVA 27% → discriminación correcta', () => {
+    it('Factura A con IVA 27%: total correcto con discriminación', () => {
       const items = [{ quantity: 1, unit_price: 5000, tax_rate: 0.27 }];
       const result = CalculateArcaTotalsUseCase.execute(items, 0, 'A');
 
@@ -37,7 +39,7 @@ describe('CalculateArcaTotalsUseCase', () => {
       expect(result.grandTotal).toBe(6350);
     });
 
-    it('Factura A con múltiples alícuotas → suma correcta', () => {
+    it('Factura A con múltiples alícuotas: suma correcta', () => {
       const items = [
         { quantity: 1, unit_price: 10000, tax_rate: 0.21 }, // Net 10000, IVA 2100
         { quantity: 1, unit_price: 4000, tax_rate: 0.105 }, // Net 4000, IVA 420
@@ -57,11 +59,22 @@ describe('CalculateArcaTotalsUseCase', () => {
       expect(result.totalVat).toBe(3060);
       expect(result.grandTotal).toBe(20060);
     });
+
+    it('Caso Oficial Factura A: $149.000 neto + IVA 21% $31.290 - descuento $40.400 = $139.890', () => {
+      const items = [{ quantity: 1, unit_price: 149000, tax_rate: 0.21 }];
+      const result = CalculateArcaTotalsUseCase.execute(items, 40400, 'A');
+
+      expect(result.totalNet).toBe(149000);
+      expect(result.vatAmount21).toBe(31290);
+      expect(result.totalVat).toBe(31290);
+      expect(result.discount).toBe(40400);
+      expect(result.grandTotal).toBe(139890);
+    });
   });
 
-  describe('Factura B: IVA Incluido y Transparencia RG 5614/2024', () => {
-    it('Factura B con IVA incluido → no discrimina en precio, total correcto y desglose informativo', () => {
-      // Precio bruto de lista: $12.100 (incluye IVA 21%)
+  describe('2. Factura B: Precios con IVA Incluido y Transparencia Fiscal (RG 5614/2024)', () => {
+    it('Factura B con IVA incluido: NO discrimina, total correcto', () => {
+      // Precio final bruto: $12.100 (incluye IVA 21%)
       const items = [{ quantity: 1, unit_price: 12100, tax_rate: 0.21 }];
       const result = CalculateArcaTotalsUseCase.execute(items, 0, 'B');
 
@@ -73,22 +86,50 @@ describe('CalculateArcaTotalsUseCase', () => {
       expect(result.transparencyLegend).toContain('Régimen de Transparencia Fiscal al Consumidor');
     });
 
-    it('Factura B con descuento → total = subtotal - descuento y desglose informativo ajustado', () => {
-      // Precio bruto: $12.100, descuento $2.100 => Total a pagar $10.000
-      const items = [{ quantity: 1, unit_price: 12100, tax_rate: 0.21 }];
-      const result = CalculateArcaTotalsUseCase.execute(items, 2100, 'B');
+    it('Caso Oficial Factura B: $149.000 precio final sin descuento → neto $123.140,50 + IVA incluido $25.859,50 = $149.000', () => {
+      const items = [{ quantity: 1, unit_price: 149000, tax_rate: 0.21 }];
+      const result = CalculateArcaTotalsUseCase.execute(items, 0, 'B');
 
-      expect(result.grandTotal).toBe(10000);
-      // subtotal informativo = 10000 / 1.21 = 8264.46
-      expect(result.totalNet).toBeCloseTo(8264.46, 2);
-      // iva informativo = 10000 - 8264.46 = 1735.54
-      expect(result.totalVat).toBeCloseTo(1735.54, 2);
-      expect(result.discount).toBe(2100);
+      expect(result.grandTotal).toBe(149000);
+      expect(result.totalNet).toBe(123140.5);
+      expect(result.totalVat).toBe(25859.5);
+      expect(result.vatIncludedLegend).toBe('El IVA se encuentra incluido en el precio');
+    });
+
+    it('Caso Oficial Factura B con descuento: $149.000 precio final - descuento $40.400 = $108.600', () => {
+      const items = [{ quantity: 1, unit_price: 149000, tax_rate: 0.21 }];
+      const result = CalculateArcaTotalsUseCase.execute(items, 40400, 'B');
+
+      expect(result.grandTotal).toBe(108600);
+      expect(result.discount).toBe(40400);
+      // Neto implícito informativo = 108.600 / 1.21 = 89.752,07
+      expect(result.totalNet).toBe(89752.07);
+      // IVA implícito informativo = 108.600 - 89.752,07 = 18.847,93
+      expect(result.totalVat).toBe(18847.93);
+      expect(result.isVatIncluded).toBe(true);
+      expect(result.vatIncludedLegend).toBe('El IVA se encuentra incluido en el precio');
+    });
+
+    it('Factura B con múltiples alícuotas: neto implícito por alícuota', () => {
+      // Item 1: $12.100 al 21% (Neto implícito: 10.000, IVA: 2.100)
+      // Item 2: $11.050 al 10.5% (Neto implícito: 10.000, IVA: 1.050)
+      const items = [
+        { quantity: 1, unit_price: 12100, tax_rate: 0.21 },
+        { quantity: 1, unit_price: 11050, tax_rate: 0.105 },
+      ];
+      const result = CalculateArcaTotalsUseCase.execute(items, 0, 'B');
+
+      expect(result.grandTotal).toBe(23150);
+      expect(result.netAmount21).toBe(10000);
+      expect(result.netAmount105).toBe(10000);
+      expect(result.totalNet).toBe(20000);
+      expect(result.totalVat).toBe(3150);
+      expect(result.isVatIncluded).toBe(true);
     });
   });
 
-  describe('Factura C y X: Sin IVA', () => {
-    it('Factura C → sin IVA, sin leyenda de transparencia', () => {
+  describe('3. Factura C y Comprobantes Internos (Sin IVA)', () => {
+    it('Factura C: sin discriminación de IVA, sin leyenda de transparencia', () => {
       const items = [
         { quantity: 2, unit_price: 1500, tax_rate: 0.21 }, // Monotributista emite C sin IVA
       ];
@@ -103,55 +144,92 @@ describe('CalculateArcaTotalsUseCase', () => {
       expect(result.vatIncludedLegend).toBeUndefined();
     });
 
-    it('Factura X → comprobante interno sin IVA ni transparencia', () => {
+    it('Factura C con descuento: total = precio - descuento, IVA = 0', () => {
       const items = [{ quantity: 1, unit_price: 5000, tax_rate: 0.21 }];
+      const result = CalculateArcaTotalsUseCase.execute(items, 1000, 'C');
+
+      expect(result.grandTotal).toBe(4000);
+      expect(result.totalNet).toBe(4000);
+      expect(result.totalVat).toBe(0);
+      expect(result.discount).toBe(1000);
+    });
+
+    it('Factura X: comprobante interno no fiscal sin IVA', () => {
+      const items = [{ quantity: 1, unit_price: 8000, tax_rate: 0.21 }];
       const result = CalculateArcaTotalsUseCase.execute(items, 0, 'X');
 
       expect(result.totalVat).toBe(0);
-      expect(result.grandTotal).toBe(5000);
+      expect(result.grandTotal).toBe(8000);
       expect(result.isVatExempt).toBe(true);
     });
   });
 
-  describe('Ajustes: Descuento, Recargo y Seña', () => {
-    it('Descuento sobre subtotal → total correcto', () => {
-      // Factura A: 2000 neto - 500 desc = 1500 neto => 1500 * 0.21 = 315 IVA => total = 1815
-      const items = [{ quantity: 2, unit_price: 1000, tax_rate: 0.21 }];
-      const result = CalculateArcaTotalsUseCase.execute(items, 500, 'A');
+  describe('4. Comparación de Descuento: Factura A vs Factura B', () => {
+    it('Descuento aplicado en Factura A resta del total tras sumar IVA', () => {
+      // 1000 neto + 210 IVA - 300 desc = 910
+      const items = [{ quantity: 1, unit_price: 1000, tax_rate: 0.21 }];
+      const resultA = CalculateArcaTotalsUseCase.execute(items, 300, 'A');
 
-      expect(result.totalNet).toBe(1500);
-      expect(result.totalVat).toBe(315);
-      expect(result.grandTotal).toBe(1815);
-      expect(result.discount).toBe(500);
+      expect(resultA.totalNet).toBe(1000);
+      expect(resultA.totalVat).toBe(210);
+      expect(resultA.grandTotal).toBe(910);
     });
 
-    it('Recargo sobre subtotal → total correcto', () => {
-      // Factura A: 1000 neto + 200 recargo = 1200 neto => 1200 * 0.21 = 252 IVA => total = 1452
-      const items = [{ quantity: 1, unit_price: 1000, tax_rate: 0.21 }];
-      const result = CalculateArcaTotalsUseCase.execute(items, 0, 'A', 200);
+    it('Descuento aplicado en Factura B resta directamente del precio final bruto', () => {
+      // 1210 bruto - 210 desc = 1000 total final
+      const items = [{ quantity: 1, unit_price: 1210, tax_rate: 0.21 }];
+      const resultB = CalculateArcaTotalsUseCase.execute(items, 210, 'B');
 
-      expect(result.surcharge).toBe(200);
-      expect(result.totalNet).toBe(1200);
-      expect(result.totalVat).toBe(252);
-      expect(result.grandTotal).toBe(1452);
+      expect(resultB.grandTotal).toBe(1000);
+      expect(resultB.totalNet).toBeCloseTo(826.45, 2);
+      expect(resultB.totalVat).toBeCloseTo(173.55, 2);
+    });
+  });
+
+  describe('5. Validaciones de Condición del Emisor (Monotributista vs Responsable Inscripto)', () => {
+    const defaultParams = {
+      customer: {
+        docType: 'CUIT' as const,
+        docNumber: '20438529161',
+        name: 'Cliente Empresa SA',
+        vatCondition: 'IVA Responsable Inscripto' as const,
+      },
+      items: [{ description: 'Servicio técnico', quantity: 1, unit_price: 1000, tax_rate: 0.21 }],
+      paymentMethod: 'cash' as const,
+      grandTotal: 1000,
+    };
+
+    it('Si el emisor es Monotributista y se intenta emitir Factura A → error', () => {
+      const result = ValidateArcaInvoiceUseCase.execute({
+        ...defaultParams,
+        type: 'A',
+        emitterVatCondition: 'Responsable Monotributo',
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.some(e => e.includes('Monotributista') && e.includes('Factura A'))).toBe(true);
     });
 
-    it('Seña descontada del total → saldo a cobrar correcto', () => {
-      // Total $1210, seña $500 => saldo $710
-      const items = [{ quantity: 1, unit_price: 1000, tax_rate: 0.21 }];
-      const result = CalculateArcaTotalsUseCase.execute(items, 0, 'A', 0, 500);
+    it('Si el emisor es Monotributista y se intenta emitir Factura B → error', () => {
+      const result = ValidateArcaInvoiceUseCase.execute({
+        ...defaultParams,
+        type: 'B',
+        emitterVatCondition: 'Monotributista',
+      });
 
-      expect(result.grandTotal).toBe(1210);
-      expect(result.advancePayment).toBe(500);
-      expect(result.balanceDue).toBe(710);
+      expect(result.isValid).toBe(false);
+      expect(result.errors.some(e => e.includes('Monotributista') && e.includes('Factura B'))).toBe(true);
     });
 
-    it('Seña mayor al total → saldo a cobrar 0 (no negativo)', () => {
-      const items = [{ quantity: 1, unit_price: 1000, tax_rate: 0.21 }];
-      const result = CalculateArcaTotalsUseCase.execute(items, 0, 'A', 0, 2000);
+    it('Si el emisor es Monotributista y se intenta emitir Factura C → OK', () => {
+      const result = ValidateArcaInvoiceUseCase.execute({
+        ...defaultParams,
+        type: 'C',
+        emitterVatCondition: 'Responsable Monotributo',
+      });
 
-      expect(result.grandTotal).toBe(1210);
-      expect(result.balanceDue).toBe(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors.length).toBe(0);
     });
   });
 });

@@ -82,7 +82,7 @@ export class MenuBuilderService {
         path: `${basePrefix}/sales`,
         icon: 'fa-cash-register', 
         module: 'inventory',
-        expanded: false,
+        expanded: true,
         children: [
           { title: lang === 'es' ? 'Terminal de Venta' : 'Point of Sale (POS)', path: `${basePrefix}/sales`, icon: 'fa-plus-circle' },
           { title: lang === 'es' ? 'Pedidos & E-commerce' : 'Orders & E-commerce', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart' },
@@ -95,7 +95,7 @@ export class MenuBuilderService {
         title: lang === 'es' ? 'Servicio Técnico' : 'Technical Service',
         icon: 'fa-wrench',
         module: 'repairs',
-        expanded: false,
+        expanded: true,
         children: [
           { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' }
         ]
@@ -103,7 +103,7 @@ export class MenuBuilderService {
       {
         title: lang === 'es' ? 'Gestión & Ajustes' : 'Management & Settings',
         icon: 'fa-cogs',
-        expanded: false,
+        expanded: true,
         children: gestionChildren
       },
       { 

@@ -52,31 +52,17 @@ export class AnalyticsService {
         });
     }
 
-    private async canReachPostHog(host: string): Promise<boolean> {
-        if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
-            await fetch(`${host}/status/`, {
-                method: 'HEAD',
-                mode: 'no-cors',
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
     private async initPostHog() {
-        if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey) && window.location.hostname !== 'localhost') {
+        if (typeof window === 'undefined') return;
+
+        // Never run third-party tracking scripts on admin panel or local dev
+        if (window.location.hostname === 'localhost' || window.location.pathname.includes('/admin')) {
+            return;
+        }
+
+        if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey)) {
             try {
                 const host = environment.posthogHost || 'https://us.i.posthog.com';
-                const isReachable = await this.canReachPostHog(host);
-                if (!isReachable) {
-                    return;
-                }
 
                 const ph = await import('posthog-js');
                 posthogInstance = (ph.default || ph) as unknown as PostHogClient;
@@ -88,6 +74,7 @@ export class AnalyticsService {
                     capture_dead_clicks: false,
                     disable_session_recording: true,
                     advanced_disable_decide: true,
+                    disable_external_dependency_loading: true,
                     capture_pageview: true,
                     persistence: 'localStorage+cookie',
                     request_batching: true

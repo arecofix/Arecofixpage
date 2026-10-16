@@ -3,19 +3,15 @@ import { BaseRepository } from '@app/core/repositories/base.repository';
 import { Supplier } from '../../domain/entities/supplier.entity';
 import { LoggerService } from '@app/core/services/logger.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { SupplierRepository, SupplierPaymentDto } from '@app/domain/repositories/supplier.repository';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SupabaseSupplierRepository extends BaseRepository<Supplier> {
+export class SupabaseSupplierRepository extends BaseRepository<Supplier> implements SupplierRepository {
   protected override tableName = 'suppliers';
   protected override isGlobalTable = false;
-  /**
-   * Suppliers are tenant-level entities (not branch-specific).
-   * All branches of a tenant share the same supplier catalog.
-   * Setting this to false ensures getAll() returns all tenant suppliers
-   * regardless of the active branch context, preventing data fragmentation.
-   */
   protected override useStrictBranchIsolation = false;
 
   constructor() {
@@ -23,4 +19,44 @@ export class SupabaseSupplierRepository extends BaseRepository<Supplier> {
     const logger = inject(LoggerService);
     super(supabase, logger);
   }
+
+  async registerPayment(supplierId: string, payment: SupplierPaymentDto): Promise<void> {
+    try {
+      this.logger.info(`[SupabaseSupplierRepository] Registering payment for supplier ${supplierId}:`, payment);
+      await this.updateBalance(supplierId, -payment.amount);
+    } catch (err) {
+      this.logger.error(`[SupabaseSupplierRepository] registerPayment failed:`, err);
+    }
+  }
+
+  async updateBalance(supplierId: string, deltaAmount: number): Promise<void> {
+    try {
+      const supplier = await firstValueFrom(this.getById(supplierId));
+      if (!supplier) return;
+
+      const currentBalance = Number(supplier.balance ?? 0);
+      const newBalance = currentBalance + deltaAmount;
+
+      await firstValueFrom(this.update(supplierId, { balance: newBalance } as Partial<Supplier>));
+    } catch (err) {
+      this.logger.warn(`[SupabaseSupplierRepository] updateBalance failed:`, err);
+    }
+  }
+
+  async updateAccountStatus(
+    supplierId: string,
+    purchaseId: string,
+    amount: number,
+    paymentStatus: 'pending' | 'paid'
+  ): Promise<void> {
+    try {
+      // If purchase is pending payment, increase supplier balance due
+      if (paymentStatus === 'pending') {
+        await this.updateBalance(supplierId, amount);
+      }
+    } catch (err) {
+      this.logger.warn(`[SupabaseSupplierRepository] updateAccountStatus failed:`, err);
+    }
+  }
 }
+

@@ -79,6 +79,7 @@ export function buildMockBranch(overrides: Record<string, unknown> = {}) {
   return {
     id:        MOCK_BRANCH_ID,
     name:      'Sede Central',
+    slug:      null,
     tenant_id: MOCK_TENANT_ID,
     ...overrides,
   };

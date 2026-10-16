@@ -31,7 +31,7 @@ export interface Product {
     id: string;
     name: string;
     slug: string;
-    description?: string;
+    description?: string | null;
     price: number;
     retail_price?: number;
     sale_price?: number;

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "cust-001",
+    "tenant_id": "bba26ccd-59ce-471c-aac0-4c1f5513de3b",
+    "name": "Juan Pérez",
+    "tax_id": "20-30123456-7",
+    "tax_id_type": "CUIT",
+    "tax_condition": "RESPONSABLE_INSCRIPTO",
+    "address": "Calle Falsa 123, CABA",
+    "email": "juan.perez@example.com",
+    "phone": "+54 11 4444-5555"
+  },
+  {
+    "id": "cust-002",
+    "tenant_id": "bba26ccd-59ce-471c-aac0-4c1f5513de3b",
+    "name": "María González",
+    "tax_id": "27-35987654-2",
+    "tax_id_type": "DNI",
+    "tax_condition": "CONSUMIDOR_FINAL",
+    "address": "Av. Santa Fe 2500, CABA",
+    "email": "maria.gonzalez@example.com",
+    "phone": "+54 11 6666-7777"
+  },
+  {
+    "id": "cust-003",
+    "tenant_id": "bba26ccd-59ce-471c-aac0-4c1f5513de3b",
+    "name": "Tech Corp SA",
+    "tax_id": "30-71000000-9",
+    "tax_id_type": "CUIT",
+    "tax_condition": "RESPONSABLE_INSCRIPTO",
+    "address": "Av. Corrientes 1000, CABA",
+    "email": "contacto@techcorp.com",
+    "phone": "+54 11 9999-0000"
+  }
+]

@@ -24,7 +24,7 @@
         'us.i.posthog.com', 'us-assets.i.posthog.com', '504', 'gateway timeout',
         'preloadresponse', 'navigation preload', 'service worker navigation preload',
         'maps.googleapis.com', 'gen_204', 'csp_test', 'err_blocked_by_client',
-        'grant_type=refresh_token', 'invalid_grant', 'refresh token not found', 'ng0505', 'ng0751', 'hydration was requested'
+        'ga-audiences', 'google.com.ar/ads', 'analytics.google.com', 'ads/ga-audiences', 'autofocus processing was blocked', 'grant_type=refresh_token', 'invalid_grant', 'refresh token not found', 'ng0505', 'ng0751', 'hydration was requested'
       ];
       const isNoise = (args) => {
         const msg = args.map(a => {
@@ -194,7 +194,8 @@
     };
 
     var isLocalDev = ['localhost', '127.0.0.1', '0.0.0.0', '::1'].includes(window.location.hostname) || window.location.hostname.endsWith('.local');
-    if (!isLocalDev) {
+    var isAdminRoute = window.location.pathname.includes('/admin');
+    if (!isLocalDev && !isAdminRoute) {
       if (document.readyState === 'complete') {
         initAnalytics();
       } else {

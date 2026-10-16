@@ -31,13 +31,25 @@ export class SupabaseErrorHandlerService {
     let userMessage = 'No se pudo completar la operación.';
     
     if (code === '23505') {
-      userMessage = 'Ya existe un registro con estos datos.';
+      userMessage = 'Ya existe un registro con estos datos (código o valor duplicado).';
     } else if (code === '42501') {
       userMessage = 'No tienes permisos para realizar esta acción.';
+    } else if (code === '23502') {
+      userMessage = 'Falta completar un campo obligatorio requerido por la base de datos.';
+    } else if (code === '23503') {
+      userMessage = 'La categoría, marca o relación seleccionada no existe en la base de datos.';
+    } else if (code === '23514') {
+      userMessage = 'Uno de los valores ingresados no cumple las reglas de validación (ej: precio negativo).';
+    } else if (code === '22P02') {
+      userMessage = 'Formato de datos no válido para la base de datos.';
+    } else if (code === 'PGRST204') {
+      userMessage = `Error de esquema en la base de datos: columna inexistente (${message}).`;
     } else if (code === 'PGRST116') {
       userMessage = 'No se encontró el registro solicitado.';
     } else if (message.toLowerCase().includes('failed to fetch')) {
       userMessage = 'Error de conexión. Verifica tu internet.';
+    } else if (message && message !== 'Ocurrió un error inesperado en la base de datos.') {
+      userMessage = message;
     }
 
     // Notify user if not suppressed

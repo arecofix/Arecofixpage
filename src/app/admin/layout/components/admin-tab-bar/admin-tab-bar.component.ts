@@ -93,6 +93,9 @@ export class AdminTabBarComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
+    if (typeof document !== 'undefined') {
+      document.body.setAttribute('data-angular-ready', 'true');
+    }
     this.scrollActiveTabIntoView();
   }
 

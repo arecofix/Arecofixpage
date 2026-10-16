@@ -4,13 +4,29 @@ import { resetTestTenant } from "./cypress/support/seed-db";
 export default defineConfig({
   projectId: 'hfghsi',
   e2e: {
+    baseUrl: process.env['CYPRESS_BASE_URL'] || 'http://localhost:4200',
+    viewportWidth: 1280,
+    viewportHeight: 720,
+    video: true,
+    screenshotOnRunFailure: true,
     chromeWebSecurity: false,
     testIsolation: true,
-    video: true,
     trashAssetsBeforeRuns: false,
     pageLoadTimeout: 120000,
     defaultCommandTimeout: 10000,
+    retries: {
+      runMode: 2,
+      openMode: 0,
+    },
+    reporter: 'cypress-mochawesome-reporter',
+    reporterOptions: {
+      reportDir: 'cypress/reports',
+      charts: true,
+      embeddedScreenshots: true,
+      inlineAssets: true,
+    },
     setupNodeEvents(on, config) {
+      require('cypress-mochawesome-reporter/plugin')(on);
       on('task', {
         async seedDatabase() {
           try {
@@ -32,33 +48,14 @@ export default defineConfig({
       });
       return config;
     },
-    baseUrl: "http://localhost:4200",
     supportFile: "cypress/support/e2e.ts",
     numTestsKeptInMemory: 0,
   },
 
   env: {
-    apiUrl: "http://localhost:3000/api", // Ejemplo para API tests
-  },
-
-  allowCypressEnv: false,
-
-  component: {
-    devServer: {
-      framework: "angular",
-      bundler: "webpack",
-      options: {
-        projectConfig: {
-          root: "",
-          sourceRoot: "src",
-          buildOptions: {
-            outputPath: "dist/arecofix",
-            main: "src/main.ts",
-          },
-        },
-      },
-    },
-    specPattern: "**/*.cy.ts",
+    apiUrl: "http://localhost:3000/api",
+    mobileViewport: { width: 390, height: 844 },
+    tabletViewport: { width: 768, height: 1024 },
   },
 });
 
