@@ -707,10 +707,12 @@ export class StudentCampusPage implements OnInit {
       // 2. Validate Access — check role and enrollment directly
       let accessConfirmed = false;
 
-      // 2a. Admins and staff always have access
+      // 2a. Admins and staff always have access (Verified profile role check)
       const userSession = await this.authService.getSession();
-      const userRole = userSession?.user?.user_metadata?.['role'];
+      const verifiedProfile = this.authService.getCurrentProfile();
+      const userRole = verifiedProfile?.role;
       if (
+        userRole &&
         ['admin', 'staff', 'super_admin', 'tenant_owner'].includes(userRole)
       ) {
         accessConfirmed = true;

@@ -25,7 +25,7 @@ import {
   withFetch,
   withInterceptors,
 } from '@angular/common/http';
-import { registerLocaleData } from '@angular/common';
+import { registerLocaleData, IMAGE_CONFIG } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { AppTitleStrategy } from './core/strategies/app-title.strategy';
 
@@ -78,13 +78,35 @@ import { SupabaseCourseRepository } from './features/courses/infrastructure/repo
 import { NotificationBaseRepository } from './features/messages/domain/repositories/notification.repository';
 import { SupabaseNotificationRepository } from './features/messages/infrastructure/repositories/supabase-notification.repository';
 import { TenantService } from './core/services/tenant.service';
+import { AccountRepository } from './features/accounts/domain/repositories/account.repository';
+import { SupabaseAccountRepository } from './features/accounts/infrastructure/repositories/supabase-account.repository';
+import { IEventBus } from './domain/events/event-bus.interface';
+import { RxjsEventBusService } from './infrastructure/events/rxjs-event-bus.service';
+import { CashMovementRepository } from './domain/repositories/cash-movement.repository';
+import { SupabaseCashMovementRepository } from './infrastructure/repositories/supabase-cash-movement.repository';
+import { SupplierRepository } from './domain/repositories/supplier.repository';
+import { SupabaseSupplierRepository } from './features/customers/infrastructure/repositories/supabase-supplier.repository';
 
 const isTauri =
   typeof window !== 'undefined' &&
   (!!(window as any)['__TAURI_INTERNALS__'] || !!(window as any)['__TAURI__']);
 
+const isBrowser = typeof document !== 'undefined';
+const hasServerHydration = !isBrowser || (
+  !isTauri && (
+    !!document.querySelector('[ng-server-context]') || 
+    !!document.getElementById('ng-state')
+  )
+);
+
 export const appConfig: ApplicationConfig = {
   providers: [
+    {
+      provide: IMAGE_CONFIG,
+      useValue: {
+        domains: ['db.arecofix.com.ar', 'jftiyfnnaogmgvksgkbn.supabase.co', 'lh3.googleusercontent.com', 'avatars.githubusercontent.com', 'platform-lookaside.fbsbx.com'],
+      },
+    },
     // Locale provider
     { provide: LOCALE_ID, useValue: 'es-AR' },
 
@@ -105,6 +127,21 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
 
+    // Clean up any stale service workers in dev mode (prevents cancelled preload warnings)
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {
+        if (isDevMode() && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (const registration of registrations) {
+              registration.unregister().catch(() => {});
+            }
+          }).catch(() => {});
+        }
+      },
+      multi: true,
+    },
+
     // Supabase Client Provider via SupabaseService
     {
       provide: SUPABASE_CLIENT,
@@ -116,7 +153,7 @@ export const appConfig: ApplicationConfig = {
     // Core Angular providers
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay(), withNoIncrementalHydration()),
+    ...(hasServerHydration ? [provideClientHydration(withEventReplay(), withNoIncrementalHydration())] : []),
     provideRouter(
       routes,
       withInMemoryScrolling({
@@ -171,6 +208,7 @@ export const appConfig: ApplicationConfig = {
     },
     { provide: AnalyticsRepository, useClass: SupabaseAnalyticsRepository },
     { provide: UserProfileRepository, useClass: SupabaseUserProfileRepository },
+    { provide: AccountRepository, useClass: SupabaseAccountRepository },
     { 
       provide: OrderRepository, 
       useFactory: () => {
@@ -198,5 +236,8 @@ export const appConfig: ApplicationConfig = {
       useClass: SupabaseNotificationRepository,
     },
     { provide: ICustomerDeviceRepository, useClass: SupabaseCustomerDeviceRepository },
+    { provide: IEventBus, useClass: RxjsEventBusService },
+    { provide: CashMovementRepository, useClass: SupabaseCashMovementRepository },
+    { provide: SupplierRepository, useClass: SupabaseSupplierRepository },
   ],
 };

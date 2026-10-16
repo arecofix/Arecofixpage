@@ -5,6 +5,7 @@ import { AuthService } from '@app/core/services/auth.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { filter, take, timeout, catchError } from 'rxjs/operators';
 import { of, firstValueFrom } from 'rxjs';
+import { environment } from '@env/environment';
 
 export const instructorGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
@@ -17,8 +18,8 @@ export const instructorGuard: CanActivateFn = async (route, state) => {
       return true; // Let the browser handle authentication to avoid SSR timeouts
     }
 
-    if (typeof window !== 'undefined' && localStorage.getItem('cypress-test') === 'true') {
-      return true; // Bypass authentication guard during Cypress UI tests
+    if (!environment.production && typeof window !== 'undefined' && localStorage.getItem('cypress-test') === 'true') {
+      return true; // Bypass authentication guard ONLY during Cypress UI tests in non-production
     }
     const authState = await firstValueFrom(
       authService.authState$.pipe(

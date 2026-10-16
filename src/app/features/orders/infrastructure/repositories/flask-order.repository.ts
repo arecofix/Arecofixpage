@@ -5,12 +5,14 @@ import { map } from 'rxjs/operators';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/order.entity';
 import { OrderRepository } from '../../domain/repositories/order.repository';
 
+import { environment } from '@env/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class FlaskOrderRepository implements OrderRepository {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:5000/api/orders';
+    private apiUrl = `${environment.flaskApiUrl}/orders`;
 
     createOrder(order: Order): Observable<Order> {
         return this.http.post<Order>(this.apiUrl, order);

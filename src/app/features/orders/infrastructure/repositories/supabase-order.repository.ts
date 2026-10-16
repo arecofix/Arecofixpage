@@ -188,12 +188,12 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
 
     query = this.applyTenantFilter(query);
 
-    return from((query as any).maybeSingle()).pipe(
+    return from((query as any).order('created_at', { ascending: false }).limit(1)).pipe(
       map(({ data, error }: any) => {
         if (error) {
           this.errorHandler.handleError(error, 'getActiveCart');
         }
-        return data ? OrderMapper.toDomain(data) : null;
+        return data && data.length > 0 ? OrderMapper.toDomain(data[0]) : null;
       })
     );
   }

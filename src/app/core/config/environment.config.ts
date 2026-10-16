@@ -10,6 +10,7 @@ export interface EnvironmentConfig {
     supabaseKey: string;
     authRedirectUrl: string;
     enableProfileUpsert: boolean;
+    flaskApiUrl: string;
     posthogKey: string;
     posthogHost: string;
     externalUrls: {
@@ -83,6 +84,7 @@ export function createEnvironmentConfig(
         supabaseKey: overrides.supabaseKey || '',
         authRedirectUrl: overrides.authRedirectUrl ||
             (production ? 'https://arecofix.com.ar/login' : 'http://localhost:4200/login'),
+        flaskApiUrl: overrides.flaskApiUrl || 'http://localhost:5000/api',
         enableProfileUpsert: false,
         posthogKey: overrides.posthogKey || '',
         posthogHost: overrides.posthogHost || 'https://us.i.posthog.com',

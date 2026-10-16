@@ -22,6 +22,7 @@ export const environment: Environment = {
   supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs',
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
+  flaskApiUrl: 'http://localhost:5000/api',
 
   // RAG Chatbot Worker (Fase 3)
   chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',

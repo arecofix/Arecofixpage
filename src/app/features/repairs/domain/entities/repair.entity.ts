@@ -95,6 +95,7 @@ export interface RepairChecklist {
     chip: boolean;
     sd: boolean;
     case: boolean;
+    physical_condition?: string;
 }
 
 /**
@@ -102,6 +103,7 @@ export interface RepairChecklist {
  */
 export interface CreateRepairDto {
     customer_id?: string;
+    device_id?: string;
     customer_name?: string;
     customer_phone?: string;
     customer_email?: string;

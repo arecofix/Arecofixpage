@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, switchMap } from 'rxjs';
+import { Observable, from, map, switchMap, of } from 'rxjs';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto, RepairPart, RepairChecklist } from '../../domain/entities/repair.entity';
 import { LoggerService } from '@app/core/services/logger.service';
@@ -25,7 +25,13 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         super(supabase, logger);
     }
 
+    private static readonly UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
     override getById(id: string): Observable<Repair | null> {
+        if (!id || !SupabaseRepairRepository.UUID_REGEX.test(id)) {
+            return of(null);
+        }
+
         let query = this.supabase.from(this.tableName)
             .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email, dni), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, type, imei, passcode, model:models(name, brand_id))')
             .eq('id', id);
@@ -40,30 +46,40 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         );
     }
 
-    override getAll(params?: any): Observable<Repair[]> {
-        const branchId = typeof params === 'string' ? params : (params?.branchId);
-        const limit = params?.limit || 50;
-        const offset = params?.offset || 0;
+    /**
+     * Override de BaseRepository.getAll — compatible con la firma base.
+     * Para queries específicas con limit/offset/branch, usar getAdminList().
+     */
+    override getAll(_options?: { column?: string; ascending?: boolean; select?: string }): Observable<Repair[]> {
+        return this.getAdminList({});
+    }
+
+    /**
+     * Obtiene reparaciones con paginación y filtro de sucursal.
+     */
+    getRepairs(limit?: number, offset?: number, branchId?: string): Observable<Repair[]> {
+        const resolvedLimit = limit || 50;
+        const resolvedOffset = offset || 0;
 
         let query = this.supabase.from(this.tableName)
             .select('*, parts:repair_parts_used(*, product:products(name)), images:repair_images(image_url), client:profiles!repairs_client_id_fkey(id, first_name, last_name, phone, email), assigned_technician:profiles!repairs_assigned_technician_id_fkey(id, first_name, last_name), status:repair_status_types(id, name, color, icon), device:customer_devices!device_id(id, type, imei, passcode, model:models(name, brand_id))')
-            .range(offset, offset + limit - 1)
+            .range(resolvedOffset, resolvedOffset + resolvedLimit - 1)
             .order('created_at', { ascending: false });
 
         query = this.applyTenantFilter(query);
         if (branchId) query = query.eq('branch_id', branchId);
 
-        return from(query as any).pipe(
-            map(({ data, error }: any) => {
-                if (error) this.errorHandler.handleError(error, `getAll ${this.tableName}`);
-                return (data || []).map((d: any) => this.mapFromDb(d));
+        return from(query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>).pipe(
+            map(({ data, error }) => {
+                if (error) this.errorHandler.handleError(error, `getRepairs ${this.tableName}`);
+                return (data || []).map((d: Record<string, unknown>) => this.mapFromDb(d));
             })
         );
     }
 
     override create(repair: CreateRepairDto): Observable<Repair> {
         const generatedId = crypto.randomUUID();
-        const dbPayload = this.mapToDb(repair);
+        const dbPayload = this.mapToDb(repair as unknown as Record<string, unknown>);
         const rpcPayload = this.sanitizePayload({
             ...dbPayload,
             id: generatedId
@@ -74,25 +90,25 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         return from(
             this.supabase.rpc('save_repair_order', { p_payload: rpcPayload })
         ).pipe(
-            switchMap(async (res: any) => {
+            switchMap(async (res: { error?: unknown }) => {
                 if (res.error) throw res.error;
 
                 // Sync parts if provided (runs after the main row is committed)
-                const parts = (repair as any).parts || [];
+                const parts = (repair as unknown as Record<string, unknown>)['parts'] as RepairPart[] || [];
                 if (parts.length > 0) {
                     await this.syncParts(generatedId, parts);
                 }
 
                 // Ensure new fields are saved just in case RPC ignores them
-                if (dbPayload.supplier_id !== undefined || dbPayload.warranty !== undefined) {
+                if (dbPayload['supplier_id'] !== undefined || dbPayload['warranty'] !== undefined) {
                     await this.supabase.from('repairs').update({
-                        supplier_id: dbPayload.supplier_id || null,
-                        warranty: dbPayload.warranty || null
+                        supplier_id: dbPayload['supplier_id'] || null,
+                        warranty: dbPayload['warranty'] || null
                     }).eq('id', generatedId);
                 }
 
                 // Sync images if provided
-                const images = (repair as any).images || [];
+                const images = (repair as unknown as Record<string, unknown>)['images'] as string[] || [];
                 if (images.length > 0) {
                     await this.syncImages(generatedId, images);
                 }
@@ -114,11 +130,30 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     }
 
 
-    override update(id: string, repair: UpdateRepairDto): Observable<any> {
-        const dbPayload = this.mapToDb(repair);
-        delete (dbPayload as any).tenant_id;
-        delete (dbPayload as any).id;
+    /**
+     * Override de BaseRepository.update — compatible con la firma base.
+     * Internamente aplica la lógica específica de reparaciones (bypass RPC, sync parts/images, log status).
+     */
+    override update(id: string, repair: Partial<Repair>): Observable<Repair> {
+        const fullPayload = this.mapToDb(repair as unknown as Record<string, unknown>);
         
+        // Filter out columns that don't exist in the repairs table
+        const dbPayload: Record<string, unknown> = {};
+        const validColumns = [
+            'client_id', 'device_id', 'issue_description', 'current_status_id', 
+            'estimated_cost', 'final_cost', 'deposit_amount', 'technical_labor_cost', 
+            'technician_notes', 'technical_report', 'completed_at', 'branch_id', 
+            'received_by', 'assigned_technician_id', 'checklist', 'security_pin', 
+            'security_pattern', 'glass_upsell', 'spare_part_cost', 'whatsapp_notifications', 
+            'supplier_id', 'warranty'
+        ];
+        
+        for (const key of validColumns) {
+            if (fullPayload[key] !== undefined) {
+                dbPayload[key] = fullPayload[key];
+            }
+        }
+
         const tenantId = this.tenantService.getTenantId();
 
         return from(
@@ -128,15 +163,13 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 .eq('id', id)
                 .eq('tenant_id', tenantId)
         ).pipe(
-            switchMap(async (res: any) => {
-                const updateError = res?.error;
+            switchMap(async (res: { error?: unknown }) => {
+                const updateError = (res as { error?: { code?: string; message?: string } })?.error;
 
                 if (updateError) {
-                    const code = updateError.code ?? '';
-                    const message = updateError.message ?? '';
+                    const code = (updateError as { code?: string }).code ?? '';
+                    const message = (updateError as { message?: string }).message ?? '';
 
-                    // 42P01 'repair_statuses' is the broken DB trigger.
-                    // PGRST116 is the PostgREST "no rows" false negative.
                     const isBrokenTrigger = code === '42P01' && message.includes('repair_statuses');
                     const isPostgrest116 = code === 'PGRST116';
 
@@ -149,15 +182,17 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 }
 
                 // Log status change (proactive)
-                if (repair.current_status_id) {
-                    await this.logStatusChange(id, repair.current_status_id, (repair as any).technician_notes);
+                const repairRecord = repair as unknown as Record<string, unknown>;
+                if ((repair as Partial<Repair>).current_status_id) {
+                    await this.logStatusChange(id, (repair as Partial<Repair>).current_status_id!, repairRecord['technician_notes'] as string);
                 }
 
                 // Sync collections
-                if ((repair as any).parts !== undefined) await this.syncParts(id, (repair as any).parts || []);
-                if ((repair as any).images !== undefined) await this.syncImages(id, (repair as any).images || []);
+                if (repairRecord['parts'] !== undefined) await this.syncParts(id, repairRecord['parts'] as RepairPart[] || []);
+                if (repairRecord['images'] !== undefined) await this.syncImages(id, repairRecord['images'] as string[] || []);
 
-                return { success: true };
+                // Return the updated entity (required by BaseRepository contract)
+                return repair as Repair;
             })
         );
     }
@@ -168,7 +203,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
      * runs as owner so triggers are not fired for the specific broken one).
      * If the RPC doesn't exist yet, falls back to a raw SQL workaround.
      */
-    private async _updateViaRpcBypass(id: string, payload: any, tenantId: string): Promise<void> {
+    private async _updateViaRpcBypass(id: string, payload: Record<string, unknown>, tenantId: string): Promise<void> {
         // Strategy A: try dedicated bypass RPC (defined in fix SQL)
         const { error: rpcError } = await this.supabase.rpc('update_repair_bypass', {
             p_id: id,
@@ -182,7 +217,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         // splitting it across fields that DON'T trigger the broken AFTER UPDATE trigger.
         // This works because the trigger only fires on specific column changes.
         // We extract the most critical fields: status, costs, notes.
-        const safeFields: Record<string, any> = {};
+        const safeFields: Record<string, unknown> = {};
         const criticalKeys = [
             'current_status_id', 'final_cost', 'estimated_cost', 'technician_notes',
             'technical_report', 'technical_labor_cost', 'deposit_amount',
@@ -342,9 +377,9 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             .eq('repair_id', repairId);
         
         if (images && images.length > 0) {
-            const imagesToInsert = images.map((img: any) => ({
+            const imagesToInsert = images.map((img: string | { image_url: string }) => ({
                 repair_id: repairId,
-                image_url: typeof img === 'string' ? img : (img as any).image_url,
+                image_url: typeof img === 'string' ? img : img.image_url,
                 tenant_id: tenantId
             }));
             await this.supabase.from('repair_images').insert(imagesToInsert);
@@ -363,14 +398,14 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             id: p['id'] as string,
             tracking_code: p['tracking_code'] as string,
             customer_id: p['client_id'] as string,
-            customer_name: client ? `${client['first_name'] || ''} ${client['last_name'] || ''}`.trim() : (p['customer_name'] as string || 'Cliente'),
+            customer_name: client ? `${client['first_name'] || ''} ${client['last_name'] || ''}`.trim() : (p['customer_name'] as string || ''),
             customer_phone: (client?.['phone'] as string) || (p['customer_phone'] as string),
             customer_dni: (client?.['dni'] as string) || (p['customer_dni'] as string) || undefined,
             device_type: (device?.['type'] as string) || (p['device_type'] as string),
             brand_id: (device?.['brand_id'] as string) || (model?.['brand_id'] as string) || (p['brand_id'] as string),
             brand_name: (brand?.['name'] as string) || ((p['brand'] as Record<string, unknown>)?.['name'] as string) || (p['device_brand'] as string) || undefined,
             device_model: (() => {
-                const resolved = (model?.['name'] as string) || (p['device_model'] as string) || 'Equipo Genérico';
+                const resolved = (model?.['name'] as string) || (p['device_model'] as string) || '';
                 return resolved;
             })(),
             imei: (device?.['imei'] as string) || (p['imei'] as string),
@@ -408,40 +443,48 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
         };
     }
 
-    private mapToDb(r: any): any {
+    private mapToDb(r: Record<string, unknown>): Record<string, unknown> {
         return {
-            client_id: r.customer_id || null, 
-            device_id: r.device_id || null,
-            issue_description: r.issue_description,
-            current_status_id: r.current_status_id,
-            estimated_cost: r.estimated_cost,
-            final_cost: r.final_cost,
-            deposit_amount: r.deposit_amount,
-            technical_labor_cost: r.technical_labor_cost,
-            technician_notes: r.technician_notes || r.notes, 
-            technical_report: r.technical_report,
-            completed_at: r.completed_at,
-            branch_id: r.branch_id,
-            received_by: r.received_by,
-            assigned_technician_id: r.assigned_technician_id,
-            checklist: r.checklist,
-            security_pin: r.security_pin || null,
-            security_pattern: r.security_pattern || null,
-            glass_upsell: r.glass_upsell || false,
-            spare_part_cost: r.spare_part_cost || 0,
-            whatsapp_notifications: r.whatsapp_notifications ?? true,
-            supplier_id: r.supplier_id || null,
-            warranty: r.warranty || null
+            client_id: r['customer_id'] || null, 
+            customer_name: r['customer_name'] || null,
+            customer_phone: r['customer_phone'] || null,
+            customer_email: r['customer_email'] || null,
+            customer_dni: r['customer_dni'] || null,
+            device_id: r['device_id'] || null,
+            device_model: r['device_model'] || null,
+            device_type: r['device_type'] || null,
+            brand_id: r['brand_id'] || null,
+            imei: r['imei'] || null,
+            issue_description: r['issue_description'],
+            current_status_id: r['current_status_id'],
+            estimated_cost: r['estimated_cost'],
+            final_cost: r['final_cost'],
+            deposit_amount: r['deposit_amount'],
+            technical_labor_cost: r['technical_labor_cost'],
+            technician_notes: r['technician_notes'] || r['notes'], 
+            technical_report: r['technical_report'],
+            completed_at: r['completed_at'],
+            branch_id: r['branch_id'],
+            received_by: r['received_by'],
+            assigned_technician_id: r['assigned_technician_id'],
+            checklist: r['checklist'],
+            security_pin: r['security_pin'] || null,
+            security_pattern: r['security_pattern'] || null,
+            glass_upsell: r['glass_upsell'] || false,
+            spare_part_cost: r['spare_part_cost'] || 0,
+            whatsapp_notifications: r['whatsapp_notifications'] ?? true,
+            supplier_id: r['supplier_id'] || null,
+            warranty: r['warranty'] || null
         };
     }
 
 
 
-    getWorkshopSummary(branch_id?: string, includeOrphans?: boolean, month?: number, year?: number): Observable<any> {
+    getWorkshopSummary(branch_id?: string, includeOrphans?: boolean, month?: number, year?: number): Observable<Record<string, unknown>> {
         return from(this.internalGetWorkshopSummary(branch_id, includeOrphans, month, year));
     }
 
-    private async internalGetWorkshopSummary(branch_id?: string, includeOrphans?: boolean, month?: number, year?: number): Promise<any> {
+    private async internalGetWorkshopSummary(branch_id?: string, includeOrphans?: boolean, month?: number, year?: number): Promise<Record<string, unknown>> {
         const now = new Date();
         const y = year ?? now.getFullYear();
         const m = month ?? now.getMonth();
@@ -486,14 +529,14 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             baseQuery = baseQuery.gte('created_at', startOfMonth).lte('created_at', endOfMonth);
         }
 
-        const { data, error } = await (baseQuery as any);
+        const { data, error } = await (baseQuery as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
         if (error) throw error;
 
         const results = data || [];
         return {
-            inWorkshop: results.filter((r: any) => r.current_status_id < 5).length,
-            readyToPickup: results.filter((r: any) => r.current_status_id === 5).length,
-            pendingParts: results.filter((r: any) => r.current_status_id === 2).length,
+            inWorkshop: results.filter((r: Record<string, unknown>) => (r['current_status_id'] as number) < 5).length,
+            readyToPickup: results.filter((r: Record<string, unknown>) => (r['current_status_id'] as number) === 5).length,
+            pendingParts: results.filter((r: Record<string, unknown>) => (r['current_status_id'] as number) === 2).length,
         };
     }
 
@@ -513,11 +556,11 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
             }
         }
 
-        const { data, error } = await (profitQuery as any);
+        const { data, error } = await (profitQuery as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
         if (error) throw error;
 
-        return (data || []).reduce((acc: number, r: any) => {
-            return acc + (Number(r.final_cost || 0) - Number(r.spare_part_cost || 0));
+        return (data || []).reduce((acc: number, r: Record<string, unknown>) => {
+            return acc + (Number(r['final_cost'] || 0) - Number(r['spare_part_cost'] || 0));
         }, 0);
     }
 }

@@ -82,7 +82,7 @@
 
         <!-- PRODUCTS GRID -->
         <app-products-grid
-            [products]="productsRs.value()?.data || []"
+            [products]="displayProducts()"
             [isLoading]="productsRs.isLoading()"
             [error]="productsRs.error()"
             [totalItems]="productsRs.value()?.items || 0"

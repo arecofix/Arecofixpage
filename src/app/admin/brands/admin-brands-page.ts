@@ -14,11 +14,12 @@ import { LoggerService } from '@app/core/services/logger.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { ImgFallbackDirective } from '@app/shared/directives/img-fallback.directive';
 
 @Component({
   selector: 'app-admin-brands-page',
   standalone: true,
-  imports: [RouterLink, Pagination],
+  imports: [RouterLink, Pagination, ImgFallbackDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-brands-page.html',
 })
@@ -76,6 +77,18 @@ export class AdminBrandsPage implements OnInit {
   changePage(page: number) {
     this.currentPage.set(page);
     this.loadBrands();
+  }
+
+  getBrandLogo(brand: Brand): string {
+    if (!brand.logo_url) return '';
+    if (
+      brand.logo_url.includes('api.arecofix.com.ar/public-assets') ||
+      brand.logo_url.includes('1765333423077') ||
+      brand.logo_url.includes('jftiyfnnaogmgvksgkbn')
+    ) {
+      return '';
+    }
+    return brand.logo_url;
   }
 
   async toggleStatus(brand: Brand) {

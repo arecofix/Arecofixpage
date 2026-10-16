@@ -111,7 +111,7 @@
                     <div class="badge badge-success text-[10px] text-white border-none font-bold">{{ t().repairs.dashboard.profit || 'GANANCIA' }}</div>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.estProfit || 'Ganancia Estimada' }}</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_profit | number:'1.0-0' }}</div>
+                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
             </div>
 
             <!-- KPI: Equipos Arreglados -->
@@ -134,7 +134,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Pend. Aprobación</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.pendingAppr || 'Reparaciones Activas' }}</div>
                 <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().pending_approvals }}</div>
             </div>
 
@@ -393,7 +393,15 @@
                         <span class="text-[10px] sm:text-xs font-bold text-center">Inventario</span>
                     </a>
                     
-                    <a routerLink="/admin/repairs" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all text-gray-600 dark:text-gray-300 group">
+                    <a routerLink="/admin/repairs" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all text-gray-600 dark:text-gray-300 group relative">
+                        @if ((stats().pending_approvals ?? 0) > 0) {
+                            <div class="absolute top-2 right-2 flex h-5 w-5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 text-white text-[10px] items-center justify-center font-black shadow-sm">
+                                    {{ stats().pending_approvals }}
+                                </span>
+                            </div>
+                        }
                         <i class="fas fa-tools text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-emerald-500 transition-colors"></i>
                         <span class="text-[10px] sm:text-xs font-bold text-center">{{ t().repairs.dashboard.workshop || 'Taller' }}</span>
                     </a>
@@ -414,11 +422,11 @@
                     </a>
 
                     <a routerLink="/admin/products/approvals" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:border-violet-200 dark:hover:border-violet-500/30 hover:text-violet-600 dark:hover:text-violet-400 transition-all text-gray-600 dark:text-gray-300 group relative">
-                        @if ((stats().pending_approvals ?? 0) > 0) {
+                        @if ((pendingProductsCount() ?? 0) > 0) {
                             <div class="absolute top-2 right-2 flex h-5 w-5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-5 w-5 bg-violet-500 text-white text-[10px] items-center justify-center font-black shadow-sm">
-                                    {{ stats().pending_approvals }}
+                                    {{ pendingProductsCount() }}
                                 </span>
                             </div>
                         }

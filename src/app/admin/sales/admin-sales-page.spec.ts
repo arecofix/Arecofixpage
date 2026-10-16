@@ -13,6 +13,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
+import { IEventBus } from '@app/domain/events/event-bus.interface';
+
 describe('AdminSalesPage', () => {
     let component: AdminSalesPage;
     let fixture: ComponentFixture<AdminSalesPage>;
@@ -31,6 +33,7 @@ describe('AdminSalesPage', () => {
         await TestBed.configureTestingModule({
             imports: [AdminSalesPage],
             providers: [
+                { provide: IEventBus, useValue: { publish: jest.fn().mockResolvedValue(undefined), subscribe: jest.fn() } },
                 { provide: AdminProductService, useValue: mockAdminProductService },
                 { provide: ProductRepository, useValue: {} },
                 { provide: OrderService, useValue: {} },

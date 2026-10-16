@@ -3,11 +3,12 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Post } from '@app/features/posts/domain/entities/post.entity';
 import { AdminPostService } from './services/admin-post.service';
+import { ImgFallbackDirective } from '@app/shared/directives/img-fallback.directive';
 
 @Component({
     selector: 'app-admin-posts-page',
     standalone: true,
-    imports: [RouterLink, DatePipe],
+    imports: [RouterLink, DatePipe, ImgFallbackDirective],
     templateUrl: './admin-posts-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

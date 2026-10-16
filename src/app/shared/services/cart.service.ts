@@ -56,8 +56,21 @@ export class CartService {
     private getOrCreateSessionId(): string {
         if (!isPlatformBrowser(this.platformId)) return '';
         let sessionId = localStorage.getItem('cart_session_id');
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
+        if (!sessionId || sessionId === 'undefined') {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                try {
+                    sessionId = crypto.randomUUID();
+                } catch (e) {
+                    sessionId = null;
+                }
+            }
+            if (!sessionId) {
+                // Fallback for insecure contexts (e.g., some CI/Cypress environments)
+                sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
             localStorage.setItem('cart_session_id', sessionId);
         }
         return sessionId;

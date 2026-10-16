@@ -35,15 +35,12 @@ export const authenticatedGuard: CanActivateFn = async (route, state) => {
       return true;
     }
 
-    // Not authenticated -> redirect to login with the return URL
-    console.warn('🚫 authenticatedGuard: No session, redirecting to login');
-    router.navigate(['/login'], { 
+    // Not authenticated -> redirect to login cleanly using UrlTree
+    return router.createUrlTree(['/login'], { 
       queryParams: { returnUrl: state.url } 
     });
-    return false;
   } catch (error) {
     console.error('❌ Error in authenticatedGuard:', error);
-    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-    return false;
+    return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
   }
 };

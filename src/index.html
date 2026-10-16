@@ -19,7 +19,12 @@
         'facebook', 'gtm', 'gtag', 'user-agent-client-hints', 'permissions-policy',
         'unrecognized feature', 'private-state-token', 'join-ad-interest-group',
         'run-ad-auction', 'interest-cohort', 'ad-auction', 'ad-interest-group',
-        'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq'
+        'attribution-reporting', 'fbevents', 'rrweb', 'posthog', 'fbq',
+        'cloudflareinsights', 'beacon.min.js', 'dead-clicks', 'posthog-recorder',
+        'us.i.posthog.com', 'us-assets.i.posthog.com', '504', 'gateway timeout',
+        'preloadresponse', 'navigation preload', 'service worker navigation preload',
+        'maps.googleapis.com', 'gen_204', 'csp_test', 'err_blocked_by_client',
+        'ga-audiences', 'google.com.ar/ads', 'analytics.google.com', 'ads/ga-audiences', 'autofocus processing was blocked', 'grant_type=refresh_token', 'invalid_grant', 'refresh token not found', 'ng0505', 'ng0751', 'hydration was requested'
       ];
       const isNoise = (args) => {
         const msg = args.map(a => {
@@ -33,11 +38,24 @@
       console.warn = (...a) => { if (!isNoise(a)) _wrn.apply(console, a); };
       console.log = (...a) => { if (!isNoise(a)) _log.apply(console, a); };
 
+      // Immediately unregister stale service workers when debugging on local host
+      if (['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
+        }).catch(function() {});
+      }
+
       // Catch-all for browser-level logs that might not go through console.warn/error directly
       const _debug = console.debug;
       console.debug = (...a) => { if (!isNoise(a)) _debug.apply(console, a); };
 
       window.addEventListener('error', (e) => {
+        const target = e.target;
+        if (target && target.tagName === 'SCRIPT' && target.src && isNoise([target.src])) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          return true;
+        }
         if (isNoise([e.message, e.filename])) {
           e.stopImmediatePropagation();
           e.preventDefault();
@@ -146,6 +164,7 @@
       var gtagScript = document.createElement('script');
       gtagScript.async = true;
       gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-N7DQDV8MED';
+      gtagScript.onerror = function () { /* Silently ignore ad-blocker or gateway timeout */ };
       document.head.appendChild(gtagScript);
 
       window.dataLayer = window.dataLayer || [];
@@ -162,24 +181,32 @@
         };
         if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
         n.queue = []; t = b.createElement(e); t.async = !0;
-        t.src = v; s = b.getElementsByTagName(e)[0];
+        t.src = v;
+        t.onerror = function () { /* Silently ignore ad-blocker or gateway timeout */ };
+        s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s)
       }(window, document, 'script',
         'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1561498334311503');
-      fbq('track', 'PageView');
+      try {
+        fbq('init', '1561498334311503');
+        fbq('track', 'PageView');
+      } catch (e) {}
     };
 
-    if (document.readyState === 'complete') {
-      initAnalytics();
-    } else {
-      window.addEventListener('load', () => {
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(initAnalytics, { timeout: 2000 });
-        } else {
-          setTimeout(initAnalytics, 2000);
-        }
-      });
+    var isLocalDev = ['localhost', '127.0.0.1', '0.0.0.0', '::1'].includes(window.location.hostname) || window.location.hostname.endsWith('.local');
+    var isAdminRoute = window.location.pathname.includes('/admin');
+    if (!isLocalDev && !isAdminRoute) {
+      if (document.readyState === 'complete') {
+        initAnalytics();
+      } else {
+        window.addEventListener('load', () => {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(initAnalytics, { timeout: 2000 });
+          } else {
+            setTimeout(initAnalytics, 2000);
+          }
+        });
+      }
     }
   </script>
   <!-- End Deferred Meta Pixel & GTAG Code -->

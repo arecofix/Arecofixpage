@@ -18,6 +18,15 @@ export class ProductService {
 
   constructor() {}
 
+  public getBySlug(slug: string): Observable<import('@app/features/products/domain/entities/product.entity').Product | null> {
+    return this.repository.getBySlug(slug).pipe(
+      catchError((err) => {
+        this.logger.error('ProductService getBySlug error', err);
+        return of(null);
+      })
+    );
+  }
+
   public getData(params: ProductsParams = {}): Observable<ProductsResponse> {
     return this.repository.findWithFilters(params).pipe(
       catchError((err) => {

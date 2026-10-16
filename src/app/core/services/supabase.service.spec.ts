@@ -44,4 +44,37 @@ describe('SupabaseService', () => {
   it('should return client', () => {
     expect(service.getClient()).toBeTruthy();
   });
+
+  it('should clear cache and increment cacheEpoch on clearCache()', async () => {
+    const initialEpoch = (service as any).cacheEpoch;
+    (service as any).cacheMap.set('https://db.arecofix.com.ar/rest/v1/repairs', {
+      data: '[]',
+      headers: [],
+      status: 200,
+      statusText: 'OK',
+      expiresAt: Date.now() + 60000
+    });
+
+    await service.clearCache();
+
+    expect((service as any).cacheMap.size).toBe(0);
+    expect((service as any).cacheEpoch).toBe(initialEpoch + 1);
+    expect(mockOfflineSyncService.clearCache).toHaveBeenCalled();
+  });
+
+  it('should selectively clear entries for a specific table on clearCacheForTable()', () => {
+    const initialEpoch = (service as any).cacheEpoch;
+    (service as any).cacheMap.set('https://db.arecofix.com.ar/rest/v1/repairs?select=*', {
+      data: '[]', headers: [], status: 200, statusText: 'OK', expiresAt: Date.now() + 60000
+    });
+    (service as any).cacheMap.set('https://db.arecofix.com.ar/rest/v1/products?select=*', {
+      data: '[]', headers: [], status: 200, statusText: 'OK', expiresAt: Date.now() + 60000
+    });
+
+    service.clearCacheForTable('repairs');
+
+    expect((service as any).cacheMap.has('https://db.arecofix.com.ar/rest/v1/repairs?select=*')).toBe(false);
+    expect((service as any).cacheMap.has('https://db.arecofix.com.ar/rest/v1/products?select=*')).toBe(true);
+    expect((service as any).cacheEpoch).toBe(initialEpoch + 1);
+  });
 });

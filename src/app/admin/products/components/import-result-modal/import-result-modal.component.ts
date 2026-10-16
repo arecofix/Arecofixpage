@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportReport } from '../../services/admin-product.service';
+import { ImportReport } from '../../services/admin-product-import.service';
 
 @Component({
     selector: 'app-import-result-modal',

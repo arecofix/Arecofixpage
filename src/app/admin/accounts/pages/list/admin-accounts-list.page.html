@@ -1,0 +1,146 @@
+<div class="p-6">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <i class="fas fa-book-open text-primary"></i>
+        Cuentas Corrientes
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">Gestión de saldos, deudas y fiados de clientes.</p>
+    </div>
+    <div class="flex gap-2 w-full md:w-auto">
+      <div class="relative w-full md:w-64">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-search text-gray-400"></i>
+        </div>
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          class="input input-bordered w-full pl-10" 
+          placeholder="Buscar por cliente o email..."
+        >
+      </div>
+      <button (click)="refresh()" class="btn btn-square btn-ghost" title="Actualizar">
+        <i class="fas fa-sync-alt" [class.fa-spin]="accountsResource.isLoading()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="stat bg-base-100 rounded-2xl shadow-sm border border-base-200">
+      <div class="stat-figure text-primary">
+        <i class="fas fa-wallet text-3xl"></i>
+      </div>
+      <div class="stat-title">Balance Total Global</div>
+      <div class="stat-value text-primary">{{ totalBalance() | currency:'ARS':'symbol-narrow':'1.0-0':'es-AR' }}</div>
+      <div class="stat-desc">Suma de todos los saldos</div>
+    </div>
+    
+    <div class="stat bg-base-100 rounded-2xl shadow-sm border border-base-200">
+      <div class="stat-figure text-error">
+        <i class="fas fa-hand-holding-usd text-3xl"></i>
+      </div>
+      <div class="stat-title">Deuda en la Calle</div>
+      <div class="stat-value text-error">{{ totalDebt() | currency:'ARS':'symbol-narrow':'1.0-0':'es-AR' }}</div>
+      <div class="stat-desc">Dinero que deben los clientes</div>
+    </div>
+    
+    <div class="stat bg-base-100 rounded-2xl shadow-sm border border-base-200">
+      <div class="stat-figure text-success">
+        <i class="fas fa-piggy-bank text-3xl"></i>
+      </div>
+      <div class="stat-title">Saldos a Favor</div>
+      <div class="stat-value text-success">{{ totalCredit() | currency:'ARS':'symbol-narrow':'1.0-0':'es-AR' }}</div>
+      <div class="stat-desc">Dinero prepagado por clientes</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr class="bg-base-200/50">
+            <th>Cliente</th>
+            <th>Email</th>
+            <th class="text-right">Límite Fiado</th>
+            <th class="text-right">Saldo Actual</th>
+            <th class="text-center">Estado</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (accountsResource.isLoading()) {
+            <tr>
+              <td colspan="6" class="text-center py-10">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <p class="mt-2 text-gray-500">Cargando cuentas...</p>
+              </td>
+            </tr>
+          } @else if (accountsResource.error()) {
+            <tr>
+              <td colspan="6" class="text-center py-10 text-error">
+                <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                <p>Ocurrió un error al cargar las cuentas.</p>
+                <button (click)="refresh()" class="btn btn-sm mt-4">Reintentar</button>
+              </td>
+            </tr>
+          } @else if (filteredAccounts().length === 0) {
+            <tr>
+              <td colspan="6" class="text-center py-10">
+                <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-500">No hay cuentas corrientes registradas o que coincidan con la búsqueda.</p>
+              </td>
+            </tr>
+          } @else {
+            @for (acc of filteredAccounts(); track acc.id) {
+              <tr class="hover">
+                <td>
+                  <div class="font-bold flex items-center gap-2">
+                    <div class="avatar placeholder">
+                      <div class="bg-neutral text-neutral-content rounded-full w-8">
+                        <span>{{ acc.customer?.first_name?.charAt(0) || 'C' }}</span>
+                      </div>
+                    </div>
+                    {{ acc.customer?.first_name }} {{ acc.customer?.last_name }}
+                  </div>
+                </td>
+                <td class="text-gray-500">{{ acc.customer?.email || 'N/A' }}</td>
+                <td class="text-right font-medium">
+                  {{ acc.credit_limit > 0 ? (acc.credit_limit | currency:'ARS':'symbol-narrow':'1.0-0':'es-AR') : 'Sin Límite' }}
+                </td>
+                <td class="text-right">
+                  <div class="font-bold" 
+                       [class.text-error]="acc.balance < 0" 
+                       [class.text-success]="acc.balance > 0">
+                    {{ acc.balance < 0 ? '-' : '' }}{{ (acc.balance < 0 ? acc.balance * -1 : acc.balance) | currency:'ARS':'symbol-narrow':'1.0-0':'es-AR' }}
+                  </div>
+                  @if (acc.balance < 0) {
+                    <div class="text-[10px] text-error uppercase font-bold">DEUDA</div>
+                  } @else if (acc.balance > 0) {
+                    <div class="text-[10px] text-success uppercase font-bold">A FAVOR</div>
+                  } @else {
+                    <div class="text-[10px] text-gray-400 uppercase font-bold">AL DÍA</div>
+                  }
+                </td>
+                <td class="text-center">
+                  <div class="badge" [class.badge-success]="acc.status === 'active'" [class.badge-error]="acc.status === 'suspended'">
+                    {{ acc.status === 'active' ? 'Activo' : 'Suspendido' }}
+                  </div>
+                </td>
+                <td class="text-right">
+                  <!-- Redirige al perfil del cliente en la pestaña de cuenta corriente -->
+                  <a [routerLink]="['/admin/clients/details', acc.customer_id]" [queryParams]="{tab: 'ctacte'}" class="btn btn-sm btn-outline btn-primary">
+                    <i class="fas fa-eye mr-1"></i> Ver Detalles
+                  </a>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

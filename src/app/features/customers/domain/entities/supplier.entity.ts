@@ -17,6 +17,7 @@ export interface Supplier {
     type?: string;
     notes?: string;
     is_active: boolean;
+    balance?: number;
     created_at: string;
     updated_at: string;
 }

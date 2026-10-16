@@ -10,11 +10,12 @@ import {
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
 import { TenantService } from './tenant.service';
+import { PermissionService } from './permission.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
@@ -34,6 +35,7 @@ export class AuthService {
   private tenantService = inject(TenantService);
   private ngZone = inject(NgZone);
   private injector = inject(Injector);
+  private permissionService = inject(PermissionService);
   
   // Súper Administrador Global
   public isSuperAdmin = signal<boolean>(false);
@@ -138,14 +140,15 @@ export class AuthService {
           }
         }
 
-        if (profile) {
-           this.authState.next({ session, user: session.user, profile, isInitialized: true });
-        } else {
-           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
-        }
-
         if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
           this.isSuperAdmin.set(true);
+        }
+
+        if (profile) {
+           this.authState.next({ session, user: session.user, profile, isInitialized: true });
+           await this.permissionService.loadPermissions();
+        } else {
+           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
         }
       } else {
         this.authState.next({ ...this.authState.value, isInitialized: true });
@@ -168,10 +171,24 @@ export class AuthService {
            this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
            this.isSuperAdmin.set(false);
            this.currentBranchSubject.next(null);
+           this.permissionService.clear();
            return;
         }
 
         if (session) {
+          const current = this.authState.value;
+          const isSameUser = current.user?.id === session.user.id;
+          const wasAlreadyInitialized = current.isInitialized && isSameUser && current.profile !== null;
+          const isOAuthRedirect = typeof window !== 'undefined' && window.location.hash.includes('access_token');
+
+          // If the user session is already initialized and this is a duplicate event or token refresh, skip redundant fetches
+          if (wasAlreadyInitialized && !isOAuthRedirect && (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN')) {
+             if (current.session?.access_token !== session.access_token) {
+               this.authState.next({ ...current, session, user: session.user });
+             }
+             return;
+          }
+
           const profile = await this.ensureProfile(session);
           
           if (profile?.tenant_id) {
@@ -190,11 +207,9 @@ export class AuthService {
             }
           }
 
-          // Verificar si ya estábamos iniciados en sesión (background sync o refresh de tab)
-          const wasAlreadyInitialized = this.authState.value.isInitialized && this.authState.value.user !== null;
-
           if (profile) {
             this.authState.next({ session, user: session.user, profile, isInitialized: true });
+            await this.permissionService.loadPermissions();
           } else {
             // Keep existing profile if we failed to fetch
             this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
@@ -227,23 +242,27 @@ export class AuthService {
               const currentPath = window.location.pathname;
               const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/' || currentPath.includes('/auth/');
               
+              let navigated = false;
+
               // Evitar redirección si el usuario ya estaba validado en la UI (tab recovery, background token refresh)
               if (!wasAlreadyInitialized || isOAuthRedirect) {
                 if (hasExplicitReturnUrl) {
                    if (currentPath !== returnUrl) {
-                       router.navigateByUrl(returnUrl);
+                       await router.navigateByUrl(returnUrl);
+                       navigated = true;
                    }
                 } else if (isAuthPage) {
                    if (currentPath !== returnUrl) {
-                       router.navigateByUrl(returnUrl);
+                       await router.navigateByUrl(returnUrl);
+                       navigated = true;
                    }
                 }
               }
               
-              if (isOAuthRedirect) {
+              if (isOAuthRedirect && !navigated) {
                  history.replaceState(null, '', window.location.pathname + window.location.search);
               }
-            }, 100);
+            }, 500);
           }
 
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
@@ -302,36 +321,48 @@ export class AuthService {
     }
   }
 
+  private profileInFlightPromise: Promise<UserProfile | null> | null = null;
+
   /**
    * Ensures a profile row exists for the given session user.
    */
   private async ensureProfile(session: Session): Promise<UserProfile | null> {
-    try {
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
-        if (cached) return JSON.parse(cached);
-      }
+    const current = this.authState.value;
+    if (current.user?.id === session.user.id && current.profile) {
+      return current.profile;
+    }
 
-      const existingProfile = await this.profileService.getProfile(session.user.id);
-      const meta = session.user.user_metadata || {};
-      const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+    if (this.profileInFlightPromise) {
+      return this.profileInFlightPromise;
+    }
 
-      if (existingProfile) {
-         if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
-             const { data: updatedProfile, error } = await this.supabase
-                 .from('profiles')
-                 .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
-                 .eq('id', session.user.id)
-                 .select()
-                 .maybeSingle();
-             if (!error && updatedProfile) {
-                 localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
-                 return updatedProfile as UserProfile;
-             }
-         }
-         localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
-         return existingProfile;
-      }
+    this.profileInFlightPromise = (async () => {
+      try {
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
+          if (cached) return JSON.parse(cached);
+        }
+
+        const existingProfile = await this.profileService.getProfile(session.user.id);
+        const meta = session.user.user_metadata || {};
+        const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+
+        if (existingProfile) {
+           if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
+               const { data: updatedProfile, error } = await this.supabase
+                   .from('profiles')
+                   .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
+                   .eq('id', session.user.id)
+                   .select()
+                   .maybeSingle();
+               if (!error && updatedProfile) {
+                   localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
+                   return updatedProfile as UserProfile;
+               }
+           }
+           localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
+           return existingProfile;
+        }
 
       const currentTenantId = this.tenantService.getTenantId();
       const isFallback = currentTenantId === TENANT_CONSTANTS.FALLBACK_ID;
@@ -383,8 +414,13 @@ export class AuthService {
       const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
       if (cached) return JSON.parse(cached);
       return null;
+    } finally {
+      this.profileInFlightPromise = null;
     }
-  }
+  })();
+
+  return this.profileInFlightPromise;
+}
 
   async signOut(): Promise<string | null> {
     const { isTauri } = await import('@tauri-apps/api/core');
@@ -402,6 +438,22 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.authState.value.user;
+  }
+
+  async waitForAuth(): Promise<{ session: Session | null; user: User | null; profile: UserProfile | null; isInitialized: boolean }> {
+    if (this.authState.value.isInitialized) {
+      return this.authState.value;
+    }
+    return new Promise((resolve) => {
+      const sub = this.authState$.pipe(filter(s => s.isInitialized)).subscribe(state => {
+        sub.unsubscribe();
+        resolve(state);
+      });
+      setTimeout(() => {
+        sub.unsubscribe();
+        resolve(this.authState.value);
+      }, 3000);
+    });
   }
 
   async getUser(): Promise<User | null> {
@@ -499,7 +551,7 @@ export class AuthService {
         
         let response;
         try {
-          response = await fetch('http://localhost:5000/api/login', {
+          response = await fetch(`${environment.flaskApiUrl}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: email, password: password }),

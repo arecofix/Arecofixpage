@@ -4,7 +4,16 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { environment } from '@env/environment';
 
-let posthogInstance: any;
+type PostHogClient = {
+    init: (key: string, options: Record<string, unknown>) => void;
+    identify: (userId: string, properties?: Record<string, unknown>) => void;
+    capture: (eventName: string, properties?: Record<string, unknown>) => void;
+    reset: () => void;
+    get_distinct_id: () => string;
+    get_session_id: () => string;
+};
+
+let posthogInstance: PostHogClient | null = null;
 
 @Injectable({
     providedIn: 'root'
@@ -44,21 +53,35 @@ export class AnalyticsService {
     }
 
     private async initPostHog() {
+        if (typeof window === 'undefined') return;
+
+        // Never run third-party tracking scripts on admin panel or local dev
+        if (window.location.hostname === 'localhost' || window.location.pathname.includes('/admin')) {
+            return;
+        }
+
         if (environment.posthogKey && !this.isPlaceholder(environment.posthogKey)) {
             try {
+                const host = environment.posthogHost || 'https://us.i.posthog.com';
+
                 const ph = await import('posthog-js');
-                posthogInstance = ph.default || ph;
+                posthogInstance = (ph.default || ph) as unknown as PostHogClient;
                 
                 posthogInstance.init(environment.posthogKey as string, {
-                    api_host: environment.posthogHost || 'https://us.i.posthog.com',
+                    api_host: host,
                     person_profiles: 'identified_only',
-                    autocapture: true,
+                    autocapture: false,
+                    capture_dead_clicks: false,
+                    disable_session_recording: true,
+                    advanced_disable_decide: true,
+                    disable_external_dependency_loading: true,
                     capture_pageview: true,
-                    persistence: 'localStorage+cookie'
+                    persistence: 'localStorage+cookie',
+                    request_batching: true
                 });
                 this.posthogInitialized = true;
             } catch (err) {
-                console.warn('PostHog initialization deferred (potentially blocked by client/ad-blocker)', err);
+                // PostHog blocked or failed to load - fail silently
             }
         }
     }

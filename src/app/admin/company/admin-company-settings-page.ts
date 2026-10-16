@@ -40,6 +40,14 @@ export class AdminCompanySettingsPage implements OnInit {
     return this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
   });
 
+  isBranchContext = computed(() => {
+    return !!this.branchService.currentBranch();
+  });
+
+  currentBranchName = computed(() => {
+    return this.branchService.currentBranch()?.name || '';
+  });
+
   form = signal({
     id: '',
     name: '',
@@ -55,6 +63,7 @@ export class AdminCompanySettingsPage implements OnInit {
     currency: 'ARS',
     usd_rate: 1,
     logo_url: '',
+    primary_color: '#3b82f6',
     // Mercado Libre
     ml_markup_percentage: 5,
     ml_connected: false,
@@ -67,6 +76,7 @@ export class AdminCompanySettingsPage implements OnInit {
 
   loading = signal(true);
   saving = signal(false);
+  uploadingLogo = signal(false);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
 
@@ -102,7 +112,13 @@ export class AdminCompanySettingsPage implements OnInit {
 
   async loadSettings() {
     this.loading.set(true);
-    const branchId = this.branchService.getCurrentBranchId();
+    const profile = this.authService.getCurrentProfile();
+    let branchId = this.branchService.getCurrentBranchId();
+
+    if (!branchId && profile?.branch_id && !this.authService.isSuperAdmin() && profile?.role !== 'tenant_owner') {
+      branchId = profile.branch_id;
+      await this.branchService.setBranchById(branchId);
+    }
 
     try {
       const data = await this.companyService.getSettings(branchId || undefined);
@@ -122,6 +138,7 @@ export class AdminCompanySettingsPage implements OnInit {
           currency: data.currency || 'ARS',
           usd_rate: Number(data.usd_rate || 1),
           logo_url: data.branding_settings?.logo_url || '',
+          primary_color: data.branding_settings?.primary_color || '#3b82f6',
           ml_markup_percentage: data.ml_markup_percentage || 5,
           ml_connected: !!data.ml_access_token,
           whatsapp_access_token: data.whatsapp_access_token || '',
@@ -131,8 +148,14 @@ export class AdminCompanySettingsPage implements OnInit {
         });
       }
 
-      const branchData = await this.branchService.getAllAdminBranches();
-      this.branches.set((branchData as Branch[]) || []);
+      if (this.canManageBranches()) {
+        try {
+          const branchData = await this.branchService.getAllAdminBranches();
+          this.branches.set((branchData as Branch[]) || []);
+        } catch (be) {
+          console.warn('Could not load all branches', be);
+        }
+      }
     } catch (e: unknown) {
       if (e instanceof Error) this.error.set(e.message);
     } finally {
@@ -146,11 +169,20 @@ export class AdminCompanySettingsPage implements OnInit {
     const file: File | undefined = input.files?.[0];
     if (!file) return;
 
-    // Let's keep this out for now or define a FileUploadService.
-    // Actually, since I must remove supabase:
-    alert(
-      'Por favor contacte al administrador para subir logos. Componente de Subida en Mantenimiento.',
-    );
+    this.uploadingLogo.set(true);
+    this.error.set(null);
+    try {
+      const url = await this.branchService.uploadLogo(file);
+      if (url) {
+        this.form.update(f => ({ ...f, logo_url: url }));
+        this.success.set('Logo subido correctamente. Haz clic en Guardar Cambios para aplicar.');
+      }
+    } catch (e: any) {
+      this.error.set('Error al subir el logo: ' + (e.message || e));
+    } finally {
+      this.uploadingLogo.set(false);
+      this.cdr.markForCheck();
+    }
   }
 
   async save() {
@@ -176,7 +208,7 @@ export class AdminCompanySettingsPage implements OnInit {
       usd_rate: payload.usd_rate,
       branding_settings: {
         logo_url: payload.logo_url,
-        primary_color: '#3b82f6',
+        primary_color: payload.primary_color || '#3b82f6',
       },
       ml_markup_percentage: payload.ml_markup_percentage,
       whatsapp_access_token: payload.whatsapp_access_token,
@@ -187,7 +219,7 @@ export class AdminCompanySettingsPage implements OnInit {
     };
 
     try {
-      const branchId = this.branchService.getCurrentBranchId();
+      const branchId = this.branchService.getCurrentBranchId() || this.authService.getCurrentProfile()?.branch_id;
       const updatedRows = await this.companyService.updateSettings(
         tenantId,
         updateData,

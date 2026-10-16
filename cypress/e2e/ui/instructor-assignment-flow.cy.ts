@@ -76,24 +76,7 @@ describe('Instructor Assignment Flow', () => {
       last_name: 'Test'
     };
 
-    cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
-      req.reply({
-        statusCode: 200,
-        body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mockProfile : [mockProfile]
-      });
-    }).as('getStudentProfile');
-
-    cy.intercept('GET', '**/auth/v1/user', {
-      statusCode: 200,
-      body: session.user
-    }).as('getUser');
-
-    cy.visit('/', {
-      onBeforeLoad: (win) => {
-        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-        win.localStorage.setItem('arecofix_profile_student-123', JSON.stringify(mockProfile));
-      }
-    });
+    cy.loginAsUser('/', session, mockProfile);
     
     cy.get('[aria-label="Menú de usuario"]').click();
     cy.get('a[href="/academy/mis-cursos"], a[routerLink="/academy/mis-cursos"]').should('be.visible').and('contain', 'Mi Academia');

@@ -27,8 +27,8 @@ const MOCK_PROFILE = {
 };
 
 const MOCK_BRANCHES = [
-  { id: 'branch-1', tenant_id: ARECOFIX_TENANT_ID, name: 'Sede Central',    city: 'Buenos Aires', slug: null },
-  { id: 'branch-2', tenant_id: ARECOFIX_TENANT_ID, name: 'Sede Secundaria', city: 'Rosario',      slug: null }
+  { id: 'branch-1', tenant_id: ARECOFIX_TENANT_ID, name: 'Sede Central',    city: 'Buenos Aires', slug: 'sede-central', is_active: true, plan_id: 'basic' },
+  { id: 'branch-2', tenant_id: ARECOFIX_TENANT_ID, name: 'Sede Secundaria', city: 'Rosario',      slug: 'sede-secundaria', is_active: true, plan_id: 'basic' }
 ];
 
 // ─── Describe block ───────────────────────────────────────────────────────────
@@ -145,6 +145,12 @@ describe('Admin Tenant Flow (Multi-tenant & RLS Isolation)', () => {
   // ── Test 3: change branch plan ──────────────────────────────────────────────
 
   it('debería permitir cambiar el plan de un tenant y afectar la UI', () => {
+    cy.intercept('GET', '**/rest/v1/branches*', {
+      statusCode: 200,
+      headers: { 'content-range': '0-1/2' },
+      body: MOCK_BRANCHES
+    }).as('getBranches');
+
     cy.visit('/admin/branches');
     cy.url({ timeout: 10000 }).should('include', '/admin/branches');
     cy.wait(['@getProfile', '@getTenants', '@getBranches']);

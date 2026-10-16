@@ -185,7 +185,7 @@
                 Empieza ya
               </button>
               <a
-                routerLink="/login"
+                [routerLink]="['/login']" [queryParams]="{returnUrl: router.url}"
                 class="block text-center text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Accede a este curso adquiriendo un plan

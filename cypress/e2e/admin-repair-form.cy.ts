@@ -1,4 +1,11 @@
 describe('Admin Repair Form', () => {
+  before(() => {
+    // We only need to seed once per test suite
+    cy.task('seedDatabase').then(() => {
+      cy.log('Database seeded successfully');
+    });
+  });
+
   beforeEach(() => {
     cy.loginAsAdmin('/admin/repairs/new');
     // Wait for the form to fully load by checking customer_name is visible

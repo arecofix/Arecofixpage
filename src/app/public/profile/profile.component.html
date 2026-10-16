@@ -25,10 +25,10 @@
           Iniciá sesión para gestionar tus reparaciones, ver tus <strong class="text-amber-400">Puntos Acumulados</strong> y acceder a descuentos exclusivos.
         </p>
         <div class="flex flex-col gap-3">
-          <a routerLink="/login" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-amber-500/20">
+          <a [routerLink]="['/login']" [queryParams]="{returnUrl: router.url}" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-amber-500/20">
             Iniciar Sesión
           </a>
-          <a routerLink="/register" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition-all">
+          <a [routerLink]="['/register']" [queryParams]="{returnUrl: router.url}" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition-all">
             Crear una cuenta gratis
           </a>
         </div>

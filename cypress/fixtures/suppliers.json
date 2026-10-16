@@ -1,0 +1,22 @@
+[
+  {
+    "id": "sup-001",
+    "tenant_id": "bba26ccd-59ce-471c-aac0-4c1f5513de3b",
+    "name": "Distribuidora Repuestos Express",
+    "cuit": "30-65432109-8",
+    "email": "ventas@repuestosexpress.com",
+    "phone": "+54 11 3333-2222",
+    "pending_balance": 125000,
+    "is_active": true
+  },
+  {
+    "id": "sup-002",
+    "tenant_id": "bba26ccd-59ce-471c-aac0-4c1f5513de3b",
+    "name": "Global Parts SA",
+    "cuit": "33-77889900-9",
+    "email": "info@globalparts.com",
+    "phone": "+54 11 8888-1111",
+    "pending_balance": 0,
+    "is_active": true
+  }
+]

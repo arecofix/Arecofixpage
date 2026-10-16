@@ -34,6 +34,7 @@ import { CompanyService } from '@app/core/services/company.service';
 import { BranchService } from '@app/core/services/branch.service';
 import { AdminRepairService } from '@app/features/repairs/application/services/admin-repair.service';
 import { AdminProductService } from '@app/admin/products/services/admin-product.service';
+import { UpdateRepairUseCase } from '@app/features/repairs/application/use-cases/update-repair.use-case';
 import {
   CreateRepairDto,
   RepairStatus,
@@ -59,6 +60,14 @@ import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
 import { ICustomerDeviceRepository } from '@app/features/devices/domain/repositories/customer-device.repository';
+import { GenerateInvoiceButtonComponent } from './components/generate-invoice-button/generate-invoice-button.component';
+
+interface QuickShortcut {
+  id: string;
+  name: string;
+  issue: string;
+  report: string;
+}
 
 interface ClientView extends Partial<UserProfile> {
   displayName: string;
@@ -68,9 +77,58 @@ interface ClientView extends Partial<UserProfile> {
 @Component({
   selector: 'app-admin-repair-form-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, GenerateInvoiceButtonComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-repair-form-page.html',
+  styles: [`
+    @media print {
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+        visibility: visible !important;
+      }
+      @page {
+        size: 80mm auto;
+        margin: 0;
+      }
+      .ticket-container {
+        width: 72mm;
+        margin: 0 auto;
+        padding: 4mm 0;
+        font-family: 'Courier New', Courier, monospace, sans-serif;
+        font-size: 11px;
+        color: #000;
+        line-height: 1.2;
+      }
+      .ticket-title { font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 5px; }
+      .text-center { text-align: center; }
+      .text-right { text-align: right; }
+      .font-bold { font-weight: bold; }
+      .mb-1 { margin-bottom: 0.25rem; }
+      .mb-2 { margin-bottom: 0.5rem; }
+      .mb-4 { margin-bottom: 1rem; }
+      .mt-2 { margin-top: 0.5rem; }
+      .mt-4 { margin-top: 1rem; }
+      .border-b { border-bottom: 1px dashed #000; }
+      .border-t { border-top: 1px dashed #000; }
+      .border-y { border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 4px 0; }
+      .w-full { width: 100%; }
+      .text-sm { font-size: 12px; }
+      .text-xs { font-size: 10px; }
+      .flex { display: flex; }
+      .justify-between { justify-content: space-between; }
+    }
+    .print-only {
+      display: none;
+    }
+  `]
 })
 export class AdminRepairFormPage implements OnInit, OnDestroy {
   // Helper interface for UI
@@ -89,6 +147,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   private companyService = inject(CompanyService);
   public branchService = inject(BranchService);
   private repairService = inject(AdminRepairService);
+  private updateRepairUseCase = inject(UpdateRepairUseCase);
   private productService = inject(AdminProductService);
   private auth = inject(AuthService);
   private pricingService = inject(PricingService);
@@ -107,6 +166,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   private customerDeviceRepository = inject(ICustomerDeviceRepository);
 
   repairForm!: FormGroup;
+
+  // Shortcuts
+  shortcuts = signal<QuickShortcut[]>([]);
+  selectedShortcutId = signal<string>('');
 
   id: string | null = null;
   date = new Date();
@@ -204,6 +267,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   parts = signal<
     RepairPart[]
   >([]);
+  partsTotal = computed(() => {
+    return this.parts().reduce((acc, curr) => acc + ((curr.unit_price_at_time || 0) * curr.quantity), 0);
+  });
   images = signal<string[]>([]);
   brands = signal<{ id: string; name: string }[]>([]);
   suppliers = signal<Supplier[]>([]);
@@ -286,6 +352,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   saving = signal<boolean>(false);
+  private lastSelectedClientName = '';
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
   company = signal<unknown>(null);
@@ -333,6 +400,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         chip: [false],
         sd: [false],
         case: [false],
+        physical_condition: [''],
       }),
       security_pin: [''],
       security_pattern: [''],
@@ -388,6 +456,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
     const client = this.clients().find((c) => c.displayName === clientName);
     if (client) {
+      this.lastSelectedClientName = client.displayName || '';
       this.repairForm.patchValue({
         customer_id: client.id,
         customer_name: client.displayName,
@@ -398,7 +467,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     } else {
       this.repairForm.patchValue(
         {
-          customer_id: '',
+          customer_id: null,
+          client_id: null,
           customer_name: clientName,
         },
         { emitEvent: false },
@@ -414,6 +484,18 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     this.id = this.route.snapshot.paramMap.get('id');
     this.setupForm();
     this.setupSearchStreams();
+    this.loadShortcuts();
+
+    // Listen to changes in customer_name to clear customer_id if typed manually
+    this.repairForm.get('customer_name')?.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((newName) => {
+      const currentClientId = this.repairForm.get('customer_id')?.value;
+      // If the name changed and it doesn't match the last explicitly selected or loaded client, clear the ID
+      if (currentClientId && newName !== this.lastSelectedClientName) {
+        this.repairForm.patchValue({ customer_id: null }, { emitEvent: false });
+      }
+    });
 
     await Promise.all([
       this.loadCompanySettings(),
@@ -621,6 +703,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     try {
       const data = await this.repairService.getById(this.id);
       if (data) {
+        this.lastSelectedClientName = data.customer_name || '';
         this.repairForm.patchValue({
           customer_id: data.customer_id,
           device_id: data.device_id || '',
@@ -782,88 +865,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         ...validFormData
       } = rawData;
 
-      let finalClientId = customer_id || validFormData.client_id || null;
-      let finalDeviceId = validFormData.device_id || null;
-
-      // Si es un cliente nuevo ingresado manualmente, crear perfil invitado vía RPC
-      if (!finalClientId && customer_name) {
-        try {
-          const client = await this.customerService.create({
-            first_name: customer_name,
-            last_name: '',
-            email: customer_email || null,
-            phone: customer_phone || null,
-            dni: customer_dni || null,
-            tenant_id: this.tenantService.getTenantId(),
-            branch_id: branchIdActual,
-          });
-          if (client && client.id) {
-            finalClientId = client.id;
-          } else {
-            throw new Error('No se obtuvo el ID del cliente.');
-          }
-        } catch (err) {
-          console.error('[AdminRepairForm] Error creating guest profile:', err);
-          this.notificationService.showError(
-            'Error al crear o buscar el cliente: ' +
-              (err instanceof Error ? err.message : 'Verifique los datos.'),
-          );
-          this.saving.set(false);
-          return;
-        }
-      } else if (finalClientId) {
-        // Actualizar datos si se editó un cliente existente
-        const updateData: Record<string, unknown> = {};
-        if (customer_dni !== undefined) updateData['dni'] = customer_dni || null;
-        if (customer_phone !== undefined) updateData['phone'] = customer_phone || null;
-        if (customer_email !== undefined) updateData['email'] = customer_email || null;
-        
-        if (customer_name) {
-          const nameParts = customer_name.split(' ');
-          updateData['first_name'] = nameParts[0] || '';
-          updateData['last_name'] = nameParts.slice(1).join(' ') || '';
-        }
-
-        try {
-          if (Object.keys(updateData).length > 0) {
-            await this.customerService.update(finalClientId, updateData);
-          }
-        } catch (err) {
-          console.error('[AdminRepairForm] Error updating customer data:', err);
-        }
-      }
-
-      // Si hay cliente pero no equipo asociado, crearlo
-      // Buscar o crear modelo (siempre que haya device_model)
-      let modelId: string | null = null;
-      if (device_model) {
-        const modelName = device_model.trim();
-        const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
-        modelId = await firstValueFrom(this.customerDeviceRepository.ensureModelExists(modelName, generatedSlug, brand_id));
-      }
-
-      if (finalClientId && device_model) {
-        // Creará o actualizará el dispositivo
-        const savedDeviceId = await firstValueFrom(
-          this.customerDeviceRepository.upsertDevice({
-            deviceId: finalDeviceId,
-            userId: finalClientId,
-            modelId: modelId,
-            type: device_type,
-            imei: imei,
-            passcode: device_passcode,
-          })
-        );
-        if (savedDeviceId) {
-          finalDeviceId = savedDeviceId;
-        }
-      }
-
       const payload = {
         ...validFormData,
-        customer_id: finalClientId,
-        client_id: finalClientId,
-        device_id: finalDeviceId,
+        customer_id: customer_id,
+        device_id: rawData.device_id || null, // Will be resolved/created in service
         images: this.images(),
         parts: this.parts(),
         branch_id: branchIdActual,
@@ -879,6 +884,14 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         payment_method,
         surcharge_percentage,
       };
+
+      // TSK-02: Dirty Check Frontend - Evitar sobrescribir con fallbacks
+      if (this.id && !this.repairForm.get('customer_name')?.dirty) {
+        delete payload.customer_name;
+      }
+      if (this.id && !this.repairForm.get('device_model')?.dirty) {
+        delete payload.device_model;
+      }
 
       console.log(
         '📤 [AdminRepairForm] Enviando a servicio...',
@@ -897,11 +910,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       }
 
       if (this.id) {
-        await this.repairService.update(
+        await this.updateRepairUseCase.execute(
           this.id,
-          payload as unknown as Partial<
-            import('../../features/repairs/domain/entities/repair.entity').Repair
-          >,
+          payload as UpdateRepairDto,
         );
         this.notificationService.showSuccess(
           '✅ Reparación actualizada correctamente.',
@@ -985,6 +996,47 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     }
   }
 
+  async generateQuote() {
+    try {
+      this.notificationService.showInfo('Generando presupuesto PDF...');
+      const rawData = this.repairForm.getRawValue();
+
+      let brandName = 'No especificada';
+      if (rawData.brand_id) {
+        const brand = this.brands().find((b) => b.id === rawData.brand_id);
+        if (brand) brandName = brand.name;
+      }
+
+      const repairData: Partial<Repair> = {
+        ...rawData,
+        brand_name: brandName,
+        parts: this.parts(),
+        images: this.images(),
+        id: this.id || 'new',
+      };
+      await this.repairPdfService.generateQuotePdf(
+        repairData as import('../../features/repairs/domain/entities/repair.entity').Repair,
+        this.company(),
+      );
+    } catch (e) {
+      console.error('PDF Error:', e);
+      const message =
+        e instanceof Error ? e.message : 'Error desconocido al generar PDF';
+      this.notificationService.showError('Error al generar Presupuesto: ' + message);
+    }
+  }
+
+  printTicketNative() {
+    this.repairForm.markAllAsTouched();
+    if (!this.repairForm.get('customer_name')?.value || !this.repairForm.get('device_model')?.value) {
+      this.notificationService.showWarning('Faltan datos obligatorios para imprimir.');
+      return;
+    }
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  }
+
   shareWhatsApp() {
     const data = this.repairForm.getRawValue();
     if (!data.customer_phone) {
@@ -1049,6 +1101,89 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     const trackingCode = this.repairForm.get('tracking_code')?.value;
     if (!trackingCode) return '';
     return `${window.location.origin}/tracking/${trackingCode}`;
+  }
+
+  loadShortcuts() {
+    try {
+      const stored = localStorage.getItem('arecofix_repair_shortcuts');
+      if (stored) {
+        this.shortcuts.set(JSON.parse(stored));
+      } else {
+        const defaults: QuickShortcut[] = [
+          { id: '1', name: 'Cambio de Módulo', issue: 'Módulo astillado / Táctil dañado / Display sin imagen', report: 'Se procedió al reemplazo completo del módulo (Display + Táctil). Equipo testeado y funcionando correctamente.' },
+          { id: '2', name: 'Cambio de Batería', issue: 'Batería agotada / Se apaga solo / Inflada', report: 'Se reemplazó la batería por una nueva. Test de consumo y carga correctos.' },
+          { id: '3', name: 'Pin de Carga', issue: 'No carga / Falso contacto en pin de carga', report: 'Se reemplazó el pin de carga/placa inferior. Carga probada y funcionando en parámetros normales.' }
+        ];
+        this.shortcuts.set(defaults);
+        this.saveShortcuts();
+      }
+    } catch(e) {
+      this.shortcuts.set([]);
+    }
+  }
+
+  saveShortcuts() {
+    localStorage.setItem('arecofix_repair_shortcuts', JSON.stringify(this.shortcuts()));
+  }
+
+  applyShortcut() {
+    const id = this.selectedShortcutId();
+    if (!id) return;
+    const shortcut = this.shortcuts().find(s => s.id === id);
+    if (shortcut) {
+      this.repairForm.patchValue({
+        issue_description: shortcut.issue,
+        technician_report: shortcut.report
+      });
+      this.notificationService.showSuccess(`Atajo "${shortcut.name}" aplicado`);
+    }
+  }
+
+  addShortcut() {
+    const name = prompt('Nombre del nuevo atajo rápido (ej: Cambio glass):');
+    if (!name) return;
+    const currentForm = this.repairForm.getRawValue();
+    const newShortcut: QuickShortcut = {
+      id: Date.now().toString(),
+      name,
+      issue: currentForm.issue_description || '',
+      report: currentForm.technician_report || ''
+    };
+    this.shortcuts.update(s => [...s, newShortcut]);
+    this.saveShortcuts();
+    this.selectedShortcutId.set(newShortcut.id);
+    this.notificationService.showSuccess('Atajo guardado exitosamente');
+  }
+
+  editShortcut() {
+    const id = this.selectedShortcutId();
+    if (!id) {
+       this.notificationService.showWarning('Seleccioná un atajo para sobrescribir');
+       return;
+    }
+    const currentForm = this.repairForm.getRawValue();
+    this.shortcuts.update(s => s.map(shortcut => {
+      if (shortcut.id === id) {
+        return {
+          ...shortcut,
+          issue: currentForm.issue_description || '',
+          report: currentForm.technician_report || ''
+        };
+      }
+      return shortcut;
+    }));
+    this.saveShortcuts();
+    this.notificationService.showSuccess('Atajo actualizado con los campos actuales de la orden');
+  }
+
+  deleteShortcut() {
+    const id = this.selectedShortcutId();
+    if (!id) return;
+    if (confirm('¿Seguro que querés eliminar este atajo?')) {
+      this.shortcuts.update(s => s.filter(shortcut => shortcut.id !== id));
+      this.saveShortcuts();
+      this.selectedShortcutId.set('');
+    }
   }
 
   ngOnDestroy() {
