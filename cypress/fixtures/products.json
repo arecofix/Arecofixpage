@@ -1,0 +1,54 @@
+[
+  {
+    "id": "prod-001",
+    "name": "Módulo Pantalla iPhone 13 OLED",
+    "slug": "modulo-pantalla-iphone-13-oled",
+    "price": 149000,
+    "currency": "ARS",
+    "is_active": true,
+    "stock": 15,
+    "category_id": "cat-repuestos",
+    "category_name": "Repuestos",
+    "item_type": "REPLACEMENT",
+    "vat_rate": 21
+  },
+  {
+    "id": "prod-002",
+    "name": "Mano de Obra Cambio de Módulo",
+    "slug": "mano-de-obra-cambio-modulo",
+    "price": 35000,
+    "currency": "ARS",
+    "is_active": true,
+    "stock": 999,
+    "category_id": "cat-servicios",
+    "category_name": "Servicios",
+    "item_type": "LABOR",
+    "vat_rate": 21
+  },
+  {
+    "id": "prod-003",
+    "name": "Batería Original iPhone 12",
+    "slug": "bateria-original-iphone-12",
+    "price": 55000,
+    "currency": "ARS",
+    "is_active": true,
+    "stock": 8,
+    "category_id": "cat-repuestos",
+    "category_name": "Repuestos",
+    "item_type": "REPLACEMENT",
+    "vat_rate": 10.5
+  },
+  {
+    "id": "prod-004",
+    "name": "Cable Lightning 1m Original",
+    "slug": "cable-lightning-1m-original",
+    "price": 18000,
+    "currency": "ARS",
+    "is_active": true,
+    "stock": 25,
+    "category_id": "cat-accesorios",
+    "category_name": "Accesorios",
+    "item_type": "PRODUCT",
+    "vat_rate": 21
+  }
+]

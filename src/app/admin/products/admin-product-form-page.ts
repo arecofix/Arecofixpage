@@ -107,6 +107,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       if (this.id) {
         const data = await this.productService.getProduct(this.id);
         if (data) {
+          const specs = data.specifications || {};
           this.formVal = {
             sku: data.sku || '',
             barcode: data.barcode || '',
@@ -118,11 +119,12 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             stock: data.stock || 0,
             brand_id: data.brand_id || '',
             category_id: data.category_id || '',
-            is_active: data.is_active ?? true, is_featured: data.is_featured ?? false,
+            is_active: data.is_active ?? true, 
+            is_featured: data.is_featured ?? false,
             is_global: data.is_global ?? true,
             branch_id: data.branch_id || '',
             model_id: data.model_id || '',
-            specifications: data.specifications || {},
+            specifications: specs,
             images: data.media_metadata && data.media_metadata.length > 0 
                     ? data.media_metadata 
                     : (data.gallery_urls || (data.image_url ? [data.image_url] : [])).map(url => ({ url, color: '' })),
@@ -130,22 +132,22 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             meta_title: data.meta_title || '',
             meta_description: data.meta_description || '',
             og_image: data.og_image || '',
-            ml_category_id: data.ml_category_id || '',
-            offer_start_date: data.offer_start_date || '',
-            offer_end_date: data.offer_end_date || '',
-            warranty_days: data.warranty_days || 0,
-            tax_percentage: data.tax_percentage || 21,
-            weight: data.weight || 0,
-            dimensions: data.dimensions || { length: 0, width: 0, height: 0 },
-            seo_keywords: data.seo_keywords || '',
-            sale_price: data.sale_price || 0,
-            reference_exchange_rate: data.reference_exchange_rate || 0,
-            free_shipping: data.free_shipping || false,
-            supplier_id: data.supplier_id || '',
-            condition: data.condition || 'Nuevo',
-            warranty_type: data.warranty_type || 'Sin garantía',
-            includes_tax: data.includes_tax ?? true,
-            tags: data.tags ? data.tags.join(', ') : '',
+            ml_category_id: data.ml_category_id || specs['ml_category_id'] || '',
+            offer_start_date: data.offer_start_date ? data.offer_start_date.substring(0, 16) : '',
+            offer_end_date: data.offer_end_date ? data.offer_end_date.substring(0, 16) : '',
+            warranty_days: data.warranty_days ?? specs['warranty_days'] ?? 0,
+            tax_percentage: data.tax_percentage ?? specs['tax_percentage'] ?? 21,
+            weight: data.weight ?? specs['weight'] ?? 0,
+            dimensions: data.dimensions || specs['dimensions'] || { length: 0, width: 0, height: 0 },
+            seo_keywords: data.seo_keywords || specs['seo_keywords'] || '',
+            sale_price: data.sale_price ?? specs['sale_price'] ?? 0,
+            reference_exchange_rate: data.reference_exchange_rate ?? specs['reference_exchange_rate'] ?? 0,
+            free_shipping: data.free_shipping ?? specs['free_shipping'] ?? false,
+            supplier_id: data.supplier_id || specs['supplier_id'] || '',
+            condition: data.condition || specs['condition'] || 'Nuevo',
+            warranty_type: data.warranty_type || specs['warranty_type'] || 'Sin garantía',
+            includes_tax: data.includes_tax ?? specs['includes_tax'] ?? true,
+            tags: data.tags ? data.tags.join(', ') : (Array.isArray(specs['tags']) ? specs['tags'].join(', ') : ''),
             variants: data.variants ? [...data.variants] : [],
           };
         }
@@ -218,65 +220,92 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     this.error.set(null);
     const formVal = this.formVal;
 
-    // Basic Validation
-    if (!formVal.name || formVal.price < 0) {
-        this.error.set('Por favor complete los campos requeridos correctamente.');
+    // Robust Validations
+    if (!formVal.name || !formVal.name.trim()) {
+        this.error.set('Por favor ingrese el nombre del producto.');
         this.saving.set(false);
         this.cdr.markForCheck();
         return;
     }
 
-    let slug = formVal.slug;
+    if (formVal.price === null || formVal.price === undefined || formVal.price < 0 || isNaN(Number(formVal.price))) {
+        this.error.set('El precio debe ser un número válido mayor o igual a 0.');
+        this.saving.set(false);
+        this.cdr.markForCheck();
+        return;
+    }
+
+    if (formVal.stock !== null && formVal.stock !== undefined && (Number(formVal.stock) < 0 || isNaN(Number(formVal.stock)))) {
+        this.error.set('El stock debe ser un número mayor o igual a 0.');
+        this.saving.set(false);
+        this.cdr.markForCheck();
+        return;
+    }
+
+    if (formVal.cost_price !== null && formVal.cost_price !== undefined && (Number(formVal.cost_price) < 0 || isNaN(Number(formVal.cost_price)))) {
+        this.error.set('El costo de compra debe ser mayor o igual a 0.');
+        this.saving.set(false);
+        this.cdr.markForCheck();
+        return;
+    }
+
+    let slug = formVal.slug ? formVal.slug.trim() : '';
     if (!slug) {
       slug = this.productService.slugify(formVal.name);
     }
 
-    // Only include fields that exist in the database schema
+    // Encapsulate UI-specific non-column fields into specifications JSONB
+    const specifications: Record<string, any> = {
+      ...(formVal.specifications || {}),
+      condition: formVal.condition || 'Nuevo',
+      warranty_type: formVal.warranty_type || 'Sin garantía',
+      includes_tax: Boolean(formVal.includes_tax),
+      free_shipping: Boolean(formVal.free_shipping),
+      supplier_id: formVal.supplier_id ? formVal.supplier_id.trim() : null,
+      reference_exchange_rate: formVal.reference_exchange_rate ? Number(formVal.reference_exchange_rate) : null,
+      tags: formVal.tags ? formVal.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      ml_category_id: formVal.ml_category_id ? formVal.ml_category_id.trim() : null
+    };
+
+    // Clean payload strictly adhering to database schema
     const payload: any = {
-      name: formVal.name,
+      name: formVal.name.trim(),
       slug: slug,
-      description: formVal.description,
-      price: formVal.price,
-      currency: formVal.currency,
-      stock: formVal.stock,
+      description: formVal.description ? formVal.description.trim() : '',
+      price: Number(formVal.price) || 0,
+      currency: formVal.currency || 'ARS',
+      stock: Number(formVal.stock) || 0,
       brand_id: formVal.brand_id || null,
       category_id: formVal.category_id || null,
-      is_active: formVal.is_active, is_featured: formVal.is_featured,
-      is_global: formVal.is_global,
+      is_active: Boolean(formVal.is_active),
+      is_featured: Boolean(formVal.is_featured),
+      is_global: Boolean(formVal.is_global),
       branch_id: formVal.branch_id || null,
       model_id: formVal.model_id || null,
-      specifications: formVal.specifications,
-      image_url: formVal.images.length > 0 ? formVal.images[0].url : null, // Main image
-      cost_price: formVal.cost_price || 0,
+      specifications: specifications,
+      image_url: formVal.images.length > 0 ? formVal.images[0].url : null,
+      cost_price: Number(formVal.cost_price) || 0,
       meta_title: formVal.meta_title?.trim() || formVal.name?.trim() || null,
       meta_description: formVal.meta_description?.trim() || (formVal.description ? formVal.description.substring(0, 160).trim() : null),
       og_image: formVal.og_image?.trim() || (formVal.images.length > 0 ? formVal.images[0].url : null),
-      ml_category_id: formVal.ml_category_id || null,
       
       // Marketing & Logistics
-      offer_start_date: formVal.offer_start_date || null,
-      offer_end_date: formVal.offer_end_date || null,
-      warranty_days: formVal.warranty_days || 0,
-      tax_percentage: formVal.tax_percentage || 21,
-      weight: formVal.weight || 0,
+      offer_start_date: formVal.offer_start_date ? new Date(formVal.offer_start_date).toISOString() : null,
+      offer_end_date: formVal.offer_end_date ? new Date(formVal.offer_end_date).toISOString() : null,
+      warranty_days: Number(formVal.warranty_days) || 0,
+      tax_percentage: Number(formVal.tax_percentage) || 21,
+      weight: formVal.weight ? Number(formVal.weight) : null,
       dimensions: formVal.dimensions || { length: 0, width: 0, height: 0 },
-      seo_keywords: formVal.seo_keywords || null,
-      sale_price: formVal.sale_price || null,
-      reference_exchange_rate: formVal.reference_exchange_rate || null,
-      free_shipping: formVal.free_shipping,
-      supplier_id: formVal.supplier_id || null,
-      condition: formVal.condition || 'Nuevo',
-      warranty_type: formVal.warranty_type || 'Sin garantía',
-      includes_tax: formVal.includes_tax,
-      tags: formVal.tags ? formVal.tags.split(',').map(t => t.trim()).filter(t => t) : [],
+      seo_keywords: formVal.seo_keywords?.trim() || null,
+      sale_price: formVal.sale_price ? Number(formVal.sale_price) : null,
       
       // Variants
       variants: formVal.variants
     };
 
-    // Add optional fields only if they have values
-    if (formVal.sku) payload.sku = formVal.sku;
-    if (formVal.barcode) payload.barcode = formVal.barcode;
+    // Add optional identifiers only if present
+    if (formVal.sku) payload.sku = formVal.sku.trim();
+    if (formVal.barcode) payload.barcode = formVal.barcode.trim();
     
     // Store gallery_urls and media_metadata
     if (Array.isArray(formVal.images) && formVal.images.length > 0) {

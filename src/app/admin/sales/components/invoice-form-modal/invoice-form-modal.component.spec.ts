@@ -59,7 +59,8 @@ describe('InvoiceFormModalComponent', () => {
     expect(component.emitter().cuit).toBe('30-12345678-9');
   });
 
-  it('should calculate live totals and separate VAT breakdown according to Ley 27.743', () => {
+  it('should calculate live totals and separate VAT breakdown according to Ley 27.743 for Factura A', () => {
+    component.invoiceType.set('A');
     component.items.set([
       { description: 'Mano de obra técnica', itemType: 'labor', quantity: 1, unitPrice: 100000, taxRate: 0.21 },
       { description: 'Repuesto disyuntor', itemType: 'part', quantity: 2, unitPrice: 30000, taxRate: 0.105 },
@@ -67,6 +68,7 @@ describe('InvoiceFormModalComponent', () => {
 
     const breakdown = component.taxBreakdown();
 
+    // Factura A: Prices are NET, VAT is added
     // Line 1: Net = 100000, VAT 21% = 21000
     // Line 2: Net = 60000, VAT 10.5% = 6300
     // Total Net: 160000, Total VAT: 27300, Grand Total: 187300
@@ -77,6 +79,20 @@ describe('InvoiceFormModalComponent', () => {
     expect(breakdown.totalNet).toBe(160000);
     expect(breakdown.totalVat).toBe(27300);
     expect(breakdown.grandTotal).toBe(187300);
+  });
+
+  it('should calculate live totals for Factura B where prices already include VAT', () => {
+    component.invoiceType.set('B');
+    // Price includes VAT (gross): $12.100 -> Net: $10.000, VAT: $2.100
+    component.items.set([
+      { description: 'Repuesto disyuntor', itemType: 'part', quantity: 1, unitPrice: 12100, taxRate: 0.21 },
+    ]);
+
+    const breakdown = component.taxBreakdown();
+    expect(breakdown.grandTotal).toBe(12100);
+    expect(breakdown.totalNet).toBe(10000);
+    expect(breakdown.totalVat).toBe(2100);
+    expect(breakdown.isVatIncluded).toBe(true);
   });
 
   it('should flag mandatory customer identification when amount exceeds $208.644 for cash payment', () => {

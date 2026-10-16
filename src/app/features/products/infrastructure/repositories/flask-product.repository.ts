@@ -68,6 +68,10 @@ export class FlaskProductRepository implements ProductRepository {
         return this.getAll().pipe(map(products => products.find(p => p.id === id) || null));
     }
 
+    getBySlug(slug: string): Observable<Product | null> {
+        return this.getAll().pipe(map(products => products.find(p => p.slug === slug) || null));
+    }
+
     create(product: Product): Observable<Product> {
         return this.http.post<Product>(this.apiUrl, product);
     }

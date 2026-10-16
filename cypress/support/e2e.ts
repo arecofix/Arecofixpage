@@ -14,7 +14,11 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
+import 'cypress-mochawesome-reporter/register';
+import 'cypress-real-events';
+import 'cypress-file-upload';
+import '@testing-library/cypress/add-commands';
 
 Cypress.on('window:before:load', (win: any) => {
   win.__console_errors = [];
@@ -138,7 +142,7 @@ beforeEach(() => {
     });
   });
 
-  // Clear branch slugs to prevent prepending slug to admin URLs
+  // Clear branch slugs to ensure menu routes use /admin/... consistently
   cy.intercept('GET', '**/rest/v1/branches*', (req) => {
     req.continue((res) => {
       if (res.body) {
@@ -146,22 +150,21 @@ beforeEach(() => {
           res.body.forEach(branch => {
             if (branch) {
               branch.slug = null;
+              branch.is_active = true;
             }
           });
         } else if (typeof res.body === 'object') {
           res.body.slug = null;
+          res.body.is_active = true;
         }
       }
     });
   });
 
-  // Polyfill global para asegurar que los mocks de listas de Supabase devuelvan Content-Range
-  cy.intercept('GET', '**/rest/v1/*', (req) => {
-    req.continue((res) => {
-      // Si la respuesta es un array (típico de Supabase GET lists) y no tiene Content-Range
-      if (Array.isArray(res.body) && !res.headers['content-range'] && !res.headers['Content-Range']) {
-        res.headers['content-range'] = `0-${Math.max(0, res.body.length - 1)}/${res.body.length}`;
-      }
-    });
-  });
+  // Mock notifications to prevent unhandled upstream network aborts during navigation
+  cy.intercept('GET', '**/rest/v1/notifications*', {
+    statusCode: 200,
+    headers: { 'content-range': '0-0/0', 'Content-Range': '0-0/0' },
+    body: []
+  }).as('globalNotifications');
 });

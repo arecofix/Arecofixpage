@@ -1,0 +1,108 @@
+[
+  {
+    "id": "inv-001",
+    "invoice_number": "0001-00000042",
+    "voucher_type": "FACTURA_B",
+    "voucher_letter": "B",
+    "voucher_code": "006",
+    "point_of_sale": 1,
+    "issue_date": "2026-10-12",
+    "status": "APPROVED",
+    "cae": "74432109876543",
+    "cae_expiration_date": "2026-10-22",
+    "issuer": {
+      "business_name": "Arecofix Reparaciones",
+      "cuit": "30-71234567-9",
+      "tax_condition": "RESPONSABLE_INSCRIPTO",
+      "address": "Av. Libertador 1200, San Antonio de Areco",
+      "gross_income": "902-123456-1",
+      "activity_start_date": "01/03/2020"
+    },
+    "recipient": {
+      "name": "María González",
+      "doc_type": "DNI",
+      "doc_number": "35987654",
+      "tax_condition": "CONSUMIDOR_FINAL",
+      "address": "Av. Santa Fe 2500, CABA"
+    },
+    "items": [
+      {
+        "id": "item-1",
+        "description": "Módulo Pantalla iPhone 13 OLED",
+        "item_type": "REPLACEMENT",
+        "quantity": 1,
+        "unit_price": 149000,
+        "vat_rate": 21,
+        "discount_amount": 0,
+        "subtotal": 149000
+      }
+    ],
+    "net_amount": 123140.50,
+    "vat_amount": 25859.50,
+    "discount_amount": 0,
+    "total_amount": 149000,
+    "vat_breakdown": [
+      {
+        "rate": 21,
+        "base_amount": 123140.50,
+        "tax_amount": 25859.50
+      }
+    ],
+    "source_type": "REPAIR",
+    "source_id": "rep-001",
+    "internal_notes": "Cliente regular",
+    "qr_payload": "https://www.afip.gob.ar/fe/qr/?p=eyJ2ZXIiOjEsImZlY2hhIjoiMjAyNi0xMC0xMiIsImN1aXQiOjMwNzEyMzQ1Njc5LCJwdG9WdGEiOjEsInRpcG9DbXAiOjYsIm5yb0NtcCI6NDIsImltcG9ydGUiOjE0OTAwMCwibW9uZWRhIjoiUEVTIiwiY3R6IjoxLCJ0aXBvRG9jUmVjIjo5NiwibnJvRG9jUmVjIjozNTk4NzY1NCwidGlwb0NvZ0F1dG9yIjoiQSIsImNvZ0F1dG9yIjo3NDQzMjEwOTg3NjU0M30="
+  },
+  {
+    "id": "inv-002",
+    "invoice_number": "0001-00000043",
+    "voucher_type": "FACTURA_A",
+    "voucher_letter": "A",
+    "voucher_code": "001",
+    "point_of_sale": 1,
+    "issue_date": "2026-10-12",
+    "status": "APPROVED",
+    "cae": "74432109876544",
+    "cae_expiration_date": "2026-10-22",
+    "issuer": {
+      "business_name": "Arecofix Reparaciones",
+      "cuit": "30-71234567-9",
+      "tax_condition": "RESPONSABLE_INSCRIPTO",
+      "address": "Av. Libertador 1200, San Antonio de Areco",
+      "gross_income": "902-123456-1",
+      "activity_start_date": "01/03/2020"
+    },
+    "recipient": {
+      "name": "Tech Corp SA",
+      "doc_type": "CUIT",
+      "doc_number": "30-71000000-9",
+      "tax_condition": "RESPONSABLE_INSCRIPTO",
+      "address": "Av. Corrientes 1000, CABA"
+    },
+    "items": [
+      {
+        "id": "item-a1",
+        "description": "Servicio de Mantenimiento Preventivo Servidores",
+        "item_type": "SERVICE",
+        "quantity": 1,
+        "unit_price": 100000,
+        "vat_rate": 21,
+        "discount_amount": 0,
+        "subtotal": 100000
+      }
+    ],
+    "net_amount": 100000,
+    "vat_amount": 21000,
+    "discount_amount": 0,
+    "total_amount": 121000,
+    "vat_breakdown": [
+      {
+        "rate": 21,
+        "base_amount": 100000,
+        "tax_amount": 21000
+      }
+    ],
+    "source_type": "MANUAL",
+    "qr_payload": "https://www.afip.gob.ar/fe/qr/?p=eyJ2ZXIiOjEsImZlY2hhIjoiMjAyNi0xMC0xMiIsImN1aXQiOjMwNzEyMzQ1Njc5LCJwdG9WdGEiOjEsInRpcG9DbXAiOjEsIm5yb0NtcCI6NDMsImltcG9ydGUiOjEyMTAwMCwibW9uZWRhIjoiUEVTIiwiY3R6IjoxLCJ0aXBvRG9jUmVjIjgwLCJucm9Eb2NSZWMiOjMwNzEwMDAwMDA5LCJ0aXBvQ29nQXV0b3IiOiJBIiwiY29nQXV0b3IiOjc0NDMyMTA5ODc2NTQ0fQ=="
+  }
+]

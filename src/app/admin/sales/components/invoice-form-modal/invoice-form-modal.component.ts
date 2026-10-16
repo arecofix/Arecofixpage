@@ -34,6 +34,7 @@ import { NotificationService } from '@app/core/services/notification.service';
 import { LoggerService } from '@app/core/services/logger.service';
 
 export interface InvoiceFormItemRow {
+  id: string;
   productId?: string;
   description: string;
   itemType: ArcaItemType;
@@ -42,13 +43,17 @@ export interface InvoiceFormItemRow {
   taxRate: ArcaVatRate;
 }
 
-const DEFAULT_ROW: InvoiceFormItemRow = {
-  description: '',
-  itemType: 'service',
-  quantity: 1,
-  unitPrice: 0,
-  taxRate: 0.21,
-};
+let rowIdSequence = 0;
+function createDefaultRow(): InvoiceFormItemRow {
+  return {
+    id: `row-${Date.now()}-${++rowIdSequence}`,
+    description: '',
+    itemType: 'service',
+    quantity: 1,
+    unitPrice: 0,
+    taxRate: 0.21,
+  };
+}
 
 @Component({
   selector: 'app-invoice-form-modal',
@@ -101,7 +106,7 @@ export class InvoiceFormModalComponent implements OnInit {
   });
 
   // ── Items State ─────────────────────────────────────────────────────────────
-  items = signal<InvoiceFormItemRow[]>([{ ...DEFAULT_ROW }]);
+  items = signal<InvoiceFormItemRow[]>([createDefaultRow()]);
 
   // ── Product Catalog Picker State ────────────────────────────────────────────
   isCatalogOpen = signal<boolean>(false);
@@ -262,7 +267,7 @@ export class InvoiceFormModalComponent implements OnInit {
 
   // ── Items Management ────────────────────────────────────────────────────────
   addItem(): void {
-    this.items.update((list) => [...list, { ...DEFAULT_ROW }]);
+    this.items.update((list) => [...list, createDefaultRow()]);
   }
 
   removeItem(index: number): void {
@@ -274,8 +279,12 @@ export class InvoiceFormModalComponent implements OnInit {
     field: K,
     val: InvoiceFormItemRow[K]
   ): void {
+    const parsedVal =
+      field === 'quantity' || field === 'unitPrice' ? Number(val) || 0 : val;
     this.items.update((list) =>
-      list.map((item, i) => (i === index ? { ...item, [field]: val } : item))
+      list.map((item, i) =>
+        i === index ? { ...item, [field]: parsedVal } : item
+      )
     );
   }
 
@@ -309,6 +318,7 @@ export class InvoiceFormModalComponent implements OnInit {
     const lastItem = currentList[currentList.length - 1];
 
     const newRow: InvoiceFormItemRow = {
+      id: `row-${Date.now()}-${++rowIdSequence}`,
       productId: prod.id,
       description: prod.name + (prod.sku ? ` (${prod.sku})` : ''),
       itemType: determinedType,

@@ -22,6 +22,10 @@ import { ShortcutService } from './core/services/shortcut.service';
 import { SupabaseService } from './core/services/supabase.service';
 import { SwUpdate } from '@angular/service-worker';
 import { AiChatbotComponent } from './shared/ai-chatbot/ai-chatbot.component';
+import { CashMovementsSubscriberService } from './application/cash-movements/cash-movements-subscriber.service';
+import { InvoiceSubscriberService } from './application/invoice/invoice-subscriber.service';
+import { SuppliersSubscriberService } from './application/suppliers/suppliers-subscriber.service';
+import { IEventBus } from './domain/events/event-bus.interface';
 
 @Component({
   selector: 'app-root',
@@ -51,7 +55,20 @@ export class App implements OnInit {
   private supabase = inject(SupabaseService);
   private swUpdate = inject(SwUpdate, { optional: true });
 
+  // Domain event subscribers & bus
+  private cashSubscriber = inject(CashMovementsSubscriberService);
+  private invoiceSubscriber = inject(InvoiceSubscriberService);
+  private suppliersSubscriber = inject(SuppliersSubscriberService);
+  private eventBus = inject(IEventBus, { optional: true });
+
   ngOnInit() {
+    this.cashSubscriber.init();
+    this.invoiceSubscriber.init();
+    this.suppliersSubscriber.init();
+
+    if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined') {
+      (window as unknown as { __EVENT_BUS__?: unknown }).__EVENT_BUS__ = this.eventBus;
+    }
     this.seoService.initialize();
     if (typeof document !== 'undefined') {
       const loader = document.querySelector('.initial-loader');

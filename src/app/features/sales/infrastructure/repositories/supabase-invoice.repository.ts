@@ -86,47 +86,78 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
     return data as Invoice | null;
   }
 
-  async getByOrderId(orderId: string, tenantId: string): Promise<Invoice | null> {
-    const { data, error } = await this.supabase
-      .from('invoices')
-      .select('id')
-      .eq('tenant_id', tenantId)
-      .eq('order_id', orderId)
-      .maybeSingle();
+  private readonly inFlightOrderIds = new Set<string>();
+  private readonly processedOrderIds = new Set<string>();
+  private readonly inFlightRepairIds = new Set<string>();
+  private readonly processedRepairIds = new Set<string>();
 
-    if (error) throw error;
-    return data as Invoice | null;
+  async getByOrderId(orderId: string, tenantId: string): Promise<Invoice | null> {
+    if (!orderId) return null;
+    if (this.processedOrderIds.has(orderId) || this.inFlightOrderIds.has(orderId)) {
+      return { id: 'in-flight-' + orderId, order_id: orderId, status: 'draft' } as unknown as Invoice;
+    }
+    this.inFlightOrderIds.add(orderId);
+
+    try {
+      let query = this.supabase
+        .from('invoices')
+        .select('id')
+        .eq('order_id', orderId);
+
+      if (tenantId) {
+        query = query.eq('tenant_id', tenantId);
+      }
+
+      const { data, error } = await query.maybeSingle();
+
+      if (error) {
+        this.inFlightOrderIds.delete(orderId);
+        throw error;
+      }
+      if (data) {
+        this.processedOrderIds.add(orderId);
+        this.inFlightOrderIds.delete(orderId);
+      }
+      return data as Invoice | null;
+    } catch (err) {
+      this.inFlightOrderIds.delete(orderId);
+      throw err;
+    }
   }
 
   async getByRepairId(repairId: string, tenantId: string): Promise<Invoice | null> {
+    if (!repairId) return null;
+    if (this.processedRepairIds.has(repairId) || this.inFlightRepairIds.has(repairId)) {
+      return { id: 'in-flight-' + repairId, repair_id: repairId, status: 'draft' } as unknown as Invoice;
+    }
+    this.inFlightRepairIds.add(repairId);
+
     try {
-      const { data, error } = await this.supabase
+      let query = this.supabase
         .from('invoices')
         .select('*')
-        .eq('tenant_id', tenantId)
         .or(`repair_id.eq.${repairId},repair_order_id.eq.${repairId}`)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .limit(1);
+
+      if (tenantId) {
+        query = query.eq('tenant_id', tenantId);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (!error && data) {
+        this.processedRepairIds.add(repairId);
+        this.inFlightRepairIds.delete(repairId);
         return data as Invoice;
       }
+
+      this.inFlightRepairIds.delete(repairId);
+      return null;
     } catch {
-      // Fallback below if composite OR fails due to schema difference
+      this.inFlightRepairIds.delete(repairId);
+      return null;
     }
-
-    const fallback = await this.supabase
-      .from('invoices')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('repair_id', repairId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (fallback.error) throw fallback.error;
-    return fallback.data as Invoice | null;
   }
 
   async getDraftCount(tenantId: string): Promise<number> {
@@ -187,7 +218,20 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
       }
     }
 
+    const orderId = invoice['order_id'] as string | undefined;
+    const repairId = (invoice['repair_id'] || invoice['repair_order_id']) as string | undefined;
+
     const { data, error } = await this.supabase.from('invoices').insert(invoice).select().single();
+
+    if (orderId) {
+      this.processedOrderIds.add(orderId);
+      this.inFlightOrderIds.delete(orderId);
+    }
+    if (repairId) {
+      this.processedRepairIds.add(repairId);
+      this.inFlightRepairIds.delete(repairId);
+    }
+
     return { data: data as Invoice, error };
   }
 

@@ -79,6 +79,18 @@ export class AdminBrandsPage implements OnInit {
     this.loadBrands();
   }
 
+  getBrandLogo(brand: Brand): string {
+    if (!brand.logo_url) return '';
+    if (
+      brand.logo_url.includes('api.arecofix.com.ar/public-assets') ||
+      brand.logo_url.includes('1765333423077') ||
+      brand.logo_url.includes('jftiyfnnaogmgvksgkbn')
+    ) {
+      return '';
+    }
+    return brand.logo_url;
+  }
+
   async toggleStatus(brand: Brand) {
     try {
       await firstValueFrom(

@@ -71,19 +71,17 @@
               {{ tab.title }}
             </span>
 
-            <!-- Close Tab Button (Fat-finger friendly touch area) -->
+            <!-- Close Tab Button (Fat-finger friendly touch area >= 44x44px) -->
             <span
               role="button"
               tabindex="0"
               [attr.aria-label]="'Cerrar pestaña ' + tab.title"
-              (touchstart)="closeTab(i, $event)"
-              (touchend)="closeTab(i, $event)"
               (click)="closeTab(i, $event)"
               (keydown.enter)="closeTab(i, $event)"
               (keydown.space)="closeTab(i, $event)"
-              class="w-6 h-6 -mr-1 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-200 dark:hover:bg-slate-700/80 transition-colors ml-1"
+              class="w-11 h-11 min-w-[44px] min-h-[44px] -mr-2 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-200/80 dark:hover:bg-slate-700/80 transition-colors ml-0.5 cursor-pointer"
             >
-              <i class="fas fa-times text-[9px] pointer-events-none"></i>
+              <i class="fas fa-times text-[10px] pointer-events-none"></i>
             </span>
           </button>
         </div>

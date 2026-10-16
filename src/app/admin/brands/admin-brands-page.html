@@ -29,8 +29,8 @@
                 @for (brand of brands(); track brand.id) {
                 <tr class="hover:bg-base-200/50">
                     <td>
-                        @if (brand.logo_url) {
-                        <img [src]="brand.logo_url" appFallback="/assets/img/no-image.svg" alt="{{brand.name}}" class="w-10 h-10 object-contain">
+                        @if (getBrandLogo(brand)) {
+                        <img [src]="getBrandLogo(brand)" appFallback="/assets/img/no-image.svg" alt="{{brand.name}}" class="w-10 h-10 object-contain">
                         } @else {
                         <div class="w-10 h-10 bg-base-200 rounded flex items-center justify-center text-base-content/50">
                             <i class="fas fa-image"></i>

@@ -11,6 +11,12 @@ import {
     RepairOrderRolledBackEvent,
     RepairOrderItemSnapshot,
 } from '../../domain/events/repair-order-ready-for-invoicing.event';
+import { RepairOrderReadyForInvoicingEvent as DomainRepairOrderReadyForInvoicingEvent } from '@app/domain/events/repair-order-ready-for-invoicing.event';
+import { RepairOrderDeliveredEvent } from '@app/domain/events/repair-order-delivered.event';
+import { PaymentMethod } from '@app/domain/events/types/payment-method';
+import { CustomerSnapshot } from '@app/domain/events/types/customer-snapshot';
+import { RepairItemSnapshot } from '@app/domain/events/types/repair-item-snapshot';
+import { RepairTotalsSnapshot } from '@app/domain/events/types/repair-totals-snapshot';
 import { CustomerService } from '@app/features/customers/application/services/customer.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { BranchService } from '@app/core/services/branch.service';
@@ -370,6 +376,36 @@ export class AdminRepairService {
                     tenantId: originalRepair.tenant_id,
                 }));
             }
+            // 4. Transition to DELIVERED (6) -> Emit RepairOrderDeliveredEvent
+            else if (payload.current_status_id === RepairStatus.DELIVERED) {
+                const customerSnapshot: CustomerSnapshot = {
+                    id: originalRepair.customer_id,
+                    name: payload.customer_name ?? originalRepair.customer_name ?? 'Cliente de Taller',
+                    taxId: payload.customer_dni ?? originalRepair.customer_dni,
+                    phone: payload.customer_phone ?? originalRepair.customer_phone,
+                    email: payload.customer_email ?? originalRepair.customer_email,
+                };
+                const totalPaid = Number(payload.final_cost ?? originalRepair.final_cost ?? 0);
+                const methodMap: Record<string, PaymentMethod> = {
+                    efectivo: 'cash',
+                    transferencia: 'transfer',
+                    tarjeta: 'card',
+                    cash: 'cash',
+                    transfer: 'transfer',
+                    card: 'card',
+                };
+                const paymentMethod: PaymentMethod = methodMap[payload.payment_method ?? originalRepair.payment_method ?? ''] ?? 'cash';
+
+                this.eventBus.publish(
+                    new RepairOrderDeliveredEvent(
+                        id,
+                        customerSnapshot,
+                        totalPaid,
+                        paymentMethod,
+                        new Date(),
+                    )
+                );
+            }
         }
     }
 
@@ -443,6 +479,47 @@ export class AdminRepairService {
             technicalReport: originalRepair.technical_report || originalRepair.technician_notes,
             tenantId: originalRepair.tenant_id,
         }));
+
+        const domainCustomer: CustomerSnapshot = {
+            id: originalRepair.customer_id,
+            name: updatePayload.customer_name ?? originalRepair.customer_name ?? 'Cliente de Taller',
+            taxId: updatePayload.customer_dni ?? originalRepair.customer_dni,
+            phone: updatePayload.customer_phone ?? originalRepair.customer_phone,
+            email: updatePayload.customer_email ?? originalRepair.customer_email,
+        };
+        const domainItems: RepairItemSnapshot[] = itemsSnapshot.map((item) => ({
+            description: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            itemType: item.isLabor ? 'labor' : 'part',
+        }));
+        const domainTotals: RepairTotalsSnapshot = {
+            subtotal: subtotalPreSurcharge,
+            surcharge: surchargeAmount,
+            advancePayment: depositAmount,
+            total: totalAmount,
+        };
+        const methodMap: Record<string, PaymentMethod> = {
+            efectivo: 'cash',
+            transferencia: 'transfer',
+            tarjeta: 'card',
+            cash: 'cash',
+            transfer: 'transfer',
+            card: 'card',
+        };
+        const domainPaymentMethod: PaymentMethod =
+            methodMap[updatePayload.payment_method ?? originalRepair.payment_method ?? ''] ?? 'cash';
+
+        this.eventBus.publish(
+            new DomainRepairOrderReadyForInvoicingEvent(
+                originalRepair.id,
+                domainCustomer,
+                domainItems,
+                domainTotals,
+                domainPaymentMethod,
+                new Date(),
+            )
+        );
     }
 
     async uploadImage(file: File): Promise<string> {

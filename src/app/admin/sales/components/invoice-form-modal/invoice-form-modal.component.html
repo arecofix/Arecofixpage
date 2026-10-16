@@ -1,5 +1,5 @@
 <!-- Modal Facturación ARCA (ex AFIP) -->
-<div class="fixed inset-0 z-[70] overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fade-in" id="arca-invoice-modal">
+<div class="fixed inset-0 z-[70] overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fade-in" id="arca-invoice-modal" [attr.data-catalog-ready]="!catalogLoading()">
   <div class="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] animate-scale-up">
 
     <!-- ── MODAL HEADER ── -->
@@ -69,6 +69,8 @@
             @for (t of ['B', 'A', 'C', 'X']; track t) {
               <button
                 type="button"
+                [id]="'btn-invoice-type-' + t"
+                [attr.data-type]="t"
                 (click)="onInvoiceTypeChange($any(t))"
                 class="py-2 text-xs font-black rounded-xl border transition-all cursor-pointer"
                 [ngClass]="
@@ -112,6 +114,7 @@
         <div class="space-y-1">
           <label class="text-[10px] font-black uppercase tracking-widest text-gray-400">Medio de Pago *</label>
           <select
+            id="select-payment-method"
             [ngModel]="paymentMethod()"
             (ngModelChange)="paymentMethod.set($event)"
             class="select select-sm w-full rounded-xl bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 text-xs font-bold"
@@ -176,6 +179,7 @@
               Condición frente al IVA *
             </label>
             <select
+              id="select-customer-vat-condition"
               [ngModel]="customer().vatCondition"
               (ngModelChange)="updateCustomerField('vatCondition', $event)"
               class="select select-sm w-full rounded-xl bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 text-xs font-bold"
@@ -206,6 +210,7 @@
               </select>
               <input
                 type="text"
+                id="input-customer-doc-number"
                 [ngModel]="customer().docNumber"
                 (ngModelChange)="updateCustomerField('docNumber', $event)"
                 [placeholder]="customer().docType === 'CUIT' ? '30-XXXXXXXX-X' : 'Número de documento'"
@@ -270,7 +275,7 @@
 
         <!-- Table / Rows of Items -->
         <div class="space-y-2.5">
-          @for (item of items(); track $index; let i = $index) {
+          @for (item of items(); track item.id; let i = $index) {
             <div class="p-3 bg-white dark:bg-slate-800/60 rounded-2xl border border-gray-200/80 dark:border-slate-700/80 shadow-xs space-y-2">
               <div class="grid grid-cols-12 gap-2 items-center">
 
@@ -414,16 +419,10 @@
 
       <!-- 6. CUADRO DE DESGLOSE FISCAL Y TOTALES (Ley 27.743 y RG 5614/2024) -->
       <section class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900 text-gray-200 rounded-3xl p-5 shadow-inner">
-        <!-- Régimen de Transparencia Fiscal (Solo Factura A y B) -->
-        @if (invoiceType() === 'A' || invoiceType() === 'B') {
+        @if (invoiceType() === 'A') {
           <div class="space-y-2 text-xs border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
             <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-[10px]">
-              <i class="fas fa-scale-balanced"></i>
-              @if (invoiceType() === 'B') {
-                Transparencia Fiscal al Consumidor (Ley 27.743 / RG 5614)
-              } @else {
-                IVA Discriminado por Alícuota (Ley 27.743 / RG 5614)
-              }
+              <i class="fas fa-scale-balanced"></i> IVA Discriminado por Alícuota (Ley 27.743 / RG 5614)
             </div>
 
             <div class="space-y-1 pt-1 text-slate-400">
@@ -466,8 +465,33 @@
               }
 
               <div class="flex justify-between text-slate-300 font-bold pt-1 border-t border-slate-800">
-                <span>{{ invoiceType() === 'B' ? 'IVA Estimado en el Precio:' : 'Total IVA Discriminado:' }}</span>
+                <span>Total IVA Discriminado:</span>
                 <span class="font-mono">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        } @else if (invoiceType() === 'B') {
+          <div class="space-y-2 text-xs border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
+            <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-[10px]">
+              <i class="fas fa-scale-balanced"></i> Transparencia Fiscal al Consumidor (Ley 27.743 / RG 5614)
+            </div>
+
+            <div class="text-[11px] font-bold text-slate-300 italic py-1 border-y border-slate-800 text-center">
+              El IVA se encuentra incluido en el precio
+            </div>
+
+            <div class="space-y-1 pt-1 text-slate-400">
+              <div class="flex justify-between">
+                <span>Importe Neto:</span>
+                <span class="font-mono text-slate-200">${{ taxBreakdown().totalNet | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>IVA Incluido:</span>
+                <span class="font-mono text-slate-200">${{ taxBreakdown().totalVat | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex justify-between text-slate-200 font-bold pt-1 border-t border-slate-800">
+                <span>Importe Total:</span>
+                <span class="font-mono">${{ taxBreakdown().grandTotal | number:'1.2-2' }}</span>
               </div>
             </div>
           </div>

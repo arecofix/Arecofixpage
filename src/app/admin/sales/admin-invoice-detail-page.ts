@@ -25,6 +25,7 @@ import {
   ARCA_ITEM_TYPES,
   ArcaEmitterData,
   ArcaItemType,
+  ArcaVatCondition,
 } from '@app/features/sales/domain/entities/arca.entity';
 import { CalculateArcaTotalsUseCase } from '@app/features/sales/domain/usecases/calculate-arca-totals.usecase';
 import { ValidateArcaInvoiceUseCase } from '@app/features/sales/domain/usecases/validate-arca-invoice.usecase';
@@ -66,13 +67,14 @@ import { InvoiceDraftBannerComponent } from './components/invoice-draft-banner/i
           visibility: hidden !important;
         }
 
-        /* Contenedor oficial de la factura para evitar hoja en blanco */
+        /* Contenedor oficial de la factura para evitar hoja en blanco y solapamientos */
         .factura-container {
           visibility: visible !important;
-          position: absolute !important;
-          left: 0 !important;
-          top: 0 !important;
+          position: relative !important;
           width: 100% !important;
+          max-width: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
           background: #ffffff !important;
           color: #000000 !important;
           -webkit-print-color-adjust: exact !important;
@@ -87,7 +89,18 @@ import { InvoiceDraftBannerComponent } from './components/invoice-draft-banner/i
           print-color-adjust: exact !important;
         }
 
+        /* En impresión A4 forzar siempre 2 columnas para el encabezado y datos de emisor */
+        .grid.grid-cols-1.md\:grid-cols-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 6mm !important;
+        }
+
         .qr-container {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+        }
+
+        .section-divider {
           page-break-inside: avoid !important;
           break-inside: avoid !important;
         }
@@ -118,6 +131,54 @@ import { InvoiceDraftBannerComponent } from './components/invoice-draft-banner/i
         body.print-pos-mode #pos-ticket-print * {
           visibility: visible !important;
         }
+      }
+
+      /* Reglas estrictas de layout de comprobante ARCA */
+      .section-divider {
+        border-bottom: 1px solid #ccc;
+        padding: 4mm;
+      }
+      .section-title {
+        font-weight: 700;
+        font-size: 11pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .data-text {
+        font-size: 9.5pt;
+        line-height: 1.4;
+      }
+      .data-row {
+        margin-bottom: 2mm;
+      }
+      .last-data-row {
+        margin-bottom: 4mm;
+      }
+      .totals-text {
+        font-size: 13pt;
+        font-weight: 700;
+      }
+      .letter-box {
+        width: 1cm;
+        height: 1cm;
+        min-width: 1cm;
+        min-height: 1cm;
+        border: 1px solid #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: 700;
+        font-size: 16pt;
+        line-height: 1;
+        background-color: #ffffff;
+        color: #000000;
+      }
+      .code-badge {
+        padding: 2mm;
+        display: inline-block;
+        font-size: 9pt;
+        font-weight: 600;
       }
     `,
   ],
@@ -258,8 +319,24 @@ export class AdminInvoiceDetailPage implements OnInit {
   }
 
   getItemTypeLabel(type?: string): string {
-    if (!type) return 'General';
-    return ARCA_ITEM_TYPES[type as ArcaItemType]?.label || type;
+    if (!type) return 'Producto';
+    const mapped = ARCA_ITEM_TYPES[type as ArcaItemType]?.label;
+    if (mapped) return mapped;
+    if (type.toLowerCase().includes('labor') || type.toLowerCase().includes('obra')) return 'Mano de obra';
+    if (type.toLowerCase().includes('part') || type.toLowerCase().includes('repuesto')) return 'Repuesto';
+    if (type.toLowerCase().includes('serv')) return 'Servicio';
+    return 'Producto';
+  }
+
+  formatPaymentMethod(method?: string): string {
+    switch (method) {
+      case 'cash': return 'Efectivo';
+      case 'transfer': return 'Transferencia Bancaria';
+      case 'debit_card': return 'Tarjeta de Débito';
+      case 'credit_card': return 'Tarjeta de Crédito';
+      case 'qr_mercadopago': return 'Mercado Pago / QR';
+      default: return 'Contado';
+    }
   }
 
   confirming = signal(false);
@@ -351,18 +428,18 @@ export class AdminInvoiceDetailPage implements OnInit {
     }
   }
 
-  private getEmitterData(): ArcaEmitterData {
+  getEmitterData(): ArcaEmitterData {
     const c = this.company();
     return {
-      businessName: c?.name || 'ARECOFIX SERVICIOS INTEGRALES',
-      cuit: c?.tax_id || '30-71649281-9',
-      commercialAddress: c?.address || c?.location || 'Buenos Aires, Argentina',
-      vatCondition: (c as any)?.vat_condition || 'IVA Responsable Inscripto',
-      iibb: (c as any)?.iibb || c?.tax_id || '30-71649281-9',
-      activityStartDate: (c as any)?.activity_start_date || '01/03/2021',
-      pointOfSale: (c as any)?.point_of_sale || '00004',
-      phone: c?.phone || '',
-      email: c?.email || '',
+      businessName: c?.name || 'Arecofix',
+      cuit: c?.tax_id || '20438529161',
+      commercialAddress: c?.address || c?.location || 'Jorge Newbery 69, Buenos Aires',
+      vatCondition: (c?.vat_condition as ArcaVatCondition) || 'IVA Responsable Inscripto',
+      iibb: c?.iibb || c?.tax_id || '20438529161',
+      activityStartDate: c?.activity_start_date || '01/03/2021',
+      pointOfSale: c?.point_of_sale ? String(c.point_of_sale) : '00004',
+      phone: c?.phone || '1125960900',
+      email: c?.email || 'ezequielneryo15@gmail.com',
       logoUrl: c?.logo_url || '',
     };
   }

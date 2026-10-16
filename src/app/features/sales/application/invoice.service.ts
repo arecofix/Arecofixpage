@@ -7,7 +7,9 @@ import {
   InvoiceItem,
   InvoiceResult,
   InvoiceStatus,
+  InvoiceType,
 } from '@app/features/sales/domain/entities/invoice.entity';
+import { ArcaInvoiceType } from '../domain/entities/arca.entity';
 import { InvoiceRepository } from '../domain/repositories/invoice.repository';
 import { InvoicesStore } from './services/invoices.store';
 import { firstValueFrom } from 'rxjs';
@@ -25,6 +27,9 @@ import {
 import { CreateInvoiceDraftFromRepairOrderUseCase } from '../domain/usecases/create-invoice-draft-from-repair-order.usecase';
 import { CompanyService, CompanySettings } from '@app/core/services/company.service';
 import { ArcaEmitterData } from '../domain/entities/arca.entity';
+import { InvoiceIssuedEvent } from '@app/domain/events/invoice-issued.event';
+import { PaymentMethod } from '@app/domain/events/types/payment-method';
+import { CustomerSnapshot } from '@app/domain/events/types/customer-snapshot';
 
 /**
  * InvoiceService — Application Layer (Use Case & Event Handler)
@@ -122,7 +127,13 @@ export class InvoiceService {
       }
 
       // ── Canonical Total Calculation ────────────────────────────────────────
-      const verifiedTotals = this.calculateTotals(dto.items ?? [], dto.discount ?? 0);
+      const verifiedTotals = this.calculateTotals(
+        dto.items ?? [],
+        dto.discount ?? 0,
+        dto.type,
+        dto.surcharge ?? 0,
+        dto.advance_payment ?? 0
+      );
 
       const finalSubtotal = dto.items?.length ? verifiedTotals.subtotal : dto.subtotal;
       const finalTax     = dto.items?.length ? verifiedTotals.taxAmount : dto.tax_amount;
@@ -165,6 +176,10 @@ export class InvoiceService {
 
       // Invalidate cache on new invoice creation
       this.invoicesStore.clearCache();
+
+      if (result.data && (payload['status'] === 'issued' || !payload['status'])) {
+        this.publishInvoiceIssuedEvent(result.data);
+      }
 
       this.logger.info(`[InvoiceService] Invoice generated: ${result.data?.id} (origin: ${dto.origin})`);
       return { data: result.data, error: null, duplicate: false };
@@ -219,7 +234,56 @@ export class InvoiceService {
       status: 'confirmed',
     });
     this.invoicesStore.clearCache();
+    if (result.data) {
+      this.publishInvoiceIssuedEvent(result.data);
+    }
     return result;
+  }
+
+  private publishInvoiceIssuedEvent(invoice: Invoice): void {
+    try {
+      const methodMap: Record<string, PaymentMethod> = {
+        efectivo: 'cash',
+        transferencia: 'transfer',
+        tarjeta: 'card',
+        qr: 'qr',
+        mercadopago: 'mercadopago',
+        cash: 'cash',
+        transfer: 'transfer',
+        card: 'card',
+      };
+      const paymentMethod: PaymentMethod = methodMap[invoice.payment_method ?? ''] ?? 'cash';
+      const customer: CustomerSnapshot = {
+        id: invoice.customer_id,
+        name: invoice.customer_name ?? 'Consumidor Final',
+        taxId: invoice.customer_tax_id,
+        email: invoice.customer_email,
+        address: invoice.customer_address,
+      };
+      const origin: 'manual' | 'sale' | 'order' | 'repair' =
+        invoice.origin === 'sale'
+          ? 'sale'
+          : invoice.origin === 'order'
+            ? 'order'
+            : invoice.origin === 'repair'
+              ? 'repair'
+              : 'manual';
+
+      this.eventBus.publish(
+        new InvoiceIssuedEvent(
+          invoice.id,
+          invoice.invoice_number ? String(invoice.invoice_number) : `FC-${invoice.id.substring(0, 8)}`,
+          (invoice.type as 'A' | 'B' | 'C' | 'X') ?? 'B',
+          origin,
+          customer,
+          Number(invoice.total_amount ?? 0),
+          paymentMethod,
+          invoice.issued_at ? new Date(invoice.issued_at) : new Date(),
+        )
+      );
+    } catch (err) {
+      this.logger.error('[InvoiceService] Failed to publish InvoiceIssuedEvent:', err);
+    }
   }
 
   /**
@@ -302,16 +366,23 @@ export class InvoiceService {
 
   calculateTotals(
     items: Pick<InvoiceItem, 'quantity' | 'unit_price' | 'tax_rate'>[],
-    discount: number = 0
+    discount: number = 0,
+    type: InvoiceType | ArcaInvoiceType = 'B',
+    surcharge: number = 0,
+    advancePayment: number = 0
   ): { subtotal: number; taxAmount: number; total: number } {
-    const subtotal = items.reduce((acc, item) => acc + item.quantity * item.unit_price, 0);
-    const taxAmount = items.reduce((acc, item) => acc + item.quantity * item.unit_price * item.tax_rate, 0);
-    const total = Math.max(0, subtotal + taxAmount - discount);
+    const breakdown = CalculateArcaTotalsUseCase.execute(
+      items,
+      discount,
+      type as ArcaInvoiceType,
+      surcharge,
+      advancePayment
+    );
 
     return {
-      subtotal: +subtotal.toFixed(2),
-      taxAmount: +taxAmount.toFixed(2),
-      total: +total.toFixed(2),
+      subtotal: breakdown.totalNet,
+      taxAmount: breakdown.totalVat,
+      total: breakdown.grandTotal,
     };
   }
 

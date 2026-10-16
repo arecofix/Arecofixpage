@@ -40,6 +40,17 @@ export class AdminPostService {
     }
 
     private mapToEntity(data: any): Post {
+        let image = data.featured_image || undefined;
+        if (
+            image &&
+            (image.includes('api.arecofix.com.ar/public-assets') ||
+             image.includes('jftiyfnnaogmgvksgkbn') ||
+             image.includes('28egdow') ||
+             image.includes('1780271564143'))
+        ) {
+            image = '/assets/img/repair/2.webp';
+        }
+
         return {
             id: data.id,
             created_at: data.created_at,
@@ -47,7 +58,7 @@ export class AdminPostService {
             title: data.title,
             slug: data.slug,
             content: data.content,
-            image: data.featured_image || undefined,
+            image: image,
             published: data.status === 'published',
             status: data.status,
             meta_title: data.seo_title || undefined,

@@ -80,8 +80,12 @@ import { SupabaseNotificationRepository } from './features/messages/infrastructu
 import { TenantService } from './core/services/tenant.service';
 import { AccountRepository } from './features/accounts/domain/repositories/account.repository';
 import { SupabaseAccountRepository } from './features/accounts/infrastructure/repositories/supabase-account.repository';
-import { IEventBus } from './core/events/event-bus.interface';
-import { EventBusService } from './core/events/event-bus.service';
+import { IEventBus } from './domain/events/event-bus.interface';
+import { RxjsEventBusService } from './infrastructure/events/rxjs-event-bus.service';
+import { CashMovementRepository } from './domain/repositories/cash-movement.repository';
+import { SupabaseCashMovementRepository } from './infrastructure/repositories/supabase-cash-movement.repository';
+import { SupplierRepository } from './domain/repositories/supplier.repository';
+import { SupabaseSupplierRepository } from './features/customers/infrastructure/repositories/supabase-supplier.repository';
 
 const isTauri =
   typeof window !== 'undefined' &&
@@ -232,6 +236,8 @@ export const appConfig: ApplicationConfig = {
       useClass: SupabaseNotificationRepository,
     },
     { provide: ICustomerDeviceRepository, useClass: SupabaseCustomerDeviceRepository },
-    { provide: IEventBus, useClass: EventBusService },
+    { provide: IEventBus, useClass: RxjsEventBusService },
+    { provide: CashMovementRepository, useClass: SupabaseCashMovementRepository },
+    { provide: SupplierRepository, useClass: SupabaseSupplierRepository },
   ],
 };
