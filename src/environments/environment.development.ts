@@ -26,10 +26,9 @@ export const environment: Environment = {
   enableProfileUpsert: false,
   flaskApiUrl: 'http://localhost:5000/api',
 
-  // RAG Chatbot Worker (Fase 3)
+  // RAG Chatbot Worker (Fase 3 - backend proxy)
   chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
   embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
-  chatbotSecret: '0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=',
 
   // Analytics Configuration Removed
 

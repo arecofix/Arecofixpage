@@ -57,7 +57,6 @@ export class ChatbotService {
   private readonly platformId = inject(PLATFORM_ID);
 
   private readonly workerUrl = environment.chatbotWorkerUrl;
-  private readonly chatbotSecret = environment.chatbotSecret;
 
   /** Historial local de la conversación (últimos MAX_HISTORY turnos) */
   private readonly MAX_HISTORY = 12; // 6 pares user/assistant
@@ -77,7 +76,6 @@ export class ChatbotService {
   private buildHeaders(): HeadersInit {
     return {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.chatbotSecret}`,
       'ngsw-bypass': '1',
     };
   }
@@ -137,8 +135,8 @@ export class ChatbotService {
     this.error.set(null);
     this.addToHistory('user', question);
     try {
-      // Use environment configuration for the production API endpoint
-      const targetUrl = `${environment.chatbotWorkerUrl}/chat/offline`;
+      // Endpoint proxied through Node Express backend (no secret in browser)
+      const targetUrl = '/api/chatbot/message';
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),
@@ -203,8 +201,8 @@ export class ChatbotService {
 
     try {
       let isOnline = navigator.onLine;
-      // Use environment URL
-      const targetUrl = `${environment.chatbotWorkerUrl}/chat/stream`;
+      // Endpoint proxied through Node Express backend (no secret in browser)
+      const targetUrl = '/api/chatbot/stream';
       const reqInit = {
         method: 'POST',
         headers: this.buildHeaders(),
