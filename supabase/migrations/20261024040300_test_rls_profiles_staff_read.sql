@@ -19,7 +19,8 @@ BEGIN
   LIMIT 1;
 
   IF v_staff_uid IS NULL THEN
-    RAISE EXCEPTION 'No se encontró ningún usuario con rol staff/technician para la prueba.';
+    RAISE NOTICE 'No se encontró ningún usuario con rol staff/technician para la prueba. Omitiendo en DB limpia.';
+    RETURN;
   END IF;
 
   -- 2. Obtener una reparación de esa misma sucursal
@@ -29,7 +30,8 @@ BEGIN
   LIMIT 1;
 
   IF v_client_uid IS NULL THEN
-    RAISE EXCEPTION 'No se encontró ninguna reparación con cliente para la sucursal del staff.';
+    RAISE NOTICE 'No se encontró ninguna reparación con cliente para la sucursal del staff. Omitiendo en DB limpia.';
+    RETURN;
   END IF;
 
   -- 3. Inyectar el contexto de sesión (Impersonar al Staff)

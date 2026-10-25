@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS customer_accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     branch_id UUID REFERENCES branches(id) ON DELETE SET NULL,
-    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    customer_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     balance DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     credit_limit DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended')),
@@ -57,50 +57,50 @@ ALTER TABLE account_transactions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view accounts of their tenant"
 ON customer_accounts FOR SELECT
 USING (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = customer_accounts.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = customer_accounts.tenant_id
 ));
 
 CREATE POLICY "Users can insert accounts to their tenant"
 ON customer_accounts FOR INSERT
 WITH CHECK (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = customer_accounts.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = customer_accounts.tenant_id
 ));
 
 CREATE POLICY "Users can update accounts of their tenant"
 ON customer_accounts FOR UPDATE
 USING (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = customer_accounts.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = customer_accounts.tenant_id
 ));
 
 CREATE POLICY "Users can delete accounts of their tenant"
 ON customer_accounts FOR DELETE
 USING (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = customer_accounts.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = customer_accounts.tenant_id
 ));
 
 -- POLICIES FOR account_transactions
 CREATE POLICY "Users can view transactions of their tenant"
 ON account_transactions FOR SELECT
 USING (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = account_transactions.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = account_transactions.tenant_id
 ));
 
 CREATE POLICY "Users can insert transactions to their tenant"
 ON account_transactions FOR INSERT
 WITH CHECK (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = account_transactions.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = account_transactions.tenant_id
 ));
 
 CREATE POLICY "Users can update transactions of their tenant"
 ON account_transactions FOR UPDATE
 USING (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = account_transactions.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = account_transactions.tenant_id
 ));
 
 CREATE POLICY "Users can delete transactions of their tenant"
 ON account_transactions FOR DELETE
 USING (auth.uid() IN (
-    SELECT user_id FROM staff_profiles WHERE staff_profiles.tenant_id = account_transactions.tenant_id
+    SELECT id FROM profiles WHERE profiles.tenant_id = account_transactions.tenant_id
 ));
 
 -- Grant access to authenticated users
