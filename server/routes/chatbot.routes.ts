@@ -1,6 +1,15 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 
 export const chatbotRoutes = Router();
+
+const chatbotLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests' },
+});
 
 function getChatbotConfig() {
   const workerUrl = (process.env['CHATBOT_WORKER_URL'] || 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev').replace(/\/+$/, '');
@@ -9,7 +18,15 @@ function getChatbotConfig() {
 }
 
 // Handler para consultas completas offline (JSON)
-chatbotRoutes.post(['/message', '/offline'], async (req: Request, res: Response) => {
+chatbotRoutes.post(['/message', '/offline'], chatbotLimiter, async (req: Request, res: Response) => {
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const qLen = req.body?.question?.length || 0;
+  console.log('[chatbot]', { ip: clientIp, qLen });
+
+  if (qLen > 500) {
+    return res.status(400).json({ error: 'Question too long (max 500 characters)' });
+  }
+
   try {
     const { workerUrl, secret } = getChatbotConfig();
     if (!secret) {
@@ -35,7 +52,15 @@ chatbotRoutes.post(['/message', '/offline'], async (req: Request, res: Response)
 });
 
 // Handler para streaming token-by-token (SSE)
-chatbotRoutes.post('/stream', async (req: Request, res: Response) => {
+chatbotRoutes.post('/stream', chatbotLimiter, async (req: Request, res: Response) => {
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const qLen = req.body?.question?.length || 0;
+  console.log('[chatbot:stream]', { ip: clientIp, qLen });
+
+  if (qLen > 500) {
+    return res.status(400).json({ error: 'Question too long (max 500 characters)' });
+  }
+
   try {
     const { workerUrl, secret } = getChatbotConfig();
     if (!secret) {
