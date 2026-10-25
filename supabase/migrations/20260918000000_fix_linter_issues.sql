@@ -15,7 +15,12 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM pg_extension WHERE extname = 'pg_net' AND extnamespace = 'public'::regnamespace
     ) THEN
-        ALTER EXTENSION pg_net SET SCHEMA net;
+        BEGIN
+            ALTER EXTENSION pg_net SET SCHEMA net;
+        EXCEPTION
+            WHEN insufficient_privilege THEN
+                RAISE NOTICE 'Skipping ALTER EXTENSION pg_net: insufficient privileges';
+        END;
     END IF;
 END $$;
 

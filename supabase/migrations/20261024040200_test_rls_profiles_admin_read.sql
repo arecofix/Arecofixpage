@@ -19,6 +19,11 @@ BEGIN
   WHERE client_id IS NOT NULL 
   LIMIT 1;
 
+  IF v_staff_uid IS NULL OR v_client_uid IS NULL THEN
+    RAISE NOTICE 'No data available for RLS test in clean database. Skipping safely.';
+    RETURN;
+  END IF;
+
   PERFORM set_config('role', 'authenticated', true);
   PERFORM set_config('request.jwt.claims', format('{"sub": "%s", "role": "authenticated"}', v_staff_uid), true);
 
