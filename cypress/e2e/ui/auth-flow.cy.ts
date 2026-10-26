@@ -19,6 +19,8 @@ describe('Authentication Flow - Normal User', () => {
   });
 
   beforeEach(() => {
+    const fakeValidToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxODIzOTY5ODAxLCJzdWIiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAYXJlY29maXguY29tLmFyIiwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJpYXQiOjE3OTI0MzM4MDF9.mock_signature';
+
     // Mock Signup
     cy.intercept('POST', '**/auth/v1/signup*', {
       statusCode: 200,
@@ -32,11 +34,12 @@ describe('Authentication Flow - Normal User', () => {
           created_at: new Date().toISOString()
         },
         session: {
-          access_token: 'fake-token',
+          access_token: fakeValidToken,
           token_type: 'bearer',
           expires_in: 3600,
+          expires_at: Math.floor(Date.now() / 1000) + 3600,
           refresh_token: 'fake-refresh-token',
-          user: { id: 'test-user-id' }
+          user: { id: 'test-user-id', aud: 'authenticated', email: testEmail }
         }
       }
     });
@@ -45,29 +48,45 @@ describe('Authentication Flow - Normal User', () => {
     cy.intercept('POST', '**/auth/v1/token*', {
       statusCode: 200,
       body: {
-        access_token: 'fake-token',
+        access_token: fakeValidToken,
         token_type: 'bearer',
         expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
         refresh_token: 'fake-refresh-token',
         user: {
           id: 'test-user-id',
           email: testEmail,
+          aud: 'authenticated',
           role: 'authenticated'
         }
       }
     });
 
-    // Mock Profile
-    cy.intercept('GET', '**/rest/v1/profiles?select=*&id=eq.test-user-id*', {
+    cy.intercept('GET', '**/auth/v1/user*', {
       statusCode: 200,
-      body: [{
+      body: {
+        id: 'test-user-id',
+        email: testEmail,
+        aud: 'authenticated',
+        role: 'authenticated'
+      }
+    });
+
+    // Mock Profile
+    cy.intercept('**/rest/v1/profiles*', (req) => {
+      const mockProfile = {
         id: 'test-user-id',
         email: testEmail,
         first_name: 'Test',
         last_name: 'User',
         role: 'user',
         tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b'
-      }]
+      };
+      const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+      req.reply({
+        statusCode: 200,
+        body: wantsObject ? mockProfile : [mockProfile]
+      });
     }).as('profile');
     
     // Mock signout
@@ -83,14 +102,20 @@ describe('Authentication Flow - Normal User', () => {
     // Wait for Angular SSR hydration to complete so Reactive Forms don't reset inputs
     cy.wait(5000);
     
-    // Type slowly and assert values to ensure Reactive Forms state is updated
-    cy.get('input[name="first_name"]').clear().type('Test', { delay: 50 }).should('have.value', 'Test');
-    cy.get('input[name="last_name"]').clear().type('User', { delay: 50 }).should('have.value', 'User');
-    cy.get('input[name="email"]').clear().type(testEmail, { delay: 50 }).should('have.value', testEmail);
-    cy.get('input[name="phone"]').clear().type('1234567890', { delay: 50 }).should('have.value', '1234567890');
+    // Separate clear and type to prevent Cypress keystroke drop from zoneless reactive form re-render
+    cy.get('input[name="first_name"]').clear();
+    cy.get('input[name="first_name"]').type('Test', { delay: 30 }).should('have.value', 'Test');
+    cy.get('input[name="last_name"]').clear();
+    cy.get('input[name="last_name"]').type('User', { delay: 30 }).should('have.value', 'User');
+    cy.get('input[name="email"]').clear();
+    cy.get('input[name="email"]').type(testEmail, { delay: 30 }).should('have.value', testEmail);
+    cy.get('input[name="phone"]').clear();
+    cy.get('input[name="phone"]').type('1234567890', { delay: 30 }).should('have.value', '1234567890');
     cy.get('button').find('i.fa-eye').first().click({force: true});
-    cy.get('input[name="password"]').clear().type(testPassword, { delay: 50 }).should('have.value', testPassword);
-    cy.get('input[name="confirmPassword"]').clear().type(testPassword, { delay: 50 }).should('have.value', testPassword);
+    cy.get('input[name="password"]').clear();
+    cy.get('input[name="password"]').type(testPassword, { delay: 30 }).should('have.value', testPassword);
+    cy.get('input[name="confirmPassword"]').clear();
+    cy.get('input[name="confirmPassword"]').type(testPassword, { delay: 30 }).should('have.value', testPassword);
     
     // Add wait to ensure validators run
     cy.wait(1000);
@@ -139,18 +164,16 @@ describe('Authentication Flow - Normal User', () => {
   });
 
   it('3. Debe poder iniciar sesión y ser redirigido a la página de inicio', () => {
-    cy.intercept('POST', '**/auth/v1/token?grant_type=password').as('loginRequest');
-    
-    cy.visit('/login');
-    cy.wait(2000);
+    cy.visit('/login?returnUrl=/');
+    cy.wait(4000);
 
-    cy.get('input[name="email"]').type(testEmail);
-    cy.get('input[name="password"]').type(testPassword);
+    cy.get('input[name="email"]').clear();
+    cy.get('input[name="email"]').type(testEmail, { delay: 30 }).should('have.value', testEmail);
+    cy.get('input[name="password"]').clear();
+    cy.get('input[name="password"]').type(testPassword, { delay: 30 }).should('have.value', testPassword);
 
     cy.get('button[type="submit"]').click();
 
-    // We expect the form to show an error because the user doesn't exist in Supabase!
-    // The test was failing because it expected success. 
-    cy.get('.bg-red-50, .text-red-800', { timeout: 10000 }).should('exist');
+    cy.url({ timeout: 15000 }).should('not.include', '/login');
   });
 });

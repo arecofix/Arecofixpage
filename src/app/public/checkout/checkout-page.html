@@ -57,6 +57,7 @@
               <input
                 id="checkout-name"
                 name="name"
+                data-cy="checkout-name"
                 type="text"
                 formControlName="name"
                 placeholder="Ej. Juan Pérez"
@@ -66,14 +67,16 @@
                   checkoutForm.get('name')?.touched
                 "
               />
-              @if (
-                checkoutForm.get("name")?.invalid &&
-                checkoutForm.get("name")?.touched
-              ) {
-                <p class="mt-1 text-sm text-red-500 font-medium">
-                  El nombre es requerido
-                </p>
-              }
+              <div class="min-h-[1.25rem]">
+                @if (
+                  checkoutForm.get("name")?.invalid &&
+                  checkoutForm.get("name")?.touched
+                ) {
+                  <p class="mt-1 text-sm text-red-500 font-medium">
+                    El nombre es requerido
+                  </p>
+                }
+              </div>
             </div>
 
             <!-- Email & Phone -->
@@ -87,6 +90,7 @@
                 <input
                   id="checkout-email"
                   name="email"
+                  data-cy="checkout-email"
                   type="email"
                   formControlName="email"
                   placeholder="email@ejemplo.com"
@@ -96,14 +100,16 @@
                     checkoutForm.get('email')?.touched
                   "
                 />
-                @if (
-                  checkoutForm.get("email")?.invalid &&
-                  checkoutForm.get("email")?.touched
-                ) {
-                  <p class="mt-1 text-sm text-red-500 font-medium">
-                    Email inválido
-                  </p>
-                }
+                <div class="min-h-[1.25rem]">
+                  @if (
+                    checkoutForm.get("email")?.invalid &&
+                    checkoutForm.get("email")?.touched
+                  ) {
+                    <p class="mt-1 text-sm text-red-500 font-medium">
+                      Email inválido
+                    </p>
+                  }
+                </div>
               </div>
               <div>
                 <label
@@ -114,6 +120,7 @@
                 <input
                   id="checkout-phone"
                   name="phone"
+                  data-cy="checkout-phone"
                   type="tel"
                   formControlName="phone"
                   placeholder="+54 9 11..."
@@ -123,14 +130,16 @@
                     checkoutForm.get('phone')?.touched
                   "
                 />
-                @if (
-                  checkoutForm.get("phone")?.invalid &&
-                  checkoutForm.get("phone")?.touched
-                ) {
-                  <p class="mt-1 text-sm text-red-500 font-medium">
-                    Teléfono requerido
-                  </p>
-                }
+                <div class="min-h-[1.25rem]">
+                  @if (
+                    checkoutForm.get("phone")?.invalid &&
+                    checkoutForm.get("phone")?.touched
+                  ) {
+                    <p class="mt-1 text-sm text-red-500 font-medium">
+                      Teléfono requerido
+                    </p>
+                  }
+                </div>
               </div>
             </div>
 
@@ -155,6 +164,7 @@
                   <input
                     id="checkout-street"
                     name="street"
+                    data-cy="checkout-street"
                     type="text"
                     formControlName="street"
                     placeholder="Av. San Martín"
@@ -170,6 +180,7 @@
                   <input
                     id="checkout-number"
                     name="number"
+                    data-cy="checkout-number"
                     type="text"
                     formControlName="number"
                     placeholder="1234"
@@ -203,6 +214,7 @@
                   <input
                     id="checkout-city"
                     name="city"
+                    data-cy="checkout-city"
                     type="text"
                     formControlName="city"
                     class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white"
@@ -217,20 +229,23 @@
                   <input
                     id="checkout-cp"
                     name="postal_code"
+                    data-cy="checkout-postal-code"
                     type="text"
                     formControlName="postal_code"
                     placeholder="1727"
                     maxlength="4"
                     class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-center dark:text-white"
                   />
-                  @if (
-                    checkoutForm.get("address.postal_code")?.invalid &&
-                    checkoutForm.get("address.postal_code")?.touched
-                  ) {
-                    <p class="mt-1 text-xs text-red-500 font-medium">
-                      4 dígitos
-                    </p>
-                  }
+                  <div class="min-h-[1rem]">
+                    @if (
+                      checkoutForm.get("address.postal_code")?.invalid &&
+                      checkoutForm.get("address.postal_code")?.touched
+                    ) {
+                      <p class="mt-1 text-xs text-red-500 font-medium">
+                        4 dígitos
+                      </p>
+                    }
+                  </div>
                 </div>
               </div>
             </div>
@@ -262,6 +277,7 @@
               </a>
               <button
                 id="btn-go-payment"
+                data-cy="btn-go-payment"
                 type="submit"
                 [disabled]="
                   cartService.cartItems().length === 0 ||
@@ -301,7 +317,7 @@
             } @else {
               <!-- Items List -->
               <ul class="space-y-4 mb-6">
-                @for (item of cartService.cartItems(); track item.product.id) {
+                @for (item of cartService.cartItems(); track item.cartItemId) {
                   <li class="flex items-center gap-4">
                     <div
                       class="w-16 h-16 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-hidden shrink-0"
@@ -336,8 +352,8 @@
                         }}
                       </p>
                       <button
-                        (click)="cartService.removeFromCart(item.product.id)"
-                        class="text-xs text-red-500 hover:text-red-700 font-semibold mt-1"
+                        (click)="cartService.removeFromCart(item.cartItemId)"
+                        class="text-xs text-red-500 hover:text-red-700 font-semibold mt-1 cursor-pointer"
                       >
                         Quitar
                       </button>
@@ -615,6 +631,7 @@
             <input
               type="radio"
               name="payment"
+              data-cy="method-digital"
               value="digital"
               class="peer sr-only"
               (change)="selectMethod('digital')"
@@ -692,6 +709,7 @@
           </button>
           <button
             class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-emerald-600/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            data-cy="confirm-order"
             (click)="placeOrder()"
             [disabled]="!selectedMethod() || isProcessing()"
           >
@@ -718,7 +736,7 @@
         >
           <i class="fas fa-box-check"></i>
         </div>
-        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2">
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2" data-cy="order-confirmed">
           ¡Pedido Registrado!
         </h1>
         <p class="text-xl font-mono text-gray-500 dark:text-gray-400 mb-4">
@@ -1066,6 +1084,140 @@
             >mercado pago</span
           >
         </div>
+      </div>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: MERCADO PAGO APPROVED / PAID
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === "paid") {
+    <div class="max-w-xl mx-auto animate-slideIn mt-12">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center"
+      >
+        <div
+          class="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-8 shadow-xl shadow-emerald-500/20"
+        >
+          <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-4" data-cy="payment-approved-title">
+          ¡Pago Aprobado!
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto">
+          Tu pago ha sido acreditado exitosamente. Hemos confirmado tu orden y ya comenzamos a prepararla.
+        </p>
+
+        <div
+          class="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 text-left max-w-md mx-auto mb-8 space-y-3"
+        >
+          @if (mpPaymentId()) {
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">ID de Transacción:</span>
+              <strong class="font-mono text-gray-900 dark:text-gray-100">{{ mpPaymentId() }}</strong>
+            </div>
+          }
+          @if (mpOrderId() || currentOrder()?.order_number) {
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">Número de Orden:</span>
+              <strong class="font-mono text-blue-600 dark:text-blue-400">#{{ mpOrderId() || currentOrder()?.order_number }}</strong>
+            </div>
+          }
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-500">Método de pago:</span>
+            <span class="font-bold text-cyan-600 dark:text-cyan-400 flex items-center gap-1">
+              <i class="fas fa-shield-alt"></i> Mercado Pago
+            </span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-500">Estado:</span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+              Acreditado
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            routerLink="/"
+            class="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all text-center"
+          >
+            Volver a la tienda
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: MERCADO PAGO FAILURE / REJECTED
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === "payment_failure") {
+    <div class="max-w-xl mx-auto animate-slideIn mt-12">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center"
+      >
+        <div
+          class="w-24 h-24 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-8 shadow-xl shadow-red-500/20"
+        >
+          <i class="fas fa-times-circle"></i>
+        </div>
+
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-4" data-cy="payment-failure-title">
+          No pudimos procesar tu pago
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto">
+          Mercado Pago no autorizó la operación o fue cancelada. No se ha realizado ningún cobro a tu cuenta o tarjeta.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            type="button"
+            (click)="retryPayment()"
+            class="px-8 py-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg shadow-cyan-600/30 transition-all"
+            data-cy="retry-payment-btn"
+          >
+            Reintentar con otro medio de pago
+          </button>
+          <a
+            routerLink="/"
+            class="px-6 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-center"
+          >
+            Volver al inicio
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP: MERCADO PAGO PENDING / IN PROCESS
+  ═══════════════════════════════════════════════════════ -->
+  @if (step() === "payment_pending") {
+    <div class="max-w-xl mx-auto animate-slideIn mt-12">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-10 text-center"
+      >
+        <div
+          class="w-24 h-24 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-8 shadow-xl shadow-amber-500/20"
+        >
+          <i class="fas fa-clock"></i>
+        </div>
+
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-4" data-cy="payment-pending-title">
+          Pago en Revisión
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto">
+          Tu pago está siendo verificado por Mercado Pago. Esto suele demorar unos instantes. Te notificaremos en cuanto quede confirmado.
+        </p>
+
+        <a
+          routerLink="/"
+          class="inline-block px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          Volver a la tienda
+        </a>
       </div>
     </div>
   }

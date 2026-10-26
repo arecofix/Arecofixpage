@@ -93,16 +93,16 @@
               [class.border-red-500]="first_name?.invalid && (first_name?.touched || first_name?.dirty)"
               [class.dark:border-red-500]="first_name?.invalid && (first_name?.touched || first_name?.dirty)"
             />
-            @if (first_name?.invalid && (first_name?.touched || first_name?.dirty)) {
-              <div class="text-red-600 dark:text-red-400 text-xs mt-1">
+            <div class="text-red-600 dark:text-red-400 text-xs mt-1 min-h-[1.25rem]">
+              @if (first_name?.invalid && (first_name?.touched || first_name?.dirty)) {
                 @if (first_name?.errors?.['required']) {
                   <p>El nombre es obligatorio.</p>
                 }
                 @if (first_name?.errors?.['minlength']) {
                   <p>Mínimo 2 caracteres.</p>
                 }
-              </div>
-            }
+              }
+            </div>
           </div>
 
           <!-- Last Name -->
@@ -119,16 +119,16 @@
               [class.border-red-500]="last_name?.invalid && (last_name?.touched || last_name?.dirty)"
               [class.dark:border-red-500]="last_name?.invalid && (last_name?.touched || last_name?.dirty)"
             />
-            @if (last_name?.invalid && (last_name?.touched || last_name?.dirty)) {
-              <div class="text-red-600 dark:text-red-400 text-xs mt-1">
+            <div class="text-red-600 dark:text-red-400 text-xs mt-1 min-h-[1.25rem]">
+              @if (last_name?.invalid && (last_name?.touched || last_name?.dirty)) {
                 @if (last_name?.errors?.['required']) {
                   <p>El apellido es obligatorio.</p>
                 }
                 @if (last_name?.errors?.['minlength']) {
                   <p>Mínimo 2 caracteres.</p>
                 }
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
 
@@ -148,16 +148,16 @@
               [class.border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
               [class.dark:border-red-500]="email?.invalid && (email?.touched || email?.dirty)"
             />
-            @if (email?.invalid && (email?.touched || email?.dirty)) {
-              <div class="text-red-600 dark:text-red-400 text-xs mt-1">
+            <div class="text-red-600 dark:text-red-400 text-xs mt-1 min-h-[1.25rem]">
+              @if (email?.invalid && (email?.touched || email?.dirty)) {
                 @if (email?.errors?.['required']) {
                   <p>El email es obligatorio.</p>
                 }
                 @if (email?.errors?.['email']) {
                   <p>Debe ser un email válido.</p>
                 }
-              </div>
-            }
+              }
+            </div>
           </div>
 
           <!-- Phone Field -->
@@ -174,16 +174,16 @@
               [class.border-red-500]="phone?.invalid && (phone?.touched || phone?.dirty)"
               [class.dark:border-red-500]="phone?.invalid && (phone?.touched || phone?.dirty)"
             />
-            @if (phone?.invalid && (phone?.touched || phone?.dirty)) {
-              <div class="text-red-600 dark:text-red-400 text-xs mt-1">
+            <div class="text-red-600 dark:text-red-400 text-xs mt-1 min-h-[1.25rem]">
+              @if (phone?.invalid && (phone?.touched || phone?.dirty)) {
                 @if (phone?.errors?.['required']) {
                   <p>El teléfono es obligatorio.</p>
                 }
                 @if (phone?.errors?.['pattern']) {
                   <p>Ingresa un teléfono válido.</p>
                 }
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
 
