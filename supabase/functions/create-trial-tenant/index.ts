@@ -98,22 +98,21 @@ serve(async (req: Request) => {
       Boolean(Deno.env.get('TEST_SECRET')) &&
       req.headers.get('x-test-secret') === Deno.env.get('TEST_SECRET');
 
-    if (!isTestBypass) {
-      const turnstileToken = body['cf-turnstile-response'] || body['turnstileToken'] || body['turnstile_token'];
-
-      if (!turnstileToken) {
-        return new Response(
-          JSON.stringify({ error: 'Verificación de captcha requerida.' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
       const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY');
       if (!turnstileSecret) {
         console.error('[Turnstile Config Error] TURNSTILE_SECRET_KEY no configurado.');
         return new Response(
           JSON.stringify({ error: 'Configuración de seguridad incompleta en el servidor.' }),
           { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const turnstileToken = body['cf-turnstile-response'] || body['turnstileToken'] || body['turnstile_token'];
+
+      if (!turnstileToken) {
+        return new Response(
+          JSON.stringify({ error: 'Verificación de captcha requerida.' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       let verifyRes: Response;
