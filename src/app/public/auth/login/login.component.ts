@@ -17,13 +17,14 @@ import {
 } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HydrationPreserveDirective } from '@app/shared/directives/hydration-preserve.directive';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, HydrationPreserveDirective],
 })
 export class LoginComponent implements OnInit, OnDestroy {
   form: FormGroup;
