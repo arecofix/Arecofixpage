@@ -76,5 +76,9 @@ export const environment: Environment = {
     portfolio: {
       cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
     }
-  }
+  },
+  downloads: {
+    desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
+  },
+  turnstileSiteKey: (typeof process !== 'undefined' && process.env ? process.env['TURNSTILE_SITE_KEY'] : undefined) || ''
 };
