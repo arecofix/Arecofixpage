@@ -1,8 +1,10 @@
-import { Injectable, inject, PendingTasks } from '@angular/core';
+import { Injectable, inject, PendingTasks, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '@env/environment';
 import { LoggerService } from './logger.service';
 import { OfflineSyncService } from './offline-sync.service';
+import { getOrCreateGuestSessionId } from '../utils/uuid.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -10,12 +12,28 @@ import { OfflineSyncService } from './offline-sync.service';
 export class SupabaseService {
   private logger = inject(LoggerService);
   private syncService = inject(OfflineSyncService);
+  private platformId = inject(PLATFORM_ID);
   private client: SupabaseClient;
 
   private cacheMap = new Map<string, { data: string; headers: [string, string][]; status: number; statusText: string; expiresAt: number }>();
   private cacheEpoch = 0;
 
   private pendingTasks = inject(PendingTasks);
+
+  private cache(key: string, value: { data: string; headers: [string, string][]; status: number; statusText: string; expiresAt: number }): void {
+    // En SSR NO cachear en memoria (causa memory leak en el heap de Node.js)
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    // Cap LRU de 20 entradas para evitar crecimiento desmedido en memoria cliente
+    if (this.cacheMap.size >= 20) {
+      const oldestKey = this.cacheMap.keys().next().value;
+      if (oldestKey) {
+        this.cacheMap.delete(oldestKey);
+      }
+    }
+    this.cacheMap.set(key, value);
+  }
 
   constructor() {
     const dataBaseUrl = environment.supabaseDataUrl || environment.supabaseUrl;
@@ -24,9 +42,7 @@ export class SupabaseService {
     // Expose cache clearing hook for Cypress E2E tests
     if (typeof window !== 'undefined') {
       (window as any).__clearSupabaseCache = () => {
-        this.cacheEpoch++;
-        this.cacheMap.clear();
-        this.logger.info('[SupabaseCache] Cache cleared by test hook.');
+        this.clearCache();
       };
     }
 
@@ -41,29 +57,47 @@ export class SupabaseService {
           : new URL(urlStr);
 
         // Remove x-client-info header to avoid CORS issues with custom PostgREST
-        if (options?.headers) {
-          const headers = new Headers(options.headers);
-          headers.delete('x-client-info');
-          headers.delete('X-Client-Info');
-          options.headers = headers;
+        const headers = new Headers(options?.headers);
+        headers.delete('x-client-info');
+        headers.delete('X-Client-Info');
+
+        // Automatically inject x-guest-session header exclusively for guest carts and orders RLS
+        const needsGuestSession = urlStr.includes('/rest/v1/orders') || urlStr.includes('/rest/v1/order_items');
+        if (typeof window !== 'undefined' && needsGuestSession && !headers.has('x-guest-session')) {
+          const guestSession = getOrCreateGuestSessionId();
+          if (guestSession) {
+            headers.set('x-guest-session', guestSession);
+          }
         }
+        options = { ...(options || {}), headers };
 
         const method = (options?.method || 'GET').toUpperCase();
         const requestUrl = targetUrl.toString();
         const isRpc = targetUrl.pathname.includes('/rpc/');
-        const isReadRpc = isRpc && /\/rpc\/(get_|read_|fetch_|search_|calculate_|list_|check_|is_|count_|view_)/i.test(targetUrl.pathname);
-        const isCacheable = (method === 'GET' && requestUrl.includes('/rest/v1/')) || (method === 'POST' && isReadRpc);
+        const isReadRpc = isRpc && (targetUrl.pathname.includes('/get_') || targetUrl.pathname.includes('/check_'));
+        const isVolatileUserEndpoint =
+          requestUrl.includes('/course_enrollments') ||
+          requestUrl.includes('/course_progress') ||
+          requestUrl.includes('/course_exam_submissions') ||
+          requestUrl.includes('/course_certificates') ||
+          requestUrl.includes('/academy_subscriptions') ||
+          requestUrl.includes('/academy_payments') ||
+          requestUrl.includes('/check_and_update_membership_status');
+        const isCacheable =
+          !isVolatileUserEndpoint &&
+          ((method === 'GET' && requestUrl.includes('/rest/v1/')) ||
+            (method === 'POST' && isReadRpc));
         const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method) &&
           (requestUrl.includes('/rest/v1/') || isRpc) &&
           !isReadRpc;
         
-        // Fast in-memory cache check (key includes body for POST read RPC queries)
+        // Fast in-memory cache check (only in browser, SSR must never cache in heap)
         const CACHE_TTL = 60000;
         const bodyPayload = typeof options?.body === 'string' ? options.body : '';
         const cacheKey = (method === 'POST' && isReadRpc) ? `${requestUrl}#${bodyPayload}` : requestUrl;
         const requestEpoch = this.cacheEpoch;
 
-        if (isCacheable) {
+        if (isPlatformBrowser(this.platformId) && isCacheable) {
           const cached = this.cacheMap.get(cacheKey);
           if (cached && cached.expiresAt > Date.now()) {
             this.logger.info(`[SupabaseCache] Serving from memory cache: ${requestUrl}`);
@@ -207,7 +241,7 @@ export class SupabaseService {
               headersArray.push([key, val]);
             });
 
-            this.cacheMap.set(cacheKey, {
+            this.cache(cacheKey, {
               data: textData,
               headers: headersArray,
               status: clonedResponse.status,
@@ -215,8 +249,10 @@ export class SupabaseService {
               expiresAt: Date.now() + CACHE_TTL
             });
             
-            // Persist to IndexedDB for offline support
-            await this.syncService.cacheGetRequest(cacheKey, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
+            // Persist to IndexedDB for offline support (browser only)
+            if (isPlatformBrowser(this.platformId)) {
+              await this.syncService.cacheGetRequest(cacheKey, textData, clonedResponse.status, clonedResponse.statusText, headersArray);
+            }
           }
 
           if (isMutation && response.ok) {
@@ -252,34 +288,37 @@ export class SupabaseService {
            }
          } catch (e) {}
          
-         // D1 Failover si no hay cache en IndexedDB
-         this.logger.warn(`[Failover] No IndexedDB cache found. Attempting D1 Failover for: ${requestUrl}`);
-         try {
-             const d1WorkerUrl = 'https://arecofix-d1-failover.ezequielenrico15.workers.dev';
-             const urlObj = new URL(requestUrl);
-             const pathAndQuery = urlObj.pathname.replace('/rest/v1/', '') + urlObj.search;
-             
-             const d1Response = await fetch(`${d1WorkerUrl}/${pathAndQuery}`, {
-                 method: 'GET',
-                 headers: {
-                     'Accept': 'application/json',
-                     'Origin': window.location.origin
-                 }
-             });
-             
-             if (d1Response.ok) {
-                 const textData = await d1Response.text();
-                 this.logger.info(`[Failover] Successfully fetched from D1: ${requestUrl}`);
-                 return new Response(textData, {
-                     status: 200,
-                     statusText: 'OK',
-                     headers: new Headers([['Content-Type', 'application/json']])
-                 });
-             } else {
-                 this.logger.error(`[Failover] D1 responded with ${d1Response.status}`);
-             }
-         } catch (d1Error) {
-             this.logger.error(`[Failover] D1 Worker fetch failed for ${requestUrl}`, d1Error);
+         // D1 Failover si no hay cache en IndexedDB (solo catálogo público, nunca transaccional)
+         const isTransactional = requestUrl.includes('/orders') || requestUrl.includes('/order_items') || requestUrl.includes('/service_leads');
+         if (!isTransactional) {
+           this.logger.warn(`[Failover] No IndexedDB cache found. Attempting D1 Failover for: ${requestUrl}`);
+           try {
+               const d1WorkerUrl = 'https://arecofix-d1-failover.ezequielenrico15.workers.dev';
+               const urlObj = new URL(requestUrl);
+               const pathAndQuery = urlObj.pathname.replace('/rest/v1/', '') + urlObj.search;
+               
+               const d1Response = await fetch(`${d1WorkerUrl}/${pathAndQuery}`, {
+                   method: 'GET',
+                   headers: {
+                       'Accept': 'application/json',
+                       'Origin': window.location.origin
+                   }
+               });
+               
+               if (d1Response.ok) {
+                   const textData = await d1Response.text();
+                   this.logger.info(`[Failover] Successfully fetched from D1: ${requestUrl}`);
+                   return new Response(textData, {
+                       status: 200,
+                       statusText: 'OK',
+                       headers: new Headers([['Content-Type', 'application/json']])
+                   });
+               } else {
+                   this.logger.error(`[Failover] D1 responded with ${d1Response.status}`);
+               }
+           } catch (d1Error) {
+               this.logger.error(`[Failover] D1 Worker fetch failed for ${requestUrl}`, d1Error);
+           }
          }
       } else if (isMutation) {
          // Si es mutación y falló por timeout o error de red, encolar en IndexedDB

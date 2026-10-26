@@ -16,16 +16,15 @@ module.exports = {
   apps: [
     {
       name: 'arecofix-frontend',
-      script: 'dist/arecofix/server/server.mjs',
+      script: 'server-init.mjs',
       cwd: '/home/ubuntu/arecofix',
       
-      // Modo de ejecución
-      // 'fork' o 'cluster': en servidores con 2 o más vCPUs 'cluster' balancea la carga
-      exec_mode: 'fork',
-      instances: 1,
+      // Modo de ejecución: cluster con 2 workers para zero-downtime y alta disponibilidad
+      exec_mode: 'cluster',
+      instances: 2,
 
-      // Gestión de memoria y reinicio
-      max_memory_restart: '600M',
+      // Gestión de memoria y reinicio: reiniciar si un worker supera 400 MB
+      max_memory_restart: '400M',
       autorestart: true,
       max_restarts: 15,
       restart_delay: 2500,
