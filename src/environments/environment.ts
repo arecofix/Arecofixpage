@@ -74,5 +74,9 @@ export const environment: Environment = {
     portfolio: {
       cv: '/curriculum-ezequiel-enrico.pdf'
     }
-  }
+  },
+  downloads: {
+    desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
+  },
+  turnstileSiteKey: '1x00000000000000000000AA'
 };

@@ -63,4 +63,8 @@ export interface Environment {
       cv: string;
     };
   };
+  downloads: {
+    desktopSetupUrl: string;
+  };
+  turnstileSiteKey?: string;
 }
