@@ -20,7 +20,21 @@ interface SubscribeRequestBody {
   planId?: string;
   payerEmail?: string;
   payerName?: string;
-  backUrl?: string;
+  backUrl?: string; // Discarded server-side to prevent Open Redirect (H-12)
+}
+
+/**
+ * Helper: Build Safe Mercado Pago Subscription Redirect URLs
+ * Strictly derives URLs from trusted baseUrl to prevent Open Redirect attacks.
+ */
+export function buildSubscriptionBackUrls(baseUrl: string, subscriptionId: string, _userBackUrl?: string): { success: string; failure: string; pending: string } {
+  const safeBase = baseUrl.replace(/\/+$/, '');
+  const redirectBase = `${safeBase}/academy`;
+  return {
+    success: `${redirectBase}?payment=approved&subscription_id=${subscriptionId}`,
+    failure: `${redirectBase}?payment=rejected&subscription_id=${subscriptionId}`,
+    pending: `${redirectBase}?payment=pending&subscription_id=${subscriptionId}`
+  };
 }
 
 interface PlanRecord {
@@ -248,12 +262,7 @@ academySubscriptionRoutes.post('/subscribe', async (req: Request, res: Response)
     const firstName = nameParts[0] || 'Alumno';
     const lastName = nameParts.slice(1).join(' ') || 'Arecofix';
 
-    const redirectBase = backUrl || `${baseUrl}/academy`;
-    const backUrls = {
-      success: `${redirectBase}?payment=approved&subscription_id=${subscription.id}`,
-      failure: `${redirectBase}?payment=rejected&subscription_id=${subscription.id}`,
-      pending: `${redirectBase}?payment=pending&subscription_id=${subscription.id}`
-    };
+    const backUrls = buildSubscriptionBackUrls(baseUrl, subscription.id, backUrl);
 
     const notificationUrl = `${baseUrl}/api/webhooks/mercadopago-academy`;
 
