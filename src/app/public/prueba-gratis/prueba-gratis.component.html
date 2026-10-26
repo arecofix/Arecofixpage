@@ -122,7 +122,8 @@
               <input
                 type="text"
                 id="input-businessName"
-                formControlName="businessName" name="businessName" name="businessName"
+                formControlName="businessName"
+                name="businessName"
                 placeholder="Ej: FixCell"
                 class="input input-bordered w-full bg-white text-gray-800"
                 [class.input-error]="trialForm.get('businessName')?.invalid && trialForm.get('businessName')?.touched" />
@@ -138,7 +139,8 @@
                 <input
                   type="text"
                   id="input-userName"
-                  formControlName="userName" name="userName" name="userName"
+                  formControlName="userName"
+                  name="userName"
                   placeholder="Juan Pérez"
                   class="input input-bordered w-full bg-white text-gray-800"
                   [class.input-error]="trialForm.get('userName')?.invalid && trialForm.get('userName')?.touched" />
@@ -151,7 +153,8 @@
                 <input
                   type="tel"
                   id="input-whatsapp"
-                  formControlName="whatsapp" name="whatsapp" name="whatsapp"
+                  formControlName="whatsapp"
+                  name="whatsapp"
                   placeholder="+54 9..."
                   class="input input-bordered w-full bg-white text-gray-800"
                   [class.input-error]="trialForm.get('whatsapp')?.invalid && trialForm.get('whatsapp')?.touched" />
@@ -167,7 +170,8 @@
               <input
                 type="email"
                 id="input-email"
-                formControlName="email" name="email" name="email"
+                formControlName="email"
+                name="email"
                 placeholder="tucorreo@ejemplo.com"
                 class="input input-bordered w-full bg-white text-gray-800"
                 [class.input-error]="trialForm.get('email')?.invalid && trialForm.get('email')?.touched" />
@@ -213,11 +217,14 @@
                 (change)="onLogoSelected($event)" />
             </div>
 
+            <!-- Turnstile Widget Container -->
+            <div id="turnstile-container" class="my-4 flex justify-center min-h-[65px]"></div>
+
             <button
               type="submit"
               id="btn-submit-trial"
-              class="btn btn-primary w-full mt-6 gap-2"
-              [disabled]="loading() || uploadingLogo()">
+              class="btn btn-primary w-full mt-2 gap-2"
+              [disabled]="loading() || uploadingLogo() || !turnstileToken()">
               <span *ngIf="loading() || uploadingLogo()" class="loading loading-spinner loading-sm"></span>
               <i *ngIf="!loading() && !uploadingLogo()" class="fas fa-paper-plane"></i>
               {{ uploadingLogo() ? 'Subiendo logo...' : loading() ? 'Creando tu sucursal...' : 'Solicitar Prueba Gratis' }}
