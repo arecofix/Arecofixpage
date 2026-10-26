@@ -2,9 +2,11 @@ import {
   Component,
   inject,
   signal,
+  OnInit,
+  PLATFORM_ID,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -13,18 +15,21 @@ import {
 } from '@angular/forms';
 import { SeoService } from '@app/core/services/seo.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { STORAGE_KEYS } from '@app/core/constants/storage.constants';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-prueba-gratis',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './prueba-gratis.component.html',
 })
-export class PruebaGratisComponent {
+export class PruebaGratisComponent implements OnInit {
   private seoService = inject(SeoService);
   private fb = inject(FormBuilder);
   private supabase = inject(SUPABASE_CLIENT);
+  private platformId = inject(PLATFORM_ID);
 
   trialForm: FormGroup;
 
@@ -32,6 +37,7 @@ export class PruebaGratisComponent {
   success = signal(false);
   errorMsg = signal<string | null>(null);
   uploadingLogo = signal(false);
+  hasClaimedTrial = signal(false);
 
   // Credenciales generadas para mostrar al usuario
   generatedEmail = signal('');
@@ -41,6 +47,60 @@ export class PruebaGratisComponent {
   // Logo
   selectedLogoFile: File | null = null;
   logoPreviewUrl = signal<string | null>(null);
+
+  // Turnstile
+  turnstileToken = signal<string | null>(null);
+  readonly turnstileSiteKey = environment.turnstileSiteKey || '1x00000000000000000000AA';
+
+  readonly exeDownloadUrl = environment.downloads.desktopSetupUrl;
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      if (localStorage.getItem(STORAGE_KEYS.TRIAL_CLAIMED) === 'true') {
+        this.hasClaimedTrial.set(true);
+      }
+      this.initTurnstile();
+    }
+  }
+
+  private initTurnstile(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const scriptId = 'cloudflare-turnstile-script';
+
+    const renderWidget = () => {
+      const container = document.getElementById('turnstile-container');
+      if (container && (window as any).turnstile) {
+        container.innerHTML = '';
+        (window as any).turnstile.render('#turnstile-container', {
+          sitekey: this.turnstileSiteKey,
+          callback: (token: string) => {
+            this.turnstileToken.set(token);
+            this.errorMsg.set(null);
+          },
+          'error-callback': () => {
+            this.turnstileToken.set(null);
+          },
+          'expired-callback': () => {
+            this.turnstileToken.set(null);
+          },
+        });
+      }
+    };
+
+    if (!(window as any).turnstile && !document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+      script.async = true;
+      script.defer = true;
+      (window as any).onloadTurnstileCallback = () => {
+        renderWidget();
+      };
+      document.head.appendChild(script);
+    } else if ((window as any).turnstile) {
+      setTimeout(() => renderWidget(), 50);
+    }
+  }
 
   constructor() {
     this.trialForm = this.fb.group({
@@ -123,6 +183,11 @@ export class PruebaGratisComponent {
       return;
     }
 
+    if (!this.turnstileToken()) {
+      this.errorMsg.set('Debe completar la verificación de seguridad para continuar.');
+      return;
+    }
+
     this.loading.set(true);
     this.errorMsg.set(null);
 
@@ -146,6 +211,7 @@ export class PruebaGratisComponent {
             subtitle: 'Reparación Especializada por ' + formData.userName,
             currency: 'ARS',
             logo_url: logoUrl,
+            turnstileToken: this.turnstileToken(),
           },
         },
       );
@@ -163,6 +229,10 @@ export class PruebaGratisComponent {
       // Show generated credentials from edge function response
       this.generatedEmail.set(data?.credentials?.email ?? formData.email);
       this.generatedPassword.set(data?.credentials?.password ?? '');
+
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem(STORAGE_KEYS.TRIAL_CLAIMED, 'true');
+      }
 
       this.success.set(true);
     } catch (e: unknown) {
@@ -194,10 +264,6 @@ export class PruebaGratisComponent {
   }
 
   downloadApp() {
-    // Generar la descarga de la app de escritorio
-    const link = document.createElement('a');
-    link.href = '/assets/downloads/Arecofix-Setup.zip';
-    link.download = 'Arecofix-Setup.zip';
-    link.click();
+    window.open(this.exeDownloadUrl, '_blank', 'noopener,noreferrer');
   }
 }
