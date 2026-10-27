@@ -37,6 +37,7 @@ import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { SupabaseService } from './core/services/supabase.service';
 import { SUPABASE_CLIENT } from './core/di/supabase-token';
 import { globalErrorInterceptor } from './core/interceptors/error.interceptor';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { timeoutInterceptor } from './core/interceptors/timeout.interceptor';
 import { guestSessionInterceptor } from './core/interceptors/guest-session.interceptor';
 import { ProductRepository } from './features/products/domain/repositories/product.repository';
@@ -175,7 +176,18 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(
       withFetch(),
-      withInterceptors([guestSessionInterceptor, timeoutInterceptor, globalErrorInterceptor]),
+      withInterceptors([
+        // Order matters: interceptors form a chain where the first is outermost.
+        // globalErrorInterceptor is outermost: it shows user notifications for errors
+        //   that were NOT resolved by inner interceptors.
+        // authInterceptor is innermost: it handles 401s by refreshing the token and
+        //   retrying the request BEFORE the error reaches globalErrorInterceptor.
+        // guestSessionInterceptor and timeoutInterceptor sit between them.
+        globalErrorInterceptor,
+        guestSessionInterceptor,
+        timeoutInterceptor,
+        authInterceptor,
+      ]),
     ),
     provideServiceWorker('ngsw-worker.js?v=2', {
       enabled: !isDevMode() && !isTauri,

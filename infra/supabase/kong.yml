@@ -1,31 +1,38 @@
 _format_version: '2.1'
+consumers:
+- jwt_secrets:
+  - key: supabase
+    secret: 34154622486773b91e85a8a1fc5e24dfea8e6af5baa1c01eb94bfd5819c4685a
+  username: anon
+- jwt_secrets:
+  - key: supabase
+    secret: 34154622486773b91e85a8a1fc5e24dfea8e6af5baa1c01eb94bfd5819c4685a
+  username: service_role
 services:
 - name: postgrest
-  url: http://supabase-rest:3000
-  routes:
-  - name: rest-route
-    paths:
-    - /rest/v1
   plugins:
-  - name: cors
-    config:
-      origins:
-      - https://arecofix.com.ar
-      - https://www.arecofix.com.ar
-      methods:
-      - GET
-      - HEAD
-      - PUT
-      - PATCH
-      - POST
-      - DELETE
-      - OPTIONS
+  - config:
+      credentials: true
+      exposed_headers:
+      - Content-Range
+      - X-Total-Count
+      - X-Auth-Token
+      - X-Request-ID
       headers:
       - Accept
       - Content-Type
       - Authorization
       - apikey
       - Prefer
+      - prefer
+      - Range
+      - range
+      - Range-Unit
+      - range-unit
+      - If-Match
+      - if-match
+      - If-None-Match
+      - if-none-match
       - X-Client-ID
       - X-Auth-Token
       - x-client-info
@@ -37,23 +44,8 @@ services:
       - x-retry-count
       - x-supabase-api-version
       - x-guest-session
-      exposed_headers:
-      - Content-Range
-      - X-Total-Count
-      credentials: true
+      - X-Guest-Session
       max_age: 86400
-- name: auth
-  url: http://supabase-auth:9999
-  routes:
-  - name: auth-route
-    paths:
-    - /auth/v1
-  plugins:
-  - name: cors
-    config:
-      origins:
-      - https://arecofix.com.ar
-      - https://www.arecofix.com.ar
       methods:
       - GET
       - HEAD
@@ -62,12 +54,51 @@ services:
       - POST
       - DELETE
       - OPTIONS
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      - https://staging.arecofix.com.ar
+      - http://localhost:4200
+      - http://127.0.0.1:4200
+      - http://localhost:4201
+      - http://127.0.0.1:4201
+      - http://localhost:4202
+      - http://127.0.0.1:4202
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - tauri://localhost
+      - http://tauri.localhost
+      - https://tauri.localhost
+      - capacitor://localhost
+    name: cors
+  routes:
+  - name: rest-route
+    paths:
+    - /rest/v1
+  url: http://supabase-rest:3000
+- name: auth
+  plugins:
+  - config:
+      credentials: true
+      exposed_headers:
+      - X-Auth-Token
+      - X-Request-ID
+      - X-Response-Time
       headers:
       - Accept
       - Content-Type
       - Authorization
       - apikey
       - Prefer
+      - prefer
+      - Range
+      - range
+      - Range-Unit
+      - range-unit
+      - If-Match
+      - if-match
+      - If-None-Match
+      - if-none-match
       - X-Client-ID
       - X-Auth-Token
       - x-client-info
@@ -78,18 +109,119 @@ services:
       - Content-Profile
       - x-retry-count
       - x-supabase-api-version
-      exposed_headers:
-      - X-Auth-Token
-      - X-Request-ID
-      - X-Response-Time
-      credentials: true
+      - x-guest-session
+      - X-Guest-Session
       max_age: 86400
+      methods:
+      - GET
+      - HEAD
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+      - OPTIONS
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      - https://staging.arecofix.com.ar
+      - http://localhost:4200
+      - http://127.0.0.1:4200
+      - http://localhost:4201
+      - http://127.0.0.1:4201
+      - http://localhost:4202
+      - http://127.0.0.1:4202
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - tauri://localhost
+      - http://tauri.localhost
+      - https://tauri.localhost
+      - capacitor://localhost
+    name: cors
+  routes:
+  - name: auth-route
+    paths:
+    - /auth/v1
+  url: http://supabase-auth:9999
 - name: realtime
-  url: http://supabase-realtime:4000/socket
+  plugins:
+  - config:
+      credentials: true
+      exposed_headers:
+      - Content-Range
+      - X-Total-Count
+      headers:
+      - Accept
+      - Content-Type
+      - Authorization
+      - apikey
+      - Prefer
+      - prefer
+      - Range
+      - range
+      - Range-Unit
+      - range-unit
+      - If-Match
+      - if-match
+      - If-None-Match
+      - if-none-match
+      - X-Client-ID
+      - X-Auth-Token
+      - x-client-info
+      - X-Client-Info
+      - accept-profile
+      - Accept-Profile
+      - content-profile
+      - Content-Profile
+      - x-retry-count
+      - x-supabase-api-version
+      - x-guest-session
+      - X-Guest-Session
+      max_age: 86400
+      methods:
+      - GET
+      - HEAD
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+      - OPTIONS
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      - https://staging.arecofix.com.ar
+      - http://localhost:4200
+      - http://127.0.0.1:4200
+      - http://localhost:4201
+      - http://127.0.0.1:4201
+      - http://localhost:4202
+      - http://127.0.0.1:4202
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - tauri://localhost
+      - http://tauri.localhost
+      - https://tauri.localhost
+      - capacitor://localhost
+    name: cors
   routes:
   - name: realtime-route
     paths:
     - /realtime/v1
+    strip_path: true
+  url: http://supabase-realtime:4000/socket
+- name: studio
+  routes:
+  - hosts:
+    - studio.arecofix.com.ar
+    name: studio-route
+    paths:
+    - /
+  url: http://supabase-studio:3000
+- name: functions-create-trial
+  url: http://trial-function:8000
+  routes:
+  - name: functions-create-trial-route
+    paths:
+    - /functions/v1/create-trial-tenant
     strip_path: true
   plugins:
   - name: cors
@@ -97,13 +229,22 @@ services:
       origins:
       - https://arecofix.com.ar
       - https://www.arecofix.com.ar
+      - https://staging.arecofix.com.ar
+      - http://localhost:4200
+      - http://127.0.0.1:4200
+      - http://localhost:4201
+      - http://127.0.0.1:4201
+      - http://localhost:4202
+      - http://127.0.0.1:4202
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - tauri://localhost
+      - http://tauri.localhost
+      - https://tauri.localhost
+      - capacitor://localhost
       methods:
       - GET
-      - HEAD
-      - PUT
-      - PATCH
       - POST
-      - DELETE
       - OPTIONS
       headers:
       - Accept
@@ -111,29 +252,16 @@ services:
       - Authorization
       - apikey
       - Prefer
-      - X-Client-ID
-      - X-Auth-Token
+      - prefer
       - x-client-info
       - X-Client-Info
-      - accept-profile
-      - Accept-Profile
-      - content-profile
-      - Content-Profile
-      - x-retry-count
-      - x-supabase-api-version
-      exposed_headers:
-      - Content-Range
-      - X-Total-Count
+      - cf-connecting-ip
+      - x-forwarded-for
+      - x-test-secret
+      - x-guest-session
+      - X-Guest-Session
       credentials: true
       max_age: 86400
-- name: studio
-  url: http://supabase-studio:3000
-  routes:
-  - name: studio-route
-    hosts:
-    - studio.arecofix.com.ar
-    paths:
-    - /
 upstreams:
 - name: postgrest-upstream
   targets:

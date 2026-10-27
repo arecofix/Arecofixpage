@@ -41,6 +41,29 @@ export function app(): express.Express {
   const server = express();
   server.disable('x-powered-by'); // Prevent backend stack leakage
 
+  // CORS middleware allowing Authorization header on /api routes (placed before securityMiddleware)
+  server.use('/api', (req, res, next) => {
+    const origin = req.headers.origin;
+    const allowedOrigins = [
+      'https://arecofix.com.ar',
+      'https://www.arecofix.com.ar',
+      'https://staging.arecofix.com.ar',
+      'http://localhost:4200',
+      'http://127.0.0.1:4200'
+    ];
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept, X-Requested-With, apikey');
+    }
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+
   // Aplicar middlewares de seguridad y CSP
   server.use(securityMiddleware);
 

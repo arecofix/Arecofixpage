@@ -8,7 +8,8 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { RibbonMenuComponent } from './shared/components/ribbon-menu/ribbon-menu.component';
@@ -36,7 +37,7 @@ import { IEventBus } from './domain/events/event-bus.interface';
     RibbonMenuComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './app.html',
 })
 export class App implements OnInit {
@@ -54,6 +55,7 @@ export class App implements OnInit {
 
   private supabase = inject(SupabaseService);
   private swUpdate = inject(SwUpdate, { optional: true });
+  private router = inject(Router);
 
   // Domain event subscribers & bus
   private cashSubscriber = inject(CashMovementsSubscriberService);
@@ -99,6 +101,22 @@ export class App implements OnInit {
           );
           window.location.reload();
         });
+
+        // Comprobación y activación de actualización en cada navegación
+        this.router.events
+          .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+          .subscribe(async () => {
+            try {
+              const hasUpdate = await this.swUpdate!.checkForUpdate();
+              if (hasUpdate) {
+                this.logger.info('[PWA] Actualización disponible detectada en navegación. Activando...');
+                await this.swUpdate!.activateUpdate();
+                window.location.reload();
+              }
+            } catch (err) {
+              // Silencioso ante fallos temporales de red
+            }
+          });
       }
 
       // SEO Redirection Rule Heredada

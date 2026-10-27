@@ -3,17 +3,32 @@ import { environment } from '../../src/environments/environment';
 
 export const adminDashboardRoutes = Router();
 
-function getSupabaseConfig(req?: Request) {
+function getUserSupabaseConfig(req: Request) {
   const supabaseUrl = process.env['SUPABASE_URL'] || environment.supabaseUrl;
   const serviceKey = process.env['SUPABASE_SERVICE_ROLE_KEY'] || process.env['SUPABASE_KEY'] || environment.supabaseKey;
-  const authHeader = req?.headers['authorization'];
+  const authHeader = req.headers['authorization'];
 
   return {
     supabaseUrl: supabaseUrl.replace(/\/+$/, ''),
     serviceKey,
     headers: {
       'apikey': serviceKey,
-      'Authorization': authHeader || `Bearer ${serviceKey}`,
+      'Authorization': authHeader || '',
+      'Content-Type': 'application/json'
+    }
+  };
+}
+
+function getServiceRoleConfig() {
+  const supabaseUrl = process.env['SUPABASE_URL'] || environment.supabaseUrl;
+  const serviceKey = process.env['SUPABASE_SERVICE_ROLE_KEY'] || process.env['SUPABASE_KEY'] || environment.supabaseKey;
+
+  return {
+    supabaseUrl: supabaseUrl.replace(/\/+$/, ''),
+    serviceKey,
+    headers: {
+      'apikey': serviceKey,
+      'Authorization': `Bearer ${serviceKey}`,
       'Content-Type': 'application/json'
     }
   };
@@ -24,9 +39,12 @@ function getSupabaseConfig(req?: Request) {
  * Restricts access to super_admin or admin roles.
  */
 async function requireAdminAuth(req: Request, res: Response, next: () => void): Promise<void> {
-  // Test mode: strictly restricted to test environment with explicit secret
+  // Test mode: strictly restricted to non-production test environments with explicit secret (double-lock)
   if (
     process.env['NODE_ENV'] === 'test' &&
+    process.env['DEPLOY_ENV'] !== 'prod' &&
+    process.env['DEPLOY_ENV'] !== 'production' &&
+    process.env['ENVIRONMENT'] !== 'production' &&
     process.env['TEST_SECRET'] &&
     req.headers['x-test-secret'] === process.env['TEST_SECRET']
   ) {
@@ -45,9 +63,9 @@ async function requireAdminAuth(req: Request, res: Response, next: () => void): 
   }
 
   try {
-    const { supabaseUrl, headers } = getSupabaseConfig(req);
-    // 1. Fetch user from Supabase auth
-    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, { headers });
+    const { supabaseUrl, headers: userHeaders } = getUserSupabaseConfig(req);
+    // 1. Fetch user from Supabase auth with caller's JWT
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, { headers: userHeaders });
     if (!userRes.ok) {
       res.status(401).json({ success: false, error: 'Sesión no válida o expirada.' });
       return;
@@ -58,10 +76,11 @@ async function requireAdminAuth(req: Request, res: Response, next: () => void): 
       return;
     }
 
-    // 2. Fetch profile role & tenant_id
+    // 2. Fetch profile role & tenant_id using service_role to ensure reliable verification
+    const { headers: adminHeaders } = getServiceRoleConfig();
     const profileRes = await fetch(
       `${supabaseUrl}/rest/v1/profiles?id=eq.${user.id}&select=id,role,is_active,tenant_id`,
-      { headers }
+      { headers: adminHeaders }
     );
     const profiles = profileRes.ok ? await profileRes.json() : [];
     const profile = profiles[0];
@@ -92,7 +111,7 @@ async function requireAdminAuth(req: Request, res: Response, next: () => void): 
 adminDashboardRoutes.get('/health', async (_req: Request, res: Response): Promise<void> => {
   const startTime = Date.now();
   try {
-    const { supabaseUrl, headers } = getSupabaseConfig();
+    const { supabaseUrl, headers } = getServiceRoleConfig();
     const rpcRes = await fetch(`${supabaseUrl}/rest/v1/rpc/get_admin_business_dashboard_metrics`, {
       method: 'POST',
       headers,
@@ -148,7 +167,7 @@ adminDashboardRoutes.get('/health', async (_req: Request, res: Response): Promis
  */
 adminDashboardRoutes.get('/db-health', requireAdminAuth, async (_req: Request, res: Response): Promise<void> => {
   try {
-    const { supabaseUrl, headers } = getSupabaseConfig();
+    const { supabaseUrl, headers } = getServiceRoleConfig();
     const rpcRes = await fetch(`${supabaseUrl}/rest/v1/rpc/get_admin_database_health`, {
       method: 'POST',
       headers,
@@ -186,7 +205,7 @@ adminDashboardRoutes.get('/analytics', requireAdminAuth, async (req: Request, re
   const branchId = req.query['branch_id'] as string | undefined;
 
   try {
-    const { supabaseUrl, headers } = getSupabaseConfig();
+    const { supabaseUrl, headers } = getServiceRoleConfig();
     const rpcRes = await fetch(`${supabaseUrl}/rest/v1/rpc/get_admin_dashboard_analytics`, {
       method: 'POST',
       headers,
@@ -242,7 +261,7 @@ adminDashboardRoutes.get('/metrics', requireAdminAuth, async (req: Request, res:
   const partialErrors: Record<string, string> = {};
 
   try {
-    const { supabaseUrl, headers } = getSupabaseConfig();
+    const { supabaseUrl, headers } = getServiceRoleConfig();
 
     console.log(`[AdminDashboard] Fetching metrics range=${range}, tenant=${effectiveTenantId || 'default'}, branch=${branchId || 'all'}`);
 

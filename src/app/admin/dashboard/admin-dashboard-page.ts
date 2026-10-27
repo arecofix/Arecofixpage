@@ -10,8 +10,8 @@ import {
   ChangeDetectionStrategy,
   PLATFORM_ID,
 } from '@angular/core';
-import { Subject } from 'rxjs';
-import { switchMap, catchError, takeUntil, finalize } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { switchMap, catchError, takeUntil, finalize, map } from 'rxjs/operators';
 import { CommonModule, DecimalPipe, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
@@ -47,7 +47,8 @@ import {
   TopSellingProduct,
   CustomerRfmItem,
   RepairBrandStat,
-  RepairModelStat
+  RepairModelStat,
+  DashboardMetricsResponse,
 } from './services/admin-business-dashboard.service';
 
 
@@ -90,7 +91,7 @@ export const DEFAULT_DASHBOARD_METRICS: BusinessDashboardData = {
     BaseChartDirective,
     FormsModule,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './admin-dashboard-page.html',
 })
 export class AdminDashboardPage implements OnInit, OnDestroy {
@@ -343,6 +344,15 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
 
   private branchContextService = inject(BranchContextService);
   private loadStats$ = new Subject<string | undefined>();
+  private loadMetrics$ = new Subject<{
+    range: 'today' | '7days' | 'month' | 'year';
+    branchId?: string;
+    simulateFailure?: string;
+  }>();
+  private loadAnalytics$ = new Subject<{
+    range: 'today' | '7days' | 'month' | 'year';
+    branchId?: string;
+  }>();
 
   constructor() {
     this.loadStats$
@@ -368,14 +378,92 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         this.loadPendingProductsCount();
       });
 
+    // Subject + switchMap prevents concurrent metrics requests from stepping on each other
+    this.loadMetrics$
+      .pipe(
+        switchMap(({ range, branchId, simulateFailure }) => {
+          this.isLoading.set(true);
+          this.error.set(null);
+          return this.businessDashboardService.getMetrics(range, branchId, simulateFailure).pipe(
+            map((res) => ({ res, range })),
+            catchError((err) => {
+              console.error('Error loading business metrics:', err);
+              const errMsg = err?.error?.error || err?.message || 'Error de conexión con el servidor al cargar las métricas.';
+              return of({
+                res: {
+                  success: false,
+                  error: errMsg,
+                  data: DEFAULT_DASHBOARD_METRICS,
+                  partialErrors: { system: 'Error de red al consultar métricas del negocio.' }
+                } as DashboardMetricsResponse,
+                range
+              });
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(({ res, range }) => {
+        this.isLoading.set(false);
+        if (!res || (typeof res === 'object' && Object.keys(res).length === 0)) {
+          this.error.set(null);
+          const safeData = this.sanitizeData(null, range);
+          this.dashboardData.set(safeData);
+          this.prepareBusinessCharts(safeData);
+          this.cdr.markForCheck();
+          return;
+        }
+
+        if (res.success === false && res.error) {
+          this.error.set(res.error);
+          const safeData = this.sanitizeData(res.data, range);
+          this.dashboardData.set(safeData);
+          this.cdr.markForCheck();
+          return;
+        }
+
+        this.error.set(null);
+        const safeData = this.sanitizeData(res.data ?? (res.kpis ? res : null), range);
+        this.dashboardData.set(safeData);
+        this.partialErrors.set(res.partialErrors || null);
+        this.prepareBusinessCharts(safeData);
+        this.cdr.markForCheck();
+      });
+
+    // Subject + switchMap for analytics drilldown
+    this.loadAnalytics$
+      .pipe(
+        switchMap(({ range, branchId }) => {
+          this.loadingAnalytics.set(true);
+          this.analyticsError.set(null);
+          return this.businessDashboardService.getAnalytics(range, branchId).pipe(
+            catchError((err) => {
+              console.error('Error loading analytics:', err);
+              this.analyticsError.set('Error al cargar datos analíticos.');
+              return of(null);
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((res) => {
+        this.loadingAnalytics.set(false);
+        if (res?.data) {
+          this.analyticsData.set(res.data);
+        }
+        this.cdr.markForCheck();
+      });
+
     // React to branch changes globally
     effect(() => {
       const branchId = this.branchContextService.currentBranchId();
-      if (!isPlatformBrowser(this.platformId)) return;
+      if (!isPlatformBrowser(this.platformId) || !this.isDashboardMounted) return;
       this.loadStats$.next(branchId || undefined);
       this.loadBusinessMetrics(this.selectedRange(), branchId || undefined);
     });
   }
+
+  private isDashboardMounted = false;
 
   async ngOnInit() {
     this.isSuperAdmin.set(this.authService.isSuperAdmin());
@@ -385,6 +473,9 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
       return;
     }
 
+    // Ensure authentication state is fully resolved before executing protected API queries
+    await this.authService.waitForAuth();
+
     if (this.isSuperAdmin()) {
       await this.loadBranches();
     }
@@ -393,6 +484,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     this.loadBusinessMetrics();
     this.loadAnalytics();
     this.loadDatabaseHealth();
+    this.isDashboardMounted = true;
 
     // Analytics monitor
     this.analyticsStats.set({
@@ -542,48 +634,12 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     }
 
     const targetRange = range || this.selectedRange();
-    this.isLoading.set(true);
-    this.error.set(null);
-
     const activeBranchId = branchId !== undefined ? branchId : this.branchContextService.currentBranchId();
 
-    this.businessDashboardService.getMetrics(targetRange, activeBranchId || undefined, simulateFailure).pipe(
-      finalize(() => {
-        this.isLoading.set(false);
-        this.cdr.markForCheck();
-      })
-    ).subscribe({
-      next: (res) => {
-        // Fallback if null, undefined or empty object {}
-        if (!res || (typeof res === 'object' && Object.keys(res).length === 0)) {
-          this.error.set(null);
-          const safeData = this.sanitizeData(null, targetRange);
-          this.dashboardData.set(safeData);
-          this.prepareBusinessCharts(safeData);
-          return;
-        }
-
-        // Check if backend returned structured failure
-        if (res.success === false && res.error) {
-          this.error.set(res.error);
-          const safeData = this.sanitizeData(res.data, targetRange);
-          this.dashboardData.set(safeData);
-          return;
-        }
-
-        this.error.set(null);
-        const safeData = this.sanitizeData(res.data ?? (res.kpis ? res : null), targetRange);
-        this.dashboardData.set(safeData);
-        this.partialErrors.set(res.partialErrors || null);
-        this.prepareBusinessCharts(safeData);
-      },
-      error: (err) => {
-        console.error('Error loading business metrics:', err);
-        const errMsg = err?.error?.error || err?.message || 'Error de conexión con el servidor al cargar las métricas.';
-        this.error.set(errMsg);
-        const safeData = this.sanitizeData(null, targetRange);
-        this.dashboardData.set(safeData);
-      }
+    this.loadMetrics$.next({
+      range: targetRange,
+      branchId: activeBranchId || undefined,
+      simulateFailure
     });
   }
 
@@ -656,24 +712,10 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
     const targetRange = range || this.selectedRange();
     const activeBranchId = branchId !== undefined ? branchId : this.branchContextService.currentBranchId();
-    this.loadingAnalytics.set(true);
-    this.analyticsError.set(null);
 
-    this.businessDashboardService.getAnalytics(targetRange, activeBranchId || undefined).pipe(
-      finalize(() => {
-        this.loadingAnalytics.set(false);
-        this.cdr.markForCheck();
-      })
-    ).subscribe({
-      next: (res) => {
-        if (res?.data) {
-          this.analyticsData.set(res.data);
-        }
-      },
-      error: (err) => {
-        console.error('Error loading analytics:', err);
-        this.analyticsError.set('Error al cargar datos analíticos.');
-      }
+    this.loadAnalytics$.next({
+      range: targetRange,
+      branchId: activeBranchId || undefined
     });
   }
 

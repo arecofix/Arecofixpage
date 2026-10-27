@@ -67,6 +67,7 @@ export interface Environment {
     desktopSetupUrl: string;
   };
   turnstileSiteKey?: string;
+  allowedApiHosts?: string[];
   features?: {
     trialEnabled?: boolean;
   };
