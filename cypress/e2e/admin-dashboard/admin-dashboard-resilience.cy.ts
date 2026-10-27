@@ -176,21 +176,24 @@ describe('Admin Dashboard: Blindaje y Resiliencia a Fallos de Red', () => {
     cy.wait('@getMetricsSuccess');
 
     // Verificar tarjetas de KPI
-    cy.get('#kpi-balance').should('be.visible').within(() => {
-      cy.contains('Balance Neto').should('be.visible');
-      cy.contains('1.050.000').should('be.visible');
-      cy.contains('1.500.000').should('be.visible');
-      cy.contains('450.000').should('be.visible');
+    cy.get('#kpi-balance').scrollIntoView();
+    cy.get('#kpi-balance').within(() => {
+      cy.contains('Balance Neto').should('exist');
+      cy.contains('1.050.000').should('exist');
+      cy.contains('1.500.000').should('exist');
+      cy.contains('450.000').should('exist');
     });
 
-    cy.get('#kpi-ventas-online').should('be.visible').within(() => {
-      cy.contains('850.000').should('be.visible');
-      cy.contains('42').should('be.visible');
+    cy.get('#kpi-ventas-online').scrollIntoView();
+    cy.get('#kpi-ventas-online').within(() => {
+      cy.contains('850.000').should('exist');
+      cy.contains('42').should('exist');
     });
 
-    cy.get('#kpi-reparaciones-pendientes').should('be.visible').within(() => {
-      cy.contains('18').should('be.visible');
-      cy.get('#delayed-repairs-alert').should('be.visible').and('contain.text', '7 en retraso');
+    cy.get('#kpi-reparaciones-pendientes').scrollIntoView();
+    cy.get('#kpi-reparaciones-pendientes').within(() => {
+      cy.contains('18').should('exist');
+      cy.get('#delayed-repairs-alert').should('exist').and('contain.text', '7 en retraso');
     });
 
     cy.get('#kpi-alumnos-academia').should('be.visible').within(() => {

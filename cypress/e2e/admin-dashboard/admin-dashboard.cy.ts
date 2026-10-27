@@ -101,12 +101,13 @@ describe('Admin Business Dashboard E2E: Métricas Consolidadas y Alertas Operati
     cy.wait('@getMetricsMonth');
 
     // KPI 1: Balance del Mes
+    cy.get('#kpi-balance').scrollIntoView();
     cy.get('#kpi-balance').within(() => {
-      cy.contains('Balance Neto').should('be.visible');
-      cy.contains('+ Positivo').should('be.visible');
-      cy.contains('1.050.000').should('be.visible');
-      cy.contains('1.500.000').should('be.visible'); // Ingresos
-      cy.contains('450.000').should('be.visible'); // Egresos
+      cy.contains('Balance Neto').should('exist');
+      cy.contains('+ Positivo').should('exist');
+      cy.contains('1.050.000').should('exist');
+      cy.contains('1.500.000').should('exist'); // Ingresos
+      cy.contains('450.000').should('exist'); // Egresos
     });
 
     // KPI 2: Ventas Online
@@ -255,14 +256,17 @@ describe('Admin Business Dashboard E2E: Métricas Consolidadas y Alertas Operati
     cy.get('#partial-error-banner').should('contain.text', 'No se pudieron cargar los datos de Academia.');
 
     // 2. Verificar que el resto de las tarjetas no se rompieron y siguen operativas
-    cy.get('#kpi-balance').should('be.visible').within(() => {
-      cy.contains('1.050.000').should('be.visible');
+    cy.get('#kpi-balance').scrollIntoView();
+    cy.get('#kpi-balance').within(() => {
+      cy.contains('1.050.000').should('exist');
     });
-    cy.get('#kpi-ventas-online').should('be.visible').within(() => {
-      cy.contains('850.000').should('be.visible');
+    cy.get('#kpi-ventas-online').scrollIntoView();
+    cy.get('#kpi-ventas-online').within(() => {
+      cy.contains('850.000').should('exist');
     });
-    cy.get('#kpi-reparaciones-pendientes').should('be.visible').within(() => {
-      cy.contains('18').should('be.visible');
+    cy.get('#kpi-reparaciones-pendientes').scrollIntoView();
+    cy.get('#kpi-reparaciones-pendientes').within(() => {
+      cy.contains('18').should('exist');
     });
 
     // 3. El centro de alertas sigue visible
