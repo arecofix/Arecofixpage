@@ -85,4 +85,71 @@ describe('AdminRepairService', () => {
         expect(result).toEqual(fakeRepair);
         expect(mockRepository.getById).toHaveBeenCalledWith('123');
     });
+
+    it('CRITICAL: update() should preserve originalRepair.device_id when device_model is not changed', async () => {
+        const originalRepair = {
+            id: 'rep-1',
+            device_id: 'dev-original-uuid',
+            customer_id: 'cust-1',
+            current_status_id: 1,
+            device_model: 'iPhone 13'
+        };
+        mockRepository.getById.mockReturnValue(of(originalRepair));
+
+        const mockWorkflowService = {
+            processUpdateRepair: jest.fn().mockResolvedValue(undefined)
+        };
+        (service as any).repairWorkflowService = mockWorkflowService;
+
+        // User updates only status
+        await service.update('rep-1', { current_status_id: 3 });
+
+        expect(mockWorkflowService.processUpdateRepair).toHaveBeenCalledWith(
+            'rep-1',
+            expect.objectContaining({
+                current_status_id: 3,
+                device_id: 'dev-original-uuid'
+            })
+        );
+    });
+
+    it('CRITICAL: update() should pass originalRepair.device_id to upsertDevice when device_model IS changed', async () => {
+        const originalRepair = {
+            id: 'rep-2',
+            device_id: 'dev-existing-uuid',
+            customer_id: 'cust-2',
+            current_status_id: 1,
+            device_model: 'iPhone 11'
+        };
+        mockRepository.getById.mockReturnValue(of(originalRepair));
+
+        const mockDeviceRepo = {
+            ensureModelExists: jest.fn().mockReturnValue(of('model-iphone13-id')),
+            upsertDevice: jest.fn().mockReturnValue(of('dev-existing-uuid'))
+        };
+        const mockWorkflowService = {
+            processUpdateRepair: jest.fn().mockResolvedValue(undefined)
+        };
+        (service as any).customerDeviceRepository = mockDeviceRepo;
+        (service as any).repairWorkflowService = mockWorkflowService;
+
+        await service.update('rep-2', { device_model: 'iPhone 13 Pro', brand_id: 'brand-apple' });
+
+        expect(mockDeviceRepo.upsertDevice).toHaveBeenCalledWith({
+            deviceId: 'dev-existing-uuid',
+            userId: 'cust-2',
+            modelId: 'model-iphone13-id',
+            type: undefined,
+            imei: undefined,
+            passcode: undefined
+        });
+
+        expect(mockWorkflowService.processUpdateRepair).toHaveBeenCalledWith(
+            'rep-2',
+            expect.objectContaining({
+                device_model: 'iPhone 13 Pro',
+                device_id: 'dev-existing-uuid'
+            })
+        );
+    });
 });

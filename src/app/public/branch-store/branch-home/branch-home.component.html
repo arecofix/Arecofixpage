@@ -99,14 +99,7 @@
           <div class="bh-product-card__body">
             <h3>{{ p.name }}</h3>
             <p class="bh-product-card__price">
-              {{
-                p.sale_price || p.price
-                  | currency
-                    : p.currency || "ARS"
-                    : "symbol-narrow"
-                    : (p.currency === "ARS" ? "1.0-0" : "1.2-2")
-                    : "es-AR"
-              }}
+              {{ (p.sale_price || p.price) | formatPrice:p.currency }}
             </p>
             <span
               class="bh-product-card__converted"
@@ -119,11 +112,7 @@
                 display: block;
               "
             >
-              ~
-              {{
-                p.convertedPrice
-                  | currency: "ARS" : "symbol-narrow" : "1.0-0" : "es-AR"
-              }}
+              {{ p.convertedPrice | formatPrice:'ARS':{ prefix: '⇄ ' } }}
             </span>
             <button class="bh-product-card__btn">Ver detalle</button>
           </div>

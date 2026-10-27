@@ -1,12 +1,26 @@
-import { Routes } from '@angular/router';
+import { Routes, ActivatedRouteSnapshot } from '@angular/router';
 import { TenantIsolationGuard } from '@app/shared/guards/tenant-isolation.guard';
-import { PublicLayout } from '@app/public/layout/public-layout';
-import { PublicHomePage } from './home/public-home-page';
 import { branchSlugMatcher } from '@app/guards/system-reserved.guard';
 import { BranchResolver } from '@app/core/resolvers/branch.resolver';
 import { tauriRootRedirectGuard } from '@app/guards/tauri-root-redirect.guard';
 import { trackingSeoResolver } from '@app/core/resolvers/tracking-seo.resolver';
 import { noAuthGuard, authGuard } from '@app/guards/auth.guard';
+
+export function serviceTitleResolver(route: ActivatedRouteSnapshot): string {
+  const slug = (route.paramMap.get('slug') || '').toLowerCase().trim();
+  if (slug === 'auditoria-de-sitios-web') {
+    return 'Auditoría de Sitios Web en Marcos Paz | Arecofix';
+  }
+  if (slug === 'arecofix') {
+    return 'Servicios de Tecnología en Marcos Paz | Arecofix';
+  }
+  if (slug.includes('recuperar') || slug.includes('datos')) {
+    return 'Recuperación de Datos en Marcos Paz | Arecofix';
+  }
+  const clean = slug.replace(/-/g, ' ');
+  const title = clean.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return `${title || 'Servicio Especializado'} en Marcos Paz | Arecofix`;
+}
 
 export const publicRoutes: Routes = [
   {
@@ -28,14 +42,14 @@ export const publicRoutes: Routes = [
   {
     title: 'Arecofix',
     path: '',
-    component: PublicLayout,
+    loadComponent: () => import('@app/public/layout/public-layout').then(m => m.PublicLayout),
     canActivate: [TenantIsolationGuard],
     children: [
       {
         title: 'Consultoría IT & Software Solutions | Arecofix ',
         path: '',
         canActivate: [tauriRootRedirectGuard],
-        component: PublicHomePage,
+        loadComponent: () => import('./home/public-home-page').then(m => m.PublicHomePage),
         data: {
             seo: {
                 title: 'Consultoría IT & Software Factory | Arecofix',
@@ -46,16 +60,12 @@ export const publicRoutes: Routes = [
         }
       },
       {
-        title: 'Prueba Gratuita Sistema Taller | Arecofix',
         path: 'prueba',
-        loadComponent: () => import('@app/public/free-trial/free-trial.component').then(m => m.FreeTrialPageComponent),
-        data: {
-          seo: {
-            title: 'Prueba Gratuita 72h - Sistema Taller Arecofix',
-            description: 'Prueba nuestro sistema de gestión para talleres técnicos por 72 horas gratis. Crea tu cuenta al instante con tu logo.',
-            keywords: 'prueba gratis sistema taller, software tecnico, software reparacion celulares'
-          }
-        }
+        redirectTo: 'prueba-gratis',
+      },
+      {
+        path: 'free-trial',
+        redirectTo: 'prueba-gratis',
       },
       {
         title: 'Reparación de Celulares en Marcos Paz | Servicio Técnico Arecofix',
@@ -256,8 +266,8 @@ export const publicRoutes: Routes = [
         title: 'Servicios',
         path: 'servicios',
         loadComponent: () =>
-          import('@app/public/servicios/servicios').then(
-            (m) => m.ServiciosComponent
+          import('@app/public/services/public-services-list.component').then(
+            (m) => m.PublicServicesListComponent
           ),
         data: {
           seo: {
@@ -269,11 +279,19 @@ export const publicRoutes: Routes = [
         }
       },
       {
-        title: 'Detalle de Servicio',
+        path: 'services',
+        redirectTo: 'servicios',
+      },
+      {
+        path: 'services/:slug',
+        redirectTo: 'servicios/:slug',
+      },
+      {
         path: 'servicios/:slug',
+        title: serviceTitleResolver,
         loadComponent: () =>
-          import('@app/public/servicios/pages/detail/service-detail.component').then(
-            (m) => m.ServiceDetailComponent
+          import('@app/public/services/public-service-detail.component').then(
+            (m) => m.PublicServiceDetailComponent
           ),
       },
       {
@@ -348,6 +366,14 @@ export const publicRoutes: Routes = [
           ),
       },
       {
+        title: 'Verificación Oficial de Certificado | Arecofix Academy',
+        path: 'academy/verify/:id',
+        loadComponent: () =>
+          import('@app/public/cursos/certificate-validation/certificate-validation.page').then(
+            (m) => m.CertificateValidationPage
+          ),
+      },
+      {
         title: 'Checkout',
         path: 'checkout',
         loadComponent: () =>
@@ -355,6 +381,31 @@ export const publicRoutes: Routes = [
             (m) => m.CheckoutPage
           ),
       },
+      {
+        title: 'Pago Aprobado',
+        path: 'checkout/success',
+        loadComponent: () =>
+          import('@app/public/checkout/checkout-page').then(
+            (m) => m.CheckoutPage
+          ),
+      },
+      {
+        title: 'Pago Rechazado',
+        path: 'checkout/failure',
+        loadComponent: () =>
+          import('@app/public/checkout/checkout-page').then(
+            (m) => m.CheckoutPage
+          ),
+      },
+      {
+        title: 'Pago Pendiente',
+        path: 'checkout/pending',
+        loadComponent: () =>
+          import('@app/public/checkout/checkout-page').then(
+            (m) => m.CheckoutPage
+          ),
+      },
+
       {
         path: 'posts/servicio-tecnico-de-celulares-en-marcos-paz',
         redirectTo: 'celular',

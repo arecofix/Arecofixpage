@@ -84,6 +84,10 @@ export class FlaskProductRepository implements ProductRepository {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
+    softDelete(id: string): Observable<void> {
+        return this.update(id, { is_active: false, deleted_at: new Date().toISOString() }).pipe(map(() => void 0));
+    }
+
     async uploadImage(file: File): Promise<string> {
         const formData = new FormData();
         formData.append('file', file);

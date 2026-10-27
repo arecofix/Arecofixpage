@@ -1,0 +1,53 @@
+{
+  "id": "1234567890-a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "client_id": "8491686631401074",
+  "collector_id": 374364423,
+  "operation_type": "regular_payment",
+  "items": [
+    {
+      "id": "prod-1",
+      "title": "Módulo Pantalla iPhone 11 Incell",
+      "currency_id": "ARS",
+      "picture_url": "https://arecofix.com.ar/assets/products/screen.jpg",
+      "description": "Pantalla de repuesto de alta calidad",
+      "category_id": "repuestos",
+      "quantity": 1,
+      "unit_price": 15000
+    }
+  ],
+  "payer": {
+    "name": "Juan",
+    "surname": "Pérez",
+    "email": "juan.perez@arecofix.com.ar",
+    "phone": {
+      "area_code": "11",
+      "number": "25960900"
+    },
+    "identification": {
+      "type": "DNI",
+      "number": "35123456"
+    },
+    "address": {
+      "street_name": "Av. San Martín",
+      "street_number": 123,
+      "zip_code": "1727"
+    }
+  },
+  "back_urls": {
+    "success": "https://arecofix.com.ar/checkout/success",
+    "pending": "https://arecofix.com.ar/checkout/pending",
+    "failure": "https://arecofix.com.ar/checkout/failure"
+  },
+  "auto_return": "approved",
+  "payment_methods": {
+    "excluded_payment_methods": [],
+    "excluded_payment_types": [],
+    "installments": 12
+  },
+  "notification_url": "https://arecofix.com.ar/api/mercadopago/webhook",
+  "external_reference": "ord-test-101",
+  "expires": false,
+  "init_point": "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=1234567890-a1b2c3d4",
+  "sandbox_init_point": "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=1234567890-a1b2c3d4",
+  "date_created": "2026-10-16T12:00:00.000-03:00"
+}

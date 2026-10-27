@@ -3,6 +3,9 @@ import {
   inject,
   signal,
   OnInit,
+  AfterViewInit,
+  OnDestroy,
+  NgZone,
   PLATFORM_ID,
   ChangeDetectionStrategy,
 } from '@angular/core';
@@ -25,11 +28,12 @@ import { environment } from '@env/environment';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './prueba-gratis.component.html',
 })
-export class PruebaGratisComponent implements OnInit {
+export class PruebaGratisComponent implements OnInit, AfterViewInit, OnDestroy {
   private seoService = inject(SeoService);
   private fb = inject(FormBuilder);
   private supabase = inject(SUPABASE_CLIENT);
   private platformId = inject(PLATFORM_ID);
+  private zone = inject(NgZone);
 
   trialForm: FormGroup;
 
@@ -50,7 +54,13 @@ export class PruebaGratisComponent implements OnInit {
 
   // Turnstile
   turnstileToken = signal<string | null>(null);
-  readonly turnstileSiteKey = environment.turnstileSiteKey || '1x00000000000000000000AA';
+  readonly turnstileSiteKey = environment.turnstileSiteKey;
+  private widgetId: string | null = null;
+
+  // Feature Flag
+  readonly trialEnabled = signal<boolean>(environment.features?.trialEnabled ?? false);
+
+  readonly whatsappUrl = `https://wa.me/${environment.contact.whatsappNumber}?text=${encodeURIComponent('Hola! Quiero solicitar una prueba gratuita de Arecofix')}`;
 
   readonly exeDownloadUrl = environment.downloads.desktopSetupUrl;
 
@@ -59,46 +69,74 @@ export class PruebaGratisComponent implements OnInit {
       if (localStorage.getItem(STORAGE_KEYS.TRIAL_CLAIMED) === 'true') {
         this.hasClaimedTrial.set(true);
       }
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId) && this.trialEnabled()) {
       this.initTurnstile();
     }
   }
 
-  private initTurnstile(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    const scriptId = 'cloudflare-turnstile-script';
+  ngOnDestroy(): void {
+    if (isPlatformBrowser(this.platformId) && this.widgetId && typeof (window as any).turnstile !== 'undefined') {
+      try {
+        (window as any).turnstile.remove(this.widgetId);
+      } catch (e) {
+        console.warn('[Turnstile remove error]', e);
+      }
+    }
+  }
 
-    const renderWidget = () => {
-      const container = document.getElementById('turnstile-container');
-      if (container && (window as any).turnstile) {
-        container.innerHTML = '';
-        (window as any).turnstile.render('#turnstile-container', {
-          sitekey: this.turnstileSiteKey,
-          callback: (token: string) => {
+  private initTurnstile(): void {
+    if (!isPlatformBrowser(this.platformId) || !this.trialEnabled()) return;
+
+    if (typeof (window as any).turnstile !== 'undefined') {
+      this.renderWidget();
+    } else {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (typeof (window as any).turnstile !== 'undefined') {
+          clearInterval(interval);
+          this.renderWidget();
+        } else if (attempts > 50) {
+          clearInterval(interval);
+          console.warn('[Turnstile] Script failed to load in time.');
+        }
+      }, 100);
+    }
+  }
+
+  private renderWidget(): void {
+    const container = document.getElementById('turnstile-container');
+    if (!container) return;
+    if (this.widgetId) return;
+
+    try {
+      this.widgetId = (window as any).turnstile.render(container, {
+        sitekey: this.turnstileSiteKey,
+        action: 'trial_signup',
+        callback: (token: string) => {
+          this.zone.run(() => {
             this.turnstileToken.set(token);
             this.errorMsg.set(null);
-          },
-          'error-callback': () => {
+          });
+        },
+        'error-callback': (code: any) => {
+          this.zone.run(() => {
             this.turnstileToken.set(null);
-          },
-          'expired-callback': () => {
+            console.error('[Turnstile error code]', code);
+          });
+        },
+        'expired-callback': () => {
+          this.zone.run(() => {
             this.turnstileToken.set(null);
-          },
-        });
-      }
-    };
-
-    if (!(window as any).turnstile && !document.getElementById(scriptId)) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
-      script.async = true;
-      script.defer = true;
-      (window as any).onloadTurnstileCallback = () => {
-        renderWidget();
-      };
-      document.head.appendChild(script);
-    } else if ((window as any).turnstile) {
-      setTimeout(() => renderWidget(), 50);
+          });
+        },
+      });
+    } catch (e) {
+      console.error('[Turnstile render error]', e);
     }
   }
 
@@ -211,6 +249,7 @@ export class PruebaGratisComponent implements OnInit {
             subtitle: 'Reparación Especializada por ' + formData.userName,
             currency: 'ARS',
             logo_url: logoUrl,
+            'cf-turnstile-response': this.turnstileToken(),
             turnstileToken: this.turnstileToken(),
           },
         },
@@ -240,6 +279,12 @@ export class PruebaGratisComponent implements OnInit {
       this.errorMsg.set(
         err.message || 'Ocurrió un error inesperado al solicitar la prueba.',
       );
+      if (this.widgetId && typeof (window as any).turnstile !== 'undefined') {
+        try {
+          (window as any).turnstile.reset(this.widgetId);
+        } catch {}
+        this.turnstileToken.set(null);
+      }
     } finally {
       this.loading.set(false);
     }

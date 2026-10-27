@@ -84,7 +84,25 @@ html,
 body {
   overflow-x: clip;
   width: 100%;
+  min-height: 100%;
   font-family: var(--font-body);
+  background-color: var(--base-100, #ffffff);
+  color: var(--base-content, #1f2937);
+}
+
+.dark,
+:root.dark,
+html.dark,
+html.dark body {
+  background-color: #080808;
+  color: #f3f4f6;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  width: 100%;
 }
 
 h1,
@@ -667,6 +685,43 @@ i[class*='fa-'] { position: relative; z-index: 2; --fa-display: swap; }
 /* Stencil Logo Text Styles */
 .stencil-logo {
   font-family: 'Syncopate', 'Orbitron', 'Chakra Petch', system-ui, sans-serif;
+}
+
+/* Angular CDK Virtual Scroll essential styles */
+cdk-virtual-scroll-viewport,
+.cdk-virtual-scroll-viewport {
+  display: block;
+  position: relative;
+  overflow: auto;
+  contain: strict;
+  transform: translateZ(0);
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cdk-virtual-scroll-content-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  contain: content;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 100%;
+}
+
+.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper {
+  flex-direction: row;
+}
+
+.cdk-virtual-scroll-spacer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 1px;
+  transform-origin: top left;
+  pointer-events: none;
 }
 
 

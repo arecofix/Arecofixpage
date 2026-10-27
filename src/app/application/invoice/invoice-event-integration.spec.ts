@@ -61,7 +61,7 @@ describe('Flujos de Facturación por Eventos', () => {
 
     saleInvoiceHandler = new OnSaleCompletedInvoiceHandler(invoiceRepo, tenantService as TenantService, eventBus);
     orderInvoiceHandler = new OnOrderDeliveredInvoiceHandler(invoiceRepo, tenantService as TenantService, eventBus);
-    repairReadyHandler = new OnRepairReadyHandler(createDraftUseCase, eventBus);
+    repairReadyHandler = new OnRepairReadyHandler(createDraftUseCase, eventBus, tenantService as TenantService);
 
     saleInvoiceHandler.register();
     orderInvoiceHandler.register();

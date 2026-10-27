@@ -7,7 +7,7 @@ export interface OrderRow {
   order_number?: string;
   user_id?: string | null;
   session_id?: string | null;
-  customer_name?: string;
+  customer_name?: string | null;
   customer_email?: string | null;
   customer_phone?: string | null;
   shipping_address?: unknown;
@@ -21,6 +21,7 @@ export interface OrderRow {
   payment_proof_url?: string | null;
   notes?: string | null;
   invoice_url?: string | null;
+  tracking_code?: string | null;
   tenant_id?: string;
   branch_id?: string | null;
   created_at?: string;
@@ -49,13 +50,15 @@ export class OrderMapper {
       payment_proof_url: row.payment_proof_url ?? undefined,
       notes: row.notes ?? undefined,
       invoice_url: row.invoice_url ?? undefined,
+      tracking_code: row.tracking_code ?? undefined,
       tenant_id: row.tenant_id,
       branch_id: row.branch_id ?? undefined,
       created_at: row.created_at,
       updated_at: row.updated_at,
       items: row.items?.map(item => ({
         ...item,
-        product: item.product ? ProductMapper.mapFromDb(item.product) : undefined
+        cart_item_id: item.cart_item_id || item.id,
+        product: item.product ? ProductMapper.mapFromDb(item.product as unknown as Record<string, unknown>) : undefined
       })),
     };
   }
@@ -80,8 +83,44 @@ export class OrderMapper {
       payment_proof_url: order.payment_proof_url ?? null,
       notes: order.notes ?? null,
       invoice_url: order.invoice_url ?? null,
+      tracking_code: order.tracking_code ?? null,
       branch_id: order.branch_id ?? null,
       updated_at: order.updated_at ?? new Date().toISOString(),
     };
   }
+
+  /**
+   * Safe Partial Update Mapper for Orders.
+   * STRICT GUARANTEE: Never coerces missing/undefined fields to null.
+   * Only includes fields explicitly provided with a defined value or explicit null.
+   */
+  static mapUpdateToDb(dto: Partial<Order>): Record<string, unknown> {
+    const payload: Record<string, unknown> = {};
+
+    if (dto.order_number !== undefined) payload['order_number'] = dto.order_number;
+    if (dto.user_id !== undefined) payload['user_id'] = dto.user_id;
+    if (dto.session_id !== undefined) payload['session_id'] = dto.session_id;
+    if (dto.customer_name !== undefined) payload['customer_name'] = dto.customer_name;
+    if (dto.customer_email !== undefined) payload['customer_email'] = dto.customer_email;
+    if (dto.customer_phone !== undefined) payload['customer_phone'] = dto.customer_phone;
+    if (dto.shipping_address !== undefined) payload['shipping_address'] = dto.shipping_address;
+    if (dto.status !== undefined) payload['status'] = normalizeOrderStatus(dto.status);
+    if (dto.subtotal !== undefined) payload['subtotal'] = dto.subtotal;
+    if (dto.tax !== undefined) payload['tax'] = dto.tax;
+    if (dto.discount !== undefined) payload['discount'] = dto.discount;
+    if (dto.total !== undefined || dto.total_amount !== undefined) {
+      payload['total'] = dto.total ?? dto.total_amount;
+      payload['total_amount'] = dto.total_amount ?? dto.total;
+    }
+    if (dto.payment_method !== undefined) payload['payment_method'] = dto.payment_method;
+    if (dto.payment_proof_url !== undefined) payload['payment_proof_url'] = dto.payment_proof_url;
+    if (dto.notes !== undefined) payload['notes'] = dto.notes;
+    if (dto.invoice_url !== undefined) payload['invoice_url'] = dto.invoice_url;
+    if (dto.tracking_code !== undefined) payload['tracking_code'] = dto.tracking_code;
+    if (dto.branch_id !== undefined) payload['branch_id'] = dto.branch_id;
+    if (dto.updated_at !== undefined) payload['updated_at'] = dto.updated_at;
+
+    return payload;
+  }
 }
+

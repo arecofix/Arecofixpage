@@ -54,7 +54,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
 
     cy.intercept({
       method: 'POST',
-      url: /mercadopago-preferences/
+      url: /(mercadopago-preferences|create-preference)/
     }, {
       statusCode: 200,
       body: {

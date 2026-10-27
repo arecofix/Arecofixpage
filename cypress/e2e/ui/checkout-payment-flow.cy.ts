@@ -13,7 +13,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
 
     cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, {
       statusCode: 200,
-      body: cartOrder
+      body: [cartOrder]
     }).as('getCartForPayment');
   });
 
@@ -75,7 +75,7 @@ describe('Pasarela de Pago, Procesamiento y Orden Final (E2E)', () => {
     }).as('processOrderItems');
 
     // Mockear Mercado Pago Preference creation
-    cy.intercept('POST', '**/functions/v1/mercadopago-preferences*', {
+    cy.intercept('POST', /(mercadopago-preferences|create-preference)/, {
       statusCode: 200,
       body: { init_point: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=123' }
     }).as('createPreference');

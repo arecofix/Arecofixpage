@@ -1,0 +1,50 @@
+{
+  "id": 9876543210,
+  "date_created": "2026-10-16T12:05:00.000-03:00",
+  "date_approved": "2026-10-16T12:05:02.000-03:00",
+  "date_last_updated": "2026-10-16T12:05:02.000-03:00",
+  "money_release_date": "2026-10-16T12:05:02.000-03:00",
+  "operation_type": "regular_payment",
+  "issuer_id": "24",
+  "payment_method_id": "visa",
+  "payment_type_id": "credit_card",
+  "status": "approved",
+  "status_detail": "accredited",
+  "currency_id": "ARS",
+  "description": "Arecofix - Orden #AF-TEST-101",
+  "live_mode": false,
+  "sponsor_id": null,
+  "authorization_code": "123456",
+  "collector_id": 374364423,
+  "payer": {
+    "type": "customer",
+    "id": "12345678",
+    "email": "juan.perez@arecofix.com.ar",
+    "identification": {
+      "type": "DNI",
+      "number": "35123456"
+    },
+    "first_name": "Juan",
+    "last_name": "Pérez"
+  },
+  "external_reference": "ord-test-101",
+  "transaction_amount": 15000,
+  "transaction_amount_refunded": 0,
+  "coupon_amount": 0,
+  "installments": 1,
+  "card": {
+    "first_six_digits": "450995",
+    "last_four_digits": "3704",
+    "expiration_month": 11,
+    "expiration_year": 2028,
+    "date_created": "2026-10-16T12:00:00.000-03:00",
+    "date_last_updated": "2026-10-16T12:00:00.000-03:00",
+    "cardholder": {
+      "name": "JUAN PEREZ",
+      "identification": {
+        "number": "35123456",
+        "type": "DNI"
+      }
+    }
+  }
+}

@@ -1,0 +1,570 @@
+[
+  {
+    "table": "academy_payments",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: academy_payments_admin_manage_policy",
+      "SELECT {authenticated}: academy_payments_select_policy"
+    ]
+  },
+  {
+    "table": "academy_plans",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: academy_plans_admin_manage_policy",
+      "SELECT {anon,authenticated}: academy_plans_select_policy"
+    ]
+  },
+  {
+    "table": "academy_subscriptions",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: academy_subscriptions_admin_manage_policy",
+      "SELECT {authenticated}: academy_subscriptions_select_policy"
+    ]
+  },
+  {
+    "table": "active_news",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: zarx_news_admin_all",
+      "SELECT {anon,authenticated}: zarx_news_select"
+    ]
+  },
+  {
+    "table": "audit_logs",
+    "policyCount": 3,
+    "policies": [
+      "ALL {public}: Deny all client access on audit_logs",
+      "ALL {authenticated}: audit_logs_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "auth_logs",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: auth_logs_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "bank_reconciliations",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: bank_reconciliations_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "blog_categories",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: blog_categories_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "blog_post_tags",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: blog_post_tags_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "blog_posts",
+    "policyCount": 5,
+    "policies": [
+      "DELETE {authenticated}: bp_delete",
+      "INSERT {authenticated}: bp_insert",
+      "SELECT {public}: bp_select",
+      "UPDATE {authenticated}: bp_update",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "blog_tags",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: blog_tags_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "branches",
+    "policyCount": 6,
+    "policies": [
+      "ALL {authenticated}: Branch Staff Isolation",
+      "ALL {authenticated}: SuperAdmin Bypass All",
+      "SELECT {anon}: branches_public_select",
+      "SELECT {anon,authenticated}: branches_select",
+      "ALL {authenticated}: branches_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "brands",
+    "policyCount": 3,
+    "policies": [
+      "SELECT {anon}: brands_unified_select_anon",
+      "SELECT {authenticated}: brands_unified_select_auth",
+      "ALL {authenticated}: brands_unified_write_admin"
+    ]
+  },
+  {
+    "table": "cash_movements",
+    "policyCount": 5,
+    "policies": [
+      "ALL {authenticated}: Branch Staff Isolation",
+      "ALL {authenticated}: SuperAdmin Bypass All",
+      "ALL {authenticated}: Tenant Owner Isolation",
+      "ALL {authenticated}: cash_movements_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "categories",
+    "policyCount": 3,
+    "policies": [
+      "SELECT {anon}: categories_unified_select_anon",
+      "SELECT {authenticated}: categories_unified_select_auth",
+      "ALL {authenticated}: categories_unified_write_admin"
+    ]
+  },
+  {
+    "table": "contact_messages",
+    "policyCount": 6,
+    "policies": [
+      "INSERT {anon}: public_contact_messages_insert_anon",
+      "ALL {authenticated}: super_admin_contact_messages_all",
+      "DELETE {authenticated}: tenant_contact_messages_delete",
+      "INSERT {authenticated}: tenant_contact_messages_insert_auth",
+      "SELECT {authenticated}: tenant_contact_messages_select",
+      "UPDATE {authenticated}: tenant_contact_messages_update"
+    ]
+  },
+  {
+    "table": "course_certificates",
+    "policyCount": 4,
+    "policies": [
+      "ALL {authenticated}: Admins can manage all certificates",
+      "SELECT {authenticated}: Students can view their own certificates",
+      "INSERT {authenticated}: course_certificates_instructor_insert",
+      "SELECT {anon,authenticated}: course_certificates_public_verify"
+    ]
+  },
+  {
+    "table": "course_enrollments",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: course_enrollments_all_policy",
+      "SELECT {authenticated}: course_enrollments_select_policy",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "course_exam_submissions",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: Admins can view exam submissions",
+      "SELECT {authenticated}: Students can view their own submissions"
+    ]
+  },
+  {
+    "table": "course_instructors",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: Escritura para usuarios autenticados",
+      "SELECT {anon,authenticated}: Lectura publica de instructores"
+    ]
+  },
+  {
+    "table": "course_lessons",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: Authors can manage course contents",
+      "ALL {authenticated}: course_lessons_admin_all_policy",
+      "SELECT {anon,authenticated}: course_lessons_select_policy"
+    ]
+  },
+  {
+    "table": "course_modules",
+    "policyCount": 5,
+    "policies": [
+      "ALL {authenticated}: Admins can manage course modules",
+      "ALL {authenticated}: Authors can manage course modules",
+      "SELECT {anon,authenticated}: course_modules_select_policy",
+      "ALL {authenticated}: modules_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "courses",
+    "policyCount": 4,
+    "policies": [
+      "ALL {authenticated}: Authors can manage their courses",
+      "SELECT {anon}: courses_unified_select_anon",
+      "SELECT {authenticated}: courses_unified_select_auth",
+      "ALL {authenticated}: courses_unified_write_admin"
+    ]
+  },
+  {
+    "table": "customer_devices",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: customer_devices_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "educacion_y_skills",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: educacion_y_skills_admin_all",
+      "SELECT {anon,authenticated}: educacion_y_skills_public_select"
+    ]
+  },
+  {
+    "table": "experiencia_laboral",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: experiencia_laboral_admin_all",
+      "SELECT {anon,authenticated}: experiencia_laboral_public_select"
+    ]
+  },
+  {
+    "table": "invoices",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: invoices_tenant_isolation_all",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "models",
+    "policyCount": 5,
+    "policies": [
+      "DELETE {authenticated}: mod_delete",
+      "INSERT {authenticated}: mod_insert",
+      "SELECT {public}: mod_select",
+      "UPDATE {authenticated}: mod_update",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "notifications",
+    "policyCount": 6,
+    "policies": [
+      "ALL {authenticated}: super_admin_notifications_all",
+      "DELETE {authenticated}: tenant_notifications_delete",
+      "INSERT {authenticated}: tenant_notifications_insert",
+      "SELECT {authenticated}: tenant_notifications_select",
+      "UPDATE {authenticated}: tenant_notifications_update",
+      "ALL {authenticated}: zarx_notifications_scoped"
+    ]
+  },
+  {
+    "table": "order_items",
+    "policyCount": 4,
+    "policies": [
+      "ALL {anon}: Anon can manage guest order items",
+      "ALL {authenticated}: Users can manage their own order items",
+      "ALL {authenticated}: staff_tenant_order_items",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "orders",
+    "policyCount": 13,
+    "policies": [
+      "DELETE {anon}: Anon can delete guest carts",
+      "INSERT {anon}: Anon can insert guest orders",
+      "UPDATE {anon}: Anon can update guest orders",
+      "SELECT {anon}: Anon can view guest orders",
+      "ALL {authenticated}: Branch Staff Isolation",
+      "INSERT {authenticated}: Staff can insert orders for their tenant",
+      "ALL {authenticated}: SuperAdmin Bypass All",
+      "ALL {authenticated}: Tenant Owner Isolation",
+      "DELETE {authenticated}: Users can delete their own carts",
+      "INSERT {authenticated}: Users can insert their own orders",
+      "UPDATE {authenticated}: Users can update their own orders",
+      "SELECT {authenticated}: Users can view their own orders",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "page_templates",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: page_templates_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "pages",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: pages_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "payments",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: Staff and tenant owners can manage payments",
+      "ALL {authenticated}: SuperAdmin bypass payments",
+      "SELECT {authenticated}: Users can view their own payments"
+    ]
+  },
+  {
+    "table": "post_comments",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: post_comments_admin_manage_policy",
+      "INSERT {public}: post_comments_insert_policy",
+      "SELECT {public}: post_comments_select_policy"
+    ]
+  },
+  {
+    "table": "product_images",
+    "policyCount": 5,
+    "policies": [
+      "DELETE {authenticated}: pi_delete",
+      "INSERT {authenticated}: pi_insert",
+      "SELECT {public}: pi_select",
+      "UPDATE {authenticated}: pi_update",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "product_reviews",
+    "policyCount": 5,
+    "policies": [
+      "DELETE {authenticated}: pr_delete",
+      "INSERT {authenticated}: pr_insert",
+      "SELECT {public}: pr_select",
+      "UPDATE {authenticated}: pr_update",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "product_stock_per_branch",
+    "policyCount": 2,
+    "policies": [
+      "SELECT {anon,authenticated}: Public View - Stock",
+      "ALL {authenticated}: Stock_Tenant_Isolation"
+    ]
+  },
+  {
+    "table": "profiles",
+    "policyCount": 13,
+    "policies": [
+      "ALL {public}: Admins_All_Profiles",
+      "DELETE {public}: profiles_delete_permission",
+      "INSERT {authenticated}: profiles_insert_own",
+      "INSERT {public}: profiles_insert_permission",
+      "SELECT {authenticated}: profiles_read_own",
+      "SELECT {public}: profiles_read_permission",
+      "UPDATE {authenticated}: profiles_update_own",
+      "UPDATE {public}: profiles_update_permission",
+      "DELETE {public}: Admins can delete any profile",
+      "UPDATE {public}: Admins can update any profile",
+      "INSERT {authenticated}: Users can insert own profile",
+      "UPDATE {authenticated}: Users can update own profile",
+      "SELECT {anon,authenticated}: zarx_profiles_select_public"
+    ]
+  },
+  {
+    "table": "public_alerts",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: zarx_alerts_admin_all",
+      "SELECT {anon,authenticated}: zarx_alerts_select"
+    ]
+  },
+  {
+    "table": "purchase_items",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: purchase_items_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "purchases",
+    "policyCount": 4,
+    "policies": [
+      "ALL {authenticated}: Branch Staff Isolation",
+      "ALL {authenticated}: SuperAdmin Bypass All",
+      "ALL {authenticated}: Tenant Owner Isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "repair_images",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: repair_images_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "repair_number_sequences",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: repair_number_sequences_admin_all",
+      "ALL {authenticated}: repair_number_sequences_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "repair_parts_used",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: repair_parts_used_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "repair_status_history",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: repair_status_history_tenant_isolation",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "repair_status_types",
+    "policyCount": 2,
+    "policies": [
+      "SELECT {anon,authenticated}: rst_unified_select",
+      "ALL {authenticated}: super_admin_all_access"
+    ]
+  },
+  {
+    "table": "repairs",
+    "policyCount": 5,
+    "policies": [
+      "DELETE {public}: repairs_delete_permission",
+      "INSERT {authenticated}: repairs_insert_permission",
+      "SELECT {authenticated}: repairs_read_permission",
+      "ALL {authenticated}: repairs_tenant_isolation_all",
+      "UPDATE {authenticated}: repairs_update_permission"
+    ]
+  },
+  {
+    "table": "role_permissions",
+    "policyCount": 2,
+    "policies": [
+      "SELECT {authenticated}: role_permissions_read_authenticated",
+      "ALL {authenticated}: role_permissions_write_super_admin"
+    ]
+  },
+  {
+    "table": "roles",
+    "policyCount": 2,
+    "policies": [
+      "SELECT {authenticated}: roles_read_authenticated",
+      "ALL {authenticated}: roles_write_super_admin"
+    ]
+  },
+  {
+    "table": "service_blocks",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: service_blocks_admin_all",
+      "SELECT {anon,authenticated}: service_blocks_unified_select",
+      "ALL {authenticated}: service_blocks_unified_write"
+    ]
+  },
+  {
+    "table": "service_categories",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: service_categories_admin_all",
+      "SELECT {anon,authenticated}: service_categories_public_select"
+    ]
+  },
+  {
+    "table": "service_features",
+    "policyCount": 3,
+    "policies": [
+      "ALL {authenticated}: service_features_admin_all",
+      "SELECT {anon,authenticated}: service_features_unified_select",
+      "ALL {authenticated}: service_features_unified_write"
+    ]
+  },
+  {
+    "table": "service_leads",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: service_leads_admin_all",
+      "INSERT {anon,authenticated}: service_leads_anon_insert"
+    ]
+  },
+  {
+    "table": "services",
+    "policyCount": 3,
+    "policies": [
+      "SELECT {anon}: services_unified_select_anon",
+      "SELECT {authenticated}: services_unified_select_auth",
+      "ALL {authenticated}: services_unified_write_admin"
+    ]
+  },
+  {
+    "table": "slug_redirects",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: slug_redirects_admin_all",
+      "SELECT {anon,authenticated}: slug_redirects_anon_select"
+    ]
+  },
+  {
+    "table": "stock_history",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: stock_history_super_admin",
+      "ALL {authenticated}: stock_history_tenant_isolation"
+    ]
+  },
+  {
+    "table": "suppliers",
+    "policyCount": 5,
+    "policies": [
+      "ALL {authenticated}: Branch Staff Isolation",
+      "ALL {authenticated}: SuperAdmin Bypass All",
+      "ALL {authenticated}: Tenant Owner Isolation",
+      "ALL {authenticated}: super_admin_all_access",
+      "ALL {authenticated}: suppliers_tenant_isolation"
+    ]
+  },
+  {
+    "table": "technical_solutions",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: super_admin_all_access",
+      "ALL {authenticated}: technical_solutions_tenant_isolation"
+    ]
+  },
+  {
+    "table": "tenants",
+    "policyCount": 5,
+    "policies": [
+      "SELECT {anon}: Public View - Tenants",
+      "ALL {authenticated}: super_admin_all_access",
+      "SELECT {anon,authenticated}: tenants_select",
+      "SELECT {public}: tenants_select_policy",
+      "UPDATE {authenticated}: tenants_unified_update"
+    ]
+  },
+  {
+    "table": "zones",
+    "policyCount": 2,
+    "policies": [
+      "ALL {authenticated}: zarx_zones_admin_all",
+      "SELECT {anon,authenticated}: zarx_zones_select"
+    ]
+  }
+]

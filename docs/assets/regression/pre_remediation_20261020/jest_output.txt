@@ -1,0 +1,717 @@
+$ jest "--colors=false" "--watchAll=false"
+PASS src/app/core/services/supabase.service.spec.ts (5.695 s)
+  ● Console
+
+    console.warn
+      GoTrueClient@sb-db-auth-token:1 (2.112.3) 2026-10-20T14:14:00.417Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
+
+      362 |     }
+      363 |
+    > 364 |     this.client = createClient(
+          |                               ^
+      365 |       authBaseUrl,
+      366 |       environment.supabaseKey,
+      367 |       {
+
+      at new GoTrueClient (node_modules/.pnpm/@supabase+auth-js@2.112.3/node_modules/@supabase/auth-js/src/GoTrueClient.ts:424:15)
+      at new SupabaseAuthClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/lib/SupabaseAuthClient.ts:6:5)
+      at SupabaseClient._initSupabaseAuthClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/SupabaseClient.ts:630:12)
+      at new SupabaseClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/SupabaseClient.ts:345:24)
+      at createClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/index.ts:65:10)
+      at new SupabaseService (src/app/core/services/supabase.service.ts:364:31)
+      at Object.SupabaseService_Factory [as factory] (ng:\SupabaseService\ɵfac.js:5:10)
+      at node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1316:35
+      at runInInjectorProfilerContext (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:411:5)
+      at R3Injector.hydrate (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1314:11)
+      at R3Injector.get (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1203:23)
+      at _TestBedImpl.inject (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/testing.mjs:1447:48)
+      at _TestBedImpl.inject (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/testing.mjs:1331:33)
+      at src/app/core/services/supabase.service.spec.ts:37:23
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:168)
+      at _ProxyZoneSpec.onInvoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:1079:43)
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:56)
+      at _ZoneImpl.run (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:162:47)
+      at Object.wrappedFunc (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:407:38)
+
+    console.warn
+      GoTrueClient@sb-db-auth-token:2 (2.112.3) 2026-10-20T14:14:00.830Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
+
+      362 |     }
+      363 |
+    > 364 |     this.client = createClient(
+          |                               ^
+      365 |       authBaseUrl,
+      366 |       environment.supabaseKey,
+      367 |       {
+
+      at new GoTrueClient (node_modules/.pnpm/@supabase+auth-js@2.112.3/node_modules/@supabase/auth-js/src/GoTrueClient.ts:424:15)
+      at new SupabaseAuthClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/lib/SupabaseAuthClient.ts:6:5)
+      at SupabaseClient._initSupabaseAuthClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/SupabaseClient.ts:630:12)
+      at new SupabaseClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/SupabaseClient.ts:345:24)
+      at createClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/index.ts:65:10)
+      at new SupabaseService (src/app/core/services/supabase.service.ts:364:31)
+      at Object.SupabaseService_Factory [as factory] (ng:\SupabaseService\ɵfac.js:5:10)
+      at node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1316:35
+      at runInInjectorProfilerContext (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:411:5)
+      at R3Injector.hydrate (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1314:11)
+      at R3Injector.get (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1203:23)
+      at _TestBedImpl.inject (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/testing.mjs:1447:48)
+      at _TestBedImpl.inject (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/testing.mjs:1331:33)
+      at src/app/core/services/supabase.service.spec.ts:37:23
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:168)
+      at _ProxyZoneSpec.onInvoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:1079:43)
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:56)
+      at _ZoneImpl.run (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:162:47)
+      at Object.wrappedFunc (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:407:38)
+
+    console.warn
+      GoTrueClient@sb-db-auth-token:3 (2.112.3) 2026-10-20T14:14:00.974Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
+
+      362 |     }
+      363 |
+    > 364 |     this.client = createClient(
+          |                               ^
+      365 |       authBaseUrl,
+      366 |       environment.supabaseKey,
+      367 |       {
+
+      at new GoTrueClient (node_modules/.pnpm/@supabase+auth-js@2.112.3/node_modules/@supabase/auth-js/src/GoTrueClient.ts:424:15)
+      at new SupabaseAuthClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/lib/SupabaseAuthClient.ts:6:5)
+      at SupabaseClient._initSupabaseAuthClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/SupabaseClient.ts:630:12)
+      at new SupabaseClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/SupabaseClient.ts:345:24)
+      at createClient (node_modules/.pnpm/@supabase+supabase-js@2.112.3/node_modules/@supabase/supabase-js/src/index.ts:65:10)
+      at new SupabaseService (src/app/core/services/supabase.service.ts:364:31)
+      at Object.SupabaseService_Factory [as factory] (ng:\SupabaseService\ɵfac.js:5:10)
+      at node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1316:35
+      at runInInjectorProfilerContext (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:411:5)
+      at R3Injector.hydrate (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1314:11)
+      at R3Injector.get (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/_pending_tasks-chunk.mjs:1203:23)
+      at _TestBedImpl.inject (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/testing.mjs:1447:48)
+      at _TestBedImpl.inject (node_modules/.pnpm/@angular+core@22.1.3_@angul_15319dc92ef265bf0e8df22b3687f5ff/node_modules/@angular/core/fesm2022/testing.mjs:1331:33)
+      at src/app/core/services/supabase.service.spec.ts:37:23
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:168)
+      at _ProxyZoneSpec.onInvoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:1079:43)
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:56)
+      at _ZoneImpl.run (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:162:47)
+      at Object.wrappedFunc (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:407:38)
+
+PASS src/app/features/repairs/application/services/admin-repair.service.spec.ts (5.605 s)
+PASS src/app/shared/services/cart.service.spec.ts (6.024 s)
+PASS src/app/public/checkout/checkout-page.spec.ts (6.416 s)
+PASS src/app/admin/dashboard/admin-dashboard-page.spec.ts (7.103 s)
+PASS src/app/admin/services/admin-services-page.spec.ts (7.127 s)
+PASS src/app/shared/components/block-renderer/block-renderer.component.spec.ts (7.39 s)
+PASS src/app/shared/components/blocks-editor/blocks-editor.component.spec.ts (7.726 s)
+PASS src/app/admin/sales/admin-invoice-detail-page.spec.ts (8.3 s)
+PASS src/app/features/services/domain/dtos/block-schemas.spec.ts
+PASS src/app/admin/services/service-editor/service-editor.component.spec.ts (8.818 s)
+PASS src/app/admin/layout/components/admin-tab-bar/admin-tab-bar.component.spec.ts
+PASS src/app/features/repairs/application/use-cases/update-repair.use-case.spec.ts
+PASS src/app/features/services/application/usecases/service-usecases.spec.ts
+PASS src/app/admin/sales/components/invoice-form-modal/invoice-form-modal.component.spec.ts (8.717 s)
+PASS src/app/features/orders/infrastructure/repositories/supabase-cart.repository.spec.ts
+PASS src/app/core/interceptors/error.interceptor.spec.ts
+PASS src/app/features/sales/domain/usecases/create-invoice-draft-from-repair-order.usecase.spec.ts
+PASS src/app/admin/sales/admin-sales-page.spec.ts
+PASS src/app/application/suppliers/suppliers-event-integration.spec.ts
+  ● Console
+
+    console.debug
+      [EventBus] Published: PurchaseRegisteredEvent PurchaseRegisteredEvent {
+        purchaseId: 'purch-1',
+        supplierId: 'supp-1',
+        supplierName: 'Proveedor Uno',
+        items: [],
+        subtotal: 40000,
+        taxAmount: 8400,
+        total: 48400,
+        paymentMethod: 'transfer',
+        paymentStatus: 'pending',
+        registeredAt: 2026-10-20T14:14:05.570Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SupplierPaymentMadeEvent SupplierPaymentMadeEvent {
+        supplierId: 'supp-2',
+        purchaseId: 'purch-old',
+        amount: 20000,
+        paymentMethod: 'transfer',
+        paidAt: 2026-10-20T14:14:05.636Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-xyz',
+        items: [],
+        subtotal: 100000,
+        discount: 0,
+        total: 100000,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:05.639Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+PASS src/app/core/guards/permission.guard.spec.ts
+PASS src/app/application/cash-movements/cash-movements-event-integration.spec.ts
+  ● Console
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-101',
+        items: [ { description: 'Item 1', quantity: 1, unitPrice: 5000 } ],
+        subtotal: 5000,
+        discount: 0,
+        total: 5000,
+        paymentMethod: 'cash',
+        customer: { name: 'Juan Perez' },
+        requestInvoice: false,
+        completedAt: 2026-10-12T10:00:00.000Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-102',
+        items: [],
+        subtotal: 3000,
+        discount: 0,
+        total: 3000,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:05.910Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-102',
+        items: [],
+        subtotal: 3000,
+        discount: 0,
+        total: 3000,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:05.910Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-103',
+        items: [],
+        subtotal: 7500,
+        discount: 500,
+        total: 7000,
+        paymentMethod: 'transfer',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:05.913Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: PurchaseRegisteredEvent PurchaseRegisteredEvent {
+        purchaseId: 'purch-201',
+        supplierId: 'supp-1',
+        supplierName: 'Distribuidora Central',
+        items: [],
+        subtotal: 10000,
+        taxAmount: 2100,
+        total: 12100,
+        paymentMethod: 'cash',
+        paymentStatus: 'paid',
+        registeredAt: 2026-10-20T14:14:05.915Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: PurchaseRegisteredEvent PurchaseRegisteredEvent {
+        purchaseId: 'purch-202',
+        supplierId: 'supp-1',
+        supplierName: 'Distribuidora Central',
+        items: [],
+        subtotal: 10000,
+        taxAmount: 2100,
+        total: 12100,
+        paymentMethod: 'cash',
+        paymentStatus: 'pending',
+        registeredAt: 2026-10-20T14:14:05.918Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: OrderDeliveredEvent OrderDeliveredEvent {
+        orderId: 'order-301',
+        customer: { name: 'Maria Gomez' },
+        items: [],
+        total: 15000,
+        paymentMethod: 'card',
+        requestInvoice: false,
+        deliveredAt: 2026-10-20T14:14:05.921Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: OrderDeliveredEvent OrderDeliveredEvent {
+        orderId: 'order-302',
+        customer: { name: 'Pedro' },
+        items: [],
+        total: 8000,
+        paymentMethod: 'transfer',
+        requestInvoice: false,
+        deliveredAt: 2026-10-20T14:14:05.926Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: OrderDeliveredEvent OrderDeliveredEvent {
+        orderId: 'order-302',
+        customer: { name: 'Pedro' },
+        items: [],
+        total: 8000,
+        paymentMethod: 'transfer',
+        requestInvoice: false,
+        deliveredAt: 2026-10-20T14:14:05.926Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: RepairOrderDeliveredEvent RepairOrderDeliveredEvent {
+        repairOrderId: 'rep-401',
+        customer: { name: 'Carlos Tech' },
+        totalPaid: 25000,
+        paymentMethod: 'cash',
+        deliveredAt: 2026-10-20T14:14:05.930Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: InvoiceIssuedEvent InvoiceIssuedEvent {
+        invoiceId: 'inv-501',
+        invoiceNumber: '0001-00000123',
+        invoiceType: 'B',
+        origin: 'manual',
+        customer: { name: 'Empresa SA' },
+        total: 45000,
+        paymentMethod: 'transfer',
+        issuedAt: 2026-10-20T14:14:05.946Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: InvoiceIssuedEvent InvoiceIssuedEvent {
+        invoiceId: 'inv-502',
+        invoiceNumber: '0001-00000124',
+        invoiceType: 'B',
+        origin: 'sale',
+        customer: { name: 'Cliente POS' },
+        total: 12000,
+        paymentMethod: 'cash',
+        issuedAt: 2026-10-20T14:14:05.949Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SupplierPaymentMadeEvent SupplierPaymentMadeEvent {
+        supplierId: 'supp-99',
+        purchaseId: 'purch-10',
+        amount: 30000,
+        paymentMethod: 'transfer',
+        paidAt: 2026-10-20T14:14:05.952Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+PASS src/app/features/orders/infrastructure/mappers/order.mapper.spec.ts
+PASS src/app/admin/repairs/admin-repairs-page.spec.ts
+PASS src/app/features/products/infrastructure/repositories/supabase-product.repository.spec.ts
+PASS src/app/features/products/infrastructure/mappers/product.mapper.spec.ts
+PASS src/app/core/services/whatsapp.service.spec.ts
+PASS src/app/features/services/application/mappers/service-mapper.spec.ts
+PASS src/app/features/analytics/infrastructure/repositories/supabase-analytics.repository.spec.ts
+PASS src/app/application/invoice/invoice-event-integration.spec.ts
+  ● Console
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-bill-1',
+        items: [
+          { description: 'Repuesto Pantalla', quantity: 1, unitPrice: 12000 }
+        ],
+        subtotal: 12000,
+        discount: 0,
+        total: 12000,
+        paymentMethod: 'cash',
+        customer: { name: 'Lautaro', taxId: '20334445551' },
+        requestInvoice: true,
+        completedAt: 2026-10-20T14:14:06.968Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-bill-2',
+        items: [],
+        subtotal: 5000,
+        discount: 0,
+        total: 5000,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:06.989Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-bill-3',
+        items: [ { description: 'Batería', quantity: 1, unitPrice: 8500 } ],
+        subtotal: 8500,
+        discount: 0,
+        total: 8500,
+        paymentMethod: 'transfer',
+        customer: { name: 'Consumidor' },
+        requestInvoice: true,
+        completedAt: 2026-10-20T14:14:06.992Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: OrderDeliveredEvent OrderDeliveredEvent {
+        orderId: 'order-bill-1',
+        customer: { name: 'Cliente Online', email: 'cliente@mail.com' },
+        items: [ { description: 'Accesorio', quantity: 2, unitPrice: 3000 } ],
+        total: 6000,
+        paymentMethod: 'card',
+        requestInvoice: true,
+        deliveredAt: 2026-10-20T14:14:06.998Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: OrderDeliveredEvent OrderDeliveredEvent {
+        orderId: 'order-bill-2',
+        customer: { name: 'Cliente Repetido' },
+        items: [],
+        total: 4000,
+        paymentMethod: 'cash',
+        requestInvoice: true,
+        deliveredAt: 2026-10-20T14:14:07.001Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: OrderDeliveredEvent OrderDeliveredEvent {
+        orderId: 'order-bill-2',
+        customer: { name: 'Cliente Repetido' },
+        items: [],
+        total: 4000,
+        paymentMethod: 'cash',
+        requestInvoice: true,
+        deliveredAt: 2026-10-20T14:14:07.001Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: RepairOrderReadyForInvoicingEvent RepairOrderReadyForInvoicingEvent {
+        repairOrderId: 'rep-order-1',
+        customer: { name: 'Juan Reparacion', taxId: '20304050607' },
+        items: [
+          {
+            description: 'Cambio de pantalla iPhone',
+            quantity: 1,
+            unitPrice: 20000,
+            itemType: 'part'
+          },
+          {
+            description: 'Mano de obra técnica',
+            quantity: 1,
+            unitPrice: 10000,
+            itemType: 'labor'
+          }
+        ],
+        totals: { subtotal: 30000, surcharge: 0, advancePayment: 5000, total: 30000 },
+        paymentMethod: 'cash',
+        issuedAt: 2026-10-20T14:14:07.006Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: RepairOrderReadyForInvoicingEvent RepairOrderReadyForInvoicingEvent {
+        repairOrderId: 'rep-order-cancel',
+        customer: { name: 'Cliente a Cancelar' },
+        items: [
+          {
+            description: 'Repuesto',
+            quantity: 1,
+            unitPrice: 15000,
+            itemType: 'part'
+          }
+        ],
+        totals: { subtotal: 15000, surcharge: 0, advancePayment: 0, total: 15000 },
+        paymentMethod: 'cash',
+        issuedAt: 2026-10-20T14:14:07.015Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+PASS src/app/features/sales/infrastructure/mappers/invoice.mapper.spec.ts
+PASS src/app/infrastructure/events/rxjs-event-bus.service.spec.ts
+  ● Console
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-1',
+        items: [],
+        subtotal: 1000,
+        discount: 0,
+        total: 1000,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:07.016Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-1',
+        items: [],
+        subtotal: 500,
+        discount: 0,
+        total: 500,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:07.022Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: PurchaseRegisteredEvent PurchaseRegisteredEvent {
+        purchaseId: 'purch-1',
+        supplierId: 'supp-1',
+        supplierName: 'Supplier',
+        items: [],
+        subtotal: 400,
+        taxAmount: 0,
+        total: 400,
+        paymentMethod: 'cash',
+        paymentStatus: 'paid',
+        registeredAt: 2026-10-20T14:14:07.022Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-resilient',
+        items: [],
+        subtotal: 200,
+        discount: 0,
+        total: 200,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:07.027Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+    console.error
+      [EventBus] Error in handler for SaleCompletedEvent: Error: Subscriber intentional error
+          at C:\git\Arecofixpage\src\app\infrastructure\events\rxjs-event-bus.service.spec.ts:79:13
+          at Object.next (C:\git\Arecofixpage\src\app\infrastructure\events\rxjs-event-bus.service.ts:52:37)
+          at ConsumerObserver.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:155:25)
+          at SafeSubscriber.Subscriber._next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:113:22)
+          at SafeSubscriber.Subscriber.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+          at C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\operators\filter.ts:72:109
+          at OperatorSubscriber._this._next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+          at OperatorSubscriber.Subscriber.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+          at C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subject.ts:67:20
+          at Object.errorContext (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+          at Subject.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subject.ts:60:5)
+          at Object.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\operators\share.ts:225:33)
+          at ConsumerObserver.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:155:25)
+          at SafeSubscriber.Subscriber._next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:113:22)
+          at SafeSubscriber.Subscriber.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+          at C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subject.ts:67:20
+          at Object.errorContext (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+          at Subject.next (C:\git\Arecofixpage\node_modules\.pnpm\rxjs@7.8.2\node_modules\rxjs\src\internal\Subject.ts:60:5)
+          at RxjsEventBusService.publish (C:\git\Arecofixpage\src\app\infrastructure\events\rxjs-event-bus.service.ts:27:23)
+          at C:\git\Arecofixpage\src\app\infrastructure\events\rxjs-event-bus.service.spec.ts:100:16
+          at Object.<anonymous> (C:\git\Arecofixpage\node_modules\.pnpm\expect@30.4.1\node_modules\expect\build\index.js:1824:9)
+          at Object.throwingMatcher [as toThrow] (C:\git\Arecofixpage\node_modules\.pnpm\expect@30.4.1\node_modules\expect\build\index.js:2235:93)
+          at C:\git\Arecofixpage\src\app\infrastructure\events\rxjs-event-bus.service.spec.ts:101:12
+          at _ZoneDelegate.invoke (C:\git\Arecofixpage\node_modules\.pnpm\zone.js@0.16.2\node_modules\zone.js\bundles\zone.umd.js:407:168)
+          at _ProxyZoneSpec.onInvoke (C:\git\Arecofixpage\node_modules\.pnpm\zone.js@0.16.2\node_modules\zone.js\bundles\zone-testing.umd.js:1079:43)
+          at _ZoneDelegate.invoke (C:\git\Arecofixpage\node_modules\.pnpm\zone.js@0.16.2\node_modules\zone.js\bundles\zone.umd.js:407:56)
+          at _ZoneImpl.run (C:\git\Arecofixpage\node_modules\.pnpm\zone.js@0.16.2\node_modules\zone.js\bundles\zone.umd.js:162:47)
+          at Object.wrappedFunc (C:\git\Arecofixpage\node_modules\.pnpm\zone.js@0.16.2\node_modules\zone.js\bundles\zone-testing.umd.js:407:38)
+          at Promise.finally.completed (C:\git\Arecofixpage\node_modules\.pnpm\jest-circus@30.4.2\node_modules\jest-circus\build\jestAdapterInit.js:1561:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\git\Arecofixpage\node_modules\.pnpm\jest-circus@30.4.2\node_modules\jest-circus\build\jestAdapterInit.js:1501:10)
+          at _callCircusTest (C:\git\Arecofixpage\node_modules\.pnpm\jest-circus@30.4.2\node_modules\jest-circus\build\jestAdapterInit.js:1011:40)
+          at processTicksAndRejections (node:internal/process/task_queues:104:5)
+          at _runTest (C:\git\Arecofixpage\node_modules\.pnpm\jest-circus@30.4.2\node_modules\jest-circus\build\jestAdapterInit.js:951:3)
+          at C:\git\Arecofixpage\node_modules\.pnpm\jest-circus@30.4.2\node_modules\jest-circus\build\jestAdapterInit.js:853:7
+
+      57 |             }
+      58 |           } catch (err) {
+    > 59 |             console.error(`[EventBus] Error in handler for ${eventType.name}:`, err);
+         |                     ^
+      60 |           }
+      61 |         },
+      62 |         error: (err: unknown) => {
+
+      at Object.next (src/app/infrastructure/events/rxjs-event-bus.service.ts:59:21)
+      at ConsumerObserver.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:155:25)
+      at SafeSubscriber.Subscriber._next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:113:22)
+      at SafeSubscriber.Subscriber.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+      at node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/operators/filter.ts:72:109
+      at OperatorSubscriber._this._next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+      at OperatorSubscriber.Subscriber.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+      at node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subject.ts:67:20
+      at Object.errorContext (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/util/errorContext.ts:29:5)
+      at Subject.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subject.ts:60:5)
+      at Object.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/operators/share.ts:225:33)
+      at ConsumerObserver.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:155:25)
+      at SafeSubscriber.Subscriber._next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:113:22)
+      at SafeSubscriber.Subscriber.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+      at node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subject.ts:67:20
+      at Object.errorContext (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/util/errorContext.ts:29:5)
+      at Subject.next (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subject.ts:60:5)
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:27:23)
+      at src/app/infrastructure/events/rxjs-event-bus.service.spec.ts:100:16
+      at Object.<anonymous> (node_modules/.pnpm/expect@30.4.1/node_modules/expect/build/index.js:1824:9)
+      at Object.throwingMatcher [as toThrow] (node_modules/.pnpm/expect@30.4.1/node_modules/expect/build/index.js:2235:93)
+      at src/app/infrastructure/events/rxjs-event-bus.service.spec.ts:101:12
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:168)
+      at _ProxyZoneSpec.onInvoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:1079:43)
+      at _ZoneDelegate.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:407:56)
+      at _ZoneImpl.run (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:162:47)
+      at Object.wrappedFunc (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:407:38)
+
+    console.debug
+      [EventBus] Published: SaleCompletedEvent SaleCompletedEvent {
+        saleId: 'sale-multi',
+        items: [],
+        subtotal: 100,
+        discount: 0,
+        total: 100,
+        paymentMethod: 'cash',
+        customer: null,
+        requestInvoice: false,
+        completedAt: 2026-10-20T14:14:07.118Z
+      }
+
+      at RxjsEventBusService.publish (src/app/infrastructure/events/rxjs-event-bus.service.ts:24:15)
+
+PASS src/app/public/auth/forgot-password/forgot-password.component.spec.ts
+PASS src/app/features/sales/application/services/qr-generator.service.spec.ts
+PASS src/app/features/customers/infrastructure/mappers/supplier.mapper.spec.ts
+PASS src/app/features/sales/domain/usecases/validate-arca-invoice.usecase.spec.ts
+PASS src/app/features/sales/domain/usecases/calculate-arca-totals.usecase.spec.ts
+PASS src/app/core/repositories/tenant-cart-branches.spec.ts
+PASS src/app/core/services/pricing.service.spec.ts
+PASS src/app/features/services/domain/value-objects/value-objects.spec.ts
+PASS src/app/features/devices/infrastructure/repositories/supabase-customer-device.repository.spec.ts
+PASS src/app/core/services/supabase-error-handler.service.spec.ts
+PASS src/app/features/orders/application/usecases/confirm-checkout.usecase.spec.ts
+PASS src/app/core/repositories/base.repository.spec.ts
+PASS src/app/admin/dashboard/services/admin-business-dashboard.service.spec.ts
+  ● Console
+
+    console.error
+      [AdminBusinessDashboardService] Error fetching metrics: HttpErrorResponse {
+        headers: HttpHeaders {
+          headers: Map(0) {},
+          normalizedNames: Map(0) {},
+          lazyInit: undefined,
+          lazyUpdate: null
+        },
+        status: 500,
+        statusText: 'Internal Server Error',
+        url: '/api/admin/dashboard/metrics?range=month',
+        ok: false,
+        type: undefined,
+        redirected: undefined,
+        responseType: undefined,
+        name: 'HttpErrorResponse',
+        message: 'Http failure response for /api/admin/dashboard/metrics?range=month: 500 Internal Server Error',
+        error: { error: 'Server error' }
+      }
+
+      223 |       }),
+      224 |       catchError((err) => {
+    > 225 |         console.error('[AdminBusinessDashboardService] Error fetching metrics:', err);
+          |                 ^
+      226 |         return of({
+      227 |           success: false,
+      228 |           error: err?.error?.error || err?.message || 'Error al conectar con el servidor.',
+
+      at src/app/admin/dashboard/services/admin-business-dashboard.service.ts:225:17
+      at node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/operators/catchError.ts:115:35
+      at OperatorSubscriber._this._error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:79:13)
+      at OperatorSubscriber.Subscriber.error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:86:12)
+      at OperatorSubscriber.Subscriber._error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:118:24)
+      at OperatorSubscriber.Subscriber.error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:86:12)
+      at OperatorSubscriber.Subscriber._error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:118:24)
+      at OperatorSubscriber.Subscriber.error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:86:12)
+      at OperatorSubscriber.Subscriber._error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:118:24)
+      at OperatorSubscriber.Subscriber.error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:86:12)
+      at OperatorSubscriber.Subscriber._error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:118:24)
+      at OperatorSubscriber.Subscriber.error (node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs/src/internal/Subscriber.ts:86:12)
+      at TestRequest.flush (node_modules/.pnpm/@angular+common@22.1.3_@ang_4d0428f3bf2e0f13d39976a33aabe708/node_modules/@angular/common/fesm2022/http-testing.mjs:58:21)
+      at src/app/admin/dashboard/services/admin-business-dashboard.service.spec.ts:137:11
+      at timer (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:1581:43)
+      at _ZoneDelegate.invokeTask (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:436:181)
+      at _ProxyZoneSpec.onInvokeTask (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone-testing.umd.js:1110:43)
+      at _ZoneDelegate.invokeTask (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:436:64)
+      at _ZoneImpl.runTask (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:204:51)
+      at ZoneTask.invokeTask (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:517:38)
+      at ZoneTask.invoke (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:506:52)
+      at data.args.<computed> (node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/bundles/zone.umd.js:1553:36)
+      at Timeout.task [as _onTimeout] (node_modules/.pnpm/jsdom@26.1.0_supports-color@8.1.1/node_modules/jsdom/lib/jsdom/browser/Window.js:579:19)
+
+PASS src/app/features/repairs/infrastructure/mappers/repair-order.mapper.spec.ts
+PASS src/app/core/interceptors/guest-session.interceptor.spec.ts
+PASS src/app/core/utils/uuid.utils.spec.ts
+PASS src/app/features/services/application/usecases/lead-security.spec.ts
+PASS src/app/core/resolvers/tracking-seo.resolver.spec.ts
+
+Test Suites: 50 passed, 50 total
+Tests:       276 passed, 276 total
+Snapshots:   0 total
+Time:        19.972 s
+Ran all test suites.

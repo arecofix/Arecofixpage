@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, switchMap, of, tap, Subject, firstValueFrom } from 'rxjs';
+import { combineLatest, map, switchMap, of, tap, Subject, firstValueFrom, take } from 'rxjs';
 import { debounceTime, distinctUntilChanged, catchError } from 'rxjs/operators';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { SeoService } from '@app/core/services/seo.service';
@@ -30,6 +30,7 @@ import {
 import { ProductCard } from '@app/public/products/components';
 import { Product } from '@app/public/products/interfaces';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 @Component({
   selector: 'products-by-category-page',
@@ -40,7 +41,8 @@ import { GsmService } from '@app/public/gsm/services/gsm.service';
     Pagination,
     RouterModule,
     FormsModule,
-    BreadcrumbsComponent
+    BreadcrumbsComponent,
+    FormatPricePipe,
   ],
   templateUrl: './products-by-category-page.html',
   styles: ``,
@@ -74,6 +76,7 @@ export class ProductsByCategoryPage {
 
   categoriesListRs = rxResource({
     stream: () => this.tenant$.pipe(
+      take(1),
       switchMap(tenant => {
         if (!tenant) return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
         return this.categoryService.getFeaturedData();
@@ -174,6 +177,7 @@ export class ProductsByCategoryPage {
   productsRs = rxResource({
     stream: () =>
       combineLatest([this.routeParams$, this.tenant$]).pipe(
+        take(1),
         switchMap(([routeParams, tenant]) => {
           const [slugPath, queryParams] = routeParams;
           

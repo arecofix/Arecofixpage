@@ -5,6 +5,7 @@ export default defineConfig({
   projectId: 'hfghsi',
   e2e: {
     baseUrl: process.env['CYPRESS_BASE_URL'] || 'http://localhost:4200',
+    specPattern: process.env['CYPRESS_SPEC'] || 'cypress/e2e/**/*.cy.{js,ts}',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
@@ -44,6 +45,13 @@ export default defineConfig({
             console.warn('⚠️ seedDatabase task encountered an error:', err);
           }
           return null;
+        },
+        generateMpWebhookSignature({ secret, dataId, requestId, timestamp }: { secret: string; dataId: string; requestId: string; timestamp?: number }) {
+          const crypto = require('node:crypto');
+          const ts = timestamp || Math.floor(Date.now() / 1000);
+          const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
+          const hash = crypto.createHmac('sha256', secret).update(manifest).digest('hex');
+          return `ts=${ts},v1=${hash}`;
         }
       });
       return config;
@@ -54,6 +62,7 @@ export default defineConfig({
 
   env: {
     apiUrl: "http://localhost:3000/api",
+    TEST_ADMIN_EMAIL: "testadmin@arecofix.com",
     mobileViewport: { width: 390, height: 844 },
     tabletViewport: { width: 768, height: 1024 },
   },

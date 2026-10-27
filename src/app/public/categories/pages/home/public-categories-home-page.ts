@@ -1,7 +1,7 @@
-﻿import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, switchMap, of } from 'rxjs';
+import { combineLatest, map, switchMap, of, take } from 'rxjs';
 
 /*  */
 import { Pagination, PaginationService, iPagination } from '@app/shared/components/pagination';
@@ -41,6 +41,7 @@ export class PublicCategoriesHomePage {
         this.route.queryParams.pipe(map((params) => +params['_page'] || 1)),
         this.tenant$,
       ]).pipe(
+        take(1),
         switchMap(([currentPage, tenant]) => {
           if (!tenant) return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
           return this.categoryService.getData({

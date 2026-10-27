@@ -38,6 +38,7 @@ export abstract class ProductRepository {
     abstract create(product: Product): Observable<Product>;
     abstract update(id: string, product: Partial<Product>): Observable<Product>;
     abstract delete(id: string): Observable<void>;
+    abstract softDelete(id: string): Observable<void>;
     
     abstract uploadImage(file: File): Promise<string>;
     abstract upsertMany(products: Partial<Product>[]): Observable<Product[]>;

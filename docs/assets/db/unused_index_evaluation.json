@@ -1,0 +1,352 @@
+{
+  "auditDate": "2026-10-20T20:54:26.742Z",
+  "totalZeroScan": 118,
+  "fkCoveringCount": 75,
+  "candidateDropCount": 43,
+  "candidateDrop": [
+    {
+      "schemaname": "public",
+      "table_name": "academy_email_notifications",
+      "index_name": "idx_academy_notifications_ref",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "academy_payments",
+      "index_name": "idx_academy_payments_sub",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "academy_payments",
+      "index_name": "idx_academy_payments_user",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "audit_logs",
+      "index_name": "idx_audit_logs_entity",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "bank_reconciliations",
+      "index_name": "idx_bank_recon_unmatched",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "blog_posts",
+      "index_name": "idx_blog_posts_slug",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "cash_movements",
+      "index_name": "idx_cash_movements_branch_date",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "cash_movements",
+      "index_name": "idx_cash_movements_tenant_branch",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "cash_movements",
+      "index_name": "idx_cash_movements_tenant_date",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "cola_tiktok",
+      "index_name": "idx_cola_tiktok_estado_fecha",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_certificates",
+      "index_name": "idx_course_certificates_email",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_certificates",
+      "index_name": "idx_course_certificates_status",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_certificates",
+      "index_name": "idx_course_certificates_user_id",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_exam_submissions",
+      "index_name": "idx_course_exam_submissions_email",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_instructors",
+      "index_name": "idx_course_instructors_instructor",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_modules",
+      "index_name": "idx_course_modules_unlock_date",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "course_progress",
+      "index_name": "idx_course_progress_email",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "courses",
+      "index_name": "idx_courses_instructor_id",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "customer_devices",
+      "index_name": "idx_customer_devices_imei",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "customer_devices",
+      "index_name": "idx_customer_devices_serial",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "invoices",
+      "index_name": "idx_invoices_customer_id",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "invoices",
+      "index_name": "idx_invoices_number",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "invoices",
+      "index_name": "idx_invoices_status",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "invoices",
+      "index_name": "idx_invoices_tenant_repair",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "knowledge_base",
+      "index_name": "idx_kb_embedding_hnsw",
+      "idx_scan": "0",
+      "index_size_pretty": "144 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "knowledge_base",
+      "index_name": "idx_kb_metadata",
+      "idx_scan": "0",
+      "index_size_pretty": "24 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "knowledge_base",
+      "index_name": "idx_kb_source_id",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "notifications",
+      "index_name": "idx_notifications_unread",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "notifications",
+      "index_name": "idx_notifications_user",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "orders",
+      "index_name": "idx_orders_payment_id",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "orders",
+      "index_name": "idx_orders_preference_id",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "orders",
+      "index_name": "idx_orders_tracking_code",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "pages",
+      "index_name": "idx_pages_active_slug",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "payments",
+      "index_name": "idx_payments_status",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "product_stock_per_branch",
+      "index_name": "idx_stock_available",
+      "idx_scan": "0",
+      "index_size_pretty": "144 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "products",
+      "index_name": "idx_products_search_tsv",
+      "idx_scan": "0",
+      "index_size_pretty": "720 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "products",
+      "index_name": "idx_products_tenant_active_deleted_created",
+      "idx_scan": "0",
+      "index_size_pretty": "40 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "repair_status_history",
+      "index_name": "idx_repair_status_history_changed_by",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "repairs",
+      "index_name": "idx_repairs_deleted_at",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "service_leads",
+      "index_name": "idx_service_leads_status_created",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "stock_history",
+      "index_name": "idx_stock_history_created_at",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "stock_history",
+      "index_name": "idx_stock_history_tenant_id",
+      "idx_scan": "0",
+      "index_size_pretty": "8192 bytes",
+      "is_covering_fk": false
+    },
+    {
+      "schemaname": "public",
+      "table_name": "technical_solutions",
+      "index_name": "idx_technical_solutions_search_tsv",
+      "idx_scan": "0",
+      "index_size_pretty": "16 kB",
+      "is_covering_fk": false
+    }
+  ]
+}

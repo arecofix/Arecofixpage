@@ -121,6 +121,18 @@ export function setupInvoiceMocks() {
     });
   }).as('postInvoiceItems');
 
+  cy.intercept('PATCH', '**/rest/v1/invoices*', (req) => {
+    if (typeof req.body === 'string') {
+      try {
+        req.body = JSON.parse(req.body);
+      } catch (e) {}
+    }
+    req.reply({
+      statusCode: 200,
+      body: req.body,
+    });
+  }).as('updateInvoice');
+
   cy.intercept('GET', '**/rest/v1/tenants*', (req) => {
     req.reply({
       statusCode: 200,

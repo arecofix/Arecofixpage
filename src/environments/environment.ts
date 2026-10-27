@@ -78,5 +78,8 @@ export const environment: Environment = {
   downloads: {
     desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
   },
-  turnstileSiteKey: '1x00000000000000000000AA'
+  turnstileSiteKey: '1x00000000000000000000AA',
+  features: {
+    trialEnabled: true
+  }
 };

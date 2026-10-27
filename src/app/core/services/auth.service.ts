@@ -440,6 +440,20 @@ export class AuthService {
     return this.authState.value.user;
   }
 
+  async getSession(): Promise<Session | null> {
+    if (this.authState.value.session) {
+      return this.authState.value.session;
+    }
+    const state = await this.waitForAuth();
+    if (state.session) return state.session;
+    try {
+      const { data } = await this.supabase.auth.getSession();
+      return data?.session || null;
+    } catch {
+      return null;
+    }
+  }
+
   async waitForAuth(): Promise<{ session: Session | null; user: User | null; profile: UserProfile | null; isInitialized: boolean }> {
     if (this.authState.value.isInitialized) {
       return this.authState.value;
@@ -465,11 +479,6 @@ export class AuthService {
 
   getCurrentSession(): Session | null {
     return this.authState.value.session;
-  }
-
-  async getSession(): Promise<Session | null> {
-    const { data } = await this.supabase.auth.getSession();
-    return data.session;
   }
 
   async getUserProfile(userId: string): Promise<UserProfile | null> {

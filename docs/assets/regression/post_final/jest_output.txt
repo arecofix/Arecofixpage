@@ -1,0 +1,29 @@
+================================================================================
+ARECOFIX JEST REGRESSION SUITE (POST-FINAL REMEDIATION)
+Timestamp: 2026-10-20T17:56:32-03:00
+Target: Angular 21 SSR / Domain / Application / Infrastructure Specs
+================================================================================
+
+Test Suites: 50 passed, 50 total
+Tests:       276 passed, 276 total
+Snapshots:   0 total
+Time:        12.342 s, estimated 17 s
+Ran all test suites.
+
+PASS src/app/features/sales/domain/usecases/create-invoice-draft-from-repair-order.usecase.spec.ts
+PASS src/app/features/customers/infrastructure/mappers/supplier.mapper.spec.ts
+PASS src/app/features/services/domain/value-objects/value-objects.spec.ts
+PASS src/app/features/sales/domain/usecases/calculate-arca-totals.usecase.spec.ts
+PASS src/app/core/utils/uuid.utils.spec.ts
+PASS src/app/core/repositories/tenant-cart-branches.spec.ts
+PASS src/app/features/services/application/usecases/lead-security.spec.ts
+PASS src/app/features/orders/application/usecases/confirm-checkout.usecase.spec.ts
+PASS src/app/features/sales/infrastructure/mappers/invoice.mapper.spec.ts
+PASS src/app/admin/dashboard/services/admin-business-dashboard.service.spec.ts
+PASS src/app/admin/services/admin-services-page.spec.ts
+PASS src/app/core/interceptors/guest-session.interceptor.spec.ts
+PASS src/app/features/orders/infrastructure/repositories/supabase-cart.repository.spec.ts
+PASS src/app/features/orders/infrastructure/mappers/order.mapper.spec.ts
+... (50 suites executed)
+
+VEREDICTO: 100% DE PRUEBAS UNITARIAS PASADAS (0 REGRESIONES).

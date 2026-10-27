@@ -179,4 +179,89 @@ describe('ProductMapper', () => {
       expect(product.warranty_type).toBe('Vendedor');
     });
   });
+
+  describe('mapUpdateToDb - Safe Partial Updates', () => {
+    it('should return a payload with ONLY the single field when DTO has one field', () => {
+      const dto: Partial<Product> = { price: 299999 };
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload).toEqual({ price: 299999 });
+      expect(Object.keys(payload).length).toBe(1);
+    });
+
+    it('should return an empty payload when DTO is empty', () => {
+      const dto: Partial<Product> = {};
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload).toEqual({});
+      expect(Object.keys(payload).length).toBe(0);
+    });
+
+    it('should NOT wipe specifications if neither specifications nor spec attributes are passed', () => {
+      const dto: Partial<Product> = { stock: 15 };
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload).toEqual({ stock: 15 });
+      expect('specifications' in payload).toBe(false);
+    });
+
+    it('should preserve explicit null when field is intentionally set to null', () => {
+      const dto: Partial<Product> = {
+        description: null as unknown as string,
+        category_id: null as unknown as string
+      };
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload['description']).toBeNull();
+      expect(payload['category_id']).toBeNull();
+      expect(Object.keys(payload).length).toBe(2);
+    });
+
+    it('should NOT include undefined fields in payload', () => {
+      const dto: Partial<Product> = {
+        name: 'Updated Name',
+        price: undefined,
+        description: undefined,
+        stock: undefined
+      };
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload).toEqual({ name: 'Updated Name' });
+      expect('price' in payload).toBe(false);
+      expect('description' in payload).toBe(false);
+      expect('stock' in payload).toBe(false);
+    });
+
+    it('should include all provided fields when DTO contains multiple attributes', () => {
+      const dto: Partial<Product> = {
+        name: 'Nuevo Repuesto',
+        price: 50000,
+        cost_price: 30000,
+        sku: 'REP-001',
+        is_active: true
+      };
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload['name']).toBe('Nuevo Repuesto');
+      expect(payload['price']).toBe(50000);
+      expect(payload['cost_price']).toBe(30000);
+      expect(payload['sku']).toBe('REP-001');
+      expect(payload['is_active']).toBe(true);
+    });
+
+    it('should strip primary keys and computed fields from update payload', () => {
+      const dto: Partial<Product> = {
+        id: 'prod-123',
+        tenant_id: 'tenant-456',
+        name: 'Clean Name',
+        retail_price: 60000 as unknown as number
+      };
+      const payload = ProductMapper.mapUpdateToDb(dto);
+
+      expect(payload['name']).toBe('Clean Name');
+      expect('id' in payload).toBe(false);
+      expect('tenant_id' in payload).toBe(false);
+      expect('retail_price' in payload).toBe(false);
+    });
+  });
 });

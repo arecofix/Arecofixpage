@@ -129,8 +129,10 @@ export class SeoService {
         ? currentPath 
         : `${SITE_URL}${currentPath.startsWith('/') ? '' : '/'}${currentPath}`;
     
-    // Ensure trailing slash for directory routes to prevent Cloudflare Pages 308 redirect loops with Facebook Scraper
-    if (!finalUrl.endsWith('/') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
+    // Ensure trailing slash for directory routes, except for /servicios/ which use clean slugs
+    if (currentPath.includes('/servicios/')) {
+      finalUrl = finalUrl.replace(/\/+$/, '');
+    } else if (!finalUrl.endsWith('/') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
       finalUrl = `${finalUrl}/`;
     }
     

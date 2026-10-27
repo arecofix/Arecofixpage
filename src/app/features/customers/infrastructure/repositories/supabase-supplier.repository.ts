@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { Supplier } from '../../domain/entities/supplier.entity';
+import { SupplierMapper } from '../mappers/supplier.mapper';
 import { LoggerService } from '@app/core/services/logger.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { SupplierRepository, SupplierPaymentDto } from '@app/domain/repositories/supplier.repository';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,11 @@ export class SupabaseSupplierRepository extends BaseRepository<Supplier> impleme
     const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
     super(supabase, logger);
+  }
+
+  override update(id: string, item: Partial<Supplier>): Observable<Supplier> {
+    const dbPayload = SupplierMapper.mapUpdateToDb(item);
+    return super.update(id, dbPayload as Partial<Supplier>);
   }
 
   async registerPayment(supplierId: string, payment: SupplierPaymentDto): Promise<void> {

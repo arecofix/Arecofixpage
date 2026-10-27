@@ -7,6 +7,7 @@ import { BaseRepository } from '@app/core/repositories/base.repository';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 import { SupabaseStorageService } from '@app/core/services/supabase-storage.service';
+import { RepairOrderMapper } from '../mappers/repair-order.mapper';
 
 @Injectable({
     providedIn: 'root'
@@ -100,11 +101,15 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 }
 
                 // Ensure new fields are saved just in case RPC ignores them
-                if (dbPayload['supplier_id'] !== undefined || dbPayload['warranty'] !== undefined) {
-                    await this.supabase.from('repairs').update({
-                        supplier_id: dbPayload['supplier_id'] || null,
-                        warranty: dbPayload['warranty'] || null
-                    }).eq('id', generatedId);
+                const extraFields: Record<string, unknown> = {};
+                if (dbPayload['supplier_id'] !== undefined) {
+                    extraFields['supplier_id'] = dbPayload['supplier_id'];
+                }
+                if (dbPayload['warranty'] !== undefined) {
+                    extraFields['warranty'] = dbPayload['warranty'];
+                }
+                if (Object.keys(extraFields).length > 0) {
+                    await this.supabase.from('repairs').update(extraFields).eq('id', generatedId);
                 }
 
                 // Sync images if provided
@@ -135,25 +140,7 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
      * Internamente aplica la lógica específica de reparaciones (bypass RPC, sync parts/images, log status).
      */
     override update(id: string, repair: Partial<Repair>): Observable<Repair> {
-        const fullPayload = this.mapToDb(repair as unknown as Record<string, unknown>);
-        
-        // Filter out columns that don't exist in the repairs table
-        const dbPayload: Record<string, unknown> = {};
-        const validColumns = [
-            'client_id', 'device_id', 'issue_description', 'current_status_id', 
-            'estimated_cost', 'final_cost', 'deposit_amount', 'technical_labor_cost', 
-            'technician_notes', 'technical_report', 'completed_at', 'branch_id', 
-            'received_by', 'assigned_technician_id', 'checklist', 'security_pin', 
-            'security_pattern', 'glass_upsell', 'spare_part_cost', 'whatsapp_notifications', 
-            'supplier_id', 'warranty'
-        ];
-        
-        for (const key of validColumns) {
-            if (fullPayload[key] !== undefined) {
-                dbPayload[key] = fullPayload[key];
-            }
-        }
-
+        const dbPayload = RepairOrderMapper.mapUpdateToDb(repair);
         const tenantId = this.tenantService.getTenantId();
 
         return from(
@@ -387,95 +374,11 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
     }
 
     private mapFromDb(p: Record<string, unknown>): Repair {
-        const client = p['client'] as Record<string, unknown> | null;
-        const device = p['device'] as Record<string, unknown> | null;
-        const model = device?.['model'] as Record<string, unknown> | null;
-        const brand = model?.['brand'] as Record<string, unknown> | null;
-        const rawImages = p['images'] as { image_url: string }[] | null;
-        const rawParts = p['parts'] as (RepairPart & { product?: { name?: string }; name?: string; product_name?: string })[] | null;
-
-        return {
-            id: p['id'] as string,
-            tracking_code: p['tracking_code'] as string,
-            customer_id: p['client_id'] as string,
-            customer_name: client ? `${client['first_name'] || ''} ${client['last_name'] || ''}`.trim() : (p['customer_name'] as string || ''),
-            customer_phone: (client?.['phone'] as string) || (p['customer_phone'] as string),
-            customer_dni: (client?.['dni'] as string) || (p['customer_dni'] as string) || undefined,
-            device_type: (device?.['type'] as string) || (p['device_type'] as string),
-            brand_id: (device?.['brand_id'] as string) || (model?.['brand_id'] as string) || (p['brand_id'] as string),
-            brand_name: (brand?.['name'] as string) || ((p['brand'] as Record<string, unknown>)?.['name'] as string) || (p['device_brand'] as string) || undefined,
-            device_model: (() => {
-                const resolved = (model?.['name'] as string) || (p['device_model'] as string) || '';
-                return resolved;
-            })(),
-            imei: (device?.['imei'] as string) || (p['imei'] as string),
-            repair_number: p['repair_number'] as number,
-            issue_description: p['issue_description'] as string,
-            current_status_id: p['current_status_id'] as number,
-            estimated_cost: Number(p['estimated_cost'] || 0),
-            final_cost: Number(p['final_cost'] || 0),
-            deposit_amount: Number(p['deposit_amount'] || 0),
-            technical_labor_cost: Number(p['technical_labor_cost'] || 0),
-            notes: p['technician_notes'] as string, // DB uses technician_notes
-            technician_notes: p['technician_notes'] as string,
-            technical_report: p['technical_report'] as string,
-            received_at: p['received_at'] as string,
-            created_at: p['created_at'] as string,
-            updated_at: p['updated_at'] as string,
-            completed_at: p['completed_at'] as string,
-            images: rawImages?.map((img: { image_url: string }) => img.image_url) || [],
-            parts: rawParts?.map((part) => ({
-                ...part,
-                name: part.product?.name || part.name || part.product_name || 'Repuesto (Sin nombre)',
-                product_name: part.product?.name || part.name || part.product_name || 'Repuesto (Sin nombre)'
-            })) || [],
-            branch_id: p['branch_id'] as string,
-            received_by: p['received_by'] as string,
-            assigned_technician_id: p['assigned_technician_id'] as string,
-            checklist: (p['checklist'] || {}) as RepairChecklist,
-            security_pin: p['security_pin'] as string,
-            security_pattern: p['security_pattern'] as string,
-            device_passcode: device?.['passcode'] as string,
-            glass_upsell: p['glass_upsell'] as boolean,
-            spare_part_cost: Number(p['spare_part_cost'] || 0),
-            supplier_id: p['supplier_id'] as string,
-            warranty: p['warranty'] as string
-        };
+        return RepairOrderMapper.mapFromDb(p);
     }
 
     private mapToDb(r: Record<string, unknown>): Record<string, unknown> {
-        return {
-            client_id: r['customer_id'] || null, 
-            customer_name: r['customer_name'] || null,
-            customer_phone: r['customer_phone'] || null,
-            customer_email: r['customer_email'] || null,
-            customer_dni: r['customer_dni'] || null,
-            device_id: r['device_id'] || null,
-            device_model: r['device_model'] || null,
-            device_type: r['device_type'] || null,
-            brand_id: r['brand_id'] || null,
-            imei: r['imei'] || null,
-            issue_description: r['issue_description'],
-            current_status_id: r['current_status_id'],
-            estimated_cost: r['estimated_cost'],
-            final_cost: r['final_cost'],
-            deposit_amount: r['deposit_amount'],
-            technical_labor_cost: r['technical_labor_cost'],
-            technician_notes: r['technician_notes'] || r['notes'], 
-            technical_report: r['technical_report'],
-            completed_at: r['completed_at'],
-            branch_id: r['branch_id'],
-            received_by: r['received_by'],
-            assigned_technician_id: r['assigned_technician_id'],
-            checklist: r['checklist'],
-            security_pin: r['security_pin'] || null,
-            security_pattern: r['security_pattern'] || null,
-            glass_upsell: r['glass_upsell'] || false,
-            spare_part_cost: r['spare_part_cost'] || 0,
-            whatsapp_notifications: r['whatsapp_notifications'] ?? true,
-            supplier_id: r['supplier_id'] || null,
-            warranty: r['warranty'] || null
-        };
+        return RepairOrderMapper.mapCreateToDb(r);
     }
 
 

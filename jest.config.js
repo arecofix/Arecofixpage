@@ -13,5 +13,20 @@ module.exports = {
     '!src/app/**/*.array.ts',
     '!src/app/main.ts',
     '!src/app/main.server.ts'
-  ]
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 12,
+      functions: 8,
+      lines: 13,
+      statements: 13
+    },
+    './src/app/core/interceptors/': {
+      branches: 70,
+      functions: 50,
+      lines: 70,
+      statements: 70
+    }
+  }
 };
+

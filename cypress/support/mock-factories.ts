@@ -168,6 +168,7 @@ export function buildMockOrderItem(
       price:     product.price,
       currency:  product.currency,
       image_url: product.image_url,
+      stock:     (product as any).stock ?? 10,
     },
     ...overrides,
   };

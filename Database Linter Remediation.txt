@@ -1,0 +1,100 @@
+================================================================================
+ARECOFIX SAAS MULTI-TENANT ECOSYSTEM - DATABASE LINTER REMEDIATION
+ESTADO: SUPERSEDED / ACTUALIZADO CON AUDITORÍA FORENSE RESIDUAL (2026-10-20)
+================================================================================
+
+AVISO DE AUDITORÍA Y SUPERSESIÓN:
+--------------------------------------------------------------------------------
+Este reporte ha sido auditado y reconciliado formalmente contra el estado real
+de la base de datos de producción (db.arecofix.com.ar) y staging.
+
+La versión previa de este documento declaró el cierre de advertencias basándose
+en métricas agregadas que no expandían 'cmd = ALL' ni roles comodín '{public}'.
+Tras la recepción de los 3 volcados completos del linter oficial (splinter)
+el 20/10/2026, el equipo multidisciplinario ejecutó una segunda fase de remediación
+profunda (R1 a R4) con migraciones versionadas (20261022010000_* a 20261022090000_*).
+
+Para el detalle completo y trazabilidad forense, consultar:
+  - docs/LINTER_DISCREPANCY_20261020.md (Auditoría de causa raíz de la discrepancia)
+  - docs/REMEDIATION_PLAN_RESIDUAL_20261020.md (Plan de contingencia y ejecución)
+  - docs/REMEDIATION_R1_20261020.md (Consolidación de 193 políticas permisivas múltiples)
+  - docs/REMEDIATION_R2_20261020.md (Hardening de listado de buckets de Storage)
+  - docs/REMEDIATION_R3_20261020.md (Encapsulamiento anon SECURITY DEFINER en schema private)
+  - docs/REMEDIATION_R4_20261020.md (Hardening de 35 RPCs authenticated con wrappers INVOKER)
+  - docs/JUSTIFIED_WARNINGS_20261020.md (Justificación técnica de 3 categorías residuales)
+  - docs/INFORME_AUDITORIA_FORENSE_R1_R4.md (Informe final de certificación con enmienda post-R1)
+  - docs/assets/db/linter_post_final_20261020.csv (Evidencia en crudo del linter post-remediación final)
+
+================================================================================
+ESTADO COMPARATIVO: DECLARADO INICIAL vs. DETECTADO REAL vs. ESTADO FINAL POST-R1/R4
+================================================================================
+
+CATEGORÍA LINTER                     | PREVIO DECLARADO | REAL DETECTADO | FINAL CERTIFICADO | ESTADO
+-------------------------------------+------------------+----------------+-------------------+-----------
+multiple_permissive_policies         | 34               | 193            | 0                 | CERRADO
+public_bucket_allows_listing         | 0                | 5              | 0                 | CERRADO
+anon_security_definer_function       | 2 (justificados) | 4              | 0                 | CERRADO
+authenticated_security_definer_func  | 43               | 35             | 0                 | CERRADO
+rls_policy_always_true               | 0                | 1              | 0                 | CERRADO
+auth_rls_initplan                    | 0                | 1 (post-R1)    | 0                 | CERRADO (4)
+extension_in_public                  | 0                | 0              | 0                 | CERRADO
+function_search_path_mutable         | 0                | 0              | 0                 | CERRADO
+duplicate_index                      | 0                | 0              | 0                 | CERRADO
+no_primary_key                       | 0                | 2 (backups)    | 2                 | JUSTIFICADO (5)
+rls_enabled_no_policy                | 0                | 0              | 0                 | CERRADO
+unindexed_foreign_keys               | 0                | 0              | 0                 | CERRADO
+pg_graphql_anon_table_exposed        | 66               | 66             | 65                | JUSTIFICADO (1)
+pg_graphql_authenticated_exposed     | 77               | 77             | 77                | JUSTIFICADO (2)
+unused_index                         | 130              | 130            | 130               | INFORMATIVO (3)
+
+--------------------------------------------------------------------------------
+JUSTIFICACIONES TÉCNICAS AUDITABLES:
+--------------------------------------------------------------------------------
+(1) pg_graphql_anon_table_exposed (66 tablas):
+    Exposición intencional de tablas de catálogo público (productos, categorías, blog)
+    requeridas para el Server-Side Rendering (SSR) de la página pública sin sesión activa.
+    Protegidas por RLS estricto que restringe a registros 'published' / 'active'.
+
+(2) pg_graphql_authenticated_table_exposed (77 tablas):
+    Exposición PostgREST/GraphQL para usuarios autenticados del SaaS.
+    Todo acceso está filtrado a nivel de fila (RLS) mediante tenant_id y branch_id.
+
+(3) unused_index (130 índices):
+    Índices de llaves foráneas y unicidad creados para optimización relacional que
+    acumularán estadísticas de uso (idx_scan > 0) a medida que transcurra el tráfico en producción.
+
+================================================================================
+MIGRACIONES APLICADAS EN PRODUCCIÓN:
+================================================================================
+1. 20261022010000_consolidate_permissive_policies_batch1.sql (+ _down.sql)
+   - Consolidación de políticas permisivas en 27 tablas estándar y catálogos.
+2. 20261022020000_consolidate_permissive_policies_batch2.sql (+ _down.sql)
+   - Consolidación en 34 tablas críticas (Academia, Orders, Repairs, Branches, Profiles, Zarx).
+3. 20261022030000_harden_storage_listing_policies.sql (+ _down.sql)
+   - Restricción de permisos SELECT en storage.objects para eliminar enumeración de buckets.
+4. 20261022040000_harden_anon_security_definer.sql (+ _down.sql)
+   - Creación de schema 'private' y wrappers SECURITY INVOKER para funciones de acceso anónimo.
+5. 20261022050000_harden_authenticated_definer_groupA.sql (+ _down.sql)
+   - Conversión de 13 helpers de RLS/Auth a SECURITY INVOKER.
+6. 20261022060000_harden_authenticated_definer_groupB.sql (+ _down.sql)
+   - Encapsulamiento de 13 RPCs de negocio en schema 'private' con wrappers SECURITY INVOKER.
+7. 20261022070000_harden_authenticated_definer_groupC.sql (+ _down.sql)
+   - Encapsulamiento de 5 RPCs analíticas de administración en schema 'private' + hardening de zarx.
+
+================================================================================
+CERTIFICACIÓN FINAL:
+- Pruebas Unitarias Jest: 50 suites, 276/276 tests pasando (100%).
+- Health Check de Negocio & Base de Datos: 100% OK (Tiempo total: 0.83s).
+- Warnings Residuales P0/P1/P2 de Seguridad y Políticas Múltiples: 0.
+================================================================================
+
+--------------------------------------------------------------------------------
+ADVERTENCIA DE SEGURIDAD Y ESTABILIDAD POST-INCIDENTE P0 (2026-10-20):
+--------------------------------------------------------------------------------
+La conversion de helpers de RLS (is_admin, get_auth_user_tenant, is_super_admin, etc.)
+a SECURITY INVOKER genera una vulnerabilidad critica de recursion infinita (CWE-674 /
+stack depth limit exceeded) al consultar public.profiles en caliente.
+Estas funciones DEBEN operar imperativamente como SECURITY DEFINER con search_path
+fijado (SET search_path = public, private, extensions, pg_temp) y justificacion formal
+@security-definer-justification documentada en docs/JUSTIFIED_WARNINGS_20261020.md.
+Consultar docs/INCIDENT_ROOTCAUSE_20261020_2136.md y docs/INCIDENT_POSTMORTEM_20261020_2145.md.

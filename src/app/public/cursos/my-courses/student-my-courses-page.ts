@@ -11,14 +11,17 @@ import { RouterModule } from '@angular/router';
 import { CoursesService } from '@app/core/services/courses.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
-import { Course } from '@app/features/courses/domain/entities/course.entity';
+import { Course, StudentEnrollment } from '@app/features/courses/domain/entities/course.entity';
 import { SeoService } from '@app/core/services/seo.service';
 import { CertificatesService, Certificate } from '@app/features/courses/application/services/certificates.service';
+import { AcademySubscriptionService } from '@app/core/services/academy-subscription.service';
+import { ToastService } from '@app/shared/services/toast.service';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-student-my-courses-page',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12">
       <div class="container mx-auto px-4 max-w-6xl">
@@ -30,6 +33,40 @@ import { CertificatesService, Certificate } from '@app/features/courses/applicat
             Bienvenido a tu centro de aprendizaje y enseñanza.
           </p>
         </div>
+
+        <!-- Grace Period Banner -->
+        @if (isGracePeriod()) {
+          <div class="mb-8 p-4 rounded-2xl bg-amber-500 text-slate-900 font-bold shadow-md flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle text-lg"></i>
+              <span>Tu membresía venció. Tienes 7 días de gracia para renovar.</span>
+            </div>
+            <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-sm bg-slate-900 text-white hover:bg-slate-800 border-none rounded-xl">
+              @if (isSubscribing()) {
+                <span class="loading loading-spinner loading-xs"></span>
+              } @else {
+                <i class="fas fa-credit-card mr-1"></i> Pagar Ahora
+              }
+            </button>
+          </div>
+        }
+
+        <!-- Expired/Suspended Banner -->
+        @if (isBlocked()) {
+          <div class="mb-8 p-4 rounded-2xl bg-rose-600 text-white font-bold shadow-md flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-lock text-lg"></i>
+              <span>Tu acceso a la academia ha expirado. Renueva tu membresía para continuar.</span>
+            </div>
+            <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-sm bg-white text-rose-700 hover:bg-rose-50 border-none rounded-xl">
+              @if (isSubscribing()) {
+                <span class="loading loading-spinner loading-xs"></span>
+              } @else {
+                <i class="fas fa-bolt mr-1"></i> Renovar Membresía
+              }
+            </button>
+          </div>
+        }
 
         <!-- Role-based Tabs -->
         @if (isInstructor() || isAdmin()) {
@@ -98,72 +135,88 @@ import { CertificatesService, Certificate } from '@app/features/courses/applicat
             } @else {
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @for (enrollment of enrolledCourses(); track enrollment.id) {
-                  <div
-                    class="card bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col"
-                  >
-                    <figure
-                      class="aspect-video relative bg-slate-100 dark:bg-slate-900"
+                  @if (enrollment.course; as course) {
+                    <div
+                      class="card bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col"
                     >
-                      @if (enrollment.course.image_url) {
-                        <img
-                          [src]="enrollment.course.image_url"
-                          [alt]="enrollment.course.title"
-                          class="w-full h-full object-cover"
-                        />
-                      } @else {
-                        <div
-                          class="flex items-center justify-center w-full h-full text-slate-300 dark:text-slate-600 text-4xl"
-                        >
-                          <i class="fas fa-book"></i>
-                        </div>
-                      }
-                      <div class="absolute top-3 right-3">
-                        <span
-                          class="badge badge-success border-none text-white shadow-sm font-medium"
-                          >Matriculado</span
-                        >
-                      </div>
-                    </figure>
-                    <div class="card-body p-6 flex-1 flex flex-col">
-                      <h2
-                        class="card-title text-xl text-slate-800 dark:text-white leading-tight mb-2"
+                      <figure
+                        class="aspect-video relative bg-slate-100 dark:bg-slate-900"
                       >
-                        {{ enrollment.course.title }}
-                      </h2>
-                      <p
-                        class="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 flex-1"
-                      >
-                        {{
-                          enrollment.course.short_description ||
-                            'Sin descripción'
-                        }}
-                      </p>
-
-                      <div class="divider my-2"></div>
-
-                      <div class="card-actions justify-end mt-2 flex-col gap-2">
-                        @if (enrollment.certificate) {
-                          <a
-                            [href]="enrollment.certificate.pdf_url"
-                            target="_blank"
-                            class="btn btn-success w-full text-white"
+                        @if (course.image_url) {
+                          <img
+                            [src]="course.image_url"
+                            [alt]="course.title"
+                            class="w-full h-full object-cover"
+                          />
+                        } @else {
+                          <div
+                            class="flex items-center justify-center w-full h-full text-slate-300 dark:text-slate-600 text-4xl"
                           >
-                            <i class="fas fa-certificate mr-2"></i> Ver Certificado
-                          </a>
+                            <i class="fas fa-book"></i>
+                          </div>
                         }
-                        <a
-                          [routerLink]="[
-                            '/academy',
-                            enrollment.course.slug,
-                            'aula',
-                          ]"
-                          class="btn btn-primary w-full"
+                        <div class="absolute top-3 right-3">
+                          <span
+                            class="badge badge-success border-none text-white shadow-sm font-medium"
+                            >Matriculado</span
+                          >
+                        </div>
+                      </figure>
+                      <div class="card-body p-6 flex-1 flex flex-col">
+                        <h2
+                          class="card-title text-xl text-slate-800 dark:text-white leading-tight mb-2"
                         >
-                          <i class="fas fa-chalkboard-teacher mr-2"></i> Ir al Aula
-                        </a>
+                          {{ course.title }}
+                        </h2>
+                        <p
+                          class="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 flex-1"
+                        >
+                          {{
+                            course.short_description ||
+                              'Sin descripción'
+                          }}
+                        </p>
+
+                        <div class="divider my-2"></div>
+
+                        <div class="card-actions justify-end mt-2 flex-col gap-2">
+                          @if (enrollment.certificate) {
+                            <a
+                              [href]="enrollment.certificate.pdf_url || ('/api/academy/certificates/' + enrollment.certificate.id + '/pdf')"
+                              target="_blank"
+                              class="btn btn-success w-full text-white download-certificate-btn font-bold"
+                            >
+                              <i class="fas fa-file-pdf mr-2"></i> Descargar Certificado
+                            </a>
+                            <a
+                              [routerLink]="['/academy/verify', enrollment.certificate.id]"
+                              class="btn btn-outline btn-sm w-full font-medium"
+                            >
+                              <i class="fas fa-qrcode mr-2"></i> Validar Certificado (QR)
+                            </a>
+                          } @else if (enrollment.progress === 100) {
+                            <a
+                              [href]="'/api/academy/certificates/' + enrollment.id + '/pdf'"
+                              target="_blank"
+                              class="btn btn-success w-full text-white download-certificate-btn font-bold"
+                            >
+                              <i class="fas fa-file-pdf mr-2"></i> Descargar Certificado
+                            </a>
+                          }
+                          <a
+                            [routerLink]="[
+                              '/academy',
+                              course.slug,
+                              'aula',
+                            ]"
+                            class="btn btn-primary w-full"
+                          >
+                            <i class="fas fa-chalkboard-teacher mr-2"></i> Ir al Aula
+                          </a>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  }
                 }
               </div>
             }
@@ -292,8 +345,10 @@ export class StudentMyCoursesPage implements OnInit {
   private courseRepo = inject(CourseRepository);
   private seoService = inject(SeoService);
   private certificatesService = inject(CertificatesService);
+  private academySubscriptionService = inject(AcademySubscriptionService);
+  private toastService = inject(ToastService);
 
-  enrolledCourses = signal<any[]>([]);
+  enrolledCourses = signal<StudentEnrollment[]>([]);
   authoredCourses = signal<Course[]>([]);
 
   loading = signal(true);
@@ -301,6 +356,9 @@ export class StudentMyCoursesPage implements OnInit {
 
   isInstructor = signal(false);
   isAdmin = signal(false);
+  isGracePeriod = signal(false);
+  isBlocked = signal(false);
+  isSubscribing = signal(false);
 
   async ngOnInit() {
     this.seoService.setPageData({
@@ -321,10 +379,11 @@ export class StudentMyCoursesPage implements OnInit {
       );
     }
 
-    const userEmail = user?.email || profile?.email;
+    const userEmail = user?.email || profile?.email || '';
+    const userId = user?.id || profile?.id;
 
-    if (userEmail) {
-      this.loadMyCourses(userEmail);
+    if (userEmail || userId) {
+      this.loadMyCourses(userEmail, userId);
     } else {
       this.loading.set(false);
     }
@@ -341,18 +400,18 @@ export class StudentMyCoursesPage implements OnInit {
     }
   }
 
-  async loadMyCourses(email: string) {
-    this.coursesService.getUserEnrolledCourses(email).subscribe(async (res) => {
+  async loadMyCourses(email?: string, userId?: string) {
+    this.coursesService.getUserEnrolledCourses(email, userId).subscribe(async (res) => {
       const validEnrollments = (res.data || []).filter((e) => !!e.course);
       
       try {
-        const certs = await this.certificatesService.getStudentCertificates(email);
+        const certs = email ? await this.certificatesService.getStudentCertificates(email) : [];
         const certMap = new Map<string, Certificate>();
         certs.forEach(c => certMap.set(c.course_id, c));
         
-        const enriched = validEnrollments.map(e => ({
+        const enriched: StudentEnrollment[] = validEnrollments.map(e => ({
           ...e,
-          certificate: certMap.get(e.course_id)
+          certificate: certMap.get(e.course_id) || certMap.get(e.course?.id || '') || e.certificate
         }));
         
         this.enrolledCourses.set(enriched);
@@ -361,6 +420,44 @@ export class StudentMyCoursesPage implements OnInit {
       }
       
       this.loading.set(false);
+    });
+
+    // Check membership status
+    if (userId && !this.isAdmin()) {
+      try {
+        const memStatus = await firstValueFrom(this.academySubscriptionService.checkMembershipStatus(userId));
+        if (memStatus && memStatus.has_subscription) {
+          if (memStatus.status === 'grace_period') {
+            this.isGracePeriod.set(true);
+          } else if (memStatus.status === 'suspended' || memStatus.status === 'expired') {
+            this.isBlocked.set(true);
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    }
+  }
+
+  payMembership() {
+    this.isSubscribing.set(true);
+    this.academySubscriptionService.createSubscriptionPreference({
+      backUrl: typeof window !== 'undefined' ? window.location.href.split('?')[0] : undefined
+    }).subscribe({
+      next: (res) => {
+        this.isSubscribing.set(false);
+        if (res.success && res.init_point) {
+          if (typeof window !== 'undefined') {
+            window.location.href = res.init_point;
+          }
+        } else {
+          this.toastService.show(res.error || 'Error al conectar con Mercado Pago', 'error');
+        }
+      },
+      error: () => {
+        this.isSubscribing.set(false);
+        this.toastService.show('Error al iniciar suscripción', 'error');
+      }
     });
   }
 }

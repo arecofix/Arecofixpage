@@ -1,63 +1,149 @@
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-green-600">Servicios</h1>
-    <a routerLink="/admin/services/new" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i> Nuevo Servicio
-    </a>
-</div>
+<div class="space-y-6">
 
-<div class="bg-base-100 rounded-lg shadow overflow-hidden text-base-content">
-    <div class="overflow-x-auto">
-        <table class="table w-full">
-            <thead>
-                <tr class="text-base-content">
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Precio</th>
-                    <th>Duración</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (loading()) {
-                <tr>
-                    <td colspan="6" class="text-center py-4">Cargando...</td>
-                </tr>
-                } @else if (services().length === 0) {
-                <tr>
-                    <td colspan="6" class="text-center py-4">No hay servicios registrados.</td>
-                </tr>
-                } @else {
-                @for (service of services(); track service.id) {
-                <tr>
-                    <td class="font-bold">{{ service.name }}</td>
-                    <td class="max-w-xs truncate">{{ service.description || 'Sin descripción' }}</td>
-                    <td>{{ service.price | currency }}</td>
-                    <td>{{ service.duration_minutes ? service.duration_minutes + ' min' : 'N/A' }}</td>
-                    <td>
-                        <div class="badge" [class.badge-success]="service.is_active"
-                            [class.badge-error]="!service.is_active">
-                            {{ service.is_active ? 'Activo' : 'Inactivo' }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="flex gap-2">
-                            <a [routerLink]="['/admin/services', service.id]" class="btn btn-sm btn-ghost">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button class="btn btn-sm btn-ghost text-error" (click)="deleteService(service.id)">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                }
-                }
-            </tbody>
-        </table>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-emerald-400 flex items-center gap-2">
+        <i class="fas fa-layer-group"></i> Catálogo y Landing Pages de Servicios
+      </h1>
+      <p class="text-xs text-gray-500 mt-1">
+        Gestioná los servicios de Arecofix, editá sus bloques modulares y publicá landings indexables en <code class="font-mono text-primary">/servicios/:slug</code>.
+      </p>
     </div>
-</div>
+    <div class="flex gap-2">
+      <a routerLink="/admin/leads" class="btn btn-outline btn-sm gap-1.5 text-xs">
+        <i class="fas fa-users-viewfinder"></i> Ver Todos los Leads
+      </a>
+      <a routerLink="/admin/services/new" class="btn btn-primary btn-sm gap-1.5 text-xs">
+        <i class="fas fa-plus"></i> Nuevo Servicio
+      </a>
+    </div>
+  </div>
 
-<div class="mt-4 flex justify-center pb-6">
-    <pagination [pages]="totalPages()" [currentPage]="currentPage()" (pageChange)="changePage($event)" />
+  <!-- Filter & Search Toolbar -->
+  <div class="bg-base-100 p-4 rounded-2xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+    <!-- Search Bar -->
+    <div class="relative flex-1 min-w-[240px] max-w-md">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+      <input type="text" [(ngModel)]="search" (ngModelChange)="onSearchChange()"
+             placeholder="Buscar por nombre de servicio..."
+             class="input input-sm input-bordered w-full pl-9 text-xs" />
+    </div>
+
+    <!-- Status Filter Buttons -->
+    <div class="join">
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'all'"
+              (click)="onFilterStatusChange('all')">
+        Todos ({{ totalItems() }})
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'published'"
+              (click)="onFilterStatusChange('published')">
+        Publicados
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'draft'"
+              (click)="onFilterStatusChange('draft')">
+        Borradores
+      </button>
+    </div>
+  </div>
+
+  <!-- Services Table Card -->
+  <div class="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden text-base-content">
+    <div class="overflow-x-auto">
+      <table class="table w-full text-xs">
+        <thead>
+          <tr class="text-base-content bg-base-200/50">
+            <th>Servicio</th>
+            <th>Ruta Pública (Slug)</th>
+            <th>Precio Base</th>
+            <th>Duración</th>
+            <th>Estado</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="6" class="text-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <span class="text-gray-400">Cargando catálogo...</span>
+              </td>
+            </tr>
+          } @else if (services().length === 0) {
+            <tr>
+              <td colspan="6" class="text-center py-12 text-gray-400">
+                <i class="fas fa-folder-open text-3xl mb-2 block"></i>
+                No se encontraron servicios registrados con los filtros aplicados.
+              </td>
+            </tr>
+          } @else {
+            @for (service of services(); track service.id) {
+              <tr class="hover:bg-base-200/40 transition-colors">
+                <td>
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm shrink-0">
+                      <i class="fas" [ngClass]="service.icon || 'fa-tools'"></i>
+                    </div>
+                    <div>
+                      <div class="font-bold text-sm text-base-content">{{ service.name }}</div>
+                      <div class="text-[11px] text-gray-500 max-w-xs truncate">
+                        {{ service.short_description || 'Sin descripción' }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="font-mono text-gray-500 text-[11px]">
+                  /servicios/{{ service.slug }}
+                </td>
+                <td class="font-bold text-base-content">
+                  {{ service.price_formatted }}
+                </td>
+                <td>
+                  {{ service.duration_minutes ? service.duration_minutes + ' min' : 'N/A' }}
+                </td>
+                <td>
+                  <div class="badge badge-xs text-[10px] font-semibold"
+                       [class.badge-success]="service.is_published"
+                       [class.badge-ghost]="!service.is_published">
+                    {{ service.is_published ? 'Publicado' : 'Borrador' }}
+                  </div>
+                </td>
+                <td class="text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    @if (service.is_published) {
+                      <a [href]="'/servicios/' + service.slug" target="_blank" rel="noopener noreferrer"
+                         title="Ver en web" class="btn btn-xs btn-ghost text-gray-500 hover:text-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                      </a>
+                    }
+                    <button type="button" (click)="duplicateService(service.id)" title="Duplicar"
+                            class="btn btn-xs btn-ghost text-gray-500 hover:text-primary">
+                      <i class="fas fa-clone"></i>
+                    </button>
+                    <a [routerLink]="['/admin/services', service.id, 'edit']" title="Editar"
+                       class="btn btn-xs btn-ghost text-primary">
+                      <i class="fas fa-pen-to-square"></i>
+                    </a>
+                    <button type="button" (click)="deleteService(service.id)" title="Eliminar"
+                            class="btn btn-xs btn-ghost text-error">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-4 border-t border-base-200 flex justify-center">
+      <pagination [pages]="totalPages()" [currentPage]="currentPage()" (pageChange)="changePage($event)" />
+    </div>
+  </div>
+
 </div>

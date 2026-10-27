@@ -1,138 +1,161 @@
-<footer class="bg-gray-100 dark:bg-[#050505] border-t border-gray-200 dark:border-white/10 py-10 lg:py-16 text-gray-700 dark:text-gray-300 transition-colors duration-300">
+<footer class="bg-gray-100 dark:bg-[#080808] border-t border-gray-200 dark:border-white/10 pt-8 lg:pt-10 pb-8 text-gray-700 dark:text-gray-300 transition-colors duration-300" style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));">
   <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-    <div class="flex flex-col lg:flex-row justify-between gap-10 border-b border-gray-200 dark:border-white/10 pb-10">
+    
+    <!-- Contenedor Principal: Alineación uniforme a la izquierda (mobile-first) -->
+    <div class="flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-10 border-b border-gray-200 dark:border-white/10 pb-6 lg:pb-8">
 
-      <!-- Logo + Links + Redes -->
-      <div class="flex flex-col items-center lg:items-start gap-6 w-full lg:w-1/2">
-        <a routerLink="/" class="cursor-pointer transition-transform hover:scale-105" aria-label="Arecofix - Inicio">
-          <img src="assets/img/brands/logo/logo-pag.png" width="212" height="228" alt="Logo Arecofix" class="h-10 w-auto" />
+      <!-- Columna 1: Identidad + Redes Sociales + Compartir -->
+      <div class="flex flex-col items-start gap-5 w-full lg:w-5/12 text-left">
+        <!-- Logo -->
+        <a routerLink="/" class="cursor-pointer transition-opacity hover:opacity-85 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-md" aria-label="Arecofix - Volver al Inicio">
+          <img src="assets/img/brands/logo/logo-pag.png" width="180" height="40" alt="Logo Arecofix" class="h-9 w-auto object-contain" />
         </a>
 
-        <nav aria-label="Footer navigation" class="w-full">
-          <ul class="flex flex-row flex-wrap justify-center lg:justify-start gap-5 text-sm text-gray-700 dark:text-gray-300">
-            <li><a routerLink="./" class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Inicio</a>
-            </li>
-            <li><a routerLink="/recursos"
-                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Recursos</a></li>
-            <li><a routerLink="/nosotros"
-                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Nosotros</a></li>
-            <li><a routerLink="/productos"
-                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Productos</a></li>
-            <li><a routerLink="/contacto"
-                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Contacto</a></li>
-            <li><a routerLink="/academy"
-                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Cursos</a></li>
-            <li><a routerLink="/servicios"
-                class="hover:text-blue-400 transition-colors font-medium inline-block p-1 -m-1">Servicios</a></li>
-          </ul>
-        </nav>
+        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 max-w-sm leading-relaxed">
+          Especialistas en soluciones tecnológicas, microelectrónica y servicio técnico integral multimarca.
+        </p>
 
-        <!-- Social Media Buttons -->
-        <div class="flex gap-4 mt-4 flex-wrap justify-center lg:justify-start">
-          <a [href]="socialLinks.facebook" aria-label="Facebook"
-            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-blue-200 dark:border-blue-600/30">
-            <i class="fa-brands fa-facebook-f text-lg"></i>
-          </a>
-          <a [href]="socialLinks.instagram" aria-label="Instagram"
-            class="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-600/20 text-pink-600 dark:text-pink-500 hover:bg-pink-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-pink-200 dark:border-pink-600/30">
-            <i class="fa-brands fa-instagram text-lg"></i>
-          </a>
-          <a [href]="socialLinks.github" aria-label="GitHub"
-            class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black flex items-center justify-center transition-all hover-lift border border-gray-300 dark:border-white/20">
-            <i class="fa-brands fa-github text-lg"></i>
-          </a>
-          <a [href]="socialLinks.linkedin" aria-label="LinkedIn"
-            class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-700/20 text-blue-700 dark:text-blue-400 hover:bg-blue-700 hover:text-white flex items-center justify-center transition-all hover-lift border border-blue-200 dark:border-blue-700/30">
-            <i class="fa-brands fa-linkedin-in text-lg"></i>
-          </a>
-          <a [href]="socialLinks.youtube" aria-label="YouTube"
-            class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-600/20 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-red-200 dark:border-red-600/30">
-            <i class="fa-brands fa-youtube text-lg"></i>
-          </a>
-          <a [href]="socialLinks.googleMaps" aria-label="Google Maps"
-            class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-600/20 text-green-600 dark:text-green-500 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all hover-lift border border-green-200 dark:border-green-600/30">
-            <i class="fa-solid fa-map-location-dot text-lg"></i>
-          </a>
+        <!-- Redes Sociales: Iconografía minimalista monocromática (sin fondos estridentes) -->
+        <div class="mt-2">
+          <span class="sr-only">Nuestras redes sociales</span>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <a [href]="socialLinks.facebook" target="_blank" rel="noopener noreferrer" aria-label="Seguinos en Facebook"
+               class="social-icon-btn">
+              <i class="fa-brands fa-facebook-f text-sm"></i>
+            </a>
+            <a [href]="socialLinks.instagram" target="_blank" rel="noopener noreferrer" aria-label="Seguinos en Instagram"
+               class="social-icon-btn">
+              <i class="fa-brands fa-instagram text-sm"></i>
+            </a>
+            <a [href]="socialLinks.github" target="_blank" rel="noopener noreferrer" aria-label="Perfil de GitHub"
+               class="social-icon-btn">
+              <i class="fa-brands fa-github text-sm"></i>
+            </a>
+            <a [href]="socialLinks.linkedin" target="_blank" rel="noopener noreferrer" aria-label="Perfil de LinkedIn"
+               class="social-icon-btn">
+              <i class="fa-brands fa-linkedin-in text-sm"></i>
+            </a>
+            <a [href]="socialLinks.youtube" target="_blank" rel="noopener noreferrer" aria-label="Canal de YouTube"
+               class="social-icon-btn">
+              <i class="fa-brands fa-youtube text-sm"></i>
+            </a>
+            <a [href]="socialLinks.googleMaps" target="_blank" rel="noopener noreferrer" aria-label="Cómo llegar en Google Maps"
+               class="social-icon-btn">
+              <i class="fa-solid fa-map-location-dot text-sm"></i>
+            </a>
+          </div>
         </div>
 
-        <!-- Share Buttons -->
-        <div class="mt-6 w-full text-center lg:text-left">
-          <h3 class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-3">Compartir esta página</h3>
-          <div class="flex gap-3 flex-wrap justify-center lg:justify-start">
-            <button (click)="shareOn('facebook')"
-              class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all"
-              aria-label="Compartir en Facebook" title="Compartir en Facebook">
-              <i class="fa-brands fa-facebook-f text-sm"></i>
+        <!-- Compartir esta página: Estilo compacto de bajo impacto visual -->
+        <div class="mt-3 pt-3 border-t border-gray-200/70 dark:border-white/5 w-full max-w-xs">
+          <span class="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-2">Compartir página</span>
+          <div class="flex items-center gap-2">
+            <button (click)="shareOn('whatsapp')" type="button" aria-label="Compartir en WhatsApp" title="Compartir en WhatsApp"
+                    class="share-compact-btn hover:text-green-600 hover:border-green-500/40">
+              <i class="fa-brands fa-whatsapp text-xs"></i>
             </button>
-            <button (click)="shareOn('twitter')"
-              class="w-8 h-8 rounded-full bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black flex items-center justify-center transition-all"
-              aria-label="Compartir en X" title="Compartir en X">
-              <i class="fa-brands fa-twitter text-sm"></i>
+            <button (click)="shareOn('facebook')" type="button" aria-label="Compartir en Facebook" title="Compartir en Facebook"
+                    class="share-compact-btn hover:text-blue-600 hover:border-blue-500/40">
+              <i class="fa-brands fa-facebook-f text-xs"></i>
             </button>
-            <button (click)="shareOn('whatsapp')"
-              class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500 hover:bg-green-500 hover:text-white flex items-center justify-center transition-all"
-              aria-label="Compartir en WhatsApp" title="Compartir en WhatsApp">
-              <i class="fa-brands fa-whatsapp text-sm"></i>
+            <button (click)="shareOn('twitter')" type="button" aria-label="Compartir en X" title="Compartir en X"
+                    class="share-compact-btn hover:text-gray-900 dark:hover:text-white hover:border-gray-400">
+              <i class="fa-brands fa-x-twitter text-xs"></i>
+            </button>
+            <button (click)="shareOn('linkedin')" type="button" aria-label="Compartir en LinkedIn" title="Compartir en LinkedIn"
+                    class="share-compact-btn hover:text-blue-700 hover:border-blue-600/40">
+              <i class="fa-brands fa-linkedin-in text-xs"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Links Rápidos y Contacto (Stacked on small mobile, columns on tablets+) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full lg:w-1/2 lg:flex lg:flex-nowrap lg:justify-between">
+      <!-- Columna 2: Enlaces Rápidos + Contacto (Alineados a la izquierda) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 w-full lg:w-6/12">
 
-        <!-- Links Rápidos -->
-        <div class="flex flex-col gap-6">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b-2 border-blue-500 pb-2 inline-block w-max">Enlaces
-            Rápidos</h3>
+        <!-- Enlaces Rápidos / Legales -->
+        <nav aria-label="Enlaces Legales y Ayuda" class="flex flex-col gap-4 text-left">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white border-b-2 border-indigo-500 pb-1 w-max">
+            Enlaces Rápidos
+          </h3>
+          <ul class="space-y-2.5 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <a routerLink="/privacy" class="footer-link">
+                <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
+                <span>Privacidad</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/terms" class="footer-link">
+                <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
+                <span>Términos y Condiciones</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/nosotros" class="footer-link">
+                <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
+                <span>Preguntas Frecuentes</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/productos" class="footer-link">
+                <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
+                <span>Productos</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Información de Contacto -->
+        <div class="footer-contact flex flex-col gap-4 text-left">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white border-b-2 border-indigo-500 pb-1 w-max">
+            Contacto
+          </h3>
           <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-            <li><a routerLink="/privacy" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
-                  class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Privacidad</a></li>
-            <li><a routerLink="/terms" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
-                  class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Términos Legales</a></li>
-            <li><a routerLink="/nosotros" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
-                  class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Preguntas Frecuentes</a></li>
-            <li><a routerLink="/blog" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1"><i
-                  class="fa-solid fa-chevron-right text-xs text-blue-500/50"></i> Blog</a></li>
-          </ul>
-        </div>
-
-        <!-- Contacto -->
-        <div class="flex flex-col gap-6">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b-2 border-blue-500 pb-2 inline-block w-max">Contacto</h3>
-          <ul class="space-y-4 text-sm text-gray-600 dark:text-gray-400">
-            <li class="flex items-start gap-3">
-              <i class="fa-solid fa-location-dot text-blue-500 mt-1"></i>
-              <span>Jorge Newbery 69, Marcos Paz</span>
+            <li class="flex items-start gap-2.5">
+              <i class="fa-solid fa-location-dot text-indigo-500 mt-1 shrink-0" aria-hidden="true"></i>
+              <span>Jorge Newbery 69, Marcos Paz, Bs. As.</span>
             </li>
-            <li class="flex items-center gap-3">
-              <i class="fa-solid fa-phone text-blue-500"></i>
-              <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" class="hover:text-blue-400 transition inline-block p-1 -m-1">+{{ whatsappNumber }}</a>
+            <li class="flex items-center gap-2.5">
+              <i class="fa-solid fa-phone text-indigo-500 shrink-0" aria-hidden="true"></i>
+              <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" rel="noopener noreferrer"
+                 class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
+                +{{ whatsappNumber }}
+              </a>
             </li>
-            <li class="flex items-center gap-3">
-              <i class="fa-solid fa-envelope text-blue-500"></i>
+            <li class="flex items-center gap-2.5">
+              <i class="fa-solid fa-envelope text-indigo-500 shrink-0" aria-hidden="true"></i>
               <a href="mailto:info@arecofix.com.ar"
-                class="hover:text-blue-400 transition inline-block p-1 -m-1">info@arecofix.com.ar</a>
+                 class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
+                info@arecofix.com.ar
+              </a>
             </li>
           </ul>
         </div>
+
       </div>
 
     </div>
 
-    <!-- Copyright -->
-    <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-white/5 mt-2">
+    <!-- Barra Inferior de Copyright y Accesibilidad -->
+    <div class="pt-5 sm:pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
       <p>
-        <a routerLink="/portfolio" class="hover:text-blue-400 transition hover-scale inline-block">
-          &copy; {{ currentYear }} <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-orange-500">Arecofix</span>. Todos los derechos reservados.
-        </a>
+        &copy; <a href="https://portfolio.arecofix.com.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors underline-offset-2 hover:underline focus-visible:outline-hidden focus-visible:underline">
+          {{ currentYear }} Arecofix</a>. Todos los derechos reservados.
       </p>
-      <div class="flex gap-6">
-        <button (click)="openAccessibilityMenu()" class="hover:text-blue-400 transition inline-flex items-center gap-2 p-1 -m-1" aria-label="Cambiar idioma a Español">
-          <i class="fa-solid fa-globe"></i> Español
+      <div class="flex items-center gap-5">
+        <button (click)="openAccessibilityMenu($event)" type="button"
+                class="hover:text-indigo-600 dark:hover:text-indigo-400 inline-flex items-center gap-1.5 focus-visible:outline-hidden focus-visible:underline">
+          <i class="fa-solid fa-universal-access" aria-hidden="true"></i> Accesibilidad
         </button>
-        <a routerLink="/sitemap" class="hover:text-blue-400 transition inline-block p-1 -m-1">Mapa del sitio</a>
+        <a routerLink="/sitemap" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
+          Mapa del sitio
+        </a>
       </div>
     </div>
+
   </div>
 </footer>

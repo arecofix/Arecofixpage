@@ -20,6 +20,7 @@ export const adminRoutes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
+      { path: 'pedidos', redirectTo: 'orders', pathMatch: 'full' },
       { path: 'settings', redirectTo: 'company', pathMatch: 'full' },
       { path: 'identidad', redirectTo: 'company', pathMatch: 'full' },
       { path: 'configuracion', redirectTo: 'company', pathMatch: 'full' },
@@ -94,6 +95,11 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('@app/admin/courses/admin-courses.routes').then(m => m.ADMIN_COURSES_ROUTES)
       },
       {
+        path: 'academy',
+        redirectTo: 'courses/subscriptions',
+        pathMatch: 'prefix'
+      },
+      {
         path: 'orders',
         loadChildren: () => import('@app/admin/orders/admin-orders.routes').then(m => m.ADMIN_ORDERS_ROUTES)
       },
@@ -115,6 +121,11 @@ export const adminRoutes: Routes = [
       {
         path: 'posts',
         loadChildren: () => import('@app/admin/posts/admin-posts.routes').then(m => m.ADMIN_POSTS_ROUTES)
+      },
+      {
+        path: 'leads',
+        title: 'Prospectos de Servicios | Admin Arecofix',
+        loadComponent: () => import('@app/admin/leads/admin-leads-page').then(m => m.AdminLeadsPage)
       },
       {
         path: 'finance',

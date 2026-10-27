@@ -177,7 +177,8 @@ export class NotificationService {
         const { error } = await this.supabase
             .from('notifications')
             .update({ is_read: true })
-            .eq('id', notificationId);
+            .eq('id', notificationId)
+            .eq('tenant_id', this.tenantService.getTenantId());
 
         if (!error) {
             this._dbNotifications.update(nots => 
@@ -219,27 +220,25 @@ export class NotificationService {
         const user = this.auth.getCurrentUser();
         if (!user) return;
 
+        const currentTenantId = this.tenantService.getTenantId();
         const scope = this.getUserScope();
         
         this.unsubscribe();
 
-        let filterStr = `scope=eq.${scope}`;
-        if (scope === 'user') {
-            filterStr = `user_id=eq.${user.id}`;
-        }
-
         this.realtimeChannel = this.supabase
-            .channel('public:notifications')
+            .channel(`public:notifications:${currentTenantId}`)
             .on('postgres_changes', 
                 { 
                     event: 'INSERT', 
                     schema: 'public', 
                     table: 'notifications',
-                    filter: filterStr
+                    filter: `tenant_id=eq.${currentTenantId}`
                 }, 
                 (payload: any) => {
                     const newNotif = payload.new as AppNotification;
-                    if (newNotif.tenant_id !== this.tenantService.getTenantId()) return;
+                    if (newNotif.tenant_id !== currentTenantId) return;
+                    if (scope === 'admin' && newNotif.scope !== 'admin') return;
+                    if (scope === 'user' && (newNotif.scope !== 'user' || newNotif.user_id !== user.id)) return;
 
                     this._dbNotifications.update(nots => [newNotif, ...nots]);
                     this._unreadCount.update(count => count + 1);
