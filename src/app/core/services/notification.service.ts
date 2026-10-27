@@ -218,22 +218,32 @@ export class NotificationService {
 
     private pollingInterval: ReturnType<typeof setInterval> | null = null;
     private realtimeFailed = false;
+    private isUnsubscribing = false;
 
     subscribeToRealtime() {
         if (typeof window === 'undefined') return;
         const user = this.auth.getCurrentUser();
         if (!user) return;
 
-        // Fallback a polling si Realtime está inhabilitado en la configuración o falló la conexión
+        // Iniciar sondeo periódico de respaldo para consistencia eventual
+        this.startPollingFallback();
+
+        // Si Realtime está inhabilitado en la configuración o falló previamente, mantenerse en polling
         if (environment.enableRealtime === false || this.realtimeFailed) {
-            this.startPollingFallback();
             return;
         }
 
         const currentTenantId = this.tenantService.getTenantId();
         const scope = this.getUserScope();
         
-        this.unsubscribe();
+        // Limpiar canal previo si existía sin desconectar el cliente global
+        if (this.realtimeChannel) {
+            const oldChannel = this.realtimeChannel;
+            this.realtimeChannel = null;
+            try {
+                this.supabase.removeChannel(oldChannel);
+            } catch {}
+        }
 
         try {
             this.realtimeChannel = this.supabase
@@ -247,7 +257,7 @@ export class NotificationService {
                     }, 
                     (payload: any) => {
                         const newNotif = payload.new as AppNotification;
-                        if (newNotif.tenant_id !== currentTenantId) return;
+                        if (!newNotif || newNotif.tenant_id !== currentTenantId) return;
                         if (scope === 'admin' && newNotif.scope !== 'admin') return;
                         if (scope === 'user' && (newNotif.scope !== 'user' || newNotif.user_id !== user.id)) return;
 
@@ -257,19 +267,15 @@ export class NotificationService {
                         this.showInfo(newNotif.title + ' - ' + newNotif.message);
                     }
                 )
-                .subscribe((status: string, err?: Error) => {
-                    // Si el servicio de WebSockets rechaza la firma o se desconecta,
-                    // desconectar el socket Phoenix y activar fallback de sondeo periódico silencioso
-                    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                .subscribe((status: string) => {
+                    if (status === 'SUBSCRIBED') {
+                        this.realtimeFailed = false;
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                         this.realtimeFailed = true;
-                        this.unsubscribe();
-                        this.startPollingFallback();
                     }
                 });
         } catch {
             this.realtimeFailed = true;
-            this.unsubscribe();
-            this.startPollingFallback();
         }
     }
 
@@ -284,23 +290,23 @@ export class NotificationService {
     }
 
     unsubscribe() {
-        if (this.realtimeChannel) {
-            try {
-                this.supabase.removeChannel(this.realtimeChannel);
-            } catch {}
-            this.realtimeChannel = null;
-        }
-
+        if (this.isUnsubscribing) return;
+        this.isUnsubscribing = true;
         try {
-            const realtime = (this.supabase as any)?.realtime;
-            if (realtime && typeof realtime.disconnect === 'function') {
-                realtime.disconnect();
+            if (this.realtimeChannel) {
+                const channel = this.realtimeChannel;
+                this.realtimeChannel = null;
+                try {
+                    this.supabase.removeChannel(channel);
+                } catch {}
             }
-        } catch {}
 
-        if (this.pollingInterval) {
-            clearInterval(this.pollingInterval);
-            this.pollingInterval = null;
+            if (this.pollingInterval) {
+                clearInterval(this.pollingInterval);
+                this.pollingInterval = null;
+            }
+        } finally {
+            this.isUnsubscribing = false;
         }
     }
 }

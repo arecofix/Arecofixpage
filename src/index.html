@@ -457,8 +457,11 @@
         ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(
           window.location.hostname,
         ) || window.location.hostname.endsWith(".local");
-      var isAdminRoute = window.location.pathname.includes("/admin");
-      if (!isLocalDev && !isAdminRoute) {
+      var isNonMarketingRoute =
+        window.location.pathname.includes("/admin") ||
+        window.location.pathname.includes("/login") ||
+        window.location.pathname.includes("/auth");
+      if (!isLocalDev && !isNonMarketingRoute) {
         if (document.readyState === "complete") {
           initAnalytics();
         } else {
