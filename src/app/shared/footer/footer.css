@@ -40,28 +40,7 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Botonera Compartir: Iconos reducidos y sutiles */
-.share-compact-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 9999px;
-  background-color: transparent;
-  color: #9ca3af;
-  border: 1px solid rgba(156, 163, 175, 0.25);
-  transition: all 0.15s ease-in-out;
-}
 
-.share-compact-btn:hover {
-  background-color: rgba(0, 0, 0, 0.03);
-  transform: scale(1.05);
-}
-
-:host-context(.dark) .share-compact-btn {
-  border-color: rgba(255, 255, 255, 0.1);
-}
 
 /* Enlaces del footer */
 .footer-link {

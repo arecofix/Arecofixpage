@@ -42,8 +42,10 @@
             {{ content.hero.ctaPrimary }}
           </a>
           <a routerLink="/portfolio"
-            class="px-8 py-4 glass-panel text-gray-900 dark:text-white rounded-lg font-medium text-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all text-center flex items-center justify-center cursor-pointer">
-            {{ content.hero.ctaSecondary }}
+            class="px-8 pt-3 pb-3.5 sm:pt-3.5 sm:pb-4 leading-none glass-panel text-gray-900 dark:text-white rounded-lg font-medium text-base sm:text-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all text-center flex items-center justify-center cursor-pointer min-h-[54px] sm:min-h-[58px]">
+            <span class="inline-flex items-center -translate-y-[1px]">
+              {{ content.hero.ctaSecondary }}
+            </span>
           </a>
         </div>
       </div>
