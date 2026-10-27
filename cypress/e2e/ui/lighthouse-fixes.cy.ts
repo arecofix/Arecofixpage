@@ -4,9 +4,9 @@ describe('Lighthouse Issues Verification', () => {
     cy.visit('/');
   });
 
-  it('debería tener contraste adecuado en "Open to New Projects"', () => {
+  it('debería tener contraste adecuado en el badge de disponibilidad ("Disponible para nuevos Proyectos")', () => {
     // Verificamos que tenga text-gray-700 en modo claro o text-gray-300 en oscuro, asegurando contraste
-    cy.contains('Open to New Projects')
+    cy.contains(/Disponible para nuevos Proyectos|Open to New Projects/i)
       .should('have.class', 'text-gray-700')
       .and('have.class', 'dark:text-gray-300');
   });
