@@ -18,6 +18,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { SupabaseService } from '@app/core/services/supabase.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { sanitizeHexColor } from '@app/core/utils/color.utils';
 
 @Component({
   selector: 'app-admin-branches-page',
@@ -200,10 +201,11 @@ export class AdminBranchesPage implements OnInit {
       inventory: branch.plan_id === 'premium',
       customers: true,
     };
-    const branding = branch.branding_settings || {
-      logo_url: null,
-      favicon_url: null,
-      primary_color: '#0d9488',
+    const branding = {
+      logo_url: branch.branding_settings?.logo_url ?? null,
+      favicon_url: branch.branding_settings?.favicon_url ?? null,
+      primary_color: this.sanitizeColor(branch.branding_settings?.primary_color),
+      owner_name: branch.branding_settings?.owner_name ?? '',
     };
     const bank = branch.bank_info || {
       alias: '',
@@ -217,6 +219,28 @@ export class AdminBranchesPage implements OnInit {
       bank_info: { ...bank },
     });
     this.showForm.set(true);
+  }
+
+  sanitizeColor(color?: string | null): string {
+    return sanitizeHexColor(color, '#0d9488');
+  }
+
+  onPrimaryColorChange(newColor: string) {
+    const validColor = this.sanitizeColor(newColor);
+    const form = this.currentForm();
+    const currentBranding = form.branding_settings || {
+      logo_url: null,
+      favicon_url: null,
+      primary_color: '#0d9488',
+      owner_name: '',
+    };
+    this.currentForm.set({
+      ...form,
+      branding_settings: {
+        ...currentBranding,
+        primary_color: validColor,
+      },
+    });
   }
 
   onPlanChange(newPlan: string) {

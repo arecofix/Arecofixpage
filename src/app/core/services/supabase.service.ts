@@ -394,7 +394,7 @@ export class SupabaseService {
           params: {
             eventsPerSecond: 2,
           },
-          transport: isBrowser ? undefined : (DummyWebSocket as any)
+          transport: (isBrowser && environment.enableRealtime === true) ? undefined : (DummyWebSocket as any)
         },
         auth: {
           storage: {

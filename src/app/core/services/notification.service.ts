@@ -3,6 +3,7 @@ import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { AuthService } from './auth.service';
 import { TenantService } from './tenant.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { environment } from '@env/environment';
 
 export interface AppNotification {
   id: string;
@@ -215,50 +216,91 @@ export class NotificationService {
         }
     }
 
+    private pollingInterval: ReturnType<typeof setInterval> | null = null;
+    private realtimeFailed = false;
+
     subscribeToRealtime() {
         if (typeof window === 'undefined') return;
         const user = this.auth.getCurrentUser();
         if (!user) return;
+
+        // Fallback a polling si Realtime está inhabilitado en la configuración o falló la conexión
+        if (environment.enableRealtime === false || this.realtimeFailed) {
+            this.startPollingFallback();
+            return;
+        }
 
         const currentTenantId = this.tenantService.getTenantId();
         const scope = this.getUserScope();
         
         this.unsubscribe();
 
-        this.realtimeChannel = this.supabase
-            .channel(`public:notifications:${currentTenantId}`)
-            .on('postgres_changes', 
-                { 
-                    event: 'INSERT', 
-                    schema: 'public', 
-                    table: 'notifications',
-                    filter: `tenant_id=eq.${currentTenantId}`
-                }, 
-                (payload: any) => {
-                    const newNotif = payload.new as AppNotification;
-                    if (newNotif.tenant_id !== currentTenantId) return;
-                    if (scope === 'admin' && newNotif.scope !== 'admin') return;
-                    if (scope === 'user' && (newNotif.scope !== 'user' || newNotif.user_id !== user.id)) return;
+        try {
+            this.realtimeChannel = this.supabase
+                .channel(`public:notifications:${currentTenantId}`)
+                .on('postgres_changes', 
+                    { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'notifications',
+                        filter: `tenant_id=eq.${currentTenantId}`
+                    }, 
+                    (payload: any) => {
+                        const newNotif = payload.new as AppNotification;
+                        if (newNotif.tenant_id !== currentTenantId) return;
+                        if (scope === 'admin' && newNotif.scope !== 'admin') return;
+                        if (scope === 'user' && (newNotif.scope !== 'user' || newNotif.user_id !== user.id)) return;
 
-                    this._dbNotifications.update(nots => [newNotif, ...nots]);
-                    this._unreadCount.update(count => count + 1);
-                    
-                    this.showInfo(newNotif.title + ' - ' + newNotif.message);
-                }
-            )
-            .subscribe((status: string, err?: Error) => {
-                // If the WebSocket/Realtime service is unreachable (e.g. VPS self-hosted),
-                // unsubscribe immediately to stop the Phoenix reconnection loop from
-                // flooding the console with failed WebSocket attempts.
-                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                    this.unsubscribe();
-                }
-            });
+                        this._dbNotifications.update(nots => [newNotif, ...nots]);
+                        this._unreadCount.update(count => count + 1);
+                        
+                        this.showInfo(newNotif.title + ' - ' + newNotif.message);
+                    }
+                )
+                .subscribe((status: string, err?: Error) => {
+                    // Si el servicio de WebSockets rechaza la firma o se desconecta,
+                    // desconectar el socket Phoenix y activar fallback de sondeo periódico silencioso
+                    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                        this.realtimeFailed = true;
+                        this.unsubscribe();
+                        this.startPollingFallback();
+                    }
+                });
+        } catch {
+            this.realtimeFailed = true;
+            this.unsubscribe();
+            this.startPollingFallback();
+        }
+    }
+
+    private startPollingFallback() {
+        if (this.pollingInterval || typeof window === 'undefined') return;
+        // Sondeo REST cada 60 segundos
+        this.pollingInterval = setInterval(() => {
+            if (this.auth.getCurrentUser()) {
+                this.loadNotifications();
+            }
+        }, 60000);
     }
 
     unsubscribe() {
         if (this.realtimeChannel) {
-            this.supabase.removeChannel(this.realtimeChannel);
+            try {
+                this.supabase.removeChannel(this.realtimeChannel);
+            } catch {}
+            this.realtimeChannel = null;
+        }
+
+        try {
+            const realtime = (this.supabase as any)?.realtime;
+            if (realtime && typeof realtime.disconnect === 'function') {
+                realtime.disconnect();
+            }
+        } catch {}
+
+        if (this.pollingInterval) {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
         }
     }
 }

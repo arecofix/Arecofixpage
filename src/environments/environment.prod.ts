@@ -26,6 +26,7 @@ export const environment: Environment = {
 
   authRedirectUrl: 'https://arecofix.com.ar',
   enableProfileUpsert: false,
+  enableRealtime: false,
   flaskApiUrl: 'http://localhost:5000/api',
 
   // RAG Chatbot Worker (Fase 3 - backend proxy)

@@ -16,6 +16,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { AuthService } from '@app/core/services/auth.service';
 import { TranslationService } from '@app/core/services/translation.service';
+import { sanitizeHexColor } from '@app/core/utils/color.utils';
 
 @Component({
   selector: 'app-admin-company-settings-page',
@@ -138,7 +139,7 @@ export class AdminCompanySettingsPage implements OnInit {
           currency: data.currency || 'ARS',
           usd_rate: Number(data.usd_rate || 1),
           logo_url: data.branding_settings?.logo_url || '',
-          primary_color: data.branding_settings?.primary_color || '#3b82f6',
+          primary_color: this.sanitizeColor(data.branding_settings?.primary_color),
           ml_markup_percentage: data.ml_markup_percentage || 5,
           ml_connected: !!data.ml_access_token,
           whatsapp_access_token: data.whatsapp_access_token || '',
@@ -162,6 +163,15 @@ export class AdminCompanySettingsPage implements OnInit {
       this.loading.set(false);
       this.cdr.markForCheck();
     }
+  }
+
+  sanitizeColor(color?: string | null): string {
+    return sanitizeHexColor(color, '#3b82f6');
+  }
+
+  onPrimaryColorChange(newColor: string) {
+    const valid = this.sanitizeColor(newColor);
+    this.form.update(f => ({ ...f, primary_color: valid }));
   }
 
   async onFileChange(event: Event) {
