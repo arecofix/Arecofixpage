@@ -22,6 +22,7 @@ export const environment: Environment = {
   supabaseKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzkyODk0OTg3LCJleHAiOjIxMDgyNTQ5ODd9.bv4ev9v3YD47JrDN0qDyN5MlWYNxTxiqtNhocDcp99g',
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
+  enableRealtime: false,
   flaskApiUrl: 'http://localhost:5000/api',
 
   // RAG Chatbot Worker (Fase 3 - backend proxy)
