@@ -89,8 +89,10 @@ describe('NotificationService', () => {
     expect(mockSupabase.channel).toHaveBeenCalledWith('public:notifications:tenant-abc');
   });
 
-  it('should disconnect socket and clear polling on unsubscribe', () => {
+  it('should remove channel and clear polling on unsubscribe', () => {
+    environment.enableRealtime = true;
+    service.subscribeToRealtime();
     service.unsubscribe();
-    expect(mockSupabase.realtime.disconnect).toHaveBeenCalled();
+    expect(mockSupabase.removeChannel).toHaveBeenCalled();
   });
 });
