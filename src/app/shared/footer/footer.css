@@ -1,0 +1,86 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Botonera Social: Estilo monocromático neutro, sin fondos estridentes */
+.social-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: #6b7280; /* text-gray-500 */
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.social-icon-btn:hover {
+  color: #111827; /* text-gray-900 */
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.social-icon-btn:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+:host-context(.dark) .social-icon-btn {
+  color: #9ca3af; /* text-gray-400 */
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:host-context(.dark) .social-icon-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Botonera Compartir: Iconos reducidos y sutiles */
+.share-compact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background-color: transparent;
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.25);
+  transition: all 0.15s ease-in-out;
+}
+
+.share-compact-btn:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  transform: scale(1.05);
+}
+
+:host-context(.dark) .share-compact-btn {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Enlaces del footer */
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+.footer-link:hover {
+  color: #4f46e5; /* indigo-600 */
+  transform: translateX(2px);
+}
+
+:host-context(.dark) .footer-link:hover {
+  color: #818cf8; /* indigo-400 */
+}
+
+/* Contacto sin espaciado vertical residual */
+.footer-contact {
+  padding-bottom: 0;
+}

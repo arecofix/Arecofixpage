@@ -1,0 +1,272 @@
+
+    <div class="max-w-5xl mx-auto pb-12">
+      <!-- Header -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
+      >
+        <div>
+          <h2
+            class="text-3xl font-black text-gray-900 dark:text-white mb-1 flex items-center gap-3"
+          >
+            <a
+              routerLink="/admin/courses"
+              class="btn btn-sm btn-circle btn-ghost text-slate-400 hover:text-white transition-colors"
+            >
+              <i class="fas fa-arrow-left"></i>
+            </a>
+            {{
+              isEditing
+                ? 'Editar Programa Educativo'
+                : 'Nuevo Programa Educativo'
+            }}
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-slate-400 ml-11">
+            Configura la oferta educativa, precio y presentación para los
+            alumnos.
+          </p>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Left Column (Main Info & Pricing) -->
+          <div class="lg:col-span-2 space-y-8">
+            <app-course-basic-info-form></app-course-basic-info-form>
+            <app-course-logistics-form></app-course-logistics-form>
+                        <app-course-staff-form [instructors]="instructors()"></app-course-staff-form>
+            <app-course-modules-form [modulesFormArray]="modulesFormArray" (addModule)="addModule()" (removeModule)="removeModule($event)"></app-course-modules-form>
+          </div>
+
+          <!-- Right Column (Pricing & Media) -->
+          <div class="lg:col-span-1 space-y-8">
+            <!-- Estado / Publicación -->
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6"
+            >
+              <div class="form-control">
+                <label
+                  class="cursor-pointer flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl transition-colors"
+                  [class.border-emerald-500]="form.get('is_active')?.value"
+                  [class.bg-emerald-50]="form.get('is_active')?.value"
+                  [class.dark:bg-emerald-900/10]="form.get('is_active')?.value"
+                  [class.border-slate-300]="!form.get('is_active')?.value"
+                  [class.dark:border-slate-700]="!form.get('is_active')?.value"
+                >
+                  <div class="flex items-center gap-3 w-full">
+                    <div class="flex-1">
+                      <span
+                        class="block text-sm font-bold text-gray-900 dark:text-white"
+                        >{{
+                          form.get('is_active')?.value
+                            ? 'Curso Público'
+                            : 'Modo Borrador'
+                        }}</span
+                      >
+                      <span
+                        class="block text-xs text-slate-500 dark:text-slate-400 mt-1"
+                        >{{
+                          form.get('is_active')?.value
+                            ? 'Visible en la academia para todos'
+                            : 'Oculto, solo lo ven admins'
+                        }}</span
+                      >
+                    </div>
+                    <input
+                      type="checkbox"
+                      formControlName="is_active"
+                      class="toggle toggle-success"
+                    />
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Precios -->
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-money-bill-wave text-emerald-500"></i>
+                  Estrategia de Precio
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="form-control">
+                  <label class="label"
+                    ><span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Precio Original / Normal</span
+                    ></label
+                  >
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white"
+                  >
+                    <span class="text-slate-400">$</span>
+                    <input
+                      type="number"
+                      formControlName="price"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none text-lg font-bold"
+                    />
+                  </label>
+                  @if (
+                    form.get('price')?.invalid && form.get('price')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1"
+                      ><i class="fas fa-exclamation-circle"></i> El precio es
+                      obligatorio</span
+                    >
+                  }
+                </div>
+
+                <div class="form-control">
+                  <label class="label"
+                    ><span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Precio de Oferta (Opcional)</span
+                    ></label
+                  >
+                  <label
+                    class="input bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center gap-3 rounded-xl px-4 h-12 text-gray-900 dark:text-white opacity-80"
+                  >
+                    <span
+                      class="font-bold text-emerald-600 dark:text-emerald-500"
+                      >$</span
+                    >
+                    <input
+                      type="number"
+                      formControlName="sale_price"
+                      class="grow bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                      placeholder="Opcional..."
+                    />
+                  </label>
+                  <span
+                    class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 ml-1"
+                    >Debe ser menor al Precio Original.</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Multimedia -->
+            <div
+              class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
+            >
+              <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700"
+              >
+                <h3
+                  class="font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="fas fa-image text-pink-500"></i> Portada del Curso
+                </h3>
+              </div>
+              <div class="p-6">
+                <!-- Image Preview Area -->
+                <div
+                  class="relative w-full aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4 group flex items-center justify-center"
+                >
+                  @if (form.get('image_url')?.value) {
+                    <img
+                      [src]="
+                        getImageSrc(
+                          $safeNavigationMigration(form.get('image_url')?.value)
+                        )
+                      "
+                      class="w-full h-full object-cover"
+                      alt="Portada"
+                      onerror="this.src='/assets/img/cursos/1.jpg'"
+                    />
+                    <div
+                      class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm"
+                    >
+                      <span
+                        class="text-white font-bold text-sm bg-black/50 px-4 py-2 rounded-lg backdrop-blur-md border border-white/20"
+                        ><i class="fas fa-exchange-alt mr-2"></i> Cambiar
+                        Portada</span
+                      >
+                    </div>
+                  } @else {
+                    <div
+                      class="text-slate-400 dark:text-slate-600 flex flex-col items-center"
+                    >
+                      <i class="fas fa-cloud-upload-alt text-4xl mb-2"></i>
+                      <span class="text-sm font-medium">Sin imagen</span>
+                    </div>
+                  }
+
+                  <!-- Invisible File Input overlapping the entire box for easy click -->
+                  <input
+                    type="file"
+                    (change)="onFileChange($event)"
+                    accept="image/*"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                </div>
+
+                <div class="form-control">
+                  <span
+                    class="text-[10px] text-center text-slate-500 dark:text-slate-400 mb-2"
+                    >O pega una URL directamente:</span
+                  >
+                  <input
+                    type="text"
+                    formControlName="image_url"
+                    class="input input-sm bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-xs text-gray-900 dark:text-white w-full rounded-lg text-center"
+                    placeholder="https://..."
+                  />
+                  @if (
+                    form.get('image_url')?.invalid &&
+                    form.get('image_url')?.touched
+                  ) {
+                    <span
+                      class="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1 justify-center"
+                      ><i class="fas fa-exclamation-circle"></i> La portada es
+                      obligatoria</span
+                    >
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Bottom Actions Bar -->
+        <div
+          class="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)]"
+        >
+          <div
+            class="container mx-auto max-w-5xl flex justify-between items-center px-4"
+          >
+            <button
+              type="button"
+              class="btn btn-ghost text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl"
+              routerLink="/admin/courses"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn border-none bg-blue-600 hover:bg-blue-700 text-white px-10 rounded-xl shadow-lg shadow-blue-500/30 text-base flex items-center gap-2 transition-all"
+              [disabled]="saving"
+            >
+              @if (saving) {
+                <span class="loading loading-spinner text-white w-5"></span>
+                Guardando datos...
+              } @else {
+                <i class="fas fa-save"></i>
+                {{
+                  isEditing ? 'Guardar Cambios' : 'Lanzar Programa Educativo'
+                }}
+              }
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  

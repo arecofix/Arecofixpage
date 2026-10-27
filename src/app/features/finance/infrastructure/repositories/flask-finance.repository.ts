@@ -5,12 +5,14 @@ import { map } from 'rxjs/operators';
 import { FinanceRepository } from '../../domain/repositories/finance.repository';
 import { CashMovement } from '../../domain/entities/cash-movement.entity';
 
+import { environment } from '@env/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class FlaskFinanceRepository implements FinanceRepository {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:5000/api/finances';
+    private apiUrl = `${environment.flaskApiUrl}/finances`;
 
     async recordMovement(movement: CashMovement): Promise<CashMovement> {
         return firstValueFrom(this.http.post<CashMovement>(this.apiUrl, movement));

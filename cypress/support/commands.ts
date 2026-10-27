@@ -34,12 +34,33 @@ import {
 
 export {};
 
+Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
+  let target = url;
+  if (typeof target === 'string' && !target.startsWith('http://') && !target.startsWith('https://')) {
+    const rawBase = Cypress.config('baseUrl') || 'http://localhost:4200';
+    let baseOrigin = 'http://localhost:4200';
+    try {
+      baseOrigin = new URL(rawBase).origin;
+    } catch {}
+
+    let path = target;
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    
+    target = `${baseOrigin}${path}`;
+  }
+  return originalFn(target, options);
+});
+
 declare global {
   namespace Cypress {
     interface Chainable<Subject = any> {
       loginAsAdmin(url?: string, options?: { isTauri?: boolean }): Chainable<void>;
       loginRealAdmin(url?: string, options?: { isTauri?: boolean }): Chainable<void>;
       setupCheckoutSession(): Chainable<void>;
+      loginAsTestUser(url?: string): Chainable<void>;
+      addProductToCart(productSlugOrId: string, quantity?: number): Chainable<void>;
       /**
        * Login as any user by providing a custom session and profile.
        * Use this for testing student/non-admin user flows.
@@ -52,13 +73,13 @@ declare global {
 Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean } = {}) => {
   const session = {
     provider_token: null,
-    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJzdXBlcl9hZG1pbiJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk',
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxODIzOTY5ODAxLCJzdWIiOiIxMTExMTExMS0xMTExLTExMTEtMTExMS0xMTExMTExMTExMTEiLCJlbWFpbCI6ImFkbWluQGFyZWNvZml4LmNvbS5hciIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsicm9sZSI6InN1cGVyX2FkbWluIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwidGVuYW50X2lkIjoiYmJhMjZjY2QtNTljZS00NzFjLWFhYzAtNGMxZjU1MTNkZTNiIiwiaWF0IjoxNzkyNDMzODAxfQ.gMKSwmTm-eHH0vlUcABtx7WDAj6SHvY0-saIrc4HdkI',
     expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     refresh_token: 'fake-refresh-token',
     token_type: 'bearer',
     user: {
-      id: 'mock-admin-id',
+      id: '11111111-1111-1111-1111-111111111111',
       aud: 'authenticated',
       role: 'authenticated',
       email: 'admin@arecofix.com.ar',
@@ -82,7 +103,7 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
     is_active: true
   };
 
-  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+  cy.intercept('**/rest/v1/profiles*', (req) => {
     const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
     req.reply({
       statusCode: 200,
@@ -91,15 +112,9 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
   }).as('getProfile');
 
   // Intercept other basic things like branches/tenants that could fail in online mock mode
-  cy.intercept('GET', '**/rest/v1/tenants*', {
-    statusCode: 200,
-    body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }]
-  }).as('getTenants');
+  cy.intercept('**/rest/v1/tenants*', (req) => { const mock = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, features: { hasProducts: true, hasServices: true, hasCourses: true, hasRepairs: true, hasBlog: true } }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getTenants');
 
-  cy.intercept('GET', '**/rest/v1/branches*', {
-    statusCode: 200,
-    body: [{ id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5', name: 'Sede Central' }]
-  }).as('getBranches');
+  cy.intercept('GET', '**/rest/v1/branches*', (req) => { const mock = { id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5', name: 'Sede Central', slug: null, is_active: true }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getBranches');
 
   cy.intercept('GET', '**/auth/v1/user', {
     statusCode: 200,
@@ -124,13 +139,19 @@ Cypress.Commands.add('loginRealAdmin', (url = '/', options: { isTauri?: boolean 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
       // Inject auth token BEFORE Angular initializes
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
       win.localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(fakeProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
       win.localStorage.setItem('arecofix_admin_branch_id', 'de967f68-7b15-44c0-bc98-952ccf06e1e5');
       win.localStorage.setItem('cypress-test', 'true');
+        win.localStorage.removeItem('cart_session_id');
+        win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
       
       if (options.isTauri) {
         // Forzar Tauri para validación offline absoluta
@@ -149,7 +170,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
     refresh_token: 'fake-refresh-token',
     token_type: 'bearer',
     user: {
-      id: 'mock-admin-id',
+      id: '00000000-0000-0000-0000-000000000000',
       aud: 'authenticated',
       role: 'authenticated',
       email: 'admin@arecofix.com',
@@ -164,9 +185,25 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
 
   // 1. PRIMERO definimos los interceptores
 
-  cy.intercept('**/rest/v1/**', {
-    statusCode: 200,
-    body: []
+  cy.intercept('GET', '**/rest/v1/**', (req) => {
+    const url = req.url;
+    if (
+      url.includes('/products') ||
+      url.includes('/orders') ||
+      url.includes('/order_items') ||
+      url.includes('/categories') ||
+      url.includes('/suppliers') ||
+      url.includes('/stock_history') ||
+      url.includes('/courses') ||
+      url.includes('/course_certificates')
+    ) {
+      return;
+    }
+    req.reply({
+      statusCode: 200,
+      headers: { 'content-range': '0-0/0', 'Content-Range': '0-0/0' },
+      body: []
+    });
   }).as('catchAllSupabase');
 
   // Intercept the /auth/v1/user call
@@ -188,7 +225,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
   }).as('refreshToken');
 
   const mockProfile = {
-    id: 'mock-admin-id',
+    id: '00000000-0000-0000-0000-000000000000',
     email: 'admin@arecofix.com',
     role: 'super_admin',
     first_name: 'Admin',
@@ -197,7 +234,7 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
     branch_id: 'de967f68-7b15-44c0-bc98-952ccf06e1e5'
   };
 
-  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+  cy.intercept('**/rest/v1/profiles*', (req) => {
     req.reply({
       statusCode: 200,
       body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mockProfile : [mockProfile]
@@ -254,16 +291,16 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
 
 
 
-  const mockTenant = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true };
+  const mockTenant = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, usd_rate: 1000 };
   
-  cy.intercept('GET', '**/rest/v1/tenants*', (req) => {
+  cy.intercept('**/rest/v1/tenants*', (req) => {
     req.reply({
       statusCode: 200,
       body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mockTenant : [mockTenant]
     });
   }).as('getTenants');
 
-  const mockBranch = { id: 'branch-1', name: 'Sede Central' };
+  const mockBranch = { id: 'branch-1', name: 'Sede Central', slug: null, is_active: true };
 
   cy.intercept('GET', '**/rest/v1/branches*', (req) => {
     req.reply({
@@ -279,13 +316,19 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
   cy.visit(targetUrl, { 
     failOnStatusCode: false,
     onBeforeLoad: (win) => {
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+      win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
       win.localStorage.setItem('arecofix_profile_mock-admin-id', JSON.stringify(mockProfile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
       win.localStorage.setItem('arecofix_admin_branch_id', 'branch-1');
       win.localStorage.setItem('cypress-test', 'true');
+        win.localStorage.removeItem('cart_session_id');
+        win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
       
       if (options.isTauri) {
         (win as any).__TAURI__ = true;
@@ -303,33 +346,31 @@ Cypress.Commands.add('setupCheckoutSession', () => {
   // Inject session into local storage BEFORE anything loads
   cy.window().then(w => w.indexedDB.deleteDatabase('ArecofixOfflineDB'));
     cy.on('window:before:load', (win) => {
-    win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
-    win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+    win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
+    win.localStorage.clear();
+        win.localStorage.setItem('sb-db-auth-token', JSON.stringify(session));
+        win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(session));
     win.localStorage.setItem('arecofix_current_branch_id', branch.id);
   });
 
   // Basic intercepts required for the app to function
-  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+  cy.intercept('**/rest/v1/profiles*', (req) => {
     req.reply({
       statusCode: 200,
       body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? profile : [profile]
     });
   }).as('getProfile');
 
-  cy.intercept('GET', '**/rest/v1/tenants*', {
-    statusCode: 200,
-    body: [tenant]
-  }).as('getTenant');
+  cy.intercept('**/rest/v1/tenants*', (req) => { req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? tenant : [tenant] }); }).as('getTenant');
 
   cy.intercept('GET', '**/rest/v1/companies*', {
     statusCode: 200,
     body: [{ id: 'company-1', name: 'Arecofix' }]
   }).as('getCompany');
 
-  cy.intercept('GET', '**/rest/v1/branches*', {
-    statusCode: 200,
-    body: [branch]
-  }).as('getBranch');
+  cy.intercept('GET', '**/rest/v1/branches*', (req) => { req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? branch : [branch] }); }).as('getBranch');
 
   // Supabase auth user
   cy.intercept('GET', '**/auth/v1/user', {
@@ -354,7 +395,7 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
   // We must use the valid admin JWT structure for the access_token since Supabase client
   // validates the token signature. We then override all profile/user endpoints to return
   // the desired user data (student, customer, etc.)
-  const validAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJjdXN0b21lciJ9fQ.placeholder';
+  const validAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiJtb2NrLWFkbWluLWlkIiwiZW1haWwiOiJhZG1pbkBhcmVjb2ZpeC5jb20uYXIiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsInRlbmFudF9pZCI6ImJiYTI2Y2NkLTU5Y2UtNDcxYy1hYWMwLTRjMWY1NTEzZGUzYiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7InJvbGUiOiJjdXN0b21lciJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk';
 
   // Build the full session object to inject
   const fullSession = {
@@ -369,7 +410,8 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
 
   // Set up catch-all as LOW-PRIORITY fallback (registered before specific intercepts)
   // Note: specific intercepts registered in beforeEach() BEFORE calling loginAsUser() take priority.
-  cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
+  // cy.intercept('**/rest/v1/**', { statusCode: 200, body: [] }).as('catchAllRest');
+  // cy.intercept('**/rpc/**', { statusCode: 200, body: [] }).as('catchAllRpc');
 
   // ── Auth endpoints ──────────────────────────────────────────────────────────
 
@@ -406,20 +448,14 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
 
   // ── REST endpoints ──────────────────────────────────────────────────────────
 
-  cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+  cy.intercept('**/rest/v1/profiles*', (req) => {
     const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
     req.reply({ statusCode: 200, body: wantsObject ? profile : [profile] });
   }).as('getProfile');
 
-  cy.intercept('GET', '**/rest/v1/tenants*', {
-    statusCode: 200,
-    body: [{ id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true }]
-  }).as('getTenants');
+  cy.intercept('**/rest/v1/tenants*', (req) => { const mock = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, usd_rate: 1000 }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getTenants');
 
-  cy.intercept('GET', '**/rest/v1/branches*', {
-    statusCode: 200,
-    body: [{ id: 'branch-1', name: 'Sede Central' }]
-  }).as('getBranches');
+  cy.intercept('**/rest/v1/branches*', (req) => { const mock = { id: 'branch-1', name: 'Sede Central', slug: null, is_active: true }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getBranches');
 
   // Visit with token pre-injected so Supabase can bootstrap from localStorage
   cy.visit(url, {
@@ -428,10 +464,13 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
       // Store the session in the same format Supabase expects
       const storageKey = `sb-db-auth-token`;
       win.localStorage.setItem(storageKey, JSON.stringify(fullSession));
+      win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(fullSession));
       win.localStorage.setItem(`arecofix_profile_${userId}`, JSON.stringify(profile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
       win.localStorage.setItem('cypress-test', 'true');
+        win.localStorage.removeItem('cart_session_id');
+        win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
       
       // Clear IndexedDB cache to prevent stale data from prior tests
       if ((win as any).indexedDB) {
@@ -439,4 +478,49 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
       }
     }
   });
+});
+
+
+
+Cypress.Commands.add('loginAsTestUser', (url = '/') => {
+  const session = {
+    provider_token: null,
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMDY3MjQwMjA4LCJzdWIiOiIxMTExMTExMS0xMTExLTExMTEtMTExMS0xMTExMTExMTExMTEiLCJlbWFpbCI6InRlc3RAYXJlY29maXguY29tIiwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJ0ZW5hbnRfaWQiOiJiYmEyNmNjZC01OWNlLTQ3MWMtYWFjMC00YzFmNTUxM2RlM2IiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJyb2xlIjoidXNlciJ9fQ.bF2zng6HYDH92h7zFQV5UpXp1Ii0BNIIDBpBy5agUsk',
+    expires_in: 3600,
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    refresh_token: 'fake-refresh-token',
+    token_type: 'bearer',
+    user: {
+      id: '11111111-1111-1111-1111-111111111111',
+      aud: 'authenticated',
+      role: 'authenticated',
+      email: 'test@arecofix.com',
+      email_confirmed_at: new Date().toISOString(),
+      app_metadata: { provider: 'email', providers: ['email'] },
+      user_metadata: { role: 'user' },
+      identities: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  };
+
+  const profile = {
+    id: '11111111-1111-1111-1111-111111111111',
+    email: 'test@arecofix.com',
+    role: 'user',
+    first_name: 'Juan',
+    last_name: 'Pérez',
+    tenant_id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b',
+    is_active: true
+  };
+
+  cy.loginAsUser(url, session, profile);
+});
+
+Cypress.Commands.add('addProductToCart', (productSlugOrId: string, quantity = 1) => {
+  const targetUrl = productSlugOrId.includes('/') ? productSlugOrId : `/productos/detalle/${productSlugOrId}`;
+  cy.visit(targetUrl);
+  for (let i = 0; i < quantity; i++) {
+    cy.get('[data-cy="add-to-cart"]').should('be.visible').click();
+  }
 });

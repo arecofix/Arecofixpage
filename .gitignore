@@ -1,44 +1,59 @@
-# =========================================================================
-# ARECOFIX - .gitignore
-# =========================================================================
+# ==============================================================================
+# ARECOFIX - OFFICIAL GITIGNORE CONFIGURATION
+# ==============================================================================
+# Comprehensive ignore rules for Angular 21, SSR Node.js, Cloudflare, Tauri,
+# Capacitor, Jest, Cypress, and SSH/VPS deployment artifacts.
+# ==============================================================================
 
-# -------------------------------------------------------------------------
-# DEPENDENCIAS Y ENTORNO NODE
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 1. ENTORNO, SECRETOS Y CLAVES CRIPTOGRÁFICAS (CRÍTICO DE SEGURIDAD)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+!.env.example
+src/environments/environment.generated.ts
+
+# Claves privadas SSH, certificados SSL y tokens
+*.key
+*.pem
+*.ppk
+*.pub
+id_rsa
+id_ecdsa
+id_ed25519
+ssh-key*
+*.p12
+*.pfx
+
+# ------------------------------------------------------------------------------
+# 2. DEPENDENCIAS DE PAQUETES
+# ------------------------------------------------------------------------------
 node_modules/
 .npm
 .yarn-integrity
-.env
-.env.*
-!.env.example
-.npmrc
-
-# -------------------------------------------------------------------------
-# LOCK FILES (solo se conserva pnpm-lock.yaml)
-# -------------------------------------------------------------------------
+.pnpm-debug.log*
 package-lock.json
 yarn.lock
 
-# -------------------------------------------------------------------------
-# LOGS
-# -------------------------------------------------------------------------
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-firebase-debug.log*
-firebase-debug.*.log*
-
-# -------------------------------------------------------------------------
-# BUILDS, COMPILED Y BINARIOS
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 3. COMPILACIÓN, BUILDS Y ARTEFACTOS GENERADOS
+# ------------------------------------------------------------------------------
 dist/
+dist.tar.gz
+dist_backup/
+backups/
+*.bak*
 deploy-temp/
 releases/
-firebase-public/
 build/
-build/Release/
+bin/
+out-tsc/
+www/
+
+# Binarios y empaquetados
 *.apk
 *.aab
 *.exe
@@ -47,127 +62,113 @@ build/Release/
 *.zip
 *.tar.gz
 *.tgz
-*.mp4
-*.gif
 
-# -------------------------------------------------------------------------
-# ANGULAR / IONIC / FRONTEND
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 4. FRAMEWORKS: ANGULAR, SSR Y COMPILADORES
+# ------------------------------------------------------------------------------
 .angular/
-www/
-# routes.txt is committed as a static baseline for CI/CD (Cloudflare Pages)
-# Dynamic routes are generated locally before Firebase deploy via `pnpm run routes:update`
+.angular/cache/
 
-# -------------------------------------------------------------------------
-# FIREBASE & DATACONNECT
-# -------------------------------------------------------------------------
-.firebase/
-.dataconnect/
-
-# -------------------------------------------------------------------------
-# SUPABASE
-# -------------------------------------------------------------------------
-supabase/.temp/
-
-
-# -------------------------------------------------------------------------
-# CLOUDFLARE (Wrangler)
-# -------------------------------------------------------------------------
-.wrangler/
-
-# -------------------------------------------------------------------------
-# ANDROID / CAPACITOR (build artifacts)
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 5. MOBILE & DESKTOP (CAPACITOR & TAURI)
+# ------------------------------------------------------------------------------
+# Capacitor (Android)
 android/app/build/
 android/.gradle/
 android/capacitor-cordova-android-plugins/build/
 android/local.properties
 
-# -------------------------------------------------------------------------
-# TAURI
-# -------------------------------------------------------------------------
+# Tauri Desktop (Rust)
 src-tauri/target/
+src-tauri/Cargo.lock
 
-# -------------------------------------------------------------------------
-# TESTING & COVERAGE (Playwright, Karma, NYC)
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 6. TESTING, COBERTURA Y REPORTES (JEST & CYPRESS)
+# ------------------------------------------------------------------------------
 coverage/
 .nyc_output/
 lib-cov/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+test-results/
+playwright-report/
+playwright/.cache/
+playwright/.auth/
 
-# -------------------------------------------------------------------------
-# REPORTES, AUDITORÍAS Y HERRAMIENTAS
-# -------------------------------------------------------------------------
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+cypress/reports/
+cypress.env.json
+!cypress.env.json.example
+
+# Auditorías Lighthouse
 .unlighthouse/
 unlighthouse-report/
 
-# -------------------------------------------------------------------------
-# AI / AGENTES / PLANES TEMPORALES
-# -------------------------------------------------------------------------
-.agent/
-scratch_chatbot/
-
-# -------------------------------------------------------------------------
-# SAMPLES, SCRATCH Y TEMPORALES
-# -------------------------------------------------------------------------
-AdsSample/
-scratch/
-test-og.js
-test-og-more.js
-
-# -------------------------------------------------------------------------
-# SCRIPTS DE DEBUG CON CREDENCIALES
-# -------------------------------------------------------------------------
-scripts/debug-db.mjs
-scripts/cleanup-database.js
-scripts/meta_marketing_campaign.js
-
-# -------------------------------------------------------------------------
-# EDITOR / IDE
-# -------------------------------------------------------------------------
-.vscode/
-.idea/
-
-# -------------------------------------------------------------------------
-# MISCELÁNEOS Y CACHÉS
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 7. LOGS Y PROCESOS DE SERVICIO (PM2)
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
 pids/
 *.pid
 *.seed
 *.pid.lock
-.eslintcache
-.node_repl_history
-bower_components/
-.grunt/
-.lock-wscript
 
-# -------------------------------------------------------------------------
-# SISTEMA OPERATIVO
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# 8. BACKEND & CLOUD SERVICES
+# ------------------------------------------------------------------------------
+# Supabase Local Cache
+supabase/.temp/
+
+# Cloudflare Wrangler Cache
+.wrangler/
+
+# Python Cache (Flask offline backend)
+__pycache__/
+*.py[cod]
+*$py.class
+Back-End/__pycache__/
+Back-End/venv/
+.venv/
+
+# ------------------------------------------------------------------------------
+# 9. EDITORES, IDES Y SISTEMAS OPERATIVOS
+# ------------------------------------------------------------------------------
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 Desktop.ini
 
-cypress/screenshots/
-cypress/videos/
-cypress/downloads/
-# -------------------------------------------------------------------------
-# CLAVES SSH Y DATOS SENSIBLES
-# -------------------------------------------------------------------------
-*.key
-*.pem
-*.ppk
-ssh-key-2026-08-30.key
-
-# -------------------------------------------------------------------------
-# CACHE Y BASURA
-# -------------------------------------------------------------------------
-__pycache__/
+# ------------------------------------------------------------------------------
+# 10. SCRIPTS TEMPORALES Y SCRATCH
+# ------------------------------------------------------------------------------
+scratch/
+scratch_chatbot/
+.agent/
 test-*.js
-load-test.js
 send_test.js
+debug.mjs
+temp.html
+temp.mjs
+temp_size.js
+
+# ------------------------------------------------------------------------------
+# 11. AUDITORÍAS DE SEGURIDAD LOCALES (REPORTS, POCs, FINDINGS)
+# ------------------------------------------------------------------------------
+.audit/

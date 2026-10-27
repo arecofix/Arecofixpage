@@ -1,1 +1,1 @@
-interface Window { __TAURI_INTERNALS__?: any; __TAURI__?: any; forceOffline?: boolean; gtag?: (...args: any[]) => void; fbq?: (...args: any[]) => void; __env__?: Record<string, string>; saveCalled?: boolean; requestIdleCallback?: any; }
+interface Window { __TAURI_INTERNALS__?: any; __TAURI__?: any; forceOffline?: boolean; gtag?: (...args: any[]) => void; fbq?: (...args: any[]) => void; __env__?: Record<string, string>; saveCalled?: boolean; requestIdleCallback?: any; __arecofix_adblock?: boolean; }

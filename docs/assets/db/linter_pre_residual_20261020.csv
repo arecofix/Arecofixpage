@@ -1,0 +1,238 @@
+category,level,type,object,detail
+anon_security_definer_function_executable,WARN,SECURITY,public.get_current_tenant_id,""
+anon_security_definer_function_executable,WARN,SECURITY,public.get_public_certificate_data,p_cert_id uuid
+anon_security_definer_function_executable,WARN,SECURITY,public.get_repair_tracking,p_code text
+anon_security_definer_function_executable,WARN,SECURITY,public.get_request_guest_session,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.accept_upsell_vidrio,p_tracking_code text
+authenticated_security_definer_function_executable,WARN,SECURITY,public.add_upsell_item_to_repair,"p_tracking_code text, p_product_id uuid"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.admin_reactivate_certificate,p_cert_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.admin_revoke_certificate,"p_cert_id uuid, p_reason text"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.assign_user_as_employee,"p_user_id uuid, p_role text, p_tenant_id uuid"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.can_edit_profile,target_role text
+authenticated_security_definer_function_executable,WARN,SECURITY,public.check_and_update_membership_status,p_user_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.create_employee,"p_first_name text, p_last_name text, p_email text, p_phone text"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.create_guest_profile,"p_first_name text, p_last_name text, p_email text, p_phone text"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_admin_business_dashboard_metrics,"p_tenant_id uuid, p_range text, p_start_date timestamp with tim"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_admin_dashboard_analytics,"p_range text, p_branch_id uuid"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_admin_database_health,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_auth_user_branch,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_auth_user_role,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_auth_user_tenant,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_current_tenant_id,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_dashboard_stats_v2,p_branch_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_exam_questions,p_content_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_financial_analytics_v3,"p_tenant_id uuid, p_start_date timestamp with time zone, p_bran"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_my_permissions,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_my_tenant,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_public_certificate_data,p_cert_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_repair_tracking,p_code text
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_request_guest_session,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_secure_branch_id,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.get_secure_tenant_id,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.has_permission,"p_permission text, p_branch_id uuid"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.increment_product_sales,"p_product_id uuid, amount integer"
+authenticated_security_definer_function_executable,WARN,SECURITY,public.is_admin,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.is_admin_of_tenant,target_tenant_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.is_admin_user,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.is_super_admin,""
+authenticated_security_definer_function_executable,WARN,SECURITY,public.mark_content_completed,p_content_id uuid
+authenticated_security_definer_function_executable,WARN,SECURITY,public.save_repair_order,p_payload jsonb
+authenticated_security_definer_function_executable,WARN,SECURITY,public.submit_exam,"p_content_id uuid, p_answers jsonb"
+multiple_permissive_policies,WARN,PERFORMANCE,public.academy_payments,Role authenticated has 2 permissive policies for SELECT (academ
+multiple_permissive_policies,WARN,PERFORMANCE,public.academy_plans,Role authenticated has 2 permissive policies for SELECT (academ
+multiple_permissive_policies,WARN,PERFORMANCE,public.academy_subscriptions,Role authenticated has 2 permissive policies for SELECT (academ
+multiple_permissive_policies,WARN,PERFORMANCE,public.audit_logs,Role authenticated has 3 permissive policies for DELETE (Deny a
+multiple_permissive_policies,WARN,PERFORMANCE,public.audit_logs,Role authenticated has 3 permissive policies for INSERT (Deny a
+multiple_permissive_policies,WARN,PERFORMANCE,public.audit_logs,Role authenticated has 3 permissive policies for UPDATE (Deny a
+multiple_permissive_policies,WARN,PERFORMANCE,public.audit_logs,Role authenticated has 3 permissive policies for SELECT (Deny a
+multiple_permissive_policies,WARN,PERFORMANCE,public.auth_logs,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.auth_logs,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.auth_logs,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.auth_logs,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.bank_reconciliations,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.bank_reconciliations,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.bank_reconciliations,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.bank_reconciliations,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_categories,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_categories,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_categories,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_categories,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_post_tags,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_post_tags,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_post_tags,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_post_tags,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_posts,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_posts,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_posts,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_posts,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_tags,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_tags,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_tags,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.blog_tags,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.branches,Role authenticated has 5 permissive policies for SELECT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.branches,Role authenticated has 4 permissive policies for INSERT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.branches,Role authenticated has 4 permissive policies for UPDATE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.branches,Role authenticated has 4 permissive policies for DELETE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.branches,Role anon has 2 permissive policies for SELECT (branches_public
+multiple_permissive_policies,WARN,PERFORMANCE,public.brands,Role authenticated has 2 permissive policies for SELECT (brands
+multiple_permissive_policies,WARN,PERFORMANCE,public.cash_movements,Role authenticated has 5 permissive policies for SELECT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.cash_movements,Role authenticated has 5 permissive policies for INSERT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.cash_movements,Role authenticated has 5 permissive policies for DELETE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.cash_movements,Role authenticated has 5 permissive policies for UPDATE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.categories,Role authenticated has 2 permissive policies for SELECT (catego
+multiple_permissive_policies,WARN,PERFORMANCE,public.contact_messages,Role authenticated has 2 permissive policies for SELECT (tenant
+multiple_permissive_policies,WARN,PERFORMANCE,public.contact_messages,Role authenticated has 2 permissive policies for DELETE (tenant
+multiple_permissive_policies,WARN,PERFORMANCE,public.contact_messages,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.contact_messages,Role authenticated has 2 permissive policies for UPDATE (tenant
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_certificates,Role authenticated has 3 permissive policies for SELECT (course
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_certificates,Role authenticated has 2 permissive policies for INSERT (course
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_enrollments,Role authenticated has 3 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_enrollments,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_enrollments,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_enrollments,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_exam_submissions,Role authenticated has 2 permissive policies for SELECT (Admins
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_instructors,Role authenticated has 2 permissive policies for SELECT (Escrit
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_lessons,Role authenticated has 2 permissive policies for INSERT (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_lessons,Role authenticated has 2 permissive policies for UPDATE (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_lessons,Role authenticated has 3 permissive policies for SELECT (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_lessons,Role authenticated has 2 permissive policies for DELETE (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_modules,Role authenticated has 4 permissive policies for INSERT (Admins
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_modules,Role authenticated has 4 permissive policies for UPDATE (Admins
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_modules,Role authenticated has 5 permissive policies for SELECT (Admins
+multiple_permissive_policies,WARN,PERFORMANCE,public.course_modules,Role authenticated has 4 permissive policies for DELETE (Admins
+multiple_permissive_policies,WARN,PERFORMANCE,public.courses,Role authenticated has 3 permissive policies for SELECT (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.courses,Role authenticated has 2 permissive policies for DELETE (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.courses,Role authenticated has 2 permissive policies for INSERT (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.courses,Role authenticated has 2 permissive policies for UPDATE (Author
+multiple_permissive_policies,WARN,PERFORMANCE,public.customer_devices,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.customer_devices,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.customer_devices,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.customer_devices,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.educacion_y_skills,Role authenticated has 2 permissive policies for SELECT (educac
+multiple_permissive_policies,WARN,PERFORMANCE,public.experiencia_laboral,Role authenticated has 2 permissive policies for SELECT (experi
+multiple_permissive_policies,WARN,PERFORMANCE,public.invoices,Role authenticated has 2 permissive policies for DELETE (invoic
+multiple_permissive_policies,WARN,PERFORMANCE,public.invoices,Role authenticated has 2 permissive policies for INSERT (invoic
+multiple_permissive_policies,WARN,PERFORMANCE,public.invoices,Role authenticated has 2 permissive policies for UPDATE (invoic
+multiple_permissive_policies,WARN,PERFORMANCE,public.invoices,Role authenticated has 2 permissive policies for SELECT (invoic
+multiple_permissive_policies,WARN,PERFORMANCE,public.models,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.models,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.models,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.models,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.notifications,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.notifications,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.notifications,Role authenticated has 2 permissive policies for DELETE (tenant
+multiple_permissive_policies,WARN,PERFORMANCE,public.notifications,Role authenticated has 2 permissive policies for SELECT (tenant
+multiple_permissive_policies,WARN,PERFORMANCE,public.order_items,Role authenticated has 3 permissive policies for UPDATE (staff_
+multiple_permissive_policies,WARN,PERFORMANCE,public.order_items,Role authenticated has 3 permissive policies for DELETE (staff_
+multiple_permissive_policies,WARN,PERFORMANCE,public.order_items,Role authenticated has 3 permissive policies for SELECT (staff_
+multiple_permissive_policies,WARN,PERFORMANCE,public.order_items,Role authenticated has 3 permissive policies for INSERT (staff_
+multiple_permissive_policies,WARN,PERFORMANCE,public.orders,Role authenticated has 5 permissive policies for UPDATE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.orders,Role authenticated has 5 permissive policies for DELETE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.orders,Role authenticated has 5 permissive policies for SELECT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.orders,Role authenticated has 6 permissive policies for INSERT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.page_templates,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.page_templates,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.page_templates,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.page_templates,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.pages,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.pages,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.pages,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.pages,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.payments,Role authenticated has 2 permissive policies for DELETE (Staff 
+multiple_permissive_policies,WARN,PERFORMANCE,public.payments,Role authenticated has 3 permissive policies for SELECT (Users 
+multiple_permissive_policies,WARN,PERFORMANCE,public.payments,Role authenticated has 2 permissive policies for INSERT (Staff 
+multiple_permissive_policies,WARN,PERFORMANCE,public.payments,Role authenticated has 2 permissive policies for UPDATE (Staff 
+multiple_permissive_policies,WARN,PERFORMANCE,public.post_comments,Role authenticated has 2 permissive policies for SELECT (post_c
+multiple_permissive_policies,WARN,PERFORMANCE,public.post_comments,Role authenticated has 2 permissive policies for INSERT (post_c
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_images,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_images,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_images,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_images,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_reviews,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_reviews,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_reviews,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_reviews,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.product_stock_per_branch,Role authenticated has 2 permissive policies for SELECT (Stock_
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role dashboard_user has 2 permissive policies for SELECT (profi
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role anon has 2 permissive policies for DELETE (profiles_delete
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticator has 2 permissive policies for SELECT (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role dashboard_user has 2 permissive policies for INSERT (profi
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticator has 2 permissive policies for UPDATE (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticated has 3 permissive policies for SELECT (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticated has 2 permissive policies for DELETE (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role dashboard_user has 2 permissive policies for DELETE (profi
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role anon has 2 permissive policies for UPDATE (profiles_update
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticator has 2 permissive policies for INSERT (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticated has 3 permissive policies for UPDATE (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role dashboard_user has 2 permissive policies for UPDATE (profi
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role anon has 2 permissive policies for SELECT (profiles_read_p
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role anon has 2 permissive policies for INSERT (profiles_insert
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticator has 2 permissive policies for DELETE (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.profiles,Role authenticated has 3 permissive policies for INSERT (profil
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchase_items,Role authenticated has 2 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchase_items,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchase_items,Role authenticated has 2 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchase_items,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchases,Role authenticated has 4 permissive policies for SELECT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchases,Role authenticated has 4 permissive policies for INSERT (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchases,Role authenticated has 4 permissive policies for DELETE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.purchases,Role authenticated has 4 permissive policies for UPDATE (Branch
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_images,Role authenticated has 2 permissive policies for UPDATE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_images,Role authenticated has 2 permissive policies for INSERT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_images,Role authenticated has 2 permissive policies for DELETE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_images,Role authenticated has 2 permissive policies for SELECT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_number_sequences,Role authenticated has 3 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_number_sequences,Role authenticated has 3 permissive policies for INSERT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_number_sequences,Role authenticated has 3 permissive policies for DELETE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_number_sequences,Role authenticated has 3 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_parts_used,Role authenticated has 2 permissive policies for SELECT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_parts_used,Role authenticated has 2 permissive policies for INSERT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_parts_used,Role authenticated has 2 permissive policies for DELETE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_parts_used,Role authenticated has 2 permissive policies for UPDATE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_status_history,Role authenticated has 2 permissive policies for SELECT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_status_history,Role authenticated has 2 permissive policies for DELETE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_status_history,Role authenticated has 2 permissive policies for INSERT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_status_history,Role authenticated has 2 permissive policies for UPDATE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repair_status_types,Role authenticated has 2 permissive policies for SELECT (super_
+multiple_permissive_policies,WARN,PERFORMANCE,public.repairs,Role authenticated has 2 permissive policies for UPDATE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repairs,Role authenticated has 2 permissive policies for DELETE (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repairs,Role authenticated has 2 permissive policies for SELECT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.repairs,Role authenticated has 2 permissive policies for INSERT (repair
+multiple_permissive_policies,WARN,PERFORMANCE,public.role_permissions,Role authenticated has 2 permissive policies for SELECT (role_p
+multiple_permissive_policies,WARN,PERFORMANCE,public.roles,Role authenticated has 2 permissive policies for SELECT (roles_
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_blocks,Role authenticated has 2 permissive policies for DELETE (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_blocks,Role authenticated has 3 permissive policies for SELECT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_blocks,Role authenticated has 2 permissive policies for INSERT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_blocks,Role authenticated has 2 permissive policies for UPDATE (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_categories,Role authenticated has 2 permissive policies for SELECT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_features,Role authenticated has 2 permissive policies for INSERT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_features,Role authenticated has 2 permissive policies for UPDATE (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_features,Role authenticated has 2 permissive policies for DELETE (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_features,Role authenticated has 3 permissive policies for SELECT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.service_leads,Role authenticated has 2 permissive policies for INSERT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.services,Role authenticated has 2 permissive policies for SELECT (servic
+multiple_permissive_policies,WARN,PERFORMANCE,public.slug_redirects,Role authenticated has 2 permissive policies for SELECT (slug_r
+multiple_permissive_policies,WARN,PERFORMANCE,public.stock_history,Role authenticated has 2 permissive policies for UPDATE (stock_
+multiple_permissive_policies,WARN,PERFORMANCE,public.stock_history,Role authenticated has 2 permissive policies for INSERT (stock_
+multiple_permissive_policies,WARN,PERFORMANCE,public.stock_history,Role authenticated has 2 permissive policies for SELECT (stock_
+multiple_permissive_policies,WARN,PERFORMANCE,public.stock_history,Role authenticated has 2 permissive policies for DELETE (stock_
+multiple_permissive_policies,WARN,PERFORMANCE,public.suppliers,Role authenticated has 5 permissive policies for UPDATE (suppli
+multiple_permissive_policies,WARN,PERFORMANCE,public.suppliers,Role authenticated has 5 permissive policies for DELETE (suppli
+multiple_permissive_policies,WARN,PERFORMANCE,public.suppliers,Role authenticated has 5 permissive policies for INSERT (suppli
+multiple_permissive_policies,WARN,PERFORMANCE,public.suppliers,Role authenticated has 5 permissive policies for SELECT (suppli
+multiple_permissive_policies,WARN,PERFORMANCE,public.technical_solutions,Role authenticated has 2 permissive policies for SELECT (techni
+multiple_permissive_policies,WARN,PERFORMANCE,public.technical_solutions,Role authenticated has 2 permissive policies for UPDATE (techni
+multiple_permissive_policies,WARN,PERFORMANCE,public.technical_solutions,Role authenticated has 2 permissive policies for INSERT (techni
+multiple_permissive_policies,WARN,PERFORMANCE,public.technical_solutions,Role authenticated has 2 permissive policies for DELETE (techni
+multiple_permissive_policies,WARN,PERFORMANCE,public.tenants,Role anon has 3 permissive policies for SELECT (Public View - T
+multiple_permissive_policies,WARN,PERFORMANCE,public.tenants,Role authenticated has 3 permissive policies for SELECT (tenant
+multiple_permissive_policies,WARN,PERFORMANCE,public.tenants,Role authenticated has 2 permissive policies for UPDATE (super_
+multiple_permissive_policies,WARN,PERFORMANCE,zarx.active_news,Role authenticated has 2 permissive policies for SELECT (zarx_n
+multiple_permissive_policies,WARN,PERFORMANCE,zarx.profiles,Role authenticated has 2 permissive policies for UPDATE (Users 
+multiple_permissive_policies,WARN,PERFORMANCE,zarx.public_alerts,Role authenticated has 2 permissive policies for SELECT (zarx_a
+multiple_permissive_policies,WARN,PERFORMANCE,zarx.zones,Role authenticated has 2 permissive policies for SELECT (zarx_z
+public_bucket_allows_listing,WARN,SECURITY,academy_certificates,Authenticated users can select certificates
+public_bucket_allows_listing,WARN,SECURITY,avatars,Authenticated users can select avatars
+public_bucket_allows_listing,WARN,SECURITY,course-covers,Authenticated users can select course covers
+public_bucket_allows_listing,WARN,SECURITY,cv-generados,Authenticated users can select cvs
+public_bucket_allows_listing,WARN,SECURITY,evidence,Authenticated users can select evidence

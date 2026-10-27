@@ -18,13 +18,14 @@ import {
 } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HydrationPreserveDirective } from '@app/shared/directives/hydration-preserve.directive';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [ReactiveFormsModule, RouterLink, CommonModule],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule, HydrationPreserveDirective],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
   form: FormGroup;
@@ -91,7 +92,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
         if (state.user) {
-          this.router.navigate([this.returnUrl || '/']);
+          this.router.navigateByUrl(this.returnUrl || '/');
         }
       });
 

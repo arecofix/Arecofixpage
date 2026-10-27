@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CheckoutPage } from './checkout-page';
 import { CartService } from '../../shared/services/cart.service';
 import { OrderService } from '../../features/orders/application/services/order.service';
@@ -89,7 +90,9 @@ describe('CheckoutPage', () => {
         { provide: NotificationService, useValue: notificationServiceMock },
         { provide: PLATFORM_ID, useValue: 'browser' },
         { provide: ProductService, useValue: { getData: () => of({ data: [] }) } },
-        { provide: ProfileService, useValue: { getProfile: () => Promise.resolve(null) } }
+        { provide: ProfileService, useValue: { getProfile: () => Promise.resolve(null) } },
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
+        { provide: Router, useValue: { navigate: jest.fn() } }
       ]
     });
 
@@ -138,5 +141,34 @@ describe('CheckoutPage', () => {
     // Verificamos que haga el redirect
     expect(component.mpPaymentUrl()).toBe('https://mp.com/pay');
     expect(component.step()).toBe('mp_redirect');
+  });
+
+  it('debería cambiar a step paid cuando queryParams status=approved', () => {
+    (component as any).route.queryParams = of({
+      status: 'approved',
+      payment_id: '999888',
+      external_reference: 'order-123'
+    });
+    component.ngOnInit();
+
+    expect(component.step()).toBe('paid');
+    expect(component.mpPaymentId()).toBe('999888');
+    expect(component.mpStatus()).toBe('approved');
+    expect(cartServiceMock.clearCart).toHaveBeenCalled();
+  });
+
+  it('debería cambiar a step payment_failure cuando queryParams status=rejected y permitir reintentar', () => {
+    (component as any).route.queryParams = of({
+      status: 'rejected',
+      payment_id: '999889',
+      external_reference: 'order-123'
+    });
+    component.ngOnInit();
+
+    expect(component.step()).toBe('payment_failure');
+    expect(notificationServiceMock.showError).toHaveBeenCalled();
+
+    component.retryPayment();
+    expect(component.step()).toBe('payment_method');
   });
 });

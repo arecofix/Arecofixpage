@@ -1,0 +1,444 @@
+<div class="blocks-editor-wrapper bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden">
+
+  <!-- Top Action Bar -->
+  <div class="p-4 border-b border-base-200 bg-base-200/50 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <h3 class="font-bold text-base-content text-lg flex items-center gap-2">
+        <i class="fas fa-layer-group text-primary"></i> Editor de Bloques
+      </h3>
+      <span class="badge badge-neutral text-xs">{{ blocks().length }} bloques</span>
+
+      <!-- Autosave Status Badge -->
+      @if (saveStatus() === 'saving') {
+        <span class="badge badge-warning text-xs gap-1">
+          <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+          Guardando...
+        </span>
+      } @else if (saveStatus() === 'saved') {
+        <span class="badge badge-success text-xs gap-1">
+          <i class="fas fa-check text-[10px]"></i> Guardado
+        </span>
+      } @else if (saveStatus() === 'error') {
+        <span class="badge badge-error text-xs gap-1" [title]="errorMessage() || ''">
+          <i class="fas fa-triangle-exclamation text-[10px]"></i> Error
+        </span>
+      }
+    </div>
+
+    <!-- View Mode Selector -->
+    <div class="flex items-center gap-2">
+      <div class="join">
+        <button type="button" class="join-item btn btn-sm" [class.btn-active]="previewMode() === 'editor'" (click)="previewMode.set('editor')">
+          <i class="fas fa-pen-to-square"></i> Editor
+        </button>
+        <button type="button" class="join-item btn btn-sm" [class.btn-active]="previewMode() === 'split'" (click)="previewMode.set('split')">
+          <i class="fas fa-columns"></i> Dividido
+        </button>
+        <button type="button" class="join-item btn btn-sm" [class.btn-active]="previewMode() === 'preview'" (click)="previewMode.set('preview')">
+          <i class="fas fa-eye"></i> Vista Previa
+        </button>
+      </div>
+
+      <!-- Add Block Button -->
+      <div class="relative">
+        <button type="button" (click)="showAddMenu.set(!showAddMenu())" class="btn btn-sm btn-primary">
+          <i class="fas fa-plus mr-1"></i> Agregar Bloque
+        </button>
+
+        @if (showAddMenu()) {
+          <div class="absolute right-0 mt-2 w-80 bg-base-100 rounded-xl shadow-2xl border border-base-200 z-50 p-2 space-y-1">
+            <div class="p-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Tipos de Bloques Disponibles</div>
+            <div class="max-h-96 overflow-y-auto space-y-1">
+              @for (item of availableBlockTypes; track item.type) {
+                <button type="button" (click)="addBlock(item.type)"
+                        class="w-full text-left p-2.5 rounded-lg hover:bg-base-200 flex items-start gap-3 transition-colors">
+                  <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm mt-0.5">
+                    <i class="fas" [ngClass]="item.icon"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-xs text-base-content">{{ item.label }}</h4>
+                    <p class="text-[11px] text-gray-500 leading-tight">{{ item.description }}</p>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Error alert if any -->
+  @if (errorMessage()) {
+    <div class="p-3 bg-error/10 border-b border-error/20 text-error text-xs flex items-center justify-between">
+      <span><i class="fas fa-circle-exclamation mr-1.5"></i>{{ errorMessage() }}</span>
+      <button type="button" (click)="errorMessage.set(null)" class="btn btn-ghost btn-xs">✕</button>
+    </div>
+  }
+
+  <!-- Main Split / Full Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[600px]">
+
+    <!-- Left: Editor Pane (List & Form) -->
+    @if (previewMode() !== 'preview') {
+      <div [class.lg:col-span-7]="previewMode() === 'split'"
+           [class.lg:col-span-12]="previewMode() === 'editor'"
+           class="border-r border-base-200 flex flex-col md:flex-row h-full">
+
+        <!-- Blocks Sidebar List with Drag & Drop -->
+        <div class="w-full md:w-64 border-b md:border-b-0 md:border-r border-base-200 p-3 bg-base-200/20 shrink-0">
+          <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">Estructura de la Página</div>
+
+          @if (blocks().length === 0) {
+            <div class="p-6 text-center text-gray-400 text-xs">
+              <i class="fas fa-layer-group text-2xl mb-2"></i>
+              <p>Sin bloques añadidos.</p>
+              <button type="button" (click)="showAddMenu.set(true)" class="btn btn-xs btn-primary mt-3">
+                + Primer bloque
+              </button>
+            </div>
+          }
+
+          <div cdkDropList (cdkDropListDropped)="onDrop($event)" class="space-y-1.5">
+            @for (block of blocks(); track block.id || $index; let idx = $index) {
+              <div cdkDrag class="block-item group p-2 rounded-xl border border-base-200 bg-base-100 shadow-sm flex items-center justify-between gap-2 text-xs transition-all"
+                   [class.border-primary]="selectedBlockIndex() === idx"
+                   [class.bg-primary/5]="selectedBlockIndex() === idx"
+                   [class.opacity-60]="!block.is_enabled">
+
+                <div class="flex items-center gap-2 flex-1 cursor-pointer truncate" (click)="selectedBlockIndex.set(idx)">
+                  <!-- Drag Handle -->
+                  <span cdkDragHandle class="cursor-grab text-gray-400 hover:text-base-content p-1">
+                    <i class="fas fa-grip-vertical"></i>
+                  </span>
+
+                  <!-- Block Type Badge -->
+                  <span class="font-bold truncate text-base-content">
+                    #{{ idx + 1 }} {{ block.block_type }}
+                  </span>
+                </div>
+
+                <!-- Actions: Enable Toggle, Move Up/Down, Delete -->
+                <div class="flex items-center gap-1 shrink-0">
+                  <button type="button" (click)="toggleBlockEnabled(idx)" [title]="block.is_enabled ? 'Deshabilitar' : 'Habilitar'"
+                          class="btn btn-ghost btn-xs px-1 text-gray-400 hover:text-primary">
+                    <i class="fas" [ngClass]="block.is_enabled ? 'fa-eye' : 'fa-eye-slash'"></i>
+                  </button>
+                  <button type="button" [disabled]="idx === 0" (click)="moveBlock(idx, 'up')" title="Subir"
+                          class="btn btn-ghost btn-xs px-1 disabled:opacity-20">
+                    <i class="fas fa-arrow-up text-[10px]"></i>
+                  </button>
+                  <button type="button" [disabled]="idx === blocks().length - 1" (click)="moveBlock(idx, 'down')" title="Bajar"
+                          class="btn btn-ghost btn-xs px-1 disabled:opacity-20">
+                    <i class="fas fa-arrow-down text-[10px]"></i>
+                  </button>
+                  <button type="button" (click)="removeBlock(idx)" title="Eliminar"
+                          class="btn btn-ghost btn-xs px-1 text-error hover:bg-error/10">
+                    <i class="fas fa-trash-alt text-[10px]"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Block Edit Form -->
+        <div class="flex-1 p-6 overflow-y-auto max-h-[750px]">
+          @if (currentSelectedBlock(); as block) {
+            <div class="space-y-6">
+              <div class="flex items-center justify-between pb-3 border-b border-base-200">
+                <div>
+                  <h4 class="font-extrabold text-base-content text-lg capitalize">
+                    Configuración: {{ block.block_type }}
+                  </h4>
+                  <p class="text-xs text-gray-500">Editá los campos y verificá el preview instantáneo en vivo.</p>
+                </div>
+                <div class="form-control">
+                  <label class="label cursor-pointer gap-2">
+                    <span class="label-text text-xs font-semibold">Habilitado</span>
+                    <input type="checkbox" [(ngModel)]="block.is_enabled" (ngModelChange)="onContentChange()" class="toggle toggle-sm toggle-success" />
+                  </label>
+                </div>
+              </div>
+
+              <!-- 1. HERO FORM -->
+              @if (block.block_type === 'hero') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título Principal * (máx 120)</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()"
+                           class="input input-sm input-bordered w-full font-bold" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Subtítulo (máx 280)</label>
+                    <textarea [(ngModel)]="block.content['subtitle']" (ngModelChange)="onContentChange()" rows="2"
+                              class="textarea textarea-sm textarea-bordered w-full"></textarea>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="font-bold text-gray-700 block mb-1">Texto del Botón CTA</label>
+                      <input type="text" [(ngModel)]="block.content['ctaLabel']" (ngModelChange)="onContentChange()"
+                             class="input input-sm input-bordered w-full" placeholder="Ej: Pedir Presupuesto" />
+                    </div>
+                    <div>
+                      <label class="font-bold text-gray-700 block mb-1">Enlace del Botón (Href)</label>
+                      <input type="text" [(ngModel)]="block.content['ctaHref']" (ngModelChange)="onContentChange()"
+                             class="input input-sm input-bordered w-full" placeholder="#contacto" />
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="font-bold text-gray-700 block mb-1">URL de Imagen Hero</label>
+                      <input type="text" [(ngModel)]="block.content['imageUrl']" (ngModelChange)="onContentChange()"
+                             class="input input-sm input-bordered w-full" placeholder="/assets/img/repair/1.webp" />
+                    </div>
+                    <div>
+                      <label class="font-bold text-gray-700 block mb-1">Alineación del Contenido</label>
+                      <select [(ngModel)]="block.content['align']" (ngModelChange)="onContentChange()" class="select select-sm select-bordered w-full">
+                        <option value="left">Izquierda</option>
+                        <option value="center">Centrado</option>
+                        <option value="right">Derecha</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- 2. FEATURES FORM -->
+              @if (block.block_type === 'features') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título de la Sección</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Subtítulo</label>
+                    <input type="text" [(ngModel)]="block.content['subtitle']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+
+                  <div class="pt-2">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="font-bold text-gray-700">Items de Características</span>
+                      <button type="button" (click)="addFeatureItem()" class="btn btn-xs btn-outline btn-primary">
+                        + Agregar Característica
+                      </button>
+                    </div>
+
+                    <div class="space-y-2">
+                      @for (item of block.content['items']; track $index; let fIdx = $index) {
+                        <div class="p-3 bg-base-200/50 rounded-xl border border-base-200 flex items-center gap-3">
+                          <input type="text" [(ngModel)]="item.icon" (ngModelChange)="onContentChange()" class="input input-xs input-bordered w-24" placeholder="fa-check" />
+                          <input type="text" [(ngModel)]="item.title" (ngModelChange)="onContentChange()" class="input input-xs input-bordered flex-1" placeholder="Título" />
+                          <input type="text" [(ngModel)]="item.description" (ngModelChange)="onContentChange()" class="input input-xs input-bordered flex-1" placeholder="Descripción breve" />
+                          <button type="button" (click)="removeFeatureItem(fIdx)" class="btn btn-ghost btn-xs text-error">✕</button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- 3. RICH TEXT FORM -->
+              @if (block.block_type === 'rich_text') {
+                <div class="space-y-3 text-xs">
+                  <label class="font-bold text-gray-700 block">Contenido Markdown Enriquecido *</label>
+                  <textarea [(ngModel)]="block.content['content']" (ngModelChange)="onContentChange()" rows="12"
+                            class="textarea textarea-bordered w-full font-mono text-xs leading-relaxed"
+                            placeholder="Escribí texto en Markdown (# Título, **negrita**, - listas)..."></textarea>
+                </div>
+              }
+
+              <!-- 4. CTA FORM -->
+              @if (block.block_type === 'cta') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título de la Llamada a la Acción *</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full font-bold" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Subtítulo Descriptivo</label>
+                    <textarea [(ngModel)]="block.content['subtitle']" (ngModelChange)="onContentChange()" rows="2" class="textarea textarea-sm textarea-bordered w-full"></textarea>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="font-bold text-gray-700 block mb-1">Texto del Botón</label>
+                      <input type="text" [(ngModel)]="block.content['buttonLabel']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                    </div>
+                    <div>
+                      <label class="font-bold text-gray-700 block mb-1">Estilo Visual</label>
+                      <select [(ngModel)]="block.content['style']" (ngModelChange)="onContentChange()" class="select select-sm select-bordered w-full">
+                        <option value="primary">Primario (Indigo)</option>
+                        <option value="secondary">Oscuro (Negro/Gris)</option>
+                        <option value="whatsapp">WhatsApp (Verde)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Mensaje Pre-armado de WhatsApp</label>
+                    <input type="text" [(ngModel)]="block.content['whatsappMessage']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                </div>
+              }
+
+              <!-- 5. FAQ FORM -->
+              @if (block.block_type === 'faq') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título del Bloque FAQ</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div class="flex justify-between items-center pt-2">
+                    <span class="font-bold text-gray-700">Preguntas y Respuestas</span>
+                    <button type="button" (click)="addFaqItem()" class="btn btn-xs btn-outline btn-primary">+ Pregunta</button>
+                  </div>
+                  <div class="space-y-3">
+                    @for (item of block.content['items']; track $index; let qIdx = $index) {
+                      <div class="p-3 bg-base-200/50 rounded-xl border border-base-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                          <span class="font-bold text-xs text-primary">#{{ qIdx + 1 }}</span>
+                          <button type="button" (click)="removeFaqItem(qIdx)" class="btn btn-ghost btn-xs text-error">✕</button>
+                        </div>
+                        <input type="text" [(ngModel)]="item.question" (ngModelChange)="onContentChange()" class="input input-xs input-bordered w-full font-bold" placeholder="¿Pregunta?" />
+                        <textarea [(ngModel)]="item.answer" (ngModelChange)="onContentChange()" rows="2" class="textarea textarea-xs textarea-bordered w-full" placeholder="Respuesta explicativa..."></textarea>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- 6. CONTACT FORM -->
+              @if (block.block_type === 'contact') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título del Formulario</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full font-bold" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Subtítulo</label>
+                    <input type="text" [(ngModel)]="block.content['subtitle']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Placeholder del Campo Mensaje</label>
+                    <input type="text" [(ngModel)]="block.content['messagePlaceholder']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                </div>
+              }
+
+              <!-- 7. MAP FORM -->
+              @if (block.block_type === 'map') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título de Ubicación</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Dirección Visible</label>
+                    <input type="text" [(ngModel)]="block.content['address']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">URL Iframe de Google Maps</label>
+                    <input type="text" [(ngModel)]="block.content['embedUrl']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full font-mono text-[11px]" />
+                  </div>
+                </div>
+              }
+
+              <!-- 8. GALLERY FORM -->
+              @if (block.block_type === 'gallery') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título de la Galería</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div class="flex justify-between items-center pt-2">
+                    <span class="font-bold text-gray-700">Imágenes</span>
+                    <button type="button" (click)="addGalleryImage()" class="btn btn-xs btn-outline btn-primary">+ Imagen</button>
+                  </div>
+                  <div class="space-y-2">
+                    @for (img of block.content['images']; track $index; let imgIdx = $index) {
+                      <div class="p-3 bg-base-200/50 rounded-xl border border-base-200 flex items-center gap-2">
+                        <input type="text" [(ngModel)]="img.url" (ngModelChange)="onContentChange()" class="input input-xs input-bordered flex-1" placeholder="URL de imagen" />
+                        <input type="text" [(ngModel)]="img.caption" (ngModelChange)="onContentChange()" class="input input-xs input-bordered flex-1" placeholder="Leyenda" />
+                        <button type="button" (click)="removeGalleryImage(imgIdx)" class="btn btn-ghost btn-xs text-error">✕</button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- 9. TESTIMONIALS FORM -->
+              @if (block.block_type === 'testimonials') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título de Testimonios</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div class="flex justify-between items-center pt-2">
+                    <span class="font-bold text-gray-700">Comentarios</span>
+                    <button type="button" (click)="addTestimonialItem()" class="btn btn-xs btn-outline btn-primary">+ Testimonio</button>
+                  </div>
+                  <div class="space-y-3">
+                    @for (t of block.content['items']; track $index; let tIdx = $index) {
+                      <div class="p-3 bg-base-200/50 rounded-xl border border-base-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                          <input type="text" [(ngModel)]="t.author" (ngModelChange)="onContentChange()" class="input input-xs input-bordered font-bold flex-1 mr-2" placeholder="Nombre del cliente" />
+                          <button type="button" (click)="removeTestimonialItem(tIdx)" class="btn btn-ghost btn-xs text-error">✕</button>
+                        </div>
+                        <textarea [(ngModel)]="t.text" (ngModelChange)="onContentChange()" rows="2" class="textarea textarea-xs textarea-bordered w-full" placeholder="Comentario..."></textarea>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- 10. SERVICE LIST FORM -->
+              @if (block.block_type === 'service_list') {
+                <div class="space-y-4 text-xs">
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Título de la Sección</label>
+                    <input type="text" [(ngModel)]="block.content['title']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-full" />
+                  </div>
+                  <div>
+                    <label class="font-bold text-gray-700 block mb-1">Cantidad Máxima de Servicios a Mostrar</label>
+                    <input type="number" [(ngModel)]="block.content['maxItems']" (ngModelChange)="onContentChange()" class="input input-sm input-bordered w-32" min="1" max="12" />
+                  </div>
+                </div>
+              }
+
+            </div>
+          } @else {
+            <div class="py-20 text-center text-gray-400">
+              <i class="fas fa-arrow-left text-2xl mb-2"></i>
+              <p>Seleccioná un bloque de la lista para editar sus propiedades.</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Right: Live Preview Pane using EXACT Production BlockRendererComponent -->
+    @if (previewMode() !== 'editor') {
+      <div [class.lg:col-span-5]="previewMode() === 'split'"
+           [class.lg:col-span-12]="previewMode() === 'preview'"
+           class="bg-gray-100 dark:bg-gray-900/60 p-4 overflow-y-auto max-h-[800px]">
+        <div class="mb-3 flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Vista Previa en Vivo (BlockRenderer)
+          </span>
+          <span class="badge badge-sm badge-ghost text-[10px]">Renderizado SSR idéntico a producción</span>
+        </div>
+
+        <div class="preview-canvas bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 shadow-sm space-y-4">
+          @for (block of blocks(); track block.id || $index) {
+            @if (block.is_enabled) {
+              <div class="preview-block-wrapper border border-dashed border-gray-200 dark:border-gray-800 rounded-xl p-2 relative group">
+                <app-block-renderer [block]="block" [isPreview]="true" />
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

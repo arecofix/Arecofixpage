@@ -8,11 +8,10 @@ export interface Environment {
   supabaseKey: string;
   authRedirectUrl: string;
   enableProfileUpsert: boolean;
+  flaskApiUrl?: string;
   /** URL del Worker RAG chatbot (Fase 3) */
   chatbotWorkerUrl: string;
   embeddingWorkerUrl?: string;
-  /** Secret Bearer para autenticar las peticiones al chatbot Worker */
-  chatbotSecret: string;
   posthogKey?: string;
   posthogHost?: string;
   // WhatsApp Configuration (Optional as it might not be in all envs or handled differently)
@@ -63,5 +62,12 @@ export interface Environment {
     portfolio: {
       cv: string;
     };
+  };
+  downloads: {
+    desktopSetupUrl: string;
+  };
+  turnstileSiteKey?: string;
+  features?: {
+    trialEnabled?: boolean;
   };
 }

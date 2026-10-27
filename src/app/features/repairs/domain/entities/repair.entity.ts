@@ -73,8 +73,8 @@ export interface Repair {
     readonly whatsapp_notifications?: boolean;
     readonly glass_upsell?: boolean;
     readonly spare_part_cost?: number;
-    readonly supplier_id?: string;
-    readonly warranty?: string;
+    readonly supplier_id?: string | null;
+    readonly warranty?: string | null;
     
     // Additional fields from form
     readonly checklist?: RepairChecklist;
@@ -95,6 +95,7 @@ export interface RepairChecklist {
     chip: boolean;
     sd: boolean;
     case: boolean;
+    physical_condition?: string;
 }
 
 /**
@@ -102,6 +103,7 @@ export interface RepairChecklist {
  */
 export interface CreateRepairDto {
     customer_id?: string;
+    device_id?: string;
     customer_name?: string;
     customer_phone?: string;
     customer_email?: string;
@@ -144,4 +146,48 @@ export interface UpdateRepairDto extends Partial<CreateRepairDto> {
     parts?: RepairPart[];
     glass_upsell?: boolean;
     spare_part_cost?: number;
+    supplier_id?: string | null;
+    warranty?: string | null;
 }
+
+/**
+ * Form value interface for typing Repair Order edit form
+ */
+export interface RepairOrderFormValue {
+    customer_id?: string;
+    device_id?: string;
+    customer_name: string;
+    customer_phone?: string;
+    customer_email?: string;
+    customer_dni?: string;
+    device_model: string;
+    device_type: string;
+    brand_id?: string | null;
+    imei?: string;
+    issue_description: string;
+    current_status_id: number;
+    estimated_cost: number;
+    final_cost: number;
+    technician_notes?: string;
+    checklist?: RepairChecklist;
+    security_pin?: string;
+    security_pattern?: string;
+    device_passcode?: string;
+    deposit_amount?: number;
+    technical_labor_cost?: number;
+    technical_report?: string;
+    glass_upsell?: boolean;
+    whatsapp_notifications?: boolean;
+    spare_part_cost?: number;
+    tracking_code?: string;
+    repair_number?: number;
+    payment_method?: string;
+    warranty?: string;
+    supplier_id?: string | null;
+    surcharge_percentage?: number;
+}
+
+/**
+ * Explicit payload type for update operations
+ */
+export type UpdateRepairOrderPayload = UpdateRepairDto;

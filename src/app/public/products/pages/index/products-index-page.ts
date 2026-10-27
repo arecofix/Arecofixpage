@@ -14,11 +14,12 @@ import { SeoService } from '@app/core/services/seo.service';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { Product } from '@app/shared/interfaces/product.interface';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 @Component({
   selector: 'app-products-index-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ProductCard, FormsModule],
+  imports: [CommonModule, RouterLink, ProductCard, FormsModule, FormatPricePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './products-index-page.html',
 })

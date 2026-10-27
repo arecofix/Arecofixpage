@@ -40,7 +40,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   public favoritesService = inject(FavoritesService);
   private cartService = inject(CartService);
   private authService = inject(AuthService);
-  private router = inject(Router);
+  public router = inject(Router);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();

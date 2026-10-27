@@ -3,10 +3,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdminPostService } from './services/admin-post.service';
 
+import { BlocksEditorComponent } from '@app/shared/components/blocks-editor/blocks-editor.component';
+
 @Component({
     selector: 'app-admin-post-form-page',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, BlocksEditorComponent],
     templateUrl: './admin-post-form-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,6 +25,7 @@ export class AdminPostFormPage implements OnInit {
     isEdit = false;
     postId: string | null = null;
     imagePreview: string | null = null;
+    editorMode: 'text' | 'blocks' = 'text';
 
     constructor() {
         this.form = this.fb.group({

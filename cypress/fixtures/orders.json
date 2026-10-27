@@ -1,0 +1,118 @@
+[
+  {
+    "id": "ord-001",
+    "order_number": "ORD-2026-1001",
+    "customer_id": "cust-001",
+    "customer_name": "Carlos Gomez",
+    "customer_email": "carlos.gomez@test.com",
+    "customer_phone": "+54 9 11 1234-5678",
+    "status": "pending",
+    "payment_status": "pending",
+    "payment_method": "mercadopago",
+    "items_count": 2,
+    "subtotal": 149000,
+    "shipping_cost": 2500,
+    "total": 151500,
+    "shipping_address": {
+      "street": "Av. Libertador 1200",
+      "city": "San Antonio de Areco",
+      "state": "Buenos Aires",
+      "postal_code": "2760"
+    },
+    "created_at": "2026-10-16T10:00:00.000Z",
+    "updated_at": "2026-10-16T10:00:00.000Z",
+    "order_items": [
+      {
+        "id": "item-001",
+        "order_id": "ord-001",
+        "product_id": "prod-001",
+        "quantity": 1,
+        "unit_price": 149000,
+        "subtotal": 149000,
+        "product": {
+          "id": "prod-001",
+          "name": "Módulo Pantalla iPhone 13 OLED",
+          "sku": "MOD-IP13-OLED"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ord-002",
+    "order_number": "ORD-2026-1002",
+    "customer_id": "cust-002",
+    "customer_name": "Lucía Fernández",
+    "customer_email": "lucia.f@test.com",
+    "customer_phone": "+54 9 2326 456789",
+    "status": "paid",
+    "payment_status": "approved",
+    "payment_method": "mercadopago",
+    "items_count": 1,
+    "subtotal": 55000,
+    "shipping_cost": 0,
+    "total": 55000,
+    "shipping_address": {
+      "street": "Mitre 450",
+      "city": "San Antonio de Areco",
+      "state": "Buenos Aires",
+      "postal_code": "2760"
+    },
+    "created_at": "2026-10-16T11:30:00.000Z",
+    "updated_at": "2026-10-16T11:35:00.000Z",
+    "order_items": [
+      {
+        "id": "item-002",
+        "order_id": "ord-002",
+        "product_id": "prod-003",
+        "quantity": 1,
+        "unit_price": 55000,
+        "subtotal": 55000,
+        "product": {
+          "id": "prod-003",
+          "name": "Batería Original iPhone 12",
+          "sku": "BAT-IP12-ORIG"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ord-003",
+    "order_number": "ORD-2026-1003",
+    "customer_id": "cust-003",
+    "customer_name": "Marcos Rossi",
+    "customer_email": "marcos.rossi@test.com",
+    "customer_phone": "+54 9 11 9876-5432",
+    "status": "shipped",
+    "payment_status": "approved",
+    "payment_method": "transfer",
+    "tracking_number": "AR-SHIP-998877",
+    "shipping_carrier": "Andreani",
+    "items_count": 2,
+    "subtotal": 36000,
+    "shipping_cost": 3000,
+    "total": 39000,
+    "shipping_address": {
+      "street": "Belgrano 780",
+      "city": "San Antonio de Areco",
+      "state": "Buenos Aires",
+      "postal_code": "2760"
+    },
+    "created_at": "2026-10-15T15:00:00.000Z",
+    "updated_at": "2026-10-16T09:00:00.000Z",
+    "order_items": [
+      {
+        "id": "item-003",
+        "order_id": "ord-003",
+        "product_id": "prod-004",
+        "quantity": 2,
+        "unit_price": 18000,
+        "subtotal": 36000,
+        "product": {
+          "id": "prod-004",
+          "name": "Cable Lightning 1m Original",
+          "sku": "CAB-LGT-1M"
+        }
+      }
+    ]
+  }
+]

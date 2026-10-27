@@ -17,13 +17,14 @@ import {
 } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HydrationPreserveDirective } from '@app/shared/directives/hydration-preserve.directive';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, HydrationPreserveDirective],
 })
 export class LoginComponent implements OnInit, OnDestroy {
   form: FormGroup;
@@ -90,7 +91,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
           const currentUrl = this.router.url.split('?')[0];
           if (target !== currentUrl) {
-            this.router.navigate([target]);
+            this.router.navigateByUrl(target);
           }
         }
       });
@@ -177,7 +178,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       }
 
       setTimeout(() => {
-        this.router.navigate([target]);
+        this.router.navigateByUrl(target);
       }, 1500);
     } catch (err) {
       this.loading = false;
@@ -209,7 +210,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.success = '¡Bienvenido! Redirigiendo...';
       const target = this.sanitizeReturnUrl(this.returnUrl);
       setTimeout(() => {
-        this.router.navigate([target]);
+        this.router.navigateByUrl(target);
       }, 1500);
     } catch (err) {
       this.socialLoading['google'] = false;
@@ -241,7 +242,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.success = '¡Bienvenido! Redirigiendo...';
       const target = this.sanitizeReturnUrl(this.returnUrl);
       setTimeout(() => {
-        this.router.navigate([target]);
+        this.router.navigateByUrl(target);
       }, 1500);
     } catch (err) {
       this.socialLoading['facebook'] = false;
@@ -273,7 +274,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.success = '¡Bienvenido! Redirigiendo...';
       const target = this.sanitizeReturnUrl(this.returnUrl);
       setTimeout(() => {
-        this.router.navigate([target]);
+        this.router.navigateByUrl(target);
       }, 1500);
     } catch (err) {
       this.socialLoading['github'] = false;

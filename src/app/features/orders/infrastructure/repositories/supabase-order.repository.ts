@@ -3,7 +3,7 @@ import { OrderRepository } from '../../domain/repositories/order.repository';
 import { BaseRepository } from '@app/core/repositories/base.repository';
 import { Order, OrderItem, OrderStatus } from '../../domain/entities/order.entity';
 import { LoggerService } from '@app/core/services/logger.service';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, firstValueFrom } from 'rxjs';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { OrderMapper } from '../mappers/order.mapper';
 
@@ -69,10 +69,19 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     });
   }
 
-  getOrders(params?: { page?: number; pageSize?: number }): Observable<Order[]> {
+  getOrders(params?: import('../../domain/repositories/order.repository').OrderFilterParams): Observable<Order[]> {
     let query = this.applyTenantFilter(
       this.supabase.from(this.tableName).select('*, items:order_items(*)')
     ).order('created_at', { ascending: false });
+
+    if (params?.status && params.status !== 'all') {
+      query = query.eq('status', params.status);
+    }
+
+    if (params?.search && params.search.trim()) {
+      const q = params.search.trim();
+      query = query.or(`order_number.ilike.%${q}%,customer_name.ilike.%${q}%,customer_email.ilike.%${q}%`);
+    }
 
     if (params?.page !== undefined && params?.pageSize !== undefined) {
       const start = (params.page - 1) * params.pageSize;
@@ -101,34 +110,33 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
     );
   }
 
-  updateOrder(id: string, order: Order): Observable<Order> {
+  updateOrder(id: string, order: Partial<Order>): Observable<Order> {
     return from(this._updateOrderTransaction(id, order));
   }
 
-  private async _updateOrderTransaction(id: string, order: Order): Promise<Order> {
-    const persistence = OrderMapper.toPersistence(order);
-    delete (persistence as any).id;
+  private async _updateOrderTransaction(id: string, order: Partial<Order>): Promise<Order> {
+    const payload = OrderMapper.mapUpdateToDb(order);
+    delete (payload as Record<string, unknown>)['id'];
+    delete (payload as Record<string, unknown>)['tenant_id'];
 
-    const query = this.applyTenantFilter(
-      this.supabase.from(this.tableName).update(persistence).eq('id', id)
-    );
+    if (Object.keys(payload).length > 0) {
+      const query = this.applyTenantFilter(
+        this.supabase.from(this.tableName).update(payload).eq('id', id)
+      );
 
-    const { error: orderError } = await (query as any);
-    if (orderError) this.errorHandler.handleError(orderError, 'updateOrder');
+      const { error: orderError } = await (query as PromiseLike<{ error: unknown }>);
+      if (orderError) this.errorHandler.handleError(orderError, 'updateOrder');
+    }
 
-    if (order.items) {
+    if (order.items && Array.isArray(order.items)) {
       await this.applyTenantFilter(
         this.supabase.from('order_items').delete()
       ).eq('order_id', id);
       await this._upsertOrderItems(id, order.items);
     }
 
-    // Mantenemos los items originales (que incluyen los objetos product)
-    const domainOrder = OrderMapper.toDomain({ ...order, id });
-    if (order.items) {
-        domainOrder.items = [...order.items];
-    }
-    return domainOrder;
+    const refreshed = await firstValueFrom(this.getOrderById(id));
+    return refreshed || OrderMapper.toDomain({ ...(order as Order), id });
   }
 
   private async _upsertOrderItems(orderId: string, items: OrderItem[]): Promise<void> {
@@ -188,12 +196,12 @@ export class SupabaseOrderRepository extends BaseRepository<Order> implements Or
 
     query = this.applyTenantFilter(query);
 
-    return from((query as any).maybeSingle()).pipe(
+    return from((query as any).order('created_at', { ascending: false }).limit(1)).pipe(
       map(({ data, error }: any) => {
         if (error) {
           this.errorHandler.handleError(error, 'getActiveCart');
         }
-        return data ? OrderMapper.toDomain(data) : null;
+        return data && data.length > 0 ? OrderMapper.toDomain(data[0]) : null;
       })
     );
   }

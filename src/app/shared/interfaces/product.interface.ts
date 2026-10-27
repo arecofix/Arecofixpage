@@ -35,7 +35,7 @@ export interface Product {
   slug: string;
   description?: string | null;
   price: number;
-  retail_price?: number;
+  retail_price?: number | null;
   sale_price?: number | null;
   stock?: number;
   min_stock_alert?: number;

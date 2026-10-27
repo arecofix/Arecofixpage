@@ -19,14 +19,14 @@ export const environment: Environment = {
   // Auth y datos apuntan al entorno local en la VPS.
   supabaseUrl: 'https://db.arecofix.com.ar',
   supabaseDataUrl: 'https://db.arecofix.com.ar',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs',
+  supabaseKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzkyODk0OTg3LCJleHAiOjIxMDgyNTQ5ODd9.bv4ev9v3YD47JrDN0qDyN5MlWYNxTxiqtNhocDcp99g',
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
+  flaskApiUrl: 'http://localhost:5000/api',
 
-  // RAG Chatbot Worker (Fase 3)
+  // RAG Chatbot Worker (Fase 3 - backend proxy)
   chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
   embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
-  chatbotSecret: '0GLFFVCUthNF8nfwAV5Q2xQQpYYIyzWA1g0Pt3xPyIs=',
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
   // WhatsApp Configuration
@@ -74,5 +74,12 @@ export const environment: Environment = {
     portfolio: {
       cv: '/curriculum-ezequiel-enrico.pdf'
     }
+  },
+  downloads: {
+    desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
+  },
+  turnstileSiteKey: '1x00000000000000000000AA',
+  features: {
+    trialEnabled: true
   }
 };

@@ -34,6 +34,8 @@ import { map, switchMap, catchError, filter } from 'rxjs/operators';
 import { Subscription, firstValueFrom, of } from 'rxjs';
 
 import { NavigationStateService } from '@app/core/services/navigation-state.service';
+import { HasPermissionDirective } from '@app/shared/directives/has-permission.directive';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 @Component({
   selector: 'public-layout-header',
@@ -46,6 +48,8 @@ import { NavigationStateService } from '@app/core/services/navigation-state.serv
     ThemeToggleComponent,
     AutoFocusDirective,
     NgOptimizedImage,
+    HasPermissionDirective,
+    FormatPricePipe,
   ],
   templateUrl: './public-layout-header.html',
   styles: `
@@ -70,7 +74,9 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
   private categoryRepo = inject(CategoryRepository);
   private coursesService = inject(CoursesService);
 
-  public user$ = this.authService.authState$.pipe(map((state) => state.profile || (state.user as any)));
+  public user$ = this.authService.authState$.pipe(map((state) => state.profile || state.user));
+
+  public currentUrl = signal<string>(this.router.url);
 
   get isAcademyMode(): boolean {
     return this.router.url.includes('/academy');
@@ -214,6 +220,16 @@ export class PublicLayoutHeader implements OnInit, OnDestroy {
         }, 2000);
       }
     }
+
+    // Keep currentUrl up to date
+    this.subscriptions.add(
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        this.currentUrl.set(this.router.url);
+        this.cdr.markForCheck();
+      })
+    );
 
     // Reset navbar visibility on navigation
     this.subscriptions.add(

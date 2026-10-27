@@ -10,7 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Subject, combineLatest, of } from 'rxjs';
+import { Subject, combineLatest, of, take } from 'rxjs';
 import { TenantService } from '@app/core/services/tenant.service';
 import { ProductService } from '@app/public/products/services';
 import { SeoService } from '@app/core/services/seo.service';
@@ -20,6 +20,7 @@ import { ProductsGridComponent } from '@app/public/products/components';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '@app/public/products/interfaces';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 @Component({
   selector: 'app-products-all-page',
@@ -29,7 +30,8 @@ import { GsmService } from '@app/public/gsm/services/gsm.service';
     RouterModule,
     FormsModule,
     CommonModule,
-    BreadcrumbsComponent
+    BreadcrumbsComponent,
+    FormatPricePipe,
   ],
   templateUrl: './products-all-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,6 +82,7 @@ export class ProductsAllPage {
       this.route.queryParams,
       this.tenant$,
     ]).pipe(
+      take(1),
       switchMap(([params, tenant]) => {
         if (!tenant) {
           return of({

@@ -34,11 +34,31 @@
         </div>
       </div>
 
-      <!-- Form / Success Section -->
+      <!-- Form / Success / Maintenance Section -->
       <div class="p-8 md:w-3/5">
         
-        <!-- ===================== SUCCESS STATE ===================== -->
-        <div *ngIf="success()" class="text-center py-4" id="trial-success-panel">
+        <!-- ===================== MAINTENANCE STATE ===================== -->
+        <div *ngIf="!trialEnabled()" class="flex flex-col items-center justify-center text-center py-10" id="trial-disabled-panel">
+          <div class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-6 text-3xl shadow-inner">
+            <i class="fas fa-tools"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Registro temporalmente no disponible</h3>
+          <p class="text-gray-600 mb-6 max-w-sm">
+            Estamos realizando tareas de mantenimiento y actualización en el sistema de pruebas gratuitas. Por favor, vuelve a intentar en unos momentos o contáctanos directamente.
+          </p>
+          <a
+            [href]="whatsappUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary gap-2 shadow-lg shadow-blue-500/20">
+            <i class="fab fa-whatsapp text-lg"></i> Contactar por WhatsApp
+          </a>
+        </div>
+
+        <!-- ===================== ACTIVE TRIAL FLOW ===================== -->
+        <ng-container *ngIf="trialEnabled()">
+          <!-- ===================== SUCCESS STATE ===================== -->
+          <div *ngIf="success()" class="text-center py-4" id="trial-success-panel">
           <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
             <i class="fas fa-check"></i>
           </div>
@@ -122,7 +142,8 @@
               <input
                 type="text"
                 id="input-businessName"
-                formControlName="businessName" name="businessName" name="businessName"
+                formControlName="businessName"
+                name="businessName"
                 placeholder="Ej: FixCell"
                 class="input input-bordered w-full bg-white text-gray-800"
                 [class.input-error]="trialForm.get('businessName')?.invalid && trialForm.get('businessName')?.touched" />
@@ -138,7 +159,8 @@
                 <input
                   type="text"
                   id="input-userName"
-                  formControlName="userName" name="userName" name="userName"
+                  formControlName="userName"
+                  name="userName"
                   placeholder="Juan Pérez"
                   class="input input-bordered w-full bg-white text-gray-800"
                   [class.input-error]="trialForm.get('userName')?.invalid && trialForm.get('userName')?.touched" />
@@ -151,7 +173,8 @@
                 <input
                   type="tel"
                   id="input-whatsapp"
-                  formControlName="whatsapp" name="whatsapp" name="whatsapp"
+                  formControlName="whatsapp"
+                  name="whatsapp"
                   placeholder="+54 9..."
                   class="input input-bordered w-full bg-white text-gray-800"
                   [class.input-error]="trialForm.get('whatsapp')?.invalid && trialForm.get('whatsapp')?.touched" />
@@ -167,7 +190,8 @@
               <input
                 type="email"
                 id="input-email"
-                formControlName="email" name="email" name="email"
+                formControlName="email"
+                name="email"
                 placeholder="tucorreo@ejemplo.com"
                 class="input input-bordered w-full bg-white text-gray-800"
                 [class.input-error]="trialForm.get('email')?.invalid && trialForm.get('email')?.touched" />
@@ -213,18 +237,26 @@
                 (change)="onLogoSelected($event)" />
             </div>
 
+            <!-- Turnstile Widget Container -->
+            <div
+              #turnstileContainer
+              id="turnstile-container"
+              class="my-4 flex justify-center min-h-[65px]">
+            </div>
+
             <button
               type="submit"
               id="btn-submit-trial"
-              class="btn btn-primary w-full mt-6 gap-2"
-              [disabled]="loading() || uploadingLogo()">
+              class="btn btn-primary w-full mt-2 gap-2"
+              [disabled]="loading() || uploadingLogo() || !turnstileToken()">
               <span *ngIf="loading() || uploadingLogo()" class="loading loading-spinner loading-sm"></span>
               <i *ngIf="!loading() && !uploadingLogo()" class="fas fa-paper-plane"></i>
               {{ uploadingLogo() ? 'Subiendo logo...' : loading() ? 'Creando tu sucursal...' : 'Solicitar Prueba Gratis' }}
             </button>
           </form>
         </div>
-      </div>
+      </ng-container>
     </div>
+  </div>
   </div>
 </div>

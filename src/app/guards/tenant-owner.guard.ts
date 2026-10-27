@@ -48,6 +48,11 @@ export const tenantOwnerGuard: CanActivateFn = async (route, state) => {
       return true;
     }
 
+    if (role === ROLES.ADMIN) {
+      const branchSlug = route.paramMap.get('branchSlug') || route.parent?.paramMap.get('branchSlug');
+      return router.createUrlTree(branchSlug ? [`/${branchSlug}/admin/company`] : ['/admin/company']);
+    }
+
     console.warn('🚫 tenantOwnerGuard: Access denied for role:', role);
     return router.createUrlTree(['/']);
 

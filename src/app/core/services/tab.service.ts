@@ -15,7 +15,8 @@ export interface TabInfo {
   providedIn: 'root'
 })
 export class TabService {
-  private tabsSubject = new BehaviorSubject<TabInfo[]>([]);
+  private static readonly STORAGE_KEY = 'arecofix_admin_tabs';
+  private tabsSubject = new BehaviorSubject<TabInfo[]>(this.loadSavedTabs());
   public tabs$ = this.tabsSubject.asObservable();
   
   private router = inject(Router);
@@ -30,6 +31,34 @@ export class TabService {
         this.addOrActivateTab(event.urlAfterRedirects);
       }
     });
+
+    // If already initialized on an admin route, ensure tab is present
+    setTimeout(() => {
+      if (this.router.url && this.router.url.includes('/admin')) {
+        this.addOrActivateTab(this.router.url);
+      }
+    }, 0);
+  }
+
+  private loadSavedTabs(): TabInfo[] {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      try {
+        const raw = window.sessionStorage.getItem(TabService.STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch {}
+    }
+    return [];
+  }
+
+  private saveTabs(tabs: TabInfo[]): void {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      try {
+        window.sessionStorage.setItem(TabService.STORAGE_KEY, JSON.stringify(tabs));
+      } catch {}
+    }
   }
 
   private addOrActivateTab(url: string) {
@@ -50,8 +79,8 @@ export class TabService {
     if (existingTab) {
       existingTab.active = true;
     } else {
-      // Limit to 10 tabs
-      if (tabs.length >= 10) {
+      // Limit to 50 tabs for stress handling
+      if (tabs.length >= 50) {
         // Remove first non-active or oldest
         tabs.shift();
       }
@@ -63,6 +92,7 @@ export class TabService {
     }
     
     this.tabsSubject.next([...tabs]);
+    this.saveTabs(tabs);
   }
 
   public closeTab(index: number) {
@@ -91,6 +121,7 @@ export class TabService {
     } else {
       this.tabsSubject.next([...tabs]);
     }
+    this.saveTabs(tabs);
   }
 
   public closeAllTabs() {
@@ -98,6 +129,7 @@ export class TabService {
       this.routeReuseStrategy.clearAll();
     }
     this.tabsSubject.next([]);
+    this.saveTabs([]);
     this.router.navigate(['/admin/dashboard']);
   }
 }

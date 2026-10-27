@@ -93,9 +93,9 @@
                        <div class="flex items-baseline gap-2">
                          <span class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
                            @if (!isLoggedIn() && isTechnicalCategory() && item.retail_price) {
-                              {{ item.retail_price | currency: (item.currency || 'ARS'): 'symbol-narrow': (item.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                              {{ item.retail_price | formatPrice:item.currency }}
                            } @else {
-                              {{ item.price | currency: (item.currency || 'ARS'): 'symbol-narrow': (item.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                              {{ item.price | formatPrice:item.currency }}
                            }
                          </span>
                           @if (isLoggedIn() && isTechnicalCategory() && item.retail_price && item.retail_price! > item.price) {
@@ -110,7 +110,7 @@
                        </div>
                         @if (item.currency === 'USD' && item.convertedPrice) {
                           <span class="text-sm text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 mt-1">
-                            <i class="fas fa-exchange-alt"></i> Equivale a: {{ (!isLoggedIn() && isTechnicalCategory() && item.retail_price ? item.retail_price! : item.price) * (item.convertedPrice! / item.price) | currency: 'ARS': 'symbol-narrow': '1.0-0': 'es-AR' }}
+                            {{ ((!isLoggedIn() && isTechnicalCategory() && item.retail_price ? item.retail_price! : item.price) * (item.convertedPrice! / item.price)) | formatPrice:'ARS':{ prefix: '⇄ ' } }}
                           </span>
                         }
                      </div>
@@ -126,13 +126,13 @@
                     @if (isLoggedIn() && isTechnicalCategory() && item.retail_price && item.retail_price! > item.price) {
                       <div class="text-right pb-2">
                         <span class="text-sm line-through text-gray-400 font-medium">
-                          {{ item.retail_price! | currency: (item.currency || 'ARS'): 'symbol-narrow': (item.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                          {{ item.retail_price! | formatPrice:item.currency }}
                         </span>
                       </div>
                    } @else if (item.discount_percentage) {
                      <div class="text-right pb-2">
                        <span class="text-sm line-through text-gray-400 font-medium">
-                         {{ (item.price / (1 - (item.discount_percentage || 0)/100)) | currency: (item.currency || 'ARS'): 'symbol-narrow': (item.currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                         {{ (item.price / (1 - (item.discount_percentage || 0)/100)) | formatPrice:item.currency }}
                        </span>
                      </div>
                    }
@@ -177,7 +177,7 @@
     
               <div class="mt-6">
                 <h3 class="sr-only">Description</h3>
-                <p class="text-base text-gray-700 dark:text-gray-300 leading-relaxed">{{ item.description || 'Sin descripción detallada.' }}</p>
+                <p id="product-description" data-testid="product-description" class="text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{{ item.description || 'Sin descripción detallada.' }}</p>
               </div>
 
               <!-- Features -->
@@ -212,9 +212,15 @@
                   @if (showPriceAndBuy()) {
                     <div class="flex flex-col gap-2">
                       <button type="button" (click)="addToCart()" 
-                              class="group relative flex w-full items-center justify-center rounded-2xl border border-transparent bg-linear-to-r from-orange-500 to-amber-500 px-8 py-4 text-lg font-black text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 focus:ring-4 focus:ring-orange-500/20 focus:outline-hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 overflow-hidden">
+                              data-cy="add-to-cart"
+                              [disabled]="(item.stock ?? 0) <= 0 || cartService.isLoading()"
+                              class="group relative flex w-full items-center justify-center rounded-2xl border border-transparent bg-linear-to-r from-orange-500 to-amber-500 px-8 py-4 text-lg font-black text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 focus:ring-4 focus:ring-orange-500/20 focus:outline-hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:shadow-none">
                         <div class="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                        <i class="fas fa-shopping-cart mr-3"></i> AGREGAR AL CARRITO
+                        @if (cartService.isLoading()) {
+                          <i class="fas fa-spinner fa-spin mr-3"></i> AGREGANDO...
+                        } @else {
+                          <i class="fas fa-shopping-cart mr-3"></i> {{ (item.stock ?? 0) <= 0 ? 'SIN STOCK DISPONIBLE' : 'AGREGAR AL CARRITO' }}
+                        }
                       </button>
                       <p class="text-[11px] text-center text-gray-500 dark:text-gray-400 italic leading-tight px-4 mt-1">
                         <i class="fas fa-info-circle mr-1"></i> {{ valueProposition() }}

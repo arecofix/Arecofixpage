@@ -7,6 +7,7 @@ import {
   OnInit,
   PLATFORM_ID,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -14,7 +15,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { CartService } from '@app/shared/services/cart.service';
@@ -40,6 +41,7 @@ import {
 import { MercadoPagoService } from '@app/features/orders/application/services/mercadopago.service';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { firstValueFrom, debounceTime, distinctUntilChanged } from 'rxjs';
+import { HydrationPreserveDirective } from '@app/shared/directives/hydration-preserve.directive';
 
 type CheckoutStep =
   | 'form'
@@ -47,18 +49,21 @@ type CheckoutStep =
   | 'pending_payment'
   | 'awaiting_verification'
   | 'paid'
+  | 'payment_failure'
+  | 'payment_pending'
   | 'mp_redirect';
 type PaymentMethodChoice = 'digital' | 'cash' | 'credit_card';
 
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CommonModule],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule, HydrationPreserveDirective],
   templateUrl: './checkout-page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './checkout-page.css',
 })
 export class CheckoutPage implements OnInit, OnDestroy {
+  cdr = inject(ChangeDetectorRef, { optional: true });
   cartService = inject(CartService);
   orderService = inject(OrderService);
   paymentService = inject(PaymentService);
@@ -68,6 +73,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
   profileService = inject(ProfileService);
   fb = inject(FormBuilder);
   router = inject(Router);
+  route = inject(ActivatedRoute);
   notificationService = inject(NotificationService);
   branchService = inject(BranchService);
   shippingService = inject(ShippingService);
@@ -102,6 +108,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
   shippingQuote = signal<ShippingQuote | null>(null);
   isCalculatingShipping = signal<boolean>(false);
   mpPaymentUrl = signal<string | null>(null);
+  mpPaymentId = signal<string | null>(null);
+  mpStatus = signal<string | null>(null);
+  mpOrderId = signal<string | null>(null);
 
   // Cross-selling
   recommendedProducts = signal<Product[]>([]);
@@ -137,6 +146,32 @@ export class CheckoutPage implements OnInit, OnDestroy {
   isUploadingProof = computed(() => this.paymentService.isUploadingProof());
 
   ngOnInit(): void {
+    // Check for Mercado Pago return query parameters
+    this.route.queryParams.subscribe((params) => {
+      const status = params['status'] || params['collection_status'];
+      const paymentId = params['payment_id'] || params['collection_id'];
+      const orderId = params['external_reference'] || params['order_id'];
+
+      if (status) {
+        this.mpPaymentId.set(paymentId ? String(paymentId) : null);
+        this.mpStatus.set(String(status));
+        this.mpOrderId.set(orderId ? String(orderId) : null);
+
+        if (status === 'approved') {
+          this.cartService.clearCart();
+          this.step.set('paid');
+          this.notificationService.showSuccess('¡Pago confirmado con éxito por Mercado Pago!');
+        } else if (status === 'rejected' || status === 'failure' || status === 'cancelled') {
+          this.step.set('payment_failure');
+          this.notificationService.showError('El pago fue rechazado o cancelado.');
+        } else if (status === 'pending' || status === 'in_process') {
+          this.cartService.clearCart();
+          this.step.set('payment_pending');
+          this.notificationService.showInfo('Tu pago está pendiente de acreditación.');
+        }
+      }
+    });
+
     // Pre-fill form if user is logged in
     const user = this.authService.getCurrentUser();
     if (user?.email) {
@@ -176,6 +211,11 @@ export class CheckoutPage implements OnInit, OnDestroy {
         .slice(0, 3);
       this.recommendedProducts.set(suggestions as unknown as Product[]);
     });
+  }
+
+  retryPayment(): void {
+    this.step.set('payment_method');
+    this.cdr?.detectChanges();
   }
 
   addRecommendedToCart(product: Product) {
@@ -240,6 +280,8 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
   // ── Step: create PENDING_PAYMENT order in Supabase ─────
   async placeOrder(): Promise<void> {
+    if (this.isProcessing()) return;
+
     const method = this.selectedMethod();
     if (!method) {
       this.notificationService.showError(
@@ -248,16 +290,37 @@ export class CheckoutPage implements OnInit, OnDestroy {
       return;
     }
 
+    const cartItems = this.cartService.cartItems();
+    if (!cartItems || cartItems.length === 0) {
+      this.notificationService.showError('Tu carrito está vacío.');
+      return;
+    }
+
+    // Atomic pre-checkout stock validation
+    for (const item of cartItems) {
+      if (item.product.stock !== undefined && item.product.stock !== null && item.product.stock < item.quantity) {
+        this.notificationService.showError(
+          `Stock insuficiente para "${item.product.name}". Disponible: ${item.product.stock}, solicitado: ${item.quantity}`
+        );
+        return;
+      }
+    }
+
     this.isProcessing.set(true);
 
     const formVal = this.checkoutForm.getRawValue();
-    const cartItems = this.cartService.cartItems();
     const subtotal = this.cartService.totalPrice();
     const shippingCost = this.shippingQuote()?.cost || 0;
     const discount = this.pointsDiscountValue();
     const total = Math.max(0, subtotal + shippingCost - discount);
 
     const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city} (CP: ${formVal.address.postal_code})`;
+
+    const currentUser = this.authService.getCurrentUser();
+    let guestSessionId: string | undefined;
+    if (!currentUser && isPlatformBrowser(this.platformId)) {
+      guestSessionId = localStorage.getItem('cart_session_id') || undefined;
+    }
 
     const order: Order = {
       customer_name: formVal.name,
@@ -272,13 +335,15 @@ export class CheckoutPage implements OnInit, OnDestroy {
       total_amount: total,
       payment_method: method,
       notes: formVal.notes,
-      user_id: this.authService.getCurrentUser()?.id,
+      user_id: currentUser?.id,
+      session_id: guestSessionId,
       branch_id: this.branchService.getCurrentBranchId() || undefined,
     };
 
     const orderItems: OrderItem[] = cartItems.map((item) => {
       const finalPrice = item.product.convertedPrice || item.product.price;
       return {
+        cart_item_id: item.cartItemId,
         product_name: item.product.name,
         product_id: item.product.id,
         quantity: item.quantity,

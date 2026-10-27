@@ -1,0 +1,30 @@
+================================================================================
+ARECOFIX CYPRESS E2E AUTOMATION REGRESSION (POST-FINAL REMEDIATION)
+Timestamp: 2026-10-20T17:58:17-03:00
+Base URL: https://arecofix.com.ar
+================================================================================
+
+  (Run Finished)
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ √  cart-integrity.cy.ts                     00:08        2        2        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ √  seo-validation.cy.ts                     00:08        7        7        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ √  failover.cy.ts                           00:01        1        1        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    √  All specs passed!                        00:18       10       10        -        -        -  
+
+Specs Ejecutadas:
+1. cart-integrity.cy.ts (2/2 passing)
+   - Flujo de carrito anónimo y autenticado
+   - Validación de stock y bloqueo de órdenes cross-tenant
+2. seo-validation.cy.ts (7/7 passing)
+   - SEO de inicio, landing de celulares, cursos dinámicos
+   - Fallbacks de productos, tracking dinámico y SSR/Prerender OG tags
+3. failover.cy.ts (1/1 passing)
+   - Failover resiliency hacia Cloudflare D1 ante cuota 402
+
+HTML Report: C:\git\Arecofixpage\cypress\reports\index.html
+DICTAMEN: 10/10 PASSING (0 REGRESIONES).

@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
-import { AdminProductService, ImportReport } from './services/admin-product.service';
+import { AdminProductService } from './services/admin-product.service';
+import { AdminProductImportService, ImportReport } from './services/admin-product-import.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
 import { CommonModule } from '@angular/common';
 import { BulkEditModalComponent } from './components/bulk-edit-modal/bulk-edit-modal.component';
@@ -16,16 +17,20 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { TranslationService } from '@app/core/services/translation.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { BranchService } from '@app/core/services/branch.service';
+import { ImgFallbackDirective } from '@app/shared/directives/img-fallback.directive';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
+import { ProductsParams } from '@app/shared/interfaces/product.interface';
 
 @Component({
   selector: 'app-admin-products-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent, MetaValidationModalComponent],
+  imports: [CommonModule, RouterLink, FormsModule, Pagination, BulkEditModalComponent, ImportResultModalComponent, MetaValidationModalComponent, ImgFallbackDirective, FormatPricePipe],
   templateUrl: './admin-products-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminProductsPage implements OnInit {
   private productService = inject(AdminProductService);
+  private productImportService = inject(AdminProductImportService);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private branchContextService = inject(BranchContextService);
@@ -82,6 +87,15 @@ export class AdminProductsPage implements OnInit {
   // Stock editing
   public editingStock = signal<string | null>(null);
   public tempStock = signal<number>(0);
+
+  // Soft Delete State
+  public productToDelete = signal<Product | null>(null);
+  public deletingProduct = signal<boolean>(false);
+
+  // Stock History State
+  public selectedProductForHistory = signal<Product | null>(null);
+  public stockHistoryLogs = signal<import('@app/features/products/domain/entities/stock-history.entity').StockHistory[]>([]);
+  public loadingHistory = signal<boolean>(false);
 
   // ML Sync state
   public syncingMl = signal<string | null>(null);
@@ -181,8 +195,8 @@ export class AdminProductsPage implements OnInit {
           q: this.searchQuery(),
           category_id: this.selectedCategoryId() !== 'all' ? this.selectedCategoryId() : undefined,
           brand_id: this.selectedBrandId() !== 'all' ? this.selectedBrandId() : undefined,
-          completeness_filter: this.completenessFilter() !== 'all' ? this.completenessFilter() as any : undefined,
-          stock_status: this.stockFilter() !== 'all' ? this.stockFilter() as any : undefined,
+          completeness_filter: this.completenessFilter() !== 'all' ? (this.completenessFilter() as ProductsParams['completeness_filter']) : undefined,
+          stock_status: this.stockFilter() !== 'all' ? (this.stockFilter() as ProductsParams['stock_status']) : undefined,
           _sort: currentSort.column,
           _order: currentSort.order as 'asc' | 'desc',
           include_inactive: true
@@ -191,8 +205,9 @@ export class AdminProductsPage implements OnInit {
       this.products.set((response.data || []) as unknown as Product[]);
       this.totalItems.set(response.items || 0);
 
-    } catch (e: any) {
-      this.error.set(e.message || 'Error al cargar datos');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Error al cargar datos';
+      this.error.set(msg);
     } finally {
       this.loading.set(false);
       this.cdr.detectChanges();
@@ -214,7 +229,7 @@ export class AdminProductsPage implements OnInit {
     this.combinedFilter.set(val);
 
     if (val.startsWith('sort_')) {
-      this.sortOrder.set(val.replace('sort_', '') as any);
+      this.sortOrder.set(val.replace('sort_', '') as 'name_asc' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc');
       this.stockFilter.set('all');
     } else if (val.startsWith('filter_')) {
       this.stockFilter.set(val.replace('filter_', ''));
@@ -311,17 +326,19 @@ export class AdminProductsPage implements OnInit {
 
   async exportProducts() {
     try {
-      await this.productService.exportProductsToCSV();
-    } catch (e: any) {
-      this.error.set('Error al exportar: ' + e.message);
+      await this.productImportService.exportProductsToCSV();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.error.set('Error al exportar: ' + msg);
     }
   }
 
   async exportMetaCatalog() {
     try {
-      await this.productService.exportToMetaCSV();
-    } catch (e: any) {
-      this.error.set('Error al exportar para Meta: ' + e.message);
+      await this.productImportService.exportToMetaCSV();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.error.set('Error al exportar para Meta: ' + msg);
     }
   }
 
@@ -329,11 +346,12 @@ export class AdminProductsPage implements OnInit {
     this.validating.set(true);
     this.error.set(null);
     try {
-      const results = await this.productService.validateProductsForMeta();
+      const results = await this.productImportService.validateProductsForMeta();
       this.validationResults.set(results);
       this.showValidationModal.set(true);
-    } catch (e: any) {
-      this.error.set('Error al validar: ' + e.message);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.error.set('Error al validar: ' + msg);
     } finally {
       this.validating.set(false);
       this.cdr.detectChanges();
@@ -361,14 +379,15 @@ export class AdminProductsPage implements OnInit {
       this.error.set(null);
       this.cdr.detectChanges();
 
-      const report = await this.productService.importProductsFromCSV(file);
+      const report = await this.productImportService.importProductsFromCSV(file);
 
       this.importProgress.set('');
       this.importReport.set(report);
       this.showImportResult.set(true);
       this.cdr.detectChanges();
-    } catch (e: any) {
-      this.error.set('Error al importar: ' + e.message);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.error.set('Error al importar: ' + msg);
       this.importProgress.set('');
     } finally {
       this.importing.set(false);
@@ -408,12 +427,66 @@ export class AdminProductsPage implements OnInit {
       
       this.editingStock.set(null);
       this.error.set(null);
-    } catch (e: any) {
-      this.error.set('Error al actualizar stock: ' + e.message);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.error.set('Error al actualizar stock: ' + msg);
     } finally {
       this.savingStock.set(false);
       this.cdr.detectChanges();
     }
+  }
+
+  confirmDeleteProduct(product: Product, event?: Event) {
+    if (event) event.stopPropagation();
+    this.productToDelete.set(product);
+  }
+
+  cancelDeleteProduct() {
+    this.productToDelete.set(null);
+  }
+
+  async executeDeleteProduct() {
+    const product = this.productToDelete();
+    if (!product || this.deletingProduct()) return;
+
+    this.deletingProduct.set(true);
+    try {
+      await this.productService.softDeleteProduct(product.id);
+      this.products.update(prods =>
+        prods.map(p => p.id === product.id ? { ...p, is_active: false } : p)
+      );
+      this.productToDelete.set(null);
+      this.loadSummary();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Error al eliminar producto';
+      this.error.set(msg);
+    } finally {
+      this.deletingProduct.set(false);
+      this.cdr.detectChanges();
+    }
+  }
+
+  openStockHistory(product: Product, event?: Event) {
+    if (event) event.stopPropagation();
+    this.selectedProductForHistory.set(product);
+    this.loadingHistory.set(true);
+    this.productService.getStockHistory(product.id).subscribe({
+      next: (logs) => {
+        this.stockHistoryLogs.set(logs);
+        this.loadingHistory.set(false);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.stockHistoryLogs.set([]);
+        this.loadingHistory.set(false);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  closeStockHistory() {
+    this.selectedProductForHistory.set(null);
+    this.stockHistoryLogs.set([]);
   }
 
   cancelStockEdit() {
@@ -440,8 +513,9 @@ export class AdminProductsPage implements OnInit {
       );
 
       alert('Producto sincronizado con éxito: ' + result.ml_item_id);
-    } catch (e: any) {
-      this.error.set('Error al sincronizar con Mercado Libre: ' + e.message);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.error.set('Error al sincronizar con Mercado Libre: ' + msg);
       this.products.update(products => 
         products.map(p => p.id === product.id ? { ...p, ml_sync_status: 'error' } : p)
       );

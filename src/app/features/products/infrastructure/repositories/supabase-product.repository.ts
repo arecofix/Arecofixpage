@@ -23,6 +23,24 @@ import { BranchContextService } from '@app/core/services/branch-context.service'
 })
 export class SupabaseProductRepository extends BaseRepository<Product> implements ProductRepository {
   protected override tableName = 'products';
+
+  override create(item: Partial<Product>): Observable<Product> {
+    const dbPayload = ProductMapper.mapToDb(item);
+    return super.create(dbPayload as Partial<Product>);
+  }
+
+  override update(id: string, item: Partial<Product>): Observable<Product> {
+    const dbPayload = ProductMapper.mapUpdateToDb(item);
+    return super.update(id, dbPayload as Partial<Product>);
+  }
+
+  softDelete(id: string): Observable<void> {
+    const payload = {
+      is_active: false,
+      deleted_at: new Date().toISOString(),
+    };
+    return this.update(id, payload as Partial<Product>).pipe(map(() => void 0));
+  }
   protected override isGlobalTable = false;
   protected override useSoftDeletes = true;
   protected override suppressAuthNotifications = true;
@@ -35,6 +53,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const supabase = inject(SUPABASE_CLIENT);
     const logger = inject(LoggerService);
     super(supabase, logger);
+  }
+
+  getBySlug(slug: string): Observable<Product | null> {
+    return this.findWithFilters({ slug, _page: 1, _per_page: 1, minimal: false }).pipe(
+      map(res => (res.data && res.data.length > 0 ? (res.data[0] as unknown as Product) : null))
+    );
   }
 
   findWithFilters(params: ProductsParams = {}): Observable<ProductsResponse> {
@@ -50,9 +74,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       price,
       slug,
       min_price,
-      max_price,
-      minimal = true
+      max_price
     } = params;
+
+    // Automatic minimal inference: single item lookups by slug or id require full fields by default
+    const isSingleLookup = Boolean(slug || id);
+    const minimal = params.minimal !== undefined ? params.minimal : !isSingleLookup;
     
     const hasExplicitBranch = 'branch_id' in params;
     const branch_id = hasExplicitBranch ? params.branch_id : (this.branchContextService?.getBranchId() || undefined);
@@ -64,10 +91,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       id, name, slug, price, retail_price, currency, cost_price, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id`;
 
-    selectFields += `, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
+    selectFields += `, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert), variants:product_variants(*)`;
 
     if (!minimal) {
-      selectFields += ', description, media_metadata, gallery_urls';
+      selectFields += ', description, media_metadata, gallery_urls, specifications, meta_title, meta_description, og_image, seo_keywords, warranty_days, tax_percentage, weight, dimensions, cross_sell_products, offer_start_date, offer_end_date';
     }
 
     // GET https://<TU_SUPABASE_URL>/rest/v1/products?select=...
@@ -166,15 +193,15 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       query = query.range(start, end);
     }
 
-    return from(query as any).pipe(
-      map((res: any) => {
+    return from(query as unknown as PromiseLike<{ data: Record<string, unknown>[], count: number, error: unknown }>).pipe(
+      map((res) => {
         const { data, count, error } = res;
         if (error) this.errorHandler.handleError(error, 'findWithFilters');
 
         const totalItems = count || 0;
         const pages = Math.max(1, Math.ceil(totalItems / _per_page));
 
-        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, branch_id || undefined));
+        let products = (data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p, branch_id || undefined));
 
         return {
           pages,
@@ -189,19 +216,20 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     const selectFields = `
       id, name, slug, price, retail_price, currency, cost_price, image_url, category_id, brand_id, 
       is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id,
-      branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)
+      branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert),
+      variants:product_variants(*)
     `;
 
     const query = this.applyTenantFilter(
       this.supabase.from(this.tableName).select(selectFields)
     );
 
-    return from(query as any).pipe(
-      map((res: any) => {
+    return from(query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>).pipe(
+      map((res) => {
         const { data, error } = res;
         if (error) this.errorHandler.handleError(error, 'findLowStock');
         return (data || [])
-            .map((p: any) => ProductMapper.mapFromDb(p))
+            .map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p))
             .filter((p: Product) => p.stock < threshold);
       })
     );
@@ -213,17 +241,17 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       let fromIdx = 0;
       let hasMore = true;
       const CHUNK = 1000;
-      const select = `id, name, slug, price, is_active, is_global, stock, branch_id`;
+      const select = `id, name, slug, price, is_active, is_global, stock, branch_id, variants:product_variants(*)`;
 
       while (hasMore) {
         const query = this.applyTenantFilter(this.supabase.from('products').select(select))
           .eq('is_active', true)
           .range(fromIdx, fromIdx + CHUNK - 1);
         
-        const { data, error } = await (query as any);
+        const { data, error } = await (query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
         if (error) this.errorHandler.handleError(error, 'findAvailable');
         
-        const products = (data || []).map((p: any) => ProductMapper.mapFromDb(p));
+        const products = (data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p));
         allData = [...allData, ...products];
         hasMore = products.length === CHUNK;
         fromIdx += CHUNK;
@@ -235,7 +263,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   getTopSellers(limit: number = 10, branch_id?: string): Observable<Product[]> {
     const activeBranchId = branch_id || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
-    const selectFields = `id, name, slug, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, total_units_sold, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert)`;
+    const selectFields = `id, name, slug, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, total_units_sold, branch_stock:product_stock_per_branch(quantity, branch_id, min_stock_alert), variants:product_variants(*)`;
 
     let query = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true)
@@ -243,12 +271,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       .order('total_units_sold', { ascending: false })
       .limit(limit * 2);
 
-    return from(query as any).pipe(
-      map((res: any) => {
+    return from(query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>).pipe(
+      map((res) => {
         const { data, error } = res;
         if (error) this.errorHandler.handleError(error, 'getTopSellers');
 
-        let products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, activeBranchId || undefined));
+        let products = (data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p, activeBranchId || undefined));
         products = products.filter((p: Product) => (p.stock || 0) > 0);
         
         return products.slice(0, limit);
@@ -256,22 +284,22 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     );
   }
 
-    override getAll(params?: any): Observable<Product[]> {
-    const paramBranchId = typeof params === 'string' ? params : (params?.branch_id || undefined);
-    const branch_id = paramBranchId || (this.branchContextService ? this.branchContextService.getBranchId() : undefined);
+    override getAll(params?: Record<string, unknown> | string): Observable<Product[]> {
+    const paramBranchId = typeof params === 'string' ? params : (params?.['branch_id'] as string | undefined);
+    const branch_id = (paramBranchId || (this.branchContextService ? this.branchContextService.getBranchId() : undefined)) as string | undefined;
     const fetchAll = async (): Promise<Product[]> => {
       let allData: Product[] = [];
       let fromIdx = 0;
       let hasMore = true;
       const CHUNK = 1000;
-      const select = `id, name, slug, description, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id)`;
+      const select = `id, name, slug, description, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls, branch_stock:product_stock_per_branch(quantity, branch_id), variants:product_variants(*)`;
 
       while (hasMore) {
         let query = this.applyTenantFilter(this.supabase.from('products').select(select));
-        const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as any);
+        const { data, error } = await (query.order('created_at', { ascending: false }).range(fromIdx, fromIdx + CHUNK - 1) as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
         if (error) this.errorHandler.handleError(error, 'getAll (Products)');
         
-        const products = (data || []).map((p: any) => ProductMapper.mapFromDb(p, branch_id));
+        const products = (data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p, branch_id));
         allData = [...allData, ...products];
         hasMore = products.length === CHUNK;
         fromIdx += CHUNK;
@@ -293,9 +321,9 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
           this.supabase.from('products').select('id, name, slug, sku, price, stock, branch_id')
         ).range(fromIdx, fromIdx + CHUNK - 1);
         
-        const { data, error } = await (query as any);
+        const { data, error } = await (query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
         if (error) this.errorHandler.handleError(error, 'getAllForImport');
-        allData = [...allData, ...(data || [])];
+        allData = [...allData, ...(data || []) as unknown as ImportProductSummary[]];
         hasMore = (data || []).length === CHUNK;
         fromIdx += CHUNK;
       }
@@ -330,21 +358,15 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
 
   upsertMany(products: Partial<Product>[]): Observable<Product[]> {
     const dataToUpsert = products.map(p => {
-        const copy: any = { ...p, tenant_id: this.tenantService.getTenantId(), updated_at: new Date().toISOString() };
-        delete copy.branch_id;
-        delete copy.min_stock_alert;
-        delete copy.convertedPrice;
-        delete copy.category_name;
-        delete copy.branch_stock;
-        delete copy['branches'];
+        const copy: Record<string, unknown> = { ...ProductMapper.mapToDb(p), tenant_id: this.tenantService.getTenantId(), updated_at: new Date().toISOString() };
         return copy;
     });
     // 👇 EQUIVALENTE A POSTMAN (PETICIÓN POST para crear/upsert):
     // POST https://<TU_SUPABASE_URL>/rest/v1/products
-    return from((this.supabase.from('products').upsert(dataToUpsert).select() as any)).pipe(
-      map(({ data, error }: any) => {
+    return from((this.supabase.from('products').upsert(dataToUpsert).select() as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>)).pipe(
+      map(({ data, error }) => {
         if (error) this.errorHandler.handleError(error, 'upsertMany');
-        return (data || []).map((p: any) => ProductMapper.mapFromDb(p));
+        return (data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p));
       })
     );
   }
@@ -402,7 +424,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
     
     const tsQuery = words.map(w => `'${w}':*`).join(' & ');
 
-    const selectFields = 'id, name, slug, description, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
+    const selectFields = 'id, name, slug, description, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls, variants:product_variants(*)';
     let supabaseQuery = this.applyTenantFilter(this.supabase.from(this.tableName).select(selectFields))
       .eq('is_active', true);
     
@@ -429,10 +451,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             subscriber.error(e);
           }
         } else {
-          subscriber.next((data || []).map((p: any) => ProductMapper.mapFromDb(p)));
+          subscriber.next((data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p)));
           subscriber.complete();
         }
-      }).catch((err: any) => {
+      }).catch((err: unknown) => {
         if (!isSubscribed) return;
         subscriber.error(err);
       });
@@ -444,13 +466,13 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   getPendingApprovals(): Observable<Product[]> {
-    const selectFields = 'id, name, slug, description, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls';
+    const selectFields = 'id, name, slug, description, price, retail_price, currency, cost_price, image_url, category_id, brand_id, is_active, is_featured, sku, barcode, created_at, updated_at, is_global, stock, branch_id, media_metadata, gallery_urls, variants:product_variants(*)';
     let query = this.applyTenantFilter(
       this.supabase.from(this.tableName)
         .select(selectFields)
         .eq('is_active', false)
     );
-    return from(query as any).pipe(map(({ data }: any) => (data || []).map((p: any) => ProductMapper.mapFromDb(p))));
+    return from(query as unknown as PromiseLike<{ data: Record<string, unknown>[] }>).pipe(map(({ data }) => (data || []).map((p: Record<string, unknown>) => ProductMapper.mapFromDb(p))));
   }
 
   approveProduct(id: string): Observable<void> {
@@ -486,7 +508,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             .eq('is_active', true)
             .is('deleted_at', null);
 
-            const { data, error } = await (query as any);
+            const { data, error } = await (query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
             if (error) throw error;
 
             const results = data || [];
@@ -499,7 +521,7 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             });
 
             const totalItems = branchProducts.length;
-            const totalValue = branchProducts.reduce((acc: number, item: any) => {
+            const totalValue = branchProducts.reduce((acc: number, item: Record<string, unknown>) => {
                 const price = Number(item['price'] || 0);
                 const bStock = item['branch_stock'];
                 const stockList = bStock && Array.isArray(bStock) ? bStock : [];
@@ -526,12 +548,12 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
             // Note: view_products_inventory does not have tenant_id or is_active exposed.
             // If the view handles RLS, it filters automatically.
 
-            const { data, error } = await (query as any);
+            const { data, error } = await (query as unknown as PromiseLike<{ data: Record<string, unknown>[], error: unknown }>);
             if (error) throw error;
 
             const results = data || [];
             const totalItems = results.length;
-            const totalValue = results.reduce((acc: number, p: any) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
+            const totalValue = results.reduce((acc: number, p: Record<string, unknown>) => acc + (Number(p['price'] || 0) * Number(p['stock'] || 0)), 0);
             const lowStockCount = results.filter((p: Record<string, unknown>) => {
                 const stockVal = Number(p['stock'] || 0);
                 const threshold = Number(p['min_stock_alert'] ?? 5);

@@ -1,0 +1,60 @@
+/* ==========================================================================
+   ARCA / Ley 27.743 - Estilos Oficiales de Impresión en Papel A4
+   Normativa RG 1415/03, RG 3822/94, RG 4892/2020 y RG 5614/2024
+   ========================================================================== */
+
+@page {
+  size: A4;
+  margin: 10mm 12mm;
+}
+
+@media print {
+  body {
+    visibility: hidden !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print,
+  header,
+  aside,
+  nav,
+  button,
+  .toolbar,
+  .navbar,
+  .tab-bar-container,
+  .drawer-side {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .factura-container {
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .factura-container * {
+    visibility: visible !important;
+  }
+
+  .qr-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .no-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

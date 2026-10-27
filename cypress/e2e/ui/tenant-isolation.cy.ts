@@ -37,6 +37,35 @@ beforeEach(function() {
             body: [{ id: 'branch-b', tenant_id: 'tenant-b-id', name: 'Sucursal B', is_active: true, modules_config: { repairs: true } }]
         });
 
+        const mockSession = {
+            access_token: 'fake-token-tenant-b',
+            expires_in: 3600,
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            refresh_token: 'fake-refresh',
+            token_type: 'bearer',
+            user: {
+                id: 'user-empresa-b',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'user@empresab.com',
+                user_metadata: { role: 'admin', tenant_id: 'tenant-b-id' }
+            }
+        };
+
+        cy.intercept('GET', '**/auth/v1/user', {
+            statusCode: 200,
+            body: mockSession.user
+        });
+
+        cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+            const wantsObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+            const prof = { id: 'user-empresa-b', role: 'admin', is_active: true, tenant_id: 'tenant-b-id', branch_id: 'branch-b' };
+            req.reply({
+                statusCode: 200,
+                body: wantsObject ? prof : [prof]
+            });
+        });
+
         cy.intercept('GET', '**/rest/v1/repairs*', (req) => {
             req.reply({
                 statusCode: 200,
@@ -46,23 +75,12 @@ beforeEach(function() {
 
         cy.visit('/admin/repairs', {
             onBeforeLoad: (win) => {
-                const mockSession = {
-                    access_token: 'fake-token-tenant-b',
-                    expires_in: 3600,
-                    expires_at: Math.floor(Date.now() / 1000) + 3600,
-                    refresh_token: 'fake-refresh',
-                    token_type: 'bearer',
-                    user: {
-                        id: 'user-empresa-b',
-                        aud: 'authenticated',
-                        role: 'authenticated',
-                        email: 'user@empresab.com',
-                        user_metadata: { role: 'admin', tenant_id: 'tenant-b-id' }
-                    }
-                };
                 win.localStorage.setItem('sb-db-auth-token', JSON.stringify(mockSession));
-                win.localStorage.setItem('arecofix_profile_user-empresa-b', JSON.stringify({ id: 'user-empresa-b', role: 'admin', is_active: true }));
+                win.localStorage.setItem('sb-db.arecofix.com.ar-auth-token', JSON.stringify(mockSession));
+                win.localStorage.setItem('cypress-test', 'true');
+                win.localStorage.setItem('arecofix_profile_user-empresa-b', JSON.stringify({ id: 'user-empresa-b', role: 'admin', is_active: true, tenant_id: 'tenant-b-id' }));
                 win.localStorage.setItem('arecofix_admin_branch_id', 'branch-b');
+                win.localStorage.setItem('arecofix_current_branch_id', 'branch-b');
             }
         });
 

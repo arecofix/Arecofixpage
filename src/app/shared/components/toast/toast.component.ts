@@ -85,6 +85,9 @@ import { ToastService, Toast } from '@app/shared/services/toast.service';
   changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `
+      :host {
+        display: block;
+      }
       @keyframes slideInDown {
         from {
           transform: translateY(-20px);

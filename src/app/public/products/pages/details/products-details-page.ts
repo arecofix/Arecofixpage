@@ -6,14 +6,15 @@ import {
   Injector,
   signal,
   DOCUMENT,
-  DestroyRef
+  DestroyRef,
+  PLATFORM_ID
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, switchMap, of } from 'rxjs';
+import { combineLatest, map, switchMap, of, take } from 'rxjs';
 import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Location, NgOptimizedImage, CommonModule, DecimalPipe } from '@angular/common';
+import { Location, NgOptimizedImage, CommonModule, DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { environment } from '@env/environment';
 /*  */
 import {
@@ -38,6 +39,7 @@ import { NotificationService } from '@app/core/services/notification.service';
 import { ProductStrategicService } from '@app/core/services/product-strategic.service';
 import { ShippingService, ShippingQuote } from '@app/features/orders/application/services/shipping.service';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 /*  */
 
 
@@ -51,7 +53,8 @@ import { GsmService } from '@app/public/gsm/services/gsm.service';
     FormsModule,
     RouterModule,
     BreadcrumbsComponent,
-    CommonModule
+    CommonModule,
+    FormatPricePipe,
   ],
   templateUrl: './products-details-page.html',
   styles: ``,
@@ -75,6 +78,7 @@ export class ProductsDetailsPage {
   private strategicService = inject(ProductStrategicService);
   private shippingService = inject(ShippingService);
   private gsmService = inject(GsmService);
+  private platformId = inject(PLATFORM_ID);
 
   // Exchange rate resource
   usdRate = rxResource({
@@ -181,7 +185,7 @@ export class ProductsDetailsPage {
               list.map(r => r.id === reviewId ? { ...r, helpful_count: (r.helpful_count || 0) + 1 } : r)
           );
           this.notificationService.showSuccess("¡Gracias! Marcaste esta opinión como útil.");
-      } catch (err: any) {
+      } catch (err: unknown) {
           console.error("Error marking review as helpful:", err);
           this.notificationService.showError("No se pudo registrar tu voto.");
       }
@@ -271,25 +275,6 @@ export class ProductsDetailsPage {
     // Retornar el primer producto encontrado (debería ser único por slug)
     const p = { ...data.data[0] };
     
-    // Fix relative Supabase storage URLs for images
-    if (p.image_url && !p.image_url.startsWith('http') && p.image_url !== '_' && p.image_url !== 'null' && !p.image_url.startsWith('assets/')) {
-        const encodedPath = p.image_url.split('/').map((s: string) => encodeURIComponent(s)).join('/');
-        p.image_url = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
-    }
-    if (p.og_image && !p.og_image.startsWith('http') && p.og_image !== '_' && p.og_image !== 'null' && !p.og_image.startsWith('assets/')) {
-        const encodedPath = p.og_image.split('/').map((s: string) => encodeURIComponent(s)).join('/');
-        p.og_image = `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
-    }
-    if (p.gallery_urls && p.gallery_urls.length > 0) {
-        p.gallery_urls = p.gallery_urls.map((img: string) => {
-            if (img && !img.startsWith('http') && img !== '_' && img !== 'null' && !img.startsWith('assets/')) {
-                const encodedPath = img.split('/').map((s: string) => encodeURIComponent(s)).join('/');
-                return `${environment.supabaseUrl}/storage/v1/object/public/public-assets/${encodedPath}`;
-            }
-            return img;
-        });
-    }
-
     const rate = this.usdRate.value() || 1240;
     if (p.currency === 'USD') {
       return {
@@ -372,16 +357,18 @@ export class ProductsDetailsPage {
   }
 
   constructor() {
-    toObservable(this.product, { injector: this.injector }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(product => {
-      if (!product) return;
+    if (isPlatformBrowser(this.platformId)) {
+      toObservable(this.product, { injector: this.injector }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(product => {
+        if (!product) return;
 
-      // Initialize selected image on first load
-      if (!this.selectedImage()) {
-        this.selectedImage.set(product.image_url || null);
-      }
+        // Initialize selected image on first load
+        if (!this.selectedImage()) {
+          this.selectedImage.set(product.image_url || null);
+        }
 
-      this.loadReviews(product.id);
-    });
+        this.loadReviews(product.id);
+      });
+    }
   }
 
   /**
@@ -432,6 +419,7 @@ export class ProductsDetailsPage {
    */
   categoryRs = rxResource({
     stream: () => toObservable(this.product, { injector: this.injector }).pipe(
+      take(1),
       switchMap(product => {
         if (!product?.category_id) return of(null);
         return combineLatest({
@@ -474,9 +462,12 @@ export class ProductsDetailsPage {
 
   addToCart() {
     const product = this.product();
-    if (product) {
-      this.cartService.addToCart(product);
+    if (!product) return;
+    if ((product.stock ?? 0) <= 0) {
+      this.notificationService.showError('El producto seleccionado no tiene stock disponible.');
+      return;
     }
+    this.cartService.addToCart(product);
   }
 
   shareProduct() {

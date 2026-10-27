@@ -1,0 +1,326 @@
+<div class="block-container w-full" [attr.data-block-type]="block.block_type">
+
+  <!-- 1. HERO BLOCK -->
+  @if (block.block_type === 'hero') {
+    <section class="relative overflow-hidden py-12 md:py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-950 text-white rounded-2xl shadow-xl my-6">
+      <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+           [class.text-center]="block.content['align'] === 'center'"
+           [class.md:text-left]="block.content['align'] === 'left'"
+           [class.md:text-right]="block.content['align'] === 'right'">
+        <div class="space-y-6">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
+            {{ block.content['title'] }}
+          </h1>
+          @if (block.content['subtitle']) {
+            <p class="text-lg sm:text-xl text-gray-300 font-normal leading-relaxed">
+              {{ block.content['subtitle'] }}
+            </p>
+          }
+          <div class="flex flex-wrap gap-4 pt-2"
+               [class.justify-center]="block.content['align'] === 'center'"
+               [class.justify-start]="block.content['align'] === 'left'"
+               [class.justify-end]="block.content['align'] === 'right'">
+            @if (block.content['ctaLabel'] || block.content['cta_primary_text']) {
+              <a [href]="block.content['ctaHref'] || block.content['cta_primary_url'] || '#contacto'"
+                 class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                <i class="fas fa-bolt"></i>
+                {{ block.content['ctaLabel'] || block.content['cta_primary_text'] }}
+              </a>
+            }
+            <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer"
+               class="px-6 py-3.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+              <i class="fab fa-whatsapp text-lg"></i>
+              Consultar por WhatsApp
+            </a>
+          </div>
+        </div>
+
+        @if (block.content['imageUrl']) {
+          <div class="flex justify-center items-center">
+            <img [src]="block.content['imageUrl']"
+                 [alt]="block.content['title'] || 'Servicio Arecofix'"
+                 loading="lazy"
+                 class="rounded-xl shadow-2xl max-h-96 w-full object-cover border border-gray-700 hover:scale-[1.02] transition-transform duration-300" />
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- 2. FEATURES BLOCK -->
+  @if (block.block_type === 'features') {
+    <section class="py-10 max-w-6xl mx-auto px-4 my-6">
+      @if (block.content['title']) {
+        <div class="text-center mb-8">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+            {{ block.content['title'] }}
+          </h2>
+          @if (block.content['subtitle']) {
+            <p class="text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
+              {{ block.content['subtitle'] }}
+            </p>
+          }
+        </div>
+      }
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (item of block.content['items']; track $index) {
+          <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl mb-4">
+              <i class="fas" [ngClass]="item.icon || 'fa-check-circle'"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ item.title }}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ item.description }}</p>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- 3. RICH TEXT BLOCK -->
+  @if (block.block_type === 'rich_text') {
+    <section class="py-6 max-w-4xl mx-auto px-4 prose dark:prose-invert">
+      <div [innerHTML]="sanitizedMarkdown"></div>
+    </section>
+  }
+
+  <!-- 4. GALLERY BLOCK -->
+  @if (block.block_type === 'gallery') {
+    <section class="py-10 max-w-6xl mx-auto px-4 my-6">
+      @if (block.content['title']) {
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-8">
+          {{ block.content['title'] }}
+        </h2>
+      }
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (img of block.content['images']; track $index) {
+          <figure class="overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <img [src]="img.url" [alt]="img.alt || 'Galería'" loading="lazy" class="w-full h-56 object-cover hover:scale-105 transition-transform duration-300" />
+            @if (img.caption) {
+              <figcaption class="p-3 text-xs text-center text-gray-600 dark:text-gray-400 font-medium">
+                {{ img.caption }}
+              </figcaption>
+            }
+          </figure>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- 5. CTA BLOCK -->
+  @if (block.block_type === 'cta') {
+    <section class="py-12 max-w-5xl mx-auto px-6 my-8 rounded-2xl shadow-xl text-center"
+             [class.bg-gradient-to-r]="true"
+             [class.from-indigo-600]="block.content['style'] === 'primary'"
+             [class.to-purple-700]="block.content['style'] === 'primary'"
+             [class.from-gray-800]="block.content['style'] === 'secondary'"
+             [class.to-gray-900]="block.content['style'] === 'secondary'"
+             [class.from-emerald-600]="block.content['style'] === 'whatsapp'"
+             [class.to-teal-700]="block.content['style'] === 'whatsapp'"
+             [class.text-white]="true">
+      <h2 class="text-3xl font-extrabold mb-3">{{ block.content['title'] }}</h2>
+      @if (block.content['subtitle']) {
+        <p class="text-lg opacity-90 max-w-2xl mx-auto mb-6">{{ block.content['subtitle'] }}</p>
+      }
+      <div class="flex flex-wrap justify-center gap-4">
+        @if (block.content['buttonLabel']) {
+          <a [href]="block.content['buttonHref'] || '#contacto'"
+             class="px-8 py-3.5 bg-white text-gray-900 hover:bg-gray-100 font-bold rounded-xl shadow-lg transition-transform hover:scale-105">
+            {{ block.content['buttonLabel'] }}
+          </a>
+        }
+        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer"
+           class="px-8 py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg transition-transform hover:scale-105 flex items-center gap-2">
+          <i class="fab fa-whatsapp text-lg"></i>
+          WhatsApp Directo
+        </a>
+      </div>
+    </section>
+  }
+
+  <!-- 6. FAQ BLOCK (Pure SSR Accessible Accordion) -->
+  @if (block.block_type === 'faq') {
+    <section class="py-10 max-w-4xl mx-auto px-4 my-6">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-8">
+        {{ block.content['title'] || 'Preguntas Frecuentes' }}
+      </h2>
+      <div class="space-y-4">
+        @for (item of block.content['items']; track $index) {
+          <details class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm transition-all [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-bold text-gray-900 dark:text-white text-base sm:text-lg focus:outline-none">
+              <span>{{ item.question }}</span>
+              <span class="transition group-open:rotate-180 text-emerald-500">
+                <i class="fas fa-chevron-down"></i>
+              </span>
+            </summary>
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+              {{ item.answer }}
+            </div>
+          </details>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- 7. TESTIMONIALS BLOCK -->
+  @if (block.block_type === 'testimonials') {
+    <section class="py-10 max-w-6xl mx-auto px-4 my-6">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-8">
+        {{ block.content['title'] || 'Lo que opinan nuestros clientes' }}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (item of block.content['items']; track $index) {
+          <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex text-amber-400 gap-1">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <i class="fas fa-star" [class.text-gray-300]="star > (item.rating || 5)"></i>
+                }
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 italic">"{{ item.text }}"</p>
+            </div>
+            <div class="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <div class="w-10 h-10 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-sm">
+                {{ item.author ? item.author.slice(0, 2).toUpperCase() : 'CF' }}
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-gray-900 dark:text-white">{{ item.author }}</h4>
+                <p class="text-xs text-gray-500">{{ item.role || 'Cliente verificado' }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- 8. CONTACT FORM BLOCK -->
+  @if (block.block_type === 'contact') {
+    <section id="contacto" class="py-12 max-w-3xl mx-auto px-6 my-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+          {{ block.content['title'] || 'Solicitar Presupuesto' }}
+        </h2>
+        @if (block.content['subtitle']) {
+          <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
+            {{ block.content['subtitle'] }}
+          </p>
+        }
+      </div>
+
+      @if (leadSuccess()) {
+        <div class="p-6 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-center space-y-3">
+          <i class="fas fa-check-circle text-4xl text-emerald-500"></i>
+          <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-200">¡Consulta enviada con éxito!</h3>
+          <p class="text-sm text-emerald-700 dark:text-emerald-300">
+            Gracias por comunicarte con Arecofix. Un técnico especialista se pondrá en contacto a la brevedad.
+          </p>
+        </div>
+      } @else {
+        <form (ngSubmit)="submitLeadForm()" class="space-y-4">
+          <!-- Honeypot oculto para atrapar bots -->
+          <input type="text" name="hp_field" [(ngModel)]="leadHoneypot" style="display:none;" tabindex="-1" autocomplete="off" />
+
+          @if (leadError()) {
+            <div class="p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-300 text-red-700 dark:text-red-300 text-sm">
+              <i class="fas fa-exclamation-triangle mr-2"></i>{{ leadError() }}
+            </div>
+          }
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre completo *</label>
+            <input type="text" [(ngModel)]="leadName" name="name" required
+                   class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500"
+                   placeholder="Ej: Martín Rodríguez" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">WhatsApp / Teléfono</label>
+              <input type="tel" [(ngModel)]="leadPhone" name="phone"
+                     class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500"
+                     placeholder="Ej: 11 2596 0900" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Correo electrónico</label>
+              <input type="email" [(ngModel)]="leadEmail" name="email"
+                     class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500"
+                     placeholder="Ej: martin@gmail.com" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Consulta o Detalle *</label>
+            <textarea [(ngModel)]="leadMessage" name="message" rows="4" required
+                      class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500"
+                      [placeholder]="block.content['messagePlaceholder'] || 'Describí brevemente qué necesitás...'"></textarea>
+          </div>
+
+          <button type="submit" [disabled]="leadSubmitting()"
+                  class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
+            @if (leadSubmitting()) {
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <span>Enviando consulta...</span>
+            } @else {
+              <i class="fas fa-paper-plane"></i>
+              <span>Enviar Consulta</span>
+            }
+          </button>
+        </form>
+      }
+    </section>
+  }
+
+  <!-- 9. MAP BLOCK -->
+  @if (block.block_type === 'map') {
+    <section class="py-8 max-w-5xl mx-auto px-4 my-6">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ block.content['title'] || 'Dónde Encontrarnos' }}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
+            <i class="fas fa-map-marker-alt text-emerald-500"></i>
+            {{ block.content['address'] || 'Jorge Newbery 69, Marcos Paz, Buenos Aires' }}
+          </p>
+        </div>
+        <div class="w-full h-72">
+          <iframe [src]="sanitizer.bypassSecurityTrustResourceUrl(block.content['embedUrl'] || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3278.4716766447844!2d-58.8205479234856!3d-34.76767577289808!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bc92c6e61a49c9%3A0x673418525e9e0f07!2sJorge%20Newbery%2069%2C%20Marcos%20Paz%2C%20Provincia%20de%20Buenos%20Aires!5e0!3m2!1ses-419!2sar!4v1714000000000!5m2!1ses-419!2sar')"
+                  width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- 10. SERVICE LIST BLOCK (Cross-selling) -->
+  @if (block.block_type === 'service_list') {
+    <section class="py-8 max-w-6xl mx-auto px-4 my-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ block.content['title'] || 'Otros Servicios' }}</h3>
+        <a routerLink="/servicios" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+          Ver todos los servicios <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (s of publicServices(); track s.id) {
+          <a [routerLink]="['/servicios', s.slug]"
+             class="group p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-emerald-500/50 transition-all flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition-transform">
+                <i class="fas fa-tools"></i>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 transition-colors">
+                {{ s.name }}
+              </h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                {{ s.short_description }}
+              </p>
+            </div>
+            <span class="mt-4 text-xs font-semibold text-emerald-600 flex items-center gap-1">
+              Más información <i class="fas fa-arrow-right text-[10px]"></i>
+            </span>
+          </a>
+        }
+      </div>
+    </section>
+  }
+
+</div>

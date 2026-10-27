@@ -4,6 +4,7 @@ import { roleGuard } from '@app/guards/role.guard';
 import { tenantStatusGuard } from '@app/guards/tenant-status.guard';
 import { moduleGuard } from '@app/guards/module.guard';
 import { tenantOwnerGuard } from '@app/guards/tenant-owner.guard';
+import { permissionGuard } from '@app/core/guards/permission.guard';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const adminRoutes: Routes = [
@@ -17,8 +18,13 @@ export const adminRoutes: Routes = [
       provideCharts(withDefaultRegisterables()),
     ],
     children: [
-        { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'sucursales', redirectTo: 'branches', pathMatch: 'full' },
+      { path: 'pedidos', redirectTo: 'orders', pathMatch: 'full' },
+      { path: 'settings', redirectTo: 'company', pathMatch: 'full' },
+      { path: 'identidad', redirectTo: 'company', pathMatch: 'full' },
+      { path: 'configuracion', redirectTo: 'company', pathMatch: 'full' },
+      { path: 'empresa', redirectTo: 'company', pathMatch: 'full' },
       // Note: /admin/suppliers is the dedicated supplier manager (ABM)
       // /admin/users has a 'suppliers' tab for a unified people view
       {
@@ -30,6 +36,12 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'products',
+        canActivate: [moduleGuard],
+        data: { module: 'inventory' },
+        loadChildren: () => import('@app/admin/products/admin-products.routes').then(m => m.ADMIN_PRODUCTS_ROUTES)
+      },
+      {
+        path: 'inventory',
         canActivate: [moduleGuard],
         data: { module: 'inventory' },
         loadChildren: () => import('@app/admin/products/admin-products.routes').then(m => m.ADMIN_PRODUCTS_ROUTES)
@@ -54,6 +66,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'company',
+        canActivate: [permissionGuard(['company.identity:edit:global', 'admin.panel:access:branch'])],
         loadChildren: () => import('@app/admin/company/admin-company.routes').then(m => m.ADMIN_COMPANY_ROUTES)
       },
       {
@@ -82,6 +95,11 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('@app/admin/courses/admin-courses.routes').then(m => m.ADMIN_COURSES_ROUTES)
       },
       {
+        path: 'academy',
+        redirectTo: 'courses/subscriptions',
+        pathMatch: 'prefix'
+      },
+      {
         path: 'orders',
         loadChildren: () => import('@app/admin/orders/admin-orders.routes').then(m => m.ADMIN_ORDERS_ROUTES)
       },
@@ -105,8 +123,17 @@ export const adminRoutes: Routes = [
         loadChildren: () => import('@app/admin/posts/admin-posts.routes').then(m => m.ADMIN_POSTS_ROUTES)
       },
       {
+        path: 'leads',
+        title: 'Prospectos de Servicios | Admin Arecofix',
+        loadComponent: () => import('@app/admin/leads/admin-leads-page').then(m => m.AdminLeadsPage)
+      },
+      {
         path: 'finance',
         loadChildren: () => import('@app/admin/finance/admin-finance.routes').then(m => m.ADMIN_FINANCE_ROUTES)
+      },
+      {
+        path: 'accounts',
+        loadChildren: () => import('@app/admin/accounts/admin-accounts.routes').then(m => m.ADMIN_ACCOUNTS_ROUTES)
       },
       {
         title: 'Base de Conocimiento IA',

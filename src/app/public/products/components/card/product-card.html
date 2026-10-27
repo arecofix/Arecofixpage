@@ -3,13 +3,14 @@
   <!-- Image Container -->
   <div class="relative aspect-4/3 overflow-hidden bg-gray-50/50 dark:bg-gray-700/30 p-4 flex items-center justify-center group-hover:bg-gray-100/50 dark:group-hover:bg-gray-700/50 transition-colors duration-500">
     <a [routerLink]="['/productos/detalle', product().slug]" class="absolute inset-0 block cursor-pointer">
-      @if (product().image_url || product().gallery_urls?.[0]) {
+      @if ((product().image_url || product().gallery_urls?.[0]) && !hasImageError()) {
       @if (isPriority()) {
         <img 
           [ngSrc]="product().image_url || product().gallery_urls?.[0] || ''" 
           [alt]="product().name"
           fill
           priority
+          (error)="onImageError()"
           class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-out p-4" 
         />
       } @else {
@@ -17,6 +18,7 @@
           [ngSrc]="product().image_url || product().gallery_urls?.[0] || ''" 
           [alt]="product().name"
           fill
+          (error)="onImageError()"
           class="object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-out p-4" 
         />
       }
@@ -99,39 +101,32 @@
                  Precio Web Autogestionado
               }
             </span>
-            <span class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tighter flex flex-col">
+            <span class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex flex-col">
               <span>
-                @if (!isLoggedIn() && isTechnicalCategory() && product().retail_price) {
-                   {{ product().retail_price | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
-                } @else {
-                   {{ product().price | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
-                }
+                {{ formattedMainPrice() }}
               </span>
-              @if (product().currency === 'USD' && product().convertedPrice) {
+              @if (formattedSecondaryPrice()) {
                 <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 flex items-center gap-1">
-                  <i class="fas fa-exchange-alt text-[9px]"></i> {{ (!isLoggedIn() && isTechnicalCategory() && product().retail_price ? product().retail_price! : product().price) * (product().convertedPrice! / product().price) | currency: 'ARS': 'symbol-narrow': '1.0-0': 'es-AR' }}
+                  {{ formattedSecondaryPrice() }}
                 </span>
               }
             </span>
           </div>
           
-          @if (isLoggedIn() && isTechnicalCategory() && product().retail_price && product().retail_price! > product().price) {
+          @if (formattedStrikethroughPrice()) {
             <div class="flex flex-col items-end mb-1">
               <span class="text-[10px] line-through text-gray-400">
-                {{ product().retail_price! | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
+                {{ formattedStrikethroughPrice() }}
               </span>
-              <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
-                -{{ ((1 - (product().price / product().retail_price!)) * 100).toFixed(0) }}% Gremio
-              </span>
-            </div>
-          } @else if (product().discount_percentage) {
-            <div class="flex flex-col items-end mb-1">
-              <span class="text-[10px] line-through text-gray-400">
-                {{ (product().price / (1 - (product().discount_percentage || 0)/100)) | currency: (product().currency || 'ARS'): 'symbol-narrow': (product().currency === 'ARS' ? '1.0-0' : '1.2-2'): 'es-AR' }}
-              </span>
-              <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
-                -{{ product().discount_percentage }}%
-              </span>
+              @if (isLoggedIn() && isTechnicalCategory() && product().retail_price && product().retail_price! > product().price) {
+                <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
+                  -{{ ((1 - (product().price / product().retail_price!)) * 100).toFixed(0) }}% Gremio
+                </span>
+              } @else if (product().discount_percentage) {
+                <span class="text-[10px] font-bold text-green-500 bg-green-50 dark:bg-green-900/20 px-1.5 rounded">
+                  -{{ product().discount_percentage }}%
+                </span>
+              }
             </div>
           }
         </div>
@@ -147,6 +142,7 @@
         <div class="flex flex-col gap-2">
           @if (isInStock()) {
               <button (click)="addToCart($event)" 
+                      data-cy="add-to-cart"
                       class="w-full btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-lg h-10 shadow-lg shadow-indigo-500/20 group/buy">
                 <i class="fas fa-cart-plus mr-2 group-hover/buy:scale-110 transition-transform"></i>
                 Añadir al Carrito

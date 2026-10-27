@@ -15,7 +15,10 @@ serve(async (req) => {
     const body = await req.json();
     const { orderId, items, shippingCost } = body;
 
-    const MP_ACCESS_TOKEN = Deno.env.get('MP_ACCESS_TOKEN') || 'APP_USR-8491686631401074-110201-8ea65d98ac8d5ed52e03deef65d84b77-374364423';
+    const MP_ACCESS_TOKEN = Deno.env.get('MP_ACCESS_TOKEN');
+    if (!MP_ACCESS_TOKEN) {
+      throw new Error('MP_ACCESS_TOKEN environment variable is not configured');
+    }
 
     // Map each item from the cart
     const mpItems = items.map((item: any) => ({
