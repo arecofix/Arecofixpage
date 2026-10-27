@@ -1,0 +1,146 @@
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.21.0                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v24.18.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          3 found (cart-integrity.cy.ts, seo-validation.cy.ts, failover.cy.ts)           │
+  │ Searched:       C:\git\Arecofixpage\cypress\e2e\ui\cart-integrity.cy.ts, C:\git\Arecofixpage\c │
+  │                 ypress\e2e\ui\seo-validation.cy.ts, C:\git\Arecofixpage\cypress\e2e\ui\failove │
+  │                 r.cy.ts                                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Remove output folder C:\git\Arecofixpage\cypress\reports
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  cart-integrity.cy.ts                                                            (1 of 3)
+
+
+  Carrito de Compras e Integridad de Datos (E2E)
+    √ debería calcular el subtotal correctamente y permitir vaciar el carrito (QA #26-36) (6508ms)
+    √ debería rechazar un cupón inválido o expirado (QA #38)
+
+
+  2 passing (8s)
+
+[mochawesome] Report JSON saved to C:\git\Arecofixpage\cypress\reports\.jsons\mochawesome.json
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        2                                                                                │
+  │ Passing:      2                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     8 seconds                                                                        │
+  │ Spec Ran:     cart-integrity.cy.ts                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: C:\git\Arecofixpage\cypress\videos\cart-integrity.cy.ts (4).mp4
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seo-validation.cy.ts                                                            (2 of 3)
+
+
+  SEO Meta Tags & Full Validation
+    √ Verifica el SEO de la página de Inicio (Genérico)
+    √ Verifica el SEO de la Landing de Celulares (Específico)
+    √ Verifica el SEO de Cursos Dinámicos (Curso de Barbería)
+    √ Verifica el SEO de Cursos Dinámicos (Reparación de Notebooks y PC)
+    √ Verifica el SEO de un Producto Dinámico (Usando Fallback)
+    √ Verifica el SEO de la ruta Tracking Dinámica (AF-155)
+    √ Debería retornar las etiquetas Open Graph dinámicas desde el servidor (SSR/Prerender)
+
+
+  7 passing (9s)
+
+[mochawesome] Report JSON saved to C:\git\Arecofixpage\cypress\reports\.jsons\mochawesome_001.json
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        7                                                                                │
+  │ Passing:      7                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     8 seconds                                                                        │
+  │ Spec Ran:     seo-validation.cy.ts                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: C:\git\Arecofixpage\cypress\videos\seo-validation.cy.ts (5).mp4
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  failover.cy.ts                                                                  (3 of 3)
+
+
+  Failover Resiliency (Supabase 402 to D1)
+    √ debería cargar la página principal usando D1 cuando Supabase falla por cuota (402)
+
+
+  1 passing (2s)
+
+[mochawesome] Report JSON saved to C:\git\Arecofixpage\cypress\reports\.jsons\mochawesome_002.json
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      1                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     1 second                                                                         │
+  │ Spec Ran:     failover.cy.ts                                                                   │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: C:\git\Arecofixpage\cypress\videos\failover.cy.ts (3).mp4
+
+Start generate report process
+Read and merge jsons from "C:\git\Arecofixpage\cypress\reports\.jsons"
+Copy media folder from "C:\git\Arecofixpage\cypress\videos" to "C:\git\Arecofixpage\cypress\reports\videos"
+Enhance report
+Create HTML report
+HTML report successfully created!
+C:\git\Arecofixpage\cypress\reports\index.html
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ √  cart-integrity.cy.ts                     00:08        2        2        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ √  seo-validation.cy.ts                     00:08        7        7        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ √  failover.cy.ts                           00:01        1        1        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    √  All specs passed!                        00:19       10       10        -        -        -  

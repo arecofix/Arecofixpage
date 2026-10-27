@@ -1,0 +1,153 @@
+_format_version: '2.1'
+services:
+- name: postgrest
+  url: http://supabase-rest:3000
+  routes:
+  - name: rest-route
+    paths:
+    - /rest/v1
+  plugins:
+  - name: cors
+    config:
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      methods:
+      - GET
+      - HEAD
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+      - OPTIONS
+      headers:
+      - Accept
+      - Content-Type
+      - Authorization
+      - apikey
+      - Prefer
+      - X-Client-ID
+      - X-Auth-Token
+      - x-client-info
+      - X-Client-Info
+      - accept-profile
+      - Accept-Profile
+      - content-profile
+      - Content-Profile
+      - x-retry-count
+      - x-supabase-api-version
+      - x-guest-session
+      exposed_headers:
+      - Content-Range
+      - X-Total-Count
+      credentials: true
+      max_age: 86400
+- name: auth
+  url: http://supabase-auth:9999
+  routes:
+  - name: auth-route
+    paths:
+    - /auth/v1
+  plugins:
+  - name: cors
+    config:
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      methods:
+      - GET
+      - HEAD
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+      - OPTIONS
+      headers:
+      - Accept
+      - Content-Type
+      - Authorization
+      - apikey
+      - Prefer
+      - X-Client-ID
+      - X-Auth-Token
+      - x-client-info
+      - X-Client-Info
+      - accept-profile
+      - Accept-Profile
+      - content-profile
+      - Content-Profile
+      - x-retry-count
+      - x-supabase-api-version
+      exposed_headers:
+      - X-Auth-Token
+      - X-Request-ID
+      - X-Response-Time
+      credentials: true
+      max_age: 86400
+- name: realtime
+  url: http://supabase-realtime:4000/socket
+  routes:
+  - name: realtime-route
+    paths:
+    - /realtime/v1
+    strip_path: true
+  plugins:
+  - name: cors
+    config:
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      methods:
+      - GET
+      - HEAD
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+      - OPTIONS
+      headers:
+      - Accept
+      - Content-Type
+      - Authorization
+      - apikey
+      - Prefer
+      - X-Client-ID
+      - X-Auth-Token
+      - x-client-info
+      - X-Client-Info
+      - accept-profile
+      - Accept-Profile
+      - content-profile
+      - Content-Profile
+      - x-retry-count
+      - x-supabase-api-version
+      exposed_headers:
+      - Content-Range
+      - X-Total-Count
+      credentials: true
+      max_age: 86400
+- name: studio
+  url: http://supabase-studio:3000
+  routes:
+  - name: studio-route
+    hosts:
+    - studio.arecofix.com.ar
+    paths:
+    - /
+upstreams:
+- name: postgrest-upstream
+  targets:
+  - target: supabase-rest:3000
+    weight: 100
+- name: auth-upstream
+  targets:
+  - target: supabase-auth:9999
+    weight: 100
+- name: realtime-upstream
+  targets:
+  - target: supabase-realtime:4000
+    weight: 100
+- name: studio-upstream
+  targets:
+  - target: supabase-studio:3000
+    weight: 100

@@ -1,0 +1,26 @@
+schemaname,tablename,policyname,roles,cmd,qual,with_check
+storage,objects,Admin Delete,{public},DELETE,((bucket_id = 'repair-images'::text) AND (auth.role() = 'authenticated'::text)),
+storage,objects,Admin Insert,{public},INSERT,,((bucket_id = 'repair-images'::text) AND (auth.role() = 'authenticated'::text))
+storage,objects,Admin Update,{public},UPDATE,((bucket_id = 'repair-images'::text) AND (auth.role() = 'authenticated'::text)),
+storage,objects,Admins_Read_All_Receipts,{public},SELECT,((bucket_id = 'receipts'::text) AND is_admin()),
+storage,objects,Anyone can upload an avatar.,{public},INSERT,,(bucket_id = 'avatars'::text)
+storage,objects,Autenticados suben evidencia,{authenticated},INSERT,,(bucket_id = 'repair_evidence'::text)
+storage,objects,Autenticados suben facturas,{authenticated},INSERT,,(bucket_id = 'invoices_pdf'::text)
+storage,objects,Autenticados ven facturas,{authenticated},SELECT,(bucket_id = 'invoices_pdf'::text),
+storage,objects,Autenticados ven su evidencia,{authenticated},SELECT,(bucket_id = 'repair_evidence'::text),
+storage,objects,Authenticated Delete,{authenticated},DELETE,(bucket_id = 'public-assets'::text),
+storage,objects,Authenticated Update,{authenticated},UPDATE,(bucket_id = 'public-assets'::text),
+storage,objects,Authenticated Updates,{authenticated},UPDATE,(bucket_id = 'academy_certificates'::text),
+storage,objects,Authenticated Upload,{authenticated},INSERT,,(bucket_id = 'public-assets'::text)
+storage,objects,Authenticated Uploads,{authenticated},INSERT,,(bucket_id = 'academy_certificates'::text)
+storage,objects,Authenticated can upload avatars,{public},INSERT,,((bucket_id = 'avatars'::text) AND (auth.role() = 'authenticated'::text))
+storage,objects,Authenticated can upload evidence,{public},INSERT,,((bucket_id = 'evidence'::text) AND (auth.role() = 'authenticated'::text))
+storage,objects,Avatar images are publicly accessible.,{public},SELECT,(bucket_id = 'avatars'::text),
+storage,objects,Lectura Publica CVs,{public},SELECT,(bucket_id = 'cv-generados'::text),
+storage,objects,Permitir a invitados subir comprobantes,{anon},INSERT,,((bucket_id = 'public-assets'::text) AND (name ~~ '%/payment-proofs/%'::text))
+storage,objects,Public Access,{public},SELECT,(bucket_id = 'academy_certificates'::text),
+storage,objects,Public can read avatars,{public},SELECT,(bucket_id = 'avatars'::text),
+storage,objects,Public can read evidence,{public},SELECT,(bucket_id = 'evidence'::text),
+storage,objects,Public_Read_Covers,{public},SELECT,(bucket_id = 'course-covers'::text),
+storage,objects,Student_Insert_Receipt,{public},INSERT,,((bucket_id = 'receipts'::text) AND (auth.uid() = owner))
+storage,objects,Student_Read_Own_Receipt,{public},SELECT,((bucket_id = 'receipts'::text) AND (auth.uid() = owner)),

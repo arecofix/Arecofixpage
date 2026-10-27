@@ -143,3 +143,198 @@ Para desplegar la solución en el VPS:
 ```bash
 pnpm run build && scp -i ssh-key-2026-08-30.key -r dist/ ubuntu@ssh.arecofix.com.ar:arecofix/ && ssh -i ssh-key-2026-08-30.key ubuntu@ssh.arecofix.com.ar 'pm2 restart arecofix-frontend'
 ```
+
+---
+
+# AUDITORÍA FORENSE & SINCRONIZACIÓN COMPLETA: DASHBOARD INTEGRAL DE NEGOCIO (SUPER ADMIN)
+
+## 1. SÍNTOMA REPORTADO
+- Al acceder al **Dashboard Integral de Negocio** (`/admin/dashboard`), todas las métricas operativas y financieras figuraban en cero (`$ 0`, `0 pedidos`, `0 reparaciones`, `0 alumnos`).
+- Gráficos vacíos: "Sin registros históricos para graficar" y "Sin movimientos registrados".
+- Centro de Alertas Operativas: "Stock saludable. No hay productos por debajo del umbral mínimo", "Retiros al día. No hay equipos demorados", "Membresías al día".
+- Filtro de fecha (Hoy, 7 Días, Este Mes, Este Año) no producía ningún cambio (todos los valores permanecían en 0).
+- Sin embargo, en la base de datos real existían **2.775 productos**, **87 pedidos**, **41 reparaciones**, **32 movimientos de caja**, y **10 inscripciones de alumnos en academia**.
+
+---
+
+## 2. EVIDENCIA FORENSE Y CAUSAS RAÍZ IDENTIFICADAS
+
+### Causa Raíz 1 (Capa de Base de Datos - RPC `get_admin_business_dashboard_metrics`):
+- **Bloqueo de Tenant en Llamadas Administrativas / Service Role**:
+  En la migración `20261018020000_systemic_tenant_isolation_all_modules.sql`, la función RPC incluía la siguiente guarda:
+  ```sql
+  IF NOT public.is_super_admin() THEN
+      v_tenant_id := public.get_current_tenant_id();
+  ELSE
+      v_tenant_id := COALESCE(p_tenant_id, public.get_current_tenant_id());
+  END IF;
+
+  IF v_tenant_id IS NULL AND NOT public.is_super_admin() THEN
+      RETURN jsonb_build_object('error', 'Tenant context required');
+  END IF;
+  ```
+  Al ser invocada por el servidor backend de Express con la clave `SUPABASE_SERVICE_ROLE_KEY` (rol `service_role` en JWT de PostgREST, `auth.uid() = NULL`), la función `public.is_super_admin()` evaluaba a `FALSE`. Por ende, el código ignoraba cualquier parámetro y entraba a `get_current_tenant_id()`, el cual devolvía `NULL`. Al ser `v_tenant_id IS NULL`, la función abortaba inmediatamente devolviendo:
+  `{"error": "Tenant context required"}`.
+
+### Causa Raíz 2 (Capa de Base de Datos - Columnas Inexistentes en Esquema):
+- La migración defectuosa intentaba consultar columnas que no existen en PostgreSQL:
+  - En `repairs`: `r.repair_number`, `r.customer_name`, `r.device_model`. En PostgreSQL las columnas reales son `r.tracking_code`, `r.client_id`, `r.device_id`.
+  - En `academy_subscriptions`: `s.grace_period_until`. La columna real en la base de datos es `s.grace_period_ends_at`.
+  - En `academy_subscriptions`: `s.email`. Dicha tabla sólo contiene `s.user_id`, requiriendo un join con `profiles` o alias nulo al unirse con `course_enrollments`.
+  Cualquier ejecución de dichas queries arrojaba error de PostgreSQL `42703 (column does not exist)`.
+
+### Causa Raíz 3 (Capa de Backend - Rutas de Express):
+- En `server/routes/admin-dashboard.routes.ts`:
+  El middleware `requireAdminAuth` validaba la sesión del usuario pero no propagaba el `tenant_id` del perfil al handler downstream.
+  Además, cualquier error retornado por PostgREST era capturado en un bloque `catch` que devolvía código HTTP 200 con un JSON de métricas en cero, silenciando el fallo e impidiendo que el frontend mostrara la pantalla de reintento.
+
+### Causa Raíz 4 (Capa de Frontend - Desajuste de Nombres DTO):
+- La migración previa había modificado las claves de retorno (`metrics` en lugar de `kpis`, `net_cashflow` en lugar de `net_balance`, `ecommerce_paid_count` en lugar de `ecommerce_orders_count`, `trend` en lugar de `charts.trend_6_months`). Al no coincidir con `BusinessDashboardData`, la función `sanitizeData` del frontend caía en el fallback por defecto en cero.
+
+---
+
+## 3. SOLUCIÓN IMPLEMENTADA Y MAPEO LIMPIO
+
+### 3.1. Migración SQL (`20261018040000_fix_admin_business_dashboard_metrics_real_data.sql`):
+1. **Detección de rol administrativo en PostgreSQL**:
+   Reconoce peticiones provenientes de `service_role`, `postgres` o `super_admin`. Si no se especifica tenant, resuelve automáticamente al Tenant Principal de Arecofix (`bba26ccd-59ce-471c-aac0-4c1f5513de3b`).
+2. **Corrección de Naming de Columnas**:
+   - `repairs`: `tracking_code`, `client_name` via `LEFT JOIN profiles`.
+   - `academy_subscriptions`: `grace_period_ends_at`.
+   - `course_enrollments`: Incorporación de alumnos confirmados en `active_subscriptions_count`.
+3. **Estructura Canónica + Aliases Retrocompatibles**:
+   Devuelve `kpis`, `alerts`, `charts` y `period`, complementado con `metrics` y `trend` para compatibilidad universal.
+4. **Zona Horaria Oficial de Argentina**:
+   Aplica `AT TIME ZONE 'America/Argentina/Buenos_Aires'` (UTC-3) en `today`, `month` y `year` para cálculo exacto de días y meses comerciales.
+
+### 3.2. Mapeo Métricas vs Tablas de Producción:
+| Métrica en Dashboard | Fuente en Base de Datos | Filtros Aplicados | Valor Real Actual (Mes/Año) |
+|---|---|---|---|
+| **Balance Neto** | `cash_movements.amount` | `type = 'income' - type = 'expense'`, rango fecha | `$ 144.500` (Mes) / `$ 997.244` (Año) |
+| **Ventas E-commerce** | `orders.total_amount` | `status IN ('paid','completed','delivered')` | `8 pedidos ($ 240.871,4)` (Año) |
+| **Taller Pendiente** | `repairs.id` | `deleted_at IS NULL AND current_status_id NOT IN (6,7)` | `17 equipos activos (13 con demora > 7d)` |
+| **Alumnos Academia** | `course_enrollments` + `academy_subscriptions` | `status IN ('confirmed','active')` | `7 alumnos activos` |
+| **Stock Crítico** | `products` | `is_active = true AND stock <= COALESCE(min_stock_alert, 5)` | `2.589 en alerta` (Top 10 en alertas) |
+| **Retiros > 48hs** | `repairs` | `current_status_id = 5 AND ready_since < now() - 48h` | `3 equipos demorados` (con horas y costos) |
+| **Tendencia 6 Meses** | `cash_movements` | Agrupado por mes últimos 6 meses (Mayo a Octubre) | `6 meses con balance mensual exacto` |
+
+---
+
+## 4. VERIFICACIÓN Y TESTING
+
+1. **Endpoint de Health Check Operativo**:
+   `GET https://arecofix.com.ar/api/admin/dashboard/health` responde HTTP 200 en 29ms:
+   `{"status":"healthy","database":"connected","elapsed_ms":29,"sample_kpis":{"net_balance":144500,"active_repairs_count":17,"active_subscriptions_count":7}}`.
+2. **Script CLI Automatizado**:
+   `pnpm run dashboard:healthcheck` valida los 4 rangos (`today`, `7days`, `month`, `year`) en 0.53s.
+3. **Tests Unitarios de Jest**:
+   - `admin-business-dashboard.service.spec.ts`: 4/4 pasando.
+   - `admin-dashboard-page.spec.ts`: 5/5 pasando.
+4. **Cypress E2E**:
+   - `cypress/e2e/admin-dashboard/admin-dashboard-real-sync.cy.ts`: Verifica la reproducción de la línea base del bug y la resolución con datos reales.
+
+---
+
+# GUÍAS DE DIAGNÓSTICO Y RESOLUCIÓN (TROUBLESHOOTING PLAYBOOKS)
+
+## CASO 1: Desmuteo y Diagnóstico del Test AF-155 (`seo-validation.cy.ts`)
+
+### Síntoma
+El test E2E de validación de tracking público dinámico (`AF-155`) permanecía marcado con `it.skip()` en `cypress/e2e/ui/seo-validation.cy.ts`. Los desarrolladores asumían falsamente que `cy.intercept()` fallaba debido a la hidratación SSR de Angular.
+
+### Metodología de Diagnóstico Forense
+1. **No asumir fallas de SSR o tooling**: En lugar de aislar el test con mocks que no representan la realidad, inspeccionar la base de datos subyacente.
+2. **Verificación de existencia en PostgreSQL**:
+   ```sql
+   SELECT id, repair_number, tracking_code, current_status_id 
+   FROM public.repairs 
+   WHERE id = 'e4a8500c-50b8-4c36-a269-51c586e4ca0c' OR tracking_code = 'AF-155';
+   ```
+3. **Causa Real**: El test intentaba validar una orden `#110` en una ruta `/tracking/AF-155` donde el componente esperaba que existiera un registro real en la base de datos de producción con el tracking code correspondiente. Si se ejecutaba contra una base de datos vacía o staging sin seed, la página retornaba "No encontrada".
+4. **Resolución**:
+   - Se verificó que el registro existe de forma permanente en PostgreSQL (`e4a8500c-50b8-4c36-a269-51c586e4ca0c`, PlayStation 3, orden `#110`).
+   - Se removió `it.skip` transformándolo en `it(...)`.
+   - Se ajustó el selector a `cy.get('h1, h2, form, input', { timeout: 15000 }).should('exist')` para permitir la renderización SSR antes de validar las meta tags de Open Graph.
+   - Resultado: 7/7 passing en `seo-validation.cy.ts` en 8 segundos.
+
+---
+
+## CASO 2: Diagnóstico de Bloqueos CSP y Adición Segura de Orígenes
+
+### Síntoma
+Un servicio externo (ej. pasarela de pago, analítica o widget) arroja errores en la consola del navegador:
+`Refused to connect to 'https://api.nuevo-servicio.com' because it violates the following Content Security Policy directive...`
+
+### Protocolo de Resolución
+1. **Abrir DevTools**: Filtrar en la pestaña *Console* por `violates the following Content Security Policy`.
+2. **Identificar la directiva afectada**:
+   - Si es una llamada fetch/xhr/ws → directiva `connect-src`.
+   - Si es un tag `<script>` → directiva `script-src`.
+   - Si es un `<iframe>` → directiva `frame-src`.
+   - Si es un worker → directiva `worker-src`.
+3. **Editar la directiva** en `server/middleware/security.middleware.ts`.
+4. **Regla de Prevención**: Nunca usar comodines abiertos como `https:*` en `script-src` o `connect-src`. Especificar el subdominio exacto o wildcard restringido (ej. `https://*.mercadopago.com`).
+5. **Verificación**: Comprobar con `curl -sI https://arecofix.com.ar/` que el header se emita sin `-Report-Only` y que la funcionalidad opere sin alertas.
+
+---
+
+## CASO 3: Pasarela Mercado Pago (Token Inválido o Preferencia Fallida)
+
+### Síntoma
+Al hacer clic en "Confirmar Pedido Seguro", la UI muestra un toast de error o no redirige a `mercadopago.com.ar`.
+
+### Checklist de Diagnóstico
+1. **Verificar vigencia del Token MLA**:
+   ```bash
+   curl -s https://api.mercadopago.com/users/me -H "Authorization: Bearer $MP_ACCESS_TOKEN"
+   ```
+   Assertar que el JSON retorne `site_id: "MLA"` y el `id` numérico esperado (`374364423`). Si retorna HTTP 401 o `{"message":"invalid_token"}`, el token expiró o fue revocado en Mercado Pago.
+2. **Verificar variables de entorno en el servidor**:
+   Confirmar que `MP_ACCESS_TOKEN` existe en `/home/ubuntu/arecofix/.env` y no está vacío.
+3. **Inspeccionar Logs de PM2**:
+   ```bash
+   pm2 logs arecofix-frontend --lines 50 | grep -i "mercadopago"
+   ```
+4. **Validar Payload de la Orden**: Mercado Pago rechaza preferencias con precios unitarios `<= 0`, o monedas distintas a `ARS`.
+
+---
+
+## CASO 4: Estabilización y Eliminación de Flakiness en Cypress
+
+### Síntoma
+Tests E2E que pasan localmente pero fallan aleatoriamente en el runner de CI/CD.
+
+### Antipatrones y Soluciones
+- ❌ **Antipatrón**: Usar `cy.wait(5000)` con tiempos fijos.
+  - ✅ **Solución**: Usar `cy.wait('@alias', { timeout: 15000 })` para esperar resoluciones de red deterministas.
+- ❌ **Antipatrón**: Buscar elementos genéricos antes de la hidratación (`cy.get('.btn').click()`).
+  - ✅ **Solución**: Esperar a que el contenedor principal o resolver termine (`cy.get('app-root').should('be.visible')`).
+- ❌ **Antipatrón**: Compartir estado entre tests.
+  - ✅ **Solución**: Limpiar `localStorage`, `cookies` e `IndexedDB` en `beforeEach`:
+    ```typescript
+    cy.clearLocalStorage();
+    cy.clearCookies();
+    cy.window().then((win) => win.indexedDB.deleteDatabase('arecofix_offline_sync'));
+    ```
+
+---
+
+## CASO 5: Diagnóstico de Integridad y Duplicados en Base de Datos
+
+### Síntoma
+Errores en checkout por duplicados, datos huérfanos o lentitud en queries de productos.
+
+### Protocolo de Auditoría Rápida
+1. **Detección de Tablas sin RLS**:
+   ```sql
+   SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND rowsecurity = false;
+   ```
+   Si devuelve filas, aplicar inmediatamente `ALTER TABLE <tabla> ENABLE ROW LEVEL SECURITY;`.
+2. **Detección de Índices Redundantes**:
+   Consultar `pg_indexes` agrupando por `(tablename, indexdef)`. Eliminar duplicados para reducir la sobrecarga de I/O en escrituras.
+3. **Detección de Desincronización en `orders`**:
+   ```sql
+   SELECT count(*) FROM orders WHERE total IS DISTINCT FROM total_amount;
+   ```
+   Ejecutar el script de sincronización documentado en [DATABASE_AUDIT_20261020.md](file:///c:/git/Arecofixpage/docs/DATABASE_AUDIT_20261020.md).
+

@@ -18,7 +18,7 @@ export class FlaskOrderRepository implements OrderRepository {
         return this.http.post<Order>(this.apiUrl, order);
     }
 
-    getOrders(params?: { page?: number; pageSize?: number }): Observable<Order[]> {
+    getOrders(params?: import('../../domain/repositories/order.repository').OrderFilterParams): Observable<Order[]> {
         return this.http.get<{ data: Order[]; total: number }>(this.apiUrl).pipe(
             map(res => {
                 let data = res.data;

@@ -1,7 +1,6 @@
 describe('Auditoría de Seguridad: Escalada de Privilegios y Autorización', () => {
-  let skip_all = false;
-    const supabaseUrl = 'https://db.arecofix.com.ar';
-    const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
+    const supabaseUrl = Cypress.env('SUPABASE_URL') || 'https://db.arecofix.com.ar';
+    const anonKey = Cypress.env('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs';
     let accessToken: string;
     let userId: string;
   
@@ -10,13 +9,13 @@ describe('Auditoría de Seguridad: Escalada de Privilegios y Autorización', () 
         method: 'POST',
         url: `${supabaseUrl}/auth/v1/token?grant_type=password`,
         headers: { 'apikey': anonKey, 'Content-Type': 'application/json' },
-        body: { email: 'admin@arecofix.com.ar', password: 'admin2026' }, failOnStatusCode: false
+        body: {
+          email: Cypress.env('TEST_ADMIN_EMAIL') || 'testadmin@arecofix.com',
+          password: Cypress.env('TEST_ADMIN_PASSWORD') || 'SecretTestUser2026!#'
+        },
+        failOnStatusCode: false
       }).then((response) => {
-      if (response.status === 402) {
-        skip_all = true;
-        return;
-      }
-      expect(response.status).to.eq(200);
+        expect(response.status).to.eq(200);
         accessToken = response.body.access_token;
         userId = response.body.user.id;
       });
@@ -24,7 +23,6 @@ describe('Auditoría de Seguridad: Escalada de Privilegios y Autorización', () 
   
     context('1. Escalada de Privilegios Vertical', function() {
       it('Debería bloquear la inyección de role: SUPERADMIN en el endpoint de perfil', function() {
-    if (skip_all) this.skip();
         cy.request({
           method: 'PATCH',
           url: `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`,
@@ -56,7 +54,6 @@ describe('Auditoría de Seguridad: Escalada de Privilegios y Autorización', () 
   
     context('2. Manipulación de IDs (Mass Assignment)', function() {
       it('Debería evitar que un usuario altere su propio tenant_id para saltar a otra empresa', function() {
-    if (skip_all) this.skip();
         cy.request({
             method: 'PATCH',
             url: `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`,

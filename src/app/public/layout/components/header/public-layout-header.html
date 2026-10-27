@@ -691,7 +691,7 @@
                   </div>
                 } @else {
                   <ul class="space-y-4">
-                    @for (item of cartService.cartItems(); track item.product.id) {
+                    @for (item of cartService.cartItems(); track item.cartItemId) {
                       <li class="flex gap-3 pb-4 border-b border-gray-100 dark:border-white/5 last:border-none">
                         <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-gray-100 dark:border-white/10">
                           <img [src]="item.product.image_url || '/assets/img/no-image.svg'"
@@ -703,13 +703,39 @@
                                     transition-colors">
                             {{ item.product.name }}
                           </a>
-                          <div class="flex items-center justify-between mt-1.5">
-                            <span class="text-sm font-bold text-blue-600 dark:text-blue-400">
-                              {{ item.product.currency === 'USD' ? 'USD ' : '$' }}{{ item.product.price | number:'1.0-0' }} × {{ item.quantity }}
-                            </span>
-                            <button (click)="cartService.removeFromCart(item.product.id)"
-                                    class="text-xs text-red-500 hover:text-red-400 font-medium transition-colors">
-                              Eliminar
+                          <div class="flex items-center justify-between mt-1.5 gap-2">
+                            <div class="flex flex-col">
+                              <span class="text-sm font-bold text-blue-600 dark:text-blue-400">
+                                {{ item.product.price | formatPrice:item.product.currency }}
+                              </span>
+                              @if (item.product.currency === 'USD' && item.product.convertedPrice) {
+                                <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                                  {{ item.product.convertedPrice | formatPrice:'ARS':{ prefix: '⇄ ' } }}
+                                </span>
+                              }
+                            </div>
+                            
+                            <!-- Quantity Controls -->
+                            <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
+                              <button type="button"
+                                      (click)="cartService.updateQuantity(item.cartItemId, item.quantity - 1)"
+                                      data-cy="cart-decrease-qty"
+                                      class="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors text-xs font-bold cursor-pointer">
+                                -
+                              </button>
+                              <span class="px-2 text-xs font-bold text-gray-800 dark:text-gray-200" data-cy="cart-item-qty">{{ item.quantity }}</span>
+                              <button type="button"
+                                      (click)="cartService.updateQuantity(item.cartItemId, item.quantity + 1)"
+                                      data-cy="cart-increase-qty"
+                                      class="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors text-xs font-bold cursor-pointer">
+                                +
+                              </button>
+                            </div>
+
+                            <button (click)="cartService.removeFromCart(item.cartItemId)"
+                                    data-cy="cart-remove-item"
+                                    class="text-xs text-red-500 hover:text-red-400 font-medium transition-colors flex items-center gap-1 cursor-pointer">
+                              <i class="fas fa-trash-alt text-[10px]"></i> Eliminar
                             </button>
                           </div>
                         </div>
@@ -724,7 +750,7 @@
                 <div class="border-t border-gray-100 dark:border-white/5 px-5 py-4 shrink-0">
                   <div class="flex justify-between text-base font-bold text-gray-900 dark:text-white mb-3">
                     <span>Subtotal</span>
-                    <span>{{ cartService.totalPrice() | currency }}</span>
+                    <span data-cy="cart-subtotal">{{ cartService.totalPrice() | formatPrice:'ARS' }}</span>
                   </div>
                   <a (click)="toggleCart()" routerLink="/checkout"
                      class="btn btn-primary w-full rounded-xl font-medium mb-2">

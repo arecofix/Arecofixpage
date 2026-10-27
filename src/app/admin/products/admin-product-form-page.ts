@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, signal, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy, signal, computed, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -6,10 +6,14 @@ import { AdminProductService } from './services/admin-product.service';
 import { ProductImagesManagerComponent } from './components/product-images-manager/product-images-manager.component';
 import { NotificationService } from '@app/core/services/notification.service';
 import { Brand } from '@app/features/products/domain/entities/brand.entity';
+import { Product, ProductVariant } from '@app/features/products/domain/entities/product.entity';
 import { Category } from '@app/features/products/domain/entities/category.entity';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { AdminLayout } from '@app/admin/layout/admin-layout';
 import { BranchContextService } from '@app/core/services/branch-context.service';
+import { validateProductData } from '@app/features/products/domain/schemas/product.schema';
+import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { formatPrice } from '@app/shared/utils/price-formatter.util';
 
 @Component({
   selector: 'app-admin-product-form-page',
@@ -26,8 +30,63 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private adminLayout = inject(AdminLayout, { optional: true });
   private branchContextService = inject(BranchContextService);
+  private gsmService = inject(GsmService);
 
   id: string | null = null;
+  
+  // Cotización y estado de validación de moneda
+  exchangeRate = signal<number>(1240);
+  priceValidationError = signal<string | null>(null);
+
+  previewMainPrice = computed(() => {
+    const price = Number(this.formVal.price);
+    return formatPrice(price, this.formVal.currency);
+  });
+
+  previewConvertedPrice = computed(() => {
+    const price = Number(this.formVal.price);
+    const rate = this.exchangeRate();
+
+    if (!price || price <= 0 || !rate) return null;
+
+    if (this.formVal.currency === 'USD') {
+      const converted = price * rate;
+      return formatPrice(converted, 'ARS', { prefix: '⇄ ' });
+    } else {
+      const converted = price / rate;
+      return formatPrice(converted, 'USD', { prefix: '⇄ ' });
+    }
+  });
+
+  setCurrency(curr: 'ARS' | 'USD') {
+    this.formVal.currency = curr;
+    this.validatePriceField();
+    this.cdr.markForCheck();
+  }
+
+  onPriceOrCurrencyChanged() {
+    this.validatePriceField();
+  }
+
+  validatePriceField(): boolean {
+    const price = Number(this.formVal.price);
+
+    if (this.formVal.price === null || this.formVal.price === undefined || isNaN(price)) {
+      this.priceValidationError.set('El precio debe ser un valor numérico.');
+      return false;
+    }
+    if (price <= 0) {
+      this.priceValidationError.set('El precio debe ser mayor a 0.');
+      return false;
+    }
+    if (this.formVal.currency !== 'ARS' && this.formVal.currency !== 'USD') {
+      this.priceValidationError.set('Debe seleccionar una moneda válida (ARS o USD).');
+      return false;
+    }
+
+    this.priceValidationError.set(null);
+    return true;
+  }
   
   // Form State
   formVal = {
@@ -39,14 +98,15 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     price: 0,
     currency: 'ARS',
     stock: 0,
+    min_stock_alert: 5,
     brand_id: '',
     category_id: '',
     is_active: true, is_featured: false,
     is_global: true,
     branch_id: '',
     model_id: '',
-    specifications: {} as Record<string, any>,
-    images: [] as any[], // Now holds { url: string, color?: string }
+    specifications: {} as Record<string, unknown>,
+    images: [] as { url: string; color?: string; order?: number }[], // Now holds { url: string, color?: string }
     cost_price: 0,
     meta_title: '',
     meta_description: '',
@@ -62,7 +122,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     dimensions: { length: 0, width: 0, height: 0 },
     seo_keywords: '',
     sale_price: 0,
-    reference_exchange_rate: 0,
+    reference_exchange_rate: 1240,
     free_shipping: false,
     supplier_id: '',
     condition: 'Nuevo',
@@ -71,7 +131,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     tags: '',
     
     // Variants
-    variants: [] as any[],
+    variants: [] as Array<Partial<ProductVariant> & { id: string; name: string; stock: number; attributes: Record<string, unknown>; is_active: boolean }>,
   };
 
   // Resources
@@ -91,6 +151,24 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     if (this.adminLayout) {
       this.adminLayout.isMainMenuOpen.set(false);
     }
+
+    this.gsmService.getUsdtRate().subscribe({
+      next: (rate) => {
+        if (rate && rate > 0) {
+          this.exchangeRate.set(rate);
+          if (!this.id || !this.formVal.reference_exchange_rate) {
+            this.formVal.reference_exchange_rate = rate;
+          }
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {
+        this.exchangeRate.set(1240);
+        if (!this.id || !this.formVal.reference_exchange_rate) {
+          this.formVal.reference_exchange_rate = 1240;
+        }
+      }
+    });
 
     try {
       const [brands, categories, branches] = await Promise.all([
@@ -117,6 +195,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             price: data.price || 0,
             currency: data.currency || 'ARS',
             stock: data.stock || 0,
+            min_stock_alert: data.min_stock_alert ?? 5,
             brand_id: data.brand_id || '',
             category_id: data.category_id || '',
             is_active: data.is_active ?? true, 
@@ -141,7 +220,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
             dimensions: data.dimensions || specs['dimensions'] || { length: 0, width: 0, height: 0 },
             seo_keywords: data.seo_keywords || specs['seo_keywords'] || '',
             sale_price: data.sale_price ?? specs['sale_price'] ?? 0,
-            reference_exchange_rate: data.reference_exchange_rate ?? specs['reference_exchange_rate'] ?? 0,
+            reference_exchange_rate: data.reference_exchange_rate ?? specs['reference_exchange_rate'] ?? this.exchangeRate(),
             free_shipping: data.free_shipping ?? specs['free_shipping'] ?? false,
             supplier_id: data.supplier_id || specs['supplier_id'] || '',
             condition: data.condition || specs['condition'] || 'Nuevo',
@@ -154,6 +233,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       } else {
         // En creación de producto, asignar la sucursal actual por defecto
         this.formVal.branch_id = this.branchContextService.getBranchId() || '';
+        this.formVal.reference_exchange_rate = this.exchangeRate();
       }
     } catch (e: unknown) {
       this.error.set((e instanceof Error ? e.message : String(e)) || 'Error al cargar datos');
@@ -202,7 +282,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       name: '',
       sku: '',
       barcode: '',
-      price: null,
+      price: undefined,
       stock: 0,
       attributes: {},
       is_active: true
@@ -216,37 +296,38 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
   }
 
   async save() {
+    if (!this.validatePriceField()) {
+      this.error.set(this.priceValidationError());
+      this.notificationService.showError(this.priceValidationError() || 'Corrija los datos de precio y moneda.');
+      this.saving.set(false);
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.saving.set(true);
     this.error.set(null);
     const formVal = this.formVal;
 
-    // Robust Validations
-    if (!formVal.name || !formVal.name.trim()) {
-        this.error.set('Por favor ingrese el nombre del producto.');
-        this.saving.set(false);
-        this.cdr.markForCheck();
-        return;
-    }
+    // Schema Validation
+    const validation = validateProductData({
+      name: formVal.name?.trim(),
+      description: formVal.description?.trim() || null,
+      price: Number(formVal.price),
+      cost: formVal.cost_price !== null && formVal.cost_price !== undefined ? Number(formVal.cost_price) : null,
+      stock: Number(formVal.stock),
+      minStock: Number(formVal.min_stock_alert ?? 0),
+      sku: formVal.sku?.trim() || null,
+      categoryId: formVal.category_id || null,
+      supplierId: formVal.supplier_id || null,
+      imageUrl: formVal.images.length > 0 ? formVal.images[0].url : null,
+      isActive: Boolean(formVal.is_active),
+    });
 
-    if (formVal.price === null || formVal.price === undefined || formVal.price < 0 || isNaN(Number(formVal.price))) {
-        this.error.set('El precio debe ser un número válido mayor o igual a 0.');
-        this.saving.set(false);
-        this.cdr.markForCheck();
-        return;
-    }
-
-    if (formVal.stock !== null && formVal.stock !== undefined && (Number(formVal.stock) < 0 || isNaN(Number(formVal.stock)))) {
-        this.error.set('El stock debe ser un número mayor o igual a 0.');
-        this.saving.set(false);
-        this.cdr.markForCheck();
-        return;
-    }
-
-    if (formVal.cost_price !== null && formVal.cost_price !== undefined && (Number(formVal.cost_price) < 0 || isNaN(Number(formVal.cost_price)))) {
-        this.error.set('El costo de compra debe ser mayor o igual a 0.');
-        this.saving.set(false);
-        this.cdr.markForCheck();
-        return;
+    if (!validation.success) {
+      this.error.set(validation.firstError || 'El formulario contiene errores de validación.');
+      this.saving.set(false);
+      this.cdr.markForCheck();
+      return;
     }
 
     let slug = formVal.slug ? formVal.slug.trim() : '';
@@ -255,7 +336,7 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     }
 
     // Encapsulate UI-specific non-column fields into specifications JSONB
-    const specifications: Record<string, any> = {
+    const specifications: Record<string, unknown> = {
       ...(formVal.specifications || {}),
       condition: formVal.condition || 'Nuevo',
       warranty_type: formVal.warranty_type || 'Sin garantía',
@@ -268,13 +349,14 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
     };
 
     // Clean payload strictly adhering to database schema
-    const payload: any = {
+    const payload: Partial<Product> = {
       name: formVal.name.trim(),
       slug: slug,
       description: formVal.description ? formVal.description.trim() : '',
       price: Number(formVal.price) || 0,
-      currency: formVal.currency || 'ARS',
+      currency: (formVal.currency as 'ARS' | 'USD') || 'ARS',
       stock: Number(formVal.stock) || 0,
+      min_stock_alert: Number(formVal.min_stock_alert) || 5,
       brand_id: formVal.brand_id || null,
       category_id: formVal.category_id || null,
       is_active: Boolean(formVal.is_active),
@@ -297,10 +379,10 @@ export class AdminProductFormPage implements OnInit, OnDestroy {
       weight: formVal.weight ? Number(formVal.weight) : null,
       dimensions: formVal.dimensions || { length: 0, width: 0, height: 0 },
       seo_keywords: formVal.seo_keywords?.trim() || null,
-      sale_price: formVal.sale_price ? Number(formVal.sale_price) : null,
+      sale_price: formVal.sale_price ? Number(formVal.sale_price) : undefined,
       
       // Variants
-      variants: formVal.variants
+      variants: formVal.variants as ProductVariant[]
     };
 
     // Add optional identifiers only if present

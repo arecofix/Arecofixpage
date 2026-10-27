@@ -245,4 +245,72 @@ export class ProductMapper {
 
     return dbObj;
   }
+
+  /**
+   * Safe Partial Update Mapper for Products.
+   * STRICT GUARANTEE: Never coerces missing/undefined fields to null.
+   * Only includes fields explicitly provided in the partial DTO.
+   */
+  static mapUpdateToDb(p: Partial<Product>): Record<string, unknown> {
+    const raw = { ...p } as Record<string, unknown>;
+    const dbObj: Record<string, unknown> = {};
+
+    // Handle specifications only if specifications or spec-related attributes were explicitly supplied
+    const specFields = [
+      'condition', 'warranty_type', 'includes_tax', 'free_shipping',
+      'supplier_id', 'reference_exchange_rate', 'tags', 'ml_category_id'
+    ];
+    const hasSpecAttribute = specFields.some(field => raw[field] !== undefined);
+    const hasExplicitSpecs = raw['specifications'] !== undefined;
+
+    if (hasExplicitSpecs || hasSpecAttribute) {
+      const specifications: Record<string, unknown> = {
+        ...(typeof raw['specifications'] === 'object' && raw['specifications'] ? (raw['specifications'] as Record<string, unknown>) : {})
+      };
+      if (raw['condition'] !== undefined) specifications['condition'] = raw['condition'];
+      if (raw['warranty_type'] !== undefined) specifications['warranty_type'] = raw['warranty_type'];
+      if (raw['includes_tax'] !== undefined) specifications['includes_tax'] = raw['includes_tax'];
+      if (raw['free_shipping'] !== undefined) specifications['free_shipping'] = raw['free_shipping'];
+      if (raw['supplier_id'] !== undefined) specifications['supplier_id'] = raw['supplier_id'];
+      if (raw['reference_exchange_rate'] !== undefined) specifications['reference_exchange_rate'] = raw['reference_exchange_rate'];
+      if (raw['tags'] !== undefined) specifications['tags'] = raw['tags'];
+      if (raw['ml_category_id'] !== undefined) specifications['ml_category_id'] = raw['ml_category_id'];
+      dbObj['specifications'] = specifications;
+    }
+
+    // Handle dimensions only if explicitly provided
+    if (raw['dimensions'] !== undefined) {
+      if (raw['dimensions'] && typeof raw['dimensions'] === 'object') {
+        const d = raw['dimensions'] as Record<string, unknown>;
+        dbObj['dimensions'] = {
+          length: Number(d['length'] || 0),
+          width: Number(d['width'] || 0),
+          height: Number(d['height'] || 0)
+        };
+      } else {
+        dbObj['dimensions'] = raw['dimensions'];
+      }
+    }
+
+    // Filter strictly against existing database columns where value !== undefined
+    for (const key of Object.keys(raw)) {
+      if (key === 'specifications' || key === 'dimensions') continue;
+      if (this.VALID_DB_COLUMNS.has(key) && raw[key] !== undefined) {
+        dbObj[key] = raw[key];
+      }
+    }
+
+    // Remove any computed or read-only fields that must never be sent to PostgREST
+    delete dbObj['retail_price'];
+    delete dbObj['search_tsv'];
+    delete dbObj['variants'];
+    delete dbObj['branch_stock'];
+    delete dbObj['branches'];
+    delete dbObj['convertedPrice'];
+    delete dbObj['category_name'];
+    delete dbObj['id'];
+    delete dbObj['tenant_id'];
+
+    return dbObj;
+  }
 }

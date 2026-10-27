@@ -7,6 +7,8 @@ export {
   DB_ORDER_STATUSES,
   ORDER_STATUS_LABELS,
   TERMINAL_ORDER_STATUSES,
+  VALID_TRANSITIONS,
+  isValidTransition,
   isOrderStatus,
   normalizeOrderStatus,
   getOrderStatusLabel,
@@ -26,9 +28,13 @@ export interface Address {
   notes?: string;
 }
 
+import type { Product } from '@app/shared/interfaces/product.interface';
+export type OrderItemProductSummary = Product;
+
 export interface OrderItem {
   id?: string;
   order_id?: string;
+  cart_item_id?: string;
   product_id?: string;
   course_id?: string;
   product_name?: string;
@@ -39,7 +45,7 @@ export interface OrderItem {
   subtotal: number;
   tenant_id?: string;
   created_at?: string;
-  product?: any;
+  product?: OrderItemProductSummary | null;
 }
 
 export type PaymentMethod = 'digital' | 'cash' | 'bank_transfer';

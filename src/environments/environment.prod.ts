@@ -11,6 +11,7 @@
  * However, other keys should be properly secured.
  */
 import { Environment } from './environment.model';
+import { generatedEnv } from './environment.generated';
 
 export const environment: Environment = {
   production: true,
@@ -80,5 +81,8 @@ export const environment: Environment = {
   downloads: {
     desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
   },
-  turnstileSiteKey: (typeof process !== 'undefined' && process.env ? process.env['TURNSTILE_SITE_KEY'] : undefined) || ''
+  turnstileSiteKey: generatedEnv.turnstileSiteKey,
+  features: {
+    trialEnabled: generatedEnv.trialEnabled
+  }
 };

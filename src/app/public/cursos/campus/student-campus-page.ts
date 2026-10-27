@@ -17,12 +17,17 @@ import {
 import { AuthService } from '@app/core/services/auth.service';
 import { ModuleContent } from '@app/admin/courses/materials/admin-course-materials-page';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+
+import { ToastService } from '@app/shared/services/toast.service';
+import { AcademySubscriptionService } from '@app/core/services/academy-subscription.service';
+import { MembershipCheckResult } from '@app/features/courses/domain/entities/academy-subscription.entity';
 
 @Component({
   selector: 'app-student-campus-page',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
       @if (loading()) {
@@ -91,6 +96,61 @@ import { FormsModule } from '@angular/forms';
           </div>
         }
 
+        <!-- Grace Period Banner -->
+        @if (isGracePeriod()) {
+          <div class="bg-amber-500 text-slate-900 font-bold px-4 py-3 shadow-md relative z-40 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle text-lg"></i>
+              <span>Tu membresía venció. Tienes 7 días de gracia para renovar.</span>
+            </div>
+            <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-sm bg-slate-900 text-white hover:bg-slate-800 border-none rounded-xl">
+              @if (isSubscribing()) {
+                <span class="loading loading-spinner loading-xs"></span>
+              } @else {
+                <i class="fas fa-credit-card mr-1"></i> Pagar Ahora
+              }
+            </button>
+          </div>
+        }
+
+        <!-- Suspended or Expired Blocking Modal -->
+        @if (isBlocked()) {
+          <div class="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl space-y-6">
+              <div class="w-20 h-20 bg-rose-100 text-rose-500 dark:bg-rose-900/30 dark:text-rose-400 rounded-full flex items-center justify-center text-4xl mx-auto shadow-inner">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Tu acceso a la academia ha expirado</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                  Tu membresía se encuentra vencida o suspendida. Renueva tu membresía para continuar.
+                </p>
+              </div>
+              <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center text-left">
+                <div>
+                  <div class="font-bold text-sm text-slate-800 dark:text-white">{{ membershipCheck()?.plan_name || 'Membresía Mensual Academia Pro' }}</div>
+                  <div class="text-xs text-slate-500">Acceso a todas las clases y exámenes</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-black text-lg text-blue-600 dark:text-blue-400">
+                    \${{ (membershipCheck()?.plan_price || 15000) | number }} <span class="text-xs font-normal text-slate-400">/mes</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-primary flex-1 shadow-lg shadow-blue-500/20 rounded-xl font-bold">
+                  @if (isSubscribing()) {
+                    <span class="loading loading-spinner loading-sm"></span> Conectando con Mercado Pago...
+                  } @else {
+                    <i class="fas fa-bolt mr-1"></i> Renovar Membresía
+                  }
+                </button>
+                <button routerLink="/academy" class="btn btn-ghost rounded-xl">Volver a la Academia</button>
+              </div>
+            </div>
+          </div>
+        }
+
         <!-- Header Banner -->
         <div
           class="bg-blue-900 dark:bg-slate-950 text-white relative overflow-hidden"
@@ -150,6 +210,43 @@ import { FormsModule } from '@angular/forms';
           <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Left Content: Modules and Materials -->
             <div class="lg:col-span-3 space-y-6">
+              <!-- Diploma de Finalización -->
+              @if (progress() >= 100) {
+                <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-5 animate-fade-in">
+                  <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl shadow-inner shrink-0">
+                      🎓
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-bold flex items-center gap-2">
+                        ¡Felicitaciones! Has completado el 100% del curso
+                      </h3>
+                      <p class="text-emerald-100 text-sm mt-1">
+                        Tu diploma oficial está listo con validez técnica y código QR de verificación.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    @if (certificateId()) {
+                      <a [routerLink]="['/academy/verify', certificateId()]" 
+                         class="btn btn-sm bg-white text-emerald-900 hover:bg-emerald-50 border-none font-bold rounded-xl shadow-md">
+                        <i class="fas fa-qrcode mr-1"></i> Validar (QR)
+                      </a>
+                      <a [href]="'/api/academy/certificates/' + certificateId() + '/pdf'" 
+                         target="_blank" 
+                         class="btn btn-sm btn-outline border-white text-white hover:bg-white/20 font-bold rounded-xl download-certificate-btn">
+                        <i class="fas fa-file-pdf mr-1"></i> Descargar Diploma
+                      </a>
+                    } @else {
+                      <a [routerLink]="['/academy/mis-cursos']" 
+                         class="btn btn-sm bg-white text-emerald-900 hover:bg-emerald-50 border-none font-bold rounded-xl shadow-md">
+                        <i class="fas fa-certificate mr-1"></i> Ver en Mis Diplomas
+                      </a>
+                    }
+                  </div>
+                </div>
+              }
+
               <!-- Aviso General -->
               @if (course()?.description) {
                 <div
@@ -521,45 +618,53 @@ import { FormsModule } from '@angular/forms';
             >
               <i class="fas fa-times"></i>
             </button>
-            <h3
-              class="font-black text-2xl mb-2 text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4"
-            >
-              {{ activeExam.title }}
-            </h3>
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
+              <h3 class="font-black text-2xl text-slate-800 dark:text-white">
+                {{ activeExam.title }}
+              </h3>
+              @if (examTimeRemaining() !== null && !examResult()) {
+                <div class="badge badge-lg font-mono font-bold py-3 px-4 shadow-sm"
+                     [class.badge-warning]="(examTimeRemaining() || 0) <= 300 && (examTimeRemaining() || 0) > 60"
+                     [class.badge-error]="(examTimeRemaining() || 0) <= 60"
+                     [class.badge-primary]="(examTimeRemaining() || 0) > 300">
+                  <i class="fas fa-clock mr-2"></i> {{ formatTimer(examTimeRemaining() || 0) }}
+                </div>
+              }
+            </div>
 
             @if (examLoading()) {
               <div class="flex justify-center py-20">
                 <span class="loading loading-spinner text-blue-500"></span>
               </div>
-            } @else if (examResult()) {
+            } @else if (examResult(); as res) {
               <!-- Result Screen -->
               <div class="text-center py-10">
                 <div
                   class="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl mb-4"
-                  [class.bg-green-100]="examResult().passed"
-                  [class.text-green-600]="examResult().passed"
-                  [class.bg-red-100]="!examResult().passed"
-                  [class.text-red-600]="!examResult().passed"
+                  [class.bg-green-100]="res.passed"
+                  [class.text-green-600]="res.passed"
+                  [class.bg-red-100]="!res.passed"
+                  [class.text-red-600]="!res.passed"
                 >
                   <i
                     class="fas"
-                    [class.fa-check]="examResult().passed"
-                    [class.fa-times]="!examResult().passed"
+                    [class.fa-check]="res.passed"
+                    [class.fa-times]="!res.passed"
                   ></i>
                 </div>
                 <h2
                   class="text-3xl font-bold mb-2 text-gray-900 dark:text-white"
                 >
-                  {{ examResult().passed ? '¡Aprobado!' : 'Reprobado' }}
+                  {{ res.passed ? '¡Aprobado!' : 'Reprobado' }}
                 </h2>
                 <p class="text-lg text-slate-600 dark:text-slate-400 mb-6">
                   Obtuviste
                   <strong class="text-gray-900 dark:text-white"
-                    >{{ examResult().score | number: '1.0-0' }}%</strong
+                    >{{ res.score | number: '1.0-0' }}%</strong
                   >
                   <br />
-                  ({{ examResult().correct_answers }} de
-                  {{ examResult().total_questions }} correctas)
+                  ({{ res.correct_answers }} de
+                  {{ res.total_questions }} correctas)
                 </p>
                 <button class="btn btn-primary" (click)="closeExam()">
                   Continuar
@@ -608,6 +713,7 @@ import { FormsModule } from '@angular/forms';
                             [name]="'q_' + q.id"
                             [value]="optIndex"
                             [(ngModel)]="activeExamAnswers[q.id]"
+                            (ngModelChange)="onAnswerChange(q.id, $event)"
                             class="radio radio-primary"
                           />
                           <span
@@ -653,6 +759,8 @@ export class StudentCampusPage implements OnInit {
   private coursesService = inject(CoursesService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
+  private academySubscriptionService = inject(AcademySubscriptionService);
 
   loading = signal(true);
   course = signal<Course | null>(null);
@@ -660,6 +768,10 @@ export class StudentCampusPage implements OnInit {
   moduleContentsMap: Record<string, ModuleContent[]> = {};
 
   hasAccess = signal(false);
+  isGracePeriod = signal(false);
+  isBlocked = signal(false);
+  isSubscribing = signal(false);
+  membershipCheck = signal<MembershipCheckResult | null>(null);
 
   // Progress state
   progress = signal<number>(0);
@@ -672,11 +784,13 @@ export class StudentCampusPage implements OnInit {
 
   // Exam state
   activeExam: ModuleContent | null = null;
-  activeExamQuestions = signal<any[]>([]);
+  activeExamQuestions = signal<CourseExamQuestion[]>([]);
   activeExamAnswers: Record<string, number> = {};
   examLoading = signal(false);
   submittingExam = signal(false);
-  examResult = signal<any>(null);
+  examResult = signal<{ score: number; passed: boolean; correct_answers: number; total_questions: number; progress?: unknown } | null>(null);
+  examTimeRemaining = signal<number | null>(null);
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug');
@@ -727,12 +841,33 @@ export class StudentCampusPage implements OnInit {
       // 2c. For regular students: check directly in course_enrollments
       if (!accessConfirmed) {
         const userEmail = userSession?.user?.email || profile?.email || '';
-        if (userEmail) {
+        const userId = userSession?.user?.id || profile?.id;
+        if (userEmail || userId) {
           const { enrolled } = await this.coursesService.checkEnrollment(
             courseId,
             userEmail,
+            userId,
           );
           accessConfirmed = enrolled;
+        }
+      }
+
+      // 2d. Validate Membership Status
+      // Golden Rule: active & grace_period are allowed; suspended & expired are blocked
+      if (accessConfirmed && !this.isAdmin() && !this.isAuthor()) {
+        try {
+          const userId = userSession?.user?.id || profile?.id;
+          const statusRes = await firstValueFrom(this.academySubscriptionService.checkMembershipStatus(userId));
+          this.membershipCheck.set(statusRes);
+          if (statusRes.has_subscription) {
+            if (statusRes.status === 'grace_period') {
+              this.isGracePeriod.set(true);
+            } else if (statusRes.status === 'suspended' || statusRes.status === 'expired') {
+              this.isBlocked.set(true);
+            }
+          }
+        } catch {
+          // Graceful fallback
         }
       }
 
@@ -752,9 +887,9 @@ export class StudentCampusPage implements OnInit {
                   this.isModuleUnlocked(mod) || this.isAuthor() || this.isAdmin();
                 if (!shouldLoad) continue;
                 try {
-                  const contentsRes = await this.coursesService
-                    .getModuleContents(mod.id!)
-                    .toPromise();
+                  const contentsRes = await firstValueFrom(
+                    this.coursesService.getModuleContents(mod.id!)
+                  );
                   if (contentsRes?.data) {
                     this.moduleContentsMap[mod.id!] = contentsRes.data;
                   }
@@ -796,8 +931,32 @@ export class StudentCampusPage implements OnInit {
 
   /** Returns true if the module is currently accessible to students */
   isModuleUnlocked(mod: Module | null | undefined): boolean {
-    if (!mod?.unlock_date) return false;
-    return new Date(mod.unlock_date) <= new Date();
+    if (!mod) return false;
+    if (this.isBlocked()) return false;
+    // 1. If unlock_date is specified and in the future, it is locked
+    if (mod.unlock_date && new Date(mod.unlock_date) > new Date()) {
+      return false;
+    }
+
+    // 2. If course unlock strategy is SEQUENTIAL, check if prior module is fully completed
+    const currentCourse = this.course();
+    if (currentCourse?.unlock_strategy === 'SEQUENTIAL') {
+      const allMods = this.modules();
+      const currentIndex = allMods.findIndex((m) => m.id === mod.id);
+      if (currentIndex > 0) {
+        const prevMod = allMods[currentIndex - 1];
+        const prevContents = this.moduleContentsMap[prevMod.id!];
+        if (prevContents && prevContents.length > 0) {
+          const completed = this.completedContents();
+          const allPrevCompleted = prevContents.every((c) => completed.has(c.id!));
+          if (!allPrevCompleted) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   /** Formats an ISO date string to a human-readable date (es-AR locale) */
@@ -810,6 +969,12 @@ export class StudentCampusPage implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  formatTimer(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
   getTypeLabel(type: string): string {
@@ -832,6 +997,10 @@ export class StudentCampusPage implements OnInit {
   markContentAsCompleted(contentId: string, event: Event) {
     event.preventDefault();
     event.stopPropagation();
+    if (this.isBlocked()) {
+      this.toastService.show('Tu membresía está vencida o suspendida. Renueva tu membresía para continuar.', 'error');
+      return;
+    }
     if (this.completedContents().has(contentId)) return;
 
     this.markingCompleted.update((v) => ({ ...v, [contentId]: true }));
@@ -849,13 +1018,83 @@ export class StudentCampusPage implements OnInit {
     });
   }
 
+  payMembership() {
+    this.isSubscribing.set(true);
+    this.academySubscriptionService.createSubscriptionPreference({
+      backUrl: typeof window !== 'undefined' ? window.location.href.split('?')[0] : undefined
+    }).subscribe({
+      next: (res) => {
+        this.isSubscribing.set(false);
+        if (res.success && res.init_point) {
+          if (typeof window !== 'undefined') {
+            window.location.href = res.init_point;
+          }
+        } else {
+          this.toastService.show(res.error || 'Error al conectar con Mercado Pago', 'error');
+        }
+      },
+      error: () => {
+        this.isSubscribing.set(false);
+        this.toastService.show('Error al iniciar suscripción', 'error');
+      }
+    });
+  }
+
   // --- Exam Logic ---
 
   openExam(resource: ModuleContent) {
+    if (this.isBlocked()) {
+      this.toastService.show('Tu membresía está vencida o suspendida. Renueva tu membresía para continuar.', 'error');
+      return;
+    }
     this.activeExam = resource;
     this.examResult.set(null);
     this.activeExamAnswers = {};
     this.examLoading.set(true);
+
+    // Restore saved answers from localStorage if any
+    try {
+      const savedAnswers = localStorage.getItem(`exam_answers_${resource.id}`);
+      if (savedAnswers) {
+        this.activeExamAnswers = JSON.parse(savedAnswers);
+      }
+    } catch (e) {
+      console.warn('Could not restore saved exam answers', e);
+    }
+
+    // Timer setup
+    const timeLimitMinutes = (resource.metadata as { time_limit_minutes?: number } | undefined)?.time_limit_minutes || 15;
+    const totalSeconds = timeLimitMinutes * 60;
+    const storageKey = `exam_start_${resource.id}`;
+    let startTime = Number(localStorage.getItem(storageKey));
+    if (!startTime || isNaN(startTime)) {
+      startTime = Date.now();
+      localStorage.setItem(storageKey, String(startTime));
+    }
+
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const remaining = Math.max(0, totalSeconds - elapsed);
+    this.examTimeRemaining.set(remaining);
+
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+
+    if (remaining <= 0) {
+      this.toastService.show('El tiempo para este examen ha expirado.', 'info');
+    } else {
+      this.timerInterval = setInterval(() => {
+        const curr = this.examTimeRemaining();
+        if (curr === null || curr <= 1) {
+          if (this.timerInterval) clearInterval(this.timerInterval);
+          this.examTimeRemaining.set(0);
+          this.toastService.show('¡Tiempo agotado! Enviando examen automáticamente...', 'info');
+          this.submitExam();
+        } else {
+          this.examTimeRemaining.set(curr - 1);
+        }
+      }, 1000);
+    }
 
     this.coursesService.getExamQuestions(resource.id!).subscribe((res) => {
       this.examLoading.set(false);
@@ -863,22 +1102,46 @@ export class StudentCampusPage implements OnInit {
     });
   }
 
+  onAnswerChange(questionId: string, optionIndex: number) {
+    this.activeExamAnswers[questionId] = optionIndex;
+    if (this.activeExam?.id) {
+      try {
+        localStorage.setItem(`exam_answers_${this.activeExam.id}`, JSON.stringify(this.activeExamAnswers));
+      } catch (e) {
+        console.warn('Could not save exam answers', e);
+      }
+    }
+  }
+
   closeExam() {
     if (this.submittingExam()) return;
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
     this.activeExam = null;
   }
 
   submitExam() {
     if (!this.activeExam) return;
 
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+
     const questions = this.activeExamQuestions();
-    // Ensure all questions are answered
-    for (const q of questions) {
-      if (this.activeExamAnswers[q.id] === undefined) {
-        alert(
-          'Por favor, responde a todas las preguntas antes de entregar el examen.',
-        );
-        return;
+    const timeRemaining = this.examTimeRemaining();
+    // Only check if all answered if time hasn't expired
+    if (timeRemaining !== 0) {
+      for (const q of questions) {
+        if (this.activeExamAnswers[q.id] === undefined) {
+          this.toastService.show(
+            'Por favor, responde a todas las preguntas antes de entregar el examen.',
+            'info'
+          );
+          return;
+        }
       }
     }
 
@@ -889,22 +1152,30 @@ export class StudentCampusPage implements OnInit {
       selected_index: this.activeExamAnswers[qId],
     }));
 
+    const examId = this.activeExam.id!;
+
     this.coursesService
-      .submitExam(this.activeExam.id!, payload)
+      .submitExam(examId, payload)
       .subscribe((res) => {
         this.submittingExam.set(false);
+        // Clean up storage
+        localStorage.removeItem(`exam_start_${examId}`);
+        localStorage.removeItem(`exam_answers_${examId}`);
+
         if (res.error) {
-          alert('Error al enviar el examen: ' + res.error.message);
+          const errMsg = typeof res.error === 'string' ? res.error : (res.error as { message?: string })?.message || 'Error desconocido';
+          this.toastService.show('Error al enviar el examen: ' + errMsg, 'error');
         } else {
           this.examResult.set(res.data);
+          const data = res.data as { progress?: { progress: number; certificate_id?: string } } | null;
           // Update progress if passed
-          if (res.data?.progress) {
-            this.progress.set(res.data.progress.progress);
+          if (data?.progress) {
+            this.progress.set(data.progress.progress);
             const newSet = new Set(this.completedContents());
-            newSet.add(this.activeExam!.id!);
+            newSet.add(examId);
             this.completedContents.set(newSet);
-            if (res.data.progress.certificate_id) {
-              this.certificateId.set(res.data.progress.certificate_id);
+            if (data.progress.certificate_id) {
+              this.certificateId.set(data.progress.certificate_id);
             }
           }
         }

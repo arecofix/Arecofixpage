@@ -96,13 +96,22 @@ export class AnalyticsService {
         // Pixel initialization - we call the global fbq if available
     }
 
+    private isAnalyticsBlocked(): boolean {
+        if (!this.isBrowser) return true;
+        return typeof window !== 'undefined' && (Boolean(window.__arecofix_adblock) || Boolean((window as unknown as Record<string, unknown>)['ga-disable-G-N7DQDV8MED']));
+    }
+
     identify(userId: string, properties: Record<string, unknown> = {}) {
         if (this.isBrowser) {
             if (this.posthogInitialized && posthogInstance) {
                 try { posthogInstance.identify(userId, properties); } catch (e) {}
             }
-            if (window.gtag) {
-                window.gtag('set', 'user_properties', properties);
+            if (!this.isAnalyticsBlocked() && window.gtag) {
+                try {
+                    window.gtag('set', 'user_properties', properties);
+                } catch {
+                    // Silently ignore if blocked by client
+                }
             }
         }
     }
@@ -113,23 +122,41 @@ export class AnalyticsService {
                 try { posthogInstance.capture(eventName, properties); } catch (e) {}
             }
             
-            if (window.gtag) {
-                window.gtag('event', eventName, properties);
-            }
+            if (!this.isAnalyticsBlocked()) {
+                if (window.gtag) {
+                    try {
+                        window.gtag('event', eventName, properties);
+                    } catch {
+                        // Silently ignore if blocked by client
+                    }
+                }
 
-            if (window.fbq) {
-                window.fbq('track', eventName, properties);
+                if (window.fbq) {
+                    try {
+                        window.fbq('track', eventName, properties);
+                    } catch {
+                        // Silently ignore if blocked by client
+                    }
+                }
             }
         }
     }
 
     trackPageView() {
-        if (this.isBrowser) {
-            if (window.fbq) {
-                window.fbq('track', 'PageView');
+        if (this.isBrowser && !this.isAnalyticsBlocked()) {
+            if (window.fbq && typeof window.fbq === 'function') {
+                try {
+                    window.fbq('track', 'PageView');
+                } catch {
+                    // Silently ignore if blocked by client
+                }
             }
-            if (window.gtag) {
-                window.gtag('event', 'page_view');
+            if (window.gtag && typeof window.gtag === 'function') {
+                try {
+                    window.gtag('event', 'page_view');
+                } catch {
+                    // Silently ignore if blocked by client
+                }
             }
         }
     }

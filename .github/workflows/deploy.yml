@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Test, Build & Deploy to VPS
+name: CI/CD Pipeline - Test, Staging Gate & Production Deploy
 
 on:
   push:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   test:
-    name: 🧪 Run Unit Tests
+    name: 🧪 Run Unit & Security Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -33,11 +33,27 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Jest Unit Tests
-        run: pnpm test
+      - name: Run Jest Test Suite with Coverage Guard (50 suites, 276 tests)
+        run: pnpm test -- --coverage
+
+
+      - name: 🛡️ Verify CORS Preflight on Kong
+        run: node scripts/verify-cors-preflight.mjs
+
+      - name: 🌐 Verify Cloudflare D1 Failover Worker Health & Freshness
+        run: |
+          RES=$(curl -fsS https://arecofix-d1-failover.ezequielenrico15.workers.dev/health)
+          echo "$RES" | grep '"status":"ok"'
+          echo "$RES" | grep '"stale":false'
+
+      - name: 🔍 Verify Database Schema Contract (Prevent Schema Drift)
+        run: node scripts/verify-schema.mjs
+
+      - name: 🛡️ Audit RLS Depth & Anti-Recursion Gate (Prevent Stack Overflow CWE-674)
+        run: pnpm test:recursion
 
   build:
-    name: 🏗️ Build Angular 21 SSR
+    name: 🏗️ Build Angular 21 SSR Bundle
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -60,6 +76,8 @@ jobs:
       - name: Build Production SSR
         env:
           NODE_OPTIONS: "--max_old_space_size=6144"
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
+          TRIAL_ENABLED: 'false'
         run: pnpm run build
 
       - name: Upload Build Artifact
@@ -69,8 +87,8 @@ jobs:
           path: dist/
           retention-days: 1
 
-  deploy:
-    name: 🚀 Deploy to Oracle VPS
+  deploy_staging:
+    name: 🚀 Deploy to Staging Environment
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -93,36 +111,124 @@ jobs:
           chmod 600 ~/.ssh/id_deploy
           ssh-keyscan -H ssh.arecofix.com.ar >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Package and Deploy to VPS
+      - name: Transfer & Deploy to arecofix-frontend-staging
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST || 'ssh.arecofix.com.ar' }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER || 'ubuntu' }}
         run: |
-          # 1. Comprimir bundle
           tar -czf dist.tar.gz -C dist arecofix
+          scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=no dist.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/home/ubuntu/arecofix-staging/dist.tar.gz"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" \
+            "tar -xzf /home/ubuntu/arecofix-staging/dist.tar.gz -C /home/ubuntu/arecofix-staging/dist/ && rm -f /home/ubuntu/arecofix-staging/dist.tar.gz && pm2 reload arecofix-frontend-staging || pm2 restart arecofix-frontend-staging"
 
-          # 2. Backup remoto
+  verify_staging:
+    name: "🔍 Gate: Verify Staging Stability"
+    runs-on: ubuntu-latest
+    needs: deploy_staging
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Staging SSR Availability
+        run: |
+          echo "Verificando staging SSR..."
+          for i in {1..8}; do
+            STATUS=$(curl -k -s -o /dev/null -w "%{http_code}" https://staging.arecofix.com.ar/ || true)
+            echo "Intento $i: HTTP $STATUS"
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+              echo "✅ Staging respondiendo 200 OK."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "❌ Staging no respondió en el tiempo esperado."
+          exit 1
+
+      - name: 🛡️ Verify CORS Preflight on Staging Kong
+        run: node scripts/verify-cors-preflight.mjs
+
+      - name: 🔍 Verify Database Schema Contract on Staging
+        run: node scripts/verify-schema.mjs
+
+      - name: Run E2E Tests against Staging
+        run: |
+          npx cypress run --config baseUrl=https://staging.arecofix.com.ar
+        env:
+          CYPRESS_SUPABASE_KEY: ${{ secrets.STAGING_SUPABASE_KEY }}
+
+      - name: Upload Cypress Artifacts on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-staging-failure
+          path: |
+            cypress/screenshots/
+            cypress/videos/
+          retention-days: 7
+
+  deploy_prod:
+    name: "🚢 Deploy to Production (Manual Approval Gate)"
+    runs-on: ubuntu-latest
+    needs: verify_staging
+    environment: production
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist/
+
+      - name: Setup SSH Key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H ssh.arecofix.com.ar >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Backup & Deploy to Production VPS
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST || 'ssh.arecofix.com.ar' }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER || 'ubuntu' }}
+        run: |
+          tar -czf dist.tar.gz -C dist arecofix
           ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" \
             "mkdir -p /home/ubuntu/arecofix/dist_backup && cp -rf /home/ubuntu/arecofix/dist/arecofix /home/ubuntu/arecofix/dist_backup/ 2>/dev/null || true"
-
-          # 3. Transferencia segura
           scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=no dist.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/home/ubuntu/arecofix/dist.tar.gz"
-
-          # 4. Descompresión y recarga de PM2
           ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_HOST" \
             "tar -xzf /home/ubuntu/arecofix/dist.tar.gz -C /home/ubuntu/arecofix/dist/ && rm -f /home/ubuntu/arecofix/dist.tar.gz && pm2 reload arecofix-frontend || pm2 restart arecofix-frontend"
 
-      - name: Healthcheck Verification
+      - name: Production Healthcheck Verification
         run: |
           echo "Verificando disponibilidad en https://arecofix.com.ar..."
           for i in {1..10}; do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://arecofix.com.ar || true)
             echo "Intento $i: HTTP $STATUS"
             if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-              echo "✅ Despliegue validado exitosamente."
+              echo "✅ Despliegue en producción validado exitosamente."
               exit 0
             fi
             sleep 4
           done
           echo "❌ Healthcheck falló en producción."
           exit 1
+
+      - name: 🛡️ Verify Post-Deploy CORS Preflight on Kong
+        run: node scripts/verify-cors-preflight.mjs

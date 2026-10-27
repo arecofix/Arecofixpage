@@ -15,6 +15,10 @@ import psycopg2
 import json
 from flask import Response, stream_with_context
 import werkzeug
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("arecofix-backend")
 
 # 1. Configuración de Rutas Seguras y Compatibles (Windows/Linux)
 if getattr(sys, 'frozen', False):
@@ -56,6 +60,27 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'local-offline-engine-secret-key-2026')
 
 db.init_app(app)
+
+# --- SEGURIDAD: Bloqueo estricto de endpoints locales sin autenticación expuestos en internet ---
+@app.before_request
+def block_unprotected_endpoints():
+    blocked_prefixes = (
+        '/api/orders',
+        '/api/clientes',
+        '/api/marcas',
+        '/api/productos',
+        '/api/finances',
+        '/api/categorias',
+        '/api/upload',
+        '/api/files'
+    )
+    if request.path.startswith(blocked_prefixes):
+        return jsonify({"error": "Forbidden: endpoint disabled"}), 403
+
+# Fail-fast check al startup para variables sensibles
+WHATSAPP_TOKEN_ENV = os.getenv('WHATSAPP_TOKEN')
+if not WHATSAPP_TOKEN_ENV:
+    logger.warning("[SECURITY] WHATSAPP_TOKEN no configurado en entorno. Webhook de WhatsApp inhabilitado.")
 
 # ----------------- Rutas de la API -----------------
 
@@ -595,8 +620,11 @@ def verify_webhook():
     token = request.args.get('hub.verify_token')
     challenge = request.args.get('hub.challenge')
     
-    # Token de verificación para Meta
-    VERIFY_TOKEN = os.getenv('WHATSAPP_VERIFY_TOKEN', 'arecofix_secreto_123')
+    # Token de verificación para Meta (Fail-fast, sin secretos hardcodeados)
+    VERIFY_TOKEN = os.getenv('WHATSAPP_VERIFY_TOKEN')
+    if not VERIFY_TOKEN:
+        logger.error("[SECURITY] WHATSAPP_VERIFY_TOKEN no configurado en entorno")
+        return 'Webhook verification not configured', 500
     
     if mode and token:
         if mode == 'subscribe' and token == VERIFY_TOKEN:
@@ -610,8 +638,15 @@ def verify_webhook():
 def handle_webhook():
     body = request.json
     
-    WHATSAPP_TOKEN = os.getenv('WHATSAPP_TOKEN', 'EAARLwIJnO30BSffKUOP87hknZCXDIo4rHfHpPLr7if3yVIg5CYByC5j6XvHBVhRVjvZBlSKKuoPKoYz0x4ASmSwLNAqk6C2bGclXvV3FxJsDGO6we7lg6luv0aBsFZBZASQqlfptsMxToIlD3H0ewcaooQIZBgCA7t4CXW9mLjygRnKThCAdo1tpjI3swKZAMQ0gZDZD')
-    PHONE_NUMBER_ID = os.getenv('WHATSAPP_PHONE_ID', '3084224258535964') # Número Real
+    WHATSAPP_TOKEN = os.getenv('WHATSAPP_TOKEN')
+    if not WHATSAPP_TOKEN:
+        logger.error("[SECURITY] Intento de uso de webhook sin WHATSAPP_TOKEN configurado")
+        return jsonify({"error": "WhatsApp service not configured"}), 500
+
+    PHONE_NUMBER_ID = os.getenv('WHATSAPP_PHONE_ID')
+    if not PHONE_NUMBER_ID:
+        logger.error("[SECURITY] WHATSAPP_PHONE_ID no configurado")
+        return jsonify({"error": "WhatsApp phone ID not configured"}), 500
     
     if body.get('object') == 'whatsapp_business_account':
         try:
@@ -1426,10 +1461,11 @@ if __name__ == '__main__':
         
         # Semilla inicial para Administrador (Offline Login)
         if not Admin.query.first():
-            hashed_pw = generate_password_hash("admin123")
+            offline_admin_pw = os.getenv("OFFLINE_ADMIN_PASSWORD", "admin123")
+            hashed_pw = generate_password_hash(offline_admin_pw)
             db.session.add(Admin(username="admin", password_hash=hashed_pw))
             db.session.commit()
-            print("Usuario Admin (offline) creado. User: admin | Pass: admin123")
+            print("Usuario Admin (offline) creado.")
 
         # Semilla inicial para testing si está vacío
         if not Producto.query.first():
@@ -1440,5 +1476,6 @@ if __name__ == '__main__':
     # Iniciar Hilo de Sincronización en Segundo Plano
     start_sync_thread(app)
             
-    # Servidor local en el puerto 5000
-    app.run(host='0.0.0.0', debug=True, port=5000, use_reloader=False)
+    # Servidor local en el puerto 5000 (SEC-002: Restringido a loopback con debug deshabilitado)
+    app.run(host='127.0.0.1', debug=False, port=5000, use_reloader=False)
+

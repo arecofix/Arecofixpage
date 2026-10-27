@@ -20,7 +20,7 @@ if (typeof globalThis.WebSocket === 'undefined') {
     dispatchEvent() { return true; }
   };
 }
-// --- FIN PARCHE SUPABASE SSR ---
+import 'dotenv/config';
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
@@ -30,6 +30,11 @@ import bootstrap from './src/main.server';
 import { securityMiddleware } from './server/middleware/security.middleware';
 import { sitemapRoutes } from './server/routes/sitemap.routes';
 import { feedRoutes } from './server/routes/feed.routes';
+import { mercadopagoRoutes } from './server/routes/mercadopago.routes';
+import { academySubscriptionRoutes } from './server/routes/academy-subscription.routes';
+import { adminDashboardRoutes } from './server/routes/admin-dashboard.routes';
+import { servicesRoutes } from './server/routes/services.routes';
+import { chatbotRoutes } from './server/routes/chatbot.routes';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -39,6 +44,10 @@ export function app(): express.Express {
   // Aplicar middlewares de seguridad y CSP
   server.use(securityMiddleware);
 
+  // Parse JSON and form bodies for API routes
+  server.use(express.json({ limit: '2mb' }));
+  server.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
@@ -47,6 +56,7 @@ export function app(): express.Express {
     allowedHosts: [
       'arecofix.com.ar',
       'www.arecofix.com.ar',
+      'staging.arecofix.com.ar',
       '137.131.131.98',
       'localhost',
       '127.0.0.1',
@@ -58,9 +68,61 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Rutas modulares (Sitemap, Feeds, etc.)
+  // Rutas modulares (Sitemap, Feeds, Mercado Pago API, Servicios, etc.)
   server.use('/', sitemapRoutes);
   server.use('/feed', feedRoutes);
+  server.use('/api/mercadopago', mercadopagoRoutes);
+  server.use('/api/academy', academySubscriptionRoutes);
+  server.use('/api/admin/dashboard', adminDashboardRoutes);
+  server.use('/api/chatbot', chatbotRoutes);
+  server.use('/', servicesRoutes);
+  server.use('/api/webhooks/mercadopago-academy', (req, res, next) => {
+    req.url = '/webhook';
+    academySubscriptionRoutes(req, res, next);
+  });
+
+  // Interceptor 301 SSR para servicios con slug renombrado (preserva SEO)
+  server.get('/servicios/:slug', async (req, res, next) => {
+    try {
+      const slug = String(req.params['slug'] || '');
+      const supabaseUrl = (process.env['SUPABASE_URL'] || 'https://db.arecofix.com.ar').replace(/\/+$/, '');
+      const serviceKey = process.env['SUPABASE_SERVICE_ROLE_KEY'] || process.env['SUPABASE_KEY'] || '';
+      if (serviceKey && slug) {
+        const redirRes = await fetch(
+          `${supabaseUrl}/rest/v1/slug_redirects?entity_type=eq.service&old_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc&limit=1`,
+          { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+        );
+        if (redirRes.ok) {
+          const redirs = await redirRes.json();
+          if (redirs && redirs.length > 0 && redirs[0].new_slug) {
+            return res.redirect(301, `/servicios/${redirs[0].new_slug}`);
+          }
+        }
+      }
+    } catch {
+      // Continue to next handler
+    }
+    next();
+  });
+
+  // 301 Permanent Redirects para rutas consolidadas (SEO preservation)
+  server.get(['/prueba', '/free-trial'], (req, res) => {
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `/prueba-gratis${query}`);
+  });
+
+  // 301 Permanent Redirects para /services y /services/:slug -> /servicios
+  server.get('/services', (req, res) => {
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `/servicios${query}`);
+  });
+
+  server.get('/services/:slug', (req, res) => {
+    const slug = String(req.params['slug'] || '');
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `/servicios/${encodeURIComponent(slug)}${query}`);
+  });
+
 
 
   // Página de recuperación de emergencia para clientes trabados

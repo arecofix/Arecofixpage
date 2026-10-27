@@ -10,6 +10,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CoursesService, Course } from '@app/core/services/courses.service';
+import { CertificatesService, Certificate } from '@app/features/courses/application/services/certificates.service';
+import { ToastService } from '@app/shared/services/toast.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 
 @Component({
@@ -21,12 +23,16 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 })
 export class AdminCoursesPage implements OnInit {
   private coursesService = inject(CoursesService);
+  private certificatesService = inject(CertificatesService);
+  private toastService = inject(ToastService);
   private supabase = inject(SUPABASE_CLIENT);
   private cdr = inject(ChangeDetectorRef);
 
   courses = signal<Course[]>([]);
+  certificates = signal<Certificate[]>([]);
   loading = signal(true);
-  activeTab = signal<'activos' | 'pendientes'>('activos');
+  certificatesLoading = signal(false);
+  activeTab = signal<'activos' | 'pendientes' | 'certificados'>('activos');
 
   // Pagination State
   currentPage = signal(1);
@@ -38,6 +44,13 @@ export class AdminCoursesPage implements OnInit {
   );
   pendingCoursesCount = computed(
     () => this.courses().filter((c) => c.status === 'PENDING').length,
+  );
+  certificatesCount = computed(() => this.certificates().length);
+  validCertificatesCount = computed(
+    () => this.certificates().filter((c) => c.status !== 'revoked').length,
+  );
+  revokedCertificatesCount = computed(
+    () => this.certificates().filter((c) => c.status === 'revoked').length,
   );
 
   filteredCourses = computed(() => {
@@ -66,6 +79,7 @@ export class AdminCoursesPage implements OnInit {
 
   ngOnInit() {
     this.loadCourses();
+    this.loadCertificates();
   }
 
   loadCourses() {
@@ -82,6 +96,74 @@ export class AdminCoursesPage implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  async loadCertificates() {
+    this.certificatesLoading.set(true);
+    try {
+      const data = await this.certificatesService.getAllCertificatesAdmin();
+      this.certificates.set(data);
+    } catch (err) {
+      console.error('Error loading certificates', err);
+    } finally {
+      this.certificatesLoading.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * 1-Click Revoke Certificate Action
+   */
+  async revokeCertificate(cert: Certificate) {
+    const confirmed = confirm(
+      `¿Estás seguro de REVOCAR el certificado de ${cert.student_name}?\n\n` +
+      `Curso: ${cert.course?.title || cert.course_id}\n` +
+      `ID: ${cert.id}\n\n` +
+      `El certificado perderá su validez técnica y la URL pública (/academy/verify/${cert.id}) ` +
+      `mostrará "❌ Certificado Inválido" de inmediato.`
+    );
+
+    if (!confirmed) return;
+
+    const res = await this.certificatesService.revokeCertificateById(cert.id, 'Revocado desde Panel Admin');
+    if (res.success) {
+      this.certificates.update((list) =>
+        list.map((c) => (c.id === cert.id ? { ...c, status: 'revoked' as const } : c))
+      );
+      this.toastService.show(
+        `Certificado de ${cert.student_name} revocado. Verificación pública invalidada.`,
+        'info'
+      );
+      this.cdr.markForCheck();
+    } else {
+      this.toastService.show(`Error al revocar: ${res.error}`, 'error');
+    }
+  }
+
+  /**
+   * 1-Click Reactivate Certificate Action
+   */
+  async reactivateCertificate(cert: Certificate) {
+    const confirmed = confirm(
+      `¿Deseas REACTIVAR el certificado de ${cert.student_name}?\n` +
+      `Volverá a mostrarse como "✅ Certificado Válido" en el portal público.`
+    );
+
+    if (!confirmed) return;
+
+    const res = await this.certificatesService.reactivateCertificateById(cert.id);
+    if (res.success) {
+      this.certificates.update((list) =>
+        list.map((c) => (c.id === cert.id ? { ...c, status: 'valid' as const } : c))
+      );
+      this.toastService.show(
+        `Certificado de ${cert.student_name} reactivado exitosamente.`,
+        'success'
+      );
+      this.cdr.markForCheck();
+    } else {
+      this.toastService.show(`Error al reactivar: ${res.error}`, 'error');
+    }
   }
 
   async approveCourse(course: Course) {
@@ -117,7 +199,6 @@ export class AdminCoursesPage implements OnInit {
     )
       return;
 
-    // For rejection, we simply delete it or set status to rejected. We will use delete per standard.
     this.coursesService.deleteCourse(course.id).subscribe({
       next: () => {
         this.courses.update((current) =>
@@ -131,14 +212,15 @@ export class AdminCoursesPage implements OnInit {
   }
 
   handleImageError(event: any) {
-    event.target.src = '/assets/img/cursos/1.jpg'; // Fallback to a valid image with absolute path
+    event.target.src = '/assets/img/cursos/1.jpg';
   }
 
   getImageSrc(url: string | null | undefined): string {
-    if (!url) return 'assets/img/cursos/1.jpg'; // Usable default fallback
+    if (!url) return 'assets/img/cursos/1.jpg';
     if (url.startsWith('http') || url.startsWith('/')) {
       return url;
     }
     return '/' + url;
   }
 }
+

@@ -14,6 +14,7 @@
 .env.production
 .env.development
 !.env.example
+src/environments/environment.generated.ts
 
 # Claves privadas SSH, certificados SSL y tokens
 *.key
@@ -43,6 +44,8 @@ yarn.lock
 dist/
 dist.tar.gz
 dist_backup/
+backups/
+*.bak*
 deploy-temp/
 releases/
 build/
@@ -164,3 +167,8 @@ debug.mjs
 temp.html
 temp.mjs
 temp_size.js
+
+# ------------------------------------------------------------------------------
+# 11. AUDITORÍAS DE SEGURIDAD LOCALES (REPORTS, POCs, FINDINGS)
+# ------------------------------------------------------------------------------
+.audit/

@@ -40,7 +40,9 @@ import {
   RepairStatus,
   UpdateRepairDto,
   Repair,
-  RepairPart
+  RepairPart,
+  RepairOrderFormValue,
+  UpdateRepairOrderPayload
 } from '@app/features/repairs/domain/entities/repair.entity';
 import { Customer } from '@app/features/customers/domain/entities/customer.entity';
 import { PricingService } from '@app/core/services/pricing.service';
@@ -862,13 +864,14 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         payment_method,
         surcharge_percentage,
         customer_id,
+        device_id: formDeviceId,
         ...validFormData
       } = rawData;
 
       const payload = {
         ...validFormData,
-        customer_id: customer_id,
-        device_id: rawData.device_id || null, // Will be resolved/created in service
+        customer_id: customer_id || undefined,
+        device_id: formDeviceId || (this.id ? undefined : null), // Preserved on update, resolved on create
         images: this.images(),
         parts: this.parts(),
         branch_id: branchIdActual,

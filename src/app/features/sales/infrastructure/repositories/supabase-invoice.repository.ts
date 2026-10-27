@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { InvoiceRepository } from '../../domain/repositories/invoice.repository';
 import { Invoice, InvoiceOrigin, InvoiceStatus } from '../../domain/entities/invoice.entity';
+import { InvoiceMapper } from '../mappers/invoice.mapper';
 import { AuthService } from '@app/core/services/auth.service';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 
@@ -178,9 +179,21 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
   }
 
   async update(id: string, partial: Partial<Invoice>): Promise<{ data: Invoice | null; error: unknown }> {
+    const payload = InvoiceMapper.mapUpdateToDb(partial);
+
+    // Guard against empty update payloads
+    if (Object.keys(payload).length === 0) {
+      const { data, error } = await this.supabase
+        .from('invoices')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+      return { data: data as Invoice | null, error };
+    }
+
     const { data, error } = await this.supabase
       .from('invoices')
-      .update(partial)
+      .update(payload)
       .eq('id', id)
       .select()
       .maybeSingle();

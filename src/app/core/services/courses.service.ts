@@ -1,13 +1,23 @@
 import { Injectable, inject } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
+import { from, Observable, of, forkJoin } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Course, CourseModule, StudentEnrollment, CourseModuleContent, CourseExamQuestion, CourseExamSubmission } from '@app/features/courses/domain/entities/course.entity';
+import { 
+  Course, 
+  CourseModule, 
+  StudentEnrollment, 
+  CourseModuleContent, 
+  CourseExamQuestion, 
+  CourseExamSubmission,
+  EnrollmentStatus 
+} from '@app/features/courses/domain/entities/course.entity';
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
 import { LoggerService } from './logger.service';
 import { TenantService } from './tenant.service';
+import { SupabaseService } from './supabase.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 
-export type { Course, CourseModule as Module, StudentEnrollment, CourseModuleContent, CourseExamQuestion, CourseExamSubmission };
+export type { Course, CourseModule as Module, StudentEnrollment, CourseModuleContent, CourseExamQuestion, CourseExamSubmission, EnrollmentStatus };
 
 @Injectable({
     providedIn: 'root'
@@ -16,9 +26,10 @@ export class CoursesService {
     private repository = inject(CourseRepository);
     private logger = inject(LoggerService);
     private tenantService = inject(TenantService);
+    private supabaseService = inject(SupabaseService);
     private supabase = inject(SUPABASE_CLIENT);
 
-    getCourses(): Observable<{ data: Course[], error: any }> {
+    getCourses(): Observable<{ data: Course[], error: unknown }> {
         return from(this.repository.getAll()).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -28,7 +39,7 @@ export class CoursesService {
         );
     }
 
-    getCourseBySlug(slug: string): Observable<{ data: Course | null, error: any }> {
+    getCourseBySlug(slug: string): Observable<{ data: Course | null, error: unknown }> {
         return from(this.repository.getBySlug(slug)).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -38,7 +49,7 @@ export class CoursesService {
         );
     }
 
-    getCourseById(id: string): Observable<{ data: Course | null, error: any }> {
+    getCourseById(id: string): Observable<{ data: Course | null, error: unknown }> {
         return from(this.repository.getById(id)).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -48,7 +59,7 @@ export class CoursesService {
         );
     }
 
-    createCourse(course: Partial<Course>): Observable<{ data: Course | null, error: any }> {
+    createCourse(course: Partial<Course>): Observable<{ data: Course | null, error: unknown }> {
         this.logger.debug('Creating new course', course);
         return from(this.repository.create(course)).pipe(
             map(data => ({ data, error: null })),
@@ -59,7 +70,8 @@ export class CoursesService {
         );
     }
 
-    updateCourse(id: string, course: Partial<Course>): Observable<{ data: Course | null, error: any }> {
+    updateCourse(id: string, course: Partial<Course>): Observable<{ data: Course | null, error: unknown }> {
+        this.logger.debug(`Updating course: ${id}`, course);
         return from(this.repository.update(id, course)).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -69,90 +81,111 @@ export class CoursesService {
         );
     }
 
-    deleteCourse(id: string): Observable<any> {
+    deleteCourse(id: string): Observable<{ error: unknown }> {
+        this.logger.debug(`Deleting course: ${id}`);
         return from(this.repository.delete(id)).pipe(
             map(() => ({ error: null })),
-            catchError(error => of({ error }))
+            catchError(error => {
+                this.logger.error(`Failed to delete course: ${id}`, error);
+                return of({ error });
+            })
         );
     }
 
-    getModulesByCourseId(courseId: string): Observable<{ data: CourseModule[], error: any }> {
-         return from(this.repository.getModules(courseId)).pipe(
-             map(data => ({ data, error: null })),
-             catchError(error => {
-                 this.logger.error(`Failed to fetch modules for course: ${courseId}`, error);
-                 return of({ data: [], error });
-             })
-         );
+    // --- Modules ---
+
+    getModulesByCourseId(courseId: string): Observable<{ data: CourseModule[], error: unknown }> {
+        return from(this.repository.getModules(courseId)).pipe(
+            map(data => ({ data, error: null })),
+            catchError(error => {
+                this.logger.error(`Failed to fetch modules for course: ${courseId}`, error);
+                return of({ data: [], error });
+            })
+        );
     }
 
-    saveModules(courseId: string, modules: Partial<CourseModule>[]): Observable<any> {
+    saveModules(courseId: string, modules: Partial<CourseModule>[]): Observable<{ data: CourseModule[], error: unknown }> {
         const tenantId = this.tenantService.getTenantId();
-        this.logger.debug('Saving course modules', { courseId, count: modules.length });
-        
         return from(this.repository.saveModules(courseId, modules, tenantId)).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
-                this.logger.error('Failed to save modules', error);
-                return of({ data: null, error });
+                this.logger.error(`Failed to save modules for course: ${courseId}`, error);
+                return of({ data: [], error });
             })
         );
     }
 
     /**
-     * Actualiza la fecha de desbloqueo de un módulo (drip content).
-     * @param moduleId UUID del módulo
-     * @param unlockDate ISO string para programar, null para bloquear, 'now' para habilitar ya
+     * Updates unlock_date for drip content gating on a single module.
+     * dateOrAction: ISO string, 'now' (sets to current timestamp), or null (locks).
      */
-    updateModuleUnlockDate(moduleId: string, unlockDate: string | null): Observable<{ data: CourseModule | null, error: any }> {
-        const value = unlockDate === 'now' ? new Date().toISOString() : unlockDate;
+    updateModuleUnlockDate(
+        moduleId: string,
+        dateOrAction: string | 'now' | null,
+    ): Observable<{ data: CourseModule | null; error: unknown }> {
+        const unlock_date =
+            dateOrAction === 'now'
+                ? new Date().toISOString()
+                : dateOrAction;
+
         return from(
             this.supabase
                 .from('course_modules')
-                .update({ unlock_date: value })
+                .update({ unlock_date })
                 .eq('id', moduleId)
                 .select()
-                .single()
+                .single(),
         ).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
                 return { data: data as CourseModule, error: null };
             }),
-            catchError(error => {
+            catchError((error) => {
                 this.logger.error(`Failed to update unlock_date for module ${moduleId}`, error);
                 return of({ data: null, error });
-            })
+            }),
         );
     }
 
-    async registerStudent(data: any): Promise<{ data: StudentEnrollment | null, error: any }> {
+    // --- Student Enrollments ---
+
+    async registerStudent(data: {
+        course_id: string;
+        full_name: string;
+        email: string;
+        phone?: string;
+        user_id?: string;
+        course_title?: string;
+    }): Promise<{ data: StudentEnrollment | null, error: unknown }> {
         try {
+            const trimmedEmail = (data.email || '').trim().toLowerCase();
             const enrollment: StudentEnrollment = {
                 course_id: data.course_id,
+                user_id: data.user_id || null,
                 full_name: data.full_name,
-                email: data.email,
-                phone: data.phone,
+                email: trimmedEmail,
+                phone: data.phone || '',
                 status: 'pending',
                 tenant_id: this.tenantService.getTenantId(),
                 created_at: new Date().toISOString()
             };
             
-            // 1. Save to technical enrollments table
+            // 1. Save to course_enrollments
             const result = await this.repository.enrollStudent(enrollment);
 
-            // 2. Also send to contact_messages to show in Admin Message panel
+            // 2. Secondary notification to contact_messages
             try {
                 await this.supabase.from('contact_messages').insert({
                     name: data.full_name,
-                    email: data.email,
-                    phone: data.phone,
+                    email: trimmedEmail,
+                    phone: data.phone || '',
                     subject: 'Nueva Inscripción a Curso',
-                    message: `Se ha registrado una nueva inscripción.\nCurso: ${data.course_title || 'N/A'}\nEmail: ${data.email}\nTel: ${data.phone}`,
+                    message: `Se ha registrado una nueva inscripción.\nCurso: ${data.course_title || 'N/A'}\nEmail: ${trimmedEmail}\nTel: ${data.phone || ''}`,
                     is_read: false,
                     tenant_id: this.tenantService.getTenantId()
                 });
                 
-                // 3. Create explicit Admin Notification in admin_notifications table
+                // 3. Admin notification
                 await this.supabase.from('admin_notifications').insert({
                     title: '🎓 Nueva Inscripción a Curso',
                     message: `${data.full_name} se ha inscripto al curso de ${data.course_title || 'N/A'}.`,
@@ -162,9 +195,10 @@ export class CoursesService {
                     tenant_id: this.tenantService.getTenantId()
                 });
             } catch (msgErr) {
-                this.logger.error('Failed to create secondary contact message or notification for enrollment', msgErr);
+                this.logger.error('Failed to create secondary notification for enrollment', msgErr);
             }
 
+            this.supabaseService.clearCacheForTable('course_enrollments');
             return { data: result, error: null };
         } catch (error) {
             this.logger.error('Error registering student', error);
@@ -172,7 +206,7 @@ export class CoursesService {
         }
     }
 
-    getEnrollments(): Observable<{ data: StudentEnrollment[], error: any }> {
+    getEnrollments(): Observable<{ data: StudentEnrollment[], error: unknown }> {
         return from(this.repository.getEnrollments()).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -182,25 +216,37 @@ export class CoursesService {
         );
     }
 
-    getUserEnrolledCourses(email: string): Observable<{ data: StudentEnrollment[], error: any }> {
+    /**
+     * Resolves confirmed courses for the student using dual identity check:
+     * lower(email) = :email OR user_id = :userId.
+     */
+    getUserEnrolledCourses(email?: string, userId?: string): Observable<{ data: StudentEnrollment[], error: unknown }> {
         const tenantId = this.tenantService.getTenantId();
-        const trimmedEmail = (email || '').trim();
+        const trimmedEmail = (email || '').trim().toLowerCase();
+        
         let query = this.supabase.from('course_enrollments').select(`
             *,
-            course:courses(id, title, slug, image_url, short_description)
+            course:courses(id, title, slug, image_url, short_description, unlock_strategy, is_active)
         `)
-        .ilike('email', trimmedEmail)
-        .eq('status', 'confirmed')
+        .in('status', ['confirmed', 'in_progress', 'completed'])
         .order('created_at', { ascending: false });
 
-        if (tenantId && tenantId !== '00000000-0000-0000-0000-000000000000') {
-            query = query.or(`tenant_id.eq.${tenantId},tenant_id.is.null,tenant_id.eq.00000000-0000-0000-0000-000000000000`);
+        if (trimmedEmail && userId) {
+            query = query.or(`email.ilike.${trimmedEmail},user_id.eq.${userId}`);
+        } else if (userId) {
+            query = query.eq('user_id', userId);
+        } else if (trimmedEmail) {
+            query = query.ilike('email', trimmedEmail);
+        }
+
+        if (tenantId && tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+            query = query.eq('tenant_id', tenantId);
         }
 
         return from(query).pipe(
             map(({ data, error }) => {
                 if (error) throw error;
-                return { data: (data || []) as any[], error: null };
+                return { data: (data || []) as StudentEnrollment[], error: null };
             }),
             catchError(error => {
                 this.logger.error('Failed to fetch user enrolled courses', error);
@@ -209,13 +255,17 @@ export class CoursesService {
         );
     }
 
-    searchUsersByEmail(query: string): Observable<{ data: any[], error: any }> {
+    searchUsersByEmail(query: string): Observable<{ data: unknown[], error: unknown }> {
         const trimmed = (query || '').trim();
-        // Search by email OR by first/last name — no tenant filter so admin can find any registered user
         let dbQuery = this.supabase.from('profiles')
             .select('id, email, first_name, last_name, phone, avatar_url, role')
             .limit(100);
             
+        const tenantId = this.tenantService.getTenantId();
+        if (tenantId && tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+            dbQuery = dbQuery.eq('tenant_id', tenantId);
+        }
+
         if (trimmed) {
             dbQuery = dbQuery.or(`email.ilike.%${trimmed}%,first_name.ilike.%${trimmed}%,last_name.ilike.%${trimmed}%`);
         }
@@ -233,60 +283,101 @@ export class CoursesService {
     }
 
     /**
-     * Checks directly in course_enrollments if a confirmed enrollment exists
-     * for the given email + courseId. This is the canonical way to gate campus access.
+     * Checks in course_enrollments if a confirmed enrollment exists for the given course
+     * via email OR user_id.
      */
-    async checkEnrollment(courseId: string, email: string): Promise<{ enrolled: boolean, error: unknown }> {
-        const trimmedEmail = (email || '').trim();
-        const { data, error } = await this.supabase
+    async checkEnrollment(courseId: string, email?: string, userId?: string): Promise<{ enrolled: boolean, error: unknown }> {
+        const trimmedEmail = (email || '').trim().toLowerCase();
+        let query = this.supabase
             .from('course_enrollments')
             .select('id, status')
             .eq('course_id', courseId)
-            .ilike('email', trimmedEmail)
-            .eq('status', 'confirmed')
-            .limit(1);
+            .in('status', ['confirmed', 'in_progress', 'completed']);
+
+        if (trimmedEmail && userId) {
+            query = query.or(`email.ilike.${trimmedEmail},user_id.eq.${userId}`);
+        } else if (userId) {
+            query = query.eq('user_id', userId);
+        } else if (trimmedEmail) {
+            query = query.ilike('email', trimmedEmail);
+        } else {
+            return { enrolled: false, error: 'No user identification provided' };
+        }
+
+        const { data, error } = await query.limit(1);
         if (error) {
             this.logger.error('checkEnrollment failed', error);
             return { enrolled: false, error };
         }
-        return { enrolled: data && data.length > 0, error: null };
+        return { enrolled: !!(data && data.length > 0), error: null };
     }
 
-    async enrollStudentManually(courseId: string, email: string, fullName: string, phone?: string, userId?: string): Promise<{ data: any, error: any }> {
-        const trimmedEmail = (email || '').trim();
+    /**
+     * Enrolls a student manually with deduplication and dual identity linkage.
+     */
+    async enrollStudentManually(
+        courseId: string, 
+        email: string, 
+        fullName: string, 
+        phone?: string, 
+        userId?: string
+    ): Promise<{ data: StudentEnrollment | null, error: unknown }> {
+        const trimmedEmail = (email || '').trim().toLowerCase();
         
         try {
-            // Check if enrollment already exists
-            const { data: existing } = await this.supabase
+            let query = this.supabase
                 .from('course_enrollments')
                 .select('id')
-                .eq('course_id', courseId)
-                .ilike('email', trimmedEmail)
-                .limit(1);
+                .eq('course_id', courseId);
 
-            if (existing && existing.length > 0) {
-                // Update the existing record instead of inserting a duplicate
-                const { error: updateErr } = await this.supabase
-                    .from('course_enrollments')
-                    .update({ status: 'confirmed', user_id: userId || null, full_name: fullName, phone: phone || '' })
-                    .eq('id', existing[0].id);
-                return { data: existing[0], error: updateErr };
+            if (trimmedEmail && userId) {
+                query = query.or(`email.ilike.${trimmedEmail},user_id.eq.${userId}`);
+            } else if (userId) {
+                query = query.eq('user_id', userId);
+            } else {
+                query = query.ilike('email', trimmedEmail);
             }
 
-            // Insert new record
-            const enrollment: any = {
+            const { data: existing, error: findError } = await query.limit(1);
+            if (findError) throw findError;
+
+            if (existing && existing.length > 0) {
+                // Update existing record
+                const enrollmentUpdate: Record<string, unknown> = {
+                    status: 'confirmed',
+                    full_name: fullName,
+                };
+                if (userId) enrollmentUpdate['user_id'] = userId;
+                if (trimmedEmail) enrollmentUpdate['email'] = trimmedEmail;
+                if (phone !== undefined) enrollmentUpdate['phone'] = phone;
+
+                const { data: updated, error: updateErr } = await this.supabase
+                    .from('course_enrollments')
+                    .update(enrollmentUpdate)
+                    .eq('id', existing[0].id)
+                    .select()
+                    .single();
+
+                this.supabaseService.clearCacheForTable('course_enrollments');
+                return { data: updated as StudentEnrollment, error: updateErr };
+            }
+
+            // Insert new enrollment
+            const enrollment: StudentEnrollment = {
                 course_id: courseId,
                 full_name: fullName,
                 email: trimmedEmail,
                 phone: phone || '',
                 status: 'confirmed',
-                tenant_id: this.tenantService.getTenantId()
+                tenant_id: this.tenantService.getTenantId(),
+                created_at: new Date().toISOString()
             };
             if (userId) {
                 enrollment.user_id = userId;
             }
             
             const result = await this.repository.enrollStudent(enrollment);
+            this.supabaseService.clearCacheForTable('course_enrollments');
             return { data: result, error: null };
         } catch (error) {
             this.logger.error('Failed to manually enroll student', error);
@@ -294,7 +385,27 @@ export class CoursesService {
         }
     }
 
-    assignInstructors(courseId: string, instructorIds: string[]): Observable<{ error: any }> {
+    async deleteEnrollment(id: string): Promise<{ error: unknown }> {
+        const { error } = await this.supabase
+            .from('course_enrollments')
+            .delete()
+            .eq('id', id);
+
+        this.supabaseService.clearCacheForTable('course_enrollments');
+        return { error };
+    }
+
+    async updateEnrollmentStatus(id: string, status: EnrollmentStatus): Promise<{ error: unknown }> {
+        const { error } = await this.supabase
+            .from('course_enrollments')
+            .update({ status })
+            .eq('id', id);
+
+        this.supabaseService.clearCacheForTable('course_enrollments');
+        return { error };
+    }
+
+    assignInstructors(courseId: string, instructorIds: string[]): Observable<{ error: unknown }> {
         const tenantId = this.tenantService.getTenantId();
         return from(this.repository.assignInstructors(courseId, instructorIds, tenantId)).pipe(
             map(() => ({ error: null })),
@@ -305,7 +416,7 @@ export class CoursesService {
         );
     }
 
-    getCourseInstructors(courseId: string): Observable<{ data: any[], error: any }> {
+    getCourseInstructors(courseId: string): Observable<{ data: unknown[], error: unknown }> {
         return from(this.repository.getCourseInstructors(courseId)).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -315,7 +426,7 @@ export class CoursesService {
         );
     }
 
-    getModuleContents(moduleId: string): Observable<{ data: any[], error: any }> {
+    getModuleContents(moduleId: string): Observable<{ data: CourseModuleContent[], error: unknown }> {
         return from(this.repository.getModuleContents(moduleId)).pipe(
             map(data => ({ data, error: null })),
             catchError(error => {
@@ -325,7 +436,7 @@ export class CoursesService {
         );
     }
 
-    saveModuleContents(moduleId: string, contents: any[]): Observable<{ data: any[], error: any }> {
+    saveModuleContents(moduleId: string, contents: Partial<CourseModuleContent>[]): Observable<{ data: CourseModuleContent[], error: unknown }> {
         const tenantId = this.tenantService.getTenantId();
         return from(this.repository.saveModuleContents(moduleId, contents, tenantId)).pipe(
             map(data => ({ data, error: null })),
@@ -337,9 +448,7 @@ export class CoursesService {
     }
 
     /**
-     * Loads all modules for a course AND their contents in parallel.
-     * Returns modules with a `contents` array attached to each one.
-     * Used by the public course detail page to render the real syllabus.
+     * Loads all modules for a course AND their contents in parallel using forkJoin.
      */
     getModulesWithContents(courseId: string): Observable<{ data: (CourseModule & { contents: CourseModuleContent[] })[], error: unknown }> {
         return this.getModulesByCourseId(courseId).pipe(
@@ -351,7 +460,7 @@ export class CoursesService {
                 const contentRequests = modules.map(mod =>
                     this.getModuleContents(mod.id)
                 );
-                return from(Promise.all(contentRequests.map(obs => obs.toPromise()))).pipe(
+                return forkJoin(contentRequests).pipe(
                     map(allContents => ({
                         data: modules.map((mod, i) => ({
                             ...mod,
@@ -372,12 +481,11 @@ export class CoursesService {
         );
     }
 
-
     // --- Exams ---
     
-    getExamQuestions(contentId: string): Observable<{ data: any[], error: any }> {
+    getExamQuestions(contentId: string): Observable<{ data: CourseExamQuestion[], error: unknown }> {
         return from(this.supabase.rpc('get_exam_questions', { p_content_id: contentId })).pipe(
-            map(res => ({ data: res.data || [], error: res.error })),
+            map(res => ({ data: (res.data || []) as CourseExamQuestion[], error: res.error })),
             catchError(error => {
                 this.logger.error(`Failed to get exam questions for content: ${contentId}`, error);
                 return of({ data: [], error });
@@ -385,7 +493,7 @@ export class CoursesService {
         );
     }
 
-    saveExamQuestions(contentId: string, questions: Partial<CourseExamQuestion>[]): Observable<{ data: any[], error: any }> {
+    saveExamQuestions(contentId: string, questions: Partial<CourseExamQuestion>[]): Observable<{ data: CourseExamQuestion[], error: unknown }> {
         const tenantId = this.tenantService.getTenantId();
         const payload = questions.map(q => ({
             ...q,
@@ -406,7 +514,7 @@ export class CoursesService {
                         .select();
                 })
         ).pipe(
-            map(res => ({ data: res.data || [], error: res.error })),
+            map(res => ({ data: (res.data || []) as CourseExamQuestion[], error: res.error })),
             catchError(error => {
                 this.logger.error(`Failed to save exam questions for content: ${contentId}`, error);
                 return of({ data: [], error });
@@ -414,9 +522,15 @@ export class CoursesService {
         );
     }
 
-    submitExam(contentId: string, answers: { question_id: string, selected_index: number }[]): Observable<{ data: any, error: any }> {
+    submitExam(
+        contentId: string, 
+        answers: { question_id: string, selected_index: number }[]
+    ): Observable<{ data: { score: number; passed: boolean; correct_answers: number; total_questions: number; progress?: unknown } | null, error: unknown }> {
         return from(this.supabase.rpc('submit_exam', { p_content_id: contentId, p_answers: answers })).pipe(
-            map(res => ({ data: res.data, error: res.error })),
+            map(res => {
+                this.supabaseService.clearCacheForTable('course_progress');
+                return { data: res.data, error: res.error };
+            }),
             catchError(error => {
                 this.logger.error(`Failed to submit exam for content: ${contentId}`, error);
                 return of({ data: null, error });
@@ -424,7 +538,8 @@ export class CoursesService {
         );
     }
 
-    getCourseProgress(courseId: string): Observable<{ data: { progress: number, completed_contents: string[], certificate_id?: string } | null, error: any }> {
+    getCourseProgress(courseId: string, email?: string): Observable<{ data: { progress: number, completed_contents: string[], certificate_id?: string } | null, error: unknown }> {
+        const trimmedEmail = (email || '').trim().toLowerCase();
         return from(
             this.supabase
                 .from('course_progress')
@@ -435,26 +550,30 @@ export class CoursesService {
                 if (res.error) return { data: null, error: res.error };
                 return {
                     data: {
-                        progress: 0, // Calculated on the frontend or backend
-                        completed_contents: res.data.map((row: any) => row.content_id),
-                        certificate_id: undefined // Checked separately if needed, or we fetch from course_certificates
+                        progress: 0,
+                        completed_contents: (res.data || []).map((row: { content_id: string }) => row.content_id),
+                        certificate_id: undefined
                     },
                     error: null
                 };
             }),
             switchMap(result => {
                 if (result.error || !result.data) return of(result);
-                // Also check if certificate exists
-                return from(
-                    this.supabase
-                        .from('course_certificates')
-                        .select('id')
-                        .eq('course_id', courseId)
-                        .maybeSingle()
-                ).pipe(
+                
+                let certQuery = this.supabase
+                    .from('course_certificates')
+                    .select('id')
+                    .eq('course_id', courseId);
+
+                if (trimmedEmail) {
+                    certQuery = certQuery.eq('email', trimmedEmail);
+                }
+
+                return from(certQuery.maybeSingle()).pipe(
                     map(certRes => {
                         if (certRes.data) {
                             result.data!.certificate_id = certRes.data.id;
+                            result.data!.progress = 100;
                         }
                         return result;
                     })
@@ -467,9 +586,12 @@ export class CoursesService {
         );
     }
 
-    markContentCompleted(contentId: string): Observable<{ data: any, error: any }> {
+    markContentCompleted(contentId: string): Observable<{ data: { progress: number; completed: number; total: number; certificate_id?: string } | null, error: unknown }> {
         return from(this.supabase.rpc('mark_content_completed', { p_content_id: contentId })).pipe(
-            map(res => ({ data: res.data, error: res.error })),
+            map(res => {
+                this.supabaseService.clearCacheForTable('course_progress');
+                return { data: res.data, error: res.error };
+            }),
             catchError(error => {
                 this.logger.error(`Failed to mark content completed: ${contentId}`, error);
                 return of({ data: null, error });
@@ -477,7 +599,7 @@ export class CoursesService {
         );
     }
 
-    getCertificate(certId: string): Observable<{ data: any, error: any }> {
+    getCertificate(certId: string): Observable<{ data: unknown, error: unknown }> {
         return from(
             this.supabase
                 .from('course_certificates')

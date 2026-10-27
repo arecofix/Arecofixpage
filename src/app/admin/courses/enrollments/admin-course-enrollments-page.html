@@ -18,11 +18,11 @@
         <!-- Search User -->
         <div class="md:col-span-4 relative">
             <label class="label mb-1 block"><span class="label-text font-bold text-gray-700 dark:text-gray-300 text-xs uppercase tracking-wider">Buscar Usuario (Email)</span></label>
-            @if (selectedUser()) {
+            @if (selectedUser(); as user) {
                 <div class="flex items-center gap-3 p-2.5 border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
                     <div class="flex-1 min-w-0">
-                        <div class="font-bold text-sm text-emerald-800 dark:text-emerald-400 truncate">{{ selectedUser().full_name || (selectedUser().first_name ? selectedUser().first_name + ' ' + (selectedUser().last_name || '') : selectedUser().email) }}</div>
-                        <div class="text-xs text-emerald-600 dark:text-emerald-500/80 truncate">{{ selectedUser().email }}</div>
+                        <div class="font-bold text-sm text-emerald-800 dark:text-emerald-400 truncate">{{ user.full_name || (user.first_name ? user.first_name + ' ' + (user.last_name || '') : user.email) }}</div>
+                        <div class="text-xs text-emerald-600 dark:text-emerald-500/80 truncate">{{ user.email }}</div>
                     </div>
                     <button class="w-8 h-8 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-800/50 text-emerald-600 flex items-center justify-center transition-colors" (click)="clearSelectedUser()"><i class="fas fa-times"></i></button>
                 </div>
@@ -137,7 +137,7 @@
 
                     <!-- Actions -->
                     <div class="pt-4 border-t border-gray-100 dark:border-gray-800 flex gap-2 justify-end">
-                        <a [href]="'https://wa.me/' + (enroll.phone.replace('+', '') || '')" target="_blank" 
+                        <a [href]="'https://wa.me/' + ((enroll.phone || '').replace('+', ''))" target="_blank" 
                            class="h-9 px-3 rounded-xl flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors text-sm font-bold" 
                            title="Contactar por WhatsApp">
                             <i class="fab fa-whatsapp"></i> Chat

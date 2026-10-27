@@ -14,6 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { CoursesService, Module } from '@app/core/services/courses.service';
 import { ProductMediaService } from '@app/admin/products/services/product-media.service';
 import { LoggerService } from '@app/core/services/logger.service';
@@ -81,6 +82,7 @@ export class AdminCourseFormPage implements OnInit {
         author_id: [''],
         audience_list: [''],
         reviews_count: [0],
+        unlock_strategy: ['ALL_AT_ONCE', Validators.required],
         modules: this.fb.array([]),
       },
       { validators: this.priceValidator },
@@ -278,6 +280,7 @@ export class AdminCourseFormPage implements OnInit {
             .filter((i: string) => i)
         : null,
       reviews_count: formValue.reviews_count || 0,
+      unlock_strategy: formValue.unlock_strategy || 'ALL_AT_ONCE',
     };
 
     const modules = this.modulesFormArray.value;
@@ -289,18 +292,18 @@ export class AdminCourseFormPage implements OnInit {
     try {
       let courseResult;
       if (this.isEditing && this.courseId) {
-        courseResult = await this.coursesService
-          .updateCourse(this.courseId, courseData)
-          .toPromise();
+        courseResult = await firstValueFrom(
+          this.coursesService.updateCourse(this.courseId, courseData)
+        );
       } else {
-        courseResult = await this.coursesService
-          .createCourse(courseData)
-          .toPromise();
+        courseResult = await firstValueFrom(
+          this.coursesService.createCourse(courseData)
+        );
       }
 
       if (courseResult?.error) {
         throw new Error(
-          courseResult.error.message || 'Error al guardar el curso',
+          (courseResult.error as { message?: string })?.message || 'Error al guardar el curso',
         );
       }
 
@@ -308,10 +311,10 @@ export class AdminCourseFormPage implements OnInit {
 
       if (savedCourseId && modules && modules.length >= 0) {
         try {
-          await this.coursesService
-            .saveModules(savedCourseId, modules)
-            .toPromise();
-        } catch (modErr: any) {
+          await firstValueFrom(
+            this.coursesService.saveModules(savedCourseId, modules)
+          );
+        } catch (modErr: unknown) {
           this.logger.warn('Failed to sync modules', modErr);
           this.notificationService.showError(
             'El programa se guardó con éxito pero falló la sincronización de los Módulos. Esto puede deberse a que no has aplicado las migraciones de Base de Datos para el Temario.',

@@ -98,6 +98,7 @@ serve(async (req: Request) => {
       Boolean(Deno.env.get('TEST_SECRET')) &&
       req.headers.get('x-test-secret') === Deno.env.get('TEST_SECRET');
 
+    if (!isTestBypass) {
       const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY');
       if (!turnstileSecret) {
         console.error('[Turnstile Config Error] TURNSTILE_SECRET_KEY no configurado.');
@@ -109,7 +110,7 @@ serve(async (req: Request) => {
 
       const turnstileToken = body['cf-turnstile-response'] || body['turnstileToken'] || body['turnstile_token'];
 
-      if (!turnstileToken) {
+      if (!turnstileToken || typeof turnstileToken !== 'string' || turnstileToken.length > 2048) {
         return new Response(
           JSON.stringify({ error: 'Verificación de captcha requerida.' }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -120,6 +121,7 @@ serve(async (req: Request) => {
         verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          signal: AbortSignal.timeout(10_000),
           body: new URLSearchParams({
             secret: turnstileSecret,
             response: turnstileToken,
@@ -149,6 +151,26 @@ serve(async (req: Request) => {
           JSON.stringify({ error: 'Verificación de captcha fallida o token inválido.' }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
+      }
+
+      if (verifyData.action && verifyData.action !== 'trial_signup') {
+        console.warn('[Turnstile Action Mismatch]', verifyData.action);
+        return new Response(
+          JSON.stringify({ error: 'Acción de captcha no autorizada.' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const allowedHostnames = Deno.env.get('TURNSTILE_HOSTNAMES');
+      if (allowedHostnames) {
+        const hostnames = new Set(allowedHostnames.split(',').map(h => h.trim().toLowerCase()).filter(Boolean));
+        if (verifyData.hostname && !hostnames.has(verifyData.hostname.toLowerCase())) {
+          console.warn('[Turnstile Hostname Mismatch]', verifyData.hostname, 'Allowed:', [...hostnames]);
+          return new Response(
+            JSON.stringify({ error: 'Dominio de captcha no autorizado.' }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
       }
     }
 

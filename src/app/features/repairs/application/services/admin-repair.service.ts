@@ -285,7 +285,8 @@ export class AdminRepairService {
         if (!originalRepair) throw new Error('Reparación no encontrada');
 
         // Logic: Update customer info if changed
-        if (originalRepair.customer_id) {
+        const effectiveCustomerId = originalRepair.customer_id || originalRepair.client_id || dto.customer_id;
+        if (effectiveCustomerId) {
             const updateData: Record<string, unknown> = {};
             if (dto.customer_dni !== undefined) updateData['dni'] = dto.customer_dni || null;
             if (dto.customer_phone !== undefined) updateData['phone'] = dto.customer_phone || null;
@@ -299,7 +300,7 @@ export class AdminRepairService {
 
             try {
                 if (Object.keys(updateData).length > 0) {
-                    await this.customerService.update(originalRepair.customer_id, updateData);
+                    await this.customerService.update(effectiveCustomerId, updateData);
                 }
             } catch (err) {
                 console.error('[AdminRepairService] Error updating existing customer data during repair update:', err);
@@ -307,7 +308,9 @@ export class AdminRepairService {
         }
 
         // Logic: Update device info if changed
-        if (originalRepair.customer_id && dto.device_model) {
+        const targetDeviceId = dto.device_id || originalRepair.device_id || null;
+
+        if (effectiveCustomerId && dto.device_model) {
             let modelId: string | null = null;
             const modelName = dto.device_model.trim();
             const generatedSlug = modelName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'model-' + Math.random().toString(36).substring(2, 9);
@@ -316,8 +319,8 @@ export class AdminRepairService {
             
             const savedDeviceId = await firstValueFrom(
                 this.customerDeviceRepository.upsertDevice({
-                    deviceId: originalRepair.device_id || null,
-                    userId: originalRepair.customer_id,
+                    deviceId: targetDeviceId,
+                    userId: effectiveCustomerId,
                     modelId: modelId,
                     type: dto.device_type,
                     imei: dto.imei,
@@ -327,6 +330,9 @@ export class AdminRepairService {
             if (savedDeviceId) {
                 payload.device_id = savedDeviceId;
             }
+        } else if (originalRepair.device_id && (!payload.device_id || payload.device_id === '')) {
+            // CRITICAL: Guarantee original device_id is never wiped when device_model is untouched
+            payload.device_id = originalRepair.device_id;
         }
 
         // Logic: Set completed_at if status changes to final
@@ -473,7 +479,7 @@ export class AdminRepairService {
                 balanceDue,
             },
             issuedAt: new Date().toISOString(),
-            warranty: originalRepair.warranty,
+            warranty: originalRepair.warranty || undefined,
             paymentMethod: updatePayload.payment_method ?? originalRepair.payment_method,
             notes: originalRepair.notes,
             technicalReport: originalRepair.technical_report || originalRepair.technician_notes,

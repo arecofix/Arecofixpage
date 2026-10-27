@@ -38,11 +38,14 @@ import { SupabaseService } from './core/services/supabase.service';
 import { SUPABASE_CLIENT } from './core/di/supabase-token';
 import { globalErrorInterceptor } from './core/interceptors/error.interceptor';
 import { timeoutInterceptor } from './core/interceptors/timeout.interceptor';
+import { guestSessionInterceptor } from './core/interceptors/guest-session.interceptor';
 import { ProductRepository } from './features/products/domain/repositories/product.repository';
 import { SupabaseProductRepository } from './features/products/infrastructure/repositories/supabase-product.repository';
 import { FlaskProductRepository } from './features/products/infrastructure/repositories/flask-product.repository';
 import { ProductStockRepository } from './features/products/domain/repositories/product-stock.repository';
 import { SupabaseProductStockRepository } from './features/products/infrastructure/repositories/supabase-product-stock.repository';
+import { StockRepository } from './features/products/domain/repositories/stock.repository';
+import { SupabaseStockRepository } from './features/products/infrastructure/repositories/supabase-stock.repository';
 import { CategoryRepository } from './features/products/domain/repositories/category.repository';
 import { SupabaseCategoryRepository } from './features/products/infrastructure/repositories/supabase-category.repository';
 import { FlaskCategoryRepository } from './features/products/infrastructure/repositories/flask-category.repository';
@@ -57,6 +60,12 @@ import { SupabaseRepairRepository } from './features/repairs/infrastructure/repo
 import { FlaskRepairRepository } from './features/repairs/infrastructure/repositories/flask-repair.repository';
 import { SupabaseAppServiceRepository } from './features/products/infrastructure/repositories/supabase-app-service.repository';
 import { AppServiceRepository } from './features/products/domain/repositories/app-service.repository';
+import { ServiceRepository } from './features/services/domain/repositories/service.repository';
+import { SupabaseServiceRepository } from './features/services/infrastructure/repositories/supabase-service.repository';
+import { ServiceBlockRepository } from './features/services/domain/repositories/service-block.repository';
+import { SupabaseServiceBlockRepository } from './features/services/infrastructure/repositories/supabase-service-block.repository';
+import { ServiceLeadRepository } from './features/services/domain/repositories/service-lead.repository';
+import { SupabaseServiceLeadRepository } from './features/services/infrastructure/repositories/supabase-service-lead.repository';
 import { AnalyticsRepository } from './features/analytics/domain/repositories/analytics.repository';
 import { SupabaseAnalyticsRepository } from './features/analytics/infrastructure/repositories/supabase-analytics.repository';
 import { UserProfileRepository } from './core/repositories/user-profile.repository';
@@ -66,6 +75,8 @@ import { SupabaseCustomerDeviceRepository } from './features/devices/infrastruct
 import { OrderRepository } from './features/orders/domain/repositories/order.repository';
 import { SupabaseOrderRepository } from './features/orders/infrastructure/repositories/supabase-order.repository';
 import { FlaskOrderRepository } from './features/orders/infrastructure/repositories/flask-order.repository';
+import { CartRepository } from './features/orders/domain/repositories/cart.repository';
+import { SupabaseCartRepository } from './features/orders/infrastructure/repositories/supabase-cart.repository';
 import { FinanceRepository } from './features/finance/domain/repositories/finance.repository';
 import { SupabaseFinanceRepository } from './features/finance/infrastructure/repositories/supabase-finance.repository';
 import { FlaskFinanceRepository } from './features/finance/infrastructure/repositories/flask-finance.repository';
@@ -164,7 +175,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(
       withFetch(),
-      withInterceptors([timeoutInterceptor, globalErrorInterceptor]),
+      withInterceptors([guestSessionInterceptor, timeoutInterceptor, globalErrorInterceptor]),
     ),
     provideServiceWorker('ngsw-worker.js?v=2', {
       enabled: !isDevMode() && !isTauri,
@@ -177,6 +188,10 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         return isTauri ? inject(FlaskProductRepository) : inject(SupabaseProductRepository);
       }
+    },
+    {
+      provide: StockRepository,
+      useClass: SupabaseStockRepository,
     },
     { 
       provide: CategoryRepository, 
@@ -193,6 +208,18 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AppServiceRepository,
       useClass: SupabaseAppServiceRepository,
+    },
+    {
+      provide: ServiceRepository,
+      useClass: SupabaseServiceRepository,
+    },
+    {
+      provide: ServiceBlockRepository,
+      useClass: SupabaseServiceBlockRepository,
+    },
+    {
+      provide: ServiceLeadRepository,
+      useClass: SupabaseServiceLeadRepository,
     },
     { 
       provide: RepairRepository, 
@@ -214,6 +241,10 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         return isTauri ? inject(FlaskOrderRepository) : inject(SupabaseOrderRepository);
       }
+    },
+    {
+      provide: CartRepository,
+      useClass: SupabaseCartRepository,
     },
     { 
       provide: FinanceRepository, 

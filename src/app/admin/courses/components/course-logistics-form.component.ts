@@ -180,6 +180,26 @@ import { ReactiveFormsModule, ControlContainer, FormGroupDirective } from '@angu
                     />
                   </label>
                 </div>
+
+                <!-- Estrategia de Desbloqueo -->
+                <div class="form-control md:col-span-2">
+                  <label class="label">
+                    <span
+                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+                      >Estrategia de Desbloqueo de Contenido</span
+                    >
+                  </label>
+                  <select
+                    formControlName="unlock_strategy"
+                    class="select bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl h-12 text-gray-900 dark:text-white"
+                  >
+                    <option value="ALL_AT_ONCE">Desbloqueo Total Inmediato (ALL_AT_ONCE)</option>
+                    <option value="SEQUENTIAL">Secuencial por Progreso (SEQUENTIAL - requiere completar unidad previa)</option>
+                  </select>
+                  <span class="text-xs text-slate-400 mt-1">
+                    En modo secuencial, los alumnos no podrán visualizar el módulo N+1 hasta completar los recursos del módulo N.
+                  </span>
+                </div>
               </div>
             </div>
 

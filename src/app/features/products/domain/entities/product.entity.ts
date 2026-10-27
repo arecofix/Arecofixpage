@@ -33,48 +33,48 @@ export interface Product {
     slug: string;
     description?: string | null;
     price: number;
-    retail_price?: number;
-    sale_price?: number;
-    category_id: string;
-    brand_id?: string;
-    model_id?: string;
-    image_url?: string;
+    retail_price?: number | null;
+    sale_price?: number | null;
+    category_id: string | null;
+    brand_id?: string | null;
+    model_id?: string | null;
+    image_url?: string | null;
     gallery_urls?: string[];
     media_metadata?: Array<{ url: string; color?: string; order?: number }>;
     specifications?: Record<string, any>;
     is_featured: boolean;
     is_active: boolean;
     is_global?: boolean;
-    branch_id?: string;
+    branch_id?: string | null;
     stock: number; // General stock (aggregate or legacy)
     min_stock_alert?: number;
-    sku?: string;
-    barcode?: string;
+    sku?: string | null;
+    barcode?: string | null;
     currency?: 'ARS' | 'USD';
     convertedPrice?: number;
     cost_price?: number;
     created_at: string;
     updated_at: string;
     tenant_id?: string;
-    deleted_at?: string;
+    deleted_at?: string | null;
     search_tsv?: string;
     // SEO fields
-    meta_title?: string;
-    meta_description?: string;
-    og_image?: string;
-    seo_keywords?: string;
+    meta_title?: string | null;
+    meta_description?: string | null;
+    og_image?: string | null;
+    seo_keywords?: string | null;
     
     // Marketing & Logistics
-    offer_start_date?: string; // fecha_inicio_oferta
-    offer_end_date?: string; // fecha_fin_oferta
+    offer_start_date?: string | null; // fecha_inicio_oferta
+    offer_end_date?: string | null; // fecha_fin_oferta
     warranty_days?: number; // garantia_meses
     tax_percentage?: number; // porcentaje_impuesto
-    weight?: number; // peso_kg
+    weight?: number | null; // peso_kg
     dimensions?: { length: number; width: number; height: number }; // largo_cm, ancho_cm, alto_cm
     cross_sell_products?: string[]; // productos_relacionados
     reference_exchange_rate?: number; // tasa_cambio_referencia
     free_shipping?: boolean; // envio_gratis
-    supplier_id?: string; // proveedor_id
+    supplier_id?: string | null; // proveedor_id
     condition?: 'Nuevo' | 'Usado' | 'Reacondicionado'; // condicion
     warranty_type?: 'Fábrica' | 'Vendedor' | 'Sin garantía'; // tipo_garantia
     includes_tax?: boolean; // incluye_iva

@@ -8,18 +8,22 @@ import { PostService } from '@app/features/posts/application/post.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { ContactService } from '@app/core/services/contact.service';
 import { ReservationCalendar } from '@app/public/reservation/reservation-calendar';
+import { BlockRendererComponent } from '@app/shared/components/block-renderer/block-renderer.component';
+import { ServicesApplicationService } from '@app/features/services/application/services/services-application.service';
+import { ServiceBlockDto } from '@app/features/services/domain/dtos/service.dto';
 import { environment } from '@env/environment';
 
 @Component({
     selector: 'app-post-page',
     standalone: true,
-    imports: [RouterLink, DatePipe, CommonModule, FormsModule, ReservationCalendar],
+    imports: [RouterLink, DatePipe, CommonModule, FormsModule, ReservationCalendar, BlockRendererComponent],
     templateUrl: './post-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostPage implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private postService = inject(PostService);
+    private servicesApp = inject(ServicesApplicationService);
     private cdr = inject(ChangeDetectorRef);
     private titleService = inject(Title);
     private metaService = inject(Meta);
@@ -28,6 +32,7 @@ export class PostPage implements OnInit, OnDestroy {
     private document = inject(DOCUMENT);
 
     post: Post | null = null;
+    blocks: ServiceBlockDto[] = [];
     loading = true;
     error: string | null = null;
     currentSlug: string | null = null;
@@ -67,6 +72,11 @@ export class PostPage implements OnInit, OnDestroy {
 
             if (this.post) {
                 this.handleSeo(this.post, slug);
+                try {
+                    this.blocks = await this.servicesApp.getBlocks('post', this.post.id);
+                } catch (bErr) {
+                    this.blocks = [];
+                }
                 await this.loadComments(this.post.id);
             } else {
                 if (slug.includes('tcnico')) {
@@ -74,6 +84,11 @@ export class PostPage implements OnInit, OnDestroy {
                     this.post = await this.postService.getPostBySlug(correctedSlug);
                     if (this.post) {
                         this.handleSeo(this.post, correctedSlug);
+                        try {
+                            this.blocks = await this.servicesApp.getBlocks('post', this.post.id);
+                        } catch (bErr) {
+                            this.blocks = [];
+                        }
                         await this.loadComments(this.post.id);
                         return;
                     }

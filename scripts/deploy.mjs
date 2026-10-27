@@ -92,6 +92,15 @@ async function main() {
   }
   log('AUTH', `Clave SSH detectada: ${CONFIG.sshKey}`);
 
+  // 1.5 Verificación de contrato de esquema contra Supabase
+  log('SCHEMA', 'Verificando contrato de esquema en base de datos para prevenir Schema Drift...');
+  try {
+    run('node scripts/verify-schema.mjs', 'Validando tablas y columnas requeridas en PostgREST...');
+  } catch (err) {
+    logError('SCHEMA', 'Schema drift detectado. Falta migración o la API no la expone. Despliegue abortado.');
+    process.exit(1);
+  }
+
   // 2. Compilación de producción Angular SSR
   const skipBuild = process.argv.includes('--skip-build');
   if (!skipBuild) {

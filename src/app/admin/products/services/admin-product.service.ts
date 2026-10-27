@@ -23,6 +23,8 @@ import { ProductsStore } from '@app/features/products/application/services/produ
 import { StockManagementService } from '@app/features/products/application/services/stock-management.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { ProductVariant } from '@app/features/products/domain/entities/product.entity';
+import { StockService } from '@app/features/products/application/services/stock.service';
+import { TENANT_CONSTANTS } from '@app/core/constants/tenant.constants';
 
 // Extracted to AdminProductImportService
 
@@ -43,6 +45,7 @@ export class AdminProductService {
     private userProfileRepo = inject(UserProfileRepository);
     private productsStore = inject(ProductsStore);
     private stockService = inject(StockManagementService);
+    private stockHistoryService = inject(StockService);
     private supabase = inject(SUPABASE_CLIENT);
 
     async saveVariants(productId: string, variants: Partial<ProductVariant>[]): Promise<void> {
@@ -67,7 +70,7 @@ export class AdminProductService {
             const profile = await this.auth.getUserProfile(user.id);
             const contextBranchId = this.branchContextService.getBranchId();
             const isGlobalAdmin = this.auth.isSuperAdmin() || profile?.role === ROLES.TENANT_OWNER;
-            const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
+            const isCentralBranch = contextBranchId === TENANT_CONSTANTS.DEFAULT_BRANCH_ID || !contextBranchId;
 
             // Si es súper administrador o el dueño central
             if (isGlobalAdmin) {
@@ -93,7 +96,7 @@ export class AdminProductService {
         const contextBranchId = this.branchContextService.getBranchId();
         const profile = this.auth.getCurrentProfile();
         const isGlobalAdmin = this.auth.isSuperAdmin() || (profile?.role as string) === 'tenant_owner' || (profile?.role as string) === ROLES.TENANT_OWNER;
-        const isCentralBranch = contextBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !contextBranchId;
+        const isCentralBranch = contextBranchId === TENANT_CONSTANTS.DEFAULT_BRANCH_ID || !contextBranchId;
 
         const enrichedParams = {
             ...params,
@@ -158,7 +161,7 @@ export class AdminProductService {
         const variants = payload.variants || [];
         delete payload.variants;
 
-        let branchId = payload.branch_id || this.branchContextService.getBranchId() || 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
+        let branchId = payload.branch_id || this.branchContextService.getBranchId() || TENANT_CONSTANTS.DEFAULT_BRANCH_ID;
         
         // 🐛 BUGFIX: Anteriormente se eliminaba el branch_id aquí. Ahora lo asignamos
         // explícitamente para asegurar que el producto pertenezca a la sucursal actual.
@@ -198,6 +201,9 @@ export class AdminProductService {
         try {
             if (createdProduct && createdProduct.id && branchId && initialStock !== undefined) {
                 await this.stockService.updateStock(createdProduct.id, branchId, initialStock);
+                if (initialStock > 0) {
+                    await this.stockHistoryService.adjustStock(createdProduct.id, initialStock, 'restock', undefined, branchId);
+                }
             }
             
             if (createdProduct && createdProduct.id && variants.length > 0) {
@@ -224,15 +230,37 @@ export class AdminProductService {
         const variants = payload.variants || [];
         delete payload.variants;
 
-        const branchId = payload.branch_id || this.branchContextService.getBranchId() || 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
+        const branchId = payload.branch_id || this.branchContextService.getBranchId() || TENANT_CONSTANTS.DEFAULT_BRANCH_ID;
         
         // 🐛 BUGFIX: Mantener el branch_id para no perder la asignación del producto.
         payload.branch_id = branchId || undefined;
 
+        let previousStock = 0;
+        let delta = 0;
+        if (initialStock !== undefined) {
+            try {
+                const currentProduct = await firstValueFrom(this.productRepo.getById(id));
+                previousStock = Number(currentProduct?.stock) || 0;
+                delta = initialStock - previousStock;
+            } catch (err) {
+                console.warn('[AdminProductService] Error getting previous stock for history:', err);
+            }
+        }
+
+        // 1. Single clean update with the full payload (name, price, stock, etc.)
         await firstValueFrom(this.productRepo.update(id, payload));
 
         if (branchId && initialStock !== undefined) {
             await this.stockService.updateStock(id, branchId, initialStock);
+        }
+
+        // 2. Record stock movement in stock_history if stock changed
+        if (delta !== 0) {
+            try {
+                await this.stockHistoryService.recordMovement(id, delta, previousStock, initialStock!, 'manual_adjustment', undefined, branchId);
+            } catch (err) {
+                console.warn('[AdminProductService] Error registrando ajuste en stock_history:', err);
+            }
         }
 
         if (variants.length > 0) {
@@ -240,6 +268,19 @@ export class AdminProductService {
         }
 
         this.productsStore.clearCache();
+    }
+
+    async softDeleteProduct(id: string): Promise<void> {
+        await firstValueFrom(this.productRepo.softDelete(id));
+        this.productsStore.clearCache();
+    }
+
+    getStockHistory(productId: string) {
+        return this.stockHistoryService.getStockHistory(productId);
+    }
+
+    async getAvailableStock(productId: string) {
+        return this.stockHistoryService.getAvailableStock(productId);
     }
 
     async getProductsByIds(ids: string[]): Promise<Product[]> {

@@ -24,7 +24,7 @@ describe('Optimización Máxima Firebase - Control de Ancho de Banda', () => {
     });
 
     it('3. Las rutas deben contener el estado TransferState (ng-state) para evitar flickeos (SSR)', () => {
-        cy.request('http://localhost:4200/').then((response) => {
+        cy.request('/').then((response) => {
             const html = response.body;
             // En SSR contiene ng-state o en dev server contiene app-root / ng-version
             expect(html).to.satisfy((h: string) => h.includes('id="ng-state"') || h.includes('<app-root') || h.includes('ng-version'));

@@ -74,16 +74,32 @@ export class ProductImagesManagerComponent {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
 
-    this.uploading.set(true);
     const files = Array.from(input.files);
-    
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    const maxSizeBytes = 5 * 1024 * 1024; // 5 MB
+
+    for (const file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        this.onError.emit(`Formato de archivo no permitido: ${file.name}. Solo se admiten JPG, PNG, WEBP o SVG.`);
+        input.value = '';
+        return;
+      }
+      if (file.size > maxSizeBytes) {
+        this.onError.emit(`El archivo ${file.name} supera el tamaño máximo permitido de 5 MB.`);
+        input.value = '';
+        return;
+      }
+    }
+
+    this.uploading.set(true);
     try {
       const uploadPromises = files.map(file => this.mediaService.uploadImage(file));
       const urls = await Promise.all(uploadPromises);
       const newMedia: ProductMedia[] = urls.map(url => ({ url, color: '' }));
       this.images.update(imgs => [...imgs, ...newMedia]);
-    } catch (e: any) {
-      this.onError.emit(e.message || 'Error al subir imagen');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Error al subir imagen';
+      this.onError.emit(msg);
     } finally {
       this.uploading.set(false);
       input.value = ''; // Reset input

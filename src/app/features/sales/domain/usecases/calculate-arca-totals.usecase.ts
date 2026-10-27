@@ -54,11 +54,13 @@ export class CalculateArcaTotalsUseCase {
     const safeSurcharge = Math.max(0, Number(surcharge) || 0);
     const safeAdvancePayment = Math.max(0, Number(advancePayment) || 0);
 
+    const safeItems = Array.isArray(items) ? items : [];
+
     // ────────────────────────────────────────────────────────────────────────
     // 1. FACTURA C o X: Sin IVA (Monotributo o Comprobante Interno)
     // ────────────────────────────────────────────────────────────────────────
     if (type === 'C' || type === 'X') {
-      const grossSubtotal = items.reduce((sum, item) => {
+      const grossSubtotal = safeItems.reduce((sum, item) => {
         const qty = Number(item.quantity) || 0;
         const price = Number(item.unit_price) || 0;
         return sum + qty * price;
@@ -94,7 +96,7 @@ export class CalculateArcaTotalsUseCase {
     // ────────────────────────────────────────────────────────────────────────
     if (type === 'B') {
       // En Factura B los precios unitarios son finales (IVA ya incluido en el precio)
-      const grossSubtotal = items.reduce((sum, item) => {
+      const grossSubtotal = safeItems.reduce((sum, item) => {
         const qty = Number(item.quantity) || 0;
         const price = Number(item.unit_price) || 0;
         return sum + qty * price;
@@ -113,7 +115,7 @@ export class CalculateArcaTotalsUseCase {
 
       const factor = grossSubtotal > 0 ? grandTotal / grossSubtotal : 1;
 
-      for (const item of items) {
+      for (const item of safeItems) {
         const qty = Number(item.quantity) || 0;
         const price = Number(item.unit_price) || 0;
         const rate = Number(item.tax_rate ?? 0.21);
@@ -175,7 +177,7 @@ export class CalculateArcaTotalsUseCase {
     let exempt = 0;
 
     let subtotalNet = 0;
-    for (const item of items) {
+    for (const item of safeItems) {
       const qty = Number(item.quantity) || 0;
       const price = Number(item.unit_price) || 0;
       const rate = Number(item.tax_rate) || 0;

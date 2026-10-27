@@ -634,7 +634,15 @@
                 
                 <!-- Content Section -->
                 <div class="container mx-auto px-4 max-w-3xl py-12 md:py-20">
-                    <div class="prose prose-lg md:prose-xl prose-indigo mx-auto text-gray-700 leading-relaxed" [innerHTML]="post.content"></div>
+                    @if (blocks.length > 0) {
+                        <div class="space-y-6">
+                            @for (block of blocks; track block.id) {
+                                <app-block-renderer [block]="block" />
+                            }
+                        </div>
+                    } @else {
+                        <div class="prose prose-lg md:prose-xl prose-indigo mx-auto text-gray-700 leading-relaxed" [innerHTML]="post.content"></div>
+                    }
                 </div>
             </article>
         }
@@ -655,7 +663,15 @@
                 </div>
                 }
                 <div class="container mx-auto px-4 max-w-2xl bg-white p-8 md:p-12 shadow-sm border border-gray-100 rounded-sm mb-12">
-                    <div class="prose prose-lg prose-stone mx-auto text-gray-800 leading-loose" [innerHTML]="post.content"></div>
+                    @if (blocks.length > 0) {
+                        <div class="space-y-6">
+                            @for (block of blocks; track block.id) {
+                                <app-block-renderer [block]="block" />
+                            }
+                        </div>
+                    } @else {
+                        <div class="prose prose-lg prose-stone mx-auto text-gray-800 leading-loose" [innerHTML]="post.content"></div>
+                    }
                 </div>
             </article>
         }
@@ -672,7 +688,15 @@
                         <img [src]="post.image" (error)="onImgError($event)" [alt]="post.title" class="w-full h-64 object-cover rounded-2xl mb-12 grayscale hover:grayscale-0 transition-all duration-500">
                     }
                     
-                    <div class="prose prose-lg mx-auto text-gray-800 leading-relaxed font-light" [innerHTML]="post.content"></div>
+                    @if (blocks.length > 0) {
+                        <div class="space-y-6">
+                            @for (block of blocks; track block.id) {
+                                <app-block-renderer [block]="block" />
+                            }
+                        </div>
+                    } @else {
+                        <div class="prose prose-lg mx-auto text-gray-800 leading-relaxed font-light" [innerHTML]="post.content"></div>
+                    }
                 </div>
             </article>
         }

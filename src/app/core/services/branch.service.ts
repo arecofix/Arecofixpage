@@ -12,6 +12,7 @@ export type { Branch };
 
 import { BranchContextService } from './branch-context.service';
 import { SupabaseService } from './supabase.service';
+import { assertUuid } from '../utils/uuid.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -51,13 +52,17 @@ export class BranchService {
     }
 
     const savedId = localStorage.getItem('arecofix_current_branch_id');
-    if (savedId && savedId !== 'global') {
+    const validId = assertUuid(savedId);
+    if (validId) {
       try {
-        // We do it asynchronously to not block constructor, but set signal asap
-        await this.setBranchById(savedId);
+        await this.setBranchById(validId);
       } catch (e) {
         console.warn('[BranchService] Hydration failed:', e);
       }
+    } else if (savedId) {
+      // Clear corrupt values like 'undefined', 'null', 'global'
+      localStorage.removeItem('arecofix_current_branch_id');
+      this.setCurrentBranch(null);
     }
   }
 
@@ -71,8 +76,13 @@ export class BranchService {
     this.branchContextService.setBranchId(branch?.id || null);
     if (typeof window !== 'undefined' && window.localStorage) {
       if (branch) {
+        const validId = assertUuid(branch.id);
         if (branch.slug) this.branchCache.set(branch.slug, branch);
-        localStorage.setItem('arecofix_current_branch_id', branch.id);
+        if (validId) {
+          localStorage.setItem('arecofix_current_branch_id', validId);
+        } else {
+          localStorage.removeItem('arecofix_current_branch_id');
+        }
       } else {
         localStorage.removeItem('arecofix_current_branch_id');
       }
@@ -84,19 +94,20 @@ export class BranchService {
    * If ID is null or 'global', it resets to the global context.
    */
   async setBranchById(id: string | null): Promise<void> {
-    if (!id || id === 'global') {
+    const validId = assertUuid(id);
+    if (!validId || id === 'global') {
       this.setCurrentBranch(null);
       return;
     }
 
-    if (this._currentBranch()?.id === id) return;
+    if (this._currentBranch()?.id === validId) return;
 
     // Try to find in cache or repo
-    const branches = await firstValueFrom(this.branchRepo.getWhere('id', id));
+    const branches = await firstValueFrom(this.branchRepo.getWhere('id', validId));
     if (branches && branches.length > 0) {
       this.setCurrentBranch(branches[0] as Branch);
     } else {
-      console.warn('[BranchService] Branch not found by ID:', id);
+      console.warn('[BranchService] Branch not found by ID:', validId);
       this.setCurrentBranch(null);
     }
   }

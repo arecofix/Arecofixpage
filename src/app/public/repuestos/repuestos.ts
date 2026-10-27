@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink, Params } from '@angular/router';
 import { rxResource, toObservable } from '@angular/core/rxjs-interop';
-import { Observable, map, of, Subject, switchMap, firstValueFrom } from 'rxjs';
+import { Observable, map, of, Subject, switchMap, firstValueFrom, filter, take } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 // import { IsEmptyComponent, IsLoadingComponent } from '@app/shared/components/resource-status';
 import { CategoryService } from '@app/public/categories/services';
@@ -207,16 +207,22 @@ export class RepuestosComponent implements OnInit, OnDestroy {
     });
 
     async ngOnInit() {
-        
-        
-        this.tenant$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(async (tenant) => {
-                if (tenant) {
+        const tenant = this.tenantService.currentTenant();
+        if (tenant) {
+            await this.loadCategories();
+            await this.loadBrands();
+        } else {
+            this.tenant$
+                .pipe(
+                    filter((t): t is NonNullable<typeof t> => !!t),
+                    take(1),
+                    takeUntil(this.destroy$)
+                )
+                .subscribe(async () => {
                     await this.loadCategories();
                     await this.loadBrands();
-                }
-            });
+                });
+        }
     }
 
     onSearch(term: string) {
@@ -252,7 +258,7 @@ export class RepuestosComponent implements OnInit, OnDestroy {
 
     async loadCategories() {
         this.categoryService.getData({ _page: 1, _per_page: 500 })
-          .pipe(takeUntil(this.destroy$))
+          .pipe(take(1), takeUntil(this.destroy$))
           .subscribe((res: { data: iCategory[] }) => {
             const allCategories = res.data;
             this.categories.set(allCategories);

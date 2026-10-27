@@ -1,0 +1,24 @@
+Test Suites: 50 passed, 50 total
+Tests:       276 passed, 276 total
+Snapshots:   0 total
+Time:        31.544 s
+Ran all test suites.
+
+PASS src/app/shared/services/cart.service.spec.ts (8.488 s)
+PASS src/app/core/services/supabase.service.spec.ts (8.587 s)
+PASS src/app/core/guards/permission.guard.spec.ts
+PASS src/app/features/orders/infrastructure/mappers/order.mapper.spec.ts
+PASS src/app/admin/layout/components/admin-tab-bar/admin-tab-bar.component.spec.ts
+PASS src/app/features/orders/application/usecases/confirm-checkout.usecase.spec.ts
+PASS src/app/core/services/pricing.service.spec.ts
+PASS src/app/core/utils/uuid.utils.spec.ts
+PASS src/app/features/sales/infrastructure/mappers/invoice.mapper.spec.ts
+PASS src/app/features/sales/domain/usecases/calculate-arca-totals.usecase.spec.ts
+PASS src/app/features/products/infrastructure/mappers/product.mapper.spec.ts
+PASS src/app/features/sales/domain/usecases/validate-arca-invoice.usecase.spec.ts
+PASS src/app/features/customers/infrastructure/mappers/supplier.mapper.spec.ts
+PASS src/app/core/services/whatsapp.service.spec.ts
+PASS src/app/features/repairs/infrastructure/mappers/repair-order.mapper.spec.ts
+PASS src/app/core/interceptors/guest-session.interceptor.spec.ts
+PASS src/app/features/services/application/usecases/lead-security.spec.ts
+PASS src/app/admin/dashboard/admin-dashboard-page.spec.ts (15.69 s)

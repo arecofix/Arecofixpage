@@ -1,0 +1,62 @@
+================================================================================
+ARECOFIX SAAS MULTI-TENANT ECOSYSTEM - RLS INITPLAN FORENSIC AUDIT (PRE-FIX)
+Timestamp: 2026-10-20T17:50:00-03:00
+Target: db.arecofix.com.ar (PostgreSQL 15 / Supabase self-hosted)
+================================================================================
+
+1. QUERY FORENSE ESPECÍFICA (FASE 0.1):
+SELECT schemaname, tablename, policyname, cmd, roles, qual, with_check
+FROM pg_policies
+WHERE policyname = 'course_enrollments_select_unified';
+
+OUTPUT:
+ schemaname |     tablename      |            policyname             |  cmd   |      roles      |                                                                 qual                                                                  | with_check 
+------------+--------------------+-----------------------------------+--------+-----------------+---------------------------------------------------------------------------------------------------------------------------------------+------------
+ public     | course_enrollments | course_enrollments_select_unified | SELECT | {authenticated} | ((user_id = ( SELECT uid() AS uid)) OR (lower(email) = lower(( SELECT (jwt() ->> 'email'::text)))) OR is_admin() OR is_super_admin()) | 
+(1 row)
+
+DIAGNÓSTICO:
+- La política `course_enrollments_select_unified` consolidada en Batch 2 contiene llamadas directas a `is_admin()` y `is_super_admin()` sin subconsultas escalares `(SELECT ...)`.
+- La expresión `lower(email) = lower((SELECT (jwt() ->> 'email'::text)))` no utiliza la sintaxis canónica de subquery escalar `((SELECT auth.jwt()) ->> 'claim')`.
+- En el linter de Supabase (splinter check 0003), esto dispara la alerta `auth_rls_initplan` P1.
+
+--------------------------------------------------------------------------------
+
+2. QUERY FORENSE GENERAL (FASE 0.2):
+SELECT schemaname, tablename, policyname, cmd, roles, qual, with_check
+FROM pg_policies
+WHERE schemaname IN ('public','zarx')
+  AND (
+    (qual ~* 'auth\.(uid|jwt|role)\(\)' AND qual !~* '\(\s*SELECT\s+auth\.')
+    OR
+    (with_check ~* 'auth\.(uid|jwt|role)\(\)' AND with_check !~* '\(\s*SELECT\s+auth\.')
+    OR
+    (qual ~* 'current_setting\(' AND qual !~* '\(\s*SELECT\s+current_setting\(')
+    OR
+    (with_check ~* 'current_setting\(' AND with_check !~* '\(\s*SELECT\s+current_setting\(')
+  )
+ORDER BY schemaname, tablename, policyname;
+
+OUTPUT:
+ schemaname | tablename | policyname | cmd | roles | qual | with_check 
+------------+-----------+------------+-----+-------+------+------------
+(0 rows)
+
+--------------------------------------------------------------------------------
+
+3. QUERY FORENSE EN STORAGE (STORAGE.OBJECTS):
+SELECT schemaname, tablename, policyname, cmd, roles, qual, with_check
+FROM pg_policies
+WHERE schemaname = 'storage'
+  AND (
+    (qual ~* '(uid|role|jwt)\(\)' AND qual !~* '\(\s*SELECT')
+    OR
+    (with_check ~* '(uid|role|jwt)\(\)' AND with_check !~* '\(\s*SELECT')
+  );
+
+OUTPUT:
+ schemaname | tablename |        policyname        |  cmd   |  roles   |                         qual                         |                      with_check                      
+------------+-----------+--------------------------+--------+----------+------------------------------------------------------+------------------------------------------------------
+ storage    | objects   | Student_Insert_Receipt   | INSERT | {public} |                                                      | ((bucket_id = 'receipts'::text) AND (uid() = owner))
+ storage    | objects   | Student_Read_Own_Receipt | SELECT | {public} | ((bucket_id = 'receipts'::text) AND (uid() = owner)) | 
+(2 rows)

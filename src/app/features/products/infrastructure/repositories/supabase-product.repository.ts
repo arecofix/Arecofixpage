@@ -30,8 +30,16 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
   }
 
   override update(id: string, item: Partial<Product>): Observable<Product> {
-    const dbPayload = ProductMapper.mapToDb(item);
+    const dbPayload = ProductMapper.mapUpdateToDb(item);
     return super.update(id, dbPayload as Partial<Product>);
+  }
+
+  softDelete(id: string): Observable<void> {
+    const payload = {
+      is_active: false,
+      deleted_at: new Date().toISOString(),
+    };
+    return this.update(id, payload as Partial<Product>).pipe(map(() => void 0));
   }
   protected override isGlobalTable = false;
   protected override useSoftDeletes = true;

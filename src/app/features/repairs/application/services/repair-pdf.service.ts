@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Repair, RepairStatus } from '../../domain/entities/repair.entity';
+import { formatPrice } from '@app/shared/utils/price-formatter.util';
 
 @Injectable({
   providedIn: 'root'
@@ -123,8 +124,8 @@ export class RepairPdfService {
       return [
         p.product_name || 'Repuesto',
         p.quantity.toString(),
-        `$ ${p.unit_price_at_time.toLocaleString('es-AR')}`,
-        `$ ${sub.toLocaleString('es-AR')}`
+        formatPrice(p.unit_price_at_time, 'ARS'),
+        formatPrice(sub, 'ARS')
       ];
     });
 
@@ -135,8 +136,8 @@ export class RepairPdfService {
       tableData.push([
         'Mano de Obra Técnica / Servicio Técnico', 
         '1', 
-        `$ ${laborToDisplay.toLocaleString('es-AR')}`, 
-        `$ ${laborToDisplay.toLocaleString('es-AR')}`
+        formatPrice(laborToDisplay, 'ARS'), 
+        formatPrice(laborToDisplay, 'ARS')
       ]);
     }
 
@@ -158,14 +159,14 @@ export class RepairPdfService {
 
     // Financial Totals
     doc.setFontSize(8);
-    doc.text(`Presupuesto Inicial Estimado: $ ${repair.estimated_cost?.toLocaleString('es-AR') || '0'}`, 120, finalY + 6);
-    doc.text(`Seña / Adelanto Pagado: $ ${repair.deposit_amount?.toLocaleString('es-AR') || '0'}`, 120, finalY + 11);
+    doc.text(`Presupuesto Inicial Estimado: ${formatPrice(repair.estimated_cost || 0, 'ARS')}`, 120, finalY + 6);
+    doc.text(`Seña / Adelanto Pagado: ${formatPrice(repair.deposit_amount || 0, 'ARS')}`, 120, finalY + 11);
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     const final_cost = repair.final_cost || 0;
     const deposit = repair.deposit_amount || 0;
-    doc.text(`RESTANTE A ABONAR: $ ${(final_cost - deposit).toLocaleString('es-AR')}`, 120, finalY + 18);
+    doc.text(`RESTANTE A ABONAR: ${formatPrice(final_cost - deposit, 'ARS')}`, 120, finalY + 18);
 
     // Signatures
     doc.setFontSize(7);
@@ -282,8 +283,8 @@ export class RepairPdfService {
             tableBody.push([
                 p.product_name || p.name || 'Repuesto', 
                 p.quantity.toString(), 
-                `$ ${Number(p.unit_price_at_time || 0).toLocaleString('es-AR')}`,
-                `$ ${sub.toLocaleString('es-AR')}`
+                formatPrice(Number(p.unit_price_at_time || 0), 'ARS'),
+                formatPrice(sub, 'ARS')
             ]);
         });
     }
@@ -295,8 +296,8 @@ export class RepairPdfService {
         tableBody.push([
             'Mano de obra técnica / Servicio Técnico',
             '1',
-            `$ ${Number(laborToDisplay).toLocaleString('es-AR')}`,
-            `$ ${Number(laborToDisplay).toLocaleString('es-AR')}`
+            formatPrice(Number(laborToDisplay), 'ARS'),
+            formatPrice(Number(laborToDisplay), 'ARS')
         ]);
     }
 
@@ -305,8 +306,8 @@ export class RepairPdfService {
         tableBody.push([
             'Reparación General (Diagnóstico/Presupuesto)',
             '1',
-            `$ ${Number(total).toLocaleString('es-AR')}`,
-            `$ ${Number(total).toLocaleString('es-AR')}`
+            formatPrice(Number(total), 'ARS'),
+            formatPrice(Number(total), 'ARS')
         ]);
     }
 
@@ -329,7 +330,7 @@ export class RepairPdfService {
     doc.setFontSize(12);
     doc.text(`TOTAL PRESUPUESTO:`, 125, finalY + 18);
     doc.setTextColor(...colorArray);
-    doc.text(`$ ${total.toLocaleString('es-AR')}`, 125, finalY + 25);
+    doc.text(`${formatPrice(total, 'ARS')}`, 125, finalY + 25);
     
     // Notes
     doc.setTextColor(100, 100, 100);

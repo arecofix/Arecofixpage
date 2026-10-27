@@ -1,0 +1,127 @@
+nspname,proname,prosecdef,proconfig,args
+public,accept_upsell_vidrio,t,search_path=public,p_tracking_code text
+public,add_upsell_item_to_repair,t,search_path=public,"p_tracking_code text, p_product_id uuid"
+public,admin_reactivate_certificate,t,search_path=public,p_cert_id uuid
+public,admin_revoke_certificate,t,search_path=public,"p_cert_id uuid, p_reason text"
+public,assign_invoice_number_by_tenant,f,search_path=public,""
+public,assign_user_as_employee,t,search_path=public,"p_user_id uuid, p_role text, p_tenant_id uuid"
+public,auto_assign_cash_branch,t,search_path=public,""
+public,auto_assign_order_branch,t,search_path=public,""
+public,auto_assign_repair_branch,t,search_path=public,""
+public,can_edit_profile,t,,target_role text
+public,check_and_notify_expiring_subscriptions,t,search_path=public,""
+public,check_and_update_membership_status,t,search_path=public,p_user_id uuid
+public,check_user_profile_exists,f,search_path=public,""
+public,create_client,f,search_path=public,"p_first_name text, p_last_name text, p_email text, p_phone text, p_address text, p_dni text, p_tenant_id uuid"
+public,create_employee,t,search_path=public,"p_first_name text, p_last_name text, p_email text, p_phone text, p_role text, p_password text, p_avatar_url text, p_tenant_id uuid"
+public,create_guest_profile,t,"search_path=public, auth","p_first_name text, p_last_name text, p_email text, p_phone text, p_address text, p_dni text, p_tenant_id uuid, p_branch_id uuid"
+public,custom_access_token_hook,t,search_path=public,event jsonb
+public,decrement_stock,f,search_path=public,"row_id uuid, amount integer"
+public,deduct_product_stock_v3,f,search_path=public,"p_product_id uuid, p_branch_id uuid, p_quantity_to_deduct integer, p_tenant_id uuid"
+public,delete_old_audit_logs,t,search_path=public,end_date timestamp without time zone
+public,enforce_retail_price_for_guests,t,search_path=public,""
+public,expire_stale_enrollments,t,,""
+public,fix_repair_aggregates,f,search_path=public,""
+public,fn_assign_tracking_code,f,search_path=public,""
+public,fn_auto_generate_invoice,f,search_path=public,""
+public,fn_calculate_invoice_taxes,f,search_path=public,""
+public,fn_calculate_repair_margins,f,search_path=public,""
+public,fn_calculate_repair_profit,f,search_path=public,""
+public,fn_manage_stock_on_repair_part,f,,""
+public,fn_notify_repair_update,f,search_path=public,""
+public,fn_sync_d1_webhook,t,,""
+public,fn_sync_repair_part_costs,f,search_path=public,""
+public,fn_sync_repair_part_stock,f,search_path=public;row_security=off,""
+public,fn_update_product_search,f,search_path=public,""
+public,force_tenant_isolation,t,search_path=public,""
+public,get_admin_business_dashboard_metrics,t,search_path=public,"p_tenant_id uuid, p_range text, p_start_date timestamp with time zone, p_end_date timestamp with time zone, p_branch_id uuid"
+public,get_admin_dashboard_analytics,t,"search_path=public, pg_catalog","p_range text, p_branch_id uuid"
+public,get_admin_database_health,t,"search_path=public, pg_catalog",""
+public,get_auth_user_branch,t,search_path=public,""
+public,get_auth_user_role,t,search_path=public,""
+public,get_auth_user_tenant,t,search_path=public,""
+public,get_current_tenant_id,t,search_path=public,""
+public,get_current_user_role,f,search_path=public,""
+public,get_dashboard_stats_v2,t,search_path=public,p_branch_id uuid
+public,get_exam_questions,t,search_path=public,p_content_id uuid
+public,get_financial_analytics_v2,f,search_path=public,"p_tenant_id uuid, p_start_date timestamp with time zone, p_branch_id uuid"
+public,get_financial_analytics_v3,t,search_path=public,"p_tenant_id uuid, p_start_date timestamp with time zone, p_branch_id uuid"
+public,get_master_analytics,f,search_path=public,"p_tenant_id uuid, p_start_date date"
+public,get_my_branch,f,search_path=public,""
+public,get_my_permissions,t,,""
+public,get_my_tenant,t,search_path=public,""
+public,get_next_tenant_sequence,f,,"p_tenant_id uuid, p_table_name text, p_column_name text"
+public,get_public_certificate_data,t,search_path=public,p_cert_id uuid
+public,get_recommended_accessories,f,search_path=public,p_tracking_code text
+public,get_repair_by_tracking,f,search_path=public,t_code text
+public,get_repair_financial_stats,f,search_path=public,"p_tenant_id uuid, p_date_range text"
+public,get_repair_tracking,t,search_path=public,p_code text
+public,get_request_guest_session,t,,""
+public,get_secure_branch_id,t,search_path=public,""
+public,get_secure_tenant_id,t,search_path=public,""
+public,get_unified_clients_list,f,search_path=public,p_tenant_id uuid
+public,get_user_role,f,search_path=public,""
+public,get_user_tenant_id,f,search_path=public,""
+public,handle_new_user,t,search_path=public,""
+public,handle_order_status_change,t,search_path=public,""
+public,handle_order_status_stock_transition,f,,""
+public,handle_repair_status_change,f,search_path=public,""
+public,handle_repair_status_history,f,search_path=public,""
+public,has_permission,t,search_path=public,"p_permission text, p_branch_id uuid"
+public,increment_product_sales,t,search_path=public,"p_product_id uuid, amount integer"
+public,is_admin,t,search_path=public,""
+public,is_admin_of_tenant,t,"search_path=public, auth",target_tenant_id uuid
+public,is_admin_user,t,"search_path=public, auth",""
+public,is_global_admin,f,search_path=public,""
+public,is_platform_owner,f,search_path=public,""
+public,is_super_admin,t,search_path=public,""
+public,is_tenant_admin,f,search_path=public,""
+public,is_tenant_staff_or_above,f,search_path=public,""
+public,mark_content_completed,t,search_path=public,p_content_id uuid
+public,match_documents,t,"search_path=public, extensions","query_embedding vector, match_threshold double precision, match_count integer, filter_tenant_id uuid, filter_source_type text"
+public,next_invoice_number,f,search_path=public,p_tenant_id uuid
+public,notify_admins_on_new_repair,f,search_path=public,""
+public,notify_low_stock,f,search_path=public,""
+public,notify_n8n_new_product,t,search_path=public,""
+public,process_course_enrollments,t,,""
+public,process_order_refund_v2,f,search_path=public,"p_order_id uuid, p_tenant_id uuid, p_branch_id uuid, p_reason text"
+public,process_pos_sale,f,search_path=public,"p_tenant_id uuid, p_branch_id uuid, p_customer_id uuid, p_customer_name text, p_payment_method text, p_subtotal numeric, p_discount numeric, p_total numeric, p_items jsonb"
+public,process_purchase_reception_v2,f,search_path=public,"p_purchase_id uuid, p_tenant_id uuid, p_branch_id uuid, p_items jsonb"
+public,protect_sensitive_profile_columns,t,search_path=public,""
+public,refresh_course_metrics,t,,""
+public,retail_price,f,,product_row products
+public,save_repair_order,t,search_path=public,p_payload jsonb
+public,set_repair_number,f,search_path=public,""
+public,set_tenant_invoice_number,f,search_path=public,""
+public,set_tenant_repair_number,f,search_path=public,""
+public,set_updated_at,f,search_path=public,""
+public,slugify,f,,value text
+public,soft_delete_account,f,search_path=public,""
+public,submit_exam,t,search_path=public,"p_content_id uuid, p_answers jsonb"
+public,sync_order_items_stock,t,search_path=public,""
+public,sync_repair_parts_stock,f,search_path=public,""
+public,trg_contact_message_notify_admin,t,search_path=public,""
+public,trg_insert_admin_notifications,f,search_path=public,""
+public,trg_invoice_number,f,search_path=public,""
+public,trigger_courses_slug,f,,""
+public,trigger_payment_status_change,t,,""
+public,trigger_process_completed_order,f,search_path=public,""
+public,trigger_set_updated_at,f,,""
+public,unaccent,f,,"regdictionary, text"
+public,unaccent,f,,text
+public,unaccent_init,f,,internal
+public,unaccent_lexize,f,,"internal, internal, internal, internal"
+public,update_inventory_on_repair_part,f,search_path=public,""
+public,update_order_total,t,search_path=public,""
+public,update_repair_bypass,f,search_path=public,"p_id uuid, p_payload jsonb, p_tenant_id uuid"
+public,update_repair_total_cost,f,search_path=public,""
+public,update_updated_at_column,f,search_path=public,""
+public,validate_repair_delivery,f,search_path=public,""
+zarx,calculate_danger_level,t,,"lat double precision, lng double precision, radius_meters double precision"
+zarx,delete_own_account,t,,""
+zarx,get_alerts_in_radius,t,,"center_lat double precision, center_lng double precision, radius_meters double precision"
+zarx,get_heatmap_data,t,,hours_ago integer
+zarx,handle_new_user,t,,""
+zarx,is_admin,t,"search_path=zarx, pg_temp",""
+zarx,update_fcm_token,t,,token text
+zarx,validate_neighbor_report,t,,"target_report_id uuid, validator_id uuid"
