@@ -70,6 +70,7 @@ describe('AdminBusinessDashboardService', () => {
 
   beforeEach(() => {
     mockAuthService = {
+      getStoredAccessToken: jest.fn().mockReturnValue('mock-jwt-token-xyz'),
       getSession: jest.fn().mockResolvedValue(mockSession)
     };
 

@@ -9,8 +9,8 @@ import {
 } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import { map, filter, take, timeout, finalize } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
@@ -39,6 +39,9 @@ export class AuthService {
   
   // Súper Administrador Global
   public isSuperAdmin = signal<boolean>(false);
+
+  // Monotonic epoch counter to invalidate stale async operations (such as refreshSession after logout)
+  private sessionEpoch = 0;
 
   private authState = new BehaviorSubject<{
     session: Session | null;
@@ -112,8 +115,19 @@ export class AuthService {
 
       if (error) {
         this.logger.error('Session retrieval error', error);
-        if (navigator.onLine) {
-           // Limpiar cualquier token zombi en localStorage (ej. de la nube anterior)
+        // Only clear storage if this is a definitive auth error (invalid/expired token),
+        // NOT on transient network errors or timeouts — those would wipe valid sessions.
+        const isDefinitiveAuthError =
+          error.status === 400 ||
+          error.status === 401 ||
+          (error.message && (
+            error.message.includes('Invalid Refresh Token') ||
+            error.message.includes('Refresh Token Not Found') ||
+            error.message.includes('JWT') ||
+            error.message.includes('token is expired')
+          ));
+        if (navigator.onLine && isDefinitiveAuthError) {
+           // Only clear tokens that are confirmed invalid (not on network errors)
            if (typeof localStorage !== 'undefined') {
              const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
              keys.forEach(k => localStorage.removeItem(k));
@@ -164,6 +178,8 @@ export class AuthService {
         // this.logger.info(`Auth Event: ${event}`);
         
         if (event === 'SIGNED_OUT') {
+           this.sessionEpoch++;
+           this.refreshInFlightPromise = null;
            if (typeof localStorage !== 'undefined') {
              const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
              keys.forEach(k => localStorage.removeItem(k));
@@ -423,6 +439,9 @@ export class AuthService {
 }
 
   async signOut(): Promise<string | null> {
+    this.sessionEpoch++;
+    this.refreshInFlightPromise = null;
+
     const { isTauri } = await import('@tauri-apps/api/core');
     const runningInTauri = isTauri();
     
@@ -454,19 +473,41 @@ export class AuthService {
     }
   }
 
-  async waitForAuth(): Promise<{ session: Session | null; user: User | null; profile: UserProfile | null; isInitialized: boolean }> {
+  waitForAuth(timeoutMs: number = 4000): Promise<{ session: Session | null; user: User | null; profile: UserProfile | null; isInitialized: boolean }> {
     if (this.authState.value.isInitialized) {
-      return this.authState.value;
+      return Promise.resolve(this.authState.value);
     }
+
     return new Promise((resolve) => {
-      const sub = this.authState$.pipe(filter(s => s.isInitialized)).subscribe(state => {
-        sub.unsubscribe();
-        resolve(state);
-      });
-      setTimeout(() => {
-        sub.unsubscribe();
-        resolve(this.authState.value);
-      }, 3000);
+      let completed = false;
+      const timeoutId = setTimeout(() => {
+        if (!completed) {
+          completed = true;
+          this.logger.warn(`[AuthService] waitForAuth timed out after ${timeoutMs}ms, resolving with current state`);
+          resolve(this.authState.value);
+        }
+      }, timeoutMs);
+
+      this.authState$
+        .pipe(
+          filter((state) => state.isInitialized),
+          take(1),
+          finalize(() => clearTimeout(timeoutId))
+        )
+        .subscribe({
+          next: (state) => {
+            if (!completed) {
+              completed = true;
+              resolve(state);
+            }
+          },
+          error: () => {
+            if (!completed) {
+              completed = true;
+              resolve(this.authState.value);
+            }
+          }
+        });
     });
   }
 
@@ -479,6 +520,72 @@ export class AuthService {
 
   getCurrentSession(): Session | null {
     return this.authState.value.session;
+  }
+
+  /**
+   * Retrieves access token synchronously from current state or storage
+   */
+  getStoredAccessToken(): string | null {
+    if (this.authState.value.session?.access_token) {
+      return this.authState.value.session.access_token;
+    }
+
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // Respect supabase-remember-me flag: if false, tokens are in sessionStorage.
+      // Search sessionStorage first when not in "remember me" mode.
+      const rememberMe = localStorage.getItem('supabase-remember-me') === 'true';
+      const storageSources: Storage[] = rememberMe
+        ? [localStorage, sessionStorage]
+        : [sessionStorage, localStorage];
+
+      for (const storage of storageSources) {
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (key && ((key.startsWith('sb-') && key.endsWith('-auth-token')) || key === 'supabase-auth-token')) {
+            const raw = storage.getItem(key);
+            if (raw) {
+              try {
+                const parsed = JSON.parse(raw);
+                const token = parsed?.access_token || parsed?.session?.access_token;
+                if (token && typeof token === 'string') {
+                  return token;
+                }
+              } catch {
+                // Malformed entry — skip
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // Ignore storage access error
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolves a guaranteed valid (non-expired) access token, refreshing if needed.
+   */
+  async getAccessToken(): Promise<string | null> {
+    let session = this.authState.value.session;
+    if (!session) {
+      session = await this.getSession();
+    }
+    if (!session) {
+      return null;
+    }
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (session.expires_at && session.expires_at <= nowSec + 30) {
+      this.logger.info('[AuthService] Token expired or expiring soon. Refreshing session...');
+      const refreshed = await this.refreshSession();
+      return refreshed?.access_token || session.access_token || null;
+    }
+
+    return session.access_token || null;
   }
 
   async getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -684,18 +791,59 @@ export class AuthService {
     return error ? error.message : null;
   }
 
+  private refreshInFlightPromise: Promise<Session | null> | null = null;
+
   /**
-   * Proactively refreshes the session to ensure a valid token for long operations.
+   * Refreshes the session ensuring a valid token. Single-flight mutex prevents concurrent duplications.
+   * Enforces a timeout (default 8s) to prevent hung network states.
+   * Compares sessionEpoch before committing state to avoid rehydration if user logged out during refresh.
    */
-  async refreshSession(): Promise<Session | null> {
-    const { data: { session }, error } = await this.supabase.auth.refreshSession();
-    if (error) {
-      this.logger.error('Error refreshing session', error);
-      return null;
+  async refreshSession(timeoutMs: number = 8000): Promise<Session | null> {
+    if (this.refreshInFlightPromise) {
+      return this.refreshInFlightPromise;
     }
-    if (session) {
-      this.authState.next({ ...this.authState.value, session, user: session.user });
-    }
-    return session;
+
+    const currentEpoch = this.sessionEpoch;
+
+    this.refreshInFlightPromise = (async () => {
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error(`[AuthService] refreshSession timed out after ${timeoutMs}ms`));
+          }, timeoutMs);
+        });
+
+        const refreshPromise = this.supabase.auth.refreshSession();
+        const { data: { session }, error } = await Promise.race([refreshPromise, timeoutPromise]);
+        clearTimeout(timeoutId);
+
+        if (this.sessionEpoch !== currentEpoch) {
+          this.logger.warn('[AuthService] Stale session refresh discarded: sessionEpoch changed during refresh.');
+          return null;
+        }
+
+        if (error) {
+          this.logger.error('Error refreshing session', error);
+          return null;
+        }
+        if (session) {
+          this.authState.next({ ...this.authState.value, session, user: session.user });
+        }
+        return session;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        this.logger.error('[AuthService] Exception or timeout in refreshSession', err);
+        return null;
+      } finally {
+        this.refreshInFlightPromise = null;
+      }
+    })();
+
+    return this.refreshInFlightPromise;
+  }
+
+  getSessionEpoch(): number {
+    return this.sessionEpoch;
   }
 }

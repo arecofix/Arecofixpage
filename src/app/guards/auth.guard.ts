@@ -34,6 +34,17 @@ export const authGuard: CanActivateFn = async (route, state) => {
       return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
     }
 
+    // Verify token validity and proactively refresh if expired
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (session.expires_at && session.expires_at <= nowSec) {
+      console.info('🔄 authGuard: Session token expired. Refreshing before navigation...');
+      const refreshed = await authService.refreshSession();
+      if (!refreshed) {
+        console.warn('🚫 authGuard: Session refresh failed. Redirecting to login.');
+        return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+      }
+    }
+
     const userProfile = authState.profile;
     
     // Staff Revocation Check

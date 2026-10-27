@@ -15,8 +15,8 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Avoid showing global notification and error logs for silent fire-and-forget endpoints
-      const silentEndpoints = ['/functions/v1/send-whatsapp', '/functions/v1/create-employee'];
+      // Avoid showing global notification and error logs for silent fire-and-forget endpoints or services with local fallback
+      const silentEndpoints = ['/functions/v1/send-whatsapp', '/functions/v1/create-employee', '/api/admin/dashboard'];
       const isSilent = silentEndpoints.some(endpoint => req.url.includes(endpoint));
 
       if (!isSilent) {

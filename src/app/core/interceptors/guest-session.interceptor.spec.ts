@@ -69,4 +69,14 @@ describe('guestSessionInterceptor', () => {
     expect(req.request.headers.has('x-guest-session')).toBe(false);
     req.flush({});
   });
+
+  it('should preserve existing Authorization header when attaching x-guest-session', () => {
+    const headers = { Authorization: 'Bearer my-admin-token-123' };
+    http.get('https://db.arecofix.com.ar/rest/v1/orders', { headers }).subscribe();
+
+    const req = httpMock.expectOne('https://db.arecofix.com.ar/rest/v1/orders');
+    expect(req.request.headers.has('x-guest-session')).toBe(true);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer my-admin-token-123');
+    req.flush([]);
+  });
 });

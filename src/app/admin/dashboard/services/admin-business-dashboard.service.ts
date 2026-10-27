@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, from, of } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { Observable, of, from } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { TenantService } from '@app/core/services/tenant.service';
 import { AuthService } from '@app/core/services/auth.service';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export interface DashboardMetricsPeriod {
   range: 'today' | '7days' | 'month' | 'year' | 'custom';
@@ -207,21 +210,34 @@ export interface DashboardMetricsResponse {
 })
 export class AdminBusinessDashboardService {
   private http = inject(HttpClient);
-  private authService = inject(AuthService);
+  private supabase: SupabaseClient = inject(SUPABASE_CLIENT, { optional: true }) as SupabaseClient;
+  private tenantService = inject(TenantService, { optional: true });
+  private authService = inject(AuthService, { optional: true });
 
   getMetrics(range: string = 'month', branchId?: string, simulateFailure?: string): Observable<DashboardMetricsResponse> {
-    return from(this.buildHeaders()).pipe(
-      switchMap((headers) => {
-        let params = `?range=${encodeURIComponent(range)}`;
-        if (branchId && branchId !== 'global') {
-          params += `&branch_id=${encodeURIComponent(branchId)}`;
-        }
-        if (simulateFailure) {
-          params += `&simulate_failure=${encodeURIComponent(simulateFailure)}`;
-        }
-        return this.http.get<DashboardMetricsResponse>(`/api/admin/dashboard/metrics${params}`, { headers });
-      }),
+    const headers = this.buildHeaders();
+    let params = `?range=${encodeURIComponent(range)}`;
+    if (branchId && branchId !== 'global') {
+      params += `&branch_id=${encodeURIComponent(branchId)}`;
+    }
+    if (simulateFailure) {
+      params += `&simulate_failure=${encodeURIComponent(simulateFailure)}`;
+    }
+    return this.http.get<DashboardMetricsResponse>(`/api/admin/dashboard/metrics${params}`, { headers }).pipe(
       catchError((err) => {
+        if (this.supabase) {
+          return from(this.fetchMetricsViaRpc(range, branchId, simulateFailure)).pipe(
+            catchError((rpcErr) => {
+              console.error('[AdminBusinessDashboardService] Both HTTP and RPC failed for metrics:', rpcErr);
+              return of({
+                success: false,
+                error: err?.error?.error || err?.message || rpcErr?.message || 'Error al conectar con el servidor.',
+                data: this.getDefaultEmptyMetrics(range),
+                partialErrors: { system: 'Error de red al consultar métricas del negocio.' }
+              } as DashboardMetricsResponse);
+            })
+          );
+        }
         console.error('[AdminBusinessDashboardService] Error fetching metrics:', err);
         return of({
           success: false,
@@ -233,16 +249,75 @@ export class AdminBusinessDashboardService {
     );
   }
 
+  private async fetchMetricsViaRpc(range: string, branchId?: string, simulateFailure?: string): Promise<DashboardMetricsResponse> {
+    const tenantId = this.tenantService?.getTenantId();
+    const effectiveBranchId = (branchId && branchId !== 'global') ? branchId : null;
+    const partialErrors: Record<string, string> = {};
+
+    if (simulateFailure === 'academy') {
+      partialErrors['academy'] = 'No se pudieron cargar los datos de Academia.';
+    }
+
+    const { data, error } = await this.supabase.rpc('get_admin_business_dashboard_metrics', {
+      p_tenant_id: tenantId || null,
+      p_range: range,
+      p_branch_id: effectiveBranchId
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    const typedData = data as unknown as BusinessDashboardData;
+
+    if (simulateFailure === 'academy' && typedData?.kpis) {
+      typedData.kpis.active_subscriptions_count = 0;
+      typedData.kpis.academy_revenue = 0;
+      if (typedData.charts?.revenue_by_origin) {
+        typedData.charts.revenue_by_origin.academy = 0;
+      }
+    }
+
+    return {
+      success: true,
+      data: typedData,
+      partialErrors: Object.keys(partialErrors).length > 0 ? partialErrors : undefined
+    };
+  }
+
   getAnalytics(range: string = 'month', branchId?: string): Observable<AnalyticsResponse> {
-    return from(this.buildHeaders()).pipe(
-      switchMap((headers) => {
-        let params = `?range=${encodeURIComponent(range)}`;
-        if (branchId && branchId !== 'global') {
-          params += `&branch_id=${encodeURIComponent(branchId)}`;
-        }
-        return this.http.get<AnalyticsResponse>(`/api/admin/dashboard/analytics${params}`, { headers });
-      }),
+    const headers = this.buildHeaders();
+    let params = `?range=${encodeURIComponent(range)}`;
+    if (branchId && branchId !== 'global') {
+      params += `&branch_id=${encodeURIComponent(branchId)}`;
+    }
+    return this.http.get<AnalyticsResponse>(`/api/admin/dashboard/analytics${params}`, { headers }).pipe(
       catchError((err) => {
+        if (this.supabase) {
+          return from(this.fetchAnalyticsViaRpc(range, branchId)).pipe(
+            catchError((rpcErr) => {
+              console.error('[AdminBusinessDashboardService] Both HTTP and RPC failed for analytics:', rpcErr);
+              return of({
+                success: false,
+                error: err?.error?.error || err?.message || rpcErr?.message || 'Error al cargar analítica de negocio.',
+                data: {
+                  top_products: [],
+                  customer_analytics: {
+                    total_customers: 0,
+                    repeat_customers: 0,
+                    repeat_purchase_rate: 0,
+                    top_customers: []
+                  },
+                  repair_analytics: {
+                    by_brand: [],
+                    by_model: [],
+                    common_issues: []
+                  }
+                }
+              } as AnalyticsResponse);
+            })
+          );
+        }
         console.error('[AdminBusinessDashboardService] Error fetching analytics:', err);
         return of({
           success: false,
@@ -266,13 +341,40 @@ export class AdminBusinessDashboardService {
     );
   }
 
+  private async fetchAnalyticsViaRpc(range: string, branchId?: string): Promise<AnalyticsResponse> {
+    const effectiveBranchId = (branchId && branchId !== 'global') ? branchId : null;
+    const { data, error } = await this.supabase.rpc('get_admin_dashboard_analytics', {
+      p_range: range,
+      p_branch_id: effectiveBranchId
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return {
+      success: true,
+      data: data as unknown as BusinessAnalyticsData
+    };
+  }
+
   getDatabaseHealth(): Observable<DatabaseHealthResponse> {
-    return from(this.buildHeaders()).pipe(
-      switchMap((headers) => {
-        return this.http.get<DatabaseHealthResponse>('/api/admin/dashboard/db-health', { headers });
-      }),
+    const headers = this.buildHeaders();
+    return this.http.get<DatabaseHealthResponse>('/api/admin/dashboard/db-health', { headers }).pipe(
       catchError((err) => {
-        console.error('[AdminBusinessDashboardService] Error fetching db health:', err);
+        if (this.supabase) {
+          return from(this.fetchDatabaseHealthViaRpc()).pipe(
+            catchError((rpcErr) => {
+              console.warn('[AdminBusinessDashboardService] Both HTTP and RPC failed for db health:', rpcErr);
+              return of({
+                success: false,
+                error: err?.error?.error || err?.message || rpcErr?.message || 'Error al conectar con el estado de la base de datos.',
+                data: undefined
+              } as DatabaseHealthResponse);
+            })
+          );
+        }
+        console.warn('[AdminBusinessDashboardService] Error fetching db health:', err);
         return of({
           success: false,
           error: err?.error?.error || err?.message || 'Error al conectar con el estado de la base de datos.',
@@ -282,22 +384,23 @@ export class AdminBusinessDashboardService {
     );
   }
 
-
-  private async buildHeaders(): Promise<HttpHeaders> {
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
-    try {
-      const currentSession = this.authService.getCurrentSession();
-      const session = currentSession?.access_token ? currentSession : await this.authService.getSession();
-      if (session?.access_token) {
-        headers = headers.set('Authorization', `Bearer ${session.access_token}`);
-      }
-    } catch (e) {
-      // Ignore if session can't be fetched
+  private async fetchDatabaseHealthViaRpc(): Promise<DatabaseHealthResponse> {
+    const { data, error } = await this.supabase.rpc('get_admin_database_health', {});
+    if (error) {
+      throw error;
     }
+    return {
+      success: true,
+      data: data as unknown as DatabaseHealthData
+    };
+  }
 
+  private buildHeaders(): HttpHeaders {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const token = this.authService?.getStoredAccessToken();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
     return headers;
   }
 

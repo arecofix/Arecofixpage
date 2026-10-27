@@ -40,6 +40,7 @@ export class CartService {
   // Mutex / Queue & Race Condition Prevention
   private isMutating = false;
   private pendingLoad = false;
+  private inFlightLoad: Promise<void> | null = null;
   private mutationQueue: Promise<void> = Promise.resolve();
 
   constructor() {
@@ -117,6 +118,16 @@ export class CartService {
   }
 
   async loadCart(): Promise<void> {
+    if (this.inFlightLoad) {
+      return this.inFlightLoad;
+    }
+    this.inFlightLoad = this.executeLoadCart().finally(() => {
+      this.inFlightLoad = null;
+    });
+    return this.inFlightLoad;
+  }
+
+  private async executeLoadCart(): Promise<void> {
     // BUG-004: Prevent stale background network responses from clobbering active mutations
     if (this.isMutating) {
       this.pendingLoad = true;

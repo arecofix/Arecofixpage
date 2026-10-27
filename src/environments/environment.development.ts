@@ -20,7 +20,7 @@ export const environment: Environment = {
   // Auth y datos apuntan al entorno local en la VPS.
   supabaseUrl: 'https://db.arecofix.com.ar',
   supabaseDataUrl: 'https://db.arecofix.com.ar',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs',
+  supabaseKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzkyODk0OTg3LCJleHAiOjIxMDgyNTQ5ODd9.bv4ev9v3YD47JrDN0qDyN5MlWYNxTxiqtNhocDcp99g',
 
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
@@ -82,5 +82,12 @@ export const environment: Environment = {
   },
   downloads: {
     desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
-  }
+  },
+  allowedApiHosts: [
+    'arecofix.com.ar',
+    'www.arecofix.com.ar',
+    'staging.arecofix.com.ar',
+    'localhost',
+    '127.0.0.1'
+  ]
 };
