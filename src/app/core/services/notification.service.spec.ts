@@ -83,6 +83,12 @@ describe('NotificationService', () => {
     expect(loadSpy).toHaveBeenCalled();
   }));
 
+  it('should subscribe to realtime channel when enableRealtime is true', () => {
+    environment.enableRealtime = true;
+    service.subscribeToRealtime();
+    expect(mockSupabase.channel).toHaveBeenCalledWith('public:notifications:tenant-abc');
+  });
+
   it('should disconnect socket and clear polling on unsubscribe', () => {
     service.unsubscribe();
     expect(mockSupabase.realtime.disconnect).toHaveBeenCalled();
