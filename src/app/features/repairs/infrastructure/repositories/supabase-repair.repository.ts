@@ -339,7 +339,9 @@ export class SupabaseRepairRepository extends BaseRepository<Repair> implements 
                 quantity: Number(p.quantity) || 1,
                 unit_price_at_time: Number(p.unit_price_at_time) || 0,
                 cost_at_time: Number(p.cost_at_time) || 0,
-                tenant_id: tenantId
+                tenant_id: tenantId,
+                is_outsourced: !!p.is_outsourced,
+                supplier_id: p.supplier_id || null
             }));
             const { error: insertError } = await this.supabase.from('repair_parts_used').insert(partsToInsert);
             if (insertError) {
