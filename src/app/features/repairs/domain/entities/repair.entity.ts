@@ -24,11 +24,23 @@ export interface RepairPart {
     cost_price: number;
     cost_at_time: number;
     created_at?: string;
+    is_outsourced?: boolean;
+    supplier_id?: string | null;
     // Helper fields for UI
     product_name?: string;
     // UI Helpers
     name?: string;
     current_stock?: number;
+}
+
+export interface RepairTechnician {
+    id?: string;
+    repair_id: string;
+    technician_id: string;
+    role: 'primary' | 'assistant' | 'specialist' | 'reviewer';
+    assigned_at?: string;
+    notes?: string;
+    technician_name?: string;
 }
 
 /**
@@ -87,6 +99,7 @@ export interface Repair {
     
     // Relations (opt-in)
     readonly parts?: RepairPart[];
+    readonly technicians?: RepairTechnician[];
 }
 
 export interface RepairChecklist {
