@@ -78,4 +78,5 @@ export interface Order {
   updated_at?: string;
   items?: OrderItem[];
   tracking_code?: string;
+  origin?: 'admin' | 'ecommerce' | 'pos';
 }

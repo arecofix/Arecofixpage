@@ -8,29 +8,46 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Brand Colors - Keep static as they define the palette */
-  --color-brand-green: #4ea036;
-  --color-brand-dark-blue: #222144;
-  --color-brand-light-gray: #ededed;
-  --color-brand-gray-purple: #222047;
-  --color-brand-blue: #327cbe;
-  --color-brand-dark-blue-fav: #222144;
-  --color-brand-green-alt: #4ba12b;
+  /* Brand Colors & Actions (Oficiales) */
+  --color-brand-primary: #4CAA47;
+  --color-brand-primary-hover: #61D95B;
+  --color-brand-secondary: #48AB87;
+
+  /* Estructurales y Fondos */
+  --color-brand-dark: #1A1A40;
+  --color-brand-dark-alt: #1A1A1A;
+  --color-brand-surface: #183616;
+  --color-brand-border: #BDC0C1;
+
+  /* Semánticos y Alertas */
+  --color-brand-error: #AB4948;
+  --color-brand-warning: #AB5448;
+  --color-brand-info: #486EAB;
+  --color-brand-accent: #5648AB;
+
+  /* Legacy mappings mapped strictly to Design System */
+  --color-brand-green: #4CAA47;
+  --color-brand-dark-blue: #1A1A40;
+  --color-brand-light-gray: #BDC0C1;
+  --color-brand-gray-purple: #1A1A40;
+  --color-brand-blue: #486EAB;
+  --color-brand-dark-blue-fav: #1A1A40;
+  --color-brand-green-alt: #61D95B;
 
   /* High Contrast Colors */
-  --color-hc-bg: #000000;
+  --color-hc-bg: #1A1A1A;
   --color-hc-text: #ffffff;
-  --color-hc-accent: #ffff00;
-  --color-hc-border: #ffffff;
+  --color-hc-accent: #61D95B;
+  --color-hc-border: #BDC0C1;
 
-  /* DaisyUI / Tailwind Theme Overrides - USE DYNAMIC VARS */
-  --color-primary: var(--primary-color, var(--color-brand-dark-blue-fav));
+  /* DaisyUI / Tailwind Theme Overrides */
+  --color-primary: #4CAA47;
   --color-primary-content: #ffffff;
-  --color-secondary: var(--color-brand-blue);
+  --color-secondary: #48AB87;
   --color-secondary-content: #ffffff;
-  --color-accent: var(--color-brand-green);
+  --color-accent: #5648AB;
   --color-accent-content: #ffffff;
-  --color-neutral: var(--color-brand-gray-purple);
+  --color-neutral: #1A1A40;
   --color-neutral-content: #ffffff;
 
   /* Dynamic Base Colors */
@@ -39,13 +56,13 @@
   --color-base-300: var(--base-300);
   --color-base-content: var(--base-content);
 
-  --color-info: #3abff8;
-  --color-success: #36d399;
-  --color-warning: #fbbd23;
-  --color-error: #f87272;
+  --color-info: #486EAB;
+  --color-success: #4CAA47;
+  --color-warning: #AB5448;
+  --color-error: #AB4948;
 
-  --color-surface-dark: #0f111a;
-  --color-card-dark: #1c2131;
+  --color-surface-dark: #183616;
+  --color-card-dark: #183616;
 
   /* Custom Z-Index */
   --z-1000: 1000;
@@ -67,16 +84,19 @@
   --base-300: #d1d5db;
   --base-content: #1f2937;
 
-  /* Font Families */
-  --font-heading: "Montserrat", sans-serif;
-  --font-body: "Montserrat", sans-serif;
+  /* Font Families Oficiales */
+  --font-heading: "Montserrat", "Roboto", "Futura", sans-serif;
+  --font-body: "Montserrat", "Roboto", sans-serif;
+  --font-tech: "Ethnocentric", sans-serif;
+  --font-serif: "Playfair Display", "Merriweather", serif;
+  --font-script: "Pacifico", "Caveat", cursive;
 }
 
 .dark {
-  --base-100: #0f111a; /* Deep Space Blue/Black */
-  --base-200: #161b2c; /* Slightly Lighter */
-  --base-300: #252b42; /* Card BG */
-  --base-content: #f3f4f6;
+  --base-100: #1A1A40; /* Fondo Oscuro oficial */
+  --base-200: #183616; /* Superficie (Cards, Navbar) */
+  --base-300: #183616; /* Card BG */
+  --base-content: #BDC0C1;
 }
 
 /* Global Styles */
@@ -87,15 +107,15 @@ body {
   min-height: 100%;
   font-family: var(--font-body);
   background-color: var(--base-100, #ffffff);
-  color: var(--base-content, #1f2937);
+  color: var(--base-content, #1A1A40);
 }
 
 .dark,
 :root.dark,
 html.dark,
 html.dark body {
-  background-color: #080808;
-  color: #f3f4f6;
+  background-color: #1A1A40;
+  color: #BDC0C1;
 }
 
 app-root {
