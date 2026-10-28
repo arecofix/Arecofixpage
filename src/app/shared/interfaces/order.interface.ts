@@ -44,6 +44,7 @@ export interface Order {
   payment_proof_url?: string;
   invoice_url?: string;
   notes?: string;
+  origin?: 'admin' | 'ecommerce' | 'pos';
   tenant_id?: string;
   branch_id?: string;
   items?: OrderItem[];
